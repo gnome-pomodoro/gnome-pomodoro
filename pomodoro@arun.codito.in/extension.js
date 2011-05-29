@@ -1,19 +1,10 @@
-// Sample extension code, makes clicking on the panel show a message
-const Clutter = imports.gi.Clutter;
-const DBus = imports.dbus;
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
-const Shell = imports.gi.Shell;
-const Gvc = imports.gi.Gvc;
-const Signals = imports.signals;
 const St = imports.gi.St;
 const Main = imports.ui.main;
-const Panel = imports.ui.panel;
-const ModalDialog = imports.ui.modalDialog;
 
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
-const Util = imports.misc.util;
 
 const Gettext = imports.gettext.domain('gnome-shell');
 const _ = Gettext.gettext;
