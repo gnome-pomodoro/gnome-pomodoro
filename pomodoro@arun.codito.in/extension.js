@@ -1,6 +1,7 @@
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 const St = imports.gi.St;
+const Keybinder = imports.gi.Keybinder;
 const Main = imports.ui.main;
 
 const PanelMenu = imports.ui.panelMenu;
@@ -10,6 +11,7 @@ const Gettext = imports.gettext.domain('gnome-shell');
 const _ = Gettext.gettext;
 
 let _pomodoroInit = false;
+let _keyToggleTimer = "<Ctrl><Alt>P";
 
 function Indicator() {
     this._init.apply(this, arguments);
@@ -35,11 +37,8 @@ Indicator.prototype = {
         this.menu.addMenuItem(widget);
 
         // Register keybindings to toggle
-        //let shellwm = global.window_manager;
-        //shellwm.takeover_keybinding('something_new');
-        //shellwm.connect('keybinding::something_new', function () {
-            //Main.runDialog.open();
-        //});
+        Keybinder.init();
+        Keybinder.bind(_keyToggleTimer, Lang.bind(this, this._keyHandler), null);
 
         // Bind to system events - like lock or away
 
@@ -48,7 +47,10 @@ Indicator.prototype = {
     },
 
     _toggleTimerState: function(item) {
-        this._stopTimer = item.state;
+        if (item != null) {
+            this._stopTimer = item.state;
+        }
+
         if (this._stopTimer == false) {
             this._stopTimer = true;
             this._timer.set_text("[" + this._sessionCount + "] --:--");
@@ -77,10 +79,16 @@ Indicator.prototype = {
         }
 
         return false;
+    },
+
+    _keyHandler: function(keystring, data) {
+        if (keystring == _keyToggleTimer) {
+            this._toggleTimerState(null);
+        }
     }
 };
 
-// Put your extension initialization code here
+// Extension initialization code
 function main() {
     if (!_pomodoroInit) {
         Main.StatusIconDispatcher.STANDARD_TRAY_ICON_IMPLEMENTATIONS['pomodoro'] = 'pomodoro';
