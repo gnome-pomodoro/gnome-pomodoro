@@ -39,6 +39,8 @@ Indicator.prototype = {
 
         this._timer = new St.Label();
         this._timeSpent = -1;
+        this._minutes = 0;
+        this._seconds = 0;
         this._stopTimer = true;
         this._sessionCount = 0;
 
@@ -71,6 +73,8 @@ Indicator.prototype = {
         }
         else {
             this._timeSpent = -1;
+            this._minutes = 0;
+            this._seconds = 0;
             this._stopTimer = false;
             this._refreshTimer();
         }
@@ -79,17 +83,29 @@ Indicator.prototype = {
     _refreshTimer: function() {
         if (this._stopTimer == false) {
             this._timeSpent += 1;
-            if (this._timeSpent > 25) {
+            if (this._timeSpent > 1500) {
                 this._timeSpent = 0;
+                this._minutes = 0;
+                this._seconds = 0;
                 this._sessionCount += 1;
             }
 
-            if (this._timeSpent < 10)
-                this._timer.set_text("[" + this._sessionCount + "] 00:0" + this._timeSpent.toString());
-            else
-                this._timer.set_text("[" + this._sessionCount + "] 00:" + this._timeSpent.toString());
+            this._minutes = parseInt(this._timeSpent / 60);
+            this._seconds = this._timeSpent - (this._minutes*60);
 
-            Mainloop.timeout_add_seconds(60, Lang.bind(this, this._refreshTimer));
+            if (this._minutes < 10)
+                this._minutes = "0" + this._minutes.toString();
+            else
+                this._minutes = this._minutes.toString();
+
+            if (this._seconds < 10) 
+                this._seconds = "0" + this._seconds.toString();
+            else
+                this._seconds = this._seconds.toString();
+
+            this._timer.set_text("[" + this._sessionCount + "] " + this._minutes + ":" + this._seconds);
+
+            Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
         }
 
         return false;
