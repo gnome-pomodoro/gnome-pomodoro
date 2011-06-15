@@ -24,6 +24,7 @@ const PopupMenu = imports.ui.popupMenu;
 
 const Gettext = imports.gettext.domain('gnome-shell');
 const _ = Gettext.gettext;
+const MessageTray = imports.ui.messageTray;
 
 let _pomodoroInit = false;
 
@@ -42,6 +43,7 @@ Indicator.prototype = {
         this._minutes = 0;
         this._seconds = 0;
         this._stopTimer = true;
+        this._isPause = false;
         this._sessionCount = 0;
 
         this._timer.set_text("[0] --:--");
@@ -52,42 +54,56 @@ Indicator.prototype = {
         widget.connect("toggled", Lang.bind(this, this._toggleTimerState));
         this.menu.addMenuItem(widget);
 
-        // Register keybindings to toggle
-        //let shellwm = global.window_manager;
-        //shellwm.takeover_keybinding('something_new');
-        //shellwm.connect('keybinding::something_new', function () {
-            //Main.runDialog.open();
-        //});
-
-        // Bind to system events - like lock or away
-
         // Start the timer
         this._refreshTimer();
     },
 
+    _notifyUser: function(text) {
+        global.log("_notifyUser called: " + text);
+
+        let source = new MessageTray.SystemNotificationSource();
+        Main.messageTray.add(source);
+        let notification = new MessageTray.Notification(source, text, null);
+        notification.setTransient(true);
+        source.notify(notification);
+    },
+    
     _toggleTimerState: function(item) {
         this._stopTimer = item.state;
         if (this._stopTimer == false) {
+            this._notifyUser('Pomodoro stopped!');
             this._stopTimer = true;
+            this._isPause = false;
             this._timer.set_text("[" + this._sessionCount + "] --:--");
         }
         else {
+            this._notifyUser('Pomodoro started!');
             this._timeSpent = -1;
             this._minutes = 0;
             this._seconds = 0;
             this._stopTimer = false;
+            this._isPause = false;
             this._refreshTimer();
         }
     },
-
+    
     _refreshTimer: function() {
         if (this._stopTimer == false) {
             this._timeSpent += 1;
-            if (this._timeSpent > 1500) {
+            if (this._isPause == true) {
+                if (this._timeSpent > 300) {
+                    this._notifyUser('Pause finished, a new pomodoro is starting!');
+                    this._timeSpent = 0;
+                    this._isPause = false;
+                }
+            }
+            else if (this._timeSpent > 1500) {
+                this._notifyUser('Pomodoro finished, starting pause...');
                 this._timeSpent = 0;
                 this._minutes = 0;
                 this._seconds = 0;
                 this._sessionCount += 1;
+                this._isPause = true;
             }
 
             this._minutes = parseInt(this._timeSpent / 60);
@@ -103,7 +119,11 @@ Indicator.prototype = {
             else
                 this._seconds = this._seconds.toString();
 
-            this._timer.set_text("[" + this._sessionCount + "] " + this._minutes + ":" + this._seconds);
+            this._timer_label = this._sessionCount
+            if (this._isPause == true)
+                this._timer_label = this._timer_label + "-P"
+                
+            this._timer.set_text("[" + this._timer_label + "] " + this._minutes + ":" + this._seconds);
 
             Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
         }
