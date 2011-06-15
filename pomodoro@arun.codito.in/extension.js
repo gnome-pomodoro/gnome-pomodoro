@@ -40,11 +40,16 @@ Indicator.prototype = {
 
         this._timer = new St.Label();
         this._timeSpent = -1;
+        this._pomodoroTime = 15;
         this._minutes = 0;
         this._seconds = 0;
         this._stopTimer = true;
         this._isPause = false;
-        this._sessionCount = 0;
+        this._shortPauseTime = 6;
+        this._longPauseTime = 10;
+        this._pauseTime = this._shortPauseTime;
+        this._pauseCount = 0;
+        this._sessionCount = 1;
 
         this._timer.set_text("[0] --:--");
         this.actor.add_actor(this._timer);
@@ -58,6 +63,7 @@ Indicator.prototype = {
         this._refreshTimer();
     },
 
+    // Notify user of changes
     _notifyUser: function(text) {
         global.log("_notifyUser called: " + text);
 
@@ -74,7 +80,8 @@ Indicator.prototype = {
             this._notifyUser('Pomodoro stopped!');
             this._stopTimer = true;
             this._isPause = false;
-            this._timer.set_text("[" + this._sessionCount + "] --:--");
+            this._sessionCount = 1;
+            this._timer.set_text("[0] --:--");
         }
         else {
             this._notifyUser('Pomodoro started!');
@@ -90,15 +97,41 @@ Indicator.prototype = {
     _refreshTimer: function() {
         if (this._stopTimer == false) {
             this._timeSpent += 1;
+            let _timerLabel = 'Session ' + this._sessionCount;
+            
+            // Check if a pause is running..
             if (this._isPause == true) {
-                if (this._timeSpent > 300) {
+                // Check if the pause is over
+                if (this._timeSpent > this._pauseTime) {
                     this._notifyUser('Pause finished, a new pomodoro is starting!');
                     this._timeSpent = 0;
                     this._isPause = false;
+                    this._pauseTime = this._shortPauseTime;
+                }
+                else {
+                    if (this._pauseCount == 0)
+                        _timerLabel = 'Long pause';
+                    else
+                        _timerLabel = 'Pause ' + this._pauseCount;
                 }
             }
-            else if (this._timeSpent > 1500) {
-                this._notifyUser('Pomodoro finished, starting pause...');
+            // ..or if a pomodoro is running and a pause is needed :)
+            else if (this._timeSpent > this._pomodoroTime) {
+                this._pauseCount += 1;
+                
+                // Check if it's time of a longer pause
+                if (this._pauseCount == 4) {
+                    this._pauseCount = 0;
+                    this._sessionCount = 0;
+                    this._pauseTime = this._longPauseTime;
+                    this._notifyUser('4th pomodoro finished, starting a long pause...');
+                    _timerLabel = 'Long pause';
+                }
+                else {
+                    this._notifyUser('Pomodoro finished, starting pause...');
+                    _timerLabel = 'Pause ' + this._pauseCount;
+                }
+                    
                 this._timeSpent = 0;
                 this._minutes = 0;
                 this._seconds = 0;
@@ -109,6 +142,7 @@ Indicator.prototype = {
             this._minutes = parseInt(this._timeSpent / 60);
             this._seconds = this._timeSpent - (this._minutes*60);
 
+            // Weird way to show 2-digit number, but js doesn't have a native padding function
             if (this._minutes < 10)
                 this._minutes = "0" + this._minutes.toString();
             else
@@ -118,12 +152,8 @@ Indicator.prototype = {
                 this._seconds = "0" + this._seconds.toString();
             else
                 this._seconds = this._seconds.toString();
-
-            this._timer_label = this._sessionCount
-            if (this._isPause == true)
-                this._timer_label = this._timer_label + "-P"
                 
-            this._timer.set_text("[" + this._timer_label + "] " + this._minutes + ":" + this._seconds);
+            this._timer.set_text("[" + _timerLabel + "] " + this._minutes + ":" + this._seconds);
 
             Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
         }
