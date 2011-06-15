@@ -40,13 +40,13 @@ Indicator.prototype = {
 
         this._timer = new St.Label();
         this._timeSpent = -1;
-        this._pomodoroTime = 15;
+        this._pomodoroTime = 1500;
         this._minutes = 0;
         this._seconds = 0;
         this._stopTimer = true;
         this._isPause = false;
-        this._shortPauseTime = 3;
-        this._longPauseTime = 6;
+        this._shortPauseTime = 300;
+        this._longPauseTime = 900;
         this._pauseTime = this._shortPauseTime;
         this._pauseCount = 0;
         this._sessionCount = 1;
