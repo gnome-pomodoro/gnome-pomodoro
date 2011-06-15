@@ -40,19 +40,23 @@ Indicator.prototype = {
 
         this._timer = new St.Label();
         this._timeSpent = -1;
-        this._pomodoroTime = 1500;
+        this._pomodoroTime = 15;
         this._minutes = 0;
         this._seconds = 0;
         this._stopTimer = true;
         this._isPause = false;
-        this._shortPauseTime = 300;
-        this._longPauseTime = 600;
+        this._shortPauseTime = 3;
+        this._longPauseTime = 6;
         this._pauseTime = this._shortPauseTime;
         this._pauseCount = 0;
         this._sessionCount = 1;
-
+		this._labelMsg = new St.Label({ text: 'Stopped'});
+		
         this._timer.set_text("[0] --:--");
         this.actor.add_actor(this._timer);
+        let item = new PopupMenu.PopupMenuItem("Status:");
+        item.addActor(this._labelMsg);
+        this.menu.addMenuItem(item);
 
         // Toggle timer state button
         let widget = new PopupMenu.PopupSwitchMenuItem(_("Toggle timer"), false);
@@ -64,7 +68,7 @@ Indicator.prototype = {
     },
 
     // Notify user of changes
-    _notifyUser: function(text) {
+    _notifyUser: function(text, label_msg) {
         global.log("_notifyUser called: " + text);
 
         let source = new MessageTray.SystemNotificationSource();
@@ -72,19 +76,22 @@ Indicator.prototype = {
         let notification = new MessageTray.Notification(source, text, null);
         notification.setTransient(true);
         source.notify(notification);
+        
+        // Change the label inside the popup menu
+        this._labelMsg.set_text(label_msg);
     },
     
     _toggleTimerState: function(item) {
         this._stopTimer = item.state;
         if (this._stopTimer == false) {
-            this._notifyUser('Pomodoro stopped!');
+            this._notifyUser('Pomodoro stopped!', 'Stopped');
             this._stopTimer = true;
             this._isPause = false;
             this._sessionCount = 1;
             this._timer.set_text("[0] --:--");
         }
         else {
-            this._notifyUser('Pomodoro started!');
+            this._notifyUser('Pomodoro started!', 'Running');
             this._timeSpent = -1;
             this._minutes = 0;
             this._seconds = 0;
@@ -97,22 +104,22 @@ Indicator.prototype = {
     _refreshTimer: function() {
         if (this._stopTimer == false) {
             this._timeSpent += 1;
-            let _timerLabel = 'Session ' + this._sessionCount;
+            let _timerLabel = this._sessionCount;
             
             // Check if a pause is running..
             if (this._isPause == true) {
                 // Check if the pause is over
                 if (this._timeSpent > this._pauseTime) {
-                    this._notifyUser('Pause finished, a new pomodoro is starting!');
+                    this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
                     this._timeSpent = 0;
                     this._isPause = false;
                     this._pauseTime = this._shortPauseTime;
                 }
                 else {
                     if (this._pauseCount == 0)
-                        _timerLabel = 'Long pause';
+                        _timerLabel = 'L';
                     else
-                        _timerLabel = 'Pause ' + this._pauseCount;
+                        _timerLabel = 'S';
                 }
             }
             // ..or if a pomodoro is running and a pause is needed :)
@@ -124,12 +131,12 @@ Indicator.prototype = {
                     this._pauseCount = 0;
                     this._sessionCount = 0;
                     this._pauseTime = this._longPauseTime;
-                    this._notifyUser('4th pomodoro finished, starting a long pause...');
-                    _timerLabel = 'Long pause';
+                    this._notifyUser('4th pomodoro in a row finished, starting a long pause...', 'Long pause');
+                    _timerLabel = 'L';
                 }
                 else {
-                    this._notifyUser('Pomodoro finished, starting pause...');
-                    _timerLabel = 'Pause ' + this._pauseCount;
+                    this._notifyUser('Pomodoro finished, starting pause...', 'Short pause');
+                    _timerLabel = 'S';
                 }
                     
                 this._timeSpent = 0;
