@@ -24,6 +24,7 @@ const PopupMenu = imports.ui.popupMenu;
 
 const Gettext = imports.gettext.domain('gnome-shell');
 const _ = Gettext.gettext;
+const MessageTray = imports.ui.messageTray;
 
 let _pomodoroInit = false;
 
@@ -39,57 +40,129 @@ Indicator.prototype = {
 
         this._timer = new St.Label();
         this._timeSpent = -1;
+        this._pomodoroTime = 1500;
+        this._minutes = 0;
+        this._seconds = 0;
         this._stopTimer = true;
-        this._sessionCount = 0;
-
+        this._isPause = false;
+        this._shortPauseTime = 300;
+        this._longPauseTime = 900;
+        this._pauseTime = this._shortPauseTime;
+        this._pauseCount = 0;
+        this._sessionCount = 1;
+		this._labelMsg = new St.Label({ text: 'Stopped'});
+		
         this._timer.set_text("[0] --:--");
         this.actor.add_actor(this._timer);
+        let item = new PopupMenu.PopupMenuItem("Status:");
+        item.addActor(this._labelMsg);
+        this.menu.addMenuItem(item);
 
         // Toggle timer state button
         let widget = new PopupMenu.PopupSwitchMenuItem(_("Toggle timer"), false);
         widget.connect("toggled", Lang.bind(this, this._toggleTimerState));
         this.menu.addMenuItem(widget);
 
-        // Register keybindings to toggle
-        //let shellwm = global.window_manager;
-        //shellwm.takeover_keybinding('something_new');
-        //shellwm.connect('keybinding::something_new', function () {
-            //Main.runDialog.open();
-        //});
-
-        // Bind to system events - like lock or away
-
         // Start the timer
         this._refreshTimer();
     },
 
+    // Notify user of changes
+    _notifyUser: function(text, label_msg) {
+        global.log("_notifyUser called: " + text);
+
+        let source = new MessageTray.SystemNotificationSource();
+        Main.messageTray.add(source);
+        let notification = new MessageTray.Notification(source, text, null);
+        notification.setTransient(true);
+        source.notify(notification);
+        
+        // Change the label inside the popup menu
+        this._labelMsg.set_text(label_msg);
+    },
+    
     _toggleTimerState: function(item) {
         this._stopTimer = item.state;
         if (this._stopTimer == false) {
+            this._notifyUser('Pomodoro stopped!', 'Stopped');
             this._stopTimer = true;
-            this._timer.set_text("[" + this._sessionCount + "] --:--");
+            this._isPause = false;
+            this._sessionCount = 1;
+            this._timer.set_text("[0] --:--");
         }
         else {
+            this._notifyUser('Pomodoro started!', 'Running');
             this._timeSpent = -1;
+            this._minutes = 0;
+            this._seconds = 0;
             this._stopTimer = false;
+            this._isPause = false;
             this._refreshTimer();
         }
     },
-
+    
     _refreshTimer: function() {
         if (this._stopTimer == false) {
             this._timeSpent += 1;
-            if (this._timeSpent > 25) {
+            let _timerLabel = this._sessionCount;
+            
+            // Check if a pause is running..
+            if (this._isPause == true) {
+                // Check if the pause is over
+                if (this._timeSpent > this._pauseTime) {
+                    this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
+                    this._timeSpent = 0;
+                    this._isPause = false;
+                    this._pauseTime = this._shortPauseTime;
+                }
+                else {
+                    if (this._pauseCount == 0)
+                        _timerLabel = 'L';
+                    else
+                        _timerLabel = 'S';
+                }
+            }
+            // ..or if a pomodoro is running and a pause is needed :)
+            else if (this._timeSpent > this._pomodoroTime) {
+                this._pauseCount += 1;
+                
+                // Check if it's time of a longer pause
+                if (this._pauseCount == 4) {
+                    this._pauseCount = 0;
+                    this._sessionCount = 0;
+                    this._pauseTime = this._longPauseTime;
+                    this._notifyUser('4th pomodoro in a row finished, starting a long pause...', 'Long pause');
+                    _timerLabel = 'L';
+                }
+                else {
+                    this._notifyUser('Pomodoro finished, starting pause...', 'Short pause');
+                    _timerLabel = 'S';
+                }
+                    
                 this._timeSpent = 0;
+                this._minutes = 0;
+                this._seconds = 0;
                 this._sessionCount += 1;
+                this._isPause = true;
             }
 
-            if (this._timeSpent < 10)
-                this._timer.set_text("[" + this._sessionCount + "] 00:0" + this._timeSpent.toString());
-            else
-                this._timer.set_text("[" + this._sessionCount + "] 00:" + this._timeSpent.toString());
+            this._minutes = parseInt(this._timeSpent / 60);
+            this._seconds = this._timeSpent - (this._minutes*60);
 
-            Mainloop.timeout_add_seconds(60, Lang.bind(this, this._refreshTimer));
+            // Weird way to show 2-digit number, but js doesn't have a native padding function
+            if (this._minutes < 10)
+                this._minutes = "0" + this._minutes.toString();
+            else
+                this._minutes = this._minutes.toString();
+
+            if (this._seconds < 10) 
+                this._seconds = "0" + this._seconds.toString();
+            else
+                this._seconds = this._seconds.toString();
+                
+            this._timer.set_text("[" + _timerLabel + "] " + this._minutes + ":" + this._seconds);
+
+            Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
         }
 
         return false;
