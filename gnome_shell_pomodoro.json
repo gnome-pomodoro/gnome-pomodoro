@@ -1,0 +1,13 @@
+{
+    "version": "0.1",
+    "timer": 
+    {
+        "pomodoro_duration": 10,
+        "short_pause_duration": 3,
+        "long_pause_duration": 6
+    },
+    "ui":
+    {
+        "key_toggle_timer": "<Ctrl><Alt>P"
+    }
+}
