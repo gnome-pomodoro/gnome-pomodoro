@@ -1,5 +1,5 @@
 // A simple pomodoro timer for Gnome-shell
-// Copyright (C) 2011 Arun Mahapatra
+// Copyright (C) 2011 Arun Mahapatra, Gnome-shell-pomodoro contributors
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,19 +16,26 @@
 
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
-const St = imports.gi.St;
-const Keybinder = imports.gi.Keybinder;
-const Main = imports.ui.main;
 
+const GLib = imports.gi.GLib;
+const Keybinder = imports.gi.Keybinder;
+const St = imports.gi.St;
+
+const Main = imports.ui.main;
+const MessageTray = imports.ui.messageTray;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 
 const Gettext = imports.gettext.domain('gnome-shell');
 const _ = Gettext.gettext;
-const MessageTray = imports.ui.messageTray;
 
 let _pomodoroInit = false;
-let _keyToggleTimer = "<Ctrl><Alt>P";
+let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <default_value> ]
+    ["_pomodoroTime", "timer", "pomodoro_duration", 1500],
+    ["_shortPauseTime", "timer", "short_pause_duration", 300],
+    ["_longPauseTime", "timer", "long_pause_duration", 900],
+    ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"]
+];
 
 function Indicator() {
     this._init.apply(this, arguments);
@@ -40,20 +47,21 @@ Indicator.prototype = {
     _init: function() {
         PanelMenu.SystemStatusButton.prototype._init.call(this, 'text-x-generic-symbol');
 
+        // Set default values of options, and then override from config file
+        this._parseConfig();
+
         this._timer = new St.Label();
         this._timeSpent = -1;
-        this._pomodoroTime = 1500;
         this._minutes = 0;
         this._seconds = 0;
         this._stopTimer = true;
         this._isPause = false;
-        this._shortPauseTime = 300;
-        this._longPauseTime = 900;
         this._pauseTime = this._shortPauseTime;
         this._pauseCount = 0;                                   // Number of short pauses so far. Reset every 4 pauses.
         this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
         this._labelMsg = new St.Label({ text: 'Stopped'});
-		
+
+        // Set default menu
         this._timer.set_text("[0] --:--");
         this.actor.add_actor(this._timer);
         let item = new PopupMenu.PopupMenuItem("Status:");
@@ -67,7 +75,7 @@ Indicator.prototype = {
 
         // Register keybindings to toggle
         Keybinder.init();
-        Keybinder.bind(_keyToggleTimer, Lang.bind(this, this._keyHandler), null);
+        Keybinder.bind(this._keyToggleTimer, Lang.bind(this, this._keyHandler), null);
 
         // Start the timer
         this._refreshTimer();
@@ -75,8 +83,6 @@ Indicator.prototype = {
 
     // Notify user of changes
     _notifyUser: function(text, label_msg) {
-        global.log("_notifyUser called: " + text);
-
         let source = new MessageTray.SystemNotificationSource();
         Main.messageTray.add(source);
         let notification = new MessageTray.Notification(source, text, null);
@@ -177,8 +183,47 @@ Indicator.prototype = {
     },
 
     _keyHandler: function(keystring, data) {
-        if (keystring == _keyToggleTimer) {
+        if (keystring == this._keyToggleTimer) {
             this._toggleTimerState(null);
+        }
+    },
+    
+    _parseConfig: function() {
+        let _configFile = GLib.get_home_dir() + "/.gnome_shell_pomodoro.json";
+
+        // Set the default values
+        for (let i = 0; i < _configOptions.length; i++)
+            this[_configOptions[i][0]] = _configOptions[i][3];
+
+        if (GLib.file_test(_configFile, GLib.FileTest.EXISTS)) {
+            let filedata = null;
+
+            try {
+                filedata = GLib.file_get_contents(_configFile, null, 0);
+                global.log("Pomodoro: Using config file = " + _configFile);
+
+                let jsondata = eval("(" + filedata[1] + ")");
+                let parserVersion = null;
+                if (jsondata.hasOwnProperty("version"))
+                    parserVersion = jsondata.version;
+                else
+                    throw "Parser version not defined";
+
+                for (let i = 0; i < _configOptions.length; i++) {
+                    let option = _configOptions[i];
+                    if (jsondata.hasOwnProperty(option[1]) && jsondata[option[1]].hasOwnProperty(option[2])) {
+                        // The option "category" and the actual option is defined in config file,
+                        // override it!
+                        this[option[0]] = jsondata[option[1]][option[2]];
+                    }
+                }
+            }
+            catch (e) {
+                global.logError("Pomodoro: Error reading config file = " + e);
+            }
+            finally {
+                filedata = null;
+            }
         }
     }
 };

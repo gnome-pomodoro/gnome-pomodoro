@@ -21,6 +21,10 @@ Get from [AUR](http://aur.archlinux.org/packages.php?ID=49967)
 - Extract *pomodoro@arun.codito.in* directory to *~/.local/share/gnome-shell/extensions/*
 - Press *Alt + F2*, and *r* in command to restart gnome-shell
 
+# Configuration
+Some of the default settings can be overridden in with *~/.gnome_shell_pomodoro.json* file. Please
+refer the [wiki](https://github.com/codito/gnome-shell-pomodoro/wiki/Configuration).
+
 # Usage
 - Click on the panel item to toggle the timer state
 
