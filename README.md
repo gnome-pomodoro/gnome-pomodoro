@@ -7,6 +7,10 @@
 More on pomodoro technique [here](http://www.pomodorotechnique.com).
 
 # Installation
+## Archlinux
+Get from [AUR](http://aur.archlinux.org/packages.php?ID=49967)
+
+## Direct from source
 - Get zipball 
     * [Current stable release](https://github.com/codito/gnome-shell-pomodoro/zipball/0.1)
     * [Unstable - Master branch](https://github.com/codito/gnome-shell-pomodoro/zipball/master)
@@ -17,5 +21,9 @@ More on pomodoro technique [here](http://www.pomodorotechnique.com).
 # Usage
 - Click on the panel item to toggle the timer state
 
+# License
+GPL3. See COPYING for details.
+
 # Thanks
+- Contributors: @codito, @tommyblue
 - Patches: @nzjrs
