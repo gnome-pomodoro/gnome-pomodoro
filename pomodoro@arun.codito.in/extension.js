@@ -50,9 +50,9 @@ Indicator.prototype = {
         this._shortPauseTime = 300;
         this._longPauseTime = 900;
         this._pauseTime = this._shortPauseTime;
-        this._pauseCount = 0;
-        this._sessionCount = 1;
-		this._labelMsg = new St.Label({ text: 'Stopped'});
+        this._pauseCount = 0;                                   // Number of short pauses so far. Reset every 4 pauses.
+        this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
+        this._labelMsg = new St.Label({ text: 'Stopped'});
 		
         this._timer.set_text("[0] --:--");
         this.actor.add_actor(this._timer);
@@ -96,8 +96,7 @@ Indicator.prototype = {
             this._notifyUser('Pomodoro stopped!', 'Stopped');
             this._stopTimer = true;
             this._isPause = false;
-            this._sessionCount = 1;
-            this._timer.set_text("[0] --:--");
+            this._timer.set_text("[" + this._sessionCount + "] --:--");
         }
         else {
             this._notifyUser('Pomodoro started!', 'Running');
