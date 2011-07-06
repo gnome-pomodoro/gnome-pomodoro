@@ -49,7 +49,7 @@ Indicator.prototype = {
         // Set default values of options, and then override from config file
         this._parseConfig();
 
-        this._timer = new St.Label();
+        this._timer = new St.Label({ style_class: 'extension-pomodoro-label' });
         this._timeSpent = -1;
         this._minutes = 0;
         this._seconds = 0;
@@ -59,7 +59,7 @@ Indicator.prototype = {
         this._pauseCount = 0;                                   // Number of short pauses so far. Reset every 4 pauses.
         this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
         this._labelMsg = new St.Label({ text: 'Stopped'});
-		
+
         // Set default menu
         this._timer.set_text("[0] --:--");
         this.actor.add_actor(this._timer);
@@ -223,3 +223,4 @@ function main() {
         _pomodoroInit = true;
     }
 }
+
