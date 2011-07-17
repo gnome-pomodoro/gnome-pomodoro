@@ -29,5 +29,4 @@ refer the [wiki](https://github.com/codito/gnome-shell-pomodoro/wiki/Configurati
 GPL3. See COPYING for details.
 
 # Thanks
-- Contributors: @codito, @tommyblue
-- Patches: @nzjrs
+- Contributors: https://github.com/codito/gnome-shell-pomodoro/contributors

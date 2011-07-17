@@ -1,5 +1,5 @@
 // A simple pomodoro timer for Gnome-shell
-// Copyright (C) 2011 Arun Mahapatra
+// Copyright (C) 2011 Arun Mahapatra, Gnome-shell pomodoro extension contributors
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@ const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 
 const GLib = imports.gi.GLib;
+const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 
 const Main = imports.ui.main;
@@ -67,6 +68,9 @@ Indicator.prototype = {
         item.addActor(this._labelMsg);
         this.menu.addMenuItem(item);
 
+        // Set initial width of the timer label
+        this._timer.connect('realize', Lang.bind(this, this._onRealize));
+
         // Toggle timer state button
         let widget = new PopupMenu.PopupSwitchMenuItem(_("Toggle timer"), false);
         widget.connect("toggled", Lang.bind(this, this._toggleTimerState));
@@ -74,6 +78,21 @@ Indicator.prototype = {
 
         // Start the timer
         this._refreshTimer();
+    },
+
+    // Handle the style related properties in the timer label. These properties are dependent on
+    // font size/theme used by user, we need to calculate them during runtime
+    _onRealize: function(actor) {
+        let context = actor.get_pango_context();
+        let themeNode = actor.get_theme_node();
+        let font = themeNode.get_font();
+        let metrics = context.get_metrics(font, context.get_language());
+        let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
+        let char_width = metrics.get_approximate_digit_width() / Pango.SCALE;
+
+        // 3, 5 are the number of characters and digits we have in the label
+        actor.width = char_width * 3 + digit_width * 5;
+        global.log("Pomodoro: label width = " + char_width + ", " + digit_width);
     },
 
     // Notify user of changes
