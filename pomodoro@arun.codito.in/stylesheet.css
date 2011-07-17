@@ -1,0 +1,6 @@
+.extension-pomodoro-label {
+    color: white;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0); // transparent
+    min-width: 58px;
+}
