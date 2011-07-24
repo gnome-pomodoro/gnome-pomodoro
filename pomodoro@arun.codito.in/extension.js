@@ -34,7 +34,7 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_pomodoroTime", "timer", "pomodoro_duration", 1500],
     ["_shortPauseTime", "timer", "short_pause_duration", 300],
     ["_longPauseTime", "timer", "long_pause_duration", 900],
-    ["_showMessages", "ui", "show_messages", false],
+    ["_showMessages", "ui", "show_messages", true],
     ["_showElapsed", "ui", "show_elapsed_time", true],
     ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"]
 ];
@@ -58,7 +58,7 @@ Indicator.prototype = {
         this._seconds = 0;
         this._stopTimer = true;
         this._isPause = false;
-        this._pauseTime = this._shortPauseTime;
+        this._pauseTime = 0;
         this._pauseCount = 0;                                   // Number of short pauses so far. Reset every 4 pauses.
         this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
         this._labelMsg = new St.Label({ text: 'Stopped'});
@@ -205,6 +205,7 @@ Indicator.prototype = {
     _resetCount: function() {
         // this._stopTimer = item.state;
         this._sessionCount = 0;
+        this._pauseCount = 0;
         if (this._stopTimer == false) {
             this._stopTimer = true;
             this._isPause = false;
@@ -275,7 +276,6 @@ Indicator.prototype = {
                     this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
                     this._timeSpent = 0;
                     this._isPause = false;
-                    this._pauseTime = this._shortPauseTime;
                 }
                 else {
                     if (this._pauseCount == 0)
@@ -287,12 +287,11 @@ Indicator.prototype = {
             // ..or if a pomodoro is running and a pause is needed :)
             else if (this._timeSpent >= this._pomodoroTime) {
                 this._pauseCount += 1;
+                this._pauseTime = this._shortPauseTime;
 
                 // Check if it's time of a longer pause
                 if (this._pauseCount == 4) {
                     this._pauseCount = 0;
-                    // Dont reset session counter
-                    // this._sessionCount = 0;
                     this._pauseTime = this._longPauseTime;
                     this._notifyUser('4th pomodoro in a row finished, starting a long pause...', 'Long pause');
                     this._timerLabel = 'L';
