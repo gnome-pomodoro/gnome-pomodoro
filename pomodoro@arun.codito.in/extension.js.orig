@@ -361,8 +361,12 @@ Indicator.prototype = {
 
 
     _parseConfig: function() {
+<<<<<<< HEAD
         let _configFile = GLib.get_user_config_dir() + "/gnome-shell-pomodoro/gnome_shell_pomodoro.json";
 
+=======
+        let _configFile = GLib.get_home_dir() + "/.gnome_shell_pomodoro.json";
+>>>>>>> upstream/master
         // Set the default values
         for (let i = 0; i < _configOptions.length; i++)
             this[_configOptions[i][0]] = _configOptions[i][3];
