@@ -34,6 +34,8 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_pomodoroTime", "timer", "pomodoro_duration", 1500],
     ["_shortPauseTime", "timer", "short_pause_duration", 300],
     ["_longPauseTime", "timer", "long_pause_duration", 900],
+    ["_showMessages", "ui", "show_messages", false],
+    ["_showElapsed", "ui", "show_elapsed_time", true],
     ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"]
 ];
 
@@ -60,11 +62,12 @@ Indicator.prototype = {
         this._pauseCount = 0;                                   // Number of short pauses so far. Reset every 4 pauses.
         this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
         this._labelMsg = new St.Label({ text: 'Stopped'});
-
+        this._timerLabel = this.sessionCount;
+        
         // Set default menu
         this._timer.set_text("[0] --:--");
         this.actor.add_actor(this._timer);
-        let item = new PopupMenu.PopupMenuItem("Status:");
+        let item = new PopupMenu.PopupMenuItem("Status:", { reactive: false });
         item.addActor(this._labelMsg);
         this.menu.addMenuItem(item);
 
@@ -72,12 +75,97 @@ Indicator.prototype = {
         this._timer.connect('realize', Lang.bind(this, this._onRealize));
 
         // Toggle timer state button
-        let widget = new PopupMenu.PopupSwitchMenuItem(_("Toggle timer"), false);
-        widget.connect("toggled", Lang.bind(this, this._toggleTimerState));
-        this.menu.addMenuItem(widget);
+        this._widget = new PopupMenu.PopupSwitchMenuItem(_("Toggle timer"), false);
+        this._widget.connect("toggled", Lang.bind(this, this._toggleTimerState));
+        this.menu.addMenuItem(this._widget);
 
+        // Separator
+        let item = new PopupMenu.PopupSeparatorMenuItem();
+        this.menu.addMenuItem(item);    
+    
+        // Options SubMenu
+        this._optionsMenu = new PopupMenu.PopupSubMenuMenuItem('Options');
+        this.menu.addMenuItem(this._optionsMenu);
+        // Add options to submenu
+        this._buildOptionsMenu();
+    
         // Start the timer
         this._refreshTimer();
+    },
+
+    
+    // Add whatever options the timer needs to this submenu
+    _buildOptionsMenu: function() {
+
+        // Timer format Menu
+        if (this._showElapsed == true)
+            this._timerTypeMenu = new PopupMenu.PopupMenuItem(_("Show Remaining Time"));
+        else
+            this._timerTypeMenu = new PopupMenu.PopupMenuItem(_("Show Elapsed Time"));
+
+        this._optionsMenu.menu.addMenuItem(this._timerTypeMenu);
+        this._timerTypeMenu.connect('activate', Lang.bind(this, this._toggleTimerType));
+        
+        // Reset Counters Menu
+        this._resetMenu =  new PopupMenu.PopupMenuItem(_('Reset Counts and Timer'));
+        this._optionsMenu.menu.addMenuItem(this._resetMenu);
+        this._resetMenu.connect('activate', Lang.bind(this, this._resetCount));
+        
+        // ShowMessages option toggle
+        this._showMessagesSwitch = new PopupMenu.PopupSwitchMenuItem(_("Show Notification Messages"), this._showMessages);
+        this._showMessagesSwitch.connect("toggled", Lang.bind(this, function() {
+            this._showMessages = !(this._showMessages);
+        }));
+        this._optionsMenu.menu.addMenuItem(this._showMessagesSwitch);
+                
+        // Pomodoro Duration menu
+        let timerLengthMenu = new PopupMenu.PopupSubMenuMenuItem(_('Timer Durations'));
+        this._optionsMenu.menu.addMenuItem(timerLengthMenu);
+
+        let item = new PopupMenu.PopupMenuItem(_("Pomodoro Duration"), { reactive: false });
+        this._pomodoroTimeLabel = new St.Label({ text: this._formatTime(this._pomodoroTime) });
+        item.addActor(this._pomodoroTimeLabel);
+        timerLengthMenu.menu.addMenuItem(item);
+
+        this._pomodoroTimeSlider = new PopupMenu.PopupSliderMenuItem(this._pomodoroTime/3600);
+        this._pomodoroTimeSlider.connect('drag-end', Lang.bind(this, function() {
+            this._pomodoroTime = Math.ceil(Math.ceil(this._pomodoroTimeSlider._value * 3600)/10)*10;
+            //  this._pomodoroTime = Math.ceil(this._pomodoroTimeSlider._value * 3600); // Use this for finer control over pomodoroTime
+            this._pomodoroTimeLabel.set_text(this._formatTime(this._pomodoroTime)); 
+            this._checkTimerState();
+            this._updateTimer();
+        } ));
+        timerLengthMenu.menu.addMenuItem(this._pomodoroTimeSlider);
+        
+        // Short Break Duration menu
+        item = new PopupMenu.PopupMenuItem(_("Short Break Duration"), { reactive: false });
+        this._sBreakTimeLabel = new St.Label({ text: this._formatTime(this._shortPauseTime) });
+        item.addActor(this._sBreakTimeLabel);
+        timerLengthMenu.menu.addMenuItem(item);
+
+        this._sBreakTimeSlider = new PopupMenu.PopupSliderMenuItem(this._shortPauseTime/720);
+        this._sBreakTimeSlider.connect('drag-end', Lang.bind(this, function() {
+            this._shortPauseTime = Math.ceil(Math.ceil(this._sBreakTimeSlider._value * 720)/10)*10;
+            this._sBreakTimeLabel.set_text(this._formatTime(this._shortPauseTime)); 
+            this._checkTimerState();
+            this._updateTimer();
+        } ));
+        timerLengthMenu.menu.addMenuItem(this._sBreakTimeSlider);
+        
+        // Long Break Duration menu
+        item = new PopupMenu.PopupMenuItem(_("Long Break Duration"), { reactive: false });
+        this._lBreakTimeLabel = new St.Label({ text: this._formatTime(this._longPauseTime) });
+         item.addActor(this._lBreakTimeLabel);
+        timerLengthMenu.menu.addMenuItem(item);
+
+        this._lBreakTimeSlider = new PopupMenu.PopupSliderMenuItem(this._longPauseTime/2160);
+        this._lBreakTimeSlider.connect('drag-end', Lang.bind(this, function() {
+            this._longPauseTime = Math.ceil(Math.ceil(this._lBreakTimeSlider._value * 2160)/10)*10;
+            this._lBreakTimeLabel.set_text(this._formatTime(this._longPauseTime)); 
+            this._checkTimerState();
+            this._updateTimer();
+        } ));
+        timerLengthMenu.menu.addMenuItem(this._lBreakTimeSlider);
     },
 
     // Handle the style related properties in the timer label. These properties are dependent on
@@ -95,18 +183,52 @@ Indicator.prototype = {
         global.log("Pomodoro: label width = " + char_width + ", " + digit_width);
     },
 
+    
+    // Toggle how timeSpent is displayed on ui_timer
+    _toggleTimerType: function() {
+        if (this._showElapsed == true) {
+            this._showElapsed = false;
+            this._timerTypeMenu.label.set_text(_("Show Elapsed Time"));    
+        } else {
+            this._showElapsed = true;
+            this._timerTypeMenu.label.set_text(_("Show Remaining Time"));
+        }
+        
+        // update timer_ui to reflect this change
+        this._updateTimer();
+                 
+        return false;
+    },
+    
+
+    // Reset all counters and timers
+    _resetCount: function() {
+        // this._stopTimer = item.state;
+        this._sessionCount = 0;
+        if (this._stopTimer == false) {
+            this._stopTimer = true;
+            this._isPause = false;
+        }
+        this._notifyUser('Pomodoro reset!', 'Stopped');
+        this._timer.set_text("[" + this._sessionCount + "] --:--");
+        this._widget.setToggleState(false);
+        return false;
+    },
+    
     // Notify user of changes
     _notifyUser: function(text, label_msg) {
-        let source = new MessageTray.SystemNotificationSource();
-        Main.messageTray.add(source);
-        let notification = new MessageTray.Notification(source, text, null);
-        notification.setTransient(true);
-        source.notify(notification);
-        
+        if (this._showMessages) {
+            let source = new MessageTray.SystemNotificationSource();
+            Main.messageTray.add(source);
+            let notification = new MessageTray.Notification(source, text, null);
+            notification.setTransient(true);
+            source.notify(notification);
+        }        
         // Change the label inside the popup menu
         this._labelMsg.set_text(label_msg);
     },
     
+    // Toggle timer state
     _toggleTimerState: function(item) {
         this._stopTimer = item.state;
         if (this._stopTimer == false) {
@@ -126,15 +248,30 @@ Indicator.prototype = {
         }
     },
     
+    
+    // Increment timeSpent and call functions to check timer states and update ui_timer    
     _refreshTimer: function() {
         if (this._stopTimer == false) {
             this._timeSpent += 1;
-            let _timerLabel = this._sessionCount;
+            this._checkTimerState();
+            this._updateTimer();
+            Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
+        }
+        
+        this._updateTimer();
+        return false;
+    },
+
+    
+    // checks if timer needs to change state
+    _checkTimerState: function() {
+        if (this._stopTimer == false) {
+            this._timerLabel = this._sessionCount;
             
             // Check if a pause is running..
             if (this._isPause == true) {
                 // Check if the pause is over
-                if (this._timeSpent > this._pauseTime) {
+                if (this._timeSpent >= this._pauseTime) {
                     this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
                     this._timeSpent = 0;
                     this._isPause = false;
@@ -142,26 +279,27 @@ Indicator.prototype = {
                 }
                 else {
                     if (this._pauseCount == 0)
-                        _timerLabel = 'L';
+                        this._timerLabel = 'L';
                     else
-                        _timerLabel = 'S';
+                        this._timerLabel = 'S';
                 }
             }
             // ..or if a pomodoro is running and a pause is needed :)
-            else if (this._timeSpent > this._pomodoroTime) {
+            else if (this._timeSpent >= this._pomodoroTime) {
                 this._pauseCount += 1;
                 
                 // Check if it's time of a longer pause
                 if (this._pauseCount == 4) {
                     this._pauseCount = 0;
-                    this._sessionCount = 0;
+                    // Dont reset session counter
+                    // this._sessionCount = 0;
                     this._pauseTime = this._longPauseTime;
                     this._notifyUser('4th pomodoro in a row finished, starting a long pause...', 'Long pause');
-                    _timerLabel = 'L';
+                    this._timerLabel = 'L';
                 }
                 else {
                     this._notifyUser('Pomodoro finished, starting pause...', 'Short pause');
-                    _timerLabel = 'S';
+                    this._timerLabel = 'S';
                 }
                     
                 this._timeSpent = 0;
@@ -171,8 +309,23 @@ Indicator.prototype = {
                 this._isPause = true;
             }
 
-            this._minutes = parseInt(this._timeSpent / 60);
-            this._seconds = this._timeSpent - (this._minutes*60);
+        }
+    },
+
+    
+    // Update timer_ui
+    _updateTimer: function() {
+        if (this._stopTimer == false) {
+            let displaytime = this._timeSpent;
+            if (this._showElapsed == false) {
+                if (this._isPause == false) 
+                    displaytime = this._pomodoroTime - this._timeSpent;
+                else
+                    displaytime = this._pauseTime - this._timeSpent;
+            }                            
+            
+            this._minutes = parseInt(displaytime / 60);
+            this._seconds = displaytime - (this._minutes*60);
 
             // Weird way to show 2-digit number, but js doesn't have a native padding function
             if (this._minutes < 10)
@@ -185,17 +338,31 @@ Indicator.prototype = {
             else
                 this._seconds = this._seconds.toString();
                 
-            this._timer.set_text("[" + _timerLabel + "] " + this._minutes + ":" + this._seconds);
-
-            Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
+            this._timer.set_text("[" + this._timerLabel + "] " + this._minutes + ":" + this._seconds);
         }
-
-        return false;
     },
 
-    _parseConfig: function() {
-        let _configFile = GLib.get_home_dir() + "/.gnome_shell_pomodoro.json";
+    
+    // function to format absolute time in seconds as "Xm Ys"
+    _formatTime: function(abs) {
+        let minutes = Math.floor(abs/60);
+        let seconds = abs - minutes*60;
+        let str = "";
+        if (minutes != 0) {
+            str = str + minutes.toString() + "m ";
+        }
+        if (seconds != 0) {
+            str = str + seconds.toString() + "s";
+        }
+        if (abs == 0) {
+            str = "0s";
+        }
+        return str;
+    },
 
+
+    _parseConfig: function() {
+        let _configFile = GLib.get_home_dir() + "/.gnome_shell_pomodoro.json"; 
         // Set the default values
         for (let i = 0; i < _configOptions.length; i++)
             this[_configOptions[i][0]] = _configOptions[i][3];
