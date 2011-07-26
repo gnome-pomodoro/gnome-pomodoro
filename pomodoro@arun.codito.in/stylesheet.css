@@ -15,9 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+.helloworld-label {
+	font-size: 36px;
+	font-weight: bold;
+	color: #ffcc00;
+	background-color: rgba(10,10,10,0.7);
+	border-radius: 8px; 
+	margin: 10px;
+	padding: 30px;
+}
+
 .extension-pomodoro-label {
     /*color: white;*/
     /*font-weight: bold;*/
     background: rgba(0, 0, 0, 0);  /* transparent */
     /*min-width: 72px;*/           /* dependent on theme/font, see function _onRealize() in extension.js */ 
 }
+
+

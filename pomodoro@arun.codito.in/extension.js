@@ -36,6 +36,7 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_longPauseTime", "timer", "long_pause_duration", 900],
     ["_showMessages", "ui", "show_messages", true],
     ["_showElapsed", "ui", "show_elapsed_time", true],
+    ["_persistentBreakMessage", "ui", "show_persistent_break_message", false],
     ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"]
 ];
 
@@ -117,6 +118,17 @@ Indicator.prototype = {
             this._showMessages = !(this._showMessages);
         }));
         this._optionsMenu.menu.addMenuItem(this._showMessagesSwitch);
+
+        //Persistent Break Message toggle
+        this._breakNotificationText = new St.Label({text: ""});
+        let newtoggle = new PopupMenu.PopupSwitchMenuItem(_("Show Persistent Break Messages"), this._persistentBreakMessage);
+        newtoggle.connect("toggled", Lang.bind(this, function() {
+            this._persistentBreakMessage = !(this._persistentBreakMessage);
+            if (this._persistentBreakMessage == false) {
+                this._breakNotificationText.destroy();
+            }
+        }));
+        this._optionsMenu.menu.addMenuItem(newtoggle);  
 
         // Pomodoro Duration menu
         let timerLengthMenu = new PopupMenu.PopupSubMenuMenuItem(_('Timer Durations'));
@@ -211,6 +223,7 @@ Indicator.prototype = {
             this._isPause = false;
         }
         this._notifyUser('Pomodoro reset!', 'Stopped');
+        this._breakNotificationText.destroy();
         this._timer.set_text("[" + this._sessionCount + "] --:--");
         this._widget.setToggleState(false);
         return false;
@@ -229,6 +242,17 @@ Indicator.prototype = {
         this._labelMsg.set_text(label_msg);
     },
 
+    // Show a persistent message at the end of pomodoro session
+    _showMessageAtPomodoroCompletion: function() {
+        if (this._persistentBreakMessage) {
+            this._breakNotificationText = new St.Label({ style_class: 'helloworld-label', text: _( "Session ("+ (this._sessionCount+1) + ") Ends - Take a Break for " + this._formatTime(this._pauseTime)) });
+            let monitor = global.get_primary_monitor();
+            global.stage.add_actor(this._breakNotificationText);
+            this._breakNotificationText.set_position(Math.floor (monitor.width / 2 - this._breakNotificationText.width / 2 ), Math.floor(monitor.height / 2 - this._breakNotificationText.height/2) );
+            // Mainloop.timeout_add(this._pauseTime, function () { this._breakNotificationText.destroy(); });
+        }
+    },
+
     // Toggle timer state
     _toggleTimerState: function(item) {
         this._stopTimer = item.state;
@@ -237,6 +261,7 @@ Indicator.prototype = {
             this._stopTimer = true;
             this._isPause = false;
             this._timer.set_text("[" + this._sessionCount + "] --:--");
+            this._breakNotificationText.destroy();			
         }
         else {
             this._notifyUser('Pomodoro started!', 'Running');
@@ -276,12 +301,16 @@ Indicator.prototype = {
                     this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
                     this._timeSpent = 0;
                     this._isPause = false;
+                    this._breakNotificationText.destroy();
                 }
                 else {
-                    if (this._pauseCount == 0)
+                    if (this._pauseCount == 0) {
+                        this._pauseTime = this._longPauseTime;
                         this._timerLabel = 'L';
-                    else
+                    } else {
+                        this._pauseTime = this._shortPauseTime;
                         this._timerLabel = 'S';
+                    }
                 }
             }
             // ..or if a pomodoro is running and a pause is needed :)
@@ -301,6 +330,7 @@ Indicator.prototype = {
                     this._timerLabel = 'S';
                 }
 
+                this._showMessageAtPomodoroCompletion();
                 this._timeSpent = 0;
                 this._minutes = 0;
                 this._seconds = 0;
@@ -348,13 +378,13 @@ Indicator.prototype = {
         let seconds = abs - minutes*60;
         let str = "";
         if (minutes != 0) {
-            str = str + minutes.toString() + "m ";
+            str = str + minutes.toString() + " m ";
         }
         if (seconds != 0) {
-            str = str + seconds.toString() + "s";
+            str = str + seconds.toString() + " s";
         }
         if (abs == 0) {
-            str = "0s";
+            str = "0 s";
         }
         return str;
     },
