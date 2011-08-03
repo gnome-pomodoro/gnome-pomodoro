@@ -210,7 +210,6 @@ Indicator.prototype = {
             this._stopTimer = true;
             this._isPause = false;
         }
-        this._notifyUser('Pomodoro reset!', 'Stopped');
         this._timer.set_text("[" + this._sessionCount + "] --:--");
         this._widget.setToggleState(false);
         return false;
@@ -233,13 +232,11 @@ Indicator.prototype = {
     _toggleTimerState: function(item) {
         this._stopTimer = item.state;
         if (this._stopTimer == false) {
-            this._notifyUser('Pomodoro stopped!', 'Stopped');
             this._stopTimer = true;
             this._isPause = false;
             this._timer.set_text("[" + this._sessionCount + "] --:--");
         }
         else {
-            this._notifyUser('Pomodoro started!', 'Running');
             this._timeSpent = -1;
             this._minutes = 0;
             this._seconds = 0;
