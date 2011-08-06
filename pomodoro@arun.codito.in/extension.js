@@ -30,6 +30,7 @@ const Gettext = imports.gettext.domain('gnome-shell');
 const _ = Gettext.gettext;
 
 let _pomodoroInit = false;
+let _configVersion = "0.1";
 let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <default_value> ]
     ["_pomodoroTime", "timer", "pomodoro_duration", 1500],
     ["_shortPauseTime", "timer", "short_pause_duration", 300],
@@ -72,7 +73,7 @@ Indicator.prototype = {
         this.menu.addMenuItem(item);
 
         // Set initial width of the timer label
-        this._timer.connect('realize', Lang.bind(this, this._onRealize));
+        this._timer.connect('realize', Lang.bind(this, this._onTimerRealize));
 
         // Toggle timer state button
         this._widget = new PopupMenu.PopupSwitchMenuItem(_("Toggle timer"), false);
@@ -115,6 +116,7 @@ Indicator.prototype = {
         this._showMessagesSwitch = new PopupMenu.PopupSwitchMenuItem(_("Show Notification Messages"), this._showMessages);
         this._showMessagesSwitch.connect("toggled", Lang.bind(this, function() {
             this._showMessages = !(this._showMessages);
+            this._onConfigUpdate(false);
         }));
         this._optionsMenu.menu.addMenuItem(this._showMessagesSwitch);
 
@@ -130,10 +132,8 @@ Indicator.prototype = {
         this._pomodoroTimeSlider = new PopupMenu.PopupSliderMenuItem(this._pomodoroTime/3600);
         this._pomodoroTimeSlider.connect('drag-end', Lang.bind(this, function() {
             this._pomodoroTime = Math.ceil(Math.ceil(this._pomodoroTimeSlider._value * 3600)/10)*10;
-            //  this._pomodoroTime = Math.ceil(this._pomodoroTimeSlider._value * 3600); // Use this for finer control over pomodoroTime
             this._pomodoroTimeLabel.set_text(this._formatTime(this._pomodoroTime));
-            this._checkTimerState();
-            this._updateTimer();
+            this._onConfigUpdate(true);
         } ));
         timerLengthMenu.menu.addMenuItem(this._pomodoroTimeSlider);
 
@@ -147,8 +147,7 @@ Indicator.prototype = {
         this._sBreakTimeSlider.connect('drag-end', Lang.bind(this, function() {
             this._shortPauseTime = Math.ceil(Math.ceil(this._sBreakTimeSlider._value * 720)/10)*10;
             this._sBreakTimeLabel.set_text(this._formatTime(this._shortPauseTime));
-            this._checkTimerState();
-            this._updateTimer();
+            this._onConfigUpdate(true);
         } ));
         timerLengthMenu.menu.addMenuItem(this._sBreakTimeSlider);
 
@@ -162,15 +161,14 @@ Indicator.prototype = {
         this._lBreakTimeSlider.connect('drag-end', Lang.bind(this, function() {
             this._longPauseTime = Math.ceil(Math.ceil(this._lBreakTimeSlider._value * 2160)/10)*10;
             this._lBreakTimeLabel.set_text(this._formatTime(this._longPauseTime));
-            this._checkTimerState();
-            this._updateTimer();
+            this._onConfigUpdate(true);
         } ));
         timerLengthMenu.menu.addMenuItem(this._lBreakTimeSlider);
     },
 
     // Handle the style related properties in the timer label. These properties are dependent on
     // font size/theme used by user, we need to calculate them during runtime
-    _onRealize: function(actor) {
+    _onTimerRealize: function(actor) {
         let context = actor.get_pango_context();
         let themeNode = actor.get_theme_node();
         let font = themeNode.get_font();
@@ -183,6 +181,16 @@ Indicator.prototype = {
         global.log("Pomodoro: label width = " + char_width + ", " + digit_width);
     },
 
+    // Handles option changes in the UI, saves the configuration
+    // Set _validateTimer_ to true in case internal timer states and related options are changed
+    _onConfigUpdate: function(validateTimer) {
+        if (validateTimer == true) {
+            this._checkTimerState();
+            this._updateTimer();
+        }
+
+        this._saveConfig();
+    },
 
     // Toggle how timeSpent is displayed on ui_timer
     _toggleTimerType: function() {
@@ -194,16 +202,13 @@ Indicator.prototype = {
             this._timerTypeMenu.label.set_text(_("Show Remaining Time"));
         }
 
-        // update timer_ui to reflect this change
-        this._updateTimer();
-
+        this._onConfigUpdate(true);
         return false;
     },
 
 
     // Reset all counters and timers
     _resetCount: function() {
-        // this._stopTimer = item.state;
         this._sessionCount = 0;
         this._pauseCount = 0;
         if (this._stopTimer == false) {
@@ -261,7 +266,7 @@ Indicator.prototype = {
     },
 
 
-    // checks if timer needs to change state
+    // Checks if timer needs to change state
     _checkTimerState: function() {
         if (this._stopTimer == false) {
             this._timerLabel = this._sessionCount;
@@ -304,7 +309,6 @@ Indicator.prototype = {
                 this._sessionCount += 1;
                 this._isPause = true;
             }
-
         }
     },
 
@@ -339,7 +343,7 @@ Indicator.prototype = {
     },
 
 
-    // function to format absolute time in seconds as "Xm Ys"
+    // Format absolute time in seconds as "Xm Ys"
     _formatTime: function(abs) {
         let minutes = Math.floor(abs/60);
         let seconds = abs - minutes*60;
@@ -370,7 +374,7 @@ Indicator.prototype = {
                 filedata = GLib.file_get_contents(_configFile, null, 0);
                 global.log("Pomodoro: Using config file = " + _configFile);
 
-                let jsondata = eval("(" + filedata[1] + ")");
+                let jsondata = JSON.parse(filedata[1]);
                 let parserVersion = null;
                 if (jsondata.hasOwnProperty("version"))
                     parserVersion = jsondata.version;
@@ -393,6 +397,38 @@ Indicator.prototype = {
                 filedata = null;
             }
         }
+    },
+
+
+    _saveConfig: function() {
+        let _configFile = GLib.get_user_config_dir() + "/gnome-shell-pomodoro/gnome_shell_pomodoro.json";
+        let filedata = null;
+        let jsondata = {};
+
+        try {
+            jsondata["version"] = _configVersion;
+            for (let i = 0; i < _configOptions.length; i++) {
+                let option = _configOptions[i];
+                // Insert the option "category", if it's undefined
+                if (jsondata.hasOwnProperty(option[1]) == false) {
+                    global.log("insert " + option[1]);
+                    jsondata[option[1]] = {};
+                }
+
+                // Update the option key/value pairs
+                jsondata[option[1]][option[2]] = this[option[0]];
+            }
+            filedata = JSON.stringify(jsondata, null, "  ");
+            GLib.file_set_contents(_configFile, filedata, filedata.length);
+        }
+        catch (e) {
+            global.logError("Pomodoro: Error writing config file = " + e);
+        }
+        finally {
+            jsondata = null;
+            filedata = null;
+        }
+        global.logError("Pomodoro: Updated config file = " + _configFile);
     }
 };
 
