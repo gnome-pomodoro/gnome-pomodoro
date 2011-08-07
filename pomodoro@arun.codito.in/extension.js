@@ -401,9 +401,16 @@ Indicator.prototype = {
 
 
     _saveConfig: function() {
-        let _configFile = GLib.get_user_config_dir() + "/gnome-shell-pomodoro/gnome_shell_pomodoro.json";
+        let _configDir = GLib.get_user_config_dir() + "/gnome-shell-pomodoro";
+        let _configFile = _configDir + "/gnome_shell_pomodoro.json";
         let filedata = null;
         let jsondata = {};
+
+        if (GLib.file_test(_configDir, GLib.FileTest.EXISTS | GLib.FileTest.IS_DIR) == false &&
+                GLib.mkdir_with_parents(_configDir, 0755) != 0) {
+                    global.logError("Pomodoro: Failed to create configuration directory. Path = " +
+                            _configDir + ". Configuration will not be saved.");
+                }
 
         try {
             jsondata["version"] = _configVersion;
@@ -411,7 +418,6 @@ Indicator.prototype = {
                 let option = _configOptions[i];
                 // Insert the option "category", if it's undefined
                 if (jsondata.hasOwnProperty(option[1]) == false) {
-                    global.log("insert " + option[1]);
                     jsondata[option[1]] = {};
                 }
 
@@ -428,7 +434,7 @@ Indicator.prototype = {
             jsondata = null;
             filedata = null;
         }
-        global.logError("Pomodoro: Updated config file = " + _configFile);
+        global.log("Pomodoro: Updated config file = " + _configFile);
     }
 };
 
