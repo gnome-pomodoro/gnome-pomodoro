@@ -20,6 +20,7 @@ const Mainloop = imports.mainloop;
 const GLib = imports.gi.GLib;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
+const Util = imports.misc.util;
 
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
@@ -37,6 +38,7 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_longPauseTime", "timer", "long_pause_duration", 900],
     ["_showMessages", "ui", "show_messages", true],
     ["_showElapsed", "ui", "show_elapsed_time", true],
+    ["_persistentBreakMessage", "ui", "show_persistent_break_message", false],
     ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"]
 ];
 
@@ -120,6 +122,16 @@ Indicator.prototype = {
         }));
         this._optionsMenu.menu.addMenuItem(this._showMessagesSwitch);
 
+        //Persistent Break Message toggle
+        let breakMessageToggle = new PopupMenu.PopupSwitchMenuItem
+            (_("Show Persistent Break Messages"), this._persistentBreakMessage);
+        breakMessageToggle.connect("toggled", Lang.bind(this, function() {
+            this._persistentBreakMessage = !(this._persistentBreakMessage);
+        }));
+        // Uncomment and replace tooltip, if label does not describe use clearly
+        // breakMessageToggle.actor.tooltip_text = "Show a persistent message at the end of pomodoro session"; 
+        this._optionsMenu.menu.addMenuItem(breakMessageToggle);  
+
         // Pomodoro Duration menu
         let timerLengthMenu = new PopupMenu.PopupSubMenuMenuItem(_('Timer Durations'));
         this._optionsMenu.menu.addMenuItem(timerLengthMenu);
@@ -130,7 +142,7 @@ Indicator.prototype = {
         timerLengthMenu.menu.addMenuItem(item);
 
         this._pomodoroTimeSlider = new PopupMenu.PopupSliderMenuItem(this._pomodoroTime/3600);
-        this._pomodoroTimeSlider.connect('drag-end', Lang.bind(this, function() {
+        this._pomodoroTimeSlider.connect('value-changed', Lang.bind(this, function() {
             this._pomodoroTime = Math.ceil(Math.ceil(this._pomodoroTimeSlider._value * 3600)/10)*10;
             this._pomodoroTimeLabel.set_text(this._formatTime(this._pomodoroTime));
             this._onConfigUpdate(true);
@@ -144,7 +156,7 @@ Indicator.prototype = {
         timerLengthMenu.menu.addMenuItem(item);
 
         this._sBreakTimeSlider = new PopupMenu.PopupSliderMenuItem(this._shortPauseTime/720);
-        this._sBreakTimeSlider.connect('drag-end', Lang.bind(this, function() {
+        this._sBreakTimeSlider.connect('value-changed', Lang.bind(this, function() {
             this._shortPauseTime = Math.ceil(Math.ceil(this._sBreakTimeSlider._value * 720)/10)*10;
             this._sBreakTimeLabel.set_text(this._formatTime(this._shortPauseTime));
             this._onConfigUpdate(true);
@@ -158,7 +170,7 @@ Indicator.prototype = {
         timerLengthMenu.menu.addMenuItem(item);
 
         this._lBreakTimeSlider = new PopupMenu.PopupSliderMenuItem(this._longPauseTime/2160);
-        this._lBreakTimeSlider.connect('drag-end', Lang.bind(this, function() {
+        this._lBreakTimeSlider.connect('value-changed', Lang.bind(this, function() {
             this._longPauseTime = Math.ceil(Math.ceil(this._lBreakTimeSlider._value * 2160)/10)*10;
             this._lBreakTimeLabel.set_text(this._formatTime(this._longPauseTime));
             this._onConfigUpdate(true);
@@ -233,6 +245,20 @@ Indicator.prototype = {
         this._labelMsg.set_text(label_msg);
     },
 
+    // Show a persistent message at the end of pomodoro session
+    _showMessageAtPomodoroCompletion: function() {
+        if (this._persistentBreakMessage) {
+            Util.spawn(['zenity',
+                '--info',
+                '--text=Session ' + (this._sessionCount+1) + ' ends.' +
+                    '\nTake a break for ' + this._formatTime(this._pauseTime) + '.',
+                '--timeout=' + this._pauseTime,
+                '--title=Pomodoro',
+                '--width=250'
+            ]);
+        }
+    },
+
     // Toggle timer state
     _toggleTimerState: function(item) {
         this._stopTimer = item.state;
@@ -280,10 +306,13 @@ Indicator.prototype = {
                     this._isPause = false;
                 }
                 else {
-                    if (this._pauseCount == 0)
+                    if (this._pauseCount == 0) {
+                        this._pauseTime = this._longPauseTime;
                         this._timerLabel = 'L';
-                    else
+                    } else {
+                        this._pauseTime = this._shortPauseTime;
                         this._timerLabel = 'S';
+                    }
                 }
             }
             // ..or if a pomodoro is running and a pause is needed :)
@@ -303,6 +332,7 @@ Indicator.prototype = {
                     this._timerLabel = 'S';
                 }
 
+                this._showMessageAtPomodoroCompletion();
                 this._timeSpent = 0;
                 this._minutes = 0;
                 this._seconds = 0;
@@ -349,13 +379,13 @@ Indicator.prototype = {
         let seconds = abs - minutes*60;
         let str = "";
         if (minutes != 0) {
-            str = str + minutes.toString() + "m ";
+            str = str + minutes.toString() + " m ";
         }
         if (seconds != 0) {
-            str = str + seconds.toString() + "s";
+            str = str + seconds.toString() + " s";
         }
         if (abs == 0) {
-            str = "0s";
+            str = "0 s";
         }
         return str;
     },

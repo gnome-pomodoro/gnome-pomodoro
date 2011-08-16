@@ -10,6 +10,7 @@
     {
         "show_messages": true,
         "show_elapsed_time": true,
+        "show_persistent_break_message": false,
         "key_toggle_timer": "<Ctrl><Alt>P"
     }
 }
