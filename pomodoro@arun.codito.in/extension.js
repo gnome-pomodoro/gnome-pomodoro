@@ -127,6 +127,7 @@ Indicator.prototype = {
             (_("Show Persistent Break Messages"), this._persistentBreakMessage);
         breakMessageToggle.connect("toggled", Lang.bind(this, function() {
             this._persistentBreakMessage = !(this._persistentBreakMessage);
+            this._onConfigUpdate(false);
         }));
         // Uncomment and replace tooltip, if label does not describe use clearly
         // breakMessageToggle.actor.tooltip_text = "Show a persistent message at the end of pomodoro session"; 
