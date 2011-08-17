@@ -1,29 +1,26 @@
 NAME = gnome-shell-pomodoro
 SRC = pomodoro@arun.codito.in
 OUT = ${HOME}/.local/share/gnome-shell/extensions/${SRC}
-
-CONFIRM = echo -e "\n ${NAME} was successfully $@ed\n" \
-                  "Press Alt+F2 and type 'r' to restart gnome-shell\n"
-
-FILES = ${SRC}/extension.js \
-        ${SRC}/metadata.json \
-        ${SRC}/stylesheet.css
+FILES = ${OUT}/extension.js ${OUT}/metadata.json ${OUT}/stylesheet.css
+MSG = " ${NAME} was successfully $@ed\n Press Alt+F2 and type 'r' to refresh"
 
 help:
 	@echo "Usage:"
-	@echo
 	@echo "   make install         Install ${NAME} extension"
 	@echo "   make uninstall       Uninstall ${NAME} extension"
-	@echo
 
-install: ${FILES}
-	@mkdir -p ${OUT}
-	@install --compare --mode=644 ${FILES} ${OUT}
-	@$(CONFIRM)
+install: ${OUT} ${FILES}
+	@echo -e ${MSG}
 
 uninstall:
 	@rm -rf ${OUT}
-	@$(CONFIRM)
+	@echo -e ${MSG}
+
+$(OUT):
+	@mkdir -p $@
+
+$(OUT)/%: $(SRC)/%
+	@cp $< $@
 
 .PHONY: help install uninstall
 
