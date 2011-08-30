@@ -17,6 +17,7 @@
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 
+const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Keybinder = imports.gi.Keybinder;
 const Pango = imports.gi.Pango;
@@ -25,6 +26,7 @@ const Util = imports.misc.util;
 
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
+const ModalDialog = imports.ui.modalDialog;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 
@@ -67,6 +69,8 @@ Indicator.prototype = {
         this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
         this._labelMsg = new St.Label({ text: 'Stopped'});
         this._timerLabel = this.sessionCount;
+        this._persistentMessageDialog = new ModalDialog.ModalDialog();
+        this._persistentMessageTimer = new St.Label({ style_class: 'persistent-message-label'  }),
 
         // Set default menu
         this._timer.set_text("[0] --:--");
@@ -96,6 +100,17 @@ Indicator.prototype = {
         // Register keybindings to toggle
         Keybinder.init();
         Keybinder.bind(this._keyToggleTimer, Lang.bind(this, this._keyHandler), null);
+
+        // Create persistent message modal dialog
+        this._persistentMessageDialog.contentLayout.add(new St.Label({ style_class: 'persistent-message-label',
+            text: 'Take a break!' }), { x_fill: true, y_fill: true });
+        this._persistentMessageDialog.contentLayout.add(this._persistentMessageTimer,
+                { x_fill: true, y_fill: true });
+        this._persistentMessageDialog.setButtons([{ label: _("Hide"),
+            action: Lang.bind(this, function(param) { this._persistentMessageDialog.close(); }),
+            key:    Clutter.Escape
+        }]);
+
 
         // Start the timer
         this._refreshTimer();
@@ -254,14 +269,7 @@ Indicator.prototype = {
     // Show a persistent message at the end of pomodoro session
     _showMessageAtPomodoroCompletion: function() {
         if (this._persistentBreakMessage) {
-            Util.spawn(['zenity',
-                '--info',
-                '--text=Session ' + (this._sessionCount+1) + ' ends.' +
-                    '\nTake a break for ' + this._formatTime(this._pauseTime) + '.',
-                '--timeout=' + this._pauseTime,
-                '--title=Pomodoro',
-                '--width=250'
-            ]);
+            this._persistentMessageDialog.open();
         }
     },
 
@@ -310,9 +318,10 @@ Indicator.prototype = {
             if (this._isPause == true) {
                 // Check if the pause is over
                 if (this._timeSpent >= this._pauseTime) {
-                    this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
                     this._timeSpent = 0;
                     this._isPause = false;
+                    this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
+                    this._persistentMessageDialog.close();
                 }
                 else {
                     if (this._pauseCount == 0) {
@@ -378,6 +387,9 @@ Indicator.prototype = {
                 this._seconds = this._seconds.toString();
 
             this._timer.set_text("[" + this._timerLabel + "] " + this._minutes + ":" + this._seconds);
+
+            if (this._isPause && this._persistentBreakMessage)
+                this._persistentMessageTimer.set_text(this._minutes + ":" + this._seconds + "\n");
         }
     },
 
