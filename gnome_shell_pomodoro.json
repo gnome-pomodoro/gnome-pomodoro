@@ -2,12 +2,15 @@
     "version": "0.1",
     "timer": 
     {
-        "pomodoro_duration": 10,
-        "short_pause_duration": 3,
-        "long_pause_duration": 6
+        "pomodoro_duration": 1500,
+        "short_pause_duration": 300,
+        "long_pause_duration": 900
     },
     "ui":
     {
+        "show_messages": true,
+        "show_elapsed_time": true,
+        "show_persistent_break_message": false,
         "key_toggle_timer": "<Ctrl><Alt>P"
     }
 }
