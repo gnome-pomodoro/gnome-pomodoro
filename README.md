@@ -15,10 +15,13 @@ Get from [AUR](http://aur.archlinux.org/packages.php?ID=49967)
 
 ## Direct from source
 - Get zipball 
-    * [Current stable release](https://github.com/codito/gnome-shell-pomodoro/zipball/0.1)
+    * [Stable | Gnome-shell >= 3.2](https://github.com/codito/gnome-shell-pomodoro/zipball/0.3)
+    * [Stable | Gnome-shell < 3.0.x](https://github.com/codito/gnome-shell-pomodoro/zipball/0.2)
     * [Unstable - Master branch](https://github.com/codito/gnome-shell-pomodoro/zipball/master)
-    * [Unstable - Experimental branch](https://github.com/codito/gnome-shell-pomodoro/zipball/experimental)
 - Extract *pomodoro@arun.codito.in* directory to *~/.local/share/gnome-shell/extensions/*
+- Enable the extension using gnome-tweak-tool (Shell Extensions -> Pomodoro Extension) or via following commandline:
+        gsettings get org.gnome.shell enabled-extensions
+        gsettings set org.gnome.shell enabled-extensions [<value from get above>, pomodoro@arun.codito.in]
 - Press *Alt + F2*, and *r* in command to restart gnome-shell
 
 # Configuration

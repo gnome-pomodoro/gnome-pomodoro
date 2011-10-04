@@ -30,10 +30,9 @@ const ModalDialog = imports.ui.modalDialog;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 
-const Gettext = imports.gettext.domain('gnome-shell');
+const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
 
-let _pomodoroInit = false;
 let _configVersion = "0.1";
 let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <default_value> ]
     ["_pomodoroTime", "timer", "pomodoro_duration", 1500],
@@ -50,10 +49,10 @@ function Indicator() {
 }
 
 Indicator.prototype = {
-    __proto__: PanelMenu.SystemStatusButton.prototype,
+    __proto__: PanelMenu.Button.prototype,
 
     _init: function() {
-        PanelMenu.SystemStatusButton.prototype._init.call(this, 'text-x-generic-symbol');
+        PanelMenu.Button.prototype._init.call(this, St.Align.START);
 
         // Set default values of options, and then override from config file
         this._parseConfig();
@@ -207,7 +206,7 @@ Indicator.prototype = {
         let font = themeNode.get_font();
         let metrics = context.get_metrics(font, context.get_language());
         let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
-        let char_width = metrics.get_approximate_digit_width() / Pango.SCALE;
+        let char_width = metrics.get_approximate_char_width() / Pango.SCALE;
 
         // 3, 5 are the number of characters and digits we have in the label
         actor.width = char_width * 3 + digit_width * 5;
@@ -495,11 +494,22 @@ Indicator.prototype = {
 };
 
 // Extension initialization code
-function main() {
-    if (!_pomodoroInit) {
-        Main.StatusIconDispatcher.STANDARD_TRAY_ICON_IMPLEMENTATIONS['pomodoro'] = 'pomodoro';
-        Main.Panel.STANDARD_TRAY_ICON_ORDER.unshift('pomodoro');
-        Main.Panel.STANDARD_TRAY_ICON_SHELL_IMPLEMENTATION['pomodoro'] = Indicator;
-        _pomodoroInit = true;
+function init(metadata) {
+    //imports.gettext.bindtextdomain('gnome-shell-pomodoro', metadata.localedir);
+}
+
+let _indicator;
+
+function enable() {
+    if (_indicator == null) {
+        _indicator = new Indicator;
+        Main.panel.addToStatusArea('pomodoro', _indicator);
+    }
+}
+
+function disable() {
+    if (_indicator != null) {
+        _indicator.destroy();
+        _indicator = null;
     }
 }
