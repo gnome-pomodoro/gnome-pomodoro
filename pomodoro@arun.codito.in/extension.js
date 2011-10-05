@@ -19,7 +19,6 @@ const Mainloop = imports.mainloop;
 
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
-const Keybinder = imports.gi.Keybinder;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 const Util = imports.misc.util;
@@ -32,6 +31,9 @@ const PopupMenu = imports.ui.popupMenu;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
+
+let _useKeybinder = true;
+try { const Keybinder = imports.gi.Keybinder; } catch (error) { _useKeybinder = false; }
 
 let _configVersion = "0.1";
 let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <default_value> ]
@@ -97,8 +99,10 @@ Indicator.prototype = {
         this._buildOptionsMenu();
 
         // Register keybindings to toggle
-        Keybinder.init();
-        Keybinder.bind(this._keyToggleTimer, Lang.bind(this, this._keyHandler), null);
+        if (_useKeybinder) {
+            Keybinder.init();
+            Keybinder.bind(this._keyToggleTimer, Lang.bind(this, this._keyHandler), null);
+        }
 
         // Create persistent message modal dialog
         this._persistentMessageDialog.contentLayout.add(new St.Label({ style_class: 'persistent-message-label',
