@@ -286,6 +286,7 @@ Indicator.prototype = {
             this._stopTimer = true;
             this._isPause = false;
             this._timer.set_text("[" + this._sessionCount + "] --:--");
+            this._labelMsg.set_text('Stopped');
         }
         else {
             this._timeSpent = -1;
@@ -294,6 +295,7 @@ Indicator.prototype = {
             this._stopTimer = false;
             this._isPause = false;
             this._refreshTimer();
+            this._labelMsg.set_text('Running');
         }
     },
 

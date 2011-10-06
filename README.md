@@ -7,7 +7,7 @@
 More on pomodoro technique [here](http://www.pomodorotechnique.com).
 
 # Dependencies
-- Requires [LibKeybinder3](https://github.com/engla/keybinder/tree/keybinder-3.0) for global key bindings
+- Optional [LibKeybinder3](https://github.com/engla/keybinder/tree/keybinder-3.0) for global key bindings
 
 # Installation
 ## Archlinux
