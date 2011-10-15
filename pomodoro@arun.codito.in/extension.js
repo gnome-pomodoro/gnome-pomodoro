@@ -378,23 +378,13 @@ Indicator.prototype = {
             }                            
 
             this._minutes = parseInt(displaytime / 60);
-            this._seconds = displaytime - (this._minutes*60);
+            this._seconds = displaytime - (this._minutes * 60);
 
-            // Weird way to show 2-digit number, but js doesn't have a native padding function
-            if (this._minutes < 10)
-                this._minutes = "0" + this._minutes.toString();
-            else
-                this._minutes = this._minutes.toString();
-
-            if (this._seconds < 10) 
-                this._seconds = "0" + this._seconds.toString();
-            else
-                this._seconds = this._seconds.toString();
-
-            this._timer.set_text("[" + this._timerLabel + "] " + this._minutes + ":" + this._seconds);
+            timer_text = "%02d:%02d".format(this._minutes, this._seconds)
+            this._timer.set_text("[" + this._timerLabel + "] " + timer_text);
 
             if (this._isPause && this._persistentBreakMessage)
-                this._persistentMessageTimer.set_text(this._minutes + ":" + this._seconds + "\n");
+                this._persistentMessageTimer.set_text(timer_text + "\n");
         }
     },
 
