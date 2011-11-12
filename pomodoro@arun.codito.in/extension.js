@@ -109,11 +109,16 @@ Indicator.prototype = {
             text: 'Take a break!' }), { x_fill: true, y_fill: true });
         this._persistentMessageDialog.contentLayout.add(this._persistentMessageTimer,
                 { x_fill: true, y_fill: true });
-        this._persistentMessageDialog.setButtons([{ label: _("Hide"),
-            action: Lang.bind(this, function(param) { this._persistentMessageDialog.close(); }),
-            key:    Clutter.Escape
-        }]);
-
+        this._persistentMessageDialog.setButtons([ 
+            { label: _("Skip Break"), 
+              action: Lang.bind(this, function(param) { this._timeSpent = 99999;
+              this._checkTimerState();
+              }), 
+            },
+            { label: _("Hide"),
+              action: Lang.bind(this, function(param) { this._persistentMessageDialog.close(); }),
+              key:    Clutter.Escape 
+            },]);
 
         // Start the timer
         this._refreshTimer();
