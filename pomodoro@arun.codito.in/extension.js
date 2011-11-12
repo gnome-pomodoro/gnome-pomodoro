@@ -463,7 +463,7 @@ Indicator.prototype = {
         let jsondata = {};
 
         if (GLib.file_test(_configDir, GLib.FileTest.EXISTS | GLib.FileTest.IS_DIR) == false &&
-                GLib.mkdir_with_parents(_configDir, 0755) != 0) {
+                GLib.mkdir_with_parents(_configDir, 0x2141) != 0) { // 0755 base 8 = 0x2141 base 6
                     global.logError("Pomodoro: Failed to create configuration directory. Path = " +
                             _configDir + ". Configuration will not be saved.");
                 }
