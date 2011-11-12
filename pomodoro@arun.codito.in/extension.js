@@ -111,10 +111,9 @@ Indicator.prototype = {
                 { x_fill: true, y_fill: true });
         this._persistentMessageDialog.setButtons([ 
             { label: _("Skip Break"), 
-              action: Lang.bind(this, function(param) { this._timeSpent = 0;
-              this._isPause = false;
-              this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
-              this._persistentMessageDialog.close(); }), 
+              action: Lang.bind(this, function(param) { this._timeSpent = 99999;
+              this._checkTimerState();
+              }), 
             },
             { label: _("Hide"),
               action: Lang.bind(this, function(param) { this._persistentMessageDialog.close(); }),
