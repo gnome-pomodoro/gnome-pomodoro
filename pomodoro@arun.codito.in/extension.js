@@ -418,41 +418,46 @@ Indicator.prototype = {
     },
     
     _parseConfig: function() {
-        let _configFile = GLib.get_user_config_dir() + "/gnome-shell-pomodoro/gnome_shell_pomodoro.json";
         // Set the default values
         for (let i = 0; i < _configOptions.length; i++)
             this[_configOptions[i][0]] = _configOptions[i][3];
 
-        if (GLib.file_test(_configFile, GLib.FileTest.EXISTS)) {
-            let filedata = null;
+	// Search for configuration files first in system config dirs and after in the user dir
+	let _configDirs = [GLib.get_system_config_dirs(), GLib.get_user_config_dir()];
+	for(var i = 0; i < _configDirs.length; i++) {
+            let _configFile = _configDirs[i] + "/gnome-shell-pomodoro/gnome_shell_pomodoro.json";
 
-            try {
-                filedata = GLib.file_get_contents(_configFile, null, 0);
-                global.log("Pomodoro: Using config file = " + _configFile);
+            if (GLib.file_test(_configFile, GLib.FileTest.EXISTS)) {
+		let filedata = null;
 
-                let jsondata = JSON.parse(filedata[1]);
-                let parserVersion = null;
-                if (jsondata.hasOwnProperty("version"))
-                    parserVersion = jsondata.version;
-                else
-                    throw "Parser version not defined";
+		try {
+                    filedata = GLib.file_get_contents(_configFile, null, 0);
+                    global.log("Pomodoro: Using config file = " + _configFile);
 
-                for (let i = 0; i < _configOptions.length; i++) {
-                    let option = _configOptions[i];
-                    if (jsondata.hasOwnProperty(option[1]) && jsondata[option[1]].hasOwnProperty(option[2])) {
-                        // The option "category" and the actual option is defined in config file,
-                        // override it!
-                        this[option[0]] = jsondata[option[1]][option[2]];
+                    let jsondata = JSON.parse(filedata[1]);
+                    let parserVersion = null;
+                    if (jsondata.hasOwnProperty("version"))
+			parserVersion = jsondata.version;
+                    else
+			throw "Parser version not defined";
+
+                    for (let i = 0; i < _configOptions.length; i++) {
+			let option = _configOptions[i];
+			if (jsondata.hasOwnProperty(option[1]) && jsondata[option[1]].hasOwnProperty(option[2])) {
+                            // The option "category" and the actual option is defined in config file,
+                            // override it!
+                            this[option[0]] = jsondata[option[1]][option[2]];
+			}
                     }
-                }
+		}
+		catch (e) {
+                    global.logError("Pomodoro: Error reading config file " + _configFile + ", error = " + e);
+		}
+		finally {
+                    filedata = null;
+		}
             }
-            catch (e) {
-                global.logError("Pomodoro: Error reading config file = " + e);
-            }
-            finally {
-                filedata = null;
-            }
-        }
+	}
     },
 
 
