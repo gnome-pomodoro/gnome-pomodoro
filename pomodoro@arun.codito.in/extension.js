@@ -332,6 +332,7 @@ Indicator.prototype = {
                     this._isPause = false;
                     this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
                     this._persistentMessageDialog.close();
+                    GLib.spawn_command_line_async ("aplay -q /usr/share/sounds/generic.wav");
                 }
                 else {
                     if (this._pauseCount == 0) {
