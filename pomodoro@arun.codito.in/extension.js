@@ -43,7 +43,8 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_showMessages", "ui", "show_messages", true],
     ["_showElapsed", "ui", "show_elapsed_time", true],
     ["_persistentBreakMessage", "ui", "show_persistent_break_message", false],
-    ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"]
+    ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"],
+    ["_soundCommand", "ui", "sound_command", ""]
 ];
 
 function Indicator() {
@@ -332,7 +333,8 @@ Indicator.prototype = {
                     this._isPause = false;
                     this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
                     this._persistentMessageDialog.close();
-                    GLib.spawn_command_line_async ("aplay -q /usr/share/sounds/generic.wav");
+                    if (!this._soundCommand)
+                        GLib.spawn_command_line_async(this._soundCommand);
                 }
                 else {
                     if (this._pauseCount == 0) {
