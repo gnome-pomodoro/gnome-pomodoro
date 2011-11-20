@@ -2,7 +2,7 @@
 - Provides a countdown timer in the gnome-shell top panel
 - Keeps track of completed 25 minute cycles
 
-![Pomodoro image](https://a248.e.akamai.net/assets.github.com/img/e17034eeea5dbdeb4bd20fa280201246498ae669/687474703a2f2f692e696d6775722e636f6d2f3963474e4d2e706e67)
+![Pomodoro image](http://i.imgur.com/UtMOV.png)
 
 More on pomodoro technique [here](http://www.pomodorotechnique.com).
 
@@ -38,8 +38,9 @@ GPL3. See COPYING for details.
 - Contributors: https://github.com/codito/gnome-shell-pomodoro/contributors
 
 # Changelog
-Version 0.4
-    + Sound notification at end of a pomodoro break [Issue #26, Patch from @kamilprusko]
-    + System wide config file support [Patch from @mgrela]
-    + Support to skip breaks in case of persistent message [Patch from @amanbh]
-    - Some minor bug fixes, and keybinder3 requirement is now optional
+**Version 0.4**
+
++ Sound notification at end of a pomodoro break [Issue #26, Patch from @kamilprusko]
++ System wide config file support [Patch from @mgrela]
++ Support to skip breaks in case of persistent message [Patch from @amanbh]
+- Some minor bug fixes, and keybinder3 requirement is now optional
