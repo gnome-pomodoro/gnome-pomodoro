@@ -213,12 +213,12 @@ Indicator.prototype = {
 
         let item = new PopupMenu.PopupMenuItem(_("Pomodoro Duration"), { reactive: false });
         this._pomodoroTimeLabel = new St.Label({ text: this._formatTime(this._pomodoroTime) });
-        item.addActor(this._pomodoroTimeLabel);
+        item.addActor(this._pomodoroTimeLabel, { align: St.Align.END });
         timerLengthSection.addMenuItem(item);
 
         this._pomodoroTimeSlider = new PopupMenu.PopupSliderMenuItem(this._pomodoroTime/3600);
         this._pomodoroTimeSlider.connect('value-changed', Lang.bind(this, function() {
-            this._pomodoroTime = Math.ceil(Math.ceil(this._pomodoroTimeSlider._value * 3600)/10)*10;
+            this._pomodoroTime = Math.ceil(Math.ceil(this._pomodoroTimeSlider._value * 3600)/60)*60;
             this._pomodoroTimeLabel.set_text(this._formatTime(this._pomodoroTime));
             this._onConfigUpdate(true);
         } ));
@@ -227,12 +227,12 @@ Indicator.prototype = {
         // Short Break Duration menu
         item = new PopupMenu.PopupMenuItem(_("Short Break Duration"), { reactive: false });
         this._sBreakTimeLabel = new St.Label({ text: this._formatTime(this._shortPauseTime) });
-        item.addActor(this._sBreakTimeLabel);
+        item.addActor(this._sBreakTimeLabel, { align: St.Align.END });
         timerLengthSection.addMenuItem(item);
 
         this._sBreakTimeSlider = new PopupMenu.PopupSliderMenuItem(this._shortPauseTime/720);
         this._sBreakTimeSlider.connect('value-changed', Lang.bind(this, function() {
-            this._shortPauseTime = Math.ceil(Math.ceil(this._sBreakTimeSlider._value * 720)/10)*10;
+            this._shortPauseTime = Math.ceil(Math.ceil(this._sBreakTimeSlider._value * 720)/60)*60;
             this._sBreakTimeLabel.set_text(this._formatTime(this._shortPauseTime));
             this._onConfigUpdate(true);
         } ));
@@ -241,12 +241,12 @@ Indicator.prototype = {
         // Long Break Duration menu
         item = new PopupMenu.PopupMenuItem(_("Long Break Duration"), { reactive: false });
         this._lBreakTimeLabel = new St.Label({ text: this._formatTime(this._longPauseTime) });
-        item.addActor(this._lBreakTimeLabel);
+        item.addActor(this._lBreakTimeLabel, { align: St.Align.END });
         timerLengthSection.addMenuItem(item);
 
         this._lBreakTimeSlider = new PopupMenu.PopupSliderMenuItem(this._longPauseTime/2160);
         this._lBreakTimeSlider.connect('value-changed', Lang.bind(this, function() {
-            this._longPauseTime = Math.ceil(Math.ceil(this._lBreakTimeSlider._value * 2160)/10)*10;
+            this._longPauseTime = Math.ceil(Math.ceil(this._lBreakTimeSlider._value * 2160)/60)*60;
             this._lBreakTimeLabel.set_text(this._formatTime(this._longPauseTime));
             this._onConfigUpdate(true);
         } ));
@@ -484,17 +484,7 @@ Indicator.prototype = {
     _formatTime: function(abs) {
         let minutes = Math.floor(abs/60);
         let seconds = abs - minutes*60;
-        let str = "";
-        if (minutes != 0) {
-            str = str + minutes.toString() + " m ";
-        }
-        if (seconds != 0) {
-            str = str + seconds.toString() + " s";
-        }
-        if (abs == 0) {
-            str = "0 s";
-        }
-        return str;
+        return _("%d minutes").format(minutes);
     },
 
     _keyHandler: function(keystring, data) {
