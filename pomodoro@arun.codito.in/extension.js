@@ -70,8 +70,6 @@ Indicator.prototype = {
         this._pauseCount = 0;                                   // Number of short pauses so far. Reset every 4 pauses.
         this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
         this._labelMsg = new St.Label({ text: 'Stopped'});
-        this._persistentMessageDialog = new ModalDialog.ModalDialog();
-        this._persistentMessageTimer = new St.Label({ style_class: 'persistent-message-label'  }),
 
         // Set default menu
         this._timer.set_text("00:00");
@@ -109,20 +107,58 @@ Indicator.prototype = {
             Keybinder.bind(this._keyToggleTimer, Lang.bind(this, this._keyHandler), null);
         }
 
-        // Create persistent message modal dialog
-        this._persistentMessageDialog.contentLayout.add(new St.Label({ style_class: 'persistent-message-label',
-            text: 'Take a break!' }), { x_fill: true, y_fill: true });
-        this._persistentMessageDialog.contentLayout.add(this._persistentMessageTimer,
-                { x_fill: true, y_fill: true });
-        this._persistentMessageDialog.setButtons([ 
-            { label: _("Skip Break"), 
-              action: Lang.bind(this, function(param) { this._timeSpent = 99999;
-              this._checkTimerState();
-              }), 
-            },
+        // Dialog
+        this._persistentMessageDialog = new ModalDialog.ModalDialog({ style_class: 'polkit-dialog' });
+
+        let mainContentBox = new St.BoxLayout({ style_class: 'polkit-dialog-main-layout',
+                                                vertical: false });
+        this._persistentMessageDialog.contentLayout.add(mainContentBox,
+                                              { x_fill: true,
+                                                y_fill: true });
+
+        //let icon = new St.Icon({ icon_name: 'pomodoro-symbolic' });
+        //mainContentBox.add(icon,
+        //                   { x_fill:  true,
+        //                     y_fill:  false,
+        //                     x_align: St.Align.END,
+        //                     y_align: St.Align.START });
+
+        let messageBox = new St.BoxLayout({ style_class: 'polkit-dialog-message-layout',
+                                            vertical: true });
+        mainContentBox.add(messageBox,
+                           { y_align: St.Align.START });
+
+        this._subjectLabel = new St.Label({ style_class: 'polkit-dialog-headline',
+                                            text: _("Pomodoro Finished!") });
+
+        messageBox.add(this._subjectLabel,
+                       { y_fill:  false,
+                         y_align: St.Align.START });
+
+        this._descriptionLabel = new St.Label({ style_class: 'polkit-dialog-description',
+                                                text: '' });
+        this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._descriptionLabel.clutter_text.line_wrap = true;
+
+        messageBox.add(this._descriptionLabel,
+            { y_fill:  true,
+              y_align: St.Align.START });
+
+        this._persistentMessageDialog.contentLayout.add(this._descriptionLabel,
+            { x_fill: true,
+              y_fill: true });
+        this._persistentMessageDialog.setButtons([
             { label: _("Hide"),
-              action: Lang.bind(this, function(param) { this._persistentMessageDialog.close(); }),
-              key:    Clutter.Escape 
+              action: Lang.bind(this, function(param) {
+                        this._persistentMessageDialog.close();
+                    }),
+              key: Clutter.Escape 
+            },
+            { label: _("Start a new Pomodoro"),
+              action: Lang.bind(this, function(param) {
+                        this._timeSpent = 99999;
+                        this._checkTimerState();
+                    }), 
             },]);
 
         // Start the timer
@@ -369,7 +405,12 @@ Indicator.prototype = {
             this._timer.set_text(timer_text);
 
             if (this._isPause && this._persistentBreakMessage)
-                this._persistentMessageTimer.set_text(timer_text + "\n");
+            {
+                if (this._minutes == 0)
+                    this._descriptionLabel.text = _("Take a break! You have %d seconds\n").format(this._seconds);
+                else
+                    this._descriptionLabel.text = _("Take a break! You have %d minutes\n").format(Math.floor(this._minutes + this._seconds/60));
+            }
         }
     },
 
