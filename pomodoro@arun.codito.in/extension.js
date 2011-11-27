@@ -281,6 +281,18 @@ Indicator.prototype = {
         }
     },
 
+    // Plays a notification sound
+    _playNotificationSound: function() {
+        let extension = ExtensionSystem.extensionMeta["pomodoro@arun.codito.in"];
+        let uri = GLib.filename_to_uri(extension.path + "/bell.wav", null);
+        
+        try {
+            Util.trySpawnCommandLine("gst-launch --quiet playbin2 uri="+ GLib.shell_quote(uri));
+        } catch (err) {
+            global.logError("Pomodoro: Error playing a sound: " + err.message);
+        }
+    },
+
     // Toggle timer state
     _toggleTimerState: function(item) {
         if (item != null) {
@@ -332,7 +344,7 @@ Indicator.prototype = {
                     this._isPause = false;
                     this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
                     this._persistentMessageDialog.close();
-                    GLib.spawn_command_line_async ("aplay -q /usr/share/sounds/generic.wav");
+                    this._playNotificationSound();
                 }
                 else {
                     if (this._pauseCount == 0) {
