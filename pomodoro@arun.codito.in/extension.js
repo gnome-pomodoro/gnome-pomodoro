@@ -44,6 +44,7 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_longPauseTime", "timer", "long_pause_duration", 900],
     ["_showMessages", "ui", "show_messages", true],
     ["_persistentBreakMessage", "ui", "show_persistent_break_message", false],
+    ["_playSound", "ui", "play_sound", true],
     ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"]
 ];
 
@@ -192,6 +193,17 @@ Indicator.prototype = {
         // breakMessageToggle.actor.tooltip_text = "Show a persistent message at the end of pomodoro session"; 
         this._optionsMenu.menu.addMenuItem(breakMessageToggle);  
 
+        // Notify with a sound
+        let playSoundToggle = new PopupMenu.PopupSwitchMenuItem
+            (_("Sound Notifications"), this._playSound);
+        playSoundToggle.connect("toggled", Lang.bind(this, function() {
+            this._playSound = !(this._playSound);
+            this._onConfigUpdate(false);
+        }));
+        // Uncomment and replace tooltip, if label does not describe use clearly
+        // breakMessageToggle.actor.tooltip_text = "Show a persistent message at the end of pomodoro session"; 
+        this._optionsMenu.menu.addMenuItem(playSoundToggle);  
+
         // Pomodoro Duration menu
         let timerLengthMenu = new PopupMenu.PopupSubMenuMenuItem(_('Timer Durations'));
         this._optionsMenu.menu.addMenuItem(timerLengthMenu);
@@ -298,13 +310,15 @@ Indicator.prototype = {
 
     // Plays a notification sound
     _playNotificationSound: function() {
-        let extension = ExtensionSystem.extensionMeta["pomodoro@arun.codito.in"];
-        let uri = GLib.filename_to_uri(extension.path + "/bell.wav", null);
-        
-        try {
-            Util.trySpawnCommandLine("gst-launch --quiet playbin2 uri="+ GLib.shell_quote(uri));
-        } catch (err) {
-            global.logError("Pomodoro: Error playing a sound: " + err.message);
+        if (this._playSound) {
+            let extension = ExtensionSystem.extensionMeta["pomodoro@arun.codito.in"];
+            let uri = GLib.filename_to_uri(extension.path + "/bell.wav", null);
+            
+            try {
+                Util.trySpawnCommandLine("gst-launch --quiet playbin2 uri="+ GLib.shell_quote(uri));
+            } catch (err) {
+                global.logError("Pomodoro: Error playing a sound: " + err.message);
+            }
         }
     },
 
