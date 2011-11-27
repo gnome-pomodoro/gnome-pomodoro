@@ -42,8 +42,8 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_pomodoroTime", "timer", "pomodoro_duration", 1500],
     ["_shortPauseTime", "timer", "short_pause_duration", 300],
     ["_longPauseTime", "timer", "long_pause_duration", 900],
-    ["_showMessages", "ui", "show_messages", true],
-    ["_persistentBreakMessage", "ui", "show_persistent_break_message", false],
+    ["_showNotificationMessages", "ui", "show_messages", false],
+    ["_showDialogMessages", "ui", "show_dialog_messages", true],
     ["_playSound", "ui", "play_sound", true],
     ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"]
 ];
@@ -71,7 +71,9 @@ Indicator.prototype = {
         this._pauseCount = 0;                                   // Number of short pauses so far. Reset every 4 pauses.
         this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
         this._labelMsg = new St.Label({ text: 'Stopped'});
-
+        this._notification = null;
+        this._dialog = null;
+        
         // Set default menu
         this._timer.set_text("00:00");
         this.actor.add_actor(this._timer);
@@ -109,11 +111,11 @@ Indicator.prototype = {
         }
 
         // Dialog
-        this._persistentMessageDialog = new ModalDialog.ModalDialog({ style_class: 'polkit-dialog' });
+        this._dialog = new ModalDialog.ModalDialog({ style_class: 'polkit-dialog' });
 
         let mainContentBox = new St.BoxLayout({ style_class: 'polkit-dialog-main-layout',
                                                 vertical: false });
-        this._persistentMessageDialog.contentLayout.add(mainContentBox,
+        this._dialog.contentLayout.add(mainContentBox,
                                               { x_fill: true,
                                                 y_fill: true });
 
@@ -145,20 +147,20 @@ Indicator.prototype = {
             { y_fill:  true,
               y_align: St.Align.START });
 
-        this._persistentMessageDialog.contentLayout.add(this._descriptionLabel,
+        this._dialog.contentLayout.add(this._descriptionLabel,
             { x_fill: true,
               y_fill: true });
-        this._persistentMessageDialog.setButtons([
+        this._dialog.setButtons([
             { label: _("Hide"),
               action: Lang.bind(this, function(param) {
-                        this._persistentMessageDialog.close();
+                        this._dialog.close();
+                        this._notifyPomodoroEnd(_('Pomodoro finished, take a break!'), true);
                     }),
               key: Clutter.Escape 
             },
             { label: _("Start a new Pomodoro"),
               action: Lang.bind(this, function(param) {
-                        this._timeSpent = 99999;
-                        this._checkTimerState();
+                        this._startNewPomodoro();
                     }), 
             },]);
 
@@ -175,22 +177,22 @@ Indicator.prototype = {
         this._resetMenu.connect('activate', Lang.bind(this, this._resetCount));
 
         // ShowMessages option toggle
-        this._showMessagesSwitch = new PopupMenu.PopupSwitchMenuItem(_("Show Notification Messages"), this._showMessages);
-        this._showMessagesSwitch.connect("toggled", Lang.bind(this, function() {
-            this._showMessages = !(this._showMessages);
+        this._showNotificationMessagesSwitch = new PopupMenu.PopupSwitchMenuItem(_("Show Notification Messages"), this._showNotificationMessages);
+        this._showNotificationMessagesSwitch.connect("toggled", Lang.bind(this, function() {
+            this._showNotificationMessages = !(this._showNotificationMessages);
             this._onConfigUpdate(false);
         }));
-        this._optionsMenu.menu.addMenuItem(this._showMessagesSwitch);
+        this._optionsMenu.menu.addMenuItem(this._showNotificationMessagesSwitch);
 
-        //Persistent Break Message toggle
+        // Dialog Message toggle
         let breakMessageToggle = new PopupMenu.PopupSwitchMenuItem
-            (_("Show Persistent Break Messages"), this._persistentBreakMessage);
+            (_("Show Dialog Messages"), this._showDialogMessages);
         breakMessageToggle.connect("toggled", Lang.bind(this, function() {
-            this._persistentBreakMessage = !(this._persistentBreakMessage);
+            this._showDialogMessages = !(this._showDialogMessages);
             this._onConfigUpdate(false);
         }));
         // Uncomment and replace tooltip, if label does not describe use clearly
-        // breakMessageToggle.actor.tooltip_text = "Show a persistent message at the end of pomodoro session"; 
+        // breakMessageToggle.actor.tooltip_text = "Show a dialog message at the end of pomodoro session"; 
         this._optionsMenu.menu.addMenuItem(breakMessageToggle);  
 
         // Notify with a sound
@@ -273,6 +275,16 @@ Indicator.prototype = {
         this._saveConfig();
     },
 
+    // Skip break or reset current pomodoro
+    _startNewPomodoro: function() {
+        if (this._isPause)
+            this._timeSpent = 99999;
+        else
+            this._timeSpent = 0;
+        
+        this._checkTimerState();
+    },
+    
     // Reset all counters and timers
     _resetCount: function() {
         this._sessionCount = 0;
@@ -286,24 +298,56 @@ Indicator.prototype = {
         return false;
     },
 
-    // Notify user of changes
-    _notifyUser: function(text, label_msg) {
-        if (this._showMessages) {
-            let source = new MessageTray.SystemNotificationSource();
-            Main.messageTray.add(source);
-            let notification = new MessageTray.Notification(source, text, null);
-            notification.setTransient(true);
-            source.notify(notification);
-        }        
-        // Change the label inside the popup menu
-        this._statusLabel.set_text(label_msg);
+    _createNotificationSource: function() {
+        let source = new MessageTray.SystemNotificationSource();
+        source.setTitle(_('Pomodoro Timer'));
+        Main.messageTray.add(source);
+        return source;
     },
 
-    // Show a persistent message at the end of pomodoro session
-    _showMessageAtPomodoroCompletion: function() {
-        if (this._persistentBreakMessage) {
-            this._persistentMessageDialog.open();
+    // Notify user of changes
+    _notifyPomodoroStart: function(text, force) {
+        if (this._notification != null) {
+            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+            this._notification = null;        
         }
+        this._dialog.close();
+
+        if (this._showNotificationMessages) {
+            let source = this._createNotificationSource ();
+            this._notification = new MessageTray.Notification(source, text);
+            this._notification.setTransient(true);
+            
+            source.notify(this._notification);
+        }        
+
+        this._playNotificationSound();
+        // Change the label inside the popup menu
+        this._statusLabel.set_text(_('running'));
+    },
+    
+    // Notify user of changes
+    _notifyPomodoroEnd: function(text, hideDialog) {
+        if (this._notification != null) {
+            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+            this._notification = null;        
+        }
+        if (this._showNotificationMessages || hideDialog) {
+            let source = this._createNotificationSource ();
+            this._notification = new MessageTray.Notification(source, text, null);
+            this._notification.setResident(true);
+            this._notification.addButton(1, _('Start a new Pomodoro'));
+            this._notification.connect('action-invoked', Lang.bind(this, function(param) {
+                        this._startNewPomodoro();
+                    })
+                );
+            source.notify(this._notification);
+        }
+        if (this._showDialogMessages && hideDialog != true)
+            this._dialog.open();
+        
+        // Change the label inside the popup menu
+        this._statusLabel.set_text(_('pause'));
     },
 
     // Plays a notification sound
@@ -367,9 +411,7 @@ Indicator.prototype = {
                 if (this._timeSpent >= this._pauseTime) {
                     this._timeSpent = 0;
                     this._isPause = false;
-                    this._notifyUser('Pause finished, a new pomodoro is starting!', _('running'));
-                    this._persistentMessageDialog.close();
-                    this._playNotificationSound();
+                    this._notifyPomodoroStart(_('Pause finished, a new pomodoro is starting!'));
                 }
                 else {
                     if (this._pauseCount == 0) {
@@ -388,13 +430,12 @@ Indicator.prototype = {
                 if (this._pauseCount == 4) {
                     this._pauseCount = 0;
                     this._pauseTime = this._longPauseTime;
-                    this._notifyUser('4th pomodoro in a row finished, starting a long pause...', 'Long pause');
+                    this._notifyPomodoroEnd(_('4th pomodoro in a row finished, starting a long pause...'));
                 }
                 else {
-                    this._notifyUser('Pomodoro finished, starting pause...', _('short pause'));
+                    this._notifyPomodoroEnd(_('Pomodoro finished, take a break!'));
                 }
 
-                this._showMessageAtPomodoroCompletion();
                 this._timeSpent = 0;
                 this._minutes = 0;
                 this._seconds = 0;
@@ -413,10 +454,10 @@ Indicator.prototype = {
             this._minutes = parseInt(displaytime / 60);
             this._seconds = displaytime - (this._minutes * 60);
 
-            timer_text = "%02d:%02d".format(this._minutes, this._seconds)
+            timer_text = "%02d:%02d".format(this._minutes, this._seconds);
             this._timer.set_text(timer_text);
 
-            if (this._isPause && this._persistentBreakMessage)
+            if (this._isPause && this._showDialogMessages)
             {
                 if (this._minutes == 0)
                     this._descriptionLabel.text = _("Take a break! You have %d seconds\n").format(this._seconds);
