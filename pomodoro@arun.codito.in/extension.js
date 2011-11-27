@@ -19,9 +19,11 @@ const Mainloop = imports.mainloop;
 
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
+const Gio = imports.gi.Gio;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 const Util = imports.misc.util;
+const ExtensionSystem = imports.ui.extensionSystem;
 
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
