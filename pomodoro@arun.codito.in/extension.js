@@ -82,7 +82,7 @@ Indicator.prototype = {
         this._timer.connect('realize', Lang.bind(this, this._onTimerRealize));
 
         // Toggle timer state button
-        this._widget = new PopupMenu.PopupSwitchMenuItem(_("Toggle timer"), false);
+        this._widget = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'popup-subtitle-menu-item' });
         this._widget.connect("toggled", Lang.bind(this, this._toggleTimerState));
         this.menu.addMenuItem(this._widget);
 
