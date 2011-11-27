@@ -76,6 +76,8 @@ Indicator.prototype = {
         
         // Set default menu
         this._timer.set_text("00:00");
+        this._timer.clutter_text.set_line_wrap(false);
+        this._timer.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
         this.actor.add_actor(this._timer);
 
         // Set initial width of the timer label
