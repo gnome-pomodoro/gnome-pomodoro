@@ -292,19 +292,17 @@ Indicator.prototype = {
             this._timeSpent = 0;
         
         this._checkTimerState();
+        this._updateTimer();
     },
     
     // Reset all counters and timers
     _resetCount: function() {
+        this._timeSpent = 0;
+        this._isPause = false;
         this._sessionCount = 0;
         this._pauseCount = 0;
-        if (this._stopTimer == false) {
-            this._stopTimer = true;
-            this._isPause = false;
-        }
-        this._timer.set_text("00:00");
-        this._widget.setToggleState(false);
         this._checkTimerState();
+        this._updateTimer();
         return false;
     },
 
