@@ -200,18 +200,16 @@ Indicator.prototype = {
             this._playSound = !(this._playSound);
             this._onConfigUpdate(false);
         }));
-        // Uncomment and replace tooltip, if label does not describe use clearly
-        // breakMessageToggle.actor.tooltip_text = "Show a persistent message at the end of pomodoro session"; 
         this._optionsMenu.menu.addMenuItem(playSoundToggle);  
 
-        // Pomodoro Duration menu
-        let timerLengthMenu = new PopupMenu.PopupSubMenuMenuItem(_('Timer Durations'));
-        this._optionsMenu.menu.addMenuItem(timerLengthMenu);
+        // Pomodoro Duration section
+        let timerLengthSection = new PopupMenu.PopupMenuSection();
+        this._optionsMenu.menu.addMenuItem(timerLengthSection);
 
         let item = new PopupMenu.PopupMenuItem(_("Pomodoro Duration"), { reactive: false });
         this._pomodoroTimeLabel = new St.Label({ text: this._formatTime(this._pomodoroTime) });
         item.addActor(this._pomodoroTimeLabel);
-        timerLengthMenu.menu.addMenuItem(item);
+        timerLengthSection.addMenuItem(item);
 
         this._pomodoroTimeSlider = new PopupMenu.PopupSliderMenuItem(this._pomodoroTime/3600);
         this._pomodoroTimeSlider.connect('value-changed', Lang.bind(this, function() {
@@ -219,13 +217,13 @@ Indicator.prototype = {
             this._pomodoroTimeLabel.set_text(this._formatTime(this._pomodoroTime));
             this._onConfigUpdate(true);
         } ));
-        timerLengthMenu.menu.addMenuItem(this._pomodoroTimeSlider);
+        timerLengthSection.addMenuItem(this._pomodoroTimeSlider);
 
         // Short Break Duration menu
         item = new PopupMenu.PopupMenuItem(_("Short Break Duration"), { reactive: false });
         this._sBreakTimeLabel = new St.Label({ text: this._formatTime(this._shortPauseTime) });
         item.addActor(this._sBreakTimeLabel);
-        timerLengthMenu.menu.addMenuItem(item);
+        timerLengthSection.addMenuItem(item);
 
         this._sBreakTimeSlider = new PopupMenu.PopupSliderMenuItem(this._shortPauseTime/720);
         this._sBreakTimeSlider.connect('value-changed', Lang.bind(this, function() {
@@ -233,13 +231,13 @@ Indicator.prototype = {
             this._sBreakTimeLabel.set_text(this._formatTime(this._shortPauseTime));
             this._onConfigUpdate(true);
         } ));
-        timerLengthMenu.menu.addMenuItem(this._sBreakTimeSlider);
+        timerLengthSection.addMenuItem(this._sBreakTimeSlider);
 
         // Long Break Duration menu
         item = new PopupMenu.PopupMenuItem(_("Long Break Duration"), { reactive: false });
         this._lBreakTimeLabel = new St.Label({ text: this._formatTime(this._longPauseTime) });
         item.addActor(this._lBreakTimeLabel);
-        timerLengthMenu.menu.addMenuItem(item);
+        timerLengthSection.addMenuItem(item);
 
         this._lBreakTimeSlider = new PopupMenu.PopupSliderMenuItem(this._longPauseTime/2160);
         this._lBreakTimeSlider.connect('value-changed', Lang.bind(this, function() {
@@ -247,7 +245,7 @@ Indicator.prototype = {
             this._lBreakTimeLabel.set_text(this._formatTime(this._longPauseTime));
             this._onConfigUpdate(true);
         } ));
-        timerLengthMenu.menu.addMenuItem(this._lBreakTimeSlider);
+        timerLengthSection.addMenuItem(this._lBreakTimeSlider);
     },
 
     // Handle the style related properties in the timer label. These properties are dependent on
