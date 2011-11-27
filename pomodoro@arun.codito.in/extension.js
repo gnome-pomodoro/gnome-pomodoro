@@ -95,14 +95,6 @@ Indicator.prototype = {
         item.addActor(bin, { expand: true, span: -1, align: St.Align.END });
         this.menu.addMenuItem(item);
 
-        // Status
-        let item = new PopupMenu.PopupMenuItem(_("Status"), { reactive: false });
-        let bin = new St.Bin({ x_align: St.Align.END });
-        this._statusLabel = new St.Label({ text: _('stopped'), }); //style_class: 'popup-inactive-menu-item' });
-        bin.add_actor(this._statusLabel);
-        item.addActor(bin, { expand: true, span: -1, align: St.Align.END });
-        this.menu.addMenuItem(item);
-
         // Separator
         let item = new PopupMenu.PopupSeparatorMenuItem();
         this.menu.addMenuItem(item);
@@ -330,8 +322,6 @@ Indicator.prototype = {
         }        
 
         this._playNotificationSound();
-        // Change the label inside the popup menu
-        this._statusLabel.set_text(_('running'));
     },
     
     // Notify user of changes
@@ -353,9 +343,6 @@ Indicator.prototype = {
         }
         if (this._showDialogMessages && hideDialog != true)
             this._dialog.open();
-        
-        // Change the label inside the popup menu
-        this._statusLabel.set_text(_('pause'));
     },
 
     // Plays a notification sound
@@ -382,7 +369,6 @@ Indicator.prototype = {
             this._stopTimer = true;
             this._isPause = false;
             this._timer.set_text("00:00");
-            this._statusLabel.set_text(_('stopped'));
         }
         else {
             this._timeSpent = -1;
@@ -391,7 +377,6 @@ Indicator.prototype = {
             this._stopTimer = false;
             this._isPause = false;
             this._refreshTimer();
-            this._statusLabel.set_text(_('running'));
         }
         this._checkTimerState();
     },
