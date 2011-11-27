@@ -77,9 +77,6 @@ Indicator.prototype = {
         // Set default menu
         this._timer.set_text("00:00");
         this.actor.add_actor(this._timer);
-        let item = new PopupMenu.PopupMenuItem("Status:", { reactive: false });
-        item.addActor(this._labelMsg);
-        this.menu.addMenuItem(item);
 
         // Set initial width of the timer label
         this._timer.connect('realize', Lang.bind(this, this._onTimerRealize));
@@ -88,6 +85,14 @@ Indicator.prototype = {
         this._widget = new PopupMenu.PopupSwitchMenuItem(_("Toggle timer"), false);
         this._widget.connect("toggled", Lang.bind(this, this._toggleTimerState));
         this.menu.addMenuItem(this._widget);
+
+        // Status
+        let item = new PopupMenu.PopupMenuItem(_("Status"), { reactive: false });
+        let bin = new St.Bin({ x_align: St.Align.END });
+        this._statusLabel = new St.Label({ text: _('stopped'), }); //style_class: 'popup-inactive-menu-item' });
+        bin.add_actor(this._statusLabel);
+        item.addActor(bin, { expand: true, span: -1, align: St.Align.END });
+        this.menu.addMenuItem(item);
 
         // Separator
         let item = new PopupMenu.PopupSeparatorMenuItem();
@@ -271,7 +276,7 @@ Indicator.prototype = {
             source.notify(notification);
         }        
         // Change the label inside the popup menu
-        this._labelMsg.set_text(label_msg);
+        this._statusLabel.set_text(label_msg);
     },
 
     // Show a persistent message at the end of pomodoro session
@@ -303,7 +308,7 @@ Indicator.prototype = {
             this._stopTimer = true;
             this._isPause = false;
             this._timer.set_text("00:00");
-            this._labelMsg.set_text('Stopped');
+            this._statusLabel.set_text(_('stopped'));
         }
         else {
             this._timeSpent = -1;
@@ -312,7 +317,7 @@ Indicator.prototype = {
             this._stopTimer = false;
             this._isPause = false;
             this._refreshTimer();
-            this._labelMsg.set_text('Running');
+            this._statusLabel.set_text(_('running'));
         }
     },
 
@@ -340,7 +345,7 @@ Indicator.prototype = {
                 if (this._timeSpent >= this._pauseTime) {
                     this._timeSpent = 0;
                     this._isPause = false;
-                    this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
+                    this._notifyUser('Pause finished, a new pomodoro is starting!', _('running'));
                     this._persistentMessageDialog.close();
                     this._playNotificationSound();
                 }
@@ -364,7 +369,7 @@ Indicator.prototype = {
                     this._notifyUser('4th pomodoro in a row finished, starting a long pause...', 'Long pause');
                 }
                 else {
-                    this._notifyUser('Pomodoro finished, starting pause...', 'Short pause');
+                    this._notifyUser('Pomodoro finished, starting pause...', _('short pause'));
                 }
 
                 this._showMessageAtPomodoroCompletion();
