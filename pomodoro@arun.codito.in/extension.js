@@ -179,13 +179,16 @@ Indicator.prototype = {
         this._optionsMenu.menu.addMenuItem(this._resetMenu);
         this._resetMenu.connect('activate', Lang.bind(this, this._resetCount));
 
+        let notificationSection = new PopupMenu.PopupMenuSection();
+        this._optionsMenu.menu.addMenuItem(notificationSection);
+
         // ShowMessages option toggle
         this._showNotificationMessagesSwitch = new PopupMenu.PopupSwitchMenuItem(_("Show Notification Messages"), this._showNotificationMessages);
         this._showNotificationMessagesSwitch.connect("toggled", Lang.bind(this, function() {
             this._showNotificationMessages = !(this._showNotificationMessages);
             this._onConfigUpdate(false);
         }));
-        this._optionsMenu.menu.addMenuItem(this._showNotificationMessagesSwitch);
+        notificationSection.addMenuItem(this._showNotificationMessagesSwitch);
 
         // Dialog Message toggle
         let breakMessageToggle = new PopupMenu.PopupSwitchMenuItem
@@ -196,7 +199,7 @@ Indicator.prototype = {
         }));
         // Uncomment and replace tooltip, if label does not describe use clearly
         // breakMessageToggle.actor.tooltip_text = "Show a dialog message at the end of pomodoro session"; 
-        this._optionsMenu.menu.addMenuItem(breakMessageToggle);  
+        notificationSection.addMenuItem(breakMessageToggle);  
 
         // Notify with a sound
         let playSoundToggle = new PopupMenu.PopupSwitchMenuItem
@@ -461,20 +464,20 @@ Indicator.prototype = {
     // Update timer_ui
     _updateTimer: function() {
         if (this._stopTimer == false) {
-            let displaytime = (this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent;
+            let seconds = (this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent;
             
-            this._minutes = parseInt(displaytime / 60);
-            this._seconds = displaytime - (this._minutes * 60);
+            this._minutes = parseInt(seconds / 60);
+            this._seconds = seconds - (this._minutes * 60);
 
             timer_text = "%02d:%02d".format(this._minutes, this._seconds);
             this._timer.set_text(timer_text);
 
             if (this._isPause && this._showDialogMessages)
             {
-                if (this._minutes == 0)
-                    this._descriptionLabel.text = _("Take a break! You have %d seconds\n").format(this._seconds);
+                if (seconds < 47)
+                    this._descriptionLabel.text = _("Take a break! You have %d seconds\n").format(Math.round(seconds / 5) * 5);
                 else
-                    this._descriptionLabel.text = _("Take a break! You have %d minutes\n").format(Math.floor(this._minutes + this._seconds/60));
+                    this._descriptionLabel.text = _("Take a break! You have %d minutes\n").format(Math.round(seconds / 60));
             }
         }
     },
