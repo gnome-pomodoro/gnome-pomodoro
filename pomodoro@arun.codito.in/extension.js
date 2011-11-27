@@ -86,6 +86,15 @@ Indicator.prototype = {
         this._widget.connect("toggled", Lang.bind(this, this._toggleTimerState));
         this.menu.addMenuItem(this._widget);
 
+        // Session count
+        let item = new PopupMenu.PopupMenuItem(_("Collected"), { reactive: false });
+        let bin = new St.Bin({ x_align: St.Align.END });
+//        this._sessionCountLabel = new St.Label({ text: '\u25cf' }); // ● U+25CF BLACK CIRCLE //style_class: 'popup-inactive-menu-item' });
+        this._sessionCountLabel = new St.Label({ text: _('None') }); // ● U+25CF BLACK CIRCLE //style_class: 'popup-inactive-menu-item' });
+        bin.add_actor(this._sessionCountLabel);
+        item.addActor(bin, { expand: true, span: -1, align: St.Align.END });
+        this.menu.addMenuItem(item);
+
         // Status
         let item = new PopupMenu.PopupMenuItem(_("Status"), { reactive: false });
         let bin = new St.Bin({ x_align: St.Align.END });
@@ -295,6 +304,7 @@ Indicator.prototype = {
         }
         this._timer.set_text("00:00");
         this._widget.setToggleState(false);
+        this._checkTimerState();
         return false;
     },
 
@@ -385,6 +395,7 @@ Indicator.prototype = {
             this._refreshTimer();
             this._statusLabel.set_text(_('running'));
         }
+        this._checkTimerState();
     },
 
 
@@ -396,7 +407,7 @@ Indicator.prototype = {
             this._updateTimer();
             Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
         }
-
+        
         this._updateTimer();
         return false;
     },
@@ -441,10 +452,26 @@ Indicator.prototype = {
                 this._seconds = 0;
                 this._sessionCount += 1;
                 this._isPause = true;
+                
             }
         }
+        this._updateSessionCount();
     },
 
+    _updateSessionCount: function() {
+        let text = '';
+
+        if (this._sessionCount == 0 && this._stopTimer){
+            text = _('None');
+        }
+        else{
+            if (this._isPause || this._stopTimer)
+                text = Array((this._sessionCount-1) % 4 + 2).join('\u25cf'); // ● U+25CF BLACK CIRCLE            
+            else
+                text = Array(this._sessionCount % 4 + 1).join('\u25cf') + '\u25d6'; // ◖ U+25D6 LEFT HALF BLACK CIRCLE
+        }
+        this._sessionCountLabel.set_text(text);
+    },
 
     // Update timer_ui
     _updateTimer: function() {
