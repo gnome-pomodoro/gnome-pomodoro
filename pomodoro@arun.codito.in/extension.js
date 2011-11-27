@@ -43,7 +43,6 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_shortPauseTime", "timer", "short_pause_duration", 300],
     ["_longPauseTime", "timer", "long_pause_duration", 900],
     ["_showMessages", "ui", "show_messages", true],
-    ["_showElapsed", "ui", "show_elapsed_time", true],
     ["_persistentBreakMessage", "ui", "show_persistent_break_message", false],
     ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"]
 ];
@@ -133,16 +132,6 @@ Indicator.prototype = {
 
     // Add whatever options the timer needs to this submenu
     _buildOptionsMenu: function() {
-
-        // Timer format Menu
-        if (this._showElapsed == true)
-            this._timerTypeMenu = new PopupMenu.PopupMenuItem(_("Show Remaining Time"));
-        else
-            this._timerTypeMenu = new PopupMenu.PopupMenuItem(_("Show Elapsed Time"));
-
-        this._optionsMenu.menu.addMenuItem(this._timerTypeMenu);
-        this._timerTypeMenu.connect('activate', Lang.bind(this, this._toggleTimerType));
-
         // Reset Counters Menu
         this._resetMenu =  new PopupMenu.PopupMenuItem(_('Reset Counts and Timer'));
         this._optionsMenu.menu.addMenuItem(this._resetMenu);
@@ -237,21 +226,6 @@ Indicator.prototype = {
 
         this._saveConfig();
     },
-
-    // Toggle how timeSpent is displayed on ui_timer
-    _toggleTimerType: function() {
-        if (this._showElapsed == true) {
-            this._showElapsed = false;
-            this._timerTypeMenu.label.set_text(_("Show Elapsed Time"));
-        } else {
-            this._showElapsed = true;
-            this._timerTypeMenu.label.set_text(_("Show Remaining Time"));
-        }
-
-        this._onConfigUpdate(true);
-        return false;
-    },
-
 
     // Reset all counters and timers
     _resetCount: function() {
@@ -386,14 +360,8 @@ Indicator.prototype = {
     // Update timer_ui
     _updateTimer: function() {
         if (this._stopTimer == false) {
-            let displaytime = this._timeSpent;
-            if (this._showElapsed == false) {
-                if (this._isPause == false) 
-                    displaytime = this._pomodoroTime - this._timeSpent;
-                else
-                    displaytime = this._pauseTime - this._timeSpent;
-            }                            
-
+            let displaytime = (this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent;
+            
             this._minutes = parseInt(displaytime / 60);
             this._seconds = displaytime - (this._minutes * 60);
 
