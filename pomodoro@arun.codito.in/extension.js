@@ -18,12 +18,10 @@ const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 
 const Clutter = imports.gi.Clutter;
-const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 const Util = imports.misc.util;
-const ExtensionSystem = imports.ui.extensionSystem;
 
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
@@ -276,27 +274,12 @@ Indicator.prototype = {
         this._labelMsg.set_text(label_msg);
     },
 
-
     // Show a persistent message at the end of pomodoro session
     _showMessageAtPomodoroCompletion: function() {
         if (this._persistentBreakMessage) {
             this._persistentMessageDialog.open();
         }
     },
-
-
-    // Plays a notification sound
-    _playNotificationSound: function() {
-        let extension = ExtensionSystem.extensionMeta["pomodoro@arun.codito.in"];
-        let uri = GLib.filename_to_uri(extension.path + "/sound.wav", null);
-        
-        try {
-            Util.trySpawnCommandLine("gst-launch --quiet playbin2 uri="+ GLib.shell_quote(uri));
-        } catch (err) {
-            global.logError("Pomodoro: Error playing a sound: " + err.message);
-        }
-    },
-
 
     // Toggle timer state
     _toggleTimerState: function(item) {
@@ -334,8 +317,8 @@ Indicator.prototype = {
         this._updateTimer();
         return false;
     },
-    
-    
+
+
     // Checks if timer needs to change state
     _checkTimerState: function() {
         if (this._stopTimer == false) {
@@ -349,7 +332,7 @@ Indicator.prototype = {
                     this._isPause = false;
                     this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
                     this._persistentMessageDialog.close();
-                    this._playNotificationSound();
+                    GLib.spawn_command_line_async ("aplay -q /usr/share/sounds/generic.wav");
                 }
                 else {
                     if (this._pauseCount == 0) {
@@ -434,7 +417,6 @@ Indicator.prototype = {
             this._toggleTimerState(null);
         }
     },
-
     
     _parseConfig: function() {
         let _configFile = GLib.get_user_config_dir() + "/gnome-shell-pomodoro/gnome_shell_pomodoro.json";
@@ -513,13 +495,12 @@ Indicator.prototype = {
     }
 };
 
-let _indicator;
-
 // Extension initialization code
 function init(metadata) {
     //imports.gettext.bindtextdomain('gnome-shell-pomodoro', metadata.localedir);
 }
 
+let _indicator;
 
 function enable() {
     if (_indicator == null) {
