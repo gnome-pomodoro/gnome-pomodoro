@@ -71,12 +71,11 @@ Indicator.prototype = {
         this._pauseCount = 0;                                   // Number of short pauses so far. Reset every 4 pauses.
         this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
         this._labelMsg = new St.Label({ text: 'Stopped'});
-        this._timerLabel = this.sessionCount;
         this._persistentMessageDialog = new ModalDialog.ModalDialog();
         this._persistentMessageTimer = new St.Label({ style_class: 'persistent-message-label'  }),
 
         // Set default menu
-        this._timer.set_text("[0] --:--");
+        this._timer.set_text("00:00");
         this.actor.add_actor(this._timer);
         let item = new PopupMenu.PopupMenuItem("Status:", { reactive: false });
         item.addActor(this._labelMsg);
@@ -219,9 +218,8 @@ Indicator.prototype = {
         let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
         let char_width = metrics.get_approximate_char_width() / Pango.SCALE;
 
-        // 3, 5 are the number of characters and digits we have in the label
-        actor.width = char_width * 3 + digit_width * 5;
-        global.log("Pomodoro: label width = " + char_width + ", " + digit_width);
+        // predict by the number of characters and digits we have in the label
+        actor.width = parseInt(digit_width * 4 + 0.4*char_width);
     },
 
     // Handles option changes in the UI, saves the configuration
@@ -258,7 +256,7 @@ Indicator.prototype = {
             this._stopTimer = true;
             this._isPause = false;
         }
-        this._timer.set_text("[" + this._sessionCount + "] --:--");
+        this._timer.set_text("00:00");
         this._widget.setToggleState(false);
         return false;
     },
@@ -304,7 +302,7 @@ Indicator.prototype = {
         if (this._stopTimer == false) {
             this._stopTimer = true;
             this._isPause = false;
-            this._timer.set_text("[" + this._sessionCount + "] --:--");
+            this._timer.set_text("00:00");
             this._labelMsg.set_text('Stopped');
         }
         else {
@@ -336,8 +334,6 @@ Indicator.prototype = {
     // Checks if timer needs to change state
     _checkTimerState: function() {
         if (this._stopTimer == false) {
-            this._timerLabel = this._sessionCount;
-
             // Check if a pause is running..
             if (this._isPause == true) {
                 // Check if the pause is over
@@ -351,10 +347,8 @@ Indicator.prototype = {
                 else {
                     if (this._pauseCount == 0) {
                         this._pauseTime = this._longPauseTime;
-                        this._timerLabel = 'L';
                     } else {
                         this._pauseTime = this._shortPauseTime;
-                        this._timerLabel = 'S';
                     }
                 }
             }
@@ -368,11 +362,9 @@ Indicator.prototype = {
                     this._pauseCount = 0;
                     this._pauseTime = this._longPauseTime;
                     this._notifyUser('4th pomodoro in a row finished, starting a long pause...', 'Long pause');
-                    this._timerLabel = 'L';
                 }
                 else {
                     this._notifyUser('Pomodoro finished, starting pause...', 'Short pause');
-                    this._timerLabel = 'S';
                 }
 
                 this._showMessageAtPomodoroCompletion();
@@ -401,7 +393,7 @@ Indicator.prototype = {
             this._seconds = displaytime - (this._minutes * 60);
 
             timer_text = "%02d:%02d".format(this._minutes, this._seconds)
-            this._timer.set_text("[" + this._timerLabel + "] " + timer_text);
+            this._timer.set_text(timer_text);
 
             if (this._isPause && this._persistentBreakMessage)
                 this._persistentMessageTimer.set_text(timer_text + "\n");
