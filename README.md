@@ -2,7 +2,7 @@
 - Provides a countdown timer in the gnome-shell top panel
 - Keeps track of completed 25 minute cycles
 
-![Pomodoro image](http://i.imgur.com/UtMOV.png)
+![Pomodoro image](http://kamilprusko.org/files/gnome-shell-pomodoro-extension.png)
 
 More on pomodoro technique [here](http://www.pomodorotechnique.com).
 
@@ -38,6 +38,10 @@ GPL3. See COPYING for details.
 - Contributors: https://github.com/codito/gnome-shell-pomodoro/contributors
 
 # Changelog
+**Unstable**
+
++ 
+
 **Version 0.4**
 
 + Sound notification at end of a pomodoro break [Issue #26, Patch from @kamilprusko]

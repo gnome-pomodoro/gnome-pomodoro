@@ -19,9 +19,11 @@ const Mainloop = imports.mainloop;
 
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
+const Gio = imports.gi.Gio;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 const Util = imports.misc.util;
+const ExtensionSystem = imports.ui.extensionSystem;
 
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
@@ -40,11 +42,11 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_pomodoroTime", "timer", "pomodoro_duration", 1500],
     ["_shortPauseTime", "timer", "short_pause_duration", 300],
     ["_longPauseTime", "timer", "long_pause_duration", 900],
-    ["_showMessages", "ui", "show_messages", true],
+    ["_showNotificationMessages", "ui", "show_messages", true],
     ["_showElapsed", "ui", "show_elapsed_time", true],
-    ["_persistentBreakMessage", "ui", "show_persistent_break_message", false],
+    ["_showDialogMessages", "ui", "show_dialog_messages", true],
+    ["_playSound", "ui", "play_sound", true],
     ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"],
-    ["_soundCommand", "ui", "sound_command", ""]
 ];
 
 function Indicator() {
@@ -70,24 +72,31 @@ Indicator.prototype = {
         this._pauseCount = 0;                                   // Number of short pauses so far. Reset every 4 pauses.
         this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
         this._labelMsg = new St.Label({ text: 'Stopped'});
-        this._timerLabel = this.sessionCount;
-        this._persistentMessageDialog = new ModalDialog.ModalDialog();
-        this._persistentMessageTimer = new St.Label({ style_class: 'persistent-message-label'  }),
-
+        this._notification = null;
+        this._dialog = null;
+        
         // Set default menu
-        this._timer.set_text("[0] --:--");
+        this._timer.set_text("00:00");
+        this._timer.clutter_text.set_line_wrap(false);
+        this._timer.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
         this.actor.add_actor(this._timer);
-        let item = new PopupMenu.PopupMenuItem("Status:", { reactive: false });
-        item.addActor(this._labelMsg);
-        this.menu.addMenuItem(item);
 
         // Set initial width of the timer label
         this._timer.connect('realize', Lang.bind(this, this._onTimerRealize));
 
         // Toggle timer state button
-        this._widget = new PopupMenu.PopupSwitchMenuItem(_("Toggle timer"), false);
+        this._widget = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'popup-subtitle-menu-item' });
         this._widget.connect("toggled", Lang.bind(this, this._toggleTimerState));
         this.menu.addMenuItem(this._widget);
+
+        // Session count
+        let item = new PopupMenu.PopupMenuItem(_("Collected"), { reactive: false });
+        let bin = new St.Bin({ x_align: St.Align.END });
+//        this._sessionCountLabel = new St.Label({ text: '\u25cf' }); // ● U+25CF BLACK CIRCLE //style_class: 'popup-inactive-menu-item' });
+        this._sessionCountLabel = new St.Label({ text: _('None') }); // ● U+25CF BLACK CIRCLE //style_class: 'popup-inactive-menu-item' });
+        bin.add_actor(this._sessionCountLabel);
+        item.addActor(bin, { expand: true, span: -1, align: St.Align.END });
+        this.menu.addMenuItem(item);
 
         // Separator
         let item = new PopupMenu.PopupSeparatorMenuItem();
@@ -105,20 +114,58 @@ Indicator.prototype = {
             Keybinder.bind(this._keyToggleTimer, Lang.bind(this, this._keyHandler), null);
         }
 
-        // Create persistent message modal dialog
-        this._persistentMessageDialog.contentLayout.add(new St.Label({ style_class: 'persistent-message-label',
-            text: 'Take a break!' }), { x_fill: true, y_fill: true });
-        this._persistentMessageDialog.contentLayout.add(this._persistentMessageTimer,
-                { x_fill: true, y_fill: true });
-        this._persistentMessageDialog.setButtons([ 
-            { label: _("Skip Break"), 
-              action: Lang.bind(this, function(param) { this._timeSpent = 99999;
-              this._checkTimerState();
-              }), 
-            },
+        // Dialog
+        this._dialog = new ModalDialog.ModalDialog({ style_class: 'polkit-dialog' });
+
+        let mainContentBox = new St.BoxLayout({ style_class: 'polkit-dialog-main-layout',
+                                                vertical: false });
+        this._dialog.contentLayout.add(mainContentBox,
+                                              { x_fill: true,
+                                                y_fill: true });
+
+        //let icon = new St.Icon({ icon_name: 'pomodoro-symbolic' });
+        //mainContentBox.add(icon,
+        //                   { x_fill:  true,
+        //                     y_fill:  false,
+        //                     x_align: St.Align.END,
+        //                     y_align: St.Align.START });
+
+        let messageBox = new St.BoxLayout({ style_class: 'polkit-dialog-message-layout',
+                                            vertical: true });
+        mainContentBox.add(messageBox,
+                           { y_align: St.Align.START });
+
+        this._subjectLabel = new St.Label({ style_class: 'polkit-dialog-headline',
+                                            text: _("Pomodoro Finished!") });
+
+        messageBox.add(this._subjectLabel,
+                       { y_fill:  false,
+                         y_align: St.Align.START });
+
+        this._descriptionLabel = new St.Label({ style_class: 'polkit-dialog-description',
+                                                text: '' });
+        this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._descriptionLabel.clutter_text.line_wrap = true;
+
+        messageBox.add(this._descriptionLabel,
+            { y_fill:  true,
+              y_align: St.Align.START });
+
+        this._dialog.contentLayout.add(this._descriptionLabel,
+            { x_fill: true,
+              y_fill: true });
+        this._dialog.setButtons([
             { label: _("Hide"),
-              action: Lang.bind(this, function(param) { this._persistentMessageDialog.close(); }),
-              key:    Clutter.Escape 
+              action: Lang.bind(this, function(param) {
+                        this._dialog.close();
+                        this._notifyPomodoroEnd(_('Pomodoro finished, take a break!'), true);
+                    }),
+              key: Clutter.Escape 
+            },
+            { label: _("Start a new Pomodoro"),
+              action: Lang.bind(this, function(param) {
+                        this._startNewPomodoro();
+                    }), 
             },]);
 
         // Start the timer
@@ -128,84 +175,86 @@ Indicator.prototype = {
 
     // Add whatever options the timer needs to this submenu
     _buildOptionsMenu: function() {
-
-        // Timer format Menu
-        if (this._showElapsed == true)
-            this._timerTypeMenu = new PopupMenu.PopupMenuItem(_("Show Remaining Time"));
-        else
-            this._timerTypeMenu = new PopupMenu.PopupMenuItem(_("Show Elapsed Time"));
-
-        this._optionsMenu.menu.addMenuItem(this._timerTypeMenu);
-        this._timerTypeMenu.connect('activate', Lang.bind(this, this._toggleTimerType));
-
         // Reset Counters Menu
         this._resetMenu =  new PopupMenu.PopupMenuItem(_('Reset Counts and Timer'));
         this._optionsMenu.menu.addMenuItem(this._resetMenu);
         this._resetMenu.connect('activate', Lang.bind(this, this._resetCount));
 
+        let notificationSection = new PopupMenu.PopupMenuSection();
+        this._optionsMenu.menu.addMenuItem(notificationSection);
+
         // ShowMessages option toggle
-        this._showMessagesSwitch = new PopupMenu.PopupSwitchMenuItem(_("Show Notification Messages"), this._showMessages);
-        this._showMessagesSwitch.connect("toggled", Lang.bind(this, function() {
-            this._showMessages = !(this._showMessages);
+        this._showNotificationMessagesSwitch = new PopupMenu.PopupSwitchMenuItem(_("Show Notification Messages"), this._showNotificationMessages);
+        this._showNotificationMessagesSwitch.connect("toggled", Lang.bind(this, function() {
+            this._showNotificationMessages = !(this._showNotificationMessages);
             this._onConfigUpdate(false);
         }));
-        this._optionsMenu.menu.addMenuItem(this._showMessagesSwitch);
+        notificationSection.addMenuItem(this._showNotificationMessagesSwitch);
 
-        //Persistent Break Message toggle
+        // Dialog Message toggle
         let breakMessageToggle = new PopupMenu.PopupSwitchMenuItem
-            (_("Show Persistent Break Messages"), this._persistentBreakMessage);
+            (_("Show Dialog Messages"), this._showDialogMessages);
         breakMessageToggle.connect("toggled", Lang.bind(this, function() {
-            this._persistentBreakMessage = !(this._persistentBreakMessage);
+            this._showDialogMessages = !(this._showDialogMessages);
             this._onConfigUpdate(false);
         }));
         // Uncomment and replace tooltip, if label does not describe use clearly
-        // breakMessageToggle.actor.tooltip_text = "Show a persistent message at the end of pomodoro session"; 
-        this._optionsMenu.menu.addMenuItem(breakMessageToggle);  
+        // breakMessageToggle.actor.tooltip_text = "Show a dialog message at the end of pomodoro session"; 
+        notificationSection.addMenuItem(breakMessageToggle);  
 
-        // Pomodoro Duration menu
-        let timerLengthMenu = new PopupMenu.PopupSubMenuMenuItem(_('Timer Durations'));
-        this._optionsMenu.menu.addMenuItem(timerLengthMenu);
+        // Notify with a sound
+        let playSoundToggle = new PopupMenu.PopupSwitchMenuItem
+            (_("Sound Notifications"), this._playSound);
+        playSoundToggle.connect("toggled", Lang.bind(this, function() {
+            this._playSound = !(this._playSound);
+            this._onConfigUpdate(false);
+        }));
+        this._optionsMenu.menu.addMenuItem(playSoundToggle);  
+
+        // Pomodoro Duration section
+        let timerLengthSection = new PopupMenu.PopupMenuSection();
+        this._optionsMenu.menu.addMenuItem(timerLengthSection);
 
         let item = new PopupMenu.PopupMenuItem(_("Pomodoro Duration"), { reactive: false });
         this._pomodoroTimeLabel = new St.Label({ text: this._formatTime(this._pomodoroTime) });
-        item.addActor(this._pomodoroTimeLabel);
-        timerLengthMenu.menu.addMenuItem(item);
+        item.addActor(this._pomodoroTimeLabel, { align: St.Align.END });
+        timerLengthSection.addMenuItem(item);
 
         this._pomodoroTimeSlider = new PopupMenu.PopupSliderMenuItem(this._pomodoroTime/3600);
         this._pomodoroTimeSlider.connect('value-changed', Lang.bind(this, function() {
-            this._pomodoroTime = Math.ceil(Math.ceil(this._pomodoroTimeSlider._value * 3600)/10)*10;
+            this._pomodoroTime = Math.ceil(Math.ceil(this._pomodoroTimeSlider._value * 3600)/60)*60;
             this._pomodoroTimeLabel.set_text(this._formatTime(this._pomodoroTime));
             this._onConfigUpdate(true);
         } ));
-        timerLengthMenu.menu.addMenuItem(this._pomodoroTimeSlider);
+        timerLengthSection.addMenuItem(this._pomodoroTimeSlider);
 
         // Short Break Duration menu
         item = new PopupMenu.PopupMenuItem(_("Short Break Duration"), { reactive: false });
         this._sBreakTimeLabel = new St.Label({ text: this._formatTime(this._shortPauseTime) });
-        item.addActor(this._sBreakTimeLabel);
-        timerLengthMenu.menu.addMenuItem(item);
+        item.addActor(this._sBreakTimeLabel, { align: St.Align.END });
+        timerLengthSection.addMenuItem(item);
 
         this._sBreakTimeSlider = new PopupMenu.PopupSliderMenuItem(this._shortPauseTime/720);
         this._sBreakTimeSlider.connect('value-changed', Lang.bind(this, function() {
-            this._shortPauseTime = Math.ceil(Math.ceil(this._sBreakTimeSlider._value * 720)/10)*10;
+            this._shortPauseTime = Math.ceil(Math.ceil(this._sBreakTimeSlider._value * 720)/60)*60;
             this._sBreakTimeLabel.set_text(this._formatTime(this._shortPauseTime));
             this._onConfigUpdate(true);
         } ));
-        timerLengthMenu.menu.addMenuItem(this._sBreakTimeSlider);
+        timerLengthSection.addMenuItem(this._sBreakTimeSlider);
 
         // Long Break Duration menu
         item = new PopupMenu.PopupMenuItem(_("Long Break Duration"), { reactive: false });
         this._lBreakTimeLabel = new St.Label({ text: this._formatTime(this._longPauseTime) });
-        item.addActor(this._lBreakTimeLabel);
-        timerLengthMenu.menu.addMenuItem(item);
+        item.addActor(this._lBreakTimeLabel, { align: St.Align.END });
+        timerLengthSection.addMenuItem(item);
 
         this._lBreakTimeSlider = new PopupMenu.PopupSliderMenuItem(this._longPauseTime/2160);
         this._lBreakTimeSlider.connect('value-changed', Lang.bind(this, function() {
-            this._longPauseTime = Math.ceil(Math.ceil(this._lBreakTimeSlider._value * 2160)/10)*10;
+            this._longPauseTime = Math.ceil(Math.ceil(this._lBreakTimeSlider._value * 2160)/60)*60;
             this._lBreakTimeLabel.set_text(this._formatTime(this._longPauseTime));
             this._onConfigUpdate(true);
         } ));
-        timerLengthMenu.menu.addMenuItem(this._lBreakTimeSlider);
+        timerLengthSection.addMenuItem(this._lBreakTimeSlider);
     },
 
     // Handle the style related properties in the timer label. These properties are dependent on
@@ -218,9 +267,8 @@ Indicator.prototype = {
         let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
         let char_width = metrics.get_approximate_char_width() / Pango.SCALE;
 
-        // 3, 5 are the number of characters and digits we have in the label
-        actor.width = char_width * 3 + digit_width * 5;
-        global.log("Pomodoro: label width = " + char_width + ", " + digit_width);
+        // predict by the number of characters and digits we have in the label
+        actor.width = parseInt(digit_width * 4 + 0.4*char_width);
     },
 
     // Handles option changes in the UI, saves the configuration
@@ -234,51 +282,86 @@ Indicator.prototype = {
         this._saveConfig();
     },
 
-    // Toggle how timeSpent is displayed on ui_timer
-    _toggleTimerType: function() {
-        if (this._showElapsed == true) {
-            this._showElapsed = false;
-            this._timerTypeMenu.label.set_text(_("Show Elapsed Time"));
-        } else {
-            this._showElapsed = true;
-            this._timerTypeMenu.label.set_text(_("Show Remaining Time"));
-        }
-
-        this._onConfigUpdate(true);
+    // Skip break or reset current pomodoro
+    _startNewPomodoro: function() {
+        if (this._isPause)
+            this._timeSpent = 99999;
+        else
+            this._timeSpent = 0;
+        
+        this._checkTimerState();
+        this._updateTimer();
+    },
+    
+    // Reset all counters and timers
+    _resetCount: function() {
+        this._timeSpent = 0;
+        this._isPause = false;
+        this._sessionCount = 0;
+        this._pauseCount = 0;
+        this._checkTimerState();
+        this._updateTimer();
         return false;
     },
 
-
-    // Reset all counters and timers
-    _resetCount: function() {
-        this._sessionCount = 0;
-        this._pauseCount = 0;
-        if (this._stopTimer == false) {
-            this._stopTimer = true;
-            this._isPause = false;
-        }
-        this._timer.set_text("[" + this._sessionCount + "] --:--");
-        this._widget.setToggleState(false);
-        return false;
+    _createNotificationSource: function() {
+        let source = new MessageTray.SystemNotificationSource();
+        source.setTitle(_('Pomodoro Timer'));
+        Main.messageTray.add(source);
+        return source;
     },
 
     // Notify user of changes
-    _notifyUser: function(text, label_msg) {
-        if (this._showMessages) {
-            let source = new MessageTray.SystemNotificationSource();
-            Main.messageTray.add(source);
-            let notification = new MessageTray.Notification(source, text, null);
-            notification.setTransient(true);
-            source.notify(notification);
+    _notifyPomodoroStart: function(text, force) {
+        if (this._notification != null) {
+            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+            this._notification = null;        
+        }
+        this._dialog.close();
+
+        if (this._showNotificationMessages) {
+            let source = this._createNotificationSource ();
+            this._notification = new MessageTray.Notification(source, text);
+            this._notification.setTransient(true);
+            
+            source.notify(this._notification);
         }        
-        // Change the label inside the popup menu
-        this._labelMsg.set_text(label_msg);
+
+        this._playNotificationSound();
+    },
+    
+    // Notify user of changes
+    _notifyPomodoroEnd: function(text, hideDialog) {
+        if (this._notification != null) {
+            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+            this._notification = null;        
+        }
+        if (this._showNotificationMessages || hideDialog) {
+            let source = this._createNotificationSource ();
+            this._notification = new MessageTray.Notification(source, text, null);
+            this._notification.setResident(true);
+            this._notification.addButton(1, _('Start a new Pomodoro'));
+            this._notification.connect('action-invoked', Lang.bind(this, function(param) {
+                        this._startNewPomodoro();
+                    })
+                );
+            source.notify(this._notification);
+        }
+        if (this._showDialogMessages && hideDialog != true)
+            this._dialog.open();
     },
 
-    // Show a persistent message at the end of pomodoro session
-    _showMessageAtPomodoroCompletion: function() {
-        if (this._persistentBreakMessage) {
-            this._persistentMessageDialog.open();
+    // Plays a notification sound
+    _playNotificationSound: function() {
+        if (this._playSound) {
+            let extension = ExtensionSystem.extensionMeta["pomodoro@arun.codito.in"];
+            let uri = GLib.filename_to_uri(extension.path + "/bell.wav", null);
+            
+            try {
+                Util.trySpawnCommandLine("gst-launch --quiet playbin2 uri="+ GLib.shell_quote(uri));
+            } catch (err) {
+                global.logError("Pomodoro: Error playing a sound: " + err.message);
+            }
         }
     },
 
@@ -291,8 +374,7 @@ Indicator.prototype = {
         if (this._stopTimer == false) {
             this._stopTimer = true;
             this._isPause = false;
-            this._timer.set_text("[" + this._sessionCount + "] --:--");
-            this._labelMsg.set_text('Stopped');
+            this._timer.set_text("00:00");
         }
         else {
             this._timeSpent = -1;
@@ -301,8 +383,8 @@ Indicator.prototype = {
             this._stopTimer = false;
             this._isPause = false;
             this._refreshTimer();
-            this._labelMsg.set_text('Running');
         }
+        this._checkTimerState();
     },
 
 
@@ -314,7 +396,7 @@ Indicator.prototype = {
             this._updateTimer();
             Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
         }
-
+        
         this._updateTimer();
         return false;
     },
@@ -323,26 +405,19 @@ Indicator.prototype = {
     // Checks if timer needs to change state
     _checkTimerState: function() {
         if (this._stopTimer == false) {
-            this._timerLabel = this._sessionCount;
-
             // Check if a pause is running..
             if (this._isPause == true) {
                 // Check if the pause is over
                 if (this._timeSpent >= this._pauseTime) {
                     this._timeSpent = 0;
                     this._isPause = false;
-                    this._notifyUser('Pause finished, a new pomodoro is starting!', 'Running');
-                    this._persistentMessageDialog.close();
-                    if (!this._soundCommand)
-                        GLib.spawn_command_line_async(this._soundCommand);
+                    this._notifyPomodoroStart(_('Pause finished, a new pomodoro is starting!'));
                 }
                 else {
                     if (this._pauseCount == 0) {
                         this._pauseTime = this._longPauseTime;
-                        this._timerLabel = 'L';
                     } else {
                         this._pauseTime = this._shortPauseTime;
-                        this._timerLabel = 'S';
                     }
                 }
             }
@@ -355,44 +430,56 @@ Indicator.prototype = {
                 if (this._pauseCount == 4) {
                     this._pauseCount = 0;
                     this._pauseTime = this._longPauseTime;
-                    this._notifyUser('4th pomodoro in a row finished, starting a long pause...', 'Long pause');
-                    this._timerLabel = 'L';
+                    this._notifyPomodoroEnd(_('4th pomodoro in a row finished, starting a long pause...'));
                 }
                 else {
-                    this._notifyUser('Pomodoro finished, starting pause...', 'Short pause');
-                    this._timerLabel = 'S';
+                    this._notifyPomodoroEnd(_('Pomodoro finished, take a break!'));
                 }
 
-                this._showMessageAtPomodoroCompletion();
                 this._timeSpent = 0;
                 this._minutes = 0;
                 this._seconds = 0;
                 this._sessionCount += 1;
                 this._isPause = true;
+                
             }
         }
+        this._updateSessionCount();
     },
 
+    _updateSessionCount: function() {
+        let text = '';
+
+        if (this._sessionCount == 0 && this._stopTimer){
+            text = _('None');
+        }
+        else{
+            if (this._isPause || this._stopTimer)
+                text = Array((this._sessionCount-1) % 4 + 2).join('\u25cf'); // ● U+25CF BLACK CIRCLE            
+            else
+                text = Array(this._sessionCount % 4 + 1).join('\u25cf') + '\u25d6'; // ◖ U+25D6 LEFT HALF BLACK CIRCLE
+        }
+        this._sessionCountLabel.set_text(text);
+    },
 
     // Update timer_ui
     _updateTimer: function() {
         if (this._stopTimer == false) {
-            let displaytime = this._timeSpent;
-            if (this._showElapsed == false) {
-                if (this._isPause == false) 
-                    displaytime = this._pomodoroTime - this._timeSpent;
+            let seconds = (this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent;
+            
+            this._minutes = parseInt(seconds / 60);
+            this._seconds = seconds - (this._minutes * 60);
+
+            timer_text = "%02d:%02d".format(this._minutes, this._seconds);
+            this._timer.set_text(timer_text);
+
+            if (this._isPause && this._showDialogMessages)
+            {
+                if (seconds < 47)
+                    this._descriptionLabel.text = _("Take a break! You have %d seconds\n").format(Math.round(seconds / 5) * 5);
                 else
-                    displaytime = this._pauseTime - this._timeSpent;
-            }                            
-
-            this._minutes = parseInt(displaytime / 60);
-            this._seconds = displaytime - (this._minutes * 60);
-
-            timer_text = "%02d:%02d".format(this._minutes, this._seconds)
-            this._timer.set_text("[" + this._timerLabel + "] " + timer_text);
-
-            if (this._isPause && this._persistentBreakMessage)
-                this._persistentMessageTimer.set_text(timer_text + "\n");
+                    this._descriptionLabel.text = _("Take a break! You have %d minutes\n").format(Math.round(seconds / 60));
+            }
         }
     },
 
@@ -401,17 +488,7 @@ Indicator.prototype = {
     _formatTime: function(abs) {
         let minutes = Math.floor(abs/60);
         let seconds = abs - minutes*60;
-        let str = "";
-        if (minutes != 0) {
-            str = str + minutes.toString() + " m ";
-        }
-        if (seconds != 0) {
-            str = str + seconds.toString() + " s";
-        }
-        if (abs == 0) {
-            str = "0 s";
-        }
-        return str;
+        return _("%d minutes").format(minutes);
     },
 
     _keyHandler: function(keystring, data) {
