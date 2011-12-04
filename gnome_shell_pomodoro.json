@@ -1,17 +1,15 @@
 {
-    "version": "0.1",
-    "timer": 
-    {
-        "pomodoro_duration": 1500,
-        "short_pause_duration": 300,
-        "long_pause_duration": 900
-    },
-    "ui":
-    {
-        "show_messages": true,
-        "show_elapsed_time": true,
-        "show_persistent_break_message": false,
-        "key_toggle_timer": "<Ctrl><Alt>P",
-        "sound_command": ""
-    }
+  "version": "0.1",
+  "timer": {
+    "pomodoro_duration": 1500,
+    "short_pause_duration": 300,
+    "long_pause_duration": 900
+  },
+  "ui": {
+    "show_countdown_timer": true,
+    "show_messages": true,
+    "show_dialog_messages": true,
+    "play_sound": true,
+    "key_toggle_timer": "<Ctrl><Alt>P"
+  }
 }

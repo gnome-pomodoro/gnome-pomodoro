@@ -40,7 +40,8 @@ GPL3. See COPYING for details.
 # Changelog
 **Unstable**
 
-+ 
++ Bunch of cleanups, user interface awesomeness [Issue #37, Patch from @kamilprusko]
++ Config options are changed to more meaningful names [above patch]
 
 **Version 0.4**
 
