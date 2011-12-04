@@ -15,7 +15,7 @@ Get from [AUR](http://aur.archlinux.org/packages.php?ID=49967)
 
 ## Direct from source
 - Get zipball 
-    * [Stable | Gnome-shell >= 3.2](https://github.com/codito/gnome-shell-pomodoro/zipball/0.4)
+    * [Stable | Gnome-shell >= 3.2](https://github.com/codito/gnome-shell-pomodoro/zipball/0.5)
     * [Stable | Gnome-shell < 3.0.x](https://github.com/codito/gnome-shell-pomodoro/zipball/0.2)
     * [Unstable - Master branch](https://github.com/codito/gnome-shell-pomodoro/zipball/master)
 - Extract *pomodoro@arun.codito.in* directory to *~/.local/share/gnome-shell/extensions/*
@@ -38,7 +38,7 @@ GPL3. See COPYING for details.
 - Contributors: https://github.com/codito/gnome-shell-pomodoro/contributors
 
 # Changelog
-**Unstable**
+**Version 0.5**
 
 + Bunch of cleanups, user interface awesomeness [Issue #37, Patch from @kamilprusko]
 + Config options are changed to more meaningful names [above patch]
