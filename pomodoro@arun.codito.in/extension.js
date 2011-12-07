@@ -322,12 +322,16 @@ Indicator.prototype = {
         return source;
     },
 
-    // Notify user of changes
-    _notifyPomodoroStart: function(text, force) {
+    _closeNotification: function() {
         if (this._notification != null) {
             this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
             this._notification = null;        
         }
+    },
+
+    // Notify user of changes
+    _notifyPomodoroStart: function(text, force) {
+        this._closeNotification();
         this._dialog.close();
 
         if (this._showNotificationMessages) {
@@ -343,23 +347,24 @@ Indicator.prototype = {
     
     // Notify user of changes
     _notifyPomodoroEnd: function(text, hideDialog) {
-        if (this._notification != null) {
-            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-            this._notification = null;        
-        }
-        if (this._showNotificationMessages || hideDialog) {
-            let source = this._createNotificationSource ();
-            this._notification = new MessageTray.Notification(source, text, null);
-            this._notification.setResident(true);
-            this._notification.addButton(1, _('Start a new Pomodoro'));
-            this._notification.connect('action-invoked', Lang.bind(this, function(param) {
-                        this._startNewPomodoro();
-                    })
-                );
-            source.notify(this._notification);
-        }
-        if (this._showDialogMessages && hideDialog != true)
+        this._closeNotification();
+
+        if (this._showDialogMessages && hideDialog != true) {
             this._dialog.open();
+        }
+        else{
+            if (this._showNotificationMessages || hideDialog) {
+                let source = this._createNotificationSource ();
+                this._notification = new MessageTray.Notification(source, text, null);
+                this._notification.setResident(true);
+                this._notification.addButton(1, _('Start a new Pomodoro'));
+                this._notification.connect('action-invoked', Lang.bind(this, function(param) {
+                            this._startNewPomodoro();
+                        })
+                    );
+                source.notify(this._notification);
+            }
+        }
     },
 
     // Plays a notification sound
@@ -389,6 +394,8 @@ Indicator.prototype = {
 
     // Toggle timer state
     _toggleTimerState: function(item) {
+        this._closeNotification();
+
         if (item != null) {
             this._stopTimer = item.state;
         }
