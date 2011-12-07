@@ -76,7 +76,6 @@ Indicator.prototype = {
         this._dialog = null;
         
         // Set default menu
-        this._timer.set_text("[00] 00:00");
         this._timer.clutter_text.set_line_wrap(false);
         this._timer.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
         this.actor.add_actor(this._timer);
@@ -295,6 +294,8 @@ Indicator.prototype = {
 
     // Skip break or reset current pomodoro
     _startNewPomodoro: function() {
+        this._closeNotification();
+
         if (this._isPause)
             this._timeSpent = 99999;
         else
@@ -306,6 +307,7 @@ Indicator.prototype = {
     
     // Reset all counters and timers
     _resetCount: function() {
+        this._closeNotification();
         this._timeSpent = 0;
         this._isPause = false;
         this._sessionCount = 0;
@@ -403,7 +405,6 @@ Indicator.prototype = {
         if (this._stopTimer == false) {
             this._stopTimer = true;
             this._isPause = false;
-            this._timer.set_text("[%02d] 00:00".format(this._sessionCount));
         }
         else {
             this._timeSpent = -1;
@@ -411,8 +412,8 @@ Indicator.prototype = {
             this._seconds = 0;
             this._stopTimer = false;
             this._isPause = false;
-            this._refreshTimer();
         }
+        this._refreshTimer();
         this._checkTimerState();
     },
 
@@ -512,6 +513,10 @@ Indicator.prototype = {
                 else
                     this._descriptionLabel.text = _("Take a break! You have %d minutes\n").format(Math.round(seconds / 60));
             }
+        }
+        else{
+            timer_text = "[%02d] 00:00".format(this._sessionCount);
+            this._timer.set_text(timer_text);
         }
     },
 
