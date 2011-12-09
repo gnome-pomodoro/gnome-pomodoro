@@ -18,8 +18,11 @@ const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 
 const Clutter = imports.gi.Clutter;
+const DBus = imports.dbus;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Gio = imports.gi.Gio;
+//const GConf = imports.gi.GConf;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 const Util = imports.misc.util;
@@ -37,6 +40,14 @@ const _ = Gettext.gettext;
 
 let _useKeybinder = true;
 try { const Keybinder = imports.gi.Keybinder; } catch (error) { _useKeybinder = false; }
+
+//const SESSION_SCHEMA = 'org.gnome.desktop.session';
+//const SESSION_IDLE_DELAY_KEY = 'idle-delay';
+
+const SESSION_SCHEMA = 'org.gnome.desktop.session';
+const SESSION_IDLE_DELAY_KEY = 'idle-delay';
+
+const PAUSE_IDLE_DELAY = 60;
 
 let _configVersion = "0.1";
 let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <default_value> ]
@@ -70,7 +81,7 @@ Indicator.prototype = {
         this._stopTimer = true;
         this._isPause = false;
         this._isIdle = false;
-        this._pauseTime = 0;
+        this._pauseTime = this._longPauseTime;
         this._pauseCount = 0;                                   // Number of short pauses so far. Reset every 4 pauses.
         this._sessionCount = 0;                                 // Number of pomodoro sessions completed so far!
         this._labelMsg = new St.Label({ text: 'Stopped'});
@@ -169,7 +180,9 @@ Indicator.prototype = {
                     }), 
             },]);
 
-        // Presence
+        // GNOME Session
+        this._sessionSettings = new Gio.Settings({ schema: SESSION_SCHEMA });
+        
         this._presence = new GnomeSession.Presence();
         this._presence.connect('StatusChanged',
                                Lang.bind(this, this._onSessionStatusChanged));
@@ -177,7 +190,6 @@ Indicator.prototype = {
         // Start the timer
         this._refreshTimer();
     },
-
 
     // Add whatever options the timer needs to this submenu
     _buildOptionsMenu: function() {
@@ -300,14 +312,30 @@ Indicator.prototype = {
         this._saveConfig();
     },
 
+    _getSessionIdleDelay: function() {
+        return this._sessionSettings.get_uint(SESSION_IDLE_DELAY_KEY);
+    },
+    
     _onSessionStatusChanged: function(presence, status) {
         this._isIdle = (status == GnomeSession.PresenceStatus.IDLE);
-
         if (this._isIdle)
             this._notifiedIdle = false;
-                
-        this._checkTimerState();
-        this._updateTimer();
+        
+        if (this._stopTimer == false) {
+            // Invalidate pomodoro if was idle from the start
+            if (this._isIdle &&
+                this._isPause == false &&
+                this._timeSpent < this._getSessionIdleDelay()-1) // -1 second is to ignore clicks from timer switch
+            {
+                this._isPause = true;
+                this._pauseCount -= 1;
+                this._timeSpent = this._pauseTime + this._timeSpent;
+                this._notifiedIdle = true;
+            }
+
+            this._checkTimerState();
+            this._updateTimer();
+        }
     },
 
     // Skip break or reset current pomodoro
@@ -462,16 +490,15 @@ Indicator.prototype = {
                     if (this._notifiedIdle == false)
                         this._notifyPomodoroStart(_('Pause finished, a new pomodoro is starting!'));
                 }
-                if (this._timeSpent >= this._pauseTime && this._notifiedIdle != true) {
+                else if (this._timeSpent >= this._pauseTime && this._isIdle && this._notifiedIdle != true) {
                     this._notifiedIdle = true;
                     this._notifyPomodoroStart(_('Pause finished, a new pomodoro is starting!'));
                 }
-                else {
-                    if (this._pauseCount == 0) {
+                else{
+                    if (this._pauseCount == 0)
                         this._pauseTime = this._longPauseTime;
-                    } else {
+                    else
                         this._pauseTime = this._shortPauseTime;
-                    }
                 }
             }
             // ..or if a pomodoro is running and a pause is needed :)
@@ -494,7 +521,6 @@ Indicator.prototype = {
                 this._seconds = 0;
                 this._sessionCount += 1;
                 this._isPause = true;
-                
             }
         }
         this._updateSessionCount();
@@ -520,7 +546,7 @@ Indicator.prototype = {
         if (this._stopTimer == false) {
             let seconds = this._timeSpent;
             if (this._showCountdownTimer == true)
-                seconds = (this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent;
+                seconds = Math.max((this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent, 0);
             
             this._minutes = parseInt(seconds / 60);
             this._seconds = parseInt(seconds % 60);
