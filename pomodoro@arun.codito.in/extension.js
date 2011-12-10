@@ -337,8 +337,6 @@ Indicator.prototype = {
 
     // Skip break or reset current pomodoro
     _startNewPomodoro: function() {
-        this._closeNotification();
-
         if (this._isPause)
             this._timeSpent = 99999;
         else
@@ -346,18 +344,22 @@ Indicator.prototype = {
         
         this._stopTimer();
         this._startTimer();
-        
-        this._updateTimer();
     },
     
     // Reset all counters and timers
     _resetCount: function() {
-        this._closeNotification();
         this._timeSpent = 0;
         this._isPause = false;
         this._sessionCount = 0;
         this._pauseCount = 0;
-        this._updateTimer();
+
+        if (this._isRunning) {
+            this._stopTimer();
+            this._startTimer();
+        }else{
+            this._updateTimer();
+            this._updateSessionCount();
+        }
         return false;
     },
 
@@ -373,12 +375,13 @@ Indicator.prototype = {
             this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
             this._notification = null;        
         }
+        if (this._dialog != null)
+            this._dialog.close();
     },
 
     // Notify user of changes
     _notifyPomodoroStart: function(text, force) {
         this._closeNotification();
-        this._dialog.close();
 
         if (this._showNotificationMessages || force) {
             let source = this._createNotificationSource ();
@@ -440,8 +443,6 @@ Indicator.prototype = {
 
     // Toggle timer state
     _toggleTimerState: function(item) {
-        this._closeNotification();
-        
         this._timeSpent = 0;
         this._minutes = 0;
         this._seconds = 0;
@@ -468,7 +469,8 @@ Indicator.prototype = {
             this._timerSource = undefined;
             this._isRunning = false;
             this._updateTimer();
-            this._updateSessionCount();
+            this._updateSessionCount();            
+            this._closeNotification();
         }
     },
 
