@@ -75,10 +75,10 @@ Indicator.prototype = {
         this._parseConfig();
 
         this._timer = new St.Label({ style_class: 'extension-pomodoro-label' });
-        this._timeSpent = -1;
+        this._timeSpent = 0;
         this._minutes = 0;
         this._seconds = 0;
-        this._stopTimer = true;
+        this._isRunning = false;
         this._isPause = false;
         this._isIdle = false;
         this._pauseTime = this._longPauseTime;
@@ -88,6 +88,7 @@ Indicator.prototype = {
         this._notification = null;
         this._dialog = null;
         this._notifiedIdle = false;
+        this._timerSource = undefined;
         
         // Set default menu
         this._timer.clutter_text.set_line_wrap(false);
@@ -187,8 +188,8 @@ Indicator.prototype = {
         this._presence.connect('StatusChanged',
                                Lang.bind(this, this._onSessionStatusChanged));
 
-        // Start the timer
-        this._refreshTimer();
+        // Draw the timer
+        this._updateTimer();
     },
 
     // Add whatever options the timer needs to this submenu
@@ -304,10 +305,8 @@ Indicator.prototype = {
     // Handles option changes in the UI, saves the configuration
     // Set _validateTimer_ to true in case internal timer states and related options are changed
     _onConfigUpdate: function(validateTimer) {
-        if (validateTimer == true) {
-            this._checkTimerState();
+        if (validateTimer == true)
             this._updateTimer();
-        }
 
         this._saveConfig();
     },
@@ -321,7 +320,7 @@ Indicator.prototype = {
         if (this._isIdle)
             this._notifiedIdle = false;
         
-        if (this._stopTimer == false) {
+        if (this._isRunning) {
             // Invalidate pomodoro if was idle from the start
             if (this._isIdle &&
                 this._isPause == false &&
@@ -332,8 +331,6 @@ Indicator.prototype = {
                 this._timeSpent = this._pauseTime + this._timeSpent;
                 this._notifiedIdle = true;
             }
-
-            this._checkTimerState();
             this._updateTimer();
         }
     },
@@ -347,8 +344,10 @@ Indicator.prototype = {
         else
             this._timeSpent = 0;
         
-        this._checkTimerState();
-        this._refreshTimer();
+        this._stopTimer();
+        this._startTimer();
+        
+        this._updateTimer();
     },
     
     // Reset all counters and timers
@@ -358,7 +357,6 @@ Indicator.prototype = {
         this._isPause = false;
         this._sessionCount = 0;
         this._pauseCount = 0;
-        this._checkTimerState();
         this._updateTimer();
         return false;
     },
@@ -443,44 +441,52 @@ Indicator.prototype = {
     // Toggle timer state
     _toggleTimerState: function(item) {
         this._closeNotification();
-
-        if (item != null) {
-            this._stopTimer = item.state;
+        
+        this._timeSpent = 0;
+        this._minutes = 0;
+        this._seconds = 0;
+        this._isPause = false;
+        
+        if (item.state)
+            this._startTimer();
+        else
+            this._stopTimer();        
+    },
+    
+    _startTimer: function() {
+        if (this._timerSource == undefined) {
+            this._timerSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
+            this._isRunning = true;
+            this._updateTimer();
+            this._updateSessionCount();
         }
-
-        if (this._stopTimer == false) {
-            this._stopTimer = true;
-            this._isPause = false;
-        }
-        else {
-            this._timeSpent = -1;
-            this._minutes = 0;
-            this._seconds = 0;
-            this._stopTimer = false;
-            this._isPause = false;
-        }
-        this._refreshTimer();
-        this._checkTimerState();
     },
 
+    _stopTimer: function() {
+        if (this._timerSource != undefined) {
+            GLib.source_remove(this._timerSource);
+            this._timerSource = undefined;
+            this._isRunning = false;
+            this._updateTimer();
+            this._updateSessionCount();
+        }
+    },
 
     // Increment timeSpent and call functions to check timer states and update ui_timer    
     _refreshTimer: function() {
-        if (this._stopTimer == false) {
+        if (this._isRunning) {
             this._timeSpent += 1;
             this._checkTimerState();
             this._updateTimer();
-            Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
+            return true;
         }
-        
-        this._updateTimer();
         return false;
     },
 
 
     // Checks if timer needs to change state
     _checkTimerState: function() {
-        if (this._stopTimer == false) {
+        if (this._isRunning) {
             // Check if a pause is running..
             if (this._isPause == true) {
                 // Check if the pause is over
@@ -489,6 +495,7 @@ Indicator.prototype = {
                     this._isPause = false;
                     if (this._notifiedIdle == false)
                         this._notifyPomodoroStart(_('Pause finished, a new pomodoro is starting!'));
+                    this._updateSessionCount();
                 }
                 else if (this._timeSpent >= this._pauseTime && this._isIdle && this._notifiedIdle != true) {
                     this._notifiedIdle = true;
@@ -521,19 +528,19 @@ Indicator.prototype = {
                 this._seconds = 0;
                 this._sessionCount += 1;
                 this._isPause = true;
+                this._updateSessionCount();
             }
         }
-        this._updateSessionCount();
     },
 
     _updateSessionCount: function() {
         let text = '';
 
-        if (this._sessionCount == 0 && this._stopTimer) {
+        if (this._sessionCount == 0 && this._isRunning == false) {
             text = _('None');
         }
         else {
-            if (this._isPause || this._stopTimer)
+            if (this._isPause || this._isRunning == false)
                 text = Array((this._sessionCount-1) % 4 + 2).join('\u25cf'); // ● U+25CF BLACK CIRCLE            
             else
                 text = Array(this._sessionCount % 4 + 1).join('\u25cf') + '\u25d6'; // ◖ U+25D6 LEFT HALF BLACK CIRCLE
@@ -543,7 +550,9 @@ Indicator.prototype = {
 
     // Update timer_ui
     _updateTimer: function() {
-        if (this._stopTimer == false) {
+        this._checkTimerState();
+
+        if (this._isRunning) {
             let seconds = this._timeSpent;
             if (this._showCountdownTimer == true)
                 seconds = Math.max((this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent, 0);
@@ -580,7 +589,7 @@ Indicator.prototype = {
     _keyHandler: function(keystring, data) {
         if (keystring == this._keyToggleTimer) {
             this._toggleTimerState(null);
-            this._timerToggle.setToggleState(!this._stopTimer);
+            this._timerToggle.setToggleState(this._isRunning);
         }
     },
     
