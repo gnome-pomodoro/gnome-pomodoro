@@ -54,6 +54,7 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_pomodoroTime", "timer", "pomodoro_duration", 1500],
     ["_shortPauseTime", "timer", "short_pause_duration", 300],
     ["_longPauseTime", "timer", "long_pause_duration", 900],
+    ["_awayFromDesk", "ui", "away_from_desk", false],
     ["_showCountdownTimer", "ui", "show_countdown_timer", true],
     ["_showNotificationMessages", "ui", "show_messages", true],
     ["_showDialogMessages", "ui", "show_dialog_messages", true],
@@ -212,6 +213,16 @@ Indicator.prototype = {
         }));
         showCountdownTimerToggle.actor.tooltip_text = "Make the pomodoro timer count down to zero";
         notificationSection.addMenuItem(showCountdownTimerToggle);
+
+        // Away From Desk toggle
+        let awayFromDeskToggle = new PopupMenu.PopupSwitchMenuItem
+            (_("Away From Desk"), this._awayFromDesk);
+        awayFromDeskToggle.connect("toggled", Lang.bind(this, function(item) {
+            this._awayFromDesk = item.state;
+            this._onConfigUpdate(false);
+        }));
+        awayFromDeskToggle.actor.tooltip_text = "Set optimal settings for doing paperwork";
+        notificationSection.addMenuItem(awayFromDeskToggle);
 
         // ShowMessages option toggle
         let showNotificationMessagesToggle = new PopupMenu.PopupSwitchMenuItem(_("Show Notification Messages"), this._showNotificationMessages);
