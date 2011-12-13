@@ -334,6 +334,7 @@ Indicator.prototype = {
         if (this._isRunning) {
             // Invalidate pomodoro if was idle from the start
             if (this._isIdle &&
+                this._awayFromDesk == false &&
                 this._isPause == false &&
                 this._timeSpent < this._getSessionIdleDelay()-1) // -1 second is to ignore clicks from timer switch
             {
@@ -503,7 +504,7 @@ Indicator.prototype = {
             // Check if a pause is running..
             if (this._isPause == true) {
                 // Check if the pause is over
-                if (this._timeSpent >= this._pauseTime && this._isIdle != true) {
+                if (this._timeSpent >= this._pauseTime && (this._awayFromDesk || this._isIdle != true)) {
                     this._timeSpent = 0;
                     this._isPause = false;
                     if (this._notifiedIdle == false)
