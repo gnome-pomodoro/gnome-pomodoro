@@ -27,6 +27,7 @@ const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 const Util = imports.misc.util;
 const GnomeSession = imports.misc.gnomeSession;
+const ScreenSaver = imports.misc.screenSaver;
 const ExtensionSystem = imports.ui.extensionSystem;
 
 const Main = imports.ui.main;
@@ -410,6 +411,10 @@ Indicator.prototype = {
     _notifyPomodoroEnd: function(text, hideDialog) {
         this._closeNotification();
 
+        if (this._awayFromDesk && hideDialog != true) {
+            this._deactivateScreenSaver();
+        }
+
         if (this._showDialogMessages && hideDialog != true) {
             this._dialog.open();
         }
@@ -453,6 +458,16 @@ Indicator.prototype = {
         }
     },
 
+    _deactivateScreenSaver: function() {
+        let screenSaver = new ScreenSaver.ScreenSaverProxy();
+        screenSaver.SetActive(false);
+        try{
+            Util.trySpawnCommandLine("xdg-screensaver reset");
+        }catch (err){
+            global.logError("Pomodoro: Error waking up screen: " + err.message);
+        }
+    },
+    
     // Toggle timer state
     _toggleTimerState: function(item) {
         this._timeSpent = 0;
