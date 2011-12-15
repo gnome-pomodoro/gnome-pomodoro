@@ -432,6 +432,7 @@ Indicator.prototype = {
 
         if (this._awayFromDesk && hideDialog != true) {
             this._deactivateScreenSaver();
+            this._playNotificationSound();
         }
 
         if (this._showDialogMessages && hideDialog != true) {

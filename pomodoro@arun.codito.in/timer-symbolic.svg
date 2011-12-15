@@ -7,10 +7,34 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    width="16"
    height="16.024"
-   id="svg7384">
+   id="svg7384"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="timer-symbolic.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="739"
+     inkscape:window-height="480"
+     id="namedview16"
+     showgrid="false"
+     inkscape:zoom="14.727908"
+     inkscape:cx="8"
+     inkscape:cy="8.0120001"
+     inkscape:window-x="0"
+     inkscape:window-y="26"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g2993" />
   <title
      id="title9167">Gnome Symbolic Icon Theme</title>
   <defs
@@ -59,20 +83,20 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(-100,-685.98)"
-     id="layer12">
+     id="g2993">
     <path
-       d="m 101.01515,694.35222 c 0.10235,2.05874 1.10114,4.00882 2.8125,5.27679 3.09677,2.29444 7.50913,1.65034 9.80357,-1.44643 2.29444,-3.09678 1.62356,-7.50913 -1.47322,-9.80357 a 1.0001,1.0001 0 1 0 -1.17857,1.60714 c 2.2283,1.65097 2.69562,4.76277 1.04465,6.99107 -1.65098,2.2283 -4.76278,2.69562 -6.99108,1.04464 -1.63389,-1.21057 -2.3771,-3.27946 -1.875,-5.25 a 1.0001,1.0001 0 1 0 -1.92857,-0.50892 c -0.1753,0.68798 -0.2484,1.40303 -0.21428,2.08928 z"
+       inkscape:connector-curvature="0"
+       d="m 1.01515,8.37222 c 0.10235,2.05874 1.10114,4.00882 2.8125,5.27679 3.09677,2.29444 7.50913,1.65034 9.80357,-1.44643 C 15.92566,9.1058 15.25478,4.69345 12.158,2.39901 a 1.0001,1.0001 0 1 0 -1.17857,1.60714 c 2.2283,1.65097 2.69562,4.76277 1.04465,6.99107 C 10.3731,13.22552 7.2613,13.69284 5.033,12.04186 3.39911,10.83129 2.6559,8.7624 3.158,6.79186 A 1.0001,1.0001 0 1 0 1.22943,6.28294 C 1.05413,6.97092 0.98103,7.68597 1.01515,8.37222 z"
        id="path3031"
        style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#bebebe;fill-opacity:1;stroke:none;stroke-width:2.33333325;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
     <path
+       inkscape:connector-curvature="0"
        d="m 4,3.03125 c -0.25592,0 -0.52349,0.086 -0.71875,0.28125 C 2.9157099,3.6780401 2.8923279,4.2492062 3.2111039,4.6410523 4.4516914,6.1027005 5.6978935,7.5898051 6.9375,9.0625 c 0.58579,0.58579 1.53921,0.58579 2.125,0 0.58579,-0.58579 0.58579,-1.53921 0,-2.125 C 7.5938651,5.7119486 6.1113855,4.476788 4.6514234,3.2516917 4.4644466,3.099271 4.2276155,3.03125 4,3.03125 z"
-       transform="translate(100,685.98)"
        id="path3823"
        style="fill:#bebebe;fill-opacity:1;stroke:none" />
+    <path
+       style="fill:#bebebe;stroke:none"
+       id="path3023"
+       d="m 10,2.0240002 a 2,2 0 0 1 -4,0 2,2 0 1 1 4,0 z" />
   </g>
-  <path
-     d="m 10,2.0240002 a 2,2 0 0 1 -4,0 2,2 0 1 1 4,0 z"
-     id="path3023"
-     style="fill:#bebebe" />
 </svg>
