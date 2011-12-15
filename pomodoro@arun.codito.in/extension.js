@@ -25,6 +25,7 @@ const Gio = imports.gi.Gio;
 //const GConf = imports.gi.GConf;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
+const Gtk = imports.gi.Gtk;
 const Util = imports.misc.util;
 const GnomeSession = imports.misc.gnomeSession;
 const ScreenSaver = imports.misc.screenSaver;
@@ -62,6 +63,31 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_playSound", "ui", "play_sound", true],
     ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"],
 ];
+
+
+function NotificationSource() {
+    this._init();
+}
+
+NotificationSource.prototype = {
+    __proto__:  MessageTray.Source.prototype,
+    
+    _init: function() {
+        MessageTray.Source.prototype._init.call(this, _('Pomodoro Timer'));
+        
+        this._setSummaryIcon(this.createNotificationIcon());
+        
+        // Add ourselves as a source.
+        Main.messageTray.add(this);
+    },
+
+    createNotificationIcon: function() {
+        return new St.Icon({ icon_name: 'timer',
+                             icon_type: St.IconType.SYMBOLIC,
+                             icon_size: this.ICON_SIZE });
+    }
+}
+
 
 function Indicator() {
     this._init.apply(this, arguments);
@@ -376,13 +402,6 @@ Indicator.prototype = {
         return false;
     },
 
-    _createNotificationSource: function() {
-        let source = new MessageTray.SystemNotificationSource();
-        source.setTitle(_('Pomodoro Timer'));
-        Main.messageTray.add(source);
-        return source;
-    },
-
     _closeNotification: function() {
         if (this._notification != null) {
             this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
@@ -397,8 +416,8 @@ Indicator.prototype = {
         this._closeNotification();
 
         if (this._showNotificationMessages || force) {
-            let source = this._createNotificationSource ();
-            this._notification = new MessageTray.Notification(source, text);
+            let source = new NotificationSource();
+            this._notification = new MessageTray.Notification(source, text, null);
             this._notification.setTransient(true);
             
             source.notify(this._notification);
@@ -420,7 +439,7 @@ Indicator.prototype = {
         }
         else{
             if (this._showNotificationMessages || hideDialog) {
-                let source = this._createNotificationSource ();
+                let source = new NotificationSource();
                 this._notification = new MessageTray.Notification(source, text, null);
                 this._notification.setResident(true);
                 this._notification.addButton(1, _('Start a new Pomodoro'));
@@ -707,6 +726,9 @@ Indicator.prototype = {
 // Extension initialization code
 function init(metadata) {
     //imports.gettext.bindtextdomain('gnome-shell-pomodoro', metadata.localedir);
+    
+    // search for icons inside extension directory
+    Gtk.IconTheme.get_default().append_search_path (metadata.path);
 }
 
 let _indicator;
