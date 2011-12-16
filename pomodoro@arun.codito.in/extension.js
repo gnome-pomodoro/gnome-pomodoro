@@ -85,6 +85,10 @@ NotificationSource.prototype = {
         return new St.Icon({ icon_name: 'timer',
                              icon_type: St.IconType.SYMBOLIC,
                              icon_size: this.ICON_SIZE });
+    },
+
+    open: function(notification) {
+        this.destroyNonResidentNotifications();
     }
 }
 
