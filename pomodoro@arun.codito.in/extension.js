@@ -123,9 +123,6 @@ Indicator.prototype = {
         this._timer.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
         this.actor.add_actor(this._timer);
 
-        // Set initial width of the timer label
-        this._timer.connect('realize', Lang.bind(this, this._onTimerRealize));
-
         // Toggle timer state button
         this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'popup-subtitle-menu-item' });
         this._timerToggle.connect("toggled", Lang.bind(this, this._toggleTimerState));
@@ -328,16 +325,28 @@ Indicator.prototype = {
 
     // Handle the style related properties in the timer label. These properties are dependent on
     // font size/theme used by user, we need to calculate them during runtime
-    _onTimerRealize: function(actor) {
-        let context = actor.get_pango_context();
-        let themeNode = actor.get_theme_node();
-        let font = themeNode.get_font();
-        let metrics = context.get_metrics(font, context.get_language());
-        let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
-        let char_width = metrics.get_approximate_char_width() / Pango.SCALE;
+    _getPreferredWidth: function(actor, forHeight, alloc) {
+        let theme_node = actor.get_theme_node();
+        let min_hpadding = theme_node.get_length('-minimum-hpadding');
+        let natural_hpadding = theme_node.get_length('-natural-hpadding');
 
-        // predict by the number of characters and digits we have in the label
-        actor.width = parseInt(digit_width * 6 + 2.4 * char_width);
+        let context     = actor.get_pango_context();
+        let font        = theme_node.get_font();
+        let metrics     = context.get_metrics(font, context.get_language());
+        let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
+        let char_width  = metrics.get_approximate_char_width() / Pango.SCALE;
+        
+        let predicted_width        = parseInt(digit_width * 6 + 2.4 * char_width);
+        let predicted_min_size     = predicted_width + 2 * min_hpadding;
+        let predicted_natural_size = predicted_width + 2 * natural_hpadding;        
+
+        PanelMenu.Button.prototype._getPreferredWidth.call(this, actor, forHeight, alloc); // output stored in alloc
+
+        if (alloc.min_size < predicted_min_size)
+            alloc.min_size = predicted_min_size;
+        
+        if (alloc.natural_size < predicted_natural_size)
+            alloc.natural_size = predicted_natural_size;
     },
 
     // Handles option changes in the UI, saves the configuration
