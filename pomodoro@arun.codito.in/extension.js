@@ -25,6 +25,7 @@ const Gio = imports.gi.Gio;
 //const GConf = imports.gi.GConf;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
+const Meta = imports.gi.Meta;
 const Gtk = imports.gi.Gtk;
 const Util = imports.misc.util;
 const GnomeSession = imports.misc.gnomeSession;
@@ -43,13 +44,6 @@ const _ = Gettext.gettext;
 let _useKeybinder = true;
 try { const Keybinder = imports.gi.Keybinder; } catch (error) { _useKeybinder = false; }
 
-//const SESSION_SCHEMA = 'org.gnome.desktop.session';
-//const SESSION_IDLE_DELAY_KEY = 'idle-delay';
-
-const SESSION_SCHEMA = 'org.gnome.desktop.session';
-const SESSION_IDLE_DELAY_KEY = 'idle-delay';
-
-const PAUSE_IDLE_DELAY = 60;
 
 let _configVersion = "0.1";
 let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <default_value> ]
@@ -119,8 +113,10 @@ Indicator.prototype = {
         this._labelMsg = new St.Label({ text: 'Stopped'});
         this._notification = null;
         this._dialog = null;
-        this._notifiedIdle = false;
         this._timerSource = undefined;
+        this._eventCaptureId = 0;
+        this._eventCaptureSource = 0;
+        this._pointer = null;
         
         // Set default menu
         this._timer.clutter_text.set_line_wrap(false);
@@ -211,11 +207,7 @@ Indicator.prototype = {
             },]);
 
         // GNOME Session
-        this._sessionSettings = new Gio.Settings({ schema: SESSION_SCHEMA });
-        
-        this._presence = new GnomeSession.Presence();
-        this._presence.connect('StatusChanged',
-                               Lang.bind(this, this._onSessionStatusChanged));
+        this._screenSaver = null;
 
         // Draw the timer
         this._updateTimer();
@@ -362,31 +354,6 @@ Indicator.prototype = {
         this._saveConfig();
     },
 
-    _getSessionIdleDelay: function() {
-        return this._sessionSettings.get_uint(SESSION_IDLE_DELAY_KEY);
-    },
-    
-    _onSessionStatusChanged: function(presence, status) {
-        this._isIdle = (status == GnomeSession.PresenceStatus.IDLE);
-        if (this._isIdle)
-            this._notifiedIdle = false;
-        
-        if (this._isRunning) {
-            // Invalidate pomodoro if was idle from the start
-            if (this._isIdle &&
-                this._awayFromDesk == false &&
-                this._isPause == false &&
-                this._timeSpent < this._getSessionIdleDelay()-1) // -1 second is to ignore clicks from timer switch
-            {
-                this._isPause = true;
-                this._pauseCount -= 1;
-                this._timeSpent = this._pauseTime + this._timeSpent;
-                this._notifiedIdle = true;
-            }
-            this._updateTimer();
-        }
-    },
-
     // Skip break or reset current pomodoro
     _startNewPomodoro: function() {
         if (this._isPause)
@@ -427,6 +394,9 @@ Indicator.prototype = {
     // Notify user of changes
     _notifyPomodoroStart: function(text, force) {
         this._closeNotification();
+
+        //if (!this._awayFromDesk)
+        //    this._deactivateScreenSaver();
 
         if (this._showNotificationMessages || force) {
             let source = new NotificationSource();
@@ -492,12 +462,13 @@ Indicator.prototype = {
     },
 
     _deactivateScreenSaver: function() {
-        let screenSaver = new ScreenSaver.ScreenSaverProxy();
-        screenSaver.SetActive(false);
-        try{
-            Util.trySpawnCommandLine("xdg-screensaver reset");
-        }catch (err){
-            global.logError("Pomodoro: Error waking up screen: " + err.message);
+        if (this._screenSaver != null) {
+            this._screenSaver.SetActive(false);
+            try{
+                Util.trySpawnCommandLine("xdg-screensaver reset");
+            }catch (err){
+                global.logError("Pomodoro: Error waking up screen: " + err.message);
+            }
         }
     },
     
@@ -515,11 +486,16 @@ Indicator.prototype = {
     },
     
     _startTimer: function() {
-        if (this._timerSource == undefined) {
+        if (this._timerSource == undefined)
             this._timerSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
-            this._isRunning = true;
-            this._updateTimer();
-            this._updateSessionCount();
+
+        this._isRunning = true;
+        this._updateTimer();
+        this._updateSessionCount();
+
+        if (this._screenSaver == null) {
+            this._screenSaver = new ScreenSaver.ScreenSaverProxy();
+            //this._screenSaver.connect('ActiveChanged', Lang.bind(this, this._setIdle));
         }
     },
 
@@ -527,13 +503,83 @@ Indicator.prototype = {
         if (this._timerSource != undefined) {
             GLib.source_remove(this._timerSource);
             this._timerSource = undefined;
-            this._isRunning = false;
-            this._updateTimer();
-            this._updateSessionCount();            
-            this._closeNotification();
+        }
+        this._isRunning = false;
+        this._setIdle(false);
+        this._updateTimer();
+        this._updateSessionCount();            
+        this._closeNotification();            
+        
+        this._screenSaver = null;
+    },
+
+    _suspendTimer: function() {
+        if (this._timerSource != undefined) {
+            // Stop timer
+            GLib.source_remove(this._timerSource);
+            this._timerSource = undefined;
+
+            this._setIdle(true);
         }
     },
 
+    _setIdle: function(active) {
+        this._isIdle = active;
+        if (active) {
+            // We use meta_display_get_last_user_time() which determines any user interaction 
+            // with X11/Mutter windows but not with GNOME Shell UI, for that we handle 'captured-event'.
+            if (this._eventCaptureId == 0)
+                this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
+            
+            if (this._eventCaptureSource == 0) {
+                this._pointer = null;
+                this._eventCaptureSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onX11EventCapture));
+            }
+        }
+        else{
+            global.stage.disconnect(this._eventCaptureId);
+            this._eventCaptureId = 0;
+
+            GLib.source_remove(this._eventCaptureSource);
+            this._eventCaptureSource = 0;
+            
+            if (this._isRunning)
+                this._startTimer();
+        }
+    },
+
+    _onEventCapture: function(actor, event) {
+        // When notification dialog fades out, can trigger an event.
+        // To avoid that we need to capture just these event types:
+        switch(event.type()) {
+            case Clutter.EventType.KEY_PRESS:
+            case Clutter.EventType.BUTTON_PRESS:
+            case Clutter.EventType.MOTION:
+            case Clutter.EventType.SCROLL:
+                this._setIdle(false);
+                break;
+        }
+        return false;
+    },
+
+    _onX11EventCapture: function() {
+        let display = global.screen.get_display();
+        let pointer = global.get_pointer();
+        let idleTime = parseInt((display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000);
+        
+        if (idleTime < 1 || (this._pointer != null && (pointer[0] != this._pointer[0] || pointer[1] != this._pointer[1]))) {
+            this._setIdle(false);
+            
+            // Treat last non-idle second as if timer was running.
+            this._refreshTimer();
+
+            return false;
+        }
+        
+        this._pointer = pointer;
+        return true;
+    },
+    
     // Increment timeSpent and call functions to check timer states and update ui_timer    
     _refreshTimer: function() {
         if (this._isRunning) {
@@ -552,16 +598,14 @@ Indicator.prototype = {
             // Check if a pause is running..
             if (this._isPause == true) {
                 // Check if the pause is over
-                if (this._timeSpent >= this._pauseTime && (this._awayFromDesk || this._isIdle != true)) {
+                if (this._timeSpent >= this._pauseTime) {
                     this._timeSpent = 0;
                     this._isPause = false;
-                    if (this._notifiedIdle == false)
-                        this._notifyPomodoroStart(_('Pause finished, a new pomodoro is starting!'));
                     this._updateSessionCount();
-                }
-                else if (this._timeSpent >= this._pauseTime && this._isIdle && this._notifiedIdle != true) {
-                    this._notifiedIdle = true;
                     this._notifyPomodoroStart(_('Pause finished, a new pomodoro is starting!'));
+                    
+                    if (!this._awayFromDesk)
+                        this._suspendTimer();
                 }
                 else{
                     if (this._pauseCount == 0)
