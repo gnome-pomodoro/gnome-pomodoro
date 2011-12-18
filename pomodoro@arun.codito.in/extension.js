@@ -51,7 +51,6 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_shortPauseTime", "timer", "short_pause_duration", 300],
     ["_longPauseTime", "timer", "long_pause_duration", 900],
     ["_awayFromDesk", "ui", "away_from_desk", false],
-    ["_showNotificationMessages", "ui", "show_messages", true],
     ["_showDialogMessages", "ui", "show_dialog_messages", true],
     ["_playSound", "ui", "play_sound", true],
     ["_keyToggleTimer", "ui", "key_toggle_timer", "<Ctrl><Alt>P"],
@@ -231,15 +230,6 @@ Indicator.prototype = {
         awayFromDeskToggle.actor.tooltip_text = "Set optimal settings for doing paperwork";
         notificationSection.addMenuItem(awayFromDeskToggle);
 
-        // ShowMessages option toggle
-        let showNotificationMessagesToggle = new PopupMenu.PopupSwitchMenuItem(_("Show Notification Messages"), this._showNotificationMessages);
-        showNotificationMessagesToggle.connect("toggled", Lang.bind(this, function() {
-            this._showNotificationMessages = !(this._showNotificationMessages);
-            this._onConfigUpdate(false);
-        }));
-        showNotificationMessagesToggle.actor.tooltip_text = "Show notification messages in the gnome-shell taskbar";
-        notificationSection.addMenuItem(showNotificationMessagesToggle);
-
         // Dialog Message toggle
         let breakMessageToggle = new PopupMenu.PopupSwitchMenuItem
             (_("Show Dialog Messages"), this._showDialogMessages);
@@ -385,7 +375,7 @@ Indicator.prototype = {
         //if (!this._awayFromDesk)
         //    this._deactivateScreenSaver();
 
-        if (this._showNotificationMessages || force) {
+        if (true) {
             let source = new NotificationSource();
             this._notification = new MessageTray.Notification(source, text, null);
             this._notification.setTransient(true);
@@ -408,18 +398,15 @@ Indicator.prototype = {
         if (this._showDialogMessages && hideDialog != true) {
             this._dialog.open();
         }
-        else{
-            if (this._showNotificationMessages || hideDialog) {
-                let source = new NotificationSource();
-                this._notification = new MessageTray.Notification(source, text, null);
-                this._notification.setResident(true);
-                this._notification.addButton(1, _('Start a new Pomodoro'));
-                this._notification.connect('action-invoked', Lang.bind(this, function(param) {
-                            this._startNewPomodoro();
-                        })
-                    );
-                source.notify(this._notification);
-            }
+        else if (hideDialog) {
+            let source = new NotificationSource();
+            this._notification = new MessageTray.Notification(source, text, null);
+            this._notification.setResident(true);
+            this._notification.addButton(1, _('Start a new Pomodoro'));
+            this._notification.connect('action-invoked', Lang.bind(this, function(param) {
+                    this._startNewPomodoro();
+                }));
+            source.notify(this._notification);
         }
     },
 
