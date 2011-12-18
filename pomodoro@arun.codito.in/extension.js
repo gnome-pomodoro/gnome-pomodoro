@@ -205,6 +205,9 @@ Indicator.prototype = {
         // GNOME Session
         this._screenSaver = null;
 
+
+        this.connect('destroy', Lang.bind(this, this._onDestroy));
+        
         // Draw the timer
         this._updateTimer();
     },
@@ -330,7 +333,11 @@ Indicator.prototype = {
 
         this._saveConfig();
     },
-
+    
+    _onDestroy: function() {
+        this._stopTimer();
+    },
+    
     // Skip break or reset current pomodoro
     _startNewPomodoro: function() {
         if (this._isPause)
