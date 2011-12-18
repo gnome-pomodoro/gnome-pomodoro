@@ -51,7 +51,6 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ["_shortPauseTime", "timer", "short_pause_duration", 300],
     ["_longPauseTime", "timer", "long_pause_duration", 900],
     ["_awayFromDesk", "ui", "away_from_desk", false],
-    ["_showCountdownTimer", "ui", "show_countdown_timer", true],
     ["_showNotificationMessages", "ui", "show_messages", true],
     ["_showDialogMessages", "ui", "show_dialog_messages", true],
     ["_playSound", "ui", "play_sound", true],
@@ -102,8 +101,6 @@ Indicator.prototype = {
 
         this._timer = new St.Label({ style_class: 'extension-pomodoro-label' });
         this._timeSpent = 0;
-        this._minutes = 0;
-        this._seconds = 0;
         this._isRunning = false;
         this._isPause = false;
         this._isIdle = false;
@@ -223,16 +220,6 @@ Indicator.prototype = {
 
         let notificationSection = new PopupMenu.PopupMenuSection();
         this._optionsMenu.menu.addMenuItem(notificationSection);
-
-        // Dialog Message toggle
-        let showCountdownTimerToggle = new PopupMenu.PopupSwitchMenuItem
-            (_("Show Countdown Timer"), this._showCountdownTimer);
-        showCountdownTimerToggle.connect("toggled", Lang.bind(this, function() {
-            this._showCountdownTimer = !(this._showCountdownTimer);
-            this._onConfigUpdate(false);
-        }));
-        showCountdownTimerToggle.actor.tooltip_text = "Make the pomodoro timer count down to zero";
-        notificationSection.addMenuItem(showCountdownTimerToggle);
 
         // Away From Desk toggle
         let awayFromDeskToggle = new PopupMenu.PopupSwitchMenuItem
@@ -475,8 +462,6 @@ Indicator.prototype = {
     // Toggle timer state
     _toggleTimerState: function(item) {
         this._timeSpent = 0;
-        this._minutes = 0;
-        this._seconds = 0;
         this._isPause = false;
         
         if (item.state)
@@ -630,8 +615,6 @@ Indicator.prototype = {
                 }
 
                 this._timeSpent = 0;
-                this._minutes = 0;
-                this._seconds = 0;
                 this._sessionCount += 1;
                 this._isPause = true;
                 this._updateSessionCount();
@@ -659,23 +642,20 @@ Indicator.prototype = {
         this._checkTimerState();
 
         if (this._isRunning) {
-            let seconds = this._timeSpent;
-            if (this._showCountdownTimer == true)
-                seconds = Math.max((this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent, 0);
+            let secondsLeft = Math.max((this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent, 0);
             
-            this._minutes = parseInt(seconds / 60);
-            this._seconds = parseInt(seconds % 60);
+            let minutes = parseInt(secondsLeft / 60);
+            let seconds = parseInt(secondsLeft % 60);
 
-            timer_text = "[%02d] %02d:%02d".format(this._sessionCount, this._minutes, this._seconds);
+            timer_text = "[%02d] %02d:%02d".format(this._sessionCount, minutes, seconds);
             this._timer.set_text(timer_text);
 
             if (this._isPause && this._showDialogMessages)
             {
-                seconds = this._pauseTime - this._timeSpent;
-                if (seconds < 47)
-                    this._descriptionLabel.text = _("Take a break! You have %d seconds\n").format(Math.round(seconds / 5) * 5);
+                if (secondsLeft < 47)
+                    this._descriptionLabel.text = _("Take a break! You have %d seconds\n").format(Math.round(secondsLeft / 5) * 5);
                 else
-                    this._descriptionLabel.text = _("Take a break! You have %d minutes\n").format(Math.round(seconds / 60));
+                    this._descriptionLabel.text = _("Take a break! You have %d minutes\n").format(Math.round(secondsLeft / 60));
             }
         }
         else{
