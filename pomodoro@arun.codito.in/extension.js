@@ -398,7 +398,7 @@ Indicator.prototype = {
         if (this._showDialogMessages && hideDialog != true) {
             this._dialog.open();
         }
-        else if (hideDialog) {
+        else{
             let source = new NotificationSource();
             this._notification = new MessageTray.Notification(source, text, null);
             this._notification.setResident(true);
