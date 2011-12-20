@@ -403,9 +403,13 @@ Indicator.prototype = {
         }
 
         if (this._showDialogMessages && hideDialog != true) {
-            this._dialog.open();
+            if (this._dialog.open())
+                return;
+            else
+                ; // Show regular notification as a fallback
         }
-        else{
+        
+        if (true) {
             let source = new NotificationSource();
             this._notification = new MessageTray.Notification(source, text, null);
             this._notification.setResident(true);
