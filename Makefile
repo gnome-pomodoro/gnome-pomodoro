@@ -6,7 +6,7 @@ ifneq (${XDG_DATA_HOME},)
 else
     OUT = ${HOME}/.local/share/gnome-shell/extensions/${SRC}
 endif
-FILES = ${OUT}/extension.js ${OUT}/metadata.json ${OUT}/stylesheet.css ${OUT}/bell.wav
+FILES = ${OUT}/extension.js ${OUT}/metadata.json ${OUT}/stylesheet.css ${OUT}/bell.wav ${OUT}/timer-symbolic.svg
 
 ifneq (${XDG_CONFIG_HOME},)
     CONFIG_DIR = ${XDG_CONFIG_HOME}/${NAME}
