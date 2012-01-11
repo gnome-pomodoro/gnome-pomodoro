@@ -279,7 +279,7 @@ Indicator.prototype = {
         let char_width = metrics.get_approximate_char_width() / Pango.SCALE;
 
         // predict by the number of characters and digits we have in the label
-        actor.width = parseInt(digit_width * 6 + 2.4 * char_width);
+        actor.width = parseInt(digit_width * 6 + 2.8 * char_width);
     },
 
     // Handles option changes in the UI, saves the configuration
