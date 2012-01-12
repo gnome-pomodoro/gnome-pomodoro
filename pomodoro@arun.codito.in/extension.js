@@ -385,12 +385,14 @@ Indicator.prototype = {
     // Skip break or reset current pomodoro
     _startNewPomodoro: function() {
         if (this._isPause)
-            this._timeSpent = 99999;
-        else
-            this._timeSpent = 0;
-        
+            this._pauseCount += 0;
+        this._timeSpent = 0;
+        this._isPause = false;
         this._stopTimer();
         this._startTimer();
+        
+        this._closeNotification();
+        this._playNotificationSound();
     },
     
     // Reset all counters and timers
