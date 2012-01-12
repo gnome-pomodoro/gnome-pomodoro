@@ -432,7 +432,7 @@ Indicator.prototype = {
     },
 
     // Notify user of changes
-    _notifyPomodoroStart: function(text, force) {
+    _notifyPomodoroStart: function() {
         this._closeNotification();
 
         //if (!this._awayFromDesk)
@@ -440,7 +440,7 @@ Indicator.prototype = {
 
         if (true) {
             let source = new NotificationSource();
-            this._notification = new MessageTray.Notification(source, text, null);
+            this._notification = new MessageTray.Notification(source, _('Pause finished, a new pomodoro is starting!'), null);
             this._notification.setTransient(true);
             
             source.notify(this._notification);
@@ -450,7 +450,7 @@ Indicator.prototype = {
     },
     
     // Notify user of changes
-    _notifyPomodoroEnd: function(text, hideDialog) {
+    _notifyPomodoroEnd: function(hideDialog) {
         this._closeNotification();
 
         if (this._awayFromDesk && hideDialog != true) {
@@ -464,7 +464,7 @@ Indicator.prototype = {
             this._dialog.setButtons([
                     { label: _('Hide'),
                       action: Lang.bind(this, function() {
-                            this._notifyPomodoroEnd(_('Pomodoro finished, take a break!'), true);
+                            this._notifyPomodoroEnd(true);
                       }),
                       key: Clutter.Escape
                     },
@@ -481,7 +481,9 @@ Indicator.prototype = {
         
         if (true) {
             let source = new NotificationSource();
-            this._notification = new MessageTray.Notification(source, text, null);
+            this._notification = new MessageTray.Notification(source, '', '', null);
+            this._updateNotification();
+
             this._notification.setResident(true);
             this._notification.addButton(1, _('Start a new Pomodoro'));
             this._notification.connect('action-invoked', Lang.bind(this, function(param) {
@@ -670,7 +672,7 @@ Indicator.prototype = {
                     this._timeSpent = 0;
                     this._setPause(false);
                     this._updateSessionCount();
-                    this._notifyPomodoroStart(_('Pause finished, a new pomodoro is starting!'));
+                    this._notifyPomodoroStart();
                     
                     if (!this._awayFromDesk)
                         this._suspendTimer();
@@ -691,16 +693,13 @@ Indicator.prototype = {
                 if (this._pauseCount == 4) {
                     this._pauseCount = 0;
                     this._pauseTime = this._longPauseTime;
-                    this._notifyPomodoroEnd(_('4th pomodoro in a row finished, starting a long pause...'));
-                }
-                else {
-                    this._notifyPomodoroEnd(_('Pomodoro finished, take a break!'));
                 }
 
                 this._timeSpent = 0;
                 this._sessionCount += 1;
                 this._setPause(true);
                 this._updateSessionCount();
+                this._notifyPomodoroEnd();
             }
         }
     },
@@ -722,6 +721,8 @@ Indicator.prototype = {
 
         if (this._isRunning) {
             let secondsLeft = Math.max((this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent, 0);
+            if (this._isPause)
+                secondsLeft = Math.ceil(secondsLeft / 5) * 5;
             
             let minutes = parseInt(secondsLeft / 60);
             let seconds = parseInt(secondsLeft % 60);
@@ -729,13 +730,7 @@ Indicator.prototype = {
             timer_text = "%02d:%02d".format(minutes, seconds);
             this._timer.set_text(timer_text);
 
-            if (this._isPause && this._dialog != null)
-            {
-                if (secondsLeft < 47)
-                    this._dialog.setText(_("Take a break! You have %d seconds\n").format(Math.round(secondsLeft / 5) * 5));
-                else
-                    this._dialog.setText(_("Take a break! You have %d minutes\n").format(Math.round(secondsLeft / 60)));
-            }
+            this._updateNotification();
         }
         else{
             timer_text = "00:00";
@@ -743,7 +738,29 @@ Indicator.prototype = {
         }
     },
 
+    _updateNotification: function() {
+        if (this._isPause)
+        {
+            let seconds = Math.max((this._isPause ? this._pauseTime : this._pomodoroTime) - this._timeSpent, 0);
+            if (this._isPause)
+                seconds = Math.ceil(seconds / 5) * 5;
 
+            let minutes = Math.round(seconds / 60);
+            let timestring;
+
+            if (seconds <= 45)
+                timestring = ngettext('Take a break, you have %d second\n', 'Take a break, you have %d seconds\n', seconds).format(seconds);
+            else
+                timestring = ngettext('Take a break, you have %d minute\n', 'Take a break, you have %d minutes\n', minutes).format(minutes);
+
+            if (this._dialog)
+                this._dialog.setText(timestring);
+                
+            if (this._notification)
+                this._notification.update(_('Pomodoro Finished!'), timestring);
+        }
+    },
+    
     // Format absolute time in seconds as "Xm Ys"
     _formatTime: function(abs) {
         let minutes = Math.floor(abs/60);
