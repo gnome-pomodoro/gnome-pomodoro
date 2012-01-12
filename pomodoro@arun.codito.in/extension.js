@@ -37,6 +37,7 @@ const MessageTray = imports.ui.messageTray;
 const ModalDialog = imports.ui.modalDialog;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+const Tweener = imports.ui.tweener;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
@@ -182,6 +183,9 @@ MessageDialog.prototype = {
     }
 }
 
+
+const TIMER_LABEL_OPACITY_WHEN_PAUSE = 130;
+const TIMER_LABEL_FADE_TIME = 0.2; // seconds used to fade in/out
 
 function Indicator() {
     this._init.apply(this, arguments);
@@ -391,7 +395,7 @@ Indicator.prototype = {
         if (this._isPause)
             this._pauseCount += 0;
         this._timeSpent = 0;
-        this._isPause = false;
+        this._setPause(false);
         this._stopTimer();
         this._startTimer();
         
@@ -402,7 +406,7 @@ Indicator.prototype = {
     // Reset all counters and timers
     _resetCount: function() {
         this._timeSpent = 0;
-        this._isPause = false;
+        this._setPause(false);
         this._sessionCount = 0;
         this._pauseCount = 0;
 
@@ -526,7 +530,7 @@ Indicator.prototype = {
     // Toggle timer state
     _toggleTimerState: function(item) {
         this._timeSpent = 0;
-        this._isPause = false;
+        this._setPause(false);
         
         if (item.state)
             this._startTimer();
@@ -597,6 +601,21 @@ Indicator.prototype = {
         }
     },
 
+    _setPause: function(active) {
+        this._isPause = active;
+
+        if (active && this._isRunning)
+            Tweener.addTween(this._timer,
+                             { opacity: TIMER_LABEL_OPACITY_WHEN_PAUSE,
+                               transition: 'easeOutQuad',
+                               time: TIMER_LABEL_FADE_TIME });            
+        else
+            Tweener.addTween(this._timer,
+                             { opacity: 255,
+                               transition: 'easeOutQuad',
+                               time: TIMER_LABEL_FADE_TIME });        
+    },
+
     _onEventCapture: function(actor, event) {
         // When notification dialog fades out, can trigger an event.
         // To avoid that we need to capture just these event types:
@@ -649,7 +668,7 @@ Indicator.prototype = {
                 // Check if the pause is over
                 if (this._timeSpent >= this._pauseTime) {
                     this._timeSpent = 0;
-                    this._isPause = false;
+                    this._setPause(false);
                     this._updateSessionCount();
                     this._notifyPomodoroStart(_('Pause finished, a new pomodoro is starting!'));
                     
@@ -680,7 +699,7 @@ Indicator.prototype = {
 
                 this._timeSpent = 0;
                 this._sessionCount += 1;
-                this._isPause = true;
+                this._setPause(true);
                 this._updateSessionCount();
             }
         }
