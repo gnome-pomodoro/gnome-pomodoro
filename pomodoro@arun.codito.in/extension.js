@@ -85,6 +85,104 @@ NotificationSource.prototype = {
 }
 
 
+const MESSAGE_DIALOG_BLOCK_EVENTS_TIME = 800;
+
+function MessageDialog() {
+    this._init();
+}
+
+MessageDialog.prototype = {
+    __proto__:  ModalDialog.ModalDialog.prototype,
+    
+    _init: function() {
+        ModalDialog.ModalDialog.prototype._init.call(this);
+        
+        this.style_class = 'polkit-dialog';
+        this._timeoutSource = 0;
+
+        let mainLayout = new St.BoxLayout({
+                                style_class: 'polkit-dialog-main-layout',
+                                vertical: false });
+        
+        // let icon = new St.Icon({ icon_name: 'pomodoro-symbolic' });
+        // mainLayout.add(icon,
+        //                   { x_fill:  true,
+        //                     y_fill:  false,
+        //                     x_align: St.Align.END,
+        //                     y_align: St.Align.START });
+
+        let messageBox = new St.BoxLayout({
+                                style_class: 'polkit-dialog-message-layout',
+                                vertical: true });
+
+        this._titleLabel = new St.Label({ style_class: 'polkit-dialog-headline',
+                                            text: '' });
+                
+        this._descriptionLabel = new St.Label({ style_class: 'polkit-dialog-description',
+                                                text: '' });
+        this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._descriptionLabel.clutter_text.line_wrap = true;
+        
+        messageBox.add(this._titleLabel,
+                            { y_fill:  false,
+                              y_align: St.Align.START });                                              
+        messageBox.add(this._descriptionLabel,
+                            { y_fill:  true,
+                              y_align: St.Align.START });
+        mainLayout.add(messageBox,
+                            { x_fill: true,
+                              y_align: St.Align.START });
+        this.contentLayout.add(mainLayout,
+                            { x_fill: true,
+                              y_fill: true });
+    },
+
+    open: function(timestamp) {
+        this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
+        this._waitUntilIdle();
+        
+        return ModalDialog.ModalDialog.prototype.open.call(this, timestamp);
+    },
+    
+    _waitUntilIdle: function() {
+        if (this._timeoutSource != 0)
+            GLib.source_remove(this._timeoutSource);
+        
+        this._timeoutSource = Mainloop.timeout_add(MESSAGE_DIALOG_BLOCK_EVENTS_TIME, Lang.bind(this, function(){
+            global.stage.disconnect(this._eventCaptureId);
+            this._eventCaptureId = 0;
+            this._timeoutSource = 0;
+        }));
+    },
+
+    _onEventCapture: function(actor, event) {
+        switch(event.type()) {
+            case Clutter.EventType.KEY_PRESS:
+                let keysym = event.get_key_symbol();
+                if (keysym == Clutter.Escape || keysym == Clutter.Left || keysym == Clutter.Right)
+                    return false;
+                // User might be looking at the keyboard while typing, so continue typing to the app.
+                // TODO: pass typed letters to a focused object without blocking them
+                this._waitUntilIdle();
+                return true;                
+            
+            case Clutter.EventType.BUTTON_PRESS:
+            case Clutter.EventType.BUTTON_RELEASE:
+                return true;
+        }
+        return false;
+    },
+    
+    setTitle: function(text) {
+        this._titleLabel.text = text;
+    },
+
+    setText: function(text) {
+        this._descriptionLabel.text = text;        
+    }
+}
+
+
 function Indicator() {
     this._init.apply(this, arguments);
 }
@@ -147,60 +245,6 @@ Indicator.prototype = {
             Keybinder.init();
             Keybinder.bind(this._keyToggleTimer, Lang.bind(this, this._keyHandler), null);
         }
-
-        // Dialog
-        this._dialog = new ModalDialog.ModalDialog({ style_class: 'polkit-dialog' });
-
-        let mainContentBox = new St.BoxLayout({ style_class: 'polkit-dialog-main-layout',
-                                                vertical: false });
-        this._dialog.contentLayout.add(mainContentBox,
-                                              { x_fill: true,
-                                                y_fill: true });
-
-        //let icon = new St.Icon({ icon_name: 'pomodoro-symbolic' });
-        //mainContentBox.add(icon,
-        //                   { x_fill:  true,
-        //                     y_fill:  false,
-        //                     x_align: St.Align.END,
-        //                     y_align: St.Align.START });
-
-        let messageBox = new St.BoxLayout({ style_class: 'polkit-dialog-message-layout',
-                                            vertical: true });
-        mainContentBox.add(messageBox,
-                           { y_align: St.Align.START });
-
-        this._subjectLabel = new St.Label({ style_class: 'polkit-dialog-headline',
-                                            text: _("Pomodoro Finished!") });
-
-        messageBox.add(this._subjectLabel,
-                       { y_fill:  false,
-                         y_align: St.Align.START });
-
-        this._descriptionLabel = new St.Label({ style_class: 'polkit-dialog-description',
-                                                text: '' });
-        this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._descriptionLabel.clutter_text.line_wrap = true;
-
-        messageBox.add(this._descriptionLabel,
-            { y_fill:  true,
-              y_align: St.Align.START });
-
-        this._dialog.contentLayout.add(this._descriptionLabel,
-            { x_fill: true,
-              y_fill: true });
-        this._dialog.setButtons([
-            { label: _("Hide"),
-              action: Lang.bind(this, function(param) {
-                        this._dialog.close();
-                        this._notifyPomodoroEnd(_('Pomodoro finished, take a break!'), true);
-                    }),
-              key: Clutter.Escape 
-            },
-            { label: _("Start a new Pomodoro"),
-              action: Lang.bind(this, function(param) {
-                        this._startNewPomodoro();
-                    }), 
-            },]);
 
         // GNOME Session
         this._screenSaver = null;
@@ -371,8 +415,10 @@ Indicator.prototype = {
             this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
             this._notification = null;        
         }
-        if (this._dialog != null)
+        if (this._dialog != null) {
             this._dialog.close();
+            this._dialog = null;
+        }
     },
 
     // Notify user of changes
@@ -403,6 +449,20 @@ Indicator.prototype = {
         }
 
         if (this._showDialogMessages && hideDialog != true) {
+            this._dialog = new MessageDialog();
+            this._dialog.setTitle(_('Pomodoro Finished!'));
+            this._dialog.setButtons([
+                    { label: _('Hide'),
+                      action: Lang.bind(this, function() {
+                            this._notifyPomodoroEnd(_('Pomodoro finished, take a break!'), true);
+                      }),
+                      key: Clutter.Escape
+                    },
+                    { label: _('Start a new Pomodoro'),
+                      action: Lang.bind(this, this._startNewPomodoro),
+                    }
+                ]);
+
             if (this._dialog.open())
                 return;
             else
@@ -648,12 +708,12 @@ Indicator.prototype = {
             timer_text = "[%02d] %02d:%02d".format(this._sessionCount, minutes, seconds);
             this._timer.set_text(timer_text);
 
-            if (this._isPause && this._showDialogMessages)
+            if (this._isPause && this._dialog != null)
             {
                 if (secondsLeft < 47)
-                    this._descriptionLabel.text = _("Take a break! You have %d seconds\n").format(Math.round(secondsLeft / 5) * 5);
+                    this._dialog.setText(_("Take a break! You have %d seconds\n").format(Math.round(secondsLeft / 5) * 5));
                 else
-                    this._descriptionLabel.text = _("Take a break! You have %d minutes\n").format(Math.round(secondsLeft / 60));
+                    this._dialog.setText(_("Take a break! You have %d minutes\n").format(Math.round(secondsLeft / 60)));
             }
         }
         else{
