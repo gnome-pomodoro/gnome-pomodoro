@@ -212,10 +212,14 @@ Indicator.prototype = {
         this._eventCaptureSource = 0;
         this._pointer = null;
         
-        // Set default menu
+        // St.Label doesn't support text-align so use a Bin
+        let alignment = new St.Bin({ x_align: St.Align.START });
+
         this._timer.clutter_text.set_line_wrap(false);
         this._timer.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
-        this.actor.add_actor(this._timer);
+
+        alignment.add_actor(this._timer);
+        this.actor.add_actor(alignment);
 
         // Toggle timer state button
         this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'popup-subtitle-menu-item' });
@@ -223,9 +227,9 @@ Indicator.prototype = {
         this.menu.addMenuItem(this._timerToggle);
 
         // Session count
-        let item = new PopupMenu.PopupMenuItem(_("Collected"), { reactive: false });
+        let item = new PopupMenu.PopupMenuItem(_("Sessions Completed"), { reactive: false });
         let bin = new St.Bin({ x_align: St.Align.END });
-        this._sessionCountLabel = new St.Label({ text: _('None') }); // ● U+25CF BLACK CIRCLE //style_class: 'popup-inactive-menu-item' });
+        this._sessionCountLabel = new St.Label({ text: _('None') });
         bin.add_actor(this._sessionCountLabel);
         item.addActor(bin, { expand: true, span: -1, align: St.Align.END });
         this.menu.addMenuItem(item);
@@ -356,7 +360,7 @@ Indicator.prototype = {
         let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
         let char_width  = metrics.get_approximate_char_width() / Pango.SCALE;
         
-        let predicted_width        = parseInt(digit_width * 6 + 2.4 * char_width);
+        let predicted_width        = parseInt(digit_width * 4 + 0.8 * char_width);
         let predicted_min_size     = predicted_width + 2 * min_hpadding;
         let predicted_natural_size = predicted_width + 2 * natural_hpadding;        
 
@@ -685,15 +689,11 @@ Indicator.prototype = {
     _updateSessionCount: function() {
         let text = '';
 
-        if (this._sessionCount == 0 && this._isRunning == false) {
+        if (this._sessionCount == 0)
             text = _('None');
-        }
-        else {
-            if (this._isPause || this._isRunning == false)
-                text = Array((this._sessionCount-1) % 4 + 2).join('\u25cf'); // ● U+25CF BLACK CIRCLE            
-            else
-                text = Array(this._sessionCount % 4 + 1).join('\u25cf') + '\u25d6'; // ◖ U+25D6 LEFT HALF BLACK CIRCLE
-        }
+        else
+            text = this._sessionCount.toString();
+            
         this._sessionCountLabel.set_text(text);
     },
 
@@ -707,7 +707,7 @@ Indicator.prototype = {
             let minutes = parseInt(secondsLeft / 60);
             let seconds = parseInt(secondsLeft % 60);
 
-            timer_text = "[%02d] %02d:%02d".format(this._sessionCount, minutes, seconds);
+            timer_text = "%02d:%02d".format(minutes, seconds);
             this._timer.set_text(timer_text);
 
             if (this._isPause && this._dialog != null)
@@ -719,7 +719,7 @@ Indicator.prototype = {
             }
         }
         else{
-            timer_text = "[%02d] 00:00".format(this._sessionCount);
+            timer_text = "00:00";
             this._timer.set_text(timer_text);
         }
     },
