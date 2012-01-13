@@ -16,8 +16,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 .extension-pomodoro-label {
-    /*color: white;*/
-    /*font-weight: bold;*/
-    background: rgba(0, 0, 0, 0);  /* transparent */
-    /*min-width: 72px;*/           /* dependent on theme/font, see function _onRealize() in extension.js */ 
 }
