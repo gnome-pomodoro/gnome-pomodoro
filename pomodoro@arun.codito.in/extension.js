@@ -34,6 +34,7 @@ const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 
 const Util = imports.misc.util;
+const Params = imports.misc.params;
 const GnomeSession = imports.misc.gnomeSession;
 const ScreenSaver = imports.misc.screenSaver;
 
@@ -102,6 +103,8 @@ MessageDialog.prototype = {
         
         this.style_class = 'polkit-dialog';
         this._timeoutSource = 0;
+        this._eventCaptureId = 0;
+        this._tryOpenTimeoutSource = 0;
 
         let mainLayout = new St.BoxLayout({
                                 style_class: 'polkit-dialog-main-layout',
@@ -143,21 +146,61 @@ MessageDialog.prototype = {
                               y_fill: true });
     },
 
-    open: function(timestamp) {
-        this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
-        this._waitUntilIdle();
-        
-        return ModalDialog.ModalDialog.prototype.open.call(this, timestamp);
+    open: function(timestamp) {        
+        let success = ModalDialog.ModalDialog.prototype.open.call(this, timestamp);
+        if (success) {
+            this._disableEventCapture();
+
+            this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
+            this._waitUntilIdle();
+        }
+        return success;
+    },
+    
+    tryOpen: function(params) {
+        params = Params.parse(params, { seconds: 1,
+                                        onFailure: null });
+
+        if (!this.open()) {
+            // Ignore second call
+            if (this._tryOpenTimeoutSource != 0)
+                return;
+            
+            // Schedule reopening of the dialog
+            let tries = 1;
+            let fps = Clutter.get_default_frame_rate();
+            this._tryOpenTimeoutSource = Mainloop.timeout_add(parseInt(1000/fps), Lang.bind(this, function(){
+                tries++;
+                if (this.open()) {
+                    return false;
+                }
+                if (tries > params.seconds*fps) {
+                    if (params.onFailure != null)
+                        params.onFailure();
+                    return false;
+                }
+                return true;
+            }));
+        }
+    },
+    
+    close: function(timestamp) {
+        this._disableEventCapture();
+        if (this._tryOpenTimeoutSource != 0) {
+            GLib.source_remove(this._tryOpenTimeoutSource);
+            this._tryOpenTimeoutSource = 0;
+        }
+        return ModalDialog.ModalDialog.prototype.close.call(this, timestamp);
     },
     
     _waitUntilIdle: function() {
-        if (this._timeoutSource != 0)
+        if (this._timeoutSource != 0) {
             GLib.source_remove(this._timeoutSource);
-        
-        this._timeoutSource = Mainloop.timeout_add(MESSAGE_DIALOG_BLOCK_EVENTS_TIME, Lang.bind(this, function(){
-            global.stage.disconnect(this._eventCaptureId);
-            this._eventCaptureId = 0;
             this._timeoutSource = 0;
+        }
+        this._timeoutSource = Mainloop.timeout_add(MESSAGE_DIALOG_BLOCK_EVENTS_TIME, Lang.bind(this, function(){
+            this._disableEventCapture();
+            return false;
         }));
     },
 
@@ -177,6 +220,17 @@ MessageDialog.prototype = {
                 return true;
         }
         return false;
+    },
+    
+    _disableEventCapture: function() {
+        if (this._timeoutSource != 0) {
+            GLib.source_remove(this._timeoutSource);
+            this._timeoutSource = 0;
+        }
+        if (this._eventCaptureId != 0) {
+            global.stage.disconnect(this._eventCaptureId);
+            this._eventCaptureId = 0;
+        }
     },
     
     setTitle: function(text) {
@@ -440,9 +494,14 @@ Indicator.prototype = {
     
     // Notify user of changes
     _notifyPomodoroEnd: function(hideDialog) {
+        let screenSaverActive = this._screenSaver &&
+                                this._screenSaver.screenSaverActive;
+
         this._closeNotification();
 
         if (this._awayFromDesk && !hideDialog) {
+            // Deactivate screensaver before message dialog is created to immediately
+            // try open message dialog without waiting for _onScreenSaverActiveChanged()
             this._deactivateScreenSaver();
             this._playNotificationSound();
         }
@@ -462,13 +521,21 @@ Indicator.prototype = {
                     }
                 ]);
 
-            if (this._dialog.open())
-                return;
-            else
-                ; // Show regular notification as a fallback
+            // Try open message dialog
+            if (!this._dialog.open()) {
+                if (screenSaverActive) {
+                    this._dialog.tryOpen({ onFailure: function() {
+                        this._notifyPomodoroEnd(true);
+                    }});
+                }
+                else {
+                    // Fallback to a regular notification
+                    hideDialog = true;
+                }
+            }
         }
-        
-        if (true) {
+                
+        if (!this._showDialogMessages || hideDialog) {
             let source = new NotificationSource();
             this._notification = new MessageTray.Notification(source, '', '', null);
             this._updateNotification();
@@ -508,13 +575,14 @@ Indicator.prototype = {
     },
 
     _deactivateScreenSaver: function() {
-        if (this._screenSaver) {
+        if (this._screenSaver && this._screenSaver.screenSaverActive)
             this._screenSaver.SetActive(false);
-            try{
-                Util.trySpawnCommandLine('xdg-screensaver reset');
-            }catch (err){
-                global.logError('Pomodoro: Error waking up screen: ' + err.message);
-            }
+
+        try{
+            // Wake up the screen
+            Util.trySpawnCommandLine('xdg-screensaver reset');
+        }catch (err){
+            global.logError('Pomodoro: Error waking up screen: ' + err.message);
         }
     },
     
@@ -539,7 +607,7 @@ Indicator.prototype = {
 
         if (!this._screenSaver) {
             this._screenSaver = new ScreenSaver.ScreenSaverProxy();
-            //this._screenSaver.connect('ActiveChanged', Lang.bind(this, this._setIdle));
+            this._screenSaver.connect('ActiveChanged', Lang.bind(this, this._onScreenSaverActiveChanged));
         }
     },
 
@@ -636,6 +704,21 @@ Indicator.prototype = {
         
         this._pointer = pointer;
         return true;
+    },
+    
+    _onScreenSaverActiveChanged: function(object, active) {        
+        if (!this._isRunning)
+            return;
+        
+        if (active) {
+            // this._setIdle(true);
+        }
+        else{
+            if (this._isPause && this._showDialogMessages && this._dialog)
+                this._dialog.tryOpen({ onFailure: function() {
+                    this._notifyPomodoroEnd(true);
+                }});
+        }
     },
     
     // Increment timeSpent and call functions to check timer states and update ui_timer    
