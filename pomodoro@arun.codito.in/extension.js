@@ -44,6 +44,12 @@ const _ = Gettext.gettext;
 let _useKeybinder = true;
 try { const Keybinder = imports.gi.Keybinder; } catch (error) { _useKeybinder = false; }
 
+try {
+    const Gst = imports.gi.Gst;
+    Gst.init(null);
+} catch(e) {
+}
+
 
 let _configVersion = '0.1';
 let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <default_value> ]
@@ -556,20 +562,13 @@ Indicator.prototype = {
             let uri = GLib.filename_to_uri(extension.path + '/bell.wav', null);
             
             try {
-                let gstPath = 'gst-launch';
-                if (GLib.find_program_in_path(gstPath) == null)
-                    gstPath = GLib.find_program_in_path('gst-launch-0.10');
-                if (gstPath)
-                    Util.trySpawnCommandLine(gstPath + ' --quiet playbin2 uri=' +
-                            GLib.shell_quote(uri));
-                else
-                    this._playSound = false;
-            } catch (err) {
-                global.logError('Pomodoro: Error playing a sound: ' + err.message);
-                this._playSound = false;
-            } finally {
-                if (!this._playSound)
-                    global.logError('Pomodoro: Disabled sound.');
+                // Create a local instance of playbin as sounds may overlap
+                let playbin = Gst.ElementFactory.make('playbin2', null);
+                playbin.set_property('uri', uri);
+                playbin.set_state(Gst.State.PLAYING);
+            }
+            catch (e) {
+                global.logError('Pomodoro: Error playing a sound "'+ uri +'": ' + e.message);
             }
         }
     },
@@ -601,14 +600,19 @@ Indicator.prototype = {
         if (this._timerSource == 0)
             this._timerSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
 
-        this._isRunning = true;
-        this._updateTimer();
-        this._updateSessionCount();
-
         if (!this._screenSaver) {
             this._screenSaver = new ScreenSaver.ScreenSaverProxy();
             this._screenSaver.connect('ActiveChanged', Lang.bind(this, this._onScreenSaverActiveChanged));
         }
+
+        if (!this._playbin) {
+            // Warm up GStreamer to reduce first-use lag (Can this be done in a cleaner way?)
+            this._playbin = Gst.ElementFactory.make('playbin2', null);
+        }
+
+        this._isRunning = true;
+        this._updateTimer();
+        this._updateSessionCount();
     },
 
     _stopTimer: function() {
@@ -623,6 +627,7 @@ Indicator.prototype = {
         this._closeNotification();            
         
         this._screenSaver = null;
+        this._playbin = null;
     },
 
     _suspendTimer: function() {
