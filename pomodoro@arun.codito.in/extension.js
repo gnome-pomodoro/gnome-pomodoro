@@ -57,6 +57,7 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ['_shortPauseTime', 'timer', 'short_pause_duration', 300],
     ['_longPauseTime', 'timer', 'long_pause_duration', 900],
     ['_awayFromDesk', 'ui', 'away_from_desk', false],
+    ['_busyPresenceStatus', 'ui', 'busy_presence_status', true],
     ['_showDialogMessages', 'ui', 'show_dialog_messages', true],
     ['_playSound', 'ui', 'play_sound', true],
     ['_keyToggleTimer', 'ui', 'key_toggle_timer', '<Ctrl><Alt>P'],
@@ -314,6 +315,7 @@ Indicator.prototype = {
         }
 
         // GNOME Session
+        this._presence = new GnomeSession.Presence();
         this._screenSaver = null;
 
 
@@ -340,6 +342,16 @@ Indicator.prototype = {
         }));
         this._optionsMenu.menu.addMenuItem(this._awayFromDeskToggle);
 
+        // Presence Status toggle
+        this._busyPresenceStatusToggle = new PopupMenu.PopupSwitchMenuItem(_("Set Status to Busy"), this._busyPresenceStatus);
+        this._busyPresenceStatusToggle.actor.tooltip_text = _("Change online status and disable notifications including chat messages");
+        this._busyPresenceStatusToggle.connect('toggled', Lang.bind(this, function(item) {
+            this._busyPresenceStatus = item.state;
+            this._updatePresenceStatus();
+            this._onConfigUpdate(false);
+        }));
+        this._optionsMenu.menu.addMenuItem(this._busyPresenceStatusToggle);
+        
         // Dialog Message toggle
         this._breakMessageToggle = new PopupMenu.PopupSwitchMenuItem(_("Show Dialog Messages"), this._showDialogMessages);
         this._breakMessageToggle.actor.tooltip_text = _("Show a dialog message at the end of pomodoro session");
@@ -613,6 +625,7 @@ Indicator.prototype = {
         this._isRunning = true;
         this._updateTimer();
         this._updateSessionCount();
+        this._updatePresenceStatus();
     },
 
     _stopTimer: function() {
@@ -624,6 +637,7 @@ Indicator.prototype = {
         this._setIdle(false);
         this._updateTimer();
         this._updateSessionCount();            
+        this._updatePresenceStatus();
         this._closeNotification();            
         
         this._screenSaver = null;
@@ -678,6 +692,8 @@ Indicator.prototype = {
                              { opacity: 255,
                                transition: 'easeOutQuad',
                                time: TIMER_LABEL_FADE_TIME });        
+
+        this._updatePresenceStatus();
     },
 
     _onEventCapture: function(actor, event) {
@@ -831,6 +847,17 @@ Indicator.prototype = {
             if (this._notification)
                 this._notification.update(_("Pomodoro Finished!"), timestring);
         }
+    },
+
+    _updatePresenceStatus: function() {
+        let status;
+
+        if (this._isRunning && !this._isPause && this._busyPresenceStatus)
+            status = GnomeSession.PresenceStatus.BUSY;
+        else
+            status = GnomeSession.PresenceStatus.AVAILABLE;
+        
+        this._presence.setStatus(status);
     },
     
     _formatTime: function(seconds) {
