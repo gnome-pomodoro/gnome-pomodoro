@@ -457,8 +457,11 @@ Indicator.prototype = {
             this._pauseCount += 0;
         this._timeSpent = 0;
         this._setPauseState(false);
-        this._stopTimer();
-        this._startTimer();
+        
+        this._syncTimer();
+        this._updateTimer();
+        this._updateSessionCount();
+        this._updatePresenceStatus();
         
         this._closeNotification();
         this._playNotificationSound();
@@ -470,14 +473,13 @@ Indicator.prototype = {
         this._setPauseState(false);
         this._sessionCount = 0;
         this._pauseCount = 0;
-
-        if (this._isRunning) {
-            this._stopTimer();
-            this._startTimer();
-        }else{
-            this._updateTimer();
-            this._updateSessionCount();
-        }
+        
+        this._syncTimer();
+        this._updateTimer();
+        this._updateSessionCount();
+        this._updatePresenceStatus();        
+        
+        this._closeNotification();
         return false;
     },
 
@@ -644,6 +646,16 @@ Indicator.prototype = {
         this._playbin = null;
     },
 
+    _syncTimer: function() {
+        if (this._isRunning) {
+            if (this._timerSource != 0)
+                GLib.source_remove(this._timerSource);
+
+            this._timerSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refreshTimer));
+            this._setIdle(false);
+        }
+    },
+
     _suspendTimer: function() {
         if (this._timerSource != 0) {
             // Stop timer
@@ -692,8 +704,6 @@ Indicator.prototype = {
                              { opacity: 255,
                                transition: 'easeOutQuad',
                                time: TIMER_LABEL_FADE_TIME });        
-
-        this._updatePresenceStatus();
     },
 
     _onEventCapture: function(actor, event) {
@@ -764,6 +774,7 @@ Indicator.prototype = {
                     this._timeSpent = 0;
                     this._setPauseState(false);
                     this._updateSessionCount();
+                    this._updatePresenceStatus();
                     this._notifyPomodoroStart();
                     
                     if (!this._awayFromDesk)
@@ -791,6 +802,7 @@ Indicator.prototype = {
                 this._sessionCount += 1;
                 this._setPauseState(true);
                 this._updateSessionCount();
+                this._updatePresenceStatus();
                 this._notifyPomodoroEnd();
             }
         }
