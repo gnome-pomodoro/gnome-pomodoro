@@ -57,7 +57,7 @@ let _configOptions = [ // [ <variable>, <config_category>, <actual_option>, <def
     ['_shortPauseTime', 'timer', 'short_pause_duration', 300],
     ['_longPauseTime', 'timer', 'long_pause_duration', 900],
     ['_awayFromDesk', 'ui', 'away_from_desk', false],
-    ['_busyPresenceStatus', 'ui', 'busy_presence_status', true],
+    ['_controlPresenceStatus', 'ui', 'control_presence_status', true],
     ['_showDialogMessages', 'ui', 'show_dialog_messages', true],
     ['_playSound', 'ui', 'play_sound', true],
     ['_keyToggleTimer', 'ui', 'key_toggle_timer', '<Ctrl><Alt>P'],
@@ -343,14 +343,14 @@ Indicator.prototype = {
         this._optionsMenu.menu.addMenuItem(this._awayFromDeskToggle);
 
         // Presence Status toggle
-        this._busyPresenceStatusToggle = new PopupMenu.PopupSwitchMenuItem(_("Set Status to Busy"), this._busyPresenceStatus);
-        this._busyPresenceStatusToggle.actor.tooltip_text = _("Change online status and disable notifications including chat messages");
-        this._busyPresenceStatusToggle.connect('toggled', Lang.bind(this, function(item) {
-            this._busyPresenceStatus = item.state;
+        this._controlPresenceStatusToggle = new PopupMenu.PopupSwitchMenuItem(_("Control Presence Status"), this._controlPresenceStatus);
+        this._controlPresenceStatusToggle.actor.tooltip_text = _("Change online status and disable notifications including chat messages");
+        this._controlPresenceStatusToggle.connect('toggled', Lang.bind(this, function(item) {
+            this._controlPresenceStatus = item.state;
             this._updatePresenceStatus();
             this._onConfigUpdate(false);
         }));
-        this._optionsMenu.menu.addMenuItem(this._busyPresenceStatusToggle);
+        this._optionsMenu.menu.addMenuItem(this._controlPresenceStatusToggle);
         
         // Dialog Message toggle
         this._breakMessageToggle = new PopupMenu.PopupSwitchMenuItem(_("Show Dialog Messages"), this._showDialogMessages);
@@ -864,7 +864,7 @@ Indicator.prototype = {
     _updatePresenceStatus: function() {
         let status;
 
-        if (this._isRunning && !this._isPause && this._busyPresenceStatus)
+        if (this._isRunning && !this._isPause && this._controlPresenceStatus)
             status = GnomeSession.PresenceStatus.BUSY;
         else
             status = GnomeSession.PresenceStatus.AVAILABLE;
