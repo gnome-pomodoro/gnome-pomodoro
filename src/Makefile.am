@@ -3,6 +3,7 @@ topextensiondir = $(datadir)/gnome-shell/extensions
 extensiondir = $(topextensiondir)/$(uuid)
 
 dist_extension_DATA = \
+	dbus.js \
 	bell.wav \
 	extension.js \
 	metadata.json \

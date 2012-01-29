@@ -26,6 +26,7 @@ const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 const Extension = imports.ui.extensionSystem.extensions['pomodoro@arun.codito.in'];
 const PomodoroTimer = Extension.timer;
+const PomodoroDBus = Extension.dbus;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
@@ -72,6 +73,8 @@ Indicator.prototype = {
         this.timer = new PomodoroTimer.PomodoroTimer();
         this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
         this.timer.connect('elapsed-changed', Lang.bind(this, this._onTimerElapsedChanged));
+        
+        this.dbus = new PomodoroDBus.PomodoroTimer(this.timer);
         
         this._settings = new Gio.Settings({ schema: 'org.gnome.shell.extensions.pomodoro' });
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));

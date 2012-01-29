@@ -451,13 +451,16 @@ PomodoroTimer.prototype = {
     },
 
     _updatePresenceStatus: function() {
-        let status;
-        if (this._settings.get_boolean('change-presence-status') && (this._state == State.POMODORO || this._state == State.IDLE))
-            status = GnomeSession.PresenceStatus.BUSY;
-        else
-            status = GnomeSession.PresenceStatus.AVAILABLE;
-        
-        this._presence.setStatus(status);
+        if (this._settings.get_boolean('change-presence-status')) {
+            let status;
+            
+            if (this._state == State.POMODORO || this._state == State.IDLE)
+                status = GnomeSession.PresenceStatus.BUSY;
+            else
+                status = GnomeSession.PresenceStatus.AVAILABLE;
+            
+            this._presence.setStatus(status);
+        }
     },
 
     _enableEventCapture: function() {
