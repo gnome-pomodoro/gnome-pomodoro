@@ -451,16 +451,21 @@ PomodoroTimer.prototype = {
     },
 
     _updatePresenceStatus: function() {
-        if (this._settings.get_boolean('change-presence-status')) {
+        let enabled = this._settings.get_boolean('change-presence-status');
+        
+        if (this._presence && (enabled || this._presenceChangeEnabled)) {
             let status;
-            
-            if (this._state == State.POMODORO || this._state == State.IDLE)
-                status = GnomeSession.PresenceStatus.BUSY;
+            if (enabled)
+                status = (this._state == State.POMODORO || this._state == State.IDLE)
+                                    ? GnomeSession.PresenceStatus.BUSY
+                                    : GnomeSession.PresenceStatus.AVAILABLE;
             else
                 status = GnomeSession.PresenceStatus.AVAILABLE;
             
             this._presence.setStatus(status);
         }
+        
+        this._presenceChangeEnabled = enabled;
     },
 
     _enableEventCapture: function() {
@@ -502,6 +507,7 @@ PomodoroTimer.prototype = {
         }
         if (!this._presence) {
             this._presence = new GnomeSession.Presence();
+            this._presenceChangeEnabled = this._settings.get_boolean('change-presence-status');
         }
         if (!this._playbin && Gst) {
             // Load some GStreamer modules to memory to (hopefully) reduce first-use lag
