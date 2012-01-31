@@ -8,10 +8,10 @@ msgstr ""
 "Project-Id-Version: gnome-shell-pomodoro\n"
 "Report-Msgid-Bugs-To: juanmah@gmail.com\n"
 "POT-Creation-Date: 2012-01-30 16:55+0100\n"
-"PO-Revision-Date: 2012-01-30 18:03+0100\n"
+"PO-Revision-Date: 2012-01-31 19:12+0100\n"
 "Last-Translator: juanmah <juanmah@gmail.com>\n"
-"Language-Team: anglès <espora.upc.es>\n"
-"Language: es\n"
+"Language-Team: es <>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bits\n"
@@ -42,7 +42,7 @@ msgstr "Pulse para reiniciar el contador de la sesión a cero"
 
 #: ../src/extension.js:132
 msgid "Away From Desk"
-msgstr "Ausente del escritorio"
+msgstr "Ausencia del escritorio"
 
 #: ../src/extension.js:133
 msgid "Set optimal settings for doing paperwork"
@@ -88,14 +88,14 @@ msgstr "Duración de la pausa larga"
 
 #: ../src/extension.js:316
 msgid "No Completed Sessions"
-msgstr "Sesiones no completadas"
+msgstr "Ninguna sesión completada"
 
 #: ../src/extension.js:318
 #, c-format
 msgid "%d Completed Session"
 msgid_plural "%d Completed Sessions"
-msgstr[0] "%d Sesión completada"
-msgstr[1] "%d Sesiones completadas"
+msgstr[0] "%d sesión completada"
+msgstr[1] "%d sesiones completadas"
 
 #: ../src/timer.js:350
 msgid "Pause finished, a new pomodoro is starting!"
