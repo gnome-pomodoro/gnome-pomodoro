@@ -1,0 +1,215 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# juanmah <juanmah@gmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-pomodoro\n"
+"Report-Msgid-Bugs-To: juanmah@gmail.com\n"
+"POT-Creation-Date: 2012-01-30 16:55+0100\n"
+"PO-Revision-Date: 2012-01-31 19:01+0100\n"
+"Last-Translator: juanmah <juanmah@gmail.com>\n"
+"Language-Team:  <>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bits\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: ../src/extension.js:59
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minut"
+msgstr[1] "%d minuts"
+
+#. Toggle timer state button
+#: ../src/extension.js:93 ../src/notification.js:53
+msgid "Pomodoro Timer"
+msgstr "Temporitzador Pomodoro"
+
+#. Options SubMenu
+#: ../src/extension.js:106
+msgid "Options"
+msgstr "Opcions"
+
+#. Reset counters
+#: ../src/extension.js:126
+msgid "Reset Counts and Timer"
+msgstr "Reinicia el comptador i el temporitzador"
+
+#: ../src/extension.js:127
+msgid "Click to reset session counts to zero"
+msgstr "Premi per reiniciar el comptador de la sessió a zero"
+
+#. Away from desk toggle
+#: ../src/extension.js:132
+msgid "Away From Desk"
+msgstr "Absència de l'escriptori"
+
+#: ../src/extension.js:133
+msgid "Set optimal settings for doing paperwork"
+msgstr "Paràmetres òptims per fer paperassa"
+
+#. Presence status toggle
+#: ../src/extension.js:140
+msgid "Control Presence Status"
+msgstr "Control de l'estat de presència"
+
+#: ../src/extension.js:141
+msgid "Change online status and disable notifications including chat messages"
+msgstr ""
+"Canvia l'estat en linia i inhabilita notificacions inclouent missatges del "
+"chat"
+
+#. Notification dialog toggle
+#: ../src/extension.js:148
+msgid "Show Dialog Messages"
+msgstr "Mostra missatges de diàleg"
+
+#: ../src/extension.js:149
+msgid "Show a dialog message at the end of pomodoro session"
+msgstr "Mostra un missatge de diàleg al final de la sessió de pomodoro"
+
+#. Notify with a sound toggle
+#: ../src/extension.js:156
+msgid "Sound Notifications"
+msgstr "Notificació de so"
+
+#: ../src/extension.js:157
+msgid "Play a sound at start of pomodoro session"
+msgstr "Reprodueix un so al començar la sessió de pomodoro"
+
+#. Pomodoro duration
+#: ../src/extension.js:164
+msgid "Pomodoro Duration"
+msgstr "Durada del pomodoro"
+
+#. Short pause duration
+#: ../src/extension.js:177
+msgid "Short Break Duration"
+msgstr "Durada de la pausa curta"
+
+#. Long pause duration
+#: ../src/extension.js:198
+msgid "Long Break Duration"
+msgstr "Durada de la pausa llarga"
+
+#: ../src/extension.js:316
+msgid "No Completed Sessions"
+msgstr "Cap sessió completada"
+
+#: ../src/extension.js:318
+#, c-format
+msgid "%d Completed Session"
+msgid_plural "%d Completed Sessions"
+msgstr[0] "%d sessió completada"
+msgstr[1] "%d sessions completades"
+
+#: ../src/timer.js:350
+msgid "Pause finished, a new pomodoro is starting!"
+msgstr "La pausa ha finalitzat, un nou pomodoro està començant!"
+
+#: ../src/timer.js:368
+msgid "Pomodoro Finished!"
+msgstr "El pomodoro ha finalitzat!"
+
+#: ../src/timer.js:370
+msgid "Hide"
+msgstr "Oculta"
+
+#: ../src/timer.js:376 ../src/timer.js:388
+msgid "Start a new pomodoro"
+msgstr "Comença un nou pomodoro"
+
+#: ../src/timer.js:381
+msgid "Show dialog"
+msgstr "Mostra diàleg"
+
+#: ../src/timer.js:446
+#, c-format
+msgid "Take a break, you have %d second\n"
+msgid_plural "Take a break, you have %d seconds\n"
+msgstr[0] "Prengui's un descans, té %d segon\n"
+msgstr[1] "Prengui's un descans, té %d segons\n"
+
+#: ../src/timer.js:449
+#, c-format
+msgid "Take a break, you have %d minute\n"
+msgid_plural "Take a break, you have %d minutes\n"
+msgstr[0] "Prengui's un descans, té %d minut\n"
+msgstr[1] "Prengui's un descans, té %d minuts\n"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
+msgid "Timer toggle key"
+msgstr "Tecla de commutació del temporitzador"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:2
+msgid "Key to toggle the timer."
+msgstr "Tecla per commutar el temporitzador."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:3
+msgid "Pomodoro duration"
+msgstr "Durada del pomodoro"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:4
+msgid "Time in seconds you are supposed to be working."
+msgstr "Temps en segons que se suposa que són de treball."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:5
+msgid "Short pause duration"
+msgstr "Durada de la pausa curta"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:6
+msgid "Time in seconds you are supposed to have a short break."
+msgstr "Temps en segons que se suposa que són de pausa curta."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:7
+msgid "Long pause duration"
+msgstr "Durada de la pausa llarga"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:8
+msgid "Time in seconds you are supposed to have a longer break."
+msgstr "Temps en segons que se suposa que són de pausa llarga."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:9
+msgid "Show dialog notifications during breaks"
+msgstr "Mostra notificacions de diàleg durant les pauses"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:10
+msgid "Whether to show a notification dialog when pause starts."
+msgstr "Si es mostra un diàleg de notificació quan s'inicia una pausa."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:11
+msgid "Disable flexible breaks"
+msgstr "Inhabilita pauses flexibles"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:12
+msgid "Whether you are not using a computer to work."
+msgstr "Si no s'està fent servir un ordinador per treballar."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:13
+msgid "Change user presence status to busy"
+msgstr "Canvia l'estat de presència de l'usuari a ocupat"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:14
+msgid "Whether to change user and IM presence to busy."
+msgstr "Si es canvia l'usuari i la presència de MI a ocupat."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:15
+msgid "Use notification sound"
+msgstr "Empra so de notificació"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:16
+msgid "Whether to play a sound to notify of events."
+msgstr "Si es reprodueix un so per notificar els esdeveniments."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:17
+msgid "Notification sound file"
+msgstr "Arxiu de so de la notificació"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:18
+msgid "Sound file to play on pomodoro start or end."
+msgstr "Arxiu de so per reproduir en iniciar o finalitzar un pomodoro."
