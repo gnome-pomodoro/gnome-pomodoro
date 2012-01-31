@@ -350,6 +350,8 @@ Indicator.prototype = {
                              { opacity: 255,
                                transition: 'easeOutQuad',
                                time: FADE_ANIMATION_TIME });
+        
+        this._timerToggle.setToggleState(this.timer.state != PomodoroTimer.State.NULL);
     },
 
     _onKeyPressed: function(keystring, data) {

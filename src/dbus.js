@@ -68,25 +68,18 @@ function PomodoroTimer(timer) {
 
 PomodoroTimer.prototype = {
     _init: function(timer) {
-        DBus.session.exportObject('/org/gnome/Shell/Extensions/Pomodoro', this);
+        DBus.session.exportObject('/org/gnome/Shell/Extensions/Pomodoro',
+                                  this);
         
         this._timer = timer;
-        this._timer.connect('state-changed', function(state) {
-                    DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
-                                             'org.gnome.Shell.Extensions.Pomodoro',
-                                             'StateChanged', 'i',
-                                             [state]);
-                });
-        this._timer.connect('notify-pomodoro-start', function() {
-                    DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
-                                             'org.gnome.Shell.Extensions.Pomodoro',
-                                             'NotifyPomodoroStart');
-                });
-        this._timer.connect('notify-pomodoro-end', function() {
-                    DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
-                                             'org.gnome.Shell.Extensions.Pomodoro',
-                                             'NotifyPomodoroEnd');
-                });
+        this._timer.connect('state-changed',
+                            Lang.bind(this, this._onTimerStateChanged));
+        
+        this._timer.connect('notify-pomodoro-start',
+                            Lang.bind(this, this._onTimerNotifyPomodoroStart));
+        
+        this._timer.connect('notify-pomodoro-end',
+                            Lang.bind(this, this._onTimerNotifyPomodoroEnd));
     },
 
     Start: function() {
@@ -127,6 +120,25 @@ PomodoroTimer.prototype = {
     SetState: function(state) {
         if (this._timer)
         this._timer.setState(state);
+    },
+
+    _onTimerStateChanged: function(object, state) {
+        DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
+                                 'org.gnome.Shell.Extensions.Pomodoro',
+                                 'StateChanged', 'i',
+                                 [state]);
+    },
+
+    _onTimerNotifyPomodoroStart: function(object) {
+        DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
+                                 'org.gnome.Shell.Extensions.Pomodoro',
+                                 'NotifyPomodoroStart', '', []);
+    },
+
+    _onTimerNotifyPomodoroEnd: function(object) {
+        DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
+                                 'org.gnome.Shell.Extensions.Pomodoro',
+                                 'NotifyPomodoroEnd', '', []);
     }
 };
 
