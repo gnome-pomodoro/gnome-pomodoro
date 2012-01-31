@@ -1,7 +1,6 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Spanish translation for gnome-shell-pomodoro
+# Copyright (c) 2012 gnome-shell-pomodoro contributors
+# This file is distributed under the same license as the gnome-shell-pomodoro package.
 # juanmah <juanmah@gmail.com>, 2012.
 #
 msgid ""
@@ -12,7 +11,7 @@ msgstr ""
 "PO-Revision-Date: 2012-01-30 18:03+0100\n"
 "Last-Translator: juanmah <juanmah@gmail.com>\n"
 "Language-Team: anglès <espora.upc.es>\n"
-"Language: \n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bits\n"
@@ -25,17 +24,14 @@ msgid_plural "%d minutes"
 msgstr[0] "%d minuto"
 msgstr[1] "%d minutos"
 
-#. Toggle timer state button
 #: ../src/extension.js:93 ../src/notification.js:53
 msgid "Pomodoro Timer"
 msgstr "Temporizador Pomodoro"
 
-#. Options SubMenu
 #: ../src/extension.js:106
 msgid "Options"
 msgstr "Opciones"
 
-#. Reset counters
 #: ../src/extension.js:126
 msgid "Reset Counts and Timer"
 msgstr "Reiniciar el contador y el temporizador"
@@ -44,7 +40,6 @@ msgstr "Reiniciar el contador y el temporizador"
 msgid "Click to reset session counts to zero"
 msgstr "Pulse para reiniciar el contador de la sesión a cero"
 
-#. Away from desk toggle
 #: ../src/extension.js:132
 msgid "Away From Desk"
 msgstr "Ausente del escritorio"
@@ -53,7 +48,6 @@ msgstr "Ausente del escritorio"
 msgid "Set optimal settings for doing paperwork"
 msgstr "Ajustes óptimos para hacer papeleo"
 
-#. Presence status toggle
 #: ../src/extension.js:140
 msgid "Control Presence Status"
 msgstr "Control del estado de presencia"
@@ -64,7 +58,6 @@ msgstr ""
 "Cambiar el estado en línea e inhabilitar notificaciones incluyendo mensajes "
 "del chat"
 
-#. Notification dialog toggle
 #: ../src/extension.js:148
 msgid "Show Dialog Messages"
 msgstr "Mostrar mensajes de diálogo"
@@ -73,7 +66,6 @@ msgstr "Mostrar mensajes de diálogo"
 msgid "Show a dialog message at the end of pomodoro session"
 msgstr "Mostrar un mensaje de diálogo al final de la sesión de pomodoro"
 
-#. Notify with a sound toggle
 #: ../src/extension.js:156
 msgid "Sound Notifications"
 msgstr "Notificación de sonido"
@@ -82,17 +74,14 @@ msgstr "Notificación de sonido"
 msgid "Play a sound at start of pomodoro session"
 msgstr "Reproducir un sonido al comenzar la sesión de pomodoro"
 
-#. Pomodoro duration
 #: ../src/extension.js:164
 msgid "Pomodoro Duration"
 msgstr "Duración del pomodoro"
 
-#. Short pause duration
 #: ../src/extension.js:177
 msgid "Short Break Duration"
 msgstr "Duración de la pausa corta"
 
-#. Long pause duration
 #: ../src/extension.js:198
 msgid "Long Break Duration"
 msgstr "Duración de la pausa larga"
