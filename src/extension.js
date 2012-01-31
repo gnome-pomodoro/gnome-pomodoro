@@ -355,7 +355,7 @@ Indicator.prototype = {
     },
 
     _onKeyPressed: function(keystring, data) {
-        this._timerToggle.setToggleState(this.timer.state != PomodoroTimer.State.NULL);
+        this._timerToggle.toggle();
     },
     
     _onDestroy: function() {
