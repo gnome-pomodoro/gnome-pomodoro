@@ -1,0 +1,206 @@
+# Polish translation for gnome-shell-pomodoro
+# Copyright (c) 2012 gnome-shell-pomodoro contributors
+# This file is distributed under the same license as the gnome-shell-pomodoro package.
+# Kamil Prusko <kamilprusko@gmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-pomodoro\n"
+"POT-Creation-Date: 2012-01-30 16:02+0100\n"
+"PO-Revision-Date: 2012-01-30 16:35+0100\n"
+"Last-Translator: Kamil Prusko <kamilprusko@gmail.com>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bits\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: ../src/extension.js:59
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minuta"
+msgstr[1] "%d minuty"
+msgstr[2] "%d minut"
+
+#: ../src/extension.js:93 ../src/notification.js:53
+msgid "Pomodoro Timer"
+msgstr "Minutnik Pomodoro"
+
+#: ../src/extension.js:106
+msgid "Options"
+msgstr "Ustawienia"
+
+#: ../src/extension.js:126
+msgid "Reset Counts and Timer"
+msgstr "Wyzeruj minutnik"
+
+#: ../src/extension.js:127
+msgid "Click to reset session counts to zero"
+msgstr "Wyzeruje minutnik i licznik sesji"
+
+#: ../src/extension.js:132
+msgid "Away From Desk"
+msgstr "Praca poza komputerem"
+
+#: ../src/extension.js:133
+msgid "Set optimal settings for doing paperwork"
+msgstr "Dostosuje powiadomienia do pracy biurowej"
+
+#: ../src/extension.js:140
+msgid "Control Presence Status"
+msgstr "Zmieniaj status dostępności"
+
+#: ../src/extension.js:141
+msgid "Change online status and disable notifications including chat messages"
+msgstr "Zmienia status on-line, wyłącza powiadomienia systemowe w tym powiadomienia rozmowy"
+
+#: ../src/extension.js:148
+msgid "Show Dialog Messages"
+msgstr "Otwieraj okno dialogowe"
+
+#: ../src/extension.js:149
+msgid "Show a dialog message at the end of pomodoro session"
+msgstr "Otwiera pełnoekranowe okienko do powiadomienia o przerwie"
+
+#: ../src/extension.js:156
+msgid "Sound Notifications"
+msgstr "Powiadamiaj dźwiękiem"
+
+#: ../src/extension.js:157
+msgid "Play a sound at start of pomodoro session"
+msgstr "Odtwarza dźwięk pod koniec przerwy"
+
+#. Pomodoro duration
+#: ../src/extension.js:164
+msgid "Pomodoro Duration"
+msgstr "Długość pomodoro"
+
+#: ../src/extension.js:177
+msgid "Short Break Duration"
+msgstr "Długość krótkiej przerwy"
+
+#: ../src/extension.js:198
+msgid "Long Break Duration"
+msgstr "Długość długiej przerwy"
+
+#: ../src/extension.js:316
+msgid "No Completed Sessions"
+msgstr "Nie ukończono żadnej sesji"
+
+#: ../src/extension.js:318
+#, c-format
+msgid "%d Completed Session"
+msgid_plural "%d Completed Sessions"
+msgstr[0] "%d ukończona sesja"
+msgstr[1] "%d ukończone sesje"
+msgstr[2] "%d ukończonych sesji"
+
+#: ../src/timer.js:350
+msgid "Pause finished, a new pomodoro is starting!"
+msgstr "Koniec przerwy zaczynamy kolejne pomodoro!"
+
+#: ../src/timer.js:368
+msgid "Pomodoro Finished!"
+msgstr "Koniec pomodoro!"
+
+#: ../src/timer.js:370
+msgid "Hide"
+msgstr "Ukryj"
+
+#: ../src/timer.js:376 ../src/timer.js:388
+msgid "Start a new pomodoro"
+msgstr "Zacznij nowe pomodoro"
+
+#: ../src/timer.js:381
+msgid "Show dialog"
+msgstr "Pokarz okienko"
+
+#: ../src/timer.js:446
+#, c-format
+msgid "Take a break, you have %d second\n"
+msgid_plural "Take a break, you have %d seconds\n"
+msgstr[0] "Zrób przerwę, masz %d sekundę\n"
+msgstr[1] "Zrób przerwę, masz %d sekundy\n"
+msgstr[2] "Zrób przerwę, masz %d sekund\n"
+
+#: ../src/timer.js:449
+#, c-format
+msgid "Take a break, you have %d minute\n"
+msgid_plural "Take a break, you have %d minutes\n"
+msgstr[0] "Zrób przerwę, masz %d minutę\n"
+msgstr[1] "Zrób przerwę, masz %d minuty\n"
+msgstr[2] "Zrób przerwę, masz %d minut\n"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
+msgid "Timer toggle key"
+msgstr "Skrót klawiszowy"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:2
+msgid "Key to toggle the timer."
+msgstr "Skrót klawiszowy do włączania/wyłączania minutnika."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:3
+msgid "Pomodoro duration"
+msgstr "Długość pomodoro"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:4
+msgid "Time in seconds you are supposed to be working."
+msgstr "Czas w sekundach, w którym niby masz pracować."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:5
+msgid "Short pause duration"
+msgstr "Długość krótkiej przerwy"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:6
+msgid "Time in seconds you are supposed to have a short break."
+msgstr "Czas w sekundach, w którym niby masz mieć krótką przerwę."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:7
+msgid "Long pause duration"
+msgstr "Długość długiej przerwy"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:8
+msgid "Time in seconds you are supposed to have a longer break."
+msgstr "Czas w sekundach, w którym niby masz mieć długą przerwę."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:9
+msgid "Show dialog notifications during breaks"
+msgstr "Otwieraj okno dialogowe"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:10
+msgid "Whether to show a notification dialog when pause starts."
+msgstr "Otwiera pełnoekranowe okienko do powiadomienia o przerwie."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:11
+msgid "Disable flexible breaks"
+msgstr "Praca poza komputerem"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:12
+msgid "Whether you are not using a computer to work."
+msgstr "Dostosuje powiadomienia do pracy biurowej"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:13
+msgid "Change user presence status to busy"
+msgstr "Zmieniaj status dostępności"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:14
+msgid "Whether to change user and IM presence to busy."
+msgstr "Zmienia status on-line, wyłącza powiadomienia systemowe w tym powiadomienia rozmowy"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:15
+msgid "Use notification sound"
+msgstr "Powiadamiaj dźwiękiem"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:16
+msgid "Whether to play a sound to notify of events."
+msgstr "Odtwarza dźwięk pod koniec przerwy"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:17
+msgid "Notification sound file"
+msgstr "Plik dźwiękowy powiadomień"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:18
+msgid "Sound file to play on pomodoro start or end."
+msgstr "Plik dźwiękowy do odtworzenia na początku pomodoro."

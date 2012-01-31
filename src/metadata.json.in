@@ -1,0 +1,8 @@
+{
+ "uuid": "@UUID@",
+ "name": "Pomodoro",
+ "description": "A simple pomodoro timer",
+ "shell-version": ["3.2"],
+ "localedir": "@LOCALEDIR@",
+ "url": "https://github.com/codito/gnome-shell-pomodoro"
+}
