@@ -29,6 +29,7 @@ const ScreenSaver = imports.misc.screenSaver;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
+const ngettext = Gettext.ngettext;
 
 
 // Notification dialog blocks user input for a time corresponding to slow typing speed

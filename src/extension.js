@@ -30,6 +30,7 @@ const PomodoroDBus = Extension.dbus;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
+const ngettext = Gettext.ngettext;
 
 try {
     const Keybinder = imports.gi.Keybinder;

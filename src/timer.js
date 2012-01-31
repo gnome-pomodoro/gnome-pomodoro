@@ -37,6 +37,7 @@ const Notification = Extension.notification;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
+const ngettext = Gettext.ngettext;
 
 try {
     const Gst = imports.gi.Gst;
