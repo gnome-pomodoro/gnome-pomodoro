@@ -1,6 +1,6 @@
 /**
  * CSS Style for Gnome shell pomodoro extension
- * Copyright (C) 2011 Gnome-shell pomodoro extension contributors
+ * Copyright (C) 2011,2012 Gnome-shell pomodoro extension contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 .extension-pomodoro-label {
-    /*color: white;*/
-    /*font-weight: bold;*/
-    background: rgba(0, 0, 0, 0);  /* transparent */
-    /*min-width: 72px;*/           /* dependent on theme/font, see function _onRealize() in extension.js */ 
 }

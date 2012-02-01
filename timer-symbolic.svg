@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="16"
+   height="16.024"
+   id="svg7384">
+  <title
+     id="title9167">Gnome Symbolic Icon Theme</title>
+  <defs
+     id="defs10">
+    <clipPath
+       id="clipPath6259-6-8-25-4">
+      <rect
+         width="1.8763"
+         height="4.8734999"
+         x="26.999001"
+         y="221.5"
+         id="rect6261-4-9-24-2"
+         style="color:#bebebe;fill:#bebebe" />
+    </clipPath>
+    <clipPath
+       id="clipPath6265-33-4">
+      <rect
+         width="2.8977001"
+         height="5.2158999"
+         x="26.966"
+         y="221.33"
+         id="rect6267-6-5"
+         style="color:#bebebe;fill:#bebebe" />
+    </clipPath>
+    <clipPath
+       id="clipPath6279-6-1">
+      <rect
+         width="3.825"
+         height="6.375"
+         x="26.85"
+         y="220.75"
+         id="rect6281-3-1"
+         style="color:#bebebe;fill:#bebebe" />
+    </clipPath>
+  </defs>
+  <metadata
+     id="metadata90">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Gnome Symbolic Icon Theme</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g3117">
+    <path
+       d="m 1.01392,8.4615172 c 0.1347187,2.2073378 1.3248868,4.2672858 3.2687815,5.4910718 3.2622795,2.05378 7.5912245,1.064929 9.6455835,-2.196429 2.054361,-3.2613571 1.065231,-7.5890777 -2.197049,-9.6428572 a 1.0003829,1.0001 0 1 0 -1.071732,1.6875 c 2.347387,1.4778061 3.059028,4.5372058 1.580804,6.8839292 -1.478224,2.346723 -4.5652817,3.058163 -6.9126682,1.580357 C 3.4702798,11.095781 2.5912506,8.8673236 3.1573833,6.7472314 A 1.0003829,1.0001 0 1 0 1.2282664,6.2383029 C 1.0307635,6.9779253 0.96901383,7.7257382 1.01392,8.4615172 z"
+       style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#bebebe;fill-opacity:1;stroke:none;stroke-width:2.33333325;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans" />
+    <path
+       d="M 3.8756971,2.9354041 C 3.6197711,2.9362927 3.3524108,3.0225953 3.1576017,3.218317 2.7679835,3.6097404 2.7694224,4.2349435 3.1608159,4.6245615 L 6.9403275,9.0831852 C 7.5274618,9.6676225 8.2135998,9.4560987 8.7980372,8.8689739 9.3824646,8.2818292 9.6475523,7.537738 9.0604276,6.9533007 L 4.595088,3.2150009 C 4.3993762,3.0201917 4.1316106,2.9348226 3.875687,2.935414 z"
+       id="path3823"
+       style="fill:#bebebe;fill-opacity:1;stroke:none" />
+    <path
+       d="m 9.7824097,1.7824097 a 1.7824097,1.7824097 0 0 1 -3.5648194,0 1.7824097,1.7824097 0 1 1 3.5648194,0 z"
+       id="path3023"
+       style="fill:#bebebe;stroke:none" />
+  </g>
+</svg>
