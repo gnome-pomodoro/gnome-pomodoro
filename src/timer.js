@@ -84,18 +84,18 @@ PomodoroTimer.prototype = {
         this._sessionPartCount = 0;
         this._sessionCount = 0;
         this._state = State.NULL;
+        this._stateTimestamp = 0;
         
         this._timeoutSource = 0;
-        this._inactiveTimeoutSource = 0;
-        this._lastTimestamp = 0;
         this._eventCaptureId = 0;
         this._eventCaptureSource = 0;
         this._eventCapturePointer = null;
         
-        this._dailog = null;
         this._notification = null;
+        this._notificationDialog = null;
         this._playbin = null;
         this._presence = null;
+        this._presenceChangeEnabled = false;
         this._screenSaver = null;
         
         this._settings = new Gio.Settings({ schema: 'org.gnome.shell.extensions.pomodoro' });
@@ -136,7 +136,6 @@ PomodoroTimer.prototype = {
     reset: function() {
         this._sessionCount = 0;
         this._sessionPartCount = 0;
-        this._elapsed = 0;
         
         let isRunning = (this._state != State.NULL);
         this.setState(State.NULL);
@@ -181,10 +180,6 @@ PomodoroTimer.prototype = {
         if (newState != State.NULL) {
             this._load();
             
-            if (this._inactiveTimeoutSource != 0) {
-                GLib.source_remove(this._inactiveTimeoutSource);
-                this._inactiveTimeoutSource = 0;
-            }
             if (this._timeoutSource != 0 && (newState == State.POMODORO || newState == State.PAUSE)) {
                 GLib.source_remove(this._timeoutSource);
                 this._timeoutSource = 0;
@@ -213,14 +208,16 @@ PomodoroTimer.prototype = {
                     if (this._elapsed >= longPauseAcceptanceTime)
                         this._sessionPartCount = 0;
                 }
-                else {
+                if (this._state == State.NULL) {
                     // Reset work cycle when disabled for some time
-                    let idleTime = (timestamp - this._lastTimestamp) / 1000;
-                    if (this._lastTimestamp > 0 &&
-                        idleTime >= longPauseAcceptanceTime) {
+                    let idleTime = (timestamp - this._stateTimestamp) / 1000;
+                    
+                    if (this._stateTimestamp > 0 && idleTime >= longPauseAcceptanceTime) {
+                        global.logError("Idle time = , resetting..." + idleTime);
                         this._sessionPartCount = 0;
                     }
                 }
+                
                 this._elapsed = 0;
                 this._elapsedLimit = this._settings.get_int('pomodoro-time');
                 break;
@@ -245,11 +242,12 @@ PomodoroTimer.prototype = {
                 //     this._sessionPartCount = 0;
                 // }
                 this._elapsed = 0;
+                this._elapsedLimit = 0;
                 this._unload();
                 break;
         }
         
-        this._lastTimestamp = timestamp;
+        this._stateTimestamp = timestamp;
         this._state = newState;
         
         this._updatePresenceStatus();
@@ -287,7 +285,7 @@ PomodoroTimer.prototype = {
         switch (this._state) {
             case State.IDLE:
                 break;
-                        
+            
             case State.PAUSE:
                 // Pause is over
                 if (this._elapsed >= this._elapsedLimit) {
@@ -296,7 +294,7 @@ PomodoroTimer.prototype = {
                 }
                 this._updateNotification();
                 break;
-                
+            
             case State.POMODORO:
                 // Pomodoro over and a pause is needed :)
                 if (this._elapsed >= this._elapsedLimit) {
@@ -483,11 +481,14 @@ PomodoroTimer.prototype = {
     },
 
     _disableEventCapture: function() {
-        global.stage.disconnect(this._eventCaptureId);
-        this._eventCaptureId = 0;
-        
-        GLib.source_remove(this._eventCaptureSource);
-        this._eventCaptureSource = 0;
+        if (this._eventCaptureId != 0) {
+            global.stage.disconnect(this._eventCaptureId);
+            this._eventCaptureId = 0;
+        }
+        if (this._eventCaptureSource) {
+            GLib.source_remove(this._eventCaptureSource);
+            this._eventCaptureSource = 0;
+        }
     },
 
     _deactivateScreenSaver: function() {
