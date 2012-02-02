@@ -27,7 +27,6 @@ const St = imports.gi.St;
 const ExtensionSystem = imports.ui.extensionSystem;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
-const Config = imports.misc.config;
 const GnomeSession = imports.misc.gnomeSession;
 const ScreenSaver = imports.misc.screenSaver;
 const Util = imports.misc.util;
@@ -212,10 +211,8 @@ PomodoroTimer.prototype = {
                     // Reset work cycle when disabled for some time
                     let idleTime = (timestamp - this._stateTimestamp) / 1000;
                     
-                    if (this._stateTimestamp > 0 && idleTime >= longPauseAcceptanceTime) {
-                        global.logError("Idle time = , resetting..." + idleTime);
+                    if (this._stateTimestamp > 0 && idleTime >= longPauseAcceptanceTime)
                         this._sessionPartCount = 0;
-                    }
                 }
                 
                 this._elapsed = 0;
@@ -237,10 +234,6 @@ PomodoroTimer.prototype = {
                     this._timeoutSource = 0;
                 }
                 
-                // // Always reset work cycle when disabling timer during pause
-                // if (this._state == State.PAUSE || this._state == State.IDLE) {
-                //     this._sessionPartCount = 0;
-                // }
                 this._elapsed = 0;
                 this._elapsedLimit = 0;
                 this._unload();
