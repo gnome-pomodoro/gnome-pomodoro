@@ -23,6 +23,7 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Meta = imports.gi.Meta;
 const St = imports.gi.St;
+const UPowerGlib = imports.gi.UPowerGlib;
 
 const ExtensionSystem = imports.ui.extensionSystem;
 const Main = imports.ui.main;
@@ -93,6 +94,8 @@ PomodoroTimer.prototype = {
         this._notification = null;
         this._notificationDialog = null;
         this._playbin = null;
+        this._power = null;
+        this._powerTimestamp = 0;
         this._presence = null;
         this._presenceChangeEnabled = false;
         this._screenSaver = null;
@@ -106,14 +109,17 @@ PomodoroTimer.prototype = {
             case 'pomodoro-time':
                 if (this._state == State.POMODORO)
                     this._elapsedLimit = settings.get_int('pomodoro-time');
+                    this._elapsed = Math.min(this._elapsed, this._elapsedLimit);
                 break;
             case 'short-pause-time':
                 if (this._state == State.PAUSE && this._sessionPartCount < 4)
                     this._elapsedLimit = settings.get_int('short-pause-time');
+                    this._elapsed = Math.min(this._elapsed, this._elapsedLimit);
                 break;
             case 'long-pause-time':
                 if (this._state == State.PAUSE && this._sessionPartCount >= 4)
                     this._elapsedLimit = settings.get_int('long-pause-time');
+                    this._elapsed = Math.min(this._elapsed, this._elapsedLimit);
                 break;
             case 'change-presence-status':
                 this._updatePresenceStatus();
@@ -156,15 +162,23 @@ PomodoroTimer.prototype = {
     },
 
     setState: function(newState) {
-        if (this._state == newState) {
-            this.emit('state-changed', this._state);
-            return;
-        }
+        this._setState(newState);
         
+        this._updatePresenceStatus();
+        
+        this.emit('state-changed', this._state);
+        this.emit('elapsed-changed', this._elapsed);
+    },
+
+    _setState: function(newState) {
         let timestamp = global.get_current_time();
         
         this._closeNotification();
         this._disableEventCapture();
+        
+        if (this._state == newState) {
+            return;
+        }
         
         if (this._state == State.POMODORO) {
             if (this._elapsed >= POMODORO_ACCEPTANCE * this._settings.get_int('pomodoro-time')) {
@@ -220,12 +234,18 @@ PomodoroTimer.prototype = {
                 break;
             
             case State.PAUSE:
+                // Wrap time to pause
+                if (this._state == State.POMODORO && this._elapsed > this._elapsedLimit)
+                    this._elapsed = this._elapsed - this._elapsedLimit;
+                else
+                    this._elapsed = 0;
+                
+                // Determine which pause type user should have
                 if (this._sessionPartCount >= 4)
                     this._elapsedLimit = this._settings.get_int('long-pause-time');
                 else
                     this._elapsedLimit = this._settings.get_int('short-pause-time');
                 
-                this._elapsed = 0;
                 break;
             
             case State.NULL:
@@ -242,11 +262,6 @@ PomodoroTimer.prototype = {
         
         this._stateTimestamp = timestamp;
         this._state = newState;
-        
-        this._updatePresenceStatus();
-        
-        this.emit('state-changed', this._state);
-        this.emit('elapsed-changed', this._elapsed);
     },
 
     get elapsed() {
@@ -285,7 +300,6 @@ PomodoroTimer.prototype = {
                     this.setState(this._settings.get_boolean('away-from-desk') ? State.POMODORO : State.IDLE);
                     this._notifyPomodoroStart();
                 }
-                this._updateNotification();
                 break;
             
             case State.POMODORO:
@@ -298,6 +312,46 @@ PomodoroTimer.prototype = {
         }
         
         return true;
+    },
+
+    _onSleep: function() {
+        this._powerTimestamp = new Date().getTime();
+    },
+
+    _onResume: function() {
+        let idleTime = parseInt((new Date().getTime() - this._powerTimestamp) / 1000);
+        
+        this._powerTimestamp = 0;
+        
+        if (this._state != State.NULL) {
+            this._elapsed += idleTime;
+            
+            // Skip through states silently to avoid unnecessary notifications
+            // and signal emits stacking up
+            while (this._elapsed >= this._elapsedLimit) {
+                if (this._state == State.POMODORO)
+                    this._setState(State.PAUSE);
+                else
+                    if (this._state == State.PAUSE)
+                        this._setState(State.IDLE);
+                    else
+                        break;
+            }
+            
+            if (!this._notification || !this._notificationDialog) {
+                if (this._state == State.PAUSE)
+                    this._notifyPomodoroEnd();
+                
+                // TODO: Notify about pomodoro start once the lock screen is off
+                // if (this._state == State.IDLE)
+                //    this._notifyPomodoroStart();
+            }
+            
+            this._updatePresenceStatus();
+            
+            this.emit('state-changed', this._state);
+            this.emit('elapsed-changed', this._elapsed);
+        }
     },
 
     _onEventCapture: function(actor, event) {
@@ -351,7 +405,7 @@ PomodoroTimer.prototype = {
     _notifyPomodoroEnd: function() {
         this._closeNotification();
         
-        if (this._settings.get_boolean('away-from-desk')) {
+        if (this._settings.get_boolean('away-from-desk') && this._elapsed == 0) {
             this._deactivateScreenSaver();
             this._playNotificationSound();
         }
@@ -463,9 +517,9 @@ PomodoroTimer.prototype = {
     _enableEventCapture: function() {
         // We use meta_display_get_last_user_time() which determines any user interaction 
         // with X11/Mutter windows but not with GNOME Shell UI, for that we handle 'captured-event'.
-        if (this._eventCaptureId == 0)
+        if (this._eventCaptureId == 0) {
             this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
-        
+        }
         if (this._eventCaptureSource == 0) {
             this._eventCapturePointer = null;
             this._eventCaptureSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onX11EventCapture));
@@ -478,7 +532,7 @@ PomodoroTimer.prototype = {
             global.stage.disconnect(this._eventCaptureId);
             this._eventCaptureId = 0;
         }
-        if (this._eventCaptureSource) {
+        if (this._eventCaptureSource != 0) {
             GLib.source_remove(this._eventCaptureSource);
             this._eventCaptureSource = 0;
         }
@@ -499,6 +553,11 @@ PomodoroTimer.prototype = {
     _load: function() {
         if (!this._screenSaver) {
             this._screenSaver = new ScreenSaver.ScreenSaverProxy();
+        }
+        if (!this._power) {
+            this._power = new UPowerGlib.Client();
+            this._power.connect('notify-sleep', Lang.bind(this, this._onSleep));
+            this._power.connect('notify-resume', Lang.bind(this, this._onResume));
         }
         if (!this._presence) {
             this._presence = new GnomeSession.Presence();
