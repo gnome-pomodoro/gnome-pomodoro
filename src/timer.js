@@ -154,6 +154,11 @@ PomodoroTimer.prototype = {
         if (this._state == State.PAUSE || this._state == State.IDLE)
             this._playNotificationSound();
         
+        if (this._timeoutSource != 0) {
+            GLib.source_remove(this._timeoutSource);
+            this._timeoutSource = 0;
+        }
+        
         this.setState(State.POMODORO);
     },
 
@@ -176,6 +181,14 @@ PomodoroTimer.prototype = {
         this._closeNotification();
         this._disableEventCapture();
         
+        if (newState != State.NULL) {
+            this._load();
+            
+            if (this._timeoutSource == 0) {
+                this._timeoutSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onTimeout));
+            }
+        }
+        
         if (this._state == newState) {
             return;
         }
@@ -187,18 +200,6 @@ PomodoroTimer.prototype = {
             }
             else {
                 // Pomodoro not completed, sorry
-            }
-        }
-        
-        if (newState != State.NULL) {
-            this._load();
-            
-            if (this._timeoutSource != 0 && (newState == State.POMODORO || newState == State.PAUSE)) {
-                GLib.source_remove(this._timeoutSource);
-                this._timeoutSource = 0;
-            }
-            if (this._timeoutSource == 0) {
-                this._timeoutSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onTimeout));
             }
         }
         
@@ -528,9 +529,8 @@ PomodoroTimer.prototype = {
             this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
         }
         if (this._eventCaptureSource == 0) {
-            this._eventCapturePointer = null;
+            this._eventCapturePointer = global.get_pointer();
             this._eventCaptureSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onX11EventCapture));
-            this._onX11EventCapture();
         }
     },
 
