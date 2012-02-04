@@ -300,6 +300,7 @@ PomodoroTimer.prototype = {
                     this.setState(this._settings.get_boolean('away-from-desk') ? State.POMODORO : State.IDLE);
                     this._notifyPomodoroStart();
                 }
+                this._updateNotification();
                 break;
             
             case State.POMODORO:
@@ -395,13 +396,17 @@ PomodoroTimer.prototype = {
         let source = new Notification.NotificationSource();
         this._notification = new MessageTray.Notification(source, _("Pause finished, a new pomodoro is starting!"), null);
         this._notification.setTransient(true);
-        
+        this._notification.connect('collapsed', Lang.bind(this, function() {
+                this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+            }));
+        this._notification.connect('destroy', Lang.bind(this, function() {
+                this._notification = null;
+            }));
         source.notify(this._notification);
         
         this.emit('notify-pomodoro-start');
     },
 
-    // Notify user of changes
     _notifyPomodoroEnd: function() {
         this._closeNotification();
         
@@ -426,8 +431,6 @@ PomodoroTimer.prototype = {
         this._notificationDialog.setNotificationButtons([
                 { label: _("Show dialog"),
                   action: Lang.bind(this, function() {
-                        // force notification to close immediately
-                        this._notificationDialog._closeNotification();
                         this._notificationDialog.open();
                     })
                 },
@@ -435,6 +438,10 @@ PomodoroTimer.prototype = {
                   action: Lang.bind(this, this.startPomodoro)
                 }
             ]);
+        this._notificationDialog.connect('destroy', Lang.bind(this, function() {
+                this._notificationDialog = null;
+            }));
+        
         this._updateNotification();
         
         if (this._settings.get_boolean('show-notification-dialogs'))
@@ -446,7 +453,7 @@ PomodoroTimer.prototype = {
     },
 
     _closeNotification: function() {
-        if (this._notification) {
+        if (this._notification && !this._notification.expanded) {
             this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
             this._notification = null;
         }
