@@ -107,7 +107,7 @@ msgstr "Koniec pomodoro!"
 
 #: ../src/timer.js:370
 msgid "Hide"
-msgstr "Ukryj"
+msgstr "Schowaj"
 
 #: ../src/timer.js:376 ../src/timer.js:388
 msgid "Start a new pomodoro"
@@ -115,7 +115,7 @@ msgstr "Zacznij nowe pomodoro"
 
 #: ../src/timer.js:381
 msgid "Show dialog"
-msgstr "Pokarz okienko"
+msgstr "Pokaż okienko"
 
 #: ../src/timer.js:446
 #, c-format

@@ -23,11 +23,11 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Meta = imports.gi.Meta;
 const St = imports.gi.St;
+const UPowerGlib = imports.gi.UPowerGlib;
 
 const ExtensionSystem = imports.ui.extensionSystem;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
-const Config = imports.misc.config;
 const GnomeSession = imports.misc.gnomeSession;
 const ScreenSaver = imports.misc.screenSaver;
 const Util = imports.misc.util;
@@ -84,18 +84,20 @@ PomodoroTimer.prototype = {
         this._sessionPartCount = 0;
         this._sessionCount = 0;
         this._state = State.NULL;
+        this._stateTimestamp = 0;
         
         this._timeoutSource = 0;
-        this._inactiveTimeoutSource = 0;
-        this._lastTimestamp = 0;
         this._eventCaptureId = 0;
         this._eventCaptureSource = 0;
         this._eventCapturePointer = null;
         
-        this._dailog = null;
         this._notification = null;
+        this._notificationDialog = null;
         this._playbin = null;
+        this._power = null;
+        this._powerTimestamp = 0;
         this._presence = null;
+        this._presenceChangeEnabled = false;
         this._screenSaver = null;
         
         this._settings = new Gio.Settings({ schema: 'org.gnome.shell.extensions.pomodoro' });
@@ -107,14 +109,17 @@ PomodoroTimer.prototype = {
             case 'pomodoro-time':
                 if (this._state == State.POMODORO)
                     this._elapsedLimit = settings.get_int('pomodoro-time');
+                    this._elapsed = Math.min(this._elapsed, this._elapsedLimit);
                 break;
             case 'short-pause-time':
                 if (this._state == State.PAUSE && this._sessionPartCount < 4)
                     this._elapsedLimit = settings.get_int('short-pause-time');
+                    this._elapsed = Math.min(this._elapsed, this._elapsedLimit);
                 break;
             case 'long-pause-time':
                 if (this._state == State.PAUSE && this._sessionPartCount >= 4)
                     this._elapsedLimit = settings.get_int('long-pause-time');
+                    this._elapsed = Math.min(this._elapsed, this._elapsedLimit);
                 break;
             case 'change-presence-status':
                 this._updatePresenceStatus();
@@ -136,7 +141,6 @@ PomodoroTimer.prototype = {
     reset: function() {
         this._sessionCount = 0;
         this._sessionPartCount = 0;
-        this._elapsed = 0;
         
         let isRunning = (this._state != State.NULL);
         this.setState(State.NULL);
@@ -150,6 +154,11 @@ PomodoroTimer.prototype = {
         if (this._state == State.PAUSE || this._state == State.IDLE)
             this._playNotificationSound();
         
+        if (this._timeoutSource != 0) {
+            GLib.source_remove(this._timeoutSource);
+            this._timeoutSource = 0;
+        }
+        
         this.setState(State.POMODORO);
     },
 
@@ -158,15 +167,31 @@ PomodoroTimer.prototype = {
     },
 
     setState: function(newState) {
-        if (this._state == newState) {
-            this.emit('state-changed', this._state);
-            return;
-        }
+        this._setState(newState);
         
+        this._updatePresenceStatus();
+        
+        this.emit('state-changed', this._state);
+        this.emit('elapsed-changed', this._elapsed);
+    },
+
+    _setState: function(newState) {
         let timestamp = global.get_current_time();
         
         this._closeNotification();
         this._disableEventCapture();
+        
+        if (newState != State.NULL) {
+            this._load();
+            
+            if (this._timeoutSource == 0) {
+                this._timeoutSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onTimeout));
+            }
+        }
+        
+        if (this._state == newState) {
+            return;
+        }
         
         if (this._state == State.POMODORO) {
             if (this._elapsed >= POMODORO_ACCEPTANCE * this._settings.get_int('pomodoro-time')) {
@@ -175,22 +200,6 @@ PomodoroTimer.prototype = {
             }
             else {
                 // Pomodoro not completed, sorry
-            }
-        }
-        
-        if (newState != State.NULL) {
-            this._load();
-            
-            if (this._inactiveTimeoutSource != 0) {
-                GLib.source_remove(this._inactiveTimeoutSource);
-                this._inactiveTimeoutSource = 0;
-            }
-            if (this._timeoutSource != 0 && (newState == State.POMODORO || newState == State.PAUSE)) {
-                GLib.source_remove(this._timeoutSource);
-                this._timeoutSource = 0;
-            }
-            if (this._timeoutSource == 0) {
-                this._timeoutSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onTimeout));
             }
         }
         
@@ -213,25 +222,31 @@ PomodoroTimer.prototype = {
                     if (this._elapsed >= longPauseAcceptanceTime)
                         this._sessionPartCount = 0;
                 }
-                else {
+                if (this._state == State.NULL) {
                     // Reset work cycle when disabled for some time
-                    let idleTime = (timestamp - this._lastTimestamp) / 1000;
-                    if (this._lastTimestamp > 0 &&
-                        idleTime >= longPauseAcceptanceTime) {
+                    let idleTime = (timestamp - this._stateTimestamp) / 1000;
+                    
+                    if (this._stateTimestamp > 0 && idleTime >= longPauseAcceptanceTime)
                         this._sessionPartCount = 0;
-                    }
                 }
+                
                 this._elapsed = 0;
                 this._elapsedLimit = this._settings.get_int('pomodoro-time');
                 break;
             
             case State.PAUSE:
+                // Wrap time to pause
+                if (this._state == State.POMODORO && this._elapsed > this._elapsedLimit)
+                    this._elapsed = this._elapsed - this._elapsedLimit;
+                else
+                    this._elapsed = 0;
+                
+                // Determine which pause type user should have
                 if (this._sessionPartCount >= 4)
                     this._elapsedLimit = this._settings.get_int('long-pause-time');
                 else
                     this._elapsedLimit = this._settings.get_int('short-pause-time');
                 
-                this._elapsed = 0;
                 break;
             
             case State.NULL:
@@ -240,22 +255,14 @@ PomodoroTimer.prototype = {
                     this._timeoutSource = 0;
                 }
                 
-                // // Always reset work cycle when disabling timer during pause
-                // if (this._state == State.PAUSE || this._state == State.IDLE) {
-                //     this._sessionPartCount = 0;
-                // }
                 this._elapsed = 0;
+                this._elapsedLimit = 0;
                 this._unload();
                 break;
         }
         
-        this._lastTimestamp = timestamp;
+        this._stateTimestamp = timestamp;
         this._state = newState;
-        
-        this._updatePresenceStatus();
-        
-        this.emit('state-changed', this._state);
-        this.emit('elapsed-changed', this._elapsed);
     },
 
     get elapsed() {
@@ -287,7 +294,7 @@ PomodoroTimer.prototype = {
         switch (this._state) {
             case State.IDLE:
                 break;
-                        
+            
             case State.PAUSE:
                 // Pause is over
                 if (this._elapsed >= this._elapsedLimit) {
@@ -296,7 +303,7 @@ PomodoroTimer.prototype = {
                 }
                 this._updateNotification();
                 break;
-                
+            
             case State.POMODORO:
                 // Pomodoro over and a pause is needed :)
                 if (this._elapsed >= this._elapsedLimit) {
@@ -307,6 +314,46 @@ PomodoroTimer.prototype = {
         }
         
         return true;
+    },
+
+    _onSleep: function() {
+        this._powerTimestamp = new Date().getTime();
+    },
+
+    _onResume: function() {
+        let idleTime = parseInt((new Date().getTime() - this._powerTimestamp) / 1000);
+        
+        this._powerTimestamp = 0;
+        
+        if (this._state != State.NULL) {
+            this._elapsed += idleTime;
+            
+            // Skip through states silently to avoid unnecessary notifications
+            // and signal emits stacking up
+            while (this._elapsed >= this._elapsedLimit) {
+                if (this._state == State.POMODORO)
+                    this._setState(State.PAUSE);
+                else
+                    if (this._state == State.PAUSE)
+                        this._setState(State.IDLE);
+                    else
+                        break;
+            }
+            
+            if (!this._notification || !this._notificationDialog) {
+                if (this._state == State.PAUSE)
+                    this._notifyPomodoroEnd();
+                
+                // TODO: Notify about pomodoro start once the lock screen is off
+                // if (this._state == State.IDLE)
+                //    this._notifyPomodoroStart();
+            }
+            
+            this._updatePresenceStatus();
+            
+            this.emit('state-changed', this._state);
+            this.emit('elapsed-changed', this._elapsed);
+        }
     },
 
     _onEventCapture: function(actor, event) {
@@ -350,17 +397,21 @@ PomodoroTimer.prototype = {
         let source = new Notification.NotificationSource();
         this._notification = new MessageTray.Notification(source, _("Pause finished, a new pomodoro is starting!"), null);
         this._notification.setTransient(true);
-        
+        this._notification.connect('collapsed', Lang.bind(this, function() {
+                this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+            }));
+        this._notification.connect('destroy', Lang.bind(this, function() {
+                this._notification = null;
+            }));
         source.notify(this._notification);
         
         this.emit('notify-pomodoro-start');
     },
 
-    // Notify user of changes
     _notifyPomodoroEnd: function() {
         this._closeNotification();
         
-        if (this._settings.get_boolean('away-from-desk')) {
+        if (this._settings.get_boolean('away-from-desk') && this._elapsed == 0) {
             this._deactivateScreenSaver();
             this._playNotificationSound();
         }
@@ -381,8 +432,6 @@ PomodoroTimer.prototype = {
         this._notificationDialog.setNotificationButtons([
                 { label: _("Show dialog"),
                   action: Lang.bind(this, function() {
-                        // force notification to close immediately
-                        this._notificationDialog._closeNotification();
                         this._notificationDialog.open();
                     })
                 },
@@ -390,6 +439,10 @@ PomodoroTimer.prototype = {
                   action: Lang.bind(this, this.startPomodoro)
                 }
             ]);
+        this._notificationDialog.connect('destroy', Lang.bind(this, function() {
+                this._notificationDialog = null;
+            }));
+        
         this._updateNotification();
         
         if (this._settings.get_boolean('show-notification-dialogs'))
@@ -401,7 +454,7 @@ PomodoroTimer.prototype = {
     },
 
     _closeNotification: function() {
-        if (this._notification) {
+        if (this._notification && !this._notification.expanded) {
             this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
             this._notification = null;
         }
@@ -443,12 +496,16 @@ PomodoroTimer.prototype = {
         
         seconds = Math.ceil(seconds / 5) * 5;
         
-        if (seconds <= 45)
-            this._notificationDialog.setDescription(ngettext("Take a break, you have %d second\n",
-                                                             "Take a break, you have %d seconds\n", seconds).format(seconds));
-        else
-            this._notificationDialog.setDescription(ngettext("Take a break, you have %d minute\n",
-                                                             "Take a break, you have %d minutes\n", minutes).format(minutes));
+        try {
+            this._notificationDialog.setDescription((seconds <= 45)
+                                    ? ngettext("Take a break, you have %d second\n",
+                                               "Take a break, you have %d seconds\n", seconds).format(seconds)
+                                    : ngettext("Take a break, you have %d minute\n",
+                                               "Take a break, you have %d minutes\n", minutes).format(minutes));
+        }
+        catch (e) {
+            // Notification might be closed before we knew it
+        }
     },
 
     _updatePresenceStatus: function() {
@@ -472,22 +529,24 @@ PomodoroTimer.prototype = {
     _enableEventCapture: function() {
         // We use meta_display_get_last_user_time() which determines any user interaction 
         // with X11/Mutter windows but not with GNOME Shell UI, for that we handle 'captured-event'.
-        if (this._eventCaptureId == 0)
+        if (this._eventCaptureId == 0) {
             this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
-        
+        }
         if (this._eventCaptureSource == 0) {
-            this._eventCapturePointer = null;
+            this._eventCapturePointer = global.get_pointer();
             this._eventCaptureSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onX11EventCapture));
-            this._onX11EventCapture();
         }
     },
 
     _disableEventCapture: function() {
-        global.stage.disconnect(this._eventCaptureId);
-        this._eventCaptureId = 0;
-        
-        GLib.source_remove(this._eventCaptureSource);
-        this._eventCaptureSource = 0;
+        if (this._eventCaptureId != 0) {
+            global.stage.disconnect(this._eventCaptureId);
+            this._eventCaptureId = 0;
+        }
+        if (this._eventCaptureSource != 0) {
+            GLib.source_remove(this._eventCaptureSource);
+            this._eventCaptureSource = 0;
+        }
     },
 
     _deactivateScreenSaver: function() {
@@ -505,6 +564,11 @@ PomodoroTimer.prototype = {
     _load: function() {
         if (!this._screenSaver) {
             this._screenSaver = new ScreenSaver.ScreenSaverProxy();
+        }
+        if (!this._power) {
+            this._power = new UPowerGlib.Client();
+            this._power.connect('notify-sleep', Lang.bind(this, this._onSleep));
+            this._power.connect('notify-resume', Lang.bind(this, this._onResume));
         }
         if (!this._presence) {
             this._presence = new GnomeSession.Presence();
