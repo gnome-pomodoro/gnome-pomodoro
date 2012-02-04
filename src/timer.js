@@ -496,12 +496,16 @@ PomodoroTimer.prototype = {
         
         seconds = Math.ceil(seconds / 5) * 5;
         
-        if (seconds <= 45)
-            this._notificationDialog.setDescription(ngettext("Take a break, you have %d second\n",
-                                                             "Take a break, you have %d seconds\n", seconds).format(seconds));
-        else
-            this._notificationDialog.setDescription(ngettext("Take a break, you have %d minute\n",
-                                                             "Take a break, you have %d minutes\n", minutes).format(minutes));
+        try {
+            this._notificationDialog.setDescription((seconds <= 45)
+                                    ? ngettext("Take a break, you have %d second\n",
+                                               "Take a break, you have %d seconds\n", seconds).format(seconds)
+                                    : ngettext("Take a break, you have %d minute\n",
+                                               "Take a break, you have %d minutes\n", minutes).format(minutes));
+        }
+        catch (e) {
+            // Notification might be closed before we knew it
+        }
     },
 
     _updatePresenceStatus: function() {
