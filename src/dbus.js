@@ -139,6 +139,10 @@ PomodoroTimer.prototype = {
         DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
                                  'org.gnome.Shell.Extensions.Pomodoro',
                                  'NotifyPomodoroEnd', '', []);
+    },
+
+    destroy: function() {
+        DBus.session.unexportObject(this);
     }
 };
 
