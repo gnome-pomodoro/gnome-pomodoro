@@ -360,6 +360,7 @@ Indicator.prototype = {
     
     _onDestroy: function() {
         this.timer.destroy();
+        this.dbus.destroy();
     }
 };
 

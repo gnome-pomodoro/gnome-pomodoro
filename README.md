@@ -13,6 +13,9 @@ More on pomodoro technique [here](http://www.pomodorotechnique.com).
 ## Archlinux
 Get from [AUR](http://aur.archlinux.org/packages.php?ID=49967)
 
+## Gentoo
+Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github.com/mgrela/dropzone/tree/master/gnome-extra/gnome-shell-extensions-pomodoro). Instructions [here](http://mgrela.rootnode.net/doku.php?id=wiki:gentoo:dropzone).
+
 ## Direct from source
 - Get zipball 
     * [Stable | Gnome-shell >= 3.2](https://github.com/codito/gnome-shell-pomodoro/zipball/0.5)
@@ -37,6 +40,12 @@ GPL3. See COPYING for details.
 - Contributors: https://github.com/codito/gnome-shell-pomodoro/contributors
 
 # Changelog
+**Unstable**
+
++ Feature: Support for "Away from desk" mode
++ Feature: Ability to change IM presence status based on pomodoro activity
++ Fixed issues #38, #39, #41, #42, #45
+
 **Version 0.5**
 
 + Bunch of cleanups, user interface awesomeness [Issue #37, Patch from @kamilprusko]
