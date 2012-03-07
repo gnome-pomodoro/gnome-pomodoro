@@ -140,6 +140,7 @@ NotificationDialog.prototype = {
 
     open: function(timestamp) {
         if (ModalDialog.ModalDialog.prototype.open.call(this, timestamp)) {
+            this._closeNotification();
             this._disconnectInternals();
             this._enableEventCapture();
             return true; // dialog already opened
@@ -189,31 +190,42 @@ NotificationDialog.prototype = {
     },
 
     _openNotification: function() {
-        let source = new NotificationSource();
-        this._notification = new MessageTray.Notification(source, this._title, this._description, null);
-        this._notification.setResident(true);
-        
-        // Create buttons
-        for (let i=0; i < this._notificationButtons.length; i++) {
+        if (!this._notification) {
+            let source = new NotificationSource();
+            this._notification = new MessageTray.Notification(source, this._title, this._description, null);
+            this._notification.setResident(true);
+            
+            // Force to show description along with title,
+            // as this is private property API may change
             try {
-                this._notification.addButton(i, this._notificationButtons[i].label);
+                this._notification._titleFitsInBannerMode = true;
             }
-            catch (e) {
+            catch(e) {
                 global.logError('Pomodoro: ' + e.message);
             }
-        }
-        
-        // Connect actions
-        this._notification.connect('action-invoked', Lang.bind(this, function(object, id) {
+            
+            // Create buttons
+            for (let i=0; i < this._notificationButtons.length; i++) {
                 try {
-                    this._notificationButtons[id].action();
+                    this._notification.addButton(i, this._notificationButtons[i].label);
                 }
                 catch (e) {
                     global.logError('Pomodoro: ' + e.message);
                 }
-            }));
-        
-        source.notify(this._notification);
+            }
+            
+            // Connect actions
+            this._notification.connect('action-invoked', Lang.bind(this, function(object, id) {
+                    try {
+                        this._notificationButtons[id].action();
+                    }
+                    catch (e) {
+                        global.logError('Pomodoro: ' + e.message);
+                    }
+                }));
+            
+            source.notify(this._notification);
+        }
     },
 
     _closeNotification: function() {
