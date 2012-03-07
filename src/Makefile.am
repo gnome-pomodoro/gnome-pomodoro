@@ -19,3 +19,6 @@ CLEANFILES = metadata.json
 metadata.json: metadata.json.in $(top_builddir)/config.status
 	$(AM_V_GEN) sed -e "s|[@]UUID@|$(uuid)|" \
 		-e "s|[@]LOCALEDIR@|$(datadir)/locale|" $< > $@
+
+uninstall-hook:
+	rmdir $(extensiondir)
