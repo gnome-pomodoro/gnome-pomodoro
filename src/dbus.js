@@ -84,42 +84,38 @@ PomodoroTimer.prototype = {
 
     Start: function() {
         if (this._timer)
-        this._timer.start();
+            this._timer.start();
     },
 
     Stop: function() {
         if (this._timer)
-        this._timer.stop();
+            this._timer.stop();
     },
 
     Reset: function() {
         if (this._timer)
-        this._timer.reset();
+            this._timer.reset();
     },
 
     GetElapsed: function() {
-        if (this._timer)
-        return this._timer.elapsed;
+        return this._timer ? this._timer.elapsed : 0;
     },
 
     GetRemaining: function() {
-        if (this._timer)
-        return this._timer.remaining;
+        return this._timer ? this._timer.remaining : 0;
     },
 
     GetSessionCount: function() {
-        if (this._timer)
-        return this._timer.sessionCount;
+        return this._timer ? this._timer.sessionCount : 0;
     },
 
     GetState: function() {
-        if (this._timer)
-        return this._timer.state;
+        return this._timer ? this._timer.state : -1;
     },
 
     SetState: function(state) {
         if (this._timer)
-        this._timer.setState(state);
+            this._timer.setState(state);
     },
 
     _onTimerStateChanged: function(object, state) {
@@ -139,6 +135,10 @@ PomodoroTimer.prototype = {
         DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
                                  'org.gnome.Shell.Extensions.Pomodoro',
                                  'NotifyPomodoroEnd', '', []);
+    },
+
+    destroy: function() {
+        DBus.session.unexportObject(this);
     }
 };
 

@@ -116,6 +116,9 @@ Indicator.prototype = {
         this.connect('destroy', Lang.bind(this, this._onDestroy));
         
         // Initialize
+        if (this._settings.get_boolean('restore'))
+            this.timer.restore();
+        
         this._updateLabel();
         this._updateSessionCount();
         
@@ -360,6 +363,7 @@ Indicator.prototype = {
     
     _onDestroy: function() {
         this.timer.destroy();
+        this.dbus.destroy();
     }
 };
 
