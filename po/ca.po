@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-pomodoro\n"
-"Report-Msgid-Bugs-To: juanmah@gmail.com\n"
-"POT-Creation-Date: 2012-01-30 16:55+0100\n"
-"PO-Revision-Date: 2012-01-31 19:01+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-18 16:22+0100\n"
+"PO-Revision-Date: 2012-03-19 10:56+0100\n"
 "Last-Translator: juanmah <juanmah@gmail.com>\n"
 "Language-Team:  <>\n"
 "Language: ca\n"
@@ -17,114 +17,124 @@ msgstr ""
 "Content-Transfer-Encoding: 8bits\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
-#: ../src/extension.js:59
+#: ../src/extension.js:61
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minut"
 msgstr[1] "%d minuts"
 
-#: ../src/extension.js:93 ../src/notification.js:53
+#. Toggle timer state button
+#: ../src/extension.js:96 ../src/notification.js:54
 msgid "Pomodoro Timer"
 msgstr "Temporitzador Pomodoro"
 
-#: ../src/extension.js:106
+#. Options SubMenu
+#: ../src/extension.js:109
 msgid "Options"
 msgstr "Opcions"
 
-#: ../src/extension.js:126
+#. Reset counters
+#: ../src/extension.js:132
 msgid "Reset Counts and Timer"
 msgstr "Reinicia el comptador i el temporitzador"
 
-#: ../src/extension.js:127
+#: ../src/extension.js:133
 msgid "Click to reset session counts to zero"
 msgstr "Premi per reiniciar el comptador de la sessió a zero"
 
-#: ../src/extension.js:132
+#. Away from desk toggle
+#: ../src/extension.js:138
 msgid "Away From Desk"
 msgstr "Absència de l'escriptori"
 
-#: ../src/extension.js:133
+#: ../src/extension.js:139
 msgid "Set optimal settings for doing paperwork"
 msgstr "Paràmetres òptims per fer paperassa"
 
-#: ../src/extension.js:140
+#. Presence status toggle
+#: ../src/extension.js:146
 msgid "Control Presence Status"
 msgstr "Control de l'estat de presència"
 
-#: ../src/extension.js:141
+#: ../src/extension.js:147
 msgid "Change online status and disable notifications including chat messages"
 msgstr ""
 "Canvia l'estat en linia i inhabilita notificacions inclouent missatges del "
 "chat"
 
-#: ../src/extension.js:148
+#. Notification dialog toggle
+#: ../src/extension.js:154
 msgid "Show Dialog Messages"
 msgstr "Mostra missatges de diàleg"
 
-#: ../src/extension.js:149
+#: ../src/extension.js:155
 msgid "Show a dialog message at the end of pomodoro session"
 msgstr "Mostra un missatge de diàleg al final de la sessió de pomodoro"
 
-#: ../src/extension.js:156
+#. Notify with a sound toggle
+#: ../src/extension.js:162
 msgid "Sound Notifications"
 msgstr "Notificació de so"
 
-#: ../src/extension.js:157
+#: ../src/extension.js:163
 msgid "Play a sound at start of pomodoro session"
 msgstr "Reprodueix un so al començar la sessió de pomodoro"
 
-#: ../src/extension.js:164
+#. Pomodoro duration
+#: ../src/extension.js:170
 msgid "Pomodoro Duration"
 msgstr "Durada del pomodoro"
 
-#: ../src/extension.js:177
+#. Short pause duration
+#: ../src/extension.js:183
 msgid "Short Break Duration"
 msgstr "Durada de la pausa curta"
 
-#: ../src/extension.js:198
+#. Long pause duration
+#: ../src/extension.js:204
 msgid "Long Break Duration"
 msgstr "Durada de la pausa llarga"
 
-#: ../src/extension.js:316
+#: ../src/extension.js:322
 msgid "No Completed Sessions"
 msgstr "Cap sessió completada"
 
-#: ../src/extension.js:318
+#: ../src/extension.js:324
 #, c-format
 msgid "%d Completed Session"
 msgid_plural "%d Completed Sessions"
 msgstr[0] "%d sessió completada"
 msgstr[1] "%d sessions completades"
 
-#: ../src/timer.js:350
+#: ../src/timer.js:411
 msgid "Pause finished, a new pomodoro is starting!"
 msgstr "La pausa ha finalitzat, un nou pomodoro està començant!"
 
-#: ../src/timer.js:368
+#: ../src/timer.js:433
 msgid "Pomodoro Finished!"
 msgstr "El pomodoro ha finalitzat!"
 
-#: ../src/timer.js:370
+#: ../src/timer.js:435
 msgid "Hide"
 msgstr "Oculta"
 
-#: ../src/timer.js:376 ../src/timer.js:388
+#: ../src/timer.js:441 ../src/timer.js:451
 msgid "Start a new pomodoro"
 msgstr "Comença un nou pomodoro"
 
-#: ../src/timer.js:381
+#: ../src/timer.js:446
 msgid "Show dialog"
 msgstr "Mostra diàleg"
 
-#: ../src/timer.js:446
+#: ../src/timer.js:514
 #, c-format
 msgid "Take a break, you have %d second\n"
 msgid_plural "Take a break, you have %d seconds\n"
 msgstr[0] "Prengui's un descans, té %d segon\n"
 msgstr[1] "Prengui's un descans, té %d segons\n"
 
-#: ../src/timer.js:449
+#: ../src/timer.js:516
 #, c-format
 msgid "Take a break, you have %d minute\n"
 msgid_plural "Take a break, you have %d minutes\n"
@@ -202,3 +212,27 @@ msgstr "Arxiu de so de la notificació"
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:18
 msgid "Sound file to play on pomodoro start or end."
 msgstr "Arxiu de so per reproduir en iniciar o finalitzar un pomodoro."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:19
+msgid "Restore timer state"
+msgstr "Restaura l'estat del temporitzador"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:20
+msgid "Whether to restore state on startup."
+msgstr "Si es restaura l'estat a l'inici."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:21
+msgid "Number of completed sessions"
+msgstr "Nombre de sessions completades"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:22
+msgid "Number of completed sessions since long break"
+msgstr "Nombre de sessions completades després d'una pausa llarga"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:23
+msgid "Saved timer state"
+msgstr "Estat del temporitzador desat"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:24
+msgid "Time of saved state"
+msgstr "Hora de l'estat desat"
