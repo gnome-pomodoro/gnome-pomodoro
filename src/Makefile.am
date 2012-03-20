@@ -7,7 +7,8 @@ dist_extension_DATA = \
 	metadata.json \
 	notification.js \
 	stylesheet.css \
-	timer.js
+	timer.js \
+	util.js
 
 nodist_extension_DATA = metadata.json
 
