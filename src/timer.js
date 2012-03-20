@@ -32,8 +32,9 @@ const GnomeSession = imports.misc.gnomeSession;
 const ScreenSaver = imports.misc.screenSaver;
 const Util = imports.misc.util;
 
-const Extension = imports.ui.extensionSystem.extensions['pomodoro@arun.codito.in'];
-const Notification = Extension.notification;
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const PomodoroUtil = Extension.imports.util;
+const Notification = Extension.imports.notification;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
@@ -100,7 +101,7 @@ PomodoroTimer.prototype = {
         this._presenceChangeEnabled = false;
         this._screenSaver = null;
         
-        this._settings = new Gio.Settings({ schema: 'org.gnome.shell.extensions.pomodoro' });
+        this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
     },
 
