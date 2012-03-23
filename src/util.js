@@ -40,6 +40,10 @@ function initTranslations(domain) {
         Gettext.bindtextdomain(domain, Config.LOCALEDIR);
 }
 
+function getExtensionPath() {
+    let extension = ExtensionUtils.getCurrentExtension();
+    return extension.dir.get_path();
+}
 
 function getSettings(schema) {
     let extension = ExtensionUtils.getCurrentExtension();

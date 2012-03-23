@@ -14,63 +14,46 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-const DBus = imports.dbus;
+const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
 const Lang = imports.lang;
+const Signals = imports.signals;
 
-const PomodoroTimerIface = {
-    name: 'org.gnome.Shell.Extensions.Pomodoro',
-    methods: [{ name: 'Start',
-                inSignature: '',
-                outSignature: ''
-              },
-              { name: 'Stop',
-                inSignature: '',
-                outSignature: ''
-              },
-              { name: 'Reset',
-                inSignature: '',
-                outSignature: ''
-              },
-              { name: 'GetElapsed',
-                inSignature: '',
-                outSignature: 'i'
-              },
-              { name: 'GetRemaining',
-                inSignature: '',
-                outSignature: 'i'
-              },
-              { name: 'GetSessionCount',
-                inSignature: '',
-                outSignature: 'i'
-              },
-              { name: 'GetState',
-                inSignature: '',
-                outSignature: 'i'
-              },
-              { name: 'SetState',
-                inSignature: 'i',
-                outSignature: ''
-              }
-             ],
-    signals: [
-              { name: 'StateChanged',
-                inSignature: 'i' },
-              { name: 'NotifyPomodoroStart',
-                inSignature: '' },
-              { name: 'NotifyPomodoroEnd',
-                inSignature: '' }],
-    properties: []
-};
 
-function PomodoroTimer(timer) {
-    this._init(timer);
-}
+const PomodoroTimerIface = <interface name="org.gnome.Shell.Extensions.Pomodoro">
+<method name="Start"/>
+<method name="Stop"/>
+<method name="Reset"/>
+<method name="GetElapsed">
+    <arg type="i" direction="out" name="seconds"/>
+</method>
+<method name="GetRemaining">
+    <arg type="i" direction="out" name="seconds"/>
+</method>
+<method name="GetSessionCount">
+    <arg type="i" direction="out" name="count"/>
+</method>
+<method name="GetState">
+    <arg type="i" direction="out" name="state"/>
+</method>
+<method name="SetState">
+    <arg type="i" direction="in" name="state"/>
+</method>
+<signal name="StateChanged">
+    <arg type="i" name="state"/>
+</signal>
+<signal name="NotifyPomodoroStart"/>
+<signal name="NotifyPomodoroEnd"/>
+</interface>;
 
-PomodoroTimer.prototype = {
+
+const PomodoroTimer = new Lang.Class({
+    Name: 'PomodoroTimerDBus',
+
     _init: function(timer) {
-        DBus.session.exportObject('/org/gnome/Shell/Extensions/Pomodoro',
-                                  this);
-        
+        this._dbus = Gio.DBusExportedObject.wrapJSObject(PomodoroTimerIface, this);
+        this._dbus.export(Gio.DBus.session, '/org/gnome/Shell/Extensions/Pomodoro');
+
         this._timer = timer;
         this._timer.connect('state-changed',
                             Lang.bind(this, this._onTimerStateChanged));
@@ -119,28 +102,19 @@ PomodoroTimer.prototype = {
     },
 
     _onTimerStateChanged: function(object, state) {
-        DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
-                                 'org.gnome.Shell.Extensions.Pomodoro',
-                                 'StateChanged', 'i',
-                                 [state]);
+        this._dbus.emit_signal('StateChanged',
+                               GLib.Variant.new('(i)', [state]));
     },
 
     _onTimerNotifyPomodoroStart: function(object) {
-        DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
-                                 'org.gnome.Shell.Extensions.Pomodoro',
-                                 'NotifyPomodoroStart', '', []);
+        this._dbus.emit_signal('NotifyPomodoroStart', null);
     },
 
     _onTimerNotifyPomodoroEnd: function(object) {
-        DBus.session.emit_signal('/org/gnome/Shell/Extensions/Pomodoro',
-                                 'org.gnome.Shell.Extensions.Pomodoro',
-                                 'NotifyPomodoroEnd', '', []);
+        this._dbus.emit_signal('NotifyPomodoroEnd', null);
     },
 
     destroy: function() {
-        DBus.session.unexportObject(this);
+        this._dbus.unexport();
     }
-};
-
-DBus.conformExport(PomodoroTimer.prototype, PomodoroTimerIface);
-
+});

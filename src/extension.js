@@ -38,6 +38,7 @@ try {
     const Keybinder = imports.gi.Keybinder;
     Keybinder.init();
 } catch(e) {
+    global.logError('Pomodoro: '+ e.message);
 }
 
 
@@ -63,21 +64,18 @@ function _formatTime(seconds) {
 }
 
 
-function Indicator() {
-    this._init.apply(this, arguments);
-}
-
-Indicator.prototype = {
-    __proto__: PanelMenu.Button.prototype,
+const Indicator = new Lang.Class({
+    Name: 'PomodoroIndicator',
+    Extends: PanelMenu.Button,
 
     _init: function() {
-        PanelMenu.Button.prototype._init.call(this, St.Align.START);
+        this.parent(St.Align.START);
         
-        this.timer = new PomodoroTimer.PomodoroTimer();
-        this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
-        this.timer.connect('elapsed-changed', Lang.bind(this, this._onTimerElapsedChanged));
+        this._timer = new PomodoroTimer.PomodoroTimer();
+        this._timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
+        this._timer.connect('elapsed-changed', Lang.bind(this, this._onTimerElapsedChanged));
         
-        this.dbus = new PomodoroDBus.PomodoroTimer(this.timer);
+        this._dbus = new PomodoroDBus.PomodoroTimer(this._timer);
         
         this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
@@ -88,9 +86,7 @@ Indicator.prototype = {
         this.label.clutter_text.set_line_wrap(false);
         this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
         
-        let labelBin = new St.Bin({ x_align: St.Align.START });
-        labelBin.add_actor(this.label);
-        this.actor.add_actor(labelBin);
+        this.actor.add_actor(this.label);
         
         // Toggle timer state button
         this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'popup-subtitle-menu-item' });
@@ -119,7 +115,7 @@ Indicator.prototype = {
         
         // Initialize
         if (this._settings.get_boolean('restore'))
-            this.timer.restore();
+            this._timer.restore();
         
         this._updateLabel();
         this._updateSessionCount();
@@ -298,10 +294,10 @@ Indicator.prototype = {
     },
 
     _updateLabel: function() {
-        if (this.timer.state != PomodoroTimer.State.NULL) {
-            let secondsLeft = Math.max(this.timer.remaining, 0);
+        if (this._timer.state != PomodoroTimer.State.NULL) {
+            let secondsLeft = Math.max(this._timer.remaining, 0);
             
-            if (this.timer.state == PomodoroTimer.State.IDLE)
+            if (this._timer.state == PomodoroTimer.State.IDLE)
                 secondsLeft = this._settings.get_int('pomodoro-time');
             
             let minutes = parseInt(secondsLeft / 60);
@@ -315,7 +311,7 @@ Indicator.prototype = {
     },
 
     _updateSessionCount: function() {
-        let sessionCount = this.timer.sessionCount;
+        let sessionCount = this._timer.sessionCount;
         let text;
         
         if (sessionCount == 0)
@@ -328,13 +324,13 @@ Indicator.prototype = {
 
     _onToggled: function(item) {
         if (item.state)
-            this.timer.start();
+            this._timer.start();
         else
-            this.timer.stop();
+            this._timer.stop();
     },
 
     _onReset: function() {
-        this.timer.reset();
+        this._timer.reset();
     },
 
     _onTimerElapsedChanged: function(object, elapsed) {
@@ -356,7 +352,7 @@ Indicator.prototype = {
                                transition: 'easeOutQuad',
                                time: FADE_ANIMATION_TIME });
         
-        this._timerToggle.setToggleState(this.timer.state != PomodoroTimer.State.NULL);
+        this._timerToggle.setToggleState(this._timer.state != PomodoroTimer.State.NULL);
     },
 
     _onKeyPressed: function(keystring, data) {
@@ -364,10 +360,10 @@ Indicator.prototype = {
     },
     
     _onDestroy: function() {
-        this.timer.destroy();
-        this.dbus.destroy();
+        this._timer.destroy();
+        this._dbus.destroy();
     }
-};
+});
 
 
 let indicator;
