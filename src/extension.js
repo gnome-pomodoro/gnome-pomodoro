@@ -24,9 +24,11 @@ const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
-const Extension = imports.ui.extensionSystem.extensions['pomodoro@arun.codito.in'];
-const PomodoroTimer = Extension.timer;
-const PomodoroDBus = Extension.dbus;
+
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const PomodoroUtil = Extension.imports.util;
+const PomodoroTimer = Extension.imports.timer;
+const PomodoroDBus = Extension.imports.dbus;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
@@ -77,7 +79,7 @@ Indicator.prototype = {
         
         this.dbus = new PomodoroDBus.PomodoroTimer(this.timer);
         
-        this._settings = new Gio.Settings({ schema: 'org.gnome.shell.extensions.pomodoro' });
+        this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         
         
@@ -371,7 +373,7 @@ Indicator.prototype = {
 let indicator;
 
 function init(metadata) {
-    imports.gettext.bindtextdomain('gnome-shell-pomodoro', metadata.localedir);
+    PomodoroUtil.initTranslations('gnome-shell-pomodoro');
 }
 
 function enable() {
