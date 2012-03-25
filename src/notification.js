@@ -145,8 +145,9 @@ const NotificationDialog = new Lang.Class({
         
         if (this._screenSaver.screenSaverActive) {
             if (this._screenSaverChangedId == 0)
-                this._screenSaverChangedId = this._screenSaver.connect('ActiveChanged',
-                                                                       Lang.bind(this, this._onScreenSaverChanged));
+                this._screenSaverChangedId = this._screenSaver.connectSignal(
+                                                           'ActiveChanged',
+                                                           Lang.bind(this, this._onScreenSaverChanged));
         }
         else {
             if (this._timeoutSource == 0) {
