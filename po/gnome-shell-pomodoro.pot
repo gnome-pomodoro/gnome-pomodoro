@@ -40,31 +40,14 @@ msgstr ""
 msgid "Reset Counts and Timer"
 msgstr ""
 
-#: ../src/extension.js:133
-msgid "Click to reset session counts to zero"
-msgstr ""
-
 #. Away from desk toggle
 #: ../src/extension.js:138
 msgid "Away From Desk"
 msgstr ""
 
-#: ../src/extension.js:139
-msgid "Set optimal settings for doing paperwork"
-msgstr ""
-
 #. Presence status toggle
 #: ../src/extension.js:146
 msgid "Control Presence Status"
-msgstr ""
-
-#: ../src/extension.js:147
-msgid "Change online status and disable notifications including chat messages"
-msgstr ""
-
-#. Notification dialog toggle
-#: ../src/extension.js:154
-msgid "Show Dialog Messages"
 msgstr ""
 
 #: ../src/extension.js:155
@@ -74,10 +57,6 @@ msgstr ""
 #. Notify with a sound toggle
 #: ../src/extension.js:162
 msgid "Sound Notifications"
-msgstr ""
-
-#: ../src/extension.js:163
-msgid "Play a sound at start of pomodoro session"
 msgstr ""
 
 #. Pomodoro duration

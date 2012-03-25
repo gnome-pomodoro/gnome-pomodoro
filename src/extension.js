@@ -126,13 +126,11 @@ const Indicator = new Lang.Class({
     _buildOptionsMenu: function() {
         // Reset counters
         this._resetCountButton =  new PopupMenu.PopupMenuItem(_("Reset Counts and Timer"));
-        this._resetCountButton.actor.tooltip_text = _("Click to reset session counts to zero");
         this._resetCountButton.connect('activate', Lang.bind(this, this._onReset));
         this._optionsMenu.menu.addMenuItem(this._resetCountButton);
         
         // Away from desk toggle
         this._awayFromDeskToggle = new PopupMenu.PopupSwitchMenuItem(_("Away From Desk"));
-        this._awayFromDeskToggle.actor.tooltip_text = _("Set optimal settings for doing paperwork");
         this._awayFromDeskToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('away-from-desk', item.state);
         }));
@@ -140,7 +138,6 @@ const Indicator = new Lang.Class({
         
         // Presence status toggle
         this._changePresenceStatusToggle = new PopupMenu.PopupSwitchMenuItem(_("Control Presence Status"));
-        this._changePresenceStatusToggle.actor.tooltip_text = _("Change online status and disable notifications including chat messages");
         this._changePresenceStatusToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('change-presence-status', item.state);
         }));
@@ -148,7 +145,6 @@ const Indicator = new Lang.Class({
         
         // Notification dialog toggle
         this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Show Dialog Messages"));
-        this._showDialogsToggle.actor.tooltip_text = _("Show a dialog message at the end of pomodoro session");
         this._showDialogsToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('show-notification-dialogs', item.state);
         }));
@@ -156,7 +152,6 @@ const Indicator = new Lang.Class({
         
         // Notify with a sound toggle
         this._playSoundsToggle = new PopupMenu.PopupSwitchMenuItem(_("Sound Notifications"));
-        this._playSoundsToggle.actor.tooltip_text = _("Play a sound at start of pomodoro session");
         this._playSoundsToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('play-sounds', item.state);
         }));
