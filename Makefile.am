@@ -34,7 +34,9 @@ zip:
 	$(MKDIR_P) "$${blddir}$(extensiondir)/schemas"; \
 	cp -r "$${blddir}$(datadir)/locale/" "$${blddir}$(extensiondir)"; \
 	cp "$(gsettings_SCHEMAS)" "$${blddir}$(extensiondir)/schemas"; \
+	glib-compile-schemas "$${blddir}$(extensiondir)/schemas"; \
 	cp "COPYING" "$${blddir}$(extensiondir)"; \
+	cp "$(icons_DATA)" "$${blddir}$(extensiondir)"; \
 	cd "$${blddir}/$(extensiondir)/"; \
 	zip -qr "$${ziptarget}" "."; \
 	cd -;
