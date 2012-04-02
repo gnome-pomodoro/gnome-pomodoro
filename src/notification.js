@@ -19,6 +19,8 @@ const Mainloop = imports.mainloop;
 
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
+const Gio = imports.gi.Gio;
+const Gtk = imports.gi.Gtk;
 const St = imports.gi.St;
 const Pango = imports.gi.Pango;
 
@@ -26,6 +28,10 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const ModalDialog = imports.ui.modalDialog;
 const ScreenSaver = imports.misc.screenSaver;
+const ExtensionUtils = imports.misc.extensionUtils;
+
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const PomodoroUtil = Extension.imports.util;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
@@ -51,12 +57,14 @@ const NotificationSource = new Lang.Class({
         this.parent(_("Pomodoro Timer"));
         
         this._setSummaryIcon(this.createNotificationIcon());
-        
-        // Add ourselves as a source.
-        Main.messageTray.add(this);
     },
 
     createNotificationIcon: function() {
+        let iconTheme = Gtk.IconTheme.get_default();
+
+        if (!iconTheme.has_icon('timer'))
+            iconTheme.append_search_path (PomodoroUtil.getExtensionPath());
+
         return new St.Icon({ icon_name: 'timer',
                              icon_type: St.IconType.SYMBOLIC,
                              icon_size: this.ICON_SIZE });
@@ -187,7 +195,8 @@ const NotificationDialog = new Lang.Class({
     _openNotification: function() {
         if (!this._notification) {
             let source = new NotificationSource();
-            this._notification = new MessageTray.Notification(source, this._title, this._description, null);
+            this._notification = new MessageTray.Notification(source, this._title,
+                    this._description, {});
             this._notification.setResident(true);
             
             // Force to show description along with title,
@@ -219,6 +228,7 @@ const NotificationDialog = new Lang.Class({
                     }
                 }));
             
+            Main.messageTray.add(source);
             source.notify(this._notification);
         }
     },
