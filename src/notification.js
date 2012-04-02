@@ -43,15 +43,12 @@ const FALLBACK_TIME = 1000;
 const FALLBACK_RATE = Clutter.get_default_frame_rate();
 
 
-function NotificationSource() {
-    this._init();
-}
-
-NotificationSource.prototype = {
-    __proto__:  MessageTray.Source.prototype,
+const NotificationSource = new Lang.Class({
+    Name: 'PomodoroNotificationSource',
+    Extends: MessageTray.Source,
 
     _init: function() {
-        MessageTray.Source.prototype._init.call(this, _("Pomodoro Timer"));
+        this.parent(_("Pomodoro Timer"));
         
         this._setSummaryIcon(this.createNotificationIcon());
         
@@ -68,18 +65,15 @@ NotificationSource.prototype = {
     open: function(notification) {
         this.destroyNonResidentNotifications();
     }
-};
+});
 
 
-function NotificationDialog() {
-    this._init();
-}
-
-NotificationDialog.prototype = {
-    __proto__:  ModalDialog.ModalDialog.prototype,
+const NotificationDialog = new Lang.Class({
+    Name: 'PomodoroNotificationDialog',
+    Extends: ModalDialog.ModalDialog,
 
     _init: function() {
-        ModalDialog.ModalDialog.prototype._init.call(this);
+        this.parent();
         
         this._title = '';
         this._description = '';
@@ -93,9 +87,9 @@ NotificationDialog.prototype = {
         this._screenSaver = null;
         this._screenSaverChangedId = 0;
         
-        this.style_class = 'polkit-dialog';
+        this.style_class = 'prompt-dialog';
         
-        let mainLayout = new St.BoxLayout({ style_class: 'polkit-dialog-main-layout',
+        let mainLayout = new St.BoxLayout({ style_class: 'prompt-dialog-main-layout',
                                             vertical: false });
         
         // let icon = new St.Icon(
@@ -108,13 +102,13 @@ NotificationDialog.prototype = {
         //                     x_align: St.Align.END,
         //                     y_align: St.Align.START });
         
-        let messageBox = new St.BoxLayout({ style_class: 'polkit-dialog-message-layout',
+        let messageBox = new St.BoxLayout({ style_class: 'prompt-dialog-message-layout',
                                             vertical: true });
         
-        this._titleLabel = new St.Label({ style_class: 'polkit-dialog-headline',
+        this._titleLabel = new St.Label({ style_class: 'prompt-dialog-headline',
                                           text: '' });
         
-        this._descriptionLabel = new St.Label({ style_class: 'polkit-dialog-description',
+        this._descriptionLabel = new St.Label({ style_class: 'prompt-dialog-description',
                                                 text: '' });
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
@@ -151,8 +145,9 @@ NotificationDialog.prototype = {
         
         if (this._screenSaver.screenSaverActive) {
             if (this._screenSaverChangedId == 0)
-                this._screenSaverChangedId = this._screenSaver.connect('ActiveChanged',
-                                                                       Lang.bind(this, this._onScreenSaverChanged));
+                this._screenSaverChangedId = this._screenSaver.connectSignal(
+                                                           'ActiveChanged',
+                                                           Lang.bind(this, this._onScreenSaverChanged));
         }
         else {
             if (this._timeoutSource == 0) {
@@ -323,4 +318,4 @@ NotificationDialog.prototype = {
         ModalDialog.ModalDialog.prototype.close.call(this);
         ModalDialog.ModalDialog.prototype.destroy.call(this);
     }
-};
+});

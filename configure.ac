@@ -18,6 +18,7 @@ PKG_PROG_PKG_CONFIG([0.22])
 
 GLIB_GSETTINGS
 
+
 AC_CONFIG_FILES([
   src/Makefile
   Makefile

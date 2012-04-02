@@ -1,9 +1,9 @@
 {
-    "extension-id": "pomodoro",
-    "uuid": "@UUID@",
-    "settings-schema": "@gschemaname@",
-    "name": "Pomodoro",
-    "description": "A simple pomodoro timer",
-    "shell-version": ["3.4", "3.3.90", "3.2"],
-    "url": "https://github.com/codito/gnome-shell-pomodoro"
+  "extension-id": "pomodoro",
+  "uuid": "@UUID@",
+  "settings-schema": "@GSCHEMANAME@",
+  "name": "Pomodoro",
+  "description": "A simple pomodoro timer",
+  "shell-version": ["3.4", "3.3", "3.3.90", "3.3.91"],
+  "url": "https://github.com/codito/gnome-shell-pomodoro"
 }

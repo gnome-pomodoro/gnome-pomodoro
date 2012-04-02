@@ -25,7 +25,6 @@ const Meta = imports.gi.Meta;
 const St = imports.gi.St;
 const UPowerGlib = imports.gi.UPowerGlib;
 
-const ExtensionSystem = imports.ui.extensionSystem;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const GnomeSession = imports.misc.gnomeSession;
@@ -44,6 +43,7 @@ try {
     const Gst = imports.gi.Gst;
     Gst.init(null);
 } catch(e) {
+    global.logError('Pomodoro: '+ e.message);
 }
 
 
@@ -74,11 +74,9 @@ const State = {
 };
 
 
-function PomodoroTimer() {
-    this._init();
-}
+const PomodoroTimer = new Lang.Class({
+    Name: 'PomodoroTimer',
 
-PomodoroTimer.prototype = {
     _init: function() {
         this._elapsed = 0;
         this._elapsedLimit = 0;
@@ -96,7 +94,6 @@ PomodoroTimer.prototype = {
         this._notificationDialog = null;
         this._playbin = null;
         this._power = null;
-        this._powerTimestamp = 0;
         this._presence = null;
         this._presenceChangeEnabled = false;
         this._screenSaver = null;
@@ -176,11 +173,12 @@ PomodoroTimer.prototype = {
         this.emit('elapsed-changed', this._elapsed);
     },
 
-    _setState: function(newState) {
-        let timestamp = global.get_current_time();
-        
+    _setState: function(newState, timestamp) {        
         this._closeNotification();
         this._disableEventCapture();
+
+        if (!timestamp)
+            timestamp = new Date().getTime()
         
         if (newState != State.NULL) {
             this._load();
@@ -264,6 +262,59 @@ PomodoroTimer.prototype = {
         
         this._stateTimestamp = timestamp;
         this._state = newState;
+        
+        this._settings.set_int('saved-session-count', this._sessionCount);
+        this._settings.set_int('saved-session-part-count', this._sessionPartCount);
+        this._settings.set_enum('saved-state', this._state);
+        this._settings.set_string('saved-state-date', new Date(timestamp).toString());
+    },
+
+    restore: function() {
+        let sessionCount     = this._settings.get_int('saved-session-count');
+        let sessionPartCount = this._settings.get_int('saved-session-part-count');
+        let state            = this._settings.get_enum('saved-state');
+        let stateTimestamp   = Date.parse(this._settings.get_string('saved-state-date'));
+        
+        if (isNaN(stateTimestamp)) {
+            global.logError('Pomodoro: Failed to restore timer state, date string is funny.');
+            return;
+        }
+        
+        this._sessionCount = sessionCount;
+        this._sessionPartCount = sessionPartCount;        
+        this._stateTimestamp = stateTimestamp;
+        
+        this._setState(state, stateTimestamp);
+        
+        if (this._state != State.NULL) {
+            this._elapsed = parseInt((new Date().getTime() - this._stateTimestamp) / 1000);
+            
+            // Skip through states silently to avoid unnecessary notifications
+            // and signal emits stacking up
+            while (this._elapsed >= this._elapsedLimit) {
+                if (this._state == State.POMODORO)
+                    this._setState(State.PAUSE);
+                else
+                    if (this._state == State.PAUSE)
+                        this._setState(State.IDLE);
+                    else
+                        break;
+            }
+            
+            if (!this._notification || !this._notificationDialog) {
+                if (this._state == State.PAUSE)
+                    this._notifyPomodoroEnd();
+                
+                // TODO: Notify about pomodoro start once the lock screen is off
+                // if (this._state == State.IDLE)
+                //    this._notifyPomodoroStart();
+            }            
+        }
+        
+        this._updatePresenceStatus();
+        
+        this.emit('state-changed', this._state);
+        this.emit('elapsed-changed', this._elapsed);
     },
 
     get elapsed() {
@@ -315,46 +366,6 @@ PomodoroTimer.prototype = {
         }
         
         return true;
-    },
-
-    _onSleep: function() {
-        this._powerTimestamp = new Date().getTime();
-    },
-
-    _onResume: function() {
-        let idleTime = parseInt((new Date().getTime() - this._powerTimestamp) / 1000);
-        
-        this._powerTimestamp = 0;
-        
-        if (this._state != State.NULL) {
-            this._elapsed += idleTime;
-            
-            // Skip through states silently to avoid unnecessary notifications
-            // and signal emits stacking up
-            while (this._elapsed >= this._elapsedLimit) {
-                if (this._state == State.POMODORO)
-                    this._setState(State.PAUSE);
-                else
-                    if (this._state == State.PAUSE)
-                        this._setState(State.IDLE);
-                    else
-                        break;
-            }
-            
-            if (!this._notification || !this._notificationDialog) {
-                if (this._state == State.PAUSE)
-                    this._notifyPomodoroEnd();
-                
-                // TODO: Notify about pomodoro start once the lock screen is off
-                // if (this._state == State.IDLE)
-                //    this._notifyPomodoroStart();
-            }
-            
-            this._updatePresenceStatus();
-            
-            this.emit('state-changed', this._state);
-            this.emit('elapsed-changed', this._elapsed);
-        }
     },
 
     _onEventCapture: function(actor, event) {
@@ -469,17 +480,16 @@ PomodoroTimer.prototype = {
         if (this._settings.get_boolean('play-sounds')) {
             let uri = this._settings.get_string('sound-uri');
             
-            if (!uri) {
-                let extension = ExtensionSystem.extensionMeta['pomodoro@arun.codito.in'];
-                let path = GLib.path_is_absolute(DEFAULT_SOUND_FILE)
-                                    ? DEFAULT_SOUND_FILE
-                                    : GLib.build_filenamev([extension.path, DEFAULT_SOUND_FILE]);
-                uri = GLib.filename_to_uri(path, null);
-            }
-            
             try {
+                if (!uri) {
+                    let path = GLib.path_is_absolute(DEFAULT_SOUND_FILE)
+                                        ? DEFAULT_SOUND_FILE
+                                        : GLib.build_filenamev([ PomodoroUtil.getExtensionPath(), DEFAULT_SOUND_FILE ]);
+                    uri = GLib.filename_to_uri(path, null);
+                }
+                
                 let playbin = Gst.ElementFactory.make('playbin2', null);
-                playbin.set_property('uri', uri);
+                playbin.uri = uri;
                 playbin.set_state(Gst.State.PLAYING);
             }
             catch (e) {
@@ -521,7 +531,7 @@ PomodoroTimer.prototype = {
             else
                 status = GnomeSession.PresenceStatus.AVAILABLE;
             
-            this._presence.setStatus(status);
+            this._presence.status = status;
         }
         
         this._presenceChangeEnabled = enabled;
@@ -568,8 +578,7 @@ PomodoroTimer.prototype = {
         }
         if (!this._power) {
             this._power = new UPowerGlib.Client();
-            this._power.connect('notify-sleep', Lang.bind(this, this._onSleep));
-            this._power.connect('notify-resume', Lang.bind(this, this._onResume));
+            this._power.connect('notify-resume', Lang.bind(this, this.restore));
         }
         if (!this._presence) {
             this._presence = new GnomeSession.Presence();
@@ -596,6 +605,6 @@ PomodoroTimer.prototype = {
         this.stop();
         this.disconnectAll();
     }
-};
+});
 
 Signals.addSignalMethods(PomodoroTimer.prototype);

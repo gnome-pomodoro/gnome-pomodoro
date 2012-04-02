@@ -13,11 +13,13 @@ dist_extension_DATA = \
 nodist_extension_DATA = metadata.json
 
 EXTRA_DIST = metadata.json.in
+CLEANFILES = metadata.json
 
 metadata.json: metadata.json.in $(top_builddir)/config.status
 	$(AM_V_GEN) sed -e "s|[@]UUID@|$(uuid)|" \
 	    -e "s|[@]LOCALEDIR@|$(datadir)/locale|" \
-	    -e "s|[@]gschemaname@|$(gschemaname)|" \
+	    -e "s|[@]GSCHEMANAME@|$(gschemaname)|" \
 	    $< > $@
 
-CLEANFILES = metadata.json
+uninstall-hook:
+	rmdir $(extensiondir) 
