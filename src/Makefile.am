@@ -1,6 +1,4 @@
-uuid = pomodoro@arun.codito.in
-topextensiondir = $(datadir)/gnome-shell/extensions
-extensiondir = $(topextensiondir)/$(uuid)
+include ../extension.mk
 
 dist_extension_DATA = \
 	dbus.js \
@@ -9,13 +7,17 @@ dist_extension_DATA = \
 	metadata.json \
 	notification.js \
 	stylesheet.css \
-	timer.js
+	timer.js \
+	util.js
 
 nodist_extension_DATA = metadata.json
 
 EXTRA_DIST = metadata.json.in
-CLEANFILES = metadata.json
 
 metadata.json: metadata.json.in $(top_builddir)/config.status
 	$(AM_V_GEN) sed -e "s|[@]UUID@|$(uuid)|" \
-		-e "s|[@]LOCALEDIR@|$(datadir)/locale|" $< > $@
+	    -e "s|[@]LOCALEDIR@|$(datadir)/locale|" \
+	    -e "s|[@]gschemaname@|$(gschemaname)|" \
+	    $< > $@
+
+CLEANFILES = metadata.json
