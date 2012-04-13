@@ -4,12 +4,16 @@
 
 ![Pomodoro image](http://kamilprusko.org/files/gnome-shell-pomodoro-extension.png)
 
-More on pomodoro technique [here](http://www.pomodorotechnique.com).
+You can read more on pomodoro technique [here](http://www.pomodorotechnique.com).
 
 # Dependencies
+- Gnome-shell 3.4 (Our [0.5 release](https://extensions.gnome.org/extension/53/pomodoro/version/115/) supported gnome-shell <= 3.2)
 - Optional [LibKeybinder3](https://github.com/engla/keybinder/tree/keybinder-3.0) for global key bindings
 
 # Installation
+## Web based (recommended)
+https://extensions.gnome.org/extension/53/pomodoro/
+
 ## Archlinux
 Get from [AUR](http://aur.archlinux.org/packages.php?ID=49967)
 
@@ -18,8 +22,7 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 
 ## Direct from source
 - Get zipball 
-    * [Stable | Gnome-shell >= 3.2](https://github.com/codito/gnome-shell-pomodoro/zipball/0.5)
-    * [Stable | Gnome-shell < 3.0.x](https://github.com/codito/gnome-shell-pomodoro/zipball/0.2)
+    * [Stable | Gnome-shell >= 3.4](https://github.com/codito/gnome-shell-pomodoro/zipball/0.6)
     * [Unstable - Master branch](https://github.com/codito/gnome-shell-pomodoro/zipball/master)
 - Build it and install
         ./autogen.sh --prefix=/usr
@@ -31,7 +34,10 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 - Press *Alt + F2*, and *r* in command to restart gnome-shell
 
 # Usage
-- Click on the panel item to toggle the timer state
+- Use toggle switch (or Ctrl+Alt+P) to toggle timer on/off
+- You can configure behavior of the extension in *Options* menu
+
+For a list of configurable options, please refer [wiki](https://github.com/codito/gnome-shell-pomodoro/wiki/Configuration)
 
 # License
 GPL3. See COPYING for details.
@@ -40,11 +46,14 @@ GPL3. See COPYING for details.
 - Contributors: https://github.com/codito/gnome-shell-pomodoro/contributors
 
 # Changelog
-**Unstable**
+**Version 0.6**
 
++ New translation: Persian (thanks @arashm)
++ Feature: Support for gnome-shell 3.4
++ Breaking change: Dropped support for older gnome-shell versions due to incompatible APIs
 + Feature: Support for "Away from desk" mode
 + Feature: Ability to change IM presence status based on pomodoro activity
-+ Fixed issues #38, #39, #41, #42, #45
++ Fixed issues #38, #39, #41, #42, #45 and [more](https://github.com/codito/gnome-shell-pomodoro/issues?sort=created&direction=desc&state=closed&page=1)
 
 **Version 0.5**
 
