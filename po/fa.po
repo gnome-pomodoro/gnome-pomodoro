@@ -1,0 +1,221 @@
+# Persian translation for gnome-shell-pomodoro
+# Copyright (c) 2012 gnome-shell-pomodoro contributors
+# This file is distributed under the same license as the gnome-shell-pomodoro package.
+# Arash Mousavi <mousavi.arash@gmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-shell-pomodoro\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-18 16:22+0100\n"
+"PO-Revision-Date: 2012-04-08 11:58+0330\n"
+"Last-Translator: Arash Mousavi <mousavi.arash@gmail.com>\n"
+"Language-Team: Persian <mousavi.arash@gmail.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1)\n"
+"X-Poedit-Language: Persian\n"
+"X-Poedit-Country: IRAN, ISLAMIC REPUBLIC OF\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: ../src/extension.js:61
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%Id دقیقه"
+msgstr[1] "%Id دقیقه"
+
+#. Toggle timer state button
+#: ../src/extension.js:96
+#: ../src/notification.js:54
+msgid "Pomodoro Timer"
+msgstr "زمانسنج پومودورو"
+
+#. Options SubMenu
+#: ../src/extension.js:109
+msgid "Options"
+msgstr "گزینه‌ها"
+
+#. Reset counters
+#: ../src/extension.js:132
+msgid "Reset Counts and Timer"
+msgstr "نوسازی شمارنده و زمانسنج"
+
+#. Away from desk toggle
+#: ../src/extension.js:138
+msgid "Away From Desk"
+msgstr "دور از میز"
+
+#. Presence status toggle
+#: ../src/extension.js:146
+msgid "Control Presence Status"
+msgstr "کنترل وضعیت حضور"
+
+#: ../src/extension.js:155
+msgid "Show a dialog message at the end of pomodoro session"
+msgstr "نمایش یک پیام در پایان دوره پومودورو"
+
+#. Notify with a sound toggle
+#: ../src/extension.js:162
+msgid "Sound Notifications"
+msgstr "اعلان‌های صوتی"
+
+#. Pomodoro duration
+#: ../src/extension.js:170
+msgid "Pomodoro Duration"
+msgstr "طول مدت پومودورو"
+
+#. Short pause duration
+#: ../src/extension.js:183
+msgid "Short Break Duration"
+msgstr "طول مدت استراحت کوتاه"
+
+#. Long pause duration
+#: ../src/extension.js:204
+msgid "Long Break Duration"
+msgstr "طول مدت استراحت بلند"
+
+#: ../src/extension.js:322
+msgid "No Completed Sessions"
+msgstr "هیچ دوره‌ی کاملی انجام نشده"
+
+#: ../src/extension.js:324
+#, c-format
+msgid "%d Completed Session"
+msgid_plural "%d Completed Sessions"
+msgstr[0] "%Id دوره کامل"
+msgstr[1] "%Id دوره کامل"
+
+#: ../src/timer.js:411
+msgid "Pause finished, a new pomodoro is starting!"
+msgstr "مکث تمام شد، یک پومودورو دیگه شروع شد!"
+
+#: ../src/timer.js:433
+msgid "Pomodoro Finished!"
+msgstr "پومودورو تمام شد!"
+
+#: ../src/timer.js:435
+msgid "Hide"
+msgstr "مخفی کردن"
+
+#: ../src/timer.js:441
+#: ../src/timer.js:451
+msgid "Start a new pomodoro"
+msgstr "شروع یک پومودورو جدید"
+
+#: ../src/timer.js:446
+msgid "Show dialog"
+msgstr "نمایش محاوره"
+
+#: ../src/timer.js:514
+#, c-format
+msgid "Take a break, you have %d second\n"
+msgid_plural "Take a break, you have %d seconds\n"
+msgstr[0] "کمی استراحت کنید، شما %Id ثانیه زمان دارید\n"
+msgstr[1] "کمی استراحت کنید، شما %Id ثانیه زمان دارید\n"
+
+#: ../src/timer.js:516
+#, c-format
+msgid "Take a break, you have %d minute\n"
+msgid_plural "Take a break, you have %d minutes\n"
+msgstr[0] "کمی استراحت کنید، شما %Id دقیقه زمان دارید\n"
+msgstr[1] "کمی استراحت کنید، شما %Id دقیقه زمان دارید\n"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
+msgid "Timer toggle key"
+msgstr "کلید تغییرحالت زمانسنج"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:2
+msgid "Key to toggle the timer."
+msgstr "کلیدی برای تغییرحالت زمانسنج"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:3
+msgid "Pomodoro duration"
+msgstr "طول مدت پومودورو"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:4
+msgid "Time in seconds you are supposed to be working."
+msgstr "زمانی بر اساس ثانیه که شما قرار است در آن مدت کار کنید."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:5
+msgid "Short pause duration"
+msgstr "طول مدت مکث کوتاه"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:6
+msgid "Time in seconds you are supposed to have a short break."
+msgstr "زمانی بر اساس ثانیه که شما در آن مدت کمی استراحت میکنید."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:7
+msgid "Long pause duration"
+msgstr "طول مدت مکث بلند"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:8
+msgid "Time in seconds you are supposed to have a longer break."
+msgstr "زمانی بر اساس ثانیه که در آن مدت شما استراحت میکنید."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:9
+msgid "Show dialog notifications during breaks"
+msgstr "نمایش  محاوره‌ی اعلان‌ها در طول مدت استراحت‌ها"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:10
+msgid "Whether to show a notification dialog when pause starts."
+msgstr "این‌که آیا یک محاوره‌ی اعلان در زمان شروع مکث نشان داده شود یا خیر."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:11
+msgid "Disable flexible breaks"
+msgstr "غیرفعال کردن استراحت‌های انعطاف‌پذیر"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:12
+msgid "Whether you are not using a computer to work."
+msgstr "این‌که آیا از یک رایانه برای کار استفاده می‌کنید یا خیر."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:13
+msgid "Change user presence status to busy"
+msgstr "تغییر وضعیت حضور کاربر به مشغول"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:14
+msgid "Whether to change user and IM presence to busy."
+msgstr "این‌که آیا وضعیت حضور کاربر در پیام‌رسان نیز مشغول تنظیم شود یا خیر."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:15
+msgid "Use notification sound"
+msgstr "استفاده از صوت در اعلان‌ها"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:16
+msgid "Whether to play a sound to notify of events."
+msgstr "این‌که آیا از صوت برای اعلان رویدادها استفاده شود یا خیر."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:17
+msgid "Notification sound file"
+msgstr "پرونده‌ی صوتی اعلان"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:18
+msgid "Sound file to play on pomodoro start or end."
+msgstr "پرونده‌ی صوتی که در شروع و پایان پومودورو اجرا شود."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:19
+msgid "Restore timer state"
+msgstr "بازگردانی وضعیت زمانسنج"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:20
+msgid "Whether to restore state on startup."
+msgstr "این‌که آیا در هنگام آغاز به کار وضعیت زمانسج بازگردانده شود یا خیر."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:21
+msgid "Number of completed sessions"
+msgstr "تعداد دوره‌های کامل شده"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:22
+msgid "Number of completed sessions since long break"
+msgstr "تعداد دوره‌های کامل شده از زمان استراحت بلند."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:23
+msgid "Saved timer state"
+msgstr "ذخیره وضعیت زمانسنج"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:24
+msgid "Time of saved state"
+msgstr "زمان وضعیت ذخیره شده"
+
