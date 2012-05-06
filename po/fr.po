@@ -134,8 +134,8 @@ msgid "Start a new pomodoro"
 msgstr "Démarrer un nouveau pomodoro"
 
 #: ../src/timer.js:446
-msgid "Show dialog"
 #, fuzzy
+msgid "Show dialog"
 msgstr "Afficher la boîte de dialogue"
 
 #: ../src/timer.js:514
