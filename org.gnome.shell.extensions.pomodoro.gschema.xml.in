@@ -7,10 +7,10 @@
   </enum>
 
   <schema id="org.gnome.shell.extensions.pomodoro" path="/org/gnome/shell/extensions/pomodoro/">
-    <key name="toggle-key" type="s">
-      <default>"&lt;Ctrl&gt;&lt;Alt&gt;P"</default>
-      <_summary>Timer toggle key</_summary>
-      <_description>Key to toggle the timer.</_description>
+    <key type="as" name="toggle-key">
+      <default><![CDATA[["<Ctrl><Alt>p"]]]></default>
+      <summary>Timer toggle key</summary>
+      <description>Key to toggle the timer.</description>
     </key>
     <key name="pomodoro-time" type="i">
       <default>1500</default>
