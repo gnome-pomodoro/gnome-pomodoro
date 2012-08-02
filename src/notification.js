@@ -170,8 +170,17 @@ const NotificationDialog = new Lang.Class({
     close: function(timestamp) {
         this._disconnectInternals();
         this._openNotification();
-        
-        return ModalDialog.ModalDialog.prototype.close.call(this, timestamp);
+
+        let result = ModalDialog.ModalDialog.prototype.close.call(this, timestamp);
+
+        // ModalDialog only emits 'opened' signal, so we need to do that
+        this.emit('closed'); 
+
+        return result;
+    },
+
+    isOpened: function () {
+        return (!this._notification);
     },
 
     _onTimeout: function() {
@@ -229,6 +238,12 @@ const NotificationDialog = new Lang.Class({
                 }));
             
             Main.messageTray.add(source);
+            source.notify(this._notification);
+        }
+        else
+        {
+            // Pop-up notification again
+            let source = this._notification.source;
             source.notify(this._notification);
         }
     },

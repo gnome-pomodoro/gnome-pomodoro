@@ -65,6 +65,11 @@ const DEFAULT_SOUND_FILE = 'bell.wav';
 // Command to wake up or power on the screen
 const SCREENSAVER_DEACTIVATE_COMMAND = 'xdg-screensaver reset';
 
+// Remind about ongoing break in given delays
+const PAUSE_REMIND_TIMES = [60, 120, 240, 480];
+// Ratio between user idle time and time between reminders to determine if user
+// is finally away
+const PAUSE_REMINDER_ACCEPTANCE = 0.8
 
 const State = {
     NULL: 0,
@@ -89,6 +94,9 @@ const PomodoroTimer = new Lang.Class({
         this._eventCaptureId = 0;
         this._eventCaptureSource = 0;
         this._eventCapturePointer = null;
+        this._reminderSource = 0;
+        this._reminderTime = 0;
+        this._reminderCount = 0;
         
         this._notification = null;
         this._notificationDialog = null;
@@ -409,9 +417,6 @@ const PomodoroTimer = new Lang.Class({
         let source = new Notification.NotificationSource();
         this._notification = new MessageTray.Notification(source, _("Pause finished, a new pomodoro is starting!"), null);
         this._notification.setTransient(true);
-        this._notification.connect('collapsed', Lang.bind(this, function() {
-                this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-            }));
         this._notification.connect('destroy', Lang.bind(this, function() {
                 this._notification = null;
             }));
@@ -451,6 +456,13 @@ const PomodoroTimer = new Lang.Class({
                   action: Lang.bind(this, this.startPomodoro)
                 }
             ]);
+        this._notificationDialog.connect('opened', Lang.bind(this, function() {
+                this._unscheduleReminder();
+            }));
+        this._notificationDialog.connect('closed', Lang.bind(this, function() {
+                this._unscheduleReminder();
+                this._scheduleReminder();
+            }));
         this._notificationDialog.connect('destroy', Lang.bind(this, function() {
                 this._notificationDialog = null;
             }));
@@ -465,6 +477,80 @@ const PomodoroTimer = new Lang.Class({
         this.emit('notify-pomodoro-end');
     },
 
+    _remindPomodoroEnd: function() {
+        if (this._state != State.PAUSE)
+            return;
+        
+        // Don't show reminder if only two minutes remains to next pomodoro
+        if (this._elapsedLimit - this._elapsed < 120)
+            return;
+        
+        if (this._notificationDialog && !this._notificationDialog.isOpened()) {
+            let source = this._notificationDialog._notification.source;
+            
+            this._notification = new MessageTray.Notification(source, _("Hey, you're missing out on a break"), null);
+            this._notification.setTransient(true);
+            this._notification.connect('destroy', Lang.bind(this, function() {
+                    this._notification = null;
+                }));
+            this._notification.connect('clicked', Lang.bind(this, function() {
+                    this._notificationDialog.open();
+                }));
+            source.notify(this._notification);
+        }
+    },
+
+    _onReminderTimeout: function() {
+        let display = global.screen.get_display();
+        let idleTime = parseInt((display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000);
+        
+        // No need to notify if user seems to be away. We only monitor idle time 
+        // based on X11, and not Clutter scene which better reflects to real work
+        if (idleTime < this._reminderTime * PAUSE_REMINDER_ACCEPTANCE)
+            this._remindPomodoroEnd();
+        else
+            this._reminderCount = 0;
+        
+        this._reminderSource = 0;
+        this._scheduleReminder();
+        return false;
+    },
+
+    _scheduleReminder: function() {
+        let times = PAUSE_REMIND_TIMES;
+        let reschedule = false;
+        
+        if (this._state != State.PAUSE) {
+            this._unscheduleReminder ();
+            return;
+        }
+        
+        if (this._reminderSource != 0) {
+            GLib.source_remove(this._reminderSource);
+            this._reminderSource = 0;
+            reschedule = true;
+        }
+        
+        if (this._reminderCount < times.length) {
+            this._reminderTime = times[this._reminderCount];
+            this._reminderSource = Mainloop.timeout_add_seconds(this._reminderTime,
+                                                                Lang.bind(this, this._onReminderTimeout));
+        }
+        
+        if (!reschedule)
+            this._reminderCount += 1;
+    },
+
+    _unscheduleReminder: function() {
+        if (this._reminderSource != 0) {
+            GLib.source_remove(this._reminderSource);
+            this._reminderSource = 0;
+        }
+        
+        this._reminderTime = 0;
+        this._reminderCount = 0;
+    },
+
     _closeNotification: function() {
         if (this._notification && !this._notification.expanded) {
             this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
@@ -474,6 +560,7 @@ const PomodoroTimer = new Lang.Class({
             this._notificationDialog.destroy();
             this._notificationDialog = null;
         }
+        this._unscheduleReminder();
     },
 
     _playNotificationSound: function() {
