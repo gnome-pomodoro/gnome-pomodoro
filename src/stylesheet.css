@@ -17,3 +17,35 @@
  */
 .extension-pomodoro-label {
 }
+
+.extension-pomodoro-lightbox {
+    background-color: rgba(0, 0, 0, 0.65);
+}
+
+.extension-pomodoro-dialog {
+    padding-bottom: 12px;
+}
+
+.extension-pomodoro-dialog-main-layout {
+}
+
+.extension-pomodoro-dialog-message-layout {
+    spacing: 2px;
+}
+
+.extension-pomodoro-dialog-timer {
+    font-size: 68pt;
+    font-weight: normal;
+    font-family: Droid Sans, Droid Sans Mono, DejaVu Sans, Bitstream Vera Sans, monospace, sans-serif;
+    text-align: center;
+    text-shadow: rgba(0, 0, 0, 0.4) 2px 6px 16px;
+    color: white;
+}
+
+.extension-pomodoro-dialog-description {
+    font-size: 12pt;
+    font-weight: normal;
+    text-align: center;
+    text-shadow: rgba(0, 0, 0, 0.8) 0px 1px 8px;
+    color: white;
+}

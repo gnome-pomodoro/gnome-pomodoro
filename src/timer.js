@@ -434,28 +434,17 @@ const PomodoroTimer = new Lang.Class({
         }
         
         this._notificationDialog = new Notification.NotificationDialog();
-        this._notificationDialog.setTitle(_("Pomodoro Finished!")); 
-        this._notificationDialog.setButtons([
-                { label: _("Hide"),
-                  action: Lang.bind(this, function() {
-                        this._notificationDialog.close();
-                    }),
-                  key: Clutter.Escape
-                },
-                { label: _("Start a new pomodoro"),
-                  action: Lang.bind(this, this.startPomodoro)
-                }
-            ]);
+        this._notificationDialog.setTimer('00:00');
+        this._notificationDialog.setDescription(_("It's time to take a break!"));
+        this._notificationDialog.setNotificationTitle(_("Take a break!"));
         this._notificationDialog.setNotificationButtons([
-                { label: _("Show dialog"),
-                  action: Lang.bind(this, function() {
-                        this._notificationDialog.open();
-                    })
-                },
                 { label: _("Start a new pomodoro"),
                   action: Lang.bind(this, this.startPomodoro)
                 }
             ]);
+        this._notificationDialog.connect('clicked', Lang.bind(this, function() {
+                this._notificationDialog.open();
+            }));
         this._notificationDialog.connect('opened', Lang.bind(this, function() {
                 this._unscheduleReminder();
             }));
@@ -590,16 +579,15 @@ const PomodoroTimer = new Lang.Class({
             return;
         
         let seconds = Math.max(this._elapsedLimit - this._elapsed, 0);
-        let minutes = Math.round(seconds / 60);
-        
-        seconds = Math.ceil(seconds / 5) * 5;
+        let minutes = Math.floor(seconds / 60);
         
         try {
-            this._notificationDialog.setDescription((seconds <= 45)
-                                    ? ngettext("Take a break, you have %d second\n",
-                                               "Take a break, you have %d seconds\n", seconds).format(seconds)
-                                    : ngettext("Take a break, you have %d minute\n",
-                                               "Take a break, you have %d minutes\n", minutes).format(minutes));
+            this._notificationDialog.setTimer('%02d:%02d'.format(minutes, seconds % 60)); 
+            this._notificationDialog.setNotificationDescription((seconds < 60)
+                                    ? ngettext("You have %d second left.\n",
+                                               "You have %d seconds left.\n", seconds).format(seconds)
+                                    : ngettext("You have %d minute left.\n",
+                                               "You have %d minutes left.\n", minutes).format(minutes));
         }
         catch (e) {
             // Notification might be closed before we knew it
