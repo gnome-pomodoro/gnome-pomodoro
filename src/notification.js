@@ -21,6 +21,7 @@ const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
+const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Pango = imports.gi.Pango;
 
@@ -47,6 +48,11 @@ const BLOCK_EVENTS_TIME = 600;
 const FALLBACK_TIME = 1000;
 // Rate per second at which try opening a dialog
 const FALLBACK_RATE = Clutter.get_default_frame_rate();
+
+// Time to open notification dialog
+const IDLE_TIME_TO_OPEN = 60000;
+// Time to determine activity after which notification dialog is closed
+const IDLE_TIME_TO_CLOSE = 1500;
 
 
 const NotificationSource = new Lang.Class({
@@ -94,6 +100,9 @@ const NotificationDialog = new Lang.Class({
         this._eventCaptureId = 0;
         this._screenSaver = null;
         this._screenSaverChangedId = 0;
+        
+        this._idleMonitor = new Shell.IdleMonitor();
+        this._idleMonitorWatchId = 0;
         
         this.style_class = 'prompt-dialog';
         
@@ -145,6 +154,8 @@ const NotificationDialog = new Lang.Class({
             this._closeNotification();
             this._disconnectInternals();
             this._enableEventCapture();
+            this._closeWhenActive();
+            
             return true; // dialog already opened
         }
         
@@ -172,6 +183,8 @@ const NotificationDialog = new Lang.Class({
         this._openNotification();
 
         let result = ModalDialog.ModalDialog.prototype.close.call(this, timestamp);
+
+        this._openWhenIdle();
 
         // ModalDialog only emits 'opened' signal, so we need to do that
         this.emit('closed'); 
@@ -295,6 +308,30 @@ const NotificationDialog = new Lang.Class({
         return false;
     },
 
+    _openWhenIdle: function() {
+        this._disableIdleMonitor();
+        this._idleMonitorWatchId = this._idleMonitor.add_watch(IDLE_TIME_TO_OPEN, Lang.bind(this, function(monitor, id, userBecameIdle) {
+            if (userBecameIdle)
+                this.open();
+        }));
+    },
+
+    _closeWhenActive: function() {
+        this._disableIdleMonitor();
+        this._idleMonitorWatchId = this._idleMonitor.add_watch(IDLE_TIME_TO_CLOSE, Lang.bind(this, function(monitor, id, userBecameIdle) {
+            if (!userBecameIdle) {
+                this.close();
+            }
+        }));
+    },
+    
+    _disableIdleMonitor: function() {
+        if (this._idleMonitorWatchId != 0) {
+            this._idleMonitor.remove_watch(this._idleMonitorWatchId);
+            this._idleMonitorWatchId = 0;
+        }
+    },
+
     get title() {
         return this._title;
     },
@@ -325,6 +362,7 @@ const NotificationDialog = new Lang.Class({
 
     _disconnectInternals: function() {
         this._disableEventCapture();
+        this._disableIdleMonitor();
         
         if (this._timeoutSource != 0) {
             GLib.source_remove(this._timeoutSource);
