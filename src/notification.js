@@ -124,7 +124,7 @@ const ModalDialog = new Lang.Class({
         this._lightbox = new Lightbox.Lightbox(this._group,
                                                { inhibitEvents: true });
         this._lightbox.highlight(this._backgroundBin);
-        this._lightbox.actor.add_style_class_name('extension-pomodoro-lightbox');
+        this._lightbox.actor.style_class = 'extension-pomodoro-lightbox';
 
         let stack = new Shell.Stack();
         this._backgroundBin.child = stack;
