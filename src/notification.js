@@ -30,7 +30,6 @@ const Pango = imports.gi.Pango;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
-const ModalDialog = imports.ui.modalDialog;
 const ScreenSaver = imports.misc.screenSaver;
 const Tweener = imports.ui.tweener;
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -59,17 +58,14 @@ const IDLE_TIME_TO_OPEN = 60000;
 const IDLE_TIME_TO_CLOSE = 600;
 // Time before user activity is being monitored
 const MIN_DISPLAY_TIME = 1000;
-// Time to fade-in or fade-out notification
-const OPEN_AND_CLOSE_TIME = 0.2;
-// Time to fade-in or fade-out notification content without lightbox
-const FADE_OUT_DIALOG_TIME = 1.0;
+// Time to fade-in or fade-out notification in seconds
+const OPEN_AND_CLOSE_TIME = 0.15;
 
 const State = {
     OPENED: 0,
     CLOSED: 1,
     OPENING: 2,
-    CLOSING: 3,
-    FADED_OUT: 4
+    CLOSING: 3
 };
 
 
@@ -99,9 +95,10 @@ const NotificationSource = new Lang.Class({
     }
 });
 
-// LightboxDialog class is based on ModalDialog from GNOME Shell
-const LightboxDialog = new Lang.Class({
-    Name: 'PomodoroLightboxDialog',
+// ModalDialog class is based on ModalDialog from GNOME Shell. We need our own thing to have
+// more event signals, different fade in/out times, and different event blocking behavior
+const ModalDialog = new Lang.Class({
+    Name: 'PomodoroModalDialog',
 
     _init: function() {
         this.state = State.CLOSED;
@@ -125,11 +122,16 @@ const LightboxDialog = new Lang.Class({
                                                 vertical:    true });
 
         this._lightbox = new Lightbox.Lightbox(this._group,
-                                               { inhibitEvents: false });
+                                               { inhibitEvents: true });
         this._lightbox.highlight(this._backgroundBin);
-        this._lightbox.actor.style_class = 'extension-pomodoro-lightbox';
+        this._lightbox.actor.add_style_class_name('extension-pomodoro-lightbox');
 
-        this._backgroundBin.child = this._dialogLayout;
+        let stack = new Shell.Stack();
+        this._backgroundBin.child = stack;
+
+        this._eventBlocker = new Clutter.Group({ reactive: true });
+        stack.add_actor(this._eventBlocker);
+        stack.add_actor(this._dialogLayout);
 
         this.contentLayout = new St.BoxLayout({ vertical: true });
         this._dialogLayout.add(this.contentLayout,
@@ -137,10 +139,23 @@ const LightboxDialog = new Lang.Class({
                                  y_fill:  true,
                                  x_align: St.Align.MIDDLE,
                                  y_align: St.Align.START });
+
+        global.focus_manager.add_group(this._dialogLayout);
+//        this._initialKeyFocus = this._dialogLayout;
+//        this._initialKeyFocusDestroyId = 0;
+        this._savedKeyFocus = null;
     },
 
     destroy: function() {
-        this._group.destroy();
+        this.popModal();
+        this._group.clear_constraints();
+        this._lightbox.destroy();
+
+        // FIXME: As in ModalDialog class, destroy method is broken. If we attempt to destroy
+        //        this._group GNOME Shell crashes each time, so we at least destroy as much
+        //        as we can
+        Main.uiGroup.remove_actor(this._group);
+        // this._group.destroy();
     },
 
     _onGroupDestroy: function() {
@@ -180,6 +195,7 @@ const LightboxDialog = new Lang.Class({
             return false;
 
         this._fadeOpen();
+        this.emit('opening');
         return true;
     },
 
@@ -189,6 +205,7 @@ const LightboxDialog = new Lang.Class({
 
         this.state = State.CLOSING;
         this.popModal(timestamp);
+        this._savedKeyFocus = null;
 
         Tweener.addTween(this._group,
                          { opacity: 0,
@@ -198,8 +215,10 @@ const LightboxDialog = new Lang.Class({
                                function() {
                                    this.state = State.CLOSED;
                                    this._group.hide();
+                                   this.emit('closed');
                                })
                          });
+        this.emit('closing');
     },
 
     // Drop modal status without closing the dialog; this makes the
@@ -209,9 +228,17 @@ const LightboxDialog = new Lang.Class({
         if (!this._hasModal)
             return;
 
+        let focus = global.stage.key_focus;
+        if (focus && this._group.contains(focus))
+            this._savedKeyFocus = focus;
+        else
+            this._savedKeyFocus = null;
+
         Main.popModal(this._group, timestamp);
         global.gdk_screen.get_display().sync();
         this._hasModal = false;
+
+        this._eventBlocker.raise_top();
     },
 
     pushModal: function (timestamp) {
@@ -221,66 +248,40 @@ const LightboxDialog = new Lang.Class({
             return false;
 
         this._hasModal = true;
+        if (this._savedKeyFocus) {
+            this._savedKeyFocus.grab_key_focus();
+            this._savedKeyFocus = null;
+        } //else
+//            this._initialKeyFocus.grab_key_focus();
 
+        this._eventBlocker.lower_bottom();
         return true;
-    },
-
-    // This method is like close, but fades the dialog out much slower,
-    // and leaves the lightbox in place. Once in the faded out state,
-    // the dialog can be brought back by an open call, or the lightbox
-    // can be dismissed by a close call.
-    //
-    // The main point of this method is to give some indication to the user
-    // that the dialog reponse has been acknowledged but will take a few
-    // moments before being processed.
-    // e.g., if a user clicked "Log Out" then the dialog should go away
-    // imediately, but the lightbox should remain until the logout is
-    // complete.
-    _fadeOutDialog: function(timestamp) {
-        if (this.state == State.CLOSED || this.state == State.CLOSING)
-            return;
-
-        if (this.state == State.FADED_OUT)
-            return;
-
-        this.popModal(timestamp);
-        Tweener.addTween(this._dialogLayout,
-                         { opacity: 0,
-                           time:    FADE_OUT_DIALOG_TIME,
-                           transition: 'easeOutQuad',
-                           onComplete: Lang.bind(this,
-                               function() {
-                                   this.state = State.FADED_OUT;
-                               })
-                         });
     }
 });
-Signals.addSignalMethods(LightboxDialog.prototype);
+Signals.addSignalMethods(ModalDialog.prototype);
 
 
 const NotificationDialog = new Lang.Class({
     Name: 'PomodoroNotificationDialog',
-    Extends: LightboxDialog,
+    Extends: ModalDialog,
 
     _init: function() {
         this.parent();
         
         this._timer = '';
         this._description = '';
-        this._notificationTitle = '';
-        this._notificationDescription = '';
         
         this._timeoutSource = 0;
-        this._notification = null;
-        this._notificationButtons = [];
-        this._notificationSource = null;
         this._eventCaptureSource = 0;
         this._eventCaptureId = 0;
         this._screenSaver = null;
         this._screenSaverChangedId = 0;
         
         this._idleMonitor = new Shell.IdleMonitor();
-        this._idleMonitorWatchId = 0;
+        this._openWhenIdle = false;
+        this._openWhenIdleWatchId = 0;
+        this._closeWhenActive = false;
+        this._closeWhenActiveWatchId = 0;
         
         let mainLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-main-layout',
                                             vertical: false });
@@ -308,21 +309,15 @@ const NotificationDialog = new Lang.Class({
         this.contentLayout.add(mainLayout,
                             { x_fill: true,
                               y_fill: true });
-        
-        this.connect('opened', Lang.bind(this, function() {
-                // Close notification once dialog successfully opens
-                this._closeNotification();
-            }));
     },
 
     open: function(timestamp) {
-        if (ModalDialog.ModalDialog.prototype.open.call(this, timestamp)) {
-            this._closeNotification();
+        if (ModalDialog.prototype.open.call(this, timestamp)) {
             this._disconnectInternals();
-            this._enableEventCapture();
             
-            Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this, function(){
-                    this._closeWhenActive();
+            Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this, function() {
+                    if (this.state == State.OPENED || this.state == State.OPENING)
+                        this.setCloseWhenActive(true);
                     return false;
                 }));
             
@@ -350,20 +345,41 @@ const NotificationDialog = new Lang.Class({
 
     close: function(timestamp) {
         this._disconnectInternals();
-        this._openNotification();
+        this.setCloseWhenActive(false);
 
-        let result = ModalDialog.ModalDialog.prototype.close.call(this, timestamp);
-
-        this._openWhenIdle();
-
-        // ModalDialog only emits 'opened' signal, so we need to do that
-        this.emit('closed'); 
-
-        return result;
+        ModalDialog.prototype.close.call(this, timestamp);
     },
 
-    isOpened: function () {
-        return (!this._notification);
+    setOpenWhenIdle: function(enabled) {
+        this._openWhenIdle = enabled;
+
+        if (this._openWhenIdleWatchId != 0) {
+            this._idleMonitor.remove_watch(this._openWhenIdleWatchId);
+            this._openWhenIdleWatchId = 0;
+        }
+        if (enabled) {
+            this._openWhenIdleWatchId = this._idleMonitor.add_watch(IDLE_TIME_TO_OPEN,
+                                            Lang.bind(this, function(monitor, id, userBecameIdle) {
+                if (userBecameIdle)
+                    this.open();
+            }));
+        }
+    },
+
+    setCloseWhenActive: function(enabled) {
+        this._closeWhenActive = enabled;
+
+        if (this._closeWhenActiveWatchId != 0) {
+            this._idleMonitor.remove_watch(this._closeWhenActiveWatchId);
+            this._closeWhenActiveWatchId = 0;
+        }
+        if (enabled) {
+            this._closeWhenActiveWatchId = this._idleMonitor.add_watch(IDLE_TIME_TO_CLOSE,
+                                            Lang.bind(this, function(monitor, id, userBecameIdle) {
+                if (!userBecameIdle)
+                    this.close();
+            }));
+        }
     },
 
     _onTimeout: function() {
@@ -373,7 +389,7 @@ const NotificationDialog = new Lang.Class({
             return false; // dialog finally opened
         }
         if (this._tries > FALLBACK_TIME * FALLBACK_RATE) {
-            this.close(); // open notification as fallback
+            this.close(); // dialog can't be opened
             return false;
         }
         return true; 
@@ -382,63 +398,6 @@ const NotificationDialog = new Lang.Class({
     _onScreenSaverChanged: function(object, active) {
         if (!active)
             this.open();
-    },
-
-    _openNotification: function() {
-        if (!this._notification) {
-            let source = new NotificationSource();
-            this._notification = new MessageTray.Notification(source,
-                        this._notificationTitle, this._notificationDescription, {});
-            this._notification.setResident(true);
-            
-            // Force to show description along with title,
-            // as this is private property API may change
-            try {
-                this._notification._titleFitsInBannerMode = true;
-            }
-            catch(e) {
-                global.logError('Pomodoro: ' + e.message);
-            }
-            
-            // Create buttons
-            for (let i=0; i < this._notificationButtons.length; i++) {
-                try {
-                    this._notification.addButton(i, this._notificationButtons[i].label);
-                }
-                catch (e) {
-                    global.logError('Pomodoro: ' + e.message);
-                }
-            }
-            
-            // Connect actions
-            this._notification.connect('action-invoked', Lang.bind(this, function(object, id) {
-                    try {
-                        this._notificationButtons[id].action();
-                    }
-                    catch (e) {
-                        global.logError('Pomodoro: ' + e.message);
-                    }
-                }));
-            this._notification.connect('clicked', Lang.bind(this, function() {
-                    this.emit('clicked');
-                }));
-            
-            Main.messageTray.add(source);
-            source.notify(this._notification);
-        }
-        else
-        {
-            // Pop-up notification again
-            let source = this._notification.source;
-            source.notify(this._notification);
-        }
-    },
-
-    _closeNotification: function() {
-        if (this._notification) {
-            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-            this._notification = null;
-        }
     },
 
     _enableEventCapture: function() {
@@ -481,49 +440,9 @@ const NotificationDialog = new Lang.Class({
         return false;
     },
 
-    _openWhenIdle: function() {
-        this._disableIdleMonitor();
-        this._idleMonitorWatchId = this._idleMonitor.add_watch(IDLE_TIME_TO_OPEN, Lang.bind(this, function(monitor, id, userBecameIdle) {
-            if (userBecameIdle)
-                this.open();
-        }));
-    },
-
-    _closeWhenActive: function() {
-        this._disableIdleMonitor();
-        this._idleMonitorWatchId = this._idleMonitor.add_watch(IDLE_TIME_TO_CLOSE, Lang.bind(this, function(monitor, id, userBecameIdle) {
-            if (!userBecameIdle) {
-                this.close();
-            }
-        }));
-    },
-    
-    _disableIdleMonitor: function() {
-        if (this._idleMonitorWatchId != 0) {
-            this._idleMonitor.remove_watch(this._idleMonitorWatchId);
-            this._idleMonitorWatchId = 0;
-        }
-    },
-
-    get timer() {
-        return this._title;
-    },
-
     setTimer: function(text) {
         this._timer = text;
         this._timerLabel.text = text;
-    },
-
-    get title() {
-        return this._title;
-    },
-
-    setTitle: function(text) {
-        this._title = text;
-    },
-
-    get description() {
-        return this._description;
     },
 
     setDescription: function(text) {
@@ -531,31 +450,8 @@ const NotificationDialog = new Lang.Class({
         this._descriptionLabel.text = text;
     },
 
-    get notificationTitle() {
-        return this._notificationTitle;
-    },
-
-    setNotificationTitle: function(text) {
-        this._notificationTitle = text;
-        
-        if (this._notification)
-            this._notification.update(this._notificationTitle, this._notificationDescription);
-    },
-
-    setNotificationDescription: function(text) {
-        this._notificationDescription = text;
-        
-        if (this._notification)
-            this._notification.update(this._notificationTitle, this._notificationDescription);
-    },
-
-    setNotificationButtons: function(buttons) {
-        this._notificationButtons = buttons;
-    },
-
     _disconnectInternals: function() {
         this._disableEventCapture();
-        this._disableIdleMonitor();
         
         if (this._timeoutSource != 0) {
             GLib.source_remove(this._timeoutSource);
@@ -568,10 +464,10 @@ const NotificationDialog = new Lang.Class({
     },
 
     destroy: function() {
-        this._closeNotification();
+        this.setOpenWhenIdle(false);
+        this.setCloseWhenActive(false);
+
         this._disconnectInternals();
-        
-        ModalDialog.ModalDialog.prototype.close.call(this);
-        ModalDialog.ModalDialog.prototype.destroy.call(this);
+        ModalDialog.prototype.destroy.call(this);
     }
 });
