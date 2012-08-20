@@ -57,7 +57,7 @@ const IDLE_TIME_TO_OPEN = 60000;
 // Time to determine activity after which notification dialog is closed
 const IDLE_TIME_TO_CLOSE = 600;
 // Time before user activity is being monitored
-const MIN_DISPLAY_TIME = 1000;
+const MIN_DISPLAY_TIME = 200;
 // Time to fade-in or fade-out notification in seconds
 const OPEN_AND_CLOSE_TIME = 0.15;
 
@@ -104,6 +104,14 @@ const ModalDialog = new Lang.Class({
         this.state = State.CLOSED;
         this._hasModal = false;
 
+        this._idleMonitor = new Shell.IdleMonitor();
+        this._pushModalWatchId = 0;
+        this._pushModalSource = 0;
+        this._pushModalTries = 0;
+        this._screenSaver = null;
+        this._screenSaverChangedId = 0;
+        this._capturedEventId = 0;
+
         this._group = new St.Widget({ visible: false,
                                       x: 0,
                                       y: 0,
@@ -122,16 +130,11 @@ const ModalDialog = new Lang.Class({
                                                 vertical:    true });
 
         this._lightbox = new Lightbox.Lightbox(this._group,
-                                               { inhibitEvents: true });
+                                               { inhibitEvents: false });
         this._lightbox.highlight(this._backgroundBin);
         this._lightbox.actor.style_class = 'extension-pomodoro-lightbox';
 
-        let stack = new Shell.Stack();
-        this._backgroundBin.child = stack;
-
-        this._eventBlocker = new Clutter.Group({ reactive: true });
-        stack.add_actor(this._eventBlocker);
-        stack.add_actor(this._dialogLayout);
+        this._backgroundBin.child = this._dialogLayout;
 
         this.contentLayout = new St.BoxLayout({ vertical: true });
         this._dialogLayout.add(this.contentLayout,
@@ -141,8 +144,6 @@ const ModalDialog = new Lang.Class({
                                  y_align: St.Align.START });
 
         global.focus_manager.add_group(this._dialogLayout);
-//        this._initialKeyFocus = this._dialogLayout;
-//        this._initialKeyFocusDestroyId = 0;
         this._savedKeyFocus = null;
     },
 
@@ -179,24 +180,35 @@ const ModalDialog = new Lang.Class({
                          { opacity: 255,
                            time: OPEN_AND_CLOSE_TIME,
                            transition: 'easeOutQuad',
-                           onComplete: Lang.bind(this,
-                               function() {
-                                   this.state = State.OPENED;
-                                   this.emit('opened');
-                               })
+                           onComplete: Lang.bind(this, this._onFadeOpenComplete)
                          });
+    },
+
+    _onFadeOpenComplete: function() {
+        this.state = State.OPENED;
+        this.emit('opened');
+
+        if (this._capturedEventId == 0)
+            this._capturedEventId = global.stage.connect('captured-event', Lang.bind(this, this._onCapturedEvent));
     },
 
     open: function(timestamp) {
         if (this.state == State.OPENED || this.state == State.OPENING)
-            return true;
+            return;
 
-        if (!this.pushModal(timestamp))
-            return false;
+        // Don't become modal and block events just yet, monitor when user becomes idle.
+        if (this._pushModalWatchId == 0)
+            this._pushModalWatchId = this._idleMonitor.add_watch(BLOCK_EVENTS_TIME,
+                                                                 Lang.bind(this, this._onPushModalWatch));
+        // Reopen the dialog if screensaver gets deactived
+        if (!this._screenSaver)
+            this._screenSaver = new ScreenSaver.ScreenSaverProxy();
 
+        if (this._screenSaverChangedId == 0)
+            this._screenSaverChangedId = this._screenSaver.connectSignal('ActiveChanged',
+                                                                         Lang.bind(this, this._onScreenSaverChanged));
         this._fadeOpen();
         this.emit('opening');
-        return true;
     },
 
     close: function(timestamp) {
@@ -221,10 +233,63 @@ const ModalDialog = new Lang.Class({
         this.emit('closing');
     },
 
+    _onPushModalWatch: function(monitor, id, userBecameIdle) {
+        if (userBecameIdle) {
+            this._idleMonitor.remove_watch(this._pushModalWatchId);
+            this._pushModalWatchId = 0;
+
+            if (this.pushModal(global.get_current_time())) {
+                // dialog became modal
+            }
+            else
+                if (this._timeoutSource == 0) {
+                    this._pushModalTries = 1;
+                    this._pushModalSource = Mainloop.timeout_add(parseInt(1000/FALLBACK_RATE),
+                                                                 Lang.bind(this, this._onPushModalTimeout));
+                }
+        }
+    },
+
+    _onPushModalTimeout: function() {
+        this._pushModalTries += 1;
+
+        if (this.pushModal(global.get_current_time())) {
+            return false; // dialog finally opened
+        }
+        else
+            if (this._pushModalTries > FALLBACK_TIME * FALLBACK_RATE) {
+                this.close(); // dialog can't become modal
+                return false;
+            }
+        return true; 
+    },
+
+    _onCapturedEvent: function(actor, event) {
+        switch (event.type()) {
+            case Clutter.EventType.KEY_PRESS:
+                let symbol = event.get_key_symbol();
+                if (symbol == Clutter.Escape) {
+                    this.close();
+                    return true;
+                }
+                break;
+        }
+        return false;
+    },
+
+    _onScreenSaverChanged: function(proxy, senderName, [isActive]) {
+        if (!isActive) {
+            this.open();
+            this.pushModal();
+        }
+    },
+
     // Drop modal status without closing the dialog; this makes the
     // dialog insensitive as well, so it needs to be followed shortly
     // by either a close() or a pushModal()
     popModal: function(timestamp) {
+        this._disconnectInternals();
+
         if (!this._hasModal)
             return;
 
@@ -238,7 +303,7 @@ const ModalDialog = new Lang.Class({
         global.gdk_screen.get_display().sync();
         this._hasModal = false;
 
-        this._eventBlocker.raise_top();
+        this._lightbox.actor.reactive = false;
     },
 
     pushModal: function (timestamp) {
@@ -251,11 +316,29 @@ const ModalDialog = new Lang.Class({
         if (this._savedKeyFocus) {
             this._savedKeyFocus.grab_key_focus();
             this._savedKeyFocus = null;
-        } //else
-//            this._initialKeyFocus.grab_key_focus();
+        }
 
-        this._eventBlocker.lower_bottom();
+        this._lightbox.actor.reactive = true;
         return true;
+    },
+
+    _disconnectInternals: function() {
+        if (this._pushModalWatchId != 0) {
+            this._idleMonitor.remove_watch(this._pushModalWatchId);
+            this._pushModalWatchId = 0;
+        }
+        if (this._pushModalSource != 0) {
+            GLib.source_remove(this._pushModalSource);
+            this._pushModalSource = 0;
+        }
+        if (this._capturedEventId != 0) {
+            global.stage.disconnect(this._capturedEventId);
+            this._capturedEventId = 0;
+        }
+        if (this._screenSaverChangedId != 0) {
+            this._screenSaver.disconnect(this._screenSaverChangedId);
+            this._screenSaverChangedId = 0;
+        }
     }
 });
 Signals.addSignalMethods(ModalDialog.prototype);
@@ -271,13 +354,6 @@ const NotificationDialog = new Lang.Class({
         this._timer = '';
         this._description = '';
         
-        this._timeoutSource = 0;
-        this._eventCaptureSource = 0;
-        this._eventCaptureId = 0;
-        this._screenSaver = null;
-        this._screenSaverChangedId = 0;
-        
-        this._idleMonitor = new Shell.IdleMonitor();
         this._openWhenIdle = false;
         this._openWhenIdleWatchId = 0;
         this._closeWhenActive = false;
@@ -312,39 +388,16 @@ const NotificationDialog = new Lang.Class({
     },
 
     open: function(timestamp) {
-        if (ModalDialog.prototype.open.call(this, timestamp)) {
-            this._disconnectInternals();
-            
-            Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this, function() {
-                    if (this.state == State.OPENED || this.state == State.OPENING)
-                        this.setCloseWhenActive(true);
-                    return false;
-                }));
-            
-            return true; // dialog already opened
-        }
-        
-        if (!this._screenSaver)
-            this._screenSaver = new ScreenSaver.ScreenSaverProxy();
-        
-        if (this._screenSaver.screenSaverActive) {
-            if (this._screenSaverChangedId == 0)
-                this._screenSaverChangedId = this._screenSaver.connectSignal(
-                                                           'ActiveChanged',
-                                                           Lang.bind(this, this._onScreenSaverChanged));
-        }
-        else {
-            if (this._timeoutSource == 0) {
-                this._tries = 1;
-                this._timeoutSource = Mainloop.timeout_add(parseInt(1000/FALLBACK_RATE),
-                                                           Lang.bind(this, this._onTimeout));
-            }
-        }
-        return false;
+        ModalDialog.prototype.open.call(this, timestamp);
+
+        Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this, function() {
+                if (this.state == State.OPENED || this.state == State.OPENING)
+                    this.setCloseWhenActive(true);
+                return false;
+            }));
     },
 
     close: function(timestamp) {
-        this._disconnectInternals();
         this.setCloseWhenActive(false);
 
         ModalDialog.prototype.close.call(this, timestamp);
@@ -382,64 +435,6 @@ const NotificationDialog = new Lang.Class({
         }
     },
 
-    _onTimeout: function() {
-        this._tries += 1;
-        
-        if (this.open()) {
-            return false; // dialog finally opened
-        }
-        if (this._tries > FALLBACK_TIME * FALLBACK_RATE) {
-            this.close(); // dialog can't be opened
-            return false;
-        }
-        return true; 
-    },
-
-    _onScreenSaverChanged: function(object, active) {
-        if (!active)
-            this.open();
-    },
-
-    _enableEventCapture: function() {
-        this._disableEventCapture();
-        this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
-        this._eventCaptureSource = Mainloop.timeout_add(BLOCK_EVENTS_TIME, Lang.bind(this, this._onEventCaptureTimeout));
-    },
-
-    _disableEventCapture: function() {
-        if (this._eventCaptureSource != 0) {
-            GLib.source_remove(this._eventCaptureSource);
-            this._eventCaptureSource = 0;
-        }
-        if (this._eventCaptureId != 0) {
-            global.stage.disconnect(this._eventCaptureId);
-            this._eventCaptureId = 0;
-        }
-    },
-
-    _onEventCapture: function(actor, event) {
-        switch(event.type()) {
-            case Clutter.EventType.KEY_PRESS:
-                let keysym = event.get_key_symbol();
-                if (keysym == Clutter.Escape)
-                    return false;
-                // User might be looking at the keyboard while typing, so continue typing to the app.
-                // TODO: pass typed letters to a focused object without blocking them
-                this._enableEventCapture();
-                return true;
-            
-            case Clutter.EventType.BUTTON_PRESS:
-            case Clutter.EventType.BUTTON_RELEASE:
-                return true;
-        }
-        return false;
-    },
-
-    _onEventCaptureTimeout: function() {
-        this._disableEventCapture();
-        return false;
-    },
-
     setTimer: function(text) {
         this._timer = text;
         this._timerLabel.text = text;
@@ -450,24 +445,10 @@ const NotificationDialog = new Lang.Class({
         this._descriptionLabel.text = text;
     },
 
-    _disconnectInternals: function() {
-        this._disableEventCapture();
-        
-        if (this._timeoutSource != 0) {
-            GLib.source_remove(this._timeoutSource);
-            this._timeoutSource = 0;
-        }
-        if (this._screenSaverChangedId != 0) {
-            this._screenSaver.disconnect(this._screenSaverChangedId);
-            this._screenSaverChangedId = 0;
-        }
-    },
-
     destroy: function() {
         this.setOpenWhenIdle(false);
         this.setCloseWhenActive(false);
 
-        this._disconnectInternals();
         ModalDialog.prototype.destroy.call(this);
     }
 });

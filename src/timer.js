@@ -469,6 +469,7 @@ const PomodoroTimer = new Lang.Class({
             }));
         this._notification.connect('clicked', Lang.bind(this, function() {
                 this._notificationDialog.open();
+                this._notificationDialog.pushModal();
             }));
         this._notification.connect('destroy', Lang.bind(this, function(reason) {
                 this._notification = null;
@@ -544,6 +545,7 @@ const PomodoroTimer = new Lang.Class({
             notification.setTransient(true);
             notification.connect('clicked', Lang.bind(this, function() {
                     this._notificationDialog.open();
+                    this._notificationDialog.pushModal();
                 }));
             this._openNotification(notification);
         }
