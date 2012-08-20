@@ -59,12 +59,17 @@ const SHORT_PAUSE_ACCEPTANCE = 1.0 / 5.0;
 // is a factor between short pause time and long pause time.
 const SHORT_LONG_PAUSE_ACCEPTANCE = 0.5;
 
-// Path to sound file in case GSettings value is empty
+// Default path to sound file
 const DEFAULT_SOUND_FILE = 'bell.wav';
 
 // Command to wake up or power on the screen
 const SCREENSAVER_DEACTIVATE_COMMAND = 'xdg-screensaver reset';
 
+// Remind about ongoing break in given delays
+const PAUSE_REMIND_TIMES = [60, 120, 240, 480];
+// Ratio between user idle time and time between reminders to determine if user
+// is finally away
+const PAUSE_REMINDER_ACCEPTANCE = 0.8
 
 const State = {
     NULL: 0,
@@ -89,10 +94,12 @@ const PomodoroTimer = new Lang.Class({
         this._eventCaptureId = 0;
         this._eventCaptureSource = 0;
         this._eventCapturePointer = null;
+        this._reminderSource = 0;
+        this._reminderTime = 0;
+        this._reminderCount = 0;
         
         this._notification = null;
         this._notificationDialog = null;
-        this._playbin = null;
         this._power = null;
         this._presence = null;
         this._presenceChangeEnabled = false;
@@ -409,9 +416,6 @@ const PomodoroTimer = new Lang.Class({
         let source = new Notification.NotificationSource();
         this._notification = new MessageTray.Notification(source, _("Pause finished, a new pomodoro is starting!"), null);
         this._notification.setTransient(true);
-        this._notification.connect('collapsed', Lang.bind(this, function() {
-                this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-            }));
         this._notification.connect('destroy', Lang.bind(this, function() {
                 this._notification = null;
             }));
@@ -451,6 +455,13 @@ const PomodoroTimer = new Lang.Class({
                   action: Lang.bind(this, this.startPomodoro)
                 }
             ]);
+        this._notificationDialog.connect('opened', Lang.bind(this, function() {
+                this._unscheduleReminder();
+            }));
+        this._notificationDialog.connect('closed', Lang.bind(this, function() {
+                this._unscheduleReminder();
+                this._scheduleReminder();
+            }));
         this._notificationDialog.connect('destroy', Lang.bind(this, function() {
                 this._notificationDialog = null;
             }));
@@ -465,6 +476,80 @@ const PomodoroTimer = new Lang.Class({
         this.emit('notify-pomodoro-end');
     },
 
+    _remindPomodoroEnd: function() {
+        if (this._state != State.PAUSE)
+            return;
+        
+        // Don't show reminder if only two minutes remains to next pomodoro
+        if (this._elapsedLimit - this._elapsed < 120)
+            return;
+        
+        if (this._notificationDialog && !this._notificationDialog.isOpened()) {
+            let source = this._notificationDialog._notification.source;
+            
+            this._notification = new MessageTray.Notification(source, _("Hey, you're missing out on a break"), null);
+            this._notification.setTransient(true);
+            this._notification.connect('destroy', Lang.bind(this, function() {
+                    this._notification = null;
+                }));
+            this._notification.connect('clicked', Lang.bind(this, function() {
+                    this._notificationDialog.open();
+                }));
+            source.notify(this._notification);
+        }
+    },
+
+    _onReminderTimeout: function() {
+        let display = global.screen.get_display();
+        let idleTime = parseInt((display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000);
+        
+        // No need to notify if user seems to be away. We only monitor idle time 
+        // based on X11, and not Clutter scene which better reflects to real work
+        if (idleTime < this._reminderTime * PAUSE_REMINDER_ACCEPTANCE)
+            this._remindPomodoroEnd();
+        else
+            this._reminderCount = 0;
+        
+        this._reminderSource = 0;
+        this._scheduleReminder();
+        return false;
+    },
+
+    _scheduleReminder: function() {
+        let times = PAUSE_REMIND_TIMES;
+        let reschedule = false;
+        
+        if (this._state != State.PAUSE) {
+            this._unscheduleReminder ();
+            return;
+        }
+        
+        if (this._reminderSource != 0) {
+            GLib.source_remove(this._reminderSource);
+            this._reminderSource = 0;
+            reschedule = true;
+        }
+        
+        if (this._reminderCount < times.length) {
+            this._reminderTime = times[this._reminderCount];
+            this._reminderSource = Mainloop.timeout_add_seconds(this._reminderTime,
+                                                                Lang.bind(this, this._onReminderTimeout));
+        }
+        
+        if (!reschedule)
+            this._reminderCount += 1;
+    },
+
+    _unscheduleReminder: function() {
+        if (this._reminderSource != 0) {
+            GLib.source_remove(this._reminderSource);
+            this._reminderSource = 0;
+        }
+        
+        this._reminderTime = 0;
+        this._reminderCount = 0;
+    },
+
     _closeNotification: function() {
         if (this._notification && !this._notification.expanded) {
             this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
@@ -474,26 +559,33 @@ const PomodoroTimer = new Lang.Class({
             this._notificationDialog.destroy();
             this._notificationDialog = null;
         }
+        this._unscheduleReminder();
     },
 
     _playNotificationSound: function() {
         if (this._settings.get_boolean('play-sounds')) {
             let uri = this._settings.get_string('sound-uri');
-            
-            try {
-                if (!uri) {
-                    let path = GLib.path_is_absolute(DEFAULT_SOUND_FILE)
-                                        ? DEFAULT_SOUND_FILE
-                                        : GLib.build_filenamev([ PomodoroUtil.getExtensionPath(), DEFAULT_SOUND_FILE ]);
-                    uri = GLib.filename_to_uri(path, null);
+            let path = '';
+
+            if (uri)
+                path = GLib.filename_from_uri(uri);
+            else
+                path = GLib.path_is_absolute(DEFAULT_SOUND_FILE)
+                                ? DEFAULT_SOUND_FILE
+                                : GLib.build_filenamev([ PomodoroUtil.getExtensionPath(), DEFAULT_SOUND_FILE ]);
+
+            let file = Gio.file_new_for_path(path);
+            if (file.query_exists(null))
+            {
+                try {
+                    Util.trySpawnCommandLine('canberra-gtk-play --file='+ GLib.shell_quote(path));
                 }
-                
-                let playbin = Gst.ElementFactory.make('playbin2', null);
-                playbin.uri = uri;
-                playbin.set_state(Gst.State.PLAYING);
+                catch (e) {
+                    global.logError('Pomodoro: Error playing sound file "'+ path +'": ' + e.message);
+                }
             }
-            catch (e) {
-                global.logError('Pomodoro: Error playing sound file "'+ uri +'": ' + e.message);
+            else {
+                global.logError('Pomodoro: Sound file "'+ path +'" does not exist');
             }
         }
     },
@@ -584,20 +676,11 @@ const PomodoroTimer = new Lang.Class({
             this._presence = new GnomeSession.Presence();
             this._presenceChangeEnabled = this._settings.get_boolean('change-presence-status');
         }
-        if (!this._playbin && Gst) {
-            // Load some GStreamer modules to memory to (hopefully) reduce first-use lag
-            this._playbin = Gst.ElementFactory.make('playbin2', null);
-            this._playbin.set_state(Gst.State.READY);
-        }
     },
 
     _unload: function() {
         if (this._screenSaver) {
             this._screenSaver = null;
-        }
-        if (this._playbin && Gst) {
-            this._playbin.set_state(Gst.State.NULL);
-            this._playbin = null;
         }
     },
 
