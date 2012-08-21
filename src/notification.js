@@ -30,7 +30,6 @@ const Pango = imports.gi.Pango;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
-const ScreenSaver = imports.misc.screenSaver;
 const Tweener = imports.ui.tweener;
 const ExtensionUtils = imports.misc.extensionUtils;
 
@@ -108,8 +107,6 @@ const ModalDialog = new Lang.Class({
         this._pushModalWatchId = 0;
         this._pushModalSource = 0;
         this._pushModalTries = 0;
-        this._screenSaver = null;
-        this._screenSaverChangedId = 0;
         this._capturedEventId = 0;
 
         this._group = new St.Widget({ visible: false,
@@ -200,13 +197,7 @@ const ModalDialog = new Lang.Class({
         if (this._pushModalWatchId == 0)
             this._pushModalWatchId = this._idleMonitor.add_watch(BLOCK_EVENTS_TIME,
                                                                  Lang.bind(this, this._onPushModalWatch));
-        // Reopen the dialog if screensaver gets deactived
-        if (!this._screenSaver)
-            this._screenSaver = new ScreenSaver.ScreenSaverProxy();
 
-        if (this._screenSaverChangedId == 0)
-            this._screenSaverChangedId = this._screenSaver.connectSignal('ActiveChanged',
-                                                                         Lang.bind(this, this._onScreenSaverChanged));
         this._fadeOpen();
         this.emit('opening');
     },
@@ -277,13 +268,6 @@ const ModalDialog = new Lang.Class({
         return false;
     },
 
-    _onScreenSaverChanged: function(proxy, senderName, [isActive]) {
-        if (!isActive) {
-            this.open();
-            this.pushModal();
-        }
-    },
-
     // Drop modal status without closing the dialog; this makes the
     // dialog insensitive as well, so it needs to be followed shortly
     // by either a close() or a pushModal()
@@ -334,10 +318,6 @@ const ModalDialog = new Lang.Class({
         if (this._capturedEventId != 0) {
             global.stage.disconnect(this._capturedEventId);
             this._capturedEventId = 0;
-        }
-        if (this._screenSaverChangedId != 0) {
-            this._screenSaver.disconnect(this._screenSaverChangedId);
-            this._screenSaverChangedId = 0;
         }
     }
 });

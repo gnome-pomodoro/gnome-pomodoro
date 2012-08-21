@@ -567,6 +567,13 @@ const PomodoroTimer = new Lang.Class({
         return false;
     },
 
+    _onScreenSaverChanged: function(proxy, senderName, [active]) {
+        if (!active && this._state == State.PAUSE) {
+            this._notificationDialog.open();
+            this._notificationDialog.pushModal();
+        }
+    },
+
     _scheduleReminder: function() {
         let times = PAUSE_REMIND_TIMES;
         let reschedule = false;
@@ -705,6 +712,7 @@ const PomodoroTimer = new Lang.Class({
     _load: function() {
         if (!this._screenSaver) {
             this._screenSaver = new ScreenSaver.ScreenSaverProxy();
+            this._screenSaver.connectSignal('ActiveChanged', Lang.bind(this, this._onScreenSaverChanged));
         }
         if (!this._power) {
             this._power = new UPowerGlib.Client();
