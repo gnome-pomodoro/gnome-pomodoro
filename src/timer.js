@@ -65,6 +65,11 @@ const DEFAULT_SOUND_FILE = 'bell.wav';
 // Command to wake up or power on the screen
 const SCREENSAVER_DEACTIVATE_COMMAND = 'xdg-screensaver reset';
 
+// Remind about ongoing break in given delays
+const PAUSE_REMIND_TIMES = [60, 120, 240, 480];
+// Ratio between user idle time and time between reminders to determine if user
+// is finally away
+const PAUSE_REMINDER_ACCEPTANCE = 0.8
 
 const State = {
     NULL: 0,
@@ -89,9 +94,13 @@ const PomodoroTimer = new Lang.Class({
         this._eventCaptureId = 0;
         this._eventCaptureSource = 0;
         this._eventCapturePointer = null;
+        this._reminderSource = 0;
+        this._reminderTime = 0;
+        this._reminderCount = 0;
         
         this._notification = null;
-        this._notificationDialog = null;
+        this._notificationSource = null;
+        this._notificationDialog = new Notification.NotificationDialog();
         this._playbin = null;
         this._power = null;
         this._presence = null;
@@ -148,7 +157,7 @@ const PomodoroTimer = new Lang.Class({
     },
 
     startPomodoro: function() {
-        this._closeNotification();
+        this._closeNotifications();
         if (this._state == State.PAUSE || this._state == State.IDLE)
             this._playNotificationSound();
         
@@ -174,7 +183,7 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _setState: function(newState, timestamp) {        
-        this._closeNotification();
+        this._closeNotifications();
         this._disableEventCapture();
 
         if (!timestamp)
@@ -301,7 +310,8 @@ const PomodoroTimer = new Lang.Class({
                         break;
             }
             
-            if (!this._notification || !this._notificationDialog) {
+            if (this._notificationDialog.state == Notification.State.CLOSED ||
+                this._notificationDialog.state == Notification.State.CLOSING || !this._notification) {
                 if (this._state == State.PAUSE)
                     this._notifyPomodoroEnd();
                 
@@ -400,80 +410,203 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _notifyPomodoroStart: function() {
-        this._closeNotification();
+        this._closeNotifications();
         this._playNotificationSound();
         
         // if (!this._settings.get_boolean('away-from-desk'))
         //     this._deactivateScreenSaver();
-        
-        let source = new Notification.NotificationSource();
-        this._notification = new MessageTray.Notification(source, _("Pause finished, a new pomodoro is starting!"), null);
-        this._notification.setTransient(true);
-        this._notification.connect('collapsed', Lang.bind(this, function() {
-                this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-            }));
-        this._notification.connect('destroy', Lang.bind(this, function() {
-                this._notification = null;
-            }));
-        source.notify(this._notification);
-        
+
+        this._openNotificationSource();
+
+        let notification = new MessageTray.Notification(this._notificationSource,
+                                                        _("Pause finished."),
+                                                        _("A new pomodoro is starting."),
+                                                        null);
+        notification.setTransient(true);
+        this._openNotification(notification);
+
         this.emit('notify-pomodoro-start');
     },
 
     _notifyPomodoroEnd: function() {
-        this._closeNotification();
+        this._closeNotifications();
         
         if (this._settings.get_boolean('away-from-desk') && this._elapsed == 0) {
             this._deactivateScreenSaver();
             this._playNotificationSound();
         }
         
-        this._notificationDialog = new Notification.NotificationDialog();
-        this._notificationDialog.setTitle(_("Pomodoro Finished!")); 
-        this._notificationDialog.setButtons([
-                { label: _("Hide"),
-                  action: Lang.bind(this, function() {
-                        this._notificationDialog.close();
-                    }),
-                  key: Clutter.Escape
-                },
-                { label: _("Start a new pomodoro"),
-                  action: Lang.bind(this, this.startPomodoro)
-                }
-            ]);
-        this._notificationDialog.setNotificationButtons([
-                { label: _("Show dialog"),
-                  action: Lang.bind(this, function() {
-                        this._notificationDialog.open();
-                    })
-                },
-                { label: _("Start a new pomodoro"),
-                  action: Lang.bind(this, this.startPomodoro)
-                }
-            ]);
+        this._notificationDialog.setTimer('00:00');
+        this._notificationDialog.setDescription(_("It's time to take a break!"));
+
+        this._notificationDialog.connect('opening', Lang.bind(this, function() {
+                this._unscheduleReminder();
+            }));
+        this._notificationDialog.connect('closing', Lang.bind(this, function() {
+                this._openNotification(this._notification);
+            }));
+        this._notificationDialog.connect('closed', Lang.bind(this, function() {
+                this._unscheduleReminder(); // reset reminder count
+                this._scheduleReminder();
+            }));
         this._notificationDialog.connect('destroy', Lang.bind(this, function() {
                 this._notificationDialog = null;
             }));
-        
+
+        this._openNotificationSource();
+
+        if (this._notification)
+            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+
+        this._notification = new MessageTray.Notification(this._notificationSource,
+                                                          _("Take a break!"),
+                                                          null);
+        this._notification.setResident(true);
+        this._notification.addButton(1, _("Start a new pomodoro"));
+        this._notification.connect('action-invoked', Lang.bind(this, function(object, id) {
+                if (id == 1)
+                    this.startPomodoro();
+            }));
+        this._notification.connect('clicked', Lang.bind(this, function() {
+                this._notificationDialog.open();
+                this._notificationDialog.pushModal();
+            }));
+        this._notification.connect('destroy', Lang.bind(this, function(reason) {
+                this._notification = null;
+            }));
+
+        // Force to show description along with title,
+        // as this is private property, API might change
+        try {
+            this._notification._titleFitsInBannerMode = true;
+        }
+        catch(e) {
+            global.logError('Pomodoro: ' + e.message);
+        }
+
         this._updateNotification();
-        
+
         if (this._settings.get_boolean('show-notification-dialogs'))
             this._notificationDialog.open();
         else
-            this._notificationDialog.close();
-        
+            this._openNotification(this._notification);
+
+        this._notificationDialog.setOpenWhenIdle(true);
+
         this.emit('notify-pomodoro-end');
     },
 
-    _closeNotification: function() {
-        if (this._notification && !this._notification.expanded) {
-            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-            this._notification = null;
+    _openNotificationSource: function() {
+        if (!this._notificationSource) {
+            this._notificationSource = new Notification.NotificationSource();
+            this._notificationSource.connect('destroy', Lang.bind(this, function(reason) {
+                    this._notificationSource = null;
+                }));
+        }
+    },
+
+    _openNotification: function(notification) {
+        if (notification) {
+            if (!Main.messageTray.contains(notification.source))
+                Main.messageTray.add(notification.source);
+
+            if (notification.source)
+                notification.source.notify(notification);
+        }
+    },
+
+    _closeNotifications: function() {
+        if (this._notificationSource) {
+            this._notificationSource.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
         }
         if (this._notificationDialog) {
-            this._notificationDialog.destroy();
-            this._notificationDialog = null;
+            this._notificationDialog.close();
+            this._notificationDialog.setOpenWhenIdle(false);
         }
+        this._unscheduleReminder();
+    },
+
+    _remindPomodoroEnd: function() {
+        if (this._state != State.PAUSE)
+            return;
+        
+        // Don't show reminder if only two minutes remains to next pomodoro
+        if (this._elapsedLimit - this._elapsed < 120)
+            return;
+        
+        if (this._notificationDialog.state == Notification.State.CLOSED ||
+            this._notificationDialog.state == Notification.State.CLOSING) {
+
+            this._openNotificationSource();
+
+            let notification = new MessageTray.Notification(this._notificationSource,
+                                                            _("Hey, you're missing out on a break."),
+                                                            null);
+            notification.setTransient(true);
+            notification.connect('clicked', Lang.bind(this, function() {
+                    this._notificationDialog.open();
+                    this._notificationDialog.pushModal();
+                }));
+            this._openNotification(notification);
+        }
+    },
+
+    _onReminderTimeout: function() {
+        let display = global.screen.get_display();
+        let idleTime = parseInt((display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000);
+        
+        // No need to notify if user seems to be away. We only monitor idle time 
+        // based on X11, and not Clutter scene which better reflects to real work
+        if (idleTime < this._reminderTime * PAUSE_REMINDER_ACCEPTANCE)
+            this._remindPomodoroEnd();
+        else
+            this._reminderCount = 0;
+        
+        this._reminderSource = 0;
+        this._scheduleReminder();
+        return false;
+    },
+
+    _onScreenSaverChanged: function(proxy, senderName, [active]) {
+        if (!active && this._state == State.PAUSE) {
+            this._notificationDialog.open();
+            this._notificationDialog.pushModal();
+        }
+    },
+
+    _scheduleReminder: function() {
+        let times = PAUSE_REMIND_TIMES;
+        let reschedule = false;
+        
+        if (this._state != State.PAUSE) {
+            this._unscheduleReminder ();
+            return;
+        }
+        
+        if (this._reminderSource != 0) {
+            GLib.source_remove(this._reminderSource);
+            this._reminderSource = 0;
+            reschedule = true;
+        }
+        
+        if (this._reminderCount < times.length) {
+            this._reminderTime = times[this._reminderCount];
+            this._reminderSource = Mainloop.timeout_add_seconds(this._reminderTime,
+                                                                Lang.bind(this, this._onReminderTimeout));
+        }
+        
+        if (!reschedule)
+            this._reminderCount += 1;
+    },
+
+    _unscheduleReminder: function() {
+        if (this._reminderSource != 0) {
+            GLib.source_remove(this._reminderSource);
+            this._reminderSource = 0;
+        }
+        
+        this._reminderTime = 0;
+        this._reminderCount = 0;
     },
 
     _playNotificationSound: function() {
@@ -501,21 +634,25 @@ const PomodoroTimer = new Lang.Class({
     _updateNotification: function() {
         if (!this._notificationDialog || this._state != State.PAUSE)
             return;
-        
-        let seconds = Math.max(this._elapsedLimit - this._elapsed, 0);
-        let minutes = Math.round(seconds / 60);
-        
-        seconds = Math.ceil(seconds / 5) * 5;
-        
-        try {
-            this._notificationDialog.setDescription((seconds <= 45)
-                                    ? ngettext("Take a break, you have %d second\n",
-                                               "Take a break, you have %d seconds\n", seconds).format(seconds)
-                                    : ngettext("Take a break, you have %d minute\n",
-                                               "Take a break, you have %d minutes\n", minutes).format(minutes));
+
+        let remaining = Math.max(this._elapsedLimit - this._elapsed, 0);
+
+        if (this._notificationDialog) {
+            let seconds = Math.floor(remaining % 60);
+            let minutes = Math.floor(remaining / 60);
+
+            this._notificationDialog.setTimer('%02d:%02d'.format(minutes, seconds));
         }
-        catch (e) {
-            // Notification might be closed before we knew it
+        if (this._notification) {
+            let seconds = Math.floor(remaining % 60);
+            let minutes = Math.round(remaining / 60);
+            let message = (remaining <= 45)
+                                    ? ngettext("You have %d second left.\n",
+                                               "You have %d seconds left.\n", seconds).format(seconds)
+                                    : ngettext("You have %d minute left.\n",
+                                               "You have %d minutes left.\n", minutes).format(minutes);
+
+            this._notification.update(this._notification.title, message, {});
         }
     },
 
@@ -575,6 +712,7 @@ const PomodoroTimer = new Lang.Class({
     _load: function() {
         if (!this._screenSaver) {
             this._screenSaver = new ScreenSaver.ScreenSaverProxy();
+            this._screenSaver.connectSignal('ActiveChanged', Lang.bind(this, this._onScreenSaverChanged));
         }
         if (!this._power) {
             this._power = new UPowerGlib.Client();
@@ -604,6 +742,11 @@ const PomodoroTimer = new Lang.Class({
     destroy: function() {
         this.stop();
         this.disconnectAll();
+
+        if (this._notificationDialog) {
+            this._notificationDialog.destroy();
+            this._notificationDialog = null;
+        }
     }
 });
 
