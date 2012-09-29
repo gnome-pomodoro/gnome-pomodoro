@@ -43,7 +43,7 @@ try {
     const Gst = imports.gi.Gst;
     Gst.init(null);
 } catch(e) {
-    global.logError('Pomodoro: '+ e.message);
+    global.log('Pomodoro: '+ e.message);
 }
 
 
@@ -285,7 +285,7 @@ const PomodoroTimer = new Lang.Class({
         let stateTimestamp   = Date.parse(this._settings.get_string('saved-state-date'));
         
         if (isNaN(stateTimestamp)) {
-            global.logError('Pomodoro: Failed to restore timer state, date string is funny.');
+            global.log('Pomodoro: Failed to restore timer state, date string is funny.');
             return;
         }
         
@@ -481,7 +481,7 @@ const PomodoroTimer = new Lang.Class({
             this._notification._titleFitsInBannerMode = true;
         }
         catch(e) {
-            global.logError('Pomodoro: ' + e.message);
+            global.log('Pomodoro: ' + e.message);
         }
 
         this._updateNotification();
@@ -628,11 +628,11 @@ const PomodoroTimer = new Lang.Class({
                     Util.trySpawnCommandLine('canberra-gtk-play --file='+ GLib.shell_quote(path));
                 }
                 catch (e) {
-                    global.logError('Pomodoro: Error playing sound file "'+ path +'": ' + e.message);
+                    global.log('Pomodoro: Error playing sound file "'+ path +'": ' + e.message);
                 }
             }
             else {
-                global.logError('Pomodoro: Sound file "'+ path +'" does not exist');
+                global.log('Pomodoro: Sound file "'+ path +'" does not exist');
             }
         }
     },
@@ -711,7 +711,7 @@ const PomodoroTimer = new Lang.Class({
             Util.trySpawnCommandLine(SCREENSAVER_DEACTIVATE_COMMAND);
         }
         catch (e) {
-            global.logError('Pomodoro: Error waking up the screen: ' + e.message);
+            global.log('Pomodoro: Error waking up the screen: ' + e.message);
         }
     },
 
