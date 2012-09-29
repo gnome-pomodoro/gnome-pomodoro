@@ -27,6 +27,7 @@ const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Pango = imports.gi.Pango;
 
+const Layout = imports.ui.layout;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
@@ -60,6 +61,8 @@ const MIN_DISPLAY_TIME = 200;
 // Time to fade-in or fade-out notification in seconds
 const OPEN_AND_CLOSE_TIME = 0.15;
 
+const NOTIFICATION_DIALOG_OPACITY = 0.55;
+
 const State = {
     OPENED: 0,
     CLOSED: 1,
@@ -74,19 +77,18 @@ const NotificationSource = new Lang.Class({
 
     _init: function() {
         this.parent(_("Pomodoro Timer"));
-        
-        this._setSummaryIcon(this.createNotificationIcon());
+
+        this.iconName = 'timer-symbolic';
     },
 
-    createNotificationIcon: function() {
+    createIcon: function(size) {
         let iconTheme = Gtk.IconTheme.get_default();
 
-        if (!iconTheme.has_icon('timer'))
+        if (!iconTheme.has_icon(this.iconName))
             iconTheme.append_search_path (PomodoroUtil.getExtensionPath());
 
-        return new St.Icon({ icon_name: 'timer',
-                             icon_type: St.IconType.SYMBOLIC,
-                             icon_size: this.ICON_SIZE });
+        return new St.Icon({ icon_name: this.iconName,
+                             icon_size: size });
     },
 
     open: function(notification) {
@@ -103,7 +105,7 @@ const ModalDialog = new Lang.Class({
         this.state = State.CLOSED;
         this._hasModal = false;
 
-        this._idleMonitor = new Shell.IdleMonitor();
+        this._idleMonitor = Shell.IdleMonitor.get();
         this._pushModalWatchId = 0;
         this._pushModalSource = 0;
         this._pushModalTries = 0;
@@ -121,13 +123,16 @@ const ModalDialog = new Lang.Class({
         this._group.connect('destroy', Lang.bind(this, this._onGroupDestroy));
 
         this._backgroundBin = new St.Bin();
+        this._monitorConstraint = new Layout.MonitorConstraint();
+        this._backgroundBin.add_constraint(this._monitorConstraint);
         this._group.add_actor(this._backgroundBin);
 
         this._dialogLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog',
                                                 vertical:    true });
 
         this._lightbox = new Lightbox.Lightbox(this._group,
-                                               { inhibitEvents: false });
+                                               { fadeFactor: NOTIFICATION_DIALOG_OPACITY,
+                                                 inhibitEvents: false });
         this._lightbox.highlight(this._backgroundBin);
         this._lightbox.actor.style_class = 'extension-pomodoro-lightbox';
 
@@ -145,15 +150,7 @@ const ModalDialog = new Lang.Class({
     },
 
     destroy: function() {
-        this.popModal();
-        this._group.clear_constraints();
-        this._lightbox.destroy();
-
-        // FIXME: As in ModalDialog class, destroy method is broken. If we attempt to destroy
-        //        this._group GNOME Shell crashes each time, so we at least destroy as much
-        //        as we can
-        Main.uiGroup.remove_actor(this._group);
-        // this._group.destroy();
+        this._group.destroy();
     },
 
     _onGroupDestroy: function() {
@@ -161,10 +158,7 @@ const ModalDialog = new Lang.Class({
     },
 
     _fadeOpen: function() {
-        let monitor = Main.layoutManager.focusMonitor;
-
-        this._backgroundBin.set_position(monitor.x, monitor.y);
-        this._backgroundBin.set_size(monitor.width, monitor.height);
+        this._monitorConstraint.index = global.screen.get_current_monitor();
 
         this.state = State.OPENING;
 

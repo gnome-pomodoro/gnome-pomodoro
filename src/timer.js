@@ -28,7 +28,7 @@ const UPowerGlib = imports.gi.UPowerGlib;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const GnomeSession = imports.misc.gnomeSession;
-const ScreenSaver = imports.misc.screenSaver;
+const ScreenShield = imports.ui.screenShield;
 const Util = imports.misc.util;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
@@ -105,7 +105,7 @@ const PomodoroTimer = new Lang.Class({
         this._power = null;
         this._presence = null;
         this._presenceChangeEnabled = false;
-        this._screenSaver = null;
+        this._screenShield = null;
         
         this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
@@ -567,8 +567,8 @@ const PomodoroTimer = new Lang.Class({
         return false;
     },
 
-    _onScreenSaverChanged: function(proxy, senderName, [active]) {
-        if (!active && this._state == State.PAUSE) {
+    _onScreenShieldChanged: function() {
+        if (!this._screenShield.locked && this._state == State.PAUSE) {
             this._notificationDialog.open();
             this._notificationDialog.pushModal();
         }
@@ -704,8 +704,8 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _deactivateScreenSaver: function() {
-        if (this._screenSaver && this._screenSaver.screenSaverActive)
-            this._screenSaver.SetActive(false);
+        if (this._screenShield && this._screenShield.locked)
+            this._screenShield.unlock();
         
         try {
             Util.trySpawnCommandLine(SCREENSAVER_DEACTIVATE_COMMAND);
@@ -716,9 +716,9 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _load: function() {
-        if (!this._screenSaver) {
-            this._screenSaver = new ScreenSaver.ScreenSaverProxy();
-            this._screenSaver.connectSignal('ActiveChanged', Lang.bind(this, this._onScreenSaverChanged));
+        if (!this._screenShield) {
+            this._screenShield = new ScreenShield.ScreenShieldFallback();
+            this._screenShield.connect('lock-status-changed', Lang.bind(this, this._onScreenShieldChanged));
         }
         if (!this._power) {
             this._power = new UPowerGlib.Client();
@@ -731,9 +731,6 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _unload: function() {
-        if (this._screenSaver) {
-            this._screenSaver = null;
-        }
     },
 
     destroy: function() {
