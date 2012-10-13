@@ -24,13 +24,21 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 - Get zipball 
     * [Stable | Gnome-shell >= 3.4](https://github.com/codito/gnome-shell-pomodoro/zipball/0.6)
     * [Unstable - Master branch](https://github.com/codito/gnome-shell-pomodoro/zipball/master)
-- Build it and install
-        ./autogen.sh --prefix=/usr
-        make
-        sudo make install
-- Enable the extension using gnome-tweak-tool (Shell Extensions -> Pomodoro Extension) or via following commandline:
-        gsettings get org.gnome.shell enabled-extensions
-        gsettings set org.gnome.shell enabled-extensions [&lt;value from get above&gt;, pomodoro@arun.codito.in]
+- Build it and install 
+
+        ./autogen.sh --prefix=/usr  
+        make zip  
+        unzip \_build/gnome-shell-pomodoro.0.6.zip -d ~/.local/gnome-shell/extensions/pomodoro@arun.codito.in  
+
+    - To install it system-wide, you could do:  
+
+        sudo make install  
+
+- Enable the extension using gnome-tweak-tool (Shell Extensions -> Pomodoro Extension) or via following commandline:  
+
+        gsettings get org.gnome.shell enabled-extensions  
+        gsettings set org.gnome.shell enabled-extensions [&lt;value from get above&gt;, pomodoro@arun.codito.in]  
+
 - Press *Alt + F2*, and *r* in command to restart gnome-shell
 
 # Usage
@@ -46,6 +54,12 @@ GPL3. See COPYING for details.
 - Contributors: https://github.com/codito/gnome-shell-pomodoro/contributors
 
 # Changelog
+**Unstable**
+
++ Czech translation
++ Support for gnome-shell 3.6
++ 
+
 **Version 0.6**
 
 + New translation: Persian (thanks @arashm)
