@@ -28,13 +28,11 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 
         ./autogen.sh --prefix=/usr  
         make zip  
-        unzip \_build/gnome-shell-pomodoro.0.6.zip -d ~/.local/gnome-shell/extensions/pomodoro@arun.codito.in  
+        unzip _build/gnome-shell-pomodoro.0.6.zip -d ~/.local/gnome-shell/extensions/pomodoro@arun.codito.in  
 
-    - To install it system-wide, you could do:  
+    - To install it system-wide, you could do: `sudo make install`  
 
-        sudo make install  
-
-- Enable the extension using gnome-tweak-tool (Shell Extensions -> Pomodoro Extension) or via following commandline:  
+- Enable the extension using `gnome-tweak-tool` (Shell Extensions -> Pomodoro Extension) or via following commandline:  
 
         gsettings get org.gnome.shell enabled-extensions  
         gsettings set org.gnome.shell enabled-extensions [&lt;value from get above&gt;, pomodoro@arun.codito.in]  
