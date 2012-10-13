@@ -4,6 +4,6 @@
   "settings-schema": "@GSCHEMANAME@",
   "name": "Pomodoro",
   "description": "A simple pomodoro timer",
-  "shell-version": ["3.4", "3.3.92"],
+  "shell-version": ["3.6", "3.5.92", "3.5.91"],
   "url": "https://github.com/codito/gnome-shell-pomodoro"
 }
