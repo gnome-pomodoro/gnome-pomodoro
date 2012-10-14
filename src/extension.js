@@ -138,7 +138,7 @@ const Indicator = new Lang.Class({
         this._optionsMenu.menu.addMenuItem(this._changePresenceStatusToggle);
         
         // Notification dialog toggle
-        this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Show Dialog Messages"));
+        this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Fullscreen Notifications"));
         this._showDialogsToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('show-notification-dialogs', item.state);
         }));

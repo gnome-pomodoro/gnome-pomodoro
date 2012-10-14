@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-18 16:22+0100\n"
+"POT-Creation-Date: 2012-10-14 14:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -52,7 +52,7 @@ msgstr ""
 
 #. Notification dialog toggle
 #: ../src/extension.js:141
-msgid "Show Dialog Messages"
+msgid "Fullscreen Notifications"
 msgstr ""
 
 #. Notify with a sound toggle
