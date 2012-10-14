@@ -1,219 +1,233 @@
-# LANGUAGE translation for gnome-shell-pomodoro
+# Chinese (simplified) translation for gnome-shell-pomodoro
 # Copyright (c) 2012 gnome-shell-pomodoro contributors
 # This file is distributed under the same license as the gnome-shell-pomodoro package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Meng Zhuo <mengzhuo1203@gmail.com>, 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-18 16:22+0100\n"
+"POT-Creation-Date: 2012-10-14 14:44+0200\n"
 "PO-Revision-Date: 2012-04-22 18:32+0800\n"
-"Last-Translator: mengzhuo <mengzhuo1203@gmail.com>\n"
-"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"Last-Translator: Meng Zhuo <mengzhuo1203@gmail.com>\n"
+"Language-Team: \n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../src/extension.js:61
+#: ../src/extension.js:57
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d分钟"
-msgstr[1] "%d分钟"
 
 #. Toggle timer state button
-#: ../src/extension.js:96
-#: ../src/notification.js:54
+#: ../src/extension.js:86 ../src/notification.js:76
 msgid "Pomodoro Timer"
 msgstr "番茄计时器"
 
 #. Options SubMenu
-#: ../src/extension.js:109
+#: ../src/extension.js:99
 msgid "Options"
 msgstr "选项"
 
 #. Reset counters
-#: ../src/extension.js:132
+#: ../src/extension.js:122
 msgid "Reset Counts and Timer"
 msgstr "重置计数器和计时器"
 
 #. Away from desk toggle
-#: ../src/extension.js:138
+#: ../src/extension.js:127
 msgid "Away From Desk"
 msgstr "离开桌面"
 
 #. Presence status toggle
-#: ../src/extension.js:146
+#: ../src/extension.js:134
 msgid "Control Presence Status"
 msgstr "控制在线状态"
 
-#: ../src/extension.js:155
-msgid "Show a dialog message at the end of pomodoro session"
-msgstr "当番茄时间结束时显示一个信息"
+#. Notification dialog toggle
+#: ../src/extension.js:141
+#, fuzzy
+msgid "Fullscreen Notifications"
+msgstr "显示对话框"
 
 #. Notify with a sound toggle
-#: ../src/extension.js:162
+#: ../src/extension.js:148
 msgid "Sound Notifications"
 msgstr "声音提示"
 
 #. Pomodoro duration
-#: ../src/extension.js:170
+#: ../src/extension.js:155
 msgid "Pomodoro Duration"
 msgstr "番茄时长"
 
 #. Short pause duration
-#: ../src/extension.js:183
+#: ../src/extension.js:168
 msgid "Short Break Duration"
 msgstr "短休息时长"
 
 #. Long pause duration
-#: ../src/extension.js:204
+#: ../src/extension.js:189
 msgid "Long Break Duration"
 msgstr "长休息时长"
 
-#: ../src/extension.js:322
+#: ../src/extension.js:307
 msgid "No Completed Sessions"
 msgstr "尚无完成项目"
 
-#: ../src/extension.js:324
+#: ../src/extension.js:309
 #, c-format
 msgid "%d Completed Session"
 msgid_plural "%d Completed Sessions"
 msgstr[0] "已完成%d个番茄时间"
-msgstr[1] "已完成%d个番茄时间"
 
+#: ../src/timer.js:422
+#, fuzzy
+msgid "Pause finished."
+msgstr "暂停结束"
 
-#: ../src/timer.js:411
-msgid "Pause finished, a new pomodoro is starting!"
+#: ../src/timer.js:423
+#, fuzzy
+msgid "A new pomodoro is starting."
 msgstr "暂停结束，新的番茄时间开始了！"
 
-#: ../src/timer.js:433
-msgid "Pomodoro Finished!"
-msgstr "番茄时间结束！"
+#: ../src/timer.js:440
+#, fuzzy
+msgid "It's time to take a break!"
+msgstr "现在是时候要休息一下了！"
 
-#: ../src/timer.js:435
-msgid "Hide"
-msgstr "隐藏"
+#: ../src/timer.js:462
+#, fuzzy
+msgid "Take a break!"
+msgstr "休息一下吧！"
 
-#: ../src/timer.js:441
-#: ../src/timer.js:451
+#: ../src/timer.js:465
 msgid "Start a new pomodoro"
 msgstr "开始新的番茄时间"
 
-#: ../src/timer.js:446
-msgid "Show dialog"
-msgstr "显示对话框"
+#: ../src/timer.js:543
+#, fuzzy
+msgid "Hey, you're missing out on a break."
+msgstr "嘿，你错过了休息"
 
-#: ../src/timer.js:514
-#, c-format
-msgid "Take a break, you have %d second\n"
-msgid_plural "Take a break, you have %d seconds\n"
+#: ../src/timer.js:656
+#, fuzzy, c-format
+msgid "You have %d second left.\n"
+msgid_plural "You have %d seconds left.\n"
 msgstr[0] "休息会, 你有%d秒的休息时间\n"
-msgstr[1] "休息会, 你有%d秒的休息时间\n"
 
-#: ../src/timer.js:516
-#, c-format
-msgid "Take a break, you have %d minute\n"
-msgid_plural "Take a break, you have %d minutes\n"
+#: ../src/timer.js:658
+#, fuzzy, c-format
+msgid "You have %d minute left.\n"
+msgid_plural "You have %d minutes left.\n"
 msgstr[0] "休息会, 你有%d分的休息时间\n"
-msgstr[1] "休息会, 你有%d分的休息时间\n"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
-msgid "Timer toggle key"
-msgstr "计时器开关快捷键"
-
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:2
-msgid "Key to toggle the timer."
-msgstr "开关计时器快捷键"
-
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:3
 msgid "Pomodoro duration"
 msgstr "番茄时间时长"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:4
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:2
 msgid "Time in seconds you are supposed to be working."
 msgstr "在此秒数内您应该是工作的状态"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:5
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:3
 msgid "Short pause duration"
 msgstr "短休息时长"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:6
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:4
 msgid "Time in seconds you are supposed to have a short break."
 msgstr "在此秒数内您应该是短休息的状态"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:7
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:5
 msgid "Long pause duration"
 msgstr "长休息时长"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:8
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:6
 msgid "Time in seconds you are supposed to have a longer break."
 msgstr "在此秒数内您应该是长休息的状态"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:9
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:7
 msgid "Show dialog notifications during breaks"
 msgstr "休息时显示对话框提示"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:10
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:8
 msgid "Whether to show a notification dialog when pause starts."
 msgstr "休息时间内是否显示对话框提示"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:11
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:9
 msgid "Disable flexible breaks"
 msgstr "禁用弹性休息"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:12
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:10
 msgid "Whether you are not using a computer to work."
 msgstr "您是否在使用电脑工作"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:13
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:11
 msgid "Change user presence status to busy"
 msgstr "改变您的IM状态为繁忙"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:14
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:12
 msgid "Whether to change user and IM presence to busy."
 msgstr "是否改变您的IM状态为繁忙"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:15
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:13
 msgid "Use notification sound"
 msgstr "使用声音提示"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:16
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:14
 msgid "Whether to play a sound to notify of events."
 msgstr "事件触发时是否播放声音提示"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:17
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:15
 msgid "Notification sound file"
 msgstr "声音提示文件"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:18
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:16
 msgid "Sound file to play on pomodoro start or end."
 msgstr "在番茄时间开始或结束时播放的声音文件"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:19
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:17
 msgid "Restore timer state"
 msgstr "计时器复零"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:20
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:18
 msgid "Whether to restore state on startup."
 msgstr "是否在电脑启动后使计时器复零"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:21
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:19
 msgid "Number of completed sessions"
 msgstr "已完成的番茄时间数"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:22
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:20
 msgid "Number of completed sessions since long break"
 msgstr "从长休息开始后完成的番茄时间数"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:23
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:21
 msgid "Saved timer state"
 msgstr "保持计时器状态"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:24
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:22
 msgid "Time of saved state"
 msgstr "保持的计时器状态"
 
+#, fuzzy
+#~ msgid "Show Dialog Messages"
+#~ msgstr "显示对话框"
+
+#~ msgid "Show a dialog message at the end of pomodoro session"
+#~ msgstr "当番茄时间结束时显示一个信息"
+
+#~ msgid "Pomodoro Finished!"
+#~ msgstr "番茄时间结束！"
+
+#~ msgid "Hide"
+#~ msgstr "隐藏"
+
+#~ msgid "Timer toggle key"
+#~ msgstr "计时器开关快捷键"
+
+#~ msgid "Key to toggle the timer."
+#~ msgstr "开关计时器快捷键"
