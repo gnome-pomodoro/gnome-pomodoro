@@ -51,7 +51,7 @@ msgstr "Zkontroluj stav dostupnosti"
 
 #. Notification dialog toggle
 #: ../src/extension.js:141
-msgid "Show Dialog Messages"
+msgid "Fullscreen Notifications"
 msgstr "Ukaž dialogové zprávy"
 
 #. Notify with a sound toggle
