@@ -1,7 +1,7 @@
 {
   "extension-id": "pomodoro",
   "uuid": "@UUID@",
-  "settings-schema": "@GSCHEMANAME@",
+  "settings-schema": "org.gnome.shell.extensions.pomodoro",
   "name": "Pomodoro",
   "description": "A simple pomodoro timer",
   "shell-version": ["3.6", "3.5.92", "3.5.91"],

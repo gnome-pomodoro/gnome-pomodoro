@@ -1,6 +1,5 @@
 uuid = pomodoro@arun.codito.in
 extensiondir = $(datadir)/gnome-shell/extensions/$(uuid)
-gschemaname = org.gnome.shell.extensions.pomodoro
 
 dist_extension_DATA = \
 	dbus.js \
@@ -19,7 +18,6 @@ CLEANFILES = metadata.json
 metadata.json: metadata.json.in $(top_builddir)/config.status
 	$(AM_V_GEN) sed -e "s|[@]UUID@|$(uuid)|" \
 	    -e "s|[@]LOCALEDIR@|$(datadir)/locale|" \
-	    -e "s|[@]GSCHEMANAME@|$(gschemaname)|" \
 	    $< > $@
 
 uninstall-hook:
