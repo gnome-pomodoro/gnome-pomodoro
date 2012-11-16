@@ -1,6 +1,6 @@
-src/dbus.js
-src/extension.js
-src/metadata.json
-src/notification.js
-src/timer.js
-org.gnome.shell.extensions.pomodoro.gschema.xml.in
+extension/dbus.js
+extension/extension.js
+extension/metadata.json
+extension/notification.js
+extension/timer.js
+data/org.gnome.shell.extensions.pomodoro.gschema.xml.in
