@@ -21,6 +21,9 @@ GLIB_GSETTINGS
 AC_CONFIG_FILES([
   Makefile
   src/Makefile
+  data/Makefile
+  data/icons/Makefile
+  data/sounds/Makefile
   po/Makefile.in
 ])
 

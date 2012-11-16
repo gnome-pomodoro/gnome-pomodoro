@@ -1,8 +1,9 @@
-include ../extension.mk
+uuid = pomodoro@arun.codito.in
+extensiondir = $(datadir)/gnome-shell/extensions/$(uuid)
+gschemaname = org.gnome.shell.extensions.pomodoro
 
 dist_extension_DATA = \
 	dbus.js \
-	bell.wav \
 	extension.js \
 	metadata.json \
 	notification.js \
@@ -22,4 +23,4 @@ metadata.json: metadata.json.in $(top_builddir)/config.status
 	    $< > $@
 
 uninstall-hook:
-	rmdir $(extensiondir) 
+	rmdir $(extensiondir)
