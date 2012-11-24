@@ -1,5 +1,4 @@
-uuid = pomodoro@arun.codito.in
-extensiondir = $(datadir)/gnome-shell/extensions/$(uuid)
+include ../Makefile.include
 
 dist_extension_DATA = \
 	dbus.js \

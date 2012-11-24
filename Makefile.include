@@ -1,0 +1,5 @@
+# -*- mode: makefile -*-
+uuid = pomodoro@arun.codito.in
+extensiondir = $(datadir)/gnome-shell/extensions/$(uuid)
+localdir = $(HOME)/.local/share/gnome-shell/extensions
+builddir = $(abs_builddir)/build

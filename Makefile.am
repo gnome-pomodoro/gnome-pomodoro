@@ -1,16 +1,14 @@
+include Makefile.include
+
 SUBDIRS = extension data po
 
 ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = \
-    autogen.sh \
-    COPYING
-
-uuid = pomodoro@arun.codito.in
-extensiondir = $(datadir)/gnome-shell/extensions/$(uuid)
-
-localdir = $(HOME)/.local/share/gnome-shell/extensions
-builddir = $(abs_builddir)/build
+    COPYING \
+    README.md \
+    Makefile.include \
+    autogen.sh
 
 
 zip: local-build
