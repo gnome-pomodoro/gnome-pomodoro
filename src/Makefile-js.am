@@ -1,0 +1,32 @@
+# -*- mode: makefile -*-
+
+gnome_shell_pomodoro_built_sources = \
+    config.js \
+    $(NULL)
+
+gnome_shell_pomodoro_sources = \
+    $(gnome_shell_pomodoro_built_sources) \
+    application.js \
+    main.js \
+    mainWindow.js \
+    $(NULL)
+
+jsdir = $(pkgdatadir)/js
+dist_js_DATA = \
+    $(gnome_shell_pomodoro_sources) \
+    $(NULL)
+
+BUILT_SOURCES += \
+    $(gnome_shell_pomodoro_built_sources) \
+    $(NULL)
+
+CLEANFILES += \
+    $(BUILT_SOURCES) \
+    $(NULL)
+
+EXTRA_DIST += \
+    config.js.in \
+    $(NULL)
+
+config.js: Makefile config.js.in
+	$(AM_V_GEN) $(do_subst) $(srcdir)/config.js.in > $@

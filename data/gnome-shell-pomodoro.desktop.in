@@ -1,0 +1,11 @@
+
+[Desktop Entry]
+_Name=Pomodoro
+_Comment=Manage your time and tasks
+_Keywords=time;timer;tasks;manage;organize;
+Exec=gnome-shell-pomodoro
+Icon=
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Accessories

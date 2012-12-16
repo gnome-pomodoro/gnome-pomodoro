@@ -1,14 +1,24 @@
+include ../Makefile.include
+
 SUBDIRS = icons sounds
 
-gsettingsschema_in_files = org.gnome.shell.extensions.pomodoro.gschema.xml.in
-gsettings_SCHEMAS = $(gsettingsschema_in_files:.xml.in=.xml)
+@INTLTOOL_DESKTOP_RULE@
+desktopdir = $(datadir)/applications
+desktop_in_files = $(PACKAGE_TARNAME).desktop.in
+desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
+
+@GSETTINGS_RULES@
+@INTLTOOL_XML_NOMERGE_RULE@
+gsettings_in_files = org.gnome.shell.extensions.pomodoro.gschema.xml.in
+gsettings_SCHEMAS = $(gsettings_in_files:.xml.in=.xml)
 .PRECIOUS: $(gsettings_SCHEMAS)
 
-@INTLTOOL_XML_NOMERGE_RULE@
-@GSETTINGS_RULES@
-
-EXTRA_DIST= \
-    $(gsettingsschema_in_files)
+EXTRA_DIST = \
+    $(desktop_in_files) \
+    $(gsettings_in_files) \
+    $(NULL)
 
 CLEANFILES = \
-    $(gsettings_SCHEMAS)
+    $(desktop_DATA) \
+    $(gsettings_SCHEMAS) \
+    $(NULL)

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<interface>
+  <menu id="app-menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">About Pomodoro</attribute>
+        <attribute name="action">app.about</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Quit</attribute>
+        <attribute name="action">app.quit</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

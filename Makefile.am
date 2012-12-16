@@ -1,6 +1,6 @@
 include Makefile.include
 
-SUBDIRS = extension data po
+SUBDIRS = src extension data po
 
 ACLOCAL_AMFLAGS = -I m4
 

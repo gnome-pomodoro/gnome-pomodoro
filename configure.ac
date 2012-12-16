@@ -1,6 +1,7 @@
 AC_PREREQ(2.63)
 AC_INIT([gnome-shell-pomodoro],[0.7],[https://github.com/codito/gnome-shell-pomodoro])
 
+AC_CONFIG_SRCDIR([src/main.js])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([config])
 
@@ -18,6 +19,23 @@ PKG_PROG_PKG_CONFIG([0.22])
 
 GLIB_GSETTINGS
 
+GLIB_MIN_VERSION=2.31.6
+GTK_MIN_VERSION=3.4
+GOBJECT_INTROSPECTION_MIN_VERSION=1.31.6
+GDATA_MIN_VERSION=0.12.0
+GOA_MIN_VERSION=3.2.0
+CLUTTER_GTK_MIN_VERSION=1.2.0
+
+PKG_CHECK_MODULES(POMODORO,
+                  clutter-gtk-1.0 >= $CLUTTER_GTK_MIN_VERSION
+                  gjs-1.0
+                  glib-2.0 >= $GLIB_MIN_VERSION
+                  gobject-introspection-1.0 >= $GOBJECT_INTROSPECTION_MIN_VERSION
+                  gtk+-3.0 >= $GTK_MIN_VERSION
+                  gnome-desktop-3.0
+                  goa-1.0 >= $GOA_MIN_VERSION
+                  libgdata >= $GDATA_MIN_VERSION)
+
 GJS_CONSOLE=`$PKG_CONFIG --variable=gjs_console gjs-1.0`
 AC_SUBST(GJS_CONSOLE)
 
@@ -26,6 +44,7 @@ AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CONFIG_FILES([
   Makefile
+  src/Makefile
   extension/Makefile
   data/Makefile
   data/icons/Makefile
