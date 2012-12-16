@@ -102,7 +102,7 @@ const Indicator = new Lang.Class({
         
         
         // Register keybindings to toggle
-        global.display.add_keybinding('toggle-key', this._settings, Meta.KeyBindingFlags.NONE,
+        global.display.add_keybinding('toggle-pomodoro-timer', this._settings, Meta.KeyBindingFlags.NONE,
                 Lang.bind(this, this._onKeyPressed));
         
         this.connect('destroy', Lang.bind(this, this._onDestroy));
@@ -349,7 +349,7 @@ const Indicator = new Lang.Class({
     },
     
     _onDestroy: function() {
-        global.display.remove_keybinding('toggle-key');
+        global.display.remove_keybinding('toggle-pomodoro-timer');
 
         this._timer.destroy();
         this._dbus.destroy();
