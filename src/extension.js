@@ -349,6 +349,8 @@ const Indicator = new Lang.Class({
     },
     
     _onDestroy: function() {
+        global.display.remove_keybinding('toggle-key');
+
         this._timer.destroy();
         this._dbus.destroy();
     }
