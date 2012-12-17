@@ -734,7 +734,6 @@ const PomodoroTimer = new Lang.Class({
     },
 
     destroy: function() {
-        this.stop();
         this.disconnectAll();
 
         if (this._notificationDialog) {
