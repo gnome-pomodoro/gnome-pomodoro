@@ -39,13 +39,6 @@ const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
 const ngettext = Gettext.ngettext;
 
-try {
-    const Gst = imports.gi.Gst;
-    Gst.init(null);
-} catch(e) {
-    global.log('Pomodoro: '+ e.message);
-}
-
 
 // Pomodoro acceptance factor is useful in cases of disabling the timer,
 // accepted pomodoros increases session count and narrows time to long pause.
