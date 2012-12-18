@@ -55,11 +55,6 @@
       <_summary>Notification sound file</_summary>
       <_description>Sound file to play on pomodoro start or end.</_description>
     </key>
-    <key name="restore" type="b">
-      <default>true</default>
-      <_summary>Restore timer state</_summary>
-      <_description>Whether to restore state on startup.</_description>
-    </key>
     <key name="saved-session-count" type="i">
       <default>0</default>
       <_summary>Number of completed sessions</_summary>
