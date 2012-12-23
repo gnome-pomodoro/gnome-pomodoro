@@ -120,6 +120,7 @@ const ModalDialog = new Lang.Class({
         let constraint = new Clutter.BindConstraint({ source: global.stage,
                                                       coordinate: Clutter.BindCoordinate.ALL });
         this._group.add_constraint(constraint);
+        this._group.opacity = 0;
         this._group.connect('destroy', Lang.bind(this, this._onGroupDestroy));
 
         this._backgroundBin = new St.Bin();
@@ -162,10 +163,9 @@ const ModalDialog = new Lang.Class({
 
         this.state = State.OPENING;
 
-        this._dialogLayout.opacity = 255;
         if (this._lightbox)
             this._lightbox.show();
-        this._group.opacity = 0;
+
         this._group.show();
         Tweener.addTween(this._group,
                          { opacity: 255,
@@ -176,11 +176,13 @@ const ModalDialog = new Lang.Class({
     },
 
     _onFadeOpenComplete: function() {
-        this.state = State.OPENED;
-        this.emit('opened');
+        if (this.statue == State.OPENING) {
+            this.state = State.OPENED;
+            this.emit('opened');
 
-        if (this._capturedEventId == 0)
-            this._capturedEventId = global.stage.connect('captured-event', Lang.bind(this, this._onCapturedEvent));
+            if (this._capturedEventId == 0)
+                this._capturedEventId = global.stage.connect('captured-event', Lang.bind(this, this._onCapturedEvent));
+        }
     },
 
     open: function(timestamp) {
@@ -210,9 +212,11 @@ const ModalDialog = new Lang.Class({
                            transition: 'easeOutQuad',
                            onComplete: Lang.bind(this,
                                function() {
-                                   this.state = State.CLOSED;
-                                   this._group.hide();
-                                   this.emit('closed');
+                                    if (this.state == State.CLOSING) {
+                                        this.state = State.CLOSED;
+                                        this._group.hide();
+                                        this.emit('closed');
+                                    }
                                })
                          });
         this.emit('closing');
@@ -271,16 +275,21 @@ const ModalDialog = new Lang.Class({
         if (!this._hasModal)
             return;
 
+        try {
+            Main.popModal(this._group, timestamp);
+            global.gdk_screen.get_display().sync();
+        }
+        catch (e) {
+            // For some reason modal might have been popped externally.
+        }
+
         let focus = global.stage.key_focus;
         if (focus && this._group.contains(focus))
             this._savedKeyFocus = focus;
         else
             this._savedKeyFocus = null;
 
-        Main.popModal(this._group, timestamp);
-        global.gdk_screen.get_display().sync();
         this._hasModal = false;
-
         this._lightbox.actor.reactive = false;
     },
 
@@ -291,12 +300,13 @@ const ModalDialog = new Lang.Class({
             return false;
 
         this._hasModal = true;
+        this._lightbox.actor.reactive = true;
+
         if (this._savedKeyFocus) {
             this._savedKeyFocus.grab_key_focus();
             this._savedKeyFocus = null;
         }
 
-        this._lightbox.actor.reactive = true;
         return true;
     },
 
