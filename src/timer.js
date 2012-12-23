@@ -511,6 +511,7 @@ const PomodoroTimer = new Lang.Class({
     _closeNotifications: function() {
         if (this._notificationSource) {
             this._notificationSource.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+            this._notificationSource = null;
         }
         if (this._notificationDialog) {
             this._notificationDialog.close();
@@ -728,11 +729,25 @@ const PomodoroTimer = new Lang.Class({
 
     destroy: function() {
         this.disconnectAll();
+        this._closeNotifications();
+        this._disableEventCapture();
+
+        if (this._timeoutSource != 0) {
+            GLib.source_remove(this._timeoutSource);
+            this._timeoutSource = 0;
+        }
+
+        if (this._notification) {
+            this._notification.destroy();
+            this._notification = null;
+        }
 
         if (this._notificationDialog) {
             this._notificationDialog.destroy();
             this._notificationDialog = null;
         }
+
+        this._unload();
     }
 });
 
