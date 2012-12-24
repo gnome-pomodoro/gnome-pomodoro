@@ -93,7 +93,7 @@ const PomodoroTimer = new Lang.Class({
         
         this._notification = null;
         this._notificationSource = null;
-        this._notificationDialog = new Notification.NotificationDialog();
+        this._notificationDialog = null;
         this._playbin = null;
         this._power = null;
         this._presence = null;
@@ -303,15 +303,8 @@ const PomodoroTimer = new Lang.Class({
                         break;
             }
             
-            if (this._notificationDialog.state == Notification.State.CLOSED ||
-                this._notificationDialog.state == Notification.State.CLOSING || !this._notification) {
-                if (this._state == State.PAUSE)
-                    this._notifyPomodoroEnd();
-                
-                // TODO: Notify about pomodoro start once the lock screen is off
-                // if (this._state == State.IDLE)
-                //    this._notifyPomodoroStart();
-            }            
+            if (this._state == State.PAUSE)
+                this._notifyPomodoroEnd();
         }
         
         this._updatePresenceStatus();
@@ -428,25 +421,29 @@ const PomodoroTimer = new Lang.Class({
             this._deactivateScreenSaver();
             this._playNotificationSound();
         }
-        
-        this._notificationDialog.setTimer('00:00');
-        this._notificationDialog.setDescription(_("It's time to take a break!"));
-
-        this._notificationDialog.connect('opening', Lang.bind(this, function() {
-                this._unscheduleReminder();
-            }));
-        this._notificationDialog.connect('closing', Lang.bind(this, function() {
-                this._openNotification(this._notification);
-            }));
-        this._notificationDialog.connect('closed', Lang.bind(this, function() {
-                this._unscheduleReminder(); // reset reminder count
-                this._scheduleReminder();
-            }));
-        this._notificationDialog.connect('destroy', Lang.bind(this, function() {
-                this._notificationDialog = null;
-            }));
 
         this._openNotificationSource();
+
+        if (!this._notificationDialog) {
+            this._notificationDialog = new Notification.NotificationDialog();
+            this._notificationDialog.setTimer('00:00');
+            this._notificationDialog.setDescription(_("It's time to take a break!"));
+
+            this._notificationDialog.connect('opening', Lang.bind(this, function() {
+                    this._unscheduleReminder();
+                }));
+            this._notificationDialog.connect('closing', Lang.bind(this, function() {
+                    if (this._notification)
+                        this._openNotification(this._notification);
+                }));
+            this._notificationDialog.connect('closed', Lang.bind(this, function() {
+                    this._unscheduleReminder(); // reset reminder count
+                    this._scheduleReminder();
+                }));
+            this._notificationDialog.connect('destroy', Lang.bind(this, function() {
+                    this._notificationDialog = null;
+                }));
+        }
 
         if (this._notification)
             this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
@@ -456,17 +453,6 @@ const PomodoroTimer = new Lang.Class({
                                                           null);
         this._notification.setResident(true);
         this._notification.addButton(1, _("Start a new pomodoro"));
-        this._notification.connect('action-invoked', Lang.bind(this, function(object, id) {
-                if (id == 1)
-                    this.startPomodoro();
-            }));
-        this._notification.connect('clicked', Lang.bind(this, function() {
-                this._notificationDialog.open();
-                this._notificationDialog.pushModal();
-            }));
-        this._notification.connect('destroy', Lang.bind(this, function(reason) {
-                this._notification = null;
-            }));
 
         // Force to show description along with title,
         // as this is private property, API might change
@@ -476,6 +462,20 @@ const PomodoroTimer = new Lang.Class({
         catch(e) {
             global.log('Pomodoro: ' + e.message);
         }
+
+        this._notification.connect('action-invoked', Lang.bind(this, function(object, id) {
+                if (id == 1)
+                    this.startPomodoro();
+            }));
+        this._notification.connect('clicked', Lang.bind(this, function() {
+                if (this._notificationDialog) {
+                    this._notificationDialog.open();
+                    this._notificationDialog.pushModal();
+                }
+            }));
+        this._notification.connect('destroy', Lang.bind(this, function(reason) {
+                this._notification = null;
+            }));
 
         this._updateNotification();
 
@@ -528,9 +528,7 @@ const PomodoroTimer = new Lang.Class({
         if (this._elapsedLimit - this._elapsed < 120)
             return;
         
-        if (this._notificationDialog.state == Notification.State.CLOSED ||
-            this._notificationDialog.state == Notification.State.CLOSING) {
-
+        if (!this._notificationDialog || this._notificationDialog.state == Notification.State.CLOSED) {
             this._openNotificationSource();
 
             let notification = new MessageTray.Notification(this._notificationSource,
@@ -538,8 +536,10 @@ const PomodoroTimer = new Lang.Class({
                                                             null);
             notification.setTransient(true);
             notification.connect('clicked', Lang.bind(this, function() {
-                    this._notificationDialog.open();
-                    this._notificationDialog.pushModal();
+                    if (this._notificationDialog) {
+                        this._notificationDialog.open();
+                        this._notificationDialog.pushModal();
+                    }
                 }));
             this._openNotification(notification);
         }
@@ -563,8 +563,10 @@ const PomodoroTimer = new Lang.Class({
 
     _onScreenShieldChanged: function() {
         if (!this._screenShield.locked && this._state == State.PAUSE) {
-            this._notificationDialog.open();
-            this._notificationDialog.pushModal();
+            if (this._notificationDialog && this._settings.get_boolean('show-notification-dialogs')) {
+                this._notificationDialog.open();
+                this._notificationDialog.pushModal();
+            }
         }
     },
 
@@ -632,7 +634,7 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _updateNotification: function() {
-        if (!this._notificationDialog || this._state != State.PAUSE)
+        if (this._state != State.PAUSE)
             return;
 
         let remaining = Math.max(this._elapsedLimit - this._elapsed, 0);
