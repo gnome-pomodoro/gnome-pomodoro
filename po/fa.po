@@ -8,16 +8,14 @@ msgstr ""
 "Project-Id-Version: gnome-shell-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-18 16:22+0100\n"
-"PO-Revision-Date: 2012-04-08 11:58+0330\n"
+"PO-Revision-Date: 2012-12-25 20:56+0330\n"
 "Last-Translator: Arash Mousavi <mousavi.arash@gmail.com>\n"
 "Language-Team: Persian <mousavi.arash@gmail.com>\n"
-"Language: \n"
+"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n!=1)\n"
-"X-Poedit-Language: Persian\n"
-"X-Poedit-Country: IRAN, ISLAMIC REPUBLIC OF\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
 #: ../src/extension.js:61
@@ -25,11 +23,9 @@ msgstr ""
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%Id دقیقه"
-msgstr[1] "%Id دقیقه"
 
 #. Toggle timer state button
-#: ../src/extension.js:96
-#: ../src/notification.js:54
+#: ../src/extension.js:86 ../src/notification.js:79
 msgid "Pomodoro Timer"
 msgstr "زمانسنج پومودورو"
 
@@ -53,9 +49,10 @@ msgstr "دور از میز"
 msgid "Control Presence Status"
 msgstr "کنترل وضعیت حضور"
 
-#: ../src/extension.js:155
-msgid "Show a dialog message at the end of pomodoro session"
-msgstr "نمایش یک پیام در پایان دوره پومودورو"
+#. Notification dialog toggle
+#: ../src/extension.js:141
+msgid "Fullscreen Notifications"
+msgstr "نمایش محاوره‌ی پیام‌ها"
 
 #. Notify with a sound toggle
 #: ../src/extension.js:162
@@ -86,50 +83,43 @@ msgstr "هیچ دوره‌ی کاملی انجام نشده"
 msgid "%d Completed Session"
 msgid_plural "%d Completed Sessions"
 msgstr[0] "%Id دوره کامل"
-msgstr[1] "%Id دوره کامل"
 
-#: ../src/timer.js:411
-msgid "Pause finished, a new pomodoro is starting!"
-msgstr "مکث تمام شد، یک پومودورو دیگه شروع شد!"
+#: ../src/timer.js:422
+msgid "Pause finished."
+msgstr "مدت استراحت تمام شد."
 
-#: ../src/timer.js:433
-msgid "Pomodoro Finished!"
-msgstr "پومودورو تمام شد!"
+#: ../src/timer.js:423
+msgid "A new pomodoro is starting."
+msgstr "یک پومودورو دیگه شروع شد."
 
-#: ../src/timer.js:435
-msgid "Hide"
-msgstr "مخفی کردن"
+#: ../src/timer.js:440
+msgid "It's time to take a break!"
+msgstr "حالا وقت استراحت است!"
+
+#: ../src/timer.js:462
+msgid "Take a break!"
+msgstr "یکم استراحت کن!"
 
 #: ../src/timer.js:441
 #: ../src/timer.js:451
 msgid "Start a new pomodoro"
 msgstr "شروع یک پومودورو جدید"
 
-#: ../src/timer.js:446
-msgid "Show dialog"
-msgstr "نمایش محاوره"
+#: ../src/timer.js:543
+msgid "Hey, you're missing out on a break."
+msgstr "ای بابا. داری یک زمان استراحت رو از دست میدی."
 
-#: ../src/timer.js:514
+#: ../src/timer.js:656
 #, c-format
-msgid "Take a break, you have %d second\n"
-msgid_plural "Take a break, you have %d seconds\n"
-msgstr[0] "کمی استراحت کنید، شما %Id ثانیه زمان دارید\n"
-msgstr[1] "کمی استراحت کنید، شما %Id ثانیه زمان دارید\n"
+msgid "You have %d second left.\n"
+msgid_plural "You have %d seconds left.\n"
+msgstr[0] "شما %Id ثانیه زمان دارید\n"
 
-#: ../src/timer.js:516
+#: ../src/timer.js:658
 #, c-format
-msgid "Take a break, you have %d minute\n"
-msgid_plural "Take a break, you have %d minutes\n"
-msgstr[0] "کمی استراحت کنید، شما %Id دقیقه زمان دارید\n"
-msgstr[1] "کمی استراحت کنید، شما %Id دقیقه زمان دارید\n"
-
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
-msgid "Timer toggle key"
-msgstr "کلید تغییرحالت زمانسنج"
-
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:2
-msgid "Key to toggle the timer."
-msgstr "کلیدی برای تغییرحالت زمانسنج"
+msgid "You have %d minute left.\n"
+msgid_plural "You have %d minutes left.\n"
+msgstr[0] "شما %Id دقیقه زمان دارید\n"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:3
 msgid "Pomodoro duration"
@@ -219,3 +209,20 @@ msgstr "ذخیره وضعیت زمانسنج"
 msgid "Time of saved state"
 msgstr "زمان وضعیت ذخیره شده"
 
+#~ msgid "Show Dialog Messages"
+#~ msgstr "نمایش محاوره‌ی پیام‌ها"
+
+#~ msgid "Show a dialog message at the end of pomodoro session"
+#~ msgstr "نمایش یک پیام در پایان دوره پومودورو"
+
+#~ msgid "Pomodoro Finished!"
+#~ msgstr "پومودورو تمام شد!"
+
+#~ msgid "Hide"
+#~ msgstr "مخفی کردن"
+
+#~ msgid "Timer toggle key"
+#~ msgstr "کلید تغییرحالت زمانسنج"
+
+#~ msgid "Key to toggle the timer."
+#~ msgstr "کلیدی برای تغییرحالت زمانسنج"
