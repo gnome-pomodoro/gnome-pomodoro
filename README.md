@@ -1,13 +1,15 @@
-# Pomodoro extension for gnome-shell
-- Provides a countdown timer in the gnome-shell top panel
+# Pomodoro extension for GNOME Shell
+- Provides a countdown timer in the GNOME Shell top panel
 - Keeps track of completed 25 minute cycles
 
 ![Pomodoro image](http://kamilprusko.org/files/gnome-shell-pomodoro-extension.png)
 
 You can read more on pomodoro technique [here](http://www.pomodorotechnique.com).
 
+*This project is not affiliated with, authorized by, sponsored by, or otherwise approved by GNOME Foundation and/or the Pomodoro Technique®. The GNOME logo and GNOME name are registered trademarks or trademarks of GNOME Foundation in the United States or other countries. The Pomodoro Technique® and Pomodoro™ are registered trademarks of Francesco Cirillo.*
+
 # Dependencies
-- Gnome-shell 3.4 (Our [0.5 release](https://extensions.gnome.org/extension/53/pomodoro/version/115/) supported gnome-shell <= 3.2)
+- GNOME Shell 3.4 (Our [0.5 release](https://extensions.gnome.org/extension/53/pomodoro/version/115/) supported gnome-shell <= 3.2)
 - Optional [LibKeybinder3](https://github.com/engla/keybinder/tree/keybinder-3.0) for global key bindings
 
 # Installation
@@ -37,7 +39,7 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
         gsettings get org.gnome.shell enabled-extensions  
         gsettings set org.gnome.shell enabled-extensions [&lt;value from get above&gt;, pomodoro@arun.codito.in]  
 
-- Press *Alt + F2*, and *r* in command to restart gnome-shell
+- Press *Alt + F2*, and *r* in command to restart GNOME Shell
 
 # Usage
 - Use toggle switch (or Ctrl+Alt+P) to toggle timer on/off
@@ -55,13 +57,13 @@ GPL3. See COPYING for details.
 **Unstable**
 
 + Czech translation
-+ Support for gnome-shell 3.6
++ Support for GNOME Shell 3.6
 + 
 
 **Version 0.6**
 
 + New translation: Persian (thanks @arashm)
-+ Feature: Support for gnome-shell 3.4
++ Feature: Support for GNOME Shell 3.4
 + Breaking change: Dropped support for older gnome-shell versions due to incompatible APIs
 + Feature: Support for "Away from desk" mode
 + Feature: Ability to change IM presence status based on pomodoro activity
