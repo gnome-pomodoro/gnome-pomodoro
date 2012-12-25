@@ -1,5 +1,5 @@
 # Pomodoro extension for GNOME Shell
-- Provides a countdown timer in the GNOME Shell top panel
+- Provides a countdown timer in the [GNOME Shell](http://www.gnome.org/gnome-3/) top panel
 - Keeps track of completed 25 minute cycles
 
 ![Pomodoro image](http://kamilprusko.org/files/gnome-shell-pomodoro-extension.png)
@@ -7,10 +7,6 @@
 You can read more on pomodoro technique [here](http://www.pomodorotechnique.com).
 
 *This project is not affiliated with, authorized by, sponsored by, or otherwise approved by GNOME Foundation and/or the Pomodoro Technique®. The GNOME logo and GNOME name are registered trademarks or trademarks of GNOME Foundation in the United States or other countries. The Pomodoro Technique® and Pomodoro™ are registered trademarks of Francesco Cirillo.*
-
-# Dependencies
-- GNOME Shell 3.4 (Our [0.5 release](https://extensions.gnome.org/extension/53/pomodoro/version/115/) supported gnome-shell <= 3.2)
-- Optional [LibKeybinder3](https://github.com/engla/keybinder/tree/keybinder-3.0) for global key bindings
 
 # Installation
 ## Web based (recommended)
@@ -23,23 +19,32 @@ Get from [AUR](http://aur.archlinux.org/packages.php?ID=49967)
 Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github.com/mgrela/dropzone/tree/master/gnome-extra/gnome-shell-extensions-pomodoro). Instructions [here](http://mgrela.rootnode.net/doku.php?id=wiki:gentoo:dropzone).
 
 ## Direct from source
-- Get zipball 
-    * [Stable | Gnome-shell >= 3.4](https://github.com/codito/gnome-shell-pomodoro/zipball/0.6)
-    * [Unstable - Master branch](https://github.com/codito/gnome-shell-pomodoro/zipball/master)
-- Build it and install 
+1. Get zipball
+    * [for GNOME Shell 3.4](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-3.4)
+    * [for GNOME Shell 3.6](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-3.6)
+    * [Unstable – our master branch](https://github.com/codito/gnome-shell-pomodoro/zipball/master)
 
-        ./autogen.sh --prefix=/usr  
-        make zip  
-        unzip _build/gnome-shell-pomodoro.0.6.zip -d ~/.local/gnome-shell/extensions/pomodoro@arun.codito.in  
+2. Build it and install
 
-    - To install it system-wide, you could do: `sudo make install`  
+        ./autogen.sh --prefix=/usr
+        make zip
+        unzip _build/gnome-shell-pomodoro.0.6.zip -d ~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in
 
-- Enable the extension using `gnome-tweak-tool` (Shell Extensions -> Pomodoro Extension) or via following commandline:  
+    To install it system-wide, you could do
 
-        gsettings get org.gnome.shell enabled-extensions  
-        gsettings set org.gnome.shell enabled-extensions [&lt;value from get above&gt;, pomodoro@arun.codito.in]  
+        ./autogen.sh --prefix=/usr
+        sudo make install
 
-- Press *Alt + F2*, and *r* in command to restart GNOME Shell
+    …and after a successful installation remove the local extension
+
+        rm -R ~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in
+
+3. Enable the extension using `gnome-tweak-tool` (Shell Extensions → Pomodoro) or via following commandline:
+
+        gsettings get org.gnome.shell enabled-extensions
+        gsettings set org.gnome.shell enabled-extensions [<values from get above>, pomodoro@arun.codito.in]
+
+4. Press *Alt + F2*, and `r` in command to restart GNOME Shell
 
 # Usage
 - Use toggle switch (or Ctrl+Alt+P) to toggle timer on/off
