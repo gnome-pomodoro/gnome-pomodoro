@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-shell-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-14 14:43+0200\n"
-"PO-Revision-Date: 2012-04-08 11:58+0330\n"
+"POT-Creation-Date: 2012-03-18 16:22+0100\n"
+"PO-Revision-Date: 2012-12-25 20:56+0330\n"
 "Last-Translator: Arash Mousavi <mousavi.arash@gmail.com>\n"
 "Language-Team: Persian <mousavi.arash@gmail.com>\n"
 "Language: fa\n"
@@ -16,8 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Poedit-Language: Persian\n"
-"X-Poedit-Country: IRAN, ISLAMIC REPUBLIC OF\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
 #: ../src/extension.js:57
@@ -27,7 +25,7 @@ msgid_plural "%d minutes"
 msgstr[0] "%Id دقیقه"
 
 #. Toggle timer state button
-#: ../src/extension.js:86 ../src/notification.js:76
+#: ../src/extension.js:86 ../src/notification.js:79
 msgid "Pomodoro Timer"
 msgstr "زمانسنج پومودورو"
 
@@ -53,9 +51,8 @@ msgstr "کنترل وضعیت حضور"
 
 #. Notification dialog toggle
 #: ../src/extension.js:141
-#, fuzzy
 msgid "Fullscreen Notifications"
-msgstr "نمایش محاوره"
+msgstr "نمایش محاوره‌ی پیام‌ها"
 
 #. Notify with a sound toggle
 #: ../src/extension.js:148
@@ -88,45 +85,42 @@ msgid_plural "%d Completed Sessions"
 msgstr[0] "%Id دوره کامل"
 
 #: ../src/timer.js:422
-#, fuzzy
 msgid "Pause finished."
-msgstr "مکث به پایان رسید"
+msgstr "مدت استراحت تمام شد."
 
 #: ../src/timer.js:423
-#, fuzzy
 msgid "A new pomodoro is starting."
-msgstr "مکث تمام شد، یک پومودورو دیگه شروع شد!"
+msgstr "یک پومودورو دیگه شروع شد."
 
 #: ../src/timer.js:440
-#, fuzzy
 msgid "It's time to take a break!"
-msgstr "این زمان را به یک استراحت"
+msgstr "حالا وقت استراحت است!"
 
 #: ../src/timer.js:462
-#, fuzzy
 msgid "Take a break!"
-msgstr "نگاهی به یک استراحت"
+msgstr "یکم استراحت کن!"
 
 #: ../src/timer.js:465
 msgid "Start a new pomodoro"
 msgstr "شروع یک پومودورو جدید"
 
 #: ../src/timer.js:543
-#, fuzzy
 msgid "Hey, you're missing out on a break."
-msgstr "با سلام، شما در حال از دست رفته در شکستن"
+msgstr "ای بابا. داری یک زمان استراحت رو از دست میدی."
 
 #: ../src/timer.js:656
-#, fuzzy, c-format
+#, c-format
 msgid "You have %d second left.\n"
 msgid_plural "You have %d seconds left.\n"
-msgstr[0] "کمی استراحت کنید، شما %Id ثانیه زمان دارید\n"
+msgstr[0] "شما %Id ثانیه زمان دارید\n"
+msgstr[1] "شما %Id ثانیه زمان دارید\n"
 
 #: ../src/timer.js:658
-#, fuzzy, c-format
+#, c-format
 msgid "You have %d minute left.\n"
 msgid_plural "You have %d minutes left.\n"
-msgstr[0] "کمی استراحت کنید، شما %Id دقیقه زمان دارید\n"
+msgstr[0] "شما %Id دقیقه زمان دارید\n"
+msgstr[1] "شما %Id دقیقه زمان دارید\n"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
 msgid "Pomodoro duration"
@@ -216,9 +210,8 @@ msgstr "ذخیره وضعیت زمانسنج"
 msgid "Time of saved state"
 msgstr "زمان وضعیت ذخیره شده"
 
-#, fuzzy
 #~ msgid "Show Dialog Messages"
-#~ msgstr "نمایش محاوره"
+#~ msgstr "نمایش محاوره‌ی پیام‌ها"
 
 #~ msgid "Show a dialog message at the end of pomodoro session"
 #~ msgstr "نمایش یک پیام در پایان دوره پومودورو"
