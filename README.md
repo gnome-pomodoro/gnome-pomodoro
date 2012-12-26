@@ -1,10 +1,22 @@
 # Pomodoro extension for GNOME Shell
-- Provides a countdown timer in the [GNOME Shell](http://www.gnome.org/gnome-3/) top panel
-- Keeps track of completed 25 minute cycles
+
+This [GNOME Shell](http://www.gnome.org/gnome-3/) extension intends to help manage time according to [Pomodoro Technique](http://en.wikipedia.org/wiki/Pomodoro_technique).
+
+## Features
+
+- Countdown timer in the [GNOME Shell](http://www.gnome.org/gnome-3/) top panel
+- Full screen notifications that can be easily dismissed
+- Reminders to nag you about taking a break
+- Sets your IM (*Empathy*) status to busy
+- Hides any notifications until the start of break
 
 ![Pomodoro image](http://kamilprusko.org/files/gnome-shell-pomodoro-extension.png)
 
-You can read more on pomodoro technique [here](http://www.pomodorotechnique.com).
+## What is the pomodoro technique?
+
+The [Pomodoro Technique](http://en.wikipedia.org/wiki/Pomodoro_technique) is a time and focus management method which improves productivity and quality of work. The name comes from a kitchen timer, which can be used to keep track of time. In short, you are supposed to focus on work for around 25 minutes and then have a well deserved break in which you should relax. This cycle repeats once it reaches 4th break – then you should take a longer break (have a walk or something). It's that simple. It improves your focus, physical health and mental agility depending on how you spend your breaks and how strictly you follow the routine.
+
+You can read more on pomodoro technique [here](http://www.pomodorotechnique.com/book/).
 
 *This project is not affiliated with, authorized by, sponsored by, or otherwise approved by GNOME Foundation and/or the Pomodoro Technique®. The GNOME logo and GNOME name are registered trademarks or trademarks of GNOME Foundation in the United States or other countries. The Pomodoro Technique® and Pomodoro™ are registered trademarks of Francesco Cirillo.*
 
@@ -47,23 +59,24 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 4. Press *Alt + F2*, and `r` in command to restart GNOME Shell
 
 # Usage
-- Use toggle switch (or Ctrl+Alt+P) to toggle timer on/off
+- Use toggle switch (or *Ctrl+Alt+P*) to toggle timer on/off
 - You can configure behavior of the extension in *Options* menu
 
 For a list of configurable options, please refer [wiki](https://github.com/codito/gnome-shell-pomodoro/wiki/Configuration)
 
 # License
-GPL3. See COPYING for details.
+GPL3. See [COPYING](https://raw.github.com/codito/gnome-shell-pomodoro/master/COPYING) for details.
 
 # Thanks
-- Contributors: https://github.com/codito/gnome-shell-pomodoro/contributors
+Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodoro/contributors).
 
 # Changelog
 **Unstable**
 
 + Czech translation
-+ Support for GNOME Shell 3.6
-+ 
++ Support for GNOME Shell 3.4 and 3.6
++ Full screen notifications
++ Added reminders
 
 **Version 0.6**
 
