@@ -1,15 +1,21 @@
 include Makefile.include
 
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+
 SUBDIRS = src extension data po
 
-ACLOCAL_AMFLAGS = -I m4
-
 EXTRA_DIST = \
+    autogen.sh \
     COPYING \
-    README.md \
     Makefile.include \
-    autogen.sh
+    README.md \
+    $(NULL)
 
+MAINTAINERCLEANFILES = \
+    aclocal.m4 \
+    config.log \
+    config.status \
+    configure
 
 zip: local-build
 	gsettings_SCHEMA=$(builddir)/usr/share/glib-2.0/schemas/*.xml; \
@@ -23,7 +29,7 @@ zip: local-build
 	\
 	ziptarget=$(PACKAGE_NAME)-$(PACKAGE_VERSION).zip; \
 	(cd $(builddir)$(extensiondir); \
-	    zip -qr $(abs_builddir)/$${ziptarget} .; \
+		zip -qr $(abs_builddir)/$${ziptarget} .; \
 	);
 
 local-build:
@@ -33,12 +39,15 @@ local-build:
 
 local-uninstall:
 	if [ -d $(localdir)/$(uuid) ]; then \
-	    rm -fR $(localdir)/$(uuid); \
+		rm -Rf $(localdir)/$(uuid); \
 	fi;
 
 local-install: zip local-uninstall
 	zipfile=$(PACKAGE_NAME)-$(PACKAGE_VERSION).zip; \
 	$(MKDIR_P) $(localdir)/$(uuid); \
 	(cd $(localdir)/$(uuid); \
-	    unzip -q $(abs_builddir)/$${zipfile}; \
+		unzip -q $(abs_builddir)/$${zipfile}; \
 	);
+
+uninstall-hook:
+	rm -Rf $(pkgdatadir)

@@ -3,3 +3,23 @@ uuid = pomodoro@arun.codito.in
 extensiondir = $(datadir)/gnome-shell/extensions/$(uuid)
 localdir = $(HOME)/.local/share/gnome-shell/extensions
 builddir = $(abs_builddir)/build
+
+# convenience command for doing Makefile variable substitutions in non-Makefile
+# files (scripts, service files, etc.)
+do_subst = sed -e 's|@abs_top_srcdir[@]|$(abs_top_srcdir)|g' \
+               -e 's|@abs_top_builddir[@]|$(abs_top_builddir)|g' \
+               -e 's|@bindir[@]|$(bindir)|g' \
+               -e 's|@libdir[@]|$(libdir)|g' \
+               -e 's|@libexecdir[@]|$(libexecdir)|g' \
+               -e 's|@localedir[@]|$(localedir)|g' \
+               -e 's|@pkgdatadir[@]|$(pkgdatadir)|g' \
+               -e 's|@pkglibdir[@]|$(pkglibdir)|g' \
+               -e 's|@GETTEXT_PACKAGE[@]|$(GETTEXT_PACKAGE)|g' \
+               -e 's|@GJS_CONSOLE[@]|$(GJS_CONSOLE)|g' \
+               -e 's|@PACKAGE_BUGREPORT[@]|$(PACKAGE_BUGREPORT)|g' \
+               -e 's|@PACKAGE_NAME[@]|$(PACKAGE_NAME)|g' \
+               -e 's|@PACKAGE_STRING[@]|$(PACKAGE_STRING)|g' \
+               -e 's|@PACKAGE_TARNAME[@]|$(PACKAGE_TARNAME)|g' \
+               -e 's|@PACKAGE_URL[@]|$(PACKAGE_URL)|g' \
+               -e 's|@PACKAGE_VERSION[@]|$(PACKAGE_VERSION)|g' \
+               -e 's|@UUID[@]|$(uuid)|g'

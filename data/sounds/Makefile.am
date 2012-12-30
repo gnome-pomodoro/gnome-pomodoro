@@ -1,14 +1,11 @@
-NULL =
 
 public_sounds = \
-	bell.wav \
-	$(NULL)
+    bell.wav \
+    $(NULL)
 
 EXTRA_DIST = \
-	$(public_sounds)		\
-	$(NULL)
-
-###############################################################################
+    $(public_sounds) \
+    $(NULL)
 
 install-sounds:
 	for sound in $(public_sounds); do \
@@ -17,7 +14,7 @@ install-sounds:
 	done
 
 uninstall-sounds:
-	-for icon in $(public_icons); do \
+	for sound in $(public_sounds); do \
 		rm -f $(DESTDIR)$(pkgdatadir)/sounds/$$sound; \
 	done
 
