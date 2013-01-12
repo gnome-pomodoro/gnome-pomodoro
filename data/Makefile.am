@@ -13,9 +13,16 @@ gsettings_in_files = org.gnome.shell.extensions.pomodoro.gschema.xml.in
 gsettings_SCHEMAS = $(gsettings_in_files:.xml.in=.xml)
 .PRECIOUS: $(gsettings_SCHEMAS)
 
+styledir = $(pkgdatadir)
+style_files = \
+    gtk-style.css \
+    $(NULL)
+style_DATA = $(style_files)
+
 EXTRA_DIST = \
     $(desktop_in_files) \
     $(gsettings_in_files) \
+    $(style_files) \
     $(NULL)
 
 CLEANFILES = \
