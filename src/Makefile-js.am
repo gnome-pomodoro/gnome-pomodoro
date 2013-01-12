@@ -9,6 +9,7 @@ gnome_shell_pomodoro_sources = \
     application.js \
     main.js \
     mainWindow.js \
+    widgets.js \
     $(NULL)
 
 jsdir = $(pkgdatadir)/js
