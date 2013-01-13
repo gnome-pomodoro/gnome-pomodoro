@@ -20,6 +20,7 @@
  */
 
 const Lang = imports.lang;
+const Signals = imports.signals;
 const _ = imports.gettext.gettext;
 
 const Gdk = imports.gi.Gdk;
@@ -34,6 +35,7 @@ const ModeButton = new Lang.Class({
     Extends: Gtk.Box,
 
     _selected: -1,
+    _busy: false,
 
     get selected() {
         return this._selected;
@@ -41,23 +43,24 @@ const ModeButton = new Lang.Class({
 
     set selected(value) {
         let children = this.get_children();
-        let button = null;
 
-        if (value == this._selected)
+        if (value < 0 || value >= children.length)
             return;
 
-        if (value >= 0 && value < children.length)
+        if (!this._busy)
         {
-            // deactivate current item
-            if (this._selected >= 0) {
-                button = children[this._selected];
-                button.set_active(false);
-            }
-            // activate new item
-            button = children[value];
-            button.set_active(true);
+            this._busy = true;
 
-            this._selected = value;
+            for (let index in children) {
+                children[index].active = (index == value);
+            }
+
+            this._busy = false;
+
+            if (this._selected != value) {
+                this._selected = value;
+                this.emit('changed');
+            }
         }
     },
 
@@ -66,7 +69,7 @@ const ModeButton = new Lang.Class({
 
         this.homogeneous = true;
         this.halign = Gtk.Align.CENTER;
-        this.can_focus = true;
+        this.can_focus = false;
         this.spacing = 0;
 
         let style_context = this.get_style_context ();
@@ -78,12 +81,11 @@ const ModeButton = new Lang.Class({
         style_context.add_class('raised');
 
         child.set_alignment(0.5, 0.5);
-        child.can_focus = false;
+        child.can_focus = true;
         child.add_events(Gdk.EventMask.SCROLL_MASK);
 
-        child.connect('button-press-event', Lang.bind(this, function() {
-            this.selected = this.get_children().indexOf(child);
-            return true;
+        child.connect('clicked', Lang.bind(this, function(widget) {
+            this.selected = this.get_children().indexOf(widget);
         }));
 
         this.pack_start (child, true, true, 0);
@@ -92,19 +94,17 @@ const ModeButton = new Lang.Class({
             this.selected = 0;
     },
 
-    append_text: function(text)
-    {
+    append_text: function(text) {
         let item = new ModeButtonItem({ label: text });
         this.add(item);
     },
 
-    append_icon: function(icon_name, icon_size)
-    {
-        let icon = Gtk.Image.new_from_icon_name(icon_name, icon_size);
+    append_icon: function(icon_name, icon_size) {
         let item = new ModeButtonItem();
-        item.add(icon);
-
         this.add(item);
+
+        let icon = Gtk.Image.new_from_icon_name(icon_name, icon_size);
+        item.add(icon);
     },
 
     vfunc_scroll_event: function(event) {
@@ -122,8 +122,8 @@ const ModeButton = new Lang.Class({
         }
         return false;
     }
-
 });
+Signals.addSignalMethods(ModeButton.prototype);
 
 const ModeButtonItem = new Lang.Class({
     Name: 'ModeButtonItem',
