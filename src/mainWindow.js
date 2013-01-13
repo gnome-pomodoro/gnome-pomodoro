@@ -26,30 +26,135 @@ const _ = imports.gettext.gettext;
 const Gdk = imports.gi.Gdk;
 const GLib = imports.gi.GLib;
 const Gtk = imports.gi.Gtk;
+const Gio = imports.gi.Gio;
+const Pango = imports.gi.Pango;
 
 const Config = imports.config;
+const Widgets = imports.widgets;
+
+const COPYRIGHTS = 'Copyright \u00A9 2012 Arun Mahapatra, Kamil Prusko';
+const AUTHORS = [
+    'Arun Mahapatra <pratikarun@gmail.com>',
+    'Kamil Prusko <kamilprusko@gmail.com>',
+];
 
 const MainWindow = new Lang.Class({
     Name: 'MainWindow',
+
+    window: null,
+    views: null,
 
     _init: function(app) {
         this.window = new Gtk.ApplicationWindow({
                               application: app,
                               window_position: Gtk.WindowPosition.CENTER,
-                              icon_name: 'application-x-executable',
                               hide_titlebar_when_maximized: true,
                               title: _("Pomodoro") });
-        this.window.set_size_request(600, 400);
 
-        this._vbox = new Gtk.VBox();
+        this.window.set_size_request(640, 420);
+
+        let css_provider = new Gtk.CssProvider();
+        css_provider.load_from_path(Config.PACKAGE_DATADIR + '/gtk-style.css');
+
+        let context = new Gtk.StyleContext();
+        context.add_provider_for_screen(Gdk.Screen.get_default(),
+                                        css_provider,
+                                        Gtk.STYLE_PROVIDER_PRIORITY_USER);
+
+        this.setup_toolbar();
+        this.setup_notebook();
+        this.setup_views();
+
+        this.vbox = new Gtk.VBox();
+        this.vbox.pack_start(this.toolbar, false, false, 0);
+        this.vbox.pack_end(this.notebook, true, true, 0);
+        this.vbox.show_all();
+
+        this.window.add(this.vbox);
 
         this.window.connect('delete-event',
                             Lang.bind(this, this._quit));
         this.window.connect('key-press-event',
                             Lang.bind(this, this._onKeyPressEvent));
+    },
 
-        this.window.add(this._vbox);
-        this.window.show_all();
+    setup_toolbar: function() {
+        this.toolbar = new Gtk.Toolbar();
+        this.toolbar.icon_size = Gtk.IconSize.MENU;
+        this.toolbar.show_arrow = false;
+        this.toolbar.get_style_context().add_class('pomodoro-toolbar');
+        this.toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR);
+
+        // left controls
+        {
+            let left_item = new Gtk.ToolItem();
+            this.toolbar.insert(left_item, -1);
+
+            let left_box = new Gtk.Box();
+            left_box.set_homogeneous(true);
+            left_box.get_style_context().add_class('linked');
+            left_item.add(left_box);
+        }
+
+        // center controls
+        {
+            let center_item = new Gtk.ToolItem();
+            center_item.set_expand(true);
+            this.toolbar.insert(center_item, -1);
+
+            let center_box = new Gtk.Box();
+            center_item.add(center_box);
+
+            this.mode_button = new Widgets.ModeButton();
+            this.mode_button.set_size_request(34, 34);
+
+            center_box.pack_start(this.mode_button, true, false, 0);
+        }
+
+        // right controls
+        {
+            let right_item = new Gtk.ToolItem();
+            this.toolbar.insert(right_item, -1);
+
+            let right_box = new Gtk.Box();
+            right_item.add(right_box);
+        }
+    },
+
+    setup_notebook: function() {
+        this.notebook = new Gtk.Notebook();
+        this.notebook.set_show_tabs(false);
+        this.notebook.set_show_border(false);
+    },
+
+    setup_views: function() {
+        this.views = [
+            new TimerView(),
+            new TasksView(),
+            new StatisticsView(),
+        ];
+
+        this._busy = false;
+
+        for (let page in this.views)
+        {
+            let view = this.views[page];
+
+            this.notebook.append_page(view.widget, null);
+            this.mode_button.append_text(view.title);
+        }
+
+        this.mode_button.connect('changed', Lang.bind(this, function() {
+            this._busy = true;
+            this.notebook.set_current_page(this.mode_button.selected);
+            this.notebook.grab_focus();
+            this._busy = false;
+        }));
+
+        this.notebook.connect('switch-page', Lang.bind(this, function() {
+            if (!this._busy)
+                this.mode_button.selected = this.notebook.get_current_page();
+        }));
     },
 
     _onKeyPressEvent: function(widget, event) {
@@ -61,25 +166,77 @@ const MainWindow = new Lang.Class({
     },
 
     showAboutDialog: function() {
-        let aboutDialog = new Gtk.AboutDialog();
+        let about = new Gtk.AboutDialog();
+        about.title = _("About Pomodoro")
 
-        aboutDialog.authors = [ 'Arun Mahapatra <pratikarun@gmail.com>',
-                                'Kamil Prusko <kamilprusko@gmail.com>' ];
-        aboutDialog.translator_credits = _("translator-credits");
-        aboutDialog.program_name = _("Pomodoro");
-        aboutDialog.version = Config.PACKAGE_VERSION;
-        aboutDialog.comments = _("A simple time management utility.");
-        aboutDialog.copyright = 'Copyright \u00A9 2012 Arun Mahapatra, Kamil Prusko';
-        aboutDialog.logo_icon_name = 'timer-symbolic';
-        aboutDialog.license = _("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\nYou should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA");
-        aboutDialog.wrap_license = true;
+        about.program_name = _("Pomodoro");
+        about.comments = _("A simple time management utility.");
+        about.logo_icon_name = 'timer-symbolic';
+        about.version = Config.PACKAGE_VERSION;
+        about.website = Config.PACKAGE_URL;
+        about.authors = AUTHORS;
+        about.copyright = COPYRIGHTS;
+        about.translator_credits = _("translator-credits");
+        about.wrap_license = true;
+        about.license_type = Gtk.License.GPL_3_0;
+        about.license = _("This program is free software: you can \
+redistribute it and/or modify it under the terms of the GNU General Public \
+License as published by the Free Software Foundation; either version 3 \
+of the License, or (at your option) any later version.\n\n\
+\
+This program is distributed in the hope that it will be useful, but \
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY \
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License \
+for more details.\n\n\
+\
+You should have received a copy of the GNU General Public License along \
+with this program; if not, write to the Free Software Foundation, Inc., \
+51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA");
 
-        aboutDialog.modal = true;
-        aboutDialog.transient_for = this.window;
+        about.modal = true;
+        about.transient_for = this.window;
 
-        aboutDialog.show();
-        aboutDialog.connect('response', function() {
-            aboutDialog.destroy();
+        about.connect('response', function() {
+            about.destroy();
         });
+
+        about.present();
     }
+});
+
+const View = new Lang.Class({
+    Name: 'View',
+
+    title: null,
+    widget: null,
+
+    _init: function() {
+        this.widget = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+        });
+
+        let label = new Gtk.Label({ label: this.title });
+        this.widget.pack_start(label, true, true, 0)
+    }
+});
+
+const TimerView = new Lang.Class({
+    Name: 'TimerView',
+    Extends: View,
+
+    title: _("Timer"),
+});
+
+const TasksView = new Lang.Class({
+    Name: 'TasksView',
+    Extends: View,
+
+    title: _("Tasks"),
+});
+
+const StatisticsView = new Lang.Class({
+    Name: 'StatisticsView',
+    Extends: View,
+
+    title: _("Statistics"),
 });
