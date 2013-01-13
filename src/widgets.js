@@ -129,6 +129,34 @@ const ModeButtonItem = new Lang.Class({
     Name: 'ModeButtonItem',
     Extends: Gtk.ToggleButton,
 
+    vfunc_get_preferred_width: function() {
+        let minimum_width;
+        let natural_width;
+        let child = this.get_child();
+
+        [minimum_width, natural_width] = this.parent();
+
+        if (child instanceof Gtk.Label) {
+            let style_context = child.get_style_context();
+            let layout = child.get_layout();
+            let font = layout.get_font_description();
+
+            let font_bold = style_context.get_font(Gtk.StateFlags.NORMAL);
+            font_bold.set_weight(Pango.Weight.HEAVY);
+
+            layout.set_font_description(font_bold);
+            minimum_width += layout.get_pixel_size()[0];
+
+            layout.set_font_description(font);
+            minimum_width -= layout.get_pixel_size()[0];
+        }
+
+        if (natural_width < minimum_width) {
+            natural_width = minimum_width;
+        }
+        return [minimum_width, natural_width];
+    },
+
     vfunc_toggled: function() {
         let context = this.get_style_context();
         if (this.active)
