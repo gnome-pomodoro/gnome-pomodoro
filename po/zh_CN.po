@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-shell-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-14 14:44+0200\n"
-"PO-Revision-Date: 2012-04-22 18:32+0800\n"
+"PO-Revision-Date: 2013-01-11 19:14+0800\n"
 "Last-Translator: Meng Zhuo <mengzhuo1203@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -24,7 +24,8 @@ msgid_plural "%d minutes"
 msgstr[0] "%d分钟"
 
 #. Toggle timer state button
-#: ../src/extension.js:86 ../src/notification.js:76
+#: ../src/extension.js:86
+#: ../src/notification.js:76
 msgid "Pomodoro Timer"
 msgstr "番茄计时器"
 
@@ -50,9 +51,8 @@ msgstr "控制在线状态"
 
 #. Notification dialog toggle
 #: ../src/extension.js:141
-#, fuzzy
 msgid "Fullscreen Notifications"
-msgstr "显示对话框"
+msgstr "全屏通知"
 
 #. Notify with a sound toggle
 #: ../src/extension.js:148
@@ -85,45 +85,40 @@ msgid_plural "%d Completed Sessions"
 msgstr[0] "已完成%d个番茄时间"
 
 #: ../src/timer.js:422
-#, fuzzy
 msgid "Pause finished."
 msgstr "暂停结束"
 
 #: ../src/timer.js:423
-#, fuzzy
 msgid "A new pomodoro is starting."
-msgstr "暂停结束，新的番茄时间开始了！"
+msgstr "暂停结束，新的番茄时间开始了～"
 
 #: ../src/timer.js:440
-#, fuzzy
 msgid "It's time to take a break!"
-msgstr "现在是时候要休息一下了！"
+msgstr "现在是时候要休息一下了～"
 
 #: ../src/timer.js:462
-#, fuzzy
 msgid "Take a break!"
-msgstr "休息一下吧！"
+msgstr "休息一下吧～"
 
 #: ../src/timer.js:465
 msgid "Start a new pomodoro"
 msgstr "开始新的番茄时间"
 
 #: ../src/timer.js:543
-#, fuzzy
 msgid "Hey, you're missing out on a break."
-msgstr "嘿，你错过了休息"
+msgstr "嘿，你忘过了休息下"
 
 #: ../src/timer.js:656
-#, fuzzy, c-format
+#, c-format
 msgid "You have %d second left.\n"
 msgid_plural "You have %d seconds left.\n"
-msgstr[0] "休息会, 你有%d秒的休息时间\n"
+msgstr[0] "休息一会, 你有%d秒的休息时间\n"
 
 #: ../src/timer.js:658
-#, fuzzy, c-format
+#, c-format
 msgid "You have %d minute left.\n"
 msgid_plural "You have %d minutes left.\n"
-msgstr[0] "休息会, 你有%d分的休息时间\n"
+msgstr[0] "休息一会, 你有%d分的休息时间\n"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
 msgid "Pomodoro duration"
