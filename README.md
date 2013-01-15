@@ -7,7 +7,7 @@ This [GNOME Shell](http://www.gnome.org/gnome-3/) extension intends to help mana
 - Countdown timer in the [GNOME Shell](http://www.gnome.org/gnome-3/) top panel
 - Full screen notifications that can be easily dismissed
 - Reminders to nag you about taking a break
-- Sets your IM (*Empathy*) status to busy
+- Sets your IM (Empathy) status to busy
 - Hides any notifications until the start of break
 
 ![Pomodoro image](http://kamilprusko.org/files/gnome-shell-pomodoro-extension.png)
@@ -40,7 +40,7 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 
         ./autogen.sh --prefix=/usr
         make zip
-        unzip _build/gnome-shell-pomodoro.0.6.zip -d ~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in
+        unzip _build/gnome-shell-pomodoro.0.7.zip -d ~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in
 
     To install it system-wide, you could do
 
@@ -71,7 +71,8 @@ GPL3. See [COPYING](https://raw.github.com/codito/gnome-shell-pomodoro/master/CO
 Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodoro/contributors).
 
 # Changelog
-**Unstable**
+
+**Version 0.7**
 
 + Czech translation
 + Support for GNOME Shell 3.4 and 3.6
