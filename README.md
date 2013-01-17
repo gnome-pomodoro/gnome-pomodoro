@@ -27,6 +27,11 @@ https://extensions.gnome.org/extension/53/pomodoro/
 ## Archlinux
 Get from [AUR](http://aur.archlinux.org/packages.php?ID=49967)
 
+## Fedora 17 and Later
+Install using yum:
+
+        $ su -c 'yum install gnome-shell-extension-pomodoro'
+
 ## Gentoo
 Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github.com/mgrela/dropzone/tree/master/gnome-extra/gnome-shell-extensions-pomodoro). Instructions [here](http://mgrela.rootnode.net/doku.php?id=wiki:gentoo:dropzone).
 
