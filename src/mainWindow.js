@@ -56,7 +56,7 @@ const MainWindow = new Lang.Class({
         let css_provider = new Gtk.CssProvider();
         css_provider.load_from_path(Config.PACKAGE_DATADIR + '/gtk-style.css');
 
-        let context = new Gtk.StyleContext();
+        let context = this.window.get_style_context();
         context.add_provider_for_screen(Gdk.Screen.get_default(),
                                         css_provider,
                                         Gtk.STYLE_PROVIDER_PRIORITY_USER);
@@ -65,9 +65,13 @@ const MainWindow = new Lang.Class({
         this.setup_notebook();
         this.setup_views();
 
+        let event_box = new Gtk.EventBox();
+        event_box.get_style_context().add_class('pomodoro-window');
+        event_box.add(this.notebook);
+
         this.vbox = new Gtk.VBox();
         this.vbox.pack_start(this.toolbar, false, false, 0);
-        this.vbox.pack_end(this.notebook, true, true, 0);
+        this.vbox.pack_end(event_box, true, true, 0);
         this.vbox.show_all();
 
         this.window.add(this.vbox);
@@ -214,9 +218,6 @@ const View = new Lang.Class({
         this.widget = new Gtk.Box({
             orientation: Gtk.Orientation.VERTICAL,
         });
-
-        let label = new Gtk.Label({ label: this.title });
-        this.widget.pack_start(label, true, true, 0)
     }
 });
 
@@ -225,6 +226,65 @@ const TimerView = new Lang.Class({
     Extends: View,
 
     title: _("Timer"),
+
+    _init: function() {
+        this.parent();
+
+        let style_context = this.widget.get_style_context();
+        style_context.add_class('pomodoro-timer');
+
+        let vbox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL });
+
+        let alignment = new Gtk.Alignment({
+            xalign: 0.5,
+            yalign: 0.5,
+            xscale: 0.0,
+            yscale: 0.0,
+            bottom_padding: 50,
+        });
+        alignment.set_sensitive(true);
+        alignment.add(vbox);
+
+        this.timer_label = new Gtk.Label({ label: '00:00' });
+        this.timer_label.get_style_context().add_class('label');
+        this.timer_label.get_style_context().add_class('text-inset');
+
+        this.description = new Gtk.Label();
+        this.description.get_style_context().add_class('timer-description');
+        this.description.set_justify(Gtk.Justification.CENTER);
+        this.description.set_use_markup(true);
+        this.description.set_markup("3rd session in a row, 8th today\n25 minutes to a long break");
+
+        let description_box = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
+        description_box.pack_start(this.description, true, true, 0);
+
+        let state = new Widgets.ModeButton();
+        state.append_text(_("Pomodoro"));
+        state.append_text(_("Short Break"));
+        state.append_text(_("Long Break"));
+        state.relief = Gtk.ReliefStyle.HALF;
+
+        // TODO: Undo button
+        // TODO: Interrupt button
+        // TODO: Reset button
+
+        let toggle = new Gtk.Switch();
+        let toggle_alignment = new Gtk.Alignment({
+            xalign: 1.0,
+            yalign: 0.5,
+            xscale: 0.0,
+            top_padding: 30,
+            right_padding: 20,
+        });
+        toggle_alignment.add(toggle);
+        this.widget.pack_start(toggle_alignment, false, false, 0);
+
+        vbox.pack_start(this.timer_label, false, false, 0);
+        vbox.pack_start(description_box, false, false, 0);
+        vbox.pack_start(state, false, false, 25);
+
+        this.widget.pack_start(alignment, true, true, 0);
+    }
 });
 
 const TasksView = new Lang.Class({

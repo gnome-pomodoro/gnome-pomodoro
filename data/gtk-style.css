@@ -6,9 +6,32 @@
 }
 
 .pomodoro-toolbar.toolbar .button {
-    padding: 3px 8px;
+    padding: 1.0pt 5.0pt;
 }
 
-.pomodoro-toolbar.toolbar .button.active {
+.pomodoro-timer .button {
+    padding: 4px 6px;
+}
+
+.pomodoro-timer .button.active {
     font-weight: bold;
+}
+
+.pomodoro-timer .label {
+    padding: 0pt 0pt 0pt 0pt;
+    font-family: "Droid Sans";
+    font-size: 80;
+}
+
+.pomodoro-timer .label:insensitive {
+    text-shadow: -1.0px -1.5px #B0B0B0;
+    color: #CCC;
+}
+
+.pomodoro-timer .text-inset {
+    text-shadow: 1px 1px white;
+}
+
+.pomodoro-window {
+    background-color: #f1f2f1
 }
