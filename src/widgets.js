@@ -173,7 +173,6 @@ const SymbolicButton = new Lang.Class({
     _init: function(icon_name) {
         this.parent();
         this.set_alignment(0.5, 0.5);
-        this.set_size_request(34, 34);
 
         let icon = Gio.ThemedIcon.new_with_default_fallbacks(icon_name);
         let image = new Gtk.Image();

@@ -29,7 +29,6 @@ const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
 const GLib = imports.gi.GLib;
 
-const Main = imports.main;
 const MainWindow = imports.mainWindow;
 const Config = imports.config;
 
