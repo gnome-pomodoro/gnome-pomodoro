@@ -17,7 +17,6 @@
 const Lang = imports.lang;
 
 const Gio = imports.gi.Gio;
-const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 
@@ -25,6 +24,7 @@ const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
+const Clutter = imports.gi.Clutter;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const PomodoroUtil = Extension.imports.util;
@@ -34,6 +34,13 @@ const PomodoroDBus = Extension.imports.dbus;
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
 const ngettext = Gettext.ngettext;
+
+try {
+    const Keybinder = imports.gi.Keybinder;
+    Keybinder.init();
+} catch(e) {
+    global.logError('Pomodoro: '+ e.message);
+}
 
 
 // Time in seconds to fade timer label when pause starts or ends
@@ -73,14 +80,28 @@ const Indicator = new Lang.Class({
         
         this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
-        
+       
+       
         
         // Timer label
         this.label = new St.Label({ style_class: 'extension-pomodoro-label' });
         this.label.clutter_text.set_line_wrap(false);
         this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
         
-        this.actor.add_actor(this.label);
+        this.icon = Clutter.Texture.new_from_file(metaData.path+"/pomo.png");
+
+        this._label = new St.Bin({ 
+            can_focus: true, 
+            x_fill: true, 
+            y_fill: false, 
+            track_hover: true 
+        }); 
+        this._layout = new St.BoxLayout();
+        this._label.set_child(this._layout);
+        this._layout.insert_child_at_index(this.label, 1);
+        this._layout.insert_child_at_index(this.icon, 1);
+
+        this.actor.add_actor(this._label);
         
         // Toggle timer state button
         this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'popup-subtitle-menu-item' });
@@ -102,13 +123,14 @@ const Indicator = new Lang.Class({
         
         
         // Register keybindings to toggle
-        global.display.add_keybinding('toggle-pomodoro-timer', this._settings, Meta.KeyBindingFlags.NONE,
-                Lang.bind(this, this._onKeyPressed));
+        if (Keybinder)
+            Keybinder.bind(this._settings.get_string('toggle-key'), Lang.bind(this, this._onKeyPressed), null);
         
         this.connect('destroy', Lang.bind(this, this._onDestroy));
         
         // Initialize
-        this._timer.restore();
+        if (this._settings.get_boolean('restore') && this._settings.get_enum('saved-state') != PomodoroTimer.State.NULL)
+            this._timer.restore();
         
         this._updateLabel();
         this._updateSessionCount();
@@ -137,7 +159,7 @@ const Indicator = new Lang.Class({
         this._optionsMenu.menu.addMenuItem(this._changePresenceStatusToggle);
         
         // Notification dialog toggle
-        this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Fullscreen Notifications"));
+        this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Show Dialog Messages"));
         this._showDialogsToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('show-notification-dialogs', item.state);
         }));
@@ -273,12 +295,13 @@ const Indicator = new Lang.Class({
         let predicted_natural_size = predicted_width + 2 * natural_hpadding;
         
         PanelMenu.Button.prototype._getPreferredWidth.call(this, actor, forHeight, alloc); // output stored in alloc
-        
-        if (alloc.min_size < predicted_min_size)
-            alloc.min_size = predicted_min_size;
-        
-        if (alloc.natural_size < predicted_natural_size)
-            alloc.natural_size = predicted_natural_size;
+
+//Commented because of the Pomodoro icon        
+//        if (alloc.min_size < predicted_min_size)
+//            alloc.min_size = predicted_min_size;
+//        
+//        if (alloc.natural_size < predicted_natural_size)
+//            alloc.natural_size = predicted_natural_size;
     },
 
     _updateLabel: function() {
@@ -294,7 +317,8 @@ const Indicator = new Lang.Class({
             this.label.set_text('%02d:%02d'.format(minutes, seconds));
         }
         else {
-            this.label.set_text('00:00');
+            this.icon.show();
+            this.label.hide();
         }
     },
 
@@ -311,10 +335,15 @@ const Indicator = new Lang.Class({
     },
 
     _onToggled: function(item) {
-        if (item.state)
+        if (item.state) {
             this._timer.start();
-        else
+            this.icon.hide();
+            this.label.show();
+        } else {
             this._timer.stop();
+            this.icon.show();
+            this.label.hide();
+        }
     },
 
     _onReset: function() {
@@ -343,13 +372,11 @@ const Indicator = new Lang.Class({
         this._timerToggle.setToggleState(this._timer.state != PomodoroTimer.State.NULL);
     },
 
-    _onKeyPressed: function() {
+    _onKeyPressed: function(keystring, data) {
         this._timerToggle.toggle();
     },
     
     _onDestroy: function() {
-        global.display.remove_keybinding('toggle-pomodoro-timer');
-
         this._timer.destroy();
         this._dbus.destroy();
     }
@@ -357,8 +384,10 @@ const Indicator = new Lang.Class({
 
 
 let indicator;
+let metaData;
 
 function init(metadata) {
+    metaData = metadata;
     PomodoroUtil.initTranslations('gnome-shell-pomodoro');
 }
 
