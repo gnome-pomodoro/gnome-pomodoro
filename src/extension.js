@@ -87,15 +87,18 @@ const Indicator = new Lang.Class({
         this.label = new St.Label({ style_class: 'extension-pomodoro-label' });
         this.label.clutter_text.set_line_wrap(false);
         this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
-        
+       
+        //Pomodoro icon 
         this.icon = Clutter.Texture.new_from_file(metaData.path+"/pomo.png");
 
+        //Container for both
         this._label = new St.Bin({ 
             can_focus: true, 
             x_fill: true, 
             y_fill: false, 
             track_hover: true 
-        }); 
+        });
+
         this._layout = new St.BoxLayout();
         this._label.set_child(this._layout);
         this._layout.insert_child_at_index(this.label, 1);
@@ -279,30 +282,29 @@ const Indicator = new Lang.Class({
         this._settings.set_int('long-pause-time', seconds);
     },
 
-    _getPreferredWidth: function(actor, forHeight, alloc) {
-        let theme_node = actor.get_theme_node();
-        let min_hpadding = theme_node.get_length('-minimum-hpadding');
-        let natural_hpadding = theme_node.get_length('-natural-hpadding');
-        
-        let context     = actor.get_pango_context();
-        let font        = theme_node.get_font();
-        let metrics     = context.get_metrics(font, context.get_language());
-        let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
-        let char_width  = metrics.get_approximate_char_width() / Pango.SCALE;
-        
-        let predicted_width        = parseInt(digit_width * 4 + 0.5 * char_width);
-        let predicted_min_size     = predicted_width + 2 * min_hpadding;
-        let predicted_natural_size = predicted_width + 2 * natural_hpadding;
-        
-        PanelMenu.Button.prototype._getPreferredWidth.call(this, actor, forHeight, alloc); // output stored in alloc
-
-//Commented because of the Pomodoro icon        
+//    _getPreferredWidth: function(actor, forHeight, alloc) {
+//        let theme_node = actor.get_theme_node();
+//        let min_hpadding = theme_node.get_length('-minimum-hpadding');
+//        let natural_hpadding = theme_node.get_length('-natural-hpadding');
+//        
+//        let context     = actor.get_pango_context();
+//        let font        = theme_node.get_font();
+//        let metrics     = context.get_metrics(font, context.get_language());
+//        let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
+//        let char_width  = metrics.get_approximate_char_width() / Pango.SCALE;
+//        
+//        let predicted_width        = parseInt(digit_width * 4 + 0.5 * char_width);
+//        let predicted_min_size     = predicted_width + 2 * min_hpadding;
+//        let predicted_natural_size = predicted_width + 2 * natural_hpadding;
+//        
+//        PanelMenu.Button.prototype._getPreferredWidth.call(this, actor, forHeight, alloc); // output stored in alloc
+//
 //        if (alloc.min_size < predicted_min_size)
 //            alloc.min_size = predicted_min_size;
 //        
 //        if (alloc.natural_size < predicted_natural_size)
 //            alloc.natural_size = predicted_natural_size;
-    },
+//    },
 
     _updateLabel: function() {
         if (this._timer.state != PomodoroTimer.State.NULL) {
@@ -337,8 +339,8 @@ const Indicator = new Lang.Class({
     _onToggled: function(item) {
         if (item.state) {
             this._timer.start();
-            this.icon.hide();
             this.label.show();
+            this.icon.hide();
         } else {
             this._timer.stop();
             this.icon.show();
