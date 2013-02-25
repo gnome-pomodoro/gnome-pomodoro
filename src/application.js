@@ -51,9 +51,10 @@ const Application = new Lang.Class({
                       flags: Gio.ApplicationFlags.IS_SERVICE });
 
         this.service = null;
-
         this.settings = new Gio.Settings({ schema: 'org.gnome.shell.extensions.pomodoro' });
+
         this.timer = new Timer.Timer();
+        this.timer.restore();
 
         this._initActions();
     },
