@@ -1,11 +1,4 @@
 <schemalist gettext-domain="gnome-shell-pomodoro">
-  <enum id="State">
-    <value nick="null" value="0"/>
-    <value nick="pomodoro" value="1"/>
-    <value nick="pause" value="2"/>
-    <value nick="idle" value="3"/>
-  </enum>
-
   <schema id="org.gnome.shell.extensions.pomodoro" path="/org/gnome/shell/extensions/pomodoro/">
     <key type="as" name="toggle-pomodoro-timer">
       <default><![CDATA[["<Ctrl><Alt>p"]]]></default>
@@ -65,7 +58,13 @@
       <_summary>Number of completed sessions since long break</_summary>
       <_description></_description>
     </key>
-    <key name="saved-state" enum="State">
+    <key name="saved-state" type="s">
+      <choices>
+        <choice value="null"/>
+        <choice value="pomodoro"/>
+        <choice value="pause"/>
+        <choice value="idle"/>
+      </choices>
       <default>"null"</default>
       <_summary>Saved timer state</_summary>
       <_description></_description>

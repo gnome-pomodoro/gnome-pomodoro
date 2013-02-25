@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 gnome-shell-pomodoro contributors
+ * Copyright (c) 2013 gnome-shell-pomodoro contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the
@@ -31,28 +31,31 @@ const GLib = imports.gi.GLib;
 
 const MainWindow = imports.mainWindow;
 const Config = imports.config;
+const DBus = imports.dbus;
+const Timer = imports.timer;
+
 
 const Application = new Lang.Class({
     Name: 'Application',
     Extends: Gtk.Application,
-
-    instance: null,
 
     _init: function() {
         Gettext.bindtextdomain(Config.GETTEXT_PACKAGE, Config.PACKAGE_LOCALEDIR);
         Gettext.textdomain(Config.GETTEXT_PACKAGE);
         GLib.set_prgname(Config.PACKAGE_NAME);
 
-        Application.instance = this;
+        // Run as a service. In this mode, registration fails if the service
+        // is already running, and the application will stay around for a while
+        // when the use count falls to zero.
+        this.parent({ application_id: 'org.gnome.Pomodoro',
+                      flags: Gio.ApplicationFlags.IS_SERVICE });
+
+        this.service = null;
 
         this.settings = new Gio.Settings({ schema: 'org.gnome.shell.extensions.pomodoro' });
+        this.timer = new Timer.Timer();
 
-        this.parent({ application_id: 'org.gnome.Pomodoro',
-                      flags: Gio.ApplicationFlags.FLAGS_NONE });
-    },
-
-    get_default: function() {
-        return Application.instance;
+        this._initActions();
     },
 
     _onActionQuit: function() {
@@ -72,30 +75,29 @@ const Application = new Lang.Class({
               callback: this._onActionAbout }
         ];
 
-        actionEntries.forEach(Lang.bind(this,
-            function(actionEntry) {
-                let state = actionEntry.state;
-                let parameterType = actionEntry.parameter_type ?
-                    GLib.VariantType.new(actionEntry.parameter_type) : null;
-                let action;
+        actionEntries.forEach(Lang.bind(this, function(actionEntry) {
+            let parameterType = actionEntry.parameter_type ?
+                GLib.VariantType.new(actionEntry.parameter_type) : null;
+            let action;
 
-                if (state)
-                    action = Gio.SimpleAction.new_stateful(actionEntry.name,
-                        parameterType, actionEntry.state);
-                else
-                    action = new Gio.SimpleAction({ name: actionEntry.name });
+            if (actionEntry.state != undefined)
+                action = Gio.SimpleAction.new_stateful(actionEntry.name,
+                                                       parameterType,
+                                                       actionEntry.state);
+            else
+                action = new Gio.SimpleAction({ name: actionEntry.name });
 
-                if (actionEntry.create_hook)
-                    actionEntry.create_hook.apply(this, [action]);
+            if (actionEntry.create_hook)
+                actionEntry.create_hook.apply(this, [action]);
 
-                if (actionEntry.callback)
-                    action.connect('activate', Lang.bind(this, actionEntry.callback));
+            if (actionEntry.callback)
+                action.connect('activate', Lang.bind(this, actionEntry.callback));
 
-                if (actionEntry.accel)
-                    this.add_accelerator(actionEntry.accel, 'app.' + actionEntry.name, null);
+            if (actionEntry.accel)
+                this.add_accelerator(actionEntry.accel, 'app.' + actionEntry.name, null);
 
-                this.add_action(action);
-            }));
+            this.add_action(action);
+        }));
     },
 
     _initAppMenu: function() {
@@ -106,21 +108,56 @@ const Application = new Lang.Class({
         this.set_app_menu(menu);
     },
 
+    // Emitted on the primary instance immediately after registration.
     vfunc_startup: function() {
         this.parent();
-
-        Gtk.init(null);
 
         let resource = Gio.Resource.load(Config.PACKAGE_DATADIR + '/gnome-shell-pomodoro.gresource');
         resource._register();
 
-        this._initActions();
         this._initAppMenu();
 
         this._mainWindow = new MainWindow.MainWindow(this);
     },
 
+    // Save the state before exit.
+    // Emitted only on the registered primary instance instance immediately
+    // after the main loop terminates.
+    vfunc_shutdown: function() {
+        this.timer.destroy();
+
+        this.parent();
+    },
+
+    // Emitted on the primary instance when an activation occurs.
+    // The application must be registered before calling this function.
     vfunc_activate: function() {
-        this._mainWindow.window.present();
+        this.parent();
+    },
+
+    vfunc_dbus_register: function(connection, object_path) {
+        if (!this.parent(connection, object_path))
+            return false;
+
+        if (!this.service) {
+            // Increase the usecount
+            this.hold();
+
+            this.service = new DBus.Pomodoro(this.timer);
+        }
+
+        return true;
+    },
+
+    vfunc_dbus_unregister: function(connection, object_path) {
+        if (this.service) {
+            this.service.destroy();
+            this.service = null;
+
+            // Release the hold added when creating the app
+            this.release();
+        }
+
+        this.parent(connection, object_path);
     }
 });

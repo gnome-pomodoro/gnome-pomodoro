@@ -21,15 +21,16 @@ const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
 const St = imports.gi.St;
 
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Main = imports.ui.main;
+const MessageTray = imports.ui.messageTray;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const PomodoroUtil = Extension.imports.util;
-const PomodoroTimer = Extension.imports.timer;
-const PomodoroDBus = Extension.imports.dbus;
+const DBus = Extension.imports.dbus;
+const Notification = Extension.imports.notification;
+const Utils = Extension.imports.util;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
@@ -43,6 +44,16 @@ const FADE_OPACITY = 150;
 // Slider helper functions
 const SLIDER_UPPER = 2700;
 const SLIDER_LOWER = 60;
+
+const POMODORO_SERVICE_NAME = 'org.gnome.Pomodoro';
+
+const State = {
+    NULL: 'null',
+    POMODORO: 'pomodoro',
+    PAUSE: 'pause',
+    IDLE: 'idle'
+};
+
 
 function _valueToSeconds(value) {
     return Math.floor(value * (SLIDER_UPPER - SLIDER_LOWER) / 60) * 60 + SLIDER_LOWER;
@@ -64,92 +75,91 @@ const Indicator = new Lang.Class({
 
     _init: function() {
         this.parent(St.Align.START);
-        
-        this._timer = new PomodoroTimer.PomodoroTimer();
-        this._timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
-        this._timer.connect('elapsed-changed', Lang.bind(this, this._onTimerElapsedChanged));
-        
-        this._dbus = new PomodoroDBus.PomodoroTimer(this._timer);
-        
-        this._settings = PomodoroUtil.getSettings();
+
+        this._state = State.NULL;
+        this._proxy = null;
+
+        this._nameWatcherId = Gio.DBus.session.watch_name(
+                                    POMODORO_SERVICE_NAME,
+                                    Gio.BusNameWatcherFlags.NONE,
+                                    Lang.bind(this, this._onNameAppeared),
+                                    Lang.bind(this, this._onNameVanished));
+        this._propertiesChangedId = 0;
+
+        this._settings = Utils.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
-        
-        
+
         // Timer label
         this.label = new St.Label({ style_class: 'extension-pomodoro-label' });
         this.label.clutter_text.set_line_wrap(false);
         this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
-        
+
         this.actor.add_actor(this.label);
-        
+
         // Toggle timer state button
         this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'popup-subtitle-menu-item' });
-        this._timerToggle.connect('toggled', Lang.bind(this, this._onToggled));
+        this._timerToggle.connect('toggled', Lang.bind(this, this.toggle));
         this.menu.addMenuItem(this._timerToggle);
-        
+
         // Session count
         let sessionCountItem = new PopupMenu.PopupMenuItem('', { reactive: false });
         this._sessionCountLabel = sessionCountItem.label;
         this.menu.addMenuItem(sessionCountItem);
-        
+
         // Separator
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        
+
         // Options SubMenu
         this._optionsMenu = new PopupMenu.PopupSubMenuMenuItem(_("Options"));
         this._buildOptionsMenu();
         this.menu.addMenuItem(this._optionsMenu);
-        
-        
+
         // Register keybindings to toggle
-        global.display.add_keybinding('toggle-pomodoro-timer', this._settings, Meta.KeyBindingFlags.NONE,
-                Lang.bind(this, this._onKeyPressed));
-        
-        this.connect('destroy', Lang.bind(this, this._onDestroy));
-        
-        // Initialize
-        this._timer.restore();
-        
-        this._updateLabel();
-        this._updateSessionCount();
-        
+        global.display.add_keybinding('toggle-pomodoro-timer',
+                                      this._settings,
+                                      Meta.KeyBindingFlags.NONE,
+                                      Lang.bind(this, this.toggle));
+
+        this.menu.actor.connect('notify::visible', Lang.bind(this, this.refresh));
+
+        this.refresh();
         this._onSettingsChanged();
     },
 
     _buildOptionsMenu: function() {
         // Reset counters
         this._resetCountButton =  new PopupMenu.PopupMenuItem(_("Reset Counts and Timer"));
-        this._resetCountButton.connect('activate', Lang.bind(this, this._onReset));
+        this._resetCountButton.connect('activate', Lang.bind(this, this.reset));
         this._optionsMenu.menu.addMenuItem(this._resetCountButton);
-        
+
         // Away from desk toggle
         this._awayFromDeskToggle = new PopupMenu.PopupSwitchMenuItem(_("Away From Desk"));
         this._awayFromDeskToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('away-from-desk', item.state);
         }));
         this._optionsMenu.menu.addMenuItem(this._awayFromDeskToggle);
-        
+
         // Presence status toggle
         this._changePresenceStatusToggle = new PopupMenu.PopupSwitchMenuItem(_("Control Presence Status"));
         this._changePresenceStatusToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('change-presence-status', item.state);
         }));
         this._optionsMenu.menu.addMenuItem(this._changePresenceStatusToggle);
-        
+
         // Notification dialog toggle
         this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Fullscreen Notifications"));
         this._showDialogsToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('show-notification-dialogs', item.state);
         }));
         this._optionsMenu.menu.addMenuItem(this._showDialogsToggle);
-        
+
         // Notify with a sound toggle
         this._playSoundsToggle = new PopupMenu.PopupSwitchMenuItem(_("Sound Notifications"));
         this._playSoundsToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('play-sounds', item.state);
         }));
         this._optionsMenu.menu.addMenuItem(this._playSoundsToggle);
-        
+
         // Pomodoro duration
         this._pomodoroTimeTitle = new PopupMenu.PopupMenuItem(_("Pomodoro Duration"), { reactive: false });
         this._pomodoroTimeLabel = new St.Label({ text: '' });
@@ -162,7 +172,7 @@ const Indicator = new Lang.Class({
         this._pomodoroTimeTitle.addActor(this._pomodoroTimeLabel, { align: St.Align.END });
         this._optionsMenu.menu.addMenuItem(this._pomodoroTimeTitle);
         this._optionsMenu.menu.addMenuItem(this._pomodoroTimeSlider);
-        
+
         // Short pause duration
         this._shortPauseTimeTitle = new PopupMenu.PopupMenuItem(_("Short Break Duration"), { reactive: false });
         this._shortPauseTimeLabel = new St.Label({ text: '' });
@@ -183,7 +193,7 @@ const Indicator = new Lang.Class({
         this._shortPauseTimeTitle.addActor(this._shortPauseTimeLabel, { align: St.Align.END });
         this._optionsMenu.menu.addMenuItem(this._shortPauseTimeTitle);
         this._optionsMenu.menu.addMenuItem(this._shortPauseTimeSlider);
-        
+
         // Long pause duration
         this._longPauseTimeTitle = new PopupMenu.PopupMenuItem(_("Long Break Duration"), { reactive: false });
         this._longPauseTimeLabel = new St.Label({ text: '' });
@@ -215,16 +225,16 @@ const Indicator = new Lang.Class({
                                 this._settings.get_boolean('change-presence-status'));
         this._playSoundsToggle.setToggleState(
                                 this._settings.get_boolean('play-sounds'));
-        
+
         this._pomodoroTimeSlider.setValue(_secondsToValue(this._settings.get_int('pomodoro-time')));
         this._pomodoroTimeLabel.set_text(_formatTime(_valueToSeconds(this._pomodoroTimeSlider.value)));
-        
+
         this._shortPauseTimeSlider.setValue(_secondsToValue(this._settings.get_int('short-pause-time')));
         this._shortPauseTimeLabel.set_text(_formatTime(_valueToSeconds(this._shortPauseTimeSlider.value)));
-        
+
         this._longPauseTimeSlider.setValue(_secondsToValue(this._settings.get_int('long-pause-time')));
         this._longPauseTimeLabel.set_text(_formatTime(_valueToSeconds(this._longPauseTimeSlider.value)));
-        
+
         this._shortPauseTimeValue = this._shortPauseTimeSlider.value;
         this._shortPauseTimeText  = this._shortPauseTimeLabel.text;
         this._longPauseTimeValue  = this._longPauseTimeSlider.value;
@@ -237,7 +247,7 @@ const Indicator = new Lang.Class({
 
     _onShortPauseTimeChanged: function() {
         let seconds = _valueToSeconds(this._shortPauseTimeSlider.value);
-        
+
         if (this._shortPauseTimeSlider.value > this._longPauseTimeValue) {
             this._longPauseTimeLabel.set_text(this._shortPauseTimeLabel.text);
             this._longPauseTimeSlider.setValue(this._shortPauseTimeSlider.value);
@@ -248,7 +258,7 @@ const Indicator = new Lang.Class({
 
     _onLongPauseTimeChanged: function() {
         let seconds = _valueToSeconds(this._longPauseTimeSlider.value);
-        
+
         if (this._shortPauseTimeValue > this._longPauseTimeSlider.value) {
             this._shortPauseTimeLabel.set_text(this._longPauseTimeLabel.text);
             this._shortPauseTimeSlider.setValue(this._longPauseTimeSlider.value);
@@ -261,97 +271,165 @@ const Indicator = new Lang.Class({
         let theme_node = actor.get_theme_node();
         let min_hpadding = theme_node.get_length('-minimum-hpadding');
         let natural_hpadding = theme_node.get_length('-natural-hpadding');
-        
+
         let context     = actor.get_pango_context();
         let font        = theme_node.get_font();
         let metrics     = context.get_metrics(font, context.get_language());
         let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
         let char_width  = metrics.get_approximate_char_width() / Pango.SCALE;
-        
+
         let predicted_width        = parseInt(digit_width * 4 + 0.5 * char_width);
         let predicted_min_size     = predicted_width + 2 * min_hpadding;
         let predicted_natural_size = predicted_width + 2 * natural_hpadding;
-        
+
         PanelMenu.Button.prototype._getPreferredWidth.call(this, actor, forHeight, alloc); // output stored in alloc
-        
+
         if (alloc.min_size < predicted_min_size)
             alloc.min_size = predicted_min_size;
-        
+
         if (alloc.natural_size < predicted_natural_size)
             alloc.natural_size = predicted_natural_size;
     },
 
-    _updateLabel: function() {
-        if (this._timer.state != PomodoroTimer.State.NULL) {
-            let secondsLeft = Math.max(this._timer.remaining, 0);
-            
-            if (this._timer.state == PomodoroTimer.State.IDLE)
-                secondsLeft = this._settings.get_int('pomodoro-time');
-            
+    refresh: function() {
+        let state = this._proxy ? this._proxy.State : null;
+        let toggled = state !== null && state !== State.NULL;
+
+        if (this._state !== state) {
+            if (state == State.POMODORO || state == State.IDLE)
+                Tweener.addTween(this.label,
+                                 { opacity: 255,
+                                   transition: 'easeOutQuad',
+                                   time: FADE_ANIMATION_TIME });
+            else
+                Tweener.addTween(this.label,
+                                 { opacity: FADE_OPACITY,
+                                   transition: 'easeOutQuad',
+                                   time: FADE_ANIMATION_TIME });
+            this._state = state;
+        }
+
+        if (toggled) {
+            let secondsLeft = Math.max(this._proxy.ElapsedLimit - this._proxy.Elapsed, 0);
+
+            if (state == State.IDLE)
+                secondsLeft = this._proxy.ElapsedLimit;
+
             let minutes = parseInt(secondsLeft / 60);
             let seconds = parseInt(secondsLeft % 60);
-            
+
             this.label.set_text('%02d:%02d'.format(minutes, seconds));
         }
-        else {
+        else
             this.label.set_text('00:00');
-        }
+
+        if (this._timerToggle.toggled !== toggled)
+            this._timerToggle.setToggleState(toggled);
     },
 
     _updateSessionCount: function() {
-        let sessionCount = this._timer.sessionCount;
+        let sessionCount = this._proxy.SessionCount;
         let text;
-        
+
         if (sessionCount == 0)
             text = _("No Completed Sessions");
         else
             text = ngettext("%d Completed Session", "%d Completed Sessions", sessionCount).format(sessionCount);
-        
+
         this._sessionCountLabel.set_text(text);
     },
 
-    _onToggled: function(item) {
-        if (item.state)
-            this._timer.start();
+    start: function() {
+        if (this._proxy)
+            this._proxy.StartRemote(Lang.bind(this, this._onDBusCallback));
         else
-            this._timer.stop();
+            this._notifyError(_("Could not run the pomodoro timer"));
     },
 
-    _onReset: function() {
-        this._timer.reset();
+    stop: function() {
+        if (this._proxy)
+            this._proxy.StopRemote(Lang.bind(this, this._onDBusCallback));
     },
 
-    _onTimerElapsedChanged: function(object, elapsed) {
-        this._updateLabel();
+    reset: function() {
+        if (this._proxy)
+            this._proxy.ResetRemote(Lang.bind(this, this._onDBusCallback));
     },
 
-    _onTimerStateChanged: function(object, state) {
-        this._updateLabel();
-        this._updateSessionCount();
-        
-        if (state == PomodoroTimer.State.PAUSE)
-            Tweener.addTween(this.label,
-                             { opacity: FADE_OPACITY,
-                               transition: 'easeOutQuad',
-                               time: FADE_ANIMATION_TIME });
+    toggle: function() {
+        if (this._state === null || this._state === State.NULL)
+            this.start();
         else
-            Tweener.addTween(this.label,
-                             { opacity: 255,
-                               transition: 'easeOutQuad',
-                               time: FADE_ANIMATION_TIME });
-        
-        this._timerToggle.setToggleState(this._timer.state != PomodoroTimer.State.NULL);
+            this.stop();
     },
 
-    _onKeyPressed: function() {
-        this._timerToggle.toggle();
+    _onNameAppeared: function() {
+        this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
+            if (!error) {
+                this._propertiesChangedId = this._proxy.connect('g-properties-changed',
+                                                                Lang.bind(this, this.refresh));
+                this.refresh();
+            }
+            else {
+                global.log('Pomodoro: ' + error.message);
+            }
+        }));
     },
-    
-    _onDestroy: function() {
+
+    _onNameVanished: function() {
+        if (this._proxy && this._propertiesChangedId) {
+            this._proxy.disconnect(this._propertiesChangedId);
+            this._propertiesChangedId = 0;
+        }
+
+        if (this._proxy) {
+            this._proxy = null;
+        }
+
+        this.refresh();
+    },
+
+    _onDBusCallback: function(result, error) {
+        if (error)
+            global.log('Pomodoro: ' + error.message)
+    },
+
+    _getNotificationSource: function() {
+        let source = this._notificationSource;
+        if (!source) {
+            source = new Notification.NotificationSource();
+            source.connect('destroy', Lang.bind(this, function() {
+                this._notificationSource = null;
+            }));
+            Main.messageTray.add(source);
+        }
+        return source;
+    },
+
+    _notifyError: function(title, text, urgency) {
+        let source = this._getNotificationSource();
+
+        let notification = new MessageTray.Notification(source, title, text);
+        notification.setTransient(true);
+        notification.setUrgency(urgency !== undefined ? urgency : MessageTray.Urgency.HIGH);
+
+        source.notify(notification);
+    },
+
+    destroy: function() {
         global.display.remove_keybinding('toggle-pomodoro-timer');
 
-        this._timer.destroy();
-        this._dbus.destroy();
+        if (this._nameWatcherId) {
+            Gio.DBus.session.unwatch_name(this._nameWatcherId);
+            this._nameWatcherId = 0;
+        }
+
+        if (this._notificationSource) {
+            this._notificationSource.destroy();
+            this._notificationSource = null;
+        }
+
+        this.parent();
     }
 });
 
@@ -359,7 +437,7 @@ const Indicator = new Lang.Class({
 let indicator;
 
 function init(metadata) {
-    PomodoroUtil.initTranslations('gnome-shell-pomodoro');
+    Utils.initTranslations('gnome-shell-pomodoro');
 }
 
 function enable() {

@@ -7,8 +7,11 @@ gnome_shell_pomodoro_built_sources = \
 gnome_shell_pomodoro_sources = \
     $(gnome_shell_pomodoro_built_sources) \
     application.js \
+    dbus.js \
     main.js \
     mainWindow.js \
+    timer.js \
+    utils.js \
     widgets.js \
     $(NULL)
 

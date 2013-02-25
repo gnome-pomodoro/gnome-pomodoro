@@ -6,7 +6,6 @@ dist_extension_DATA = \
     metadata.json \
     notification.js \
     stylesheet.css \
-    timer.js \
     util.js \
     $(NULL)
 

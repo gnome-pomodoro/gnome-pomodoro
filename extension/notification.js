@@ -76,7 +76,7 @@ const NotificationSource = new Lang.Class({
     Extends: MessageTray.Source,
 
     _init: function() {
-        this.parent(_("Pomodoro Timer"));
+        this.parent(_("Pomodoro"));
 
         this.iconName = 'timer-symbolic';
     },
@@ -250,7 +250,7 @@ const ModalDialog = new Lang.Class({
                 this.close(); // dialog can't become modal
                 return false;
             }
-        return true; 
+        return true;
     },
 
     _onCapturedEvent: function(actor, event) {
@@ -334,29 +334,29 @@ const NotificationDialog = new Lang.Class({
 
     _init: function() {
         this.parent();
-        
+
         this._timer = '';
         this._description = '';
-        
+
         this._openWhenIdle = false;
         this._openWhenIdleWatchId = 0;
         this._closeWhenActive = false;
         this._closeWhenActiveWatchId = 0;
-        
+
         let mainLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-main-layout',
                                             vertical: false });
-        
+
         let messageBox = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-message-layout',
                                             vertical: true });
-        
+
         this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-timer',
                                           text: '' });
-        
+
         this._descriptionLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-description',
                                                 text: '' });
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
-        
+
         messageBox.add(this._timerLabel,
                             { y_fill:  false,
                               y_align: St.Align.START });

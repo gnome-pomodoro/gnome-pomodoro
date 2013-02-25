@@ -13,6 +13,12 @@ gsettings_in_files = org.gnome.shell.extensions.pomodoro.gschema.xml.in
 gsettings_SCHEMAS = $(gsettings_in_files:.xml.in=.xml)
 .PRECIOUS: $(gsettings_SCHEMAS)
 
+servicedir = $(datadir)/dbus-1/services
+service_in_files = \
+    org.gnome.Pomodoro.service.in \
+    $(NULL)
+service_DATA = $(service_in_files:.service.in=.service)
+
 styledir = $(pkgdatadir)
 style_files = \
     gtk-style.css \
@@ -22,10 +28,16 @@ style_DATA = $(style_files)
 EXTRA_DIST = \
     $(desktop_in_files) \
     $(gsettings_in_files) \
+    $(service_in_files) \
     $(style_files) \
     $(NULL)
 
 CLEANFILES = \
     $(desktop_DATA) \
     $(gsettings_SCHEMAS) \
+    $(service_DATA) \
     $(NULL)
+
+
+$(service_DATA): $(service_in_files) Makefile
+	@$(do_subst) $<> $@
