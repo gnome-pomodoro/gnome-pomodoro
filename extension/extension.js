@@ -101,11 +101,6 @@ const Indicator = new Lang.Class({
         this._timerToggle.connect('toggled', Lang.bind(this, this.toggle));
         this.menu.addMenuItem(this._timerToggle);
 
-        // Session count
-        let sessionCountItem = new PopupMenu.PopupMenuItem('', { reactive: false });
-        this._sessionCountLabel = sessionCountItem.label;
-        this.menu.addMenuItem(sessionCountItem);
-
         // Separator
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
@@ -325,18 +320,6 @@ const Indicator = new Lang.Class({
 
         if (this._timerToggle.toggled !== toggled)
             this._timerToggle.setToggleState(toggled);
-    },
-
-    _updateSessionCount: function() {
-        let sessionCount = this._proxy.SessionCount;
-        let text;
-
-        if (sessionCount == 0)
-            text = _("No Completed Sessions");
-        else
-            text = ngettext("%d Completed Session", "%d Completed Sessions", sessionCount).format(sessionCount);
-
-        this._sessionCountLabel.set_text(text);
     },
 
     start: function() {
