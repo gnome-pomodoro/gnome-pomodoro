@@ -125,14 +125,29 @@ const Timer = new Lang.Class({
     set_state: function(new_state) {
         let state = this._state;
         let elapsed = this._elapsed;
+        let elapsed_limit = this._elapsed_limit;
+        let session_count = this._session_count;
 
         this._do_set_state(new_state);
 
-        if (this._state != state)
-            this.emit('state-changed', this._state);
+        this._state_settings.set_double('timer-session-count', this._session_count);
+        this._state_settings.set_string('timer-state', this._state);
+        this._state_settings.set_string('timer-state-changed-date', new Date(this._state_timestamp).toString());
 
-        if (this._elapsed != elapsed)
-            this.emit('elapsed-changed', this._elapsed);
+        if (this._state != state) {
+            let completed = this._session_count != session_count;
+
+            this.emit('state-changed');
+
+            if (this._state == State.POMODORO)
+                this.emit('pomodoro-start');
+
+            if (state == State.POMODORO)
+                this.emit('pomodoro-end', completed);
+        }
+
+        if (this._elapsed != elapsed || this._elapsed_limit != elapsed_limit)
+            this.emit('elapsed-changed');
     },
 
     _do_set_state: function(new_state, timestamp) {
@@ -148,11 +163,9 @@ const Timer = new Lang.Class({
         if (this._state == State.POMODORO) {
             if (this._elapsed >= POMODORO_ACCEPTANCE * this._settings.get_uint('pomodoro-time')) {
                 this._session_count += 1;
-                this.emit('pomodoro-completed');
             }
             else {
                 // Pomodoro not completed, sorry
-                this.emit('pomodoro-cancelled');
             }
         }
 
@@ -214,10 +227,6 @@ const Timer = new Lang.Class({
 
         this._state_timestamp = timestamp;
         this._state = new_state;
-
-        this._state_settings.set_double('timer-session-count', this._session_count);
-        this._state_settings.set_string('timer-state', this._state);
-        this._state_settings.set_string('timer-state-changed-date', new Date(timestamp).toString());
     },
 
     restore: function() {
@@ -249,13 +258,24 @@ const Timer = new Lang.Class({
                     else
                         break;
             }
-
-            if (this._state == State.PAUSE)
-                this.emit('pomodoro-end');
         }
 
-        this.emit('state-changed', this._state);
-        this.emit('elapsed-changed', this._elapsed);
+        this._state_settings.set_double('timer-session-count', this._session_count);
+        this._state_settings.set_string('timer-state', this._state);
+        this._state_settings.set_string('timer-state-changed-date', new Date(this._state_timestamp).toString());
+
+        this.emit('state-changed');
+        this.emit('elapsed-changed');
+
+        if (this._state != State.NULL) {
+            let completed = this._session_count != session_count;
+
+            if (this._state == State.POMODORO)
+                this.emit('pomodoro-start');
+
+            if (this._state == State.PAUSE)
+                this.emit('pomodoro-end', completed);
+        }
     },
 
     get elapsed() {
@@ -266,6 +286,8 @@ const Timer = new Lang.Class({
         if (this._elapsed == value)
             return;
 
+        let state = this._state;
+
         this._elapsed = value;
 
         switch (this._state) {
@@ -274,23 +296,22 @@ const Timer = new Lang.Class({
 
             case State.PAUSE:
                 // Pause is over
-                if (this._elapsed >= this._elapsed_limit) {
+                if (this._elapsed >= this._elapsed_limit)
                     // TODO: Enable IDLE state
                     this.set_state(State.POMODORO);
-                    this.emit('pomodoro-start');
-                }
+
                 break;
 
             case State.POMODORO:
                 // Pomodoro is over, a pause is needed :)
-                if (this._elapsed >= this._elapsed_limit) {
+                if (this._elapsed >= this._elapsed_limit)
                     this.set_state(State.PAUSE);
-                    this.emit('pomodoro-end');
-                }
+
                 break;
         }
 
-        this.emit('elapsed-changed', this._elapsed);
+        if (state == this._state)
+            this.emit('elapsed-changed');
     },
 
     get elapsed_limit() {
