@@ -1,6 +1,6 @@
 
 public_sounds = \
-    bell.wav \
+    pomodoro-start.wav \
     $(NULL)
 
 EXTRA_DIST = \
