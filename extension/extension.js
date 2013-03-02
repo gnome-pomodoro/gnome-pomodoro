@@ -118,7 +118,9 @@ const Indicator = new Lang.Class({
         this.menu.actor.connect('notify::visible', Lang.bind(this, this.refresh));
 
         this.refresh();
+
         this._onSettingsChanged();
+        this._ensureProxy();
     },
 
     _buildOptionsMenu: function() {
@@ -314,20 +316,21 @@ const Indicator = new Lang.Class({
     },
 
     start: function() {
-        if (this._proxy)
+        this._ensureProxy(Lang.bind(this, function() {
             this._proxy.StartRemote(Lang.bind(this, this._onDBusCallback));
-        else
-            this._notifyError(_("Could not run the pomodoro timer"));
+        }));
     },
 
     stop: function() {
-        if (this._proxy)
+        this._ensureProxy(Lang.bind(this, function() {
             this._proxy.StopRemote(Lang.bind(this, this._onDBusCallback));
+        }));
     },
 
     reset: function() {
-        if (this._proxy)
+        this._ensureProxy(Lang.bind(this, function() {
             this._proxy.ResetRemote(Lang.bind(this, this._onDBusCallback));
+        }));
     },
 
     toggle: function() {
@@ -337,17 +340,34 @@ const Indicator = new Lang.Class({
             this.stop();
     },
 
+    _ensureProxy: function(callback) {
+        if (!this._proxy)
+        {
+            this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error)
+            {
+                if (!error) {
+                    global.log('Pomodoro: created a proxy');
+                    this._propertiesChangedId = this._proxy.connect('g-properties-changed',
+                                                                    Lang.bind(this, this.refresh));
+                    this.refresh();
+
+                    if (callback)
+                        callback.call(this);
+                }
+                else {
+                    this._notifyError(_("Could not run pomodoro timer"));
+                    global.log('Pomodoro: ' + error.message);
+                }
+            }));
+        }
+        else {
+            if (callback)
+                callback.call(this);
+        }
+    },
+
     _onNameAppeared: function() {
-        this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
-            if (!error) {
-                this._propertiesChangedId = this._proxy.connect('g-properties-changed',
-                                                                Lang.bind(this, this.refresh));
-                this.refresh();
-            }
-            else {
-                global.log('Pomodoro: ' + error.message);
-            }
-        }));
+        this._ensureProxy();
     },
 
     _onNameVanished: function() {
