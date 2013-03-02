@@ -9,7 +9,7 @@ desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
 @GSETTINGS_RULES@
 @INTLTOOL_XML_NOMERGE_RULE@
-gsettings_in_files = org.gnome.shell.extensions.pomodoro.gschema.xml.in
+gsettings_in_files = org.gnome.pomodoro.gschema.xml.in
 gsettings_SCHEMAS = $(gsettings_in_files:.xml.in=.xml)
 .PRECIOUS: $(gsettings_SCHEMAS)
 

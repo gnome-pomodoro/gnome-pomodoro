@@ -1,0 +1,94 @@
+<schemalist gettext-domain="gnome-shell-pomodoro">
+  <schema id="org.gnome.pomodoro" path="/apps/gnome-pomodoro/">
+    <child name="preferences" schema="org.gnome.pomodoro.preferences"/>
+    <child name="state" schema="org.gnome.pomodoro.state"/>
+  </schema>
+  <schema id="org.gnome.pomodoro.preferences" path="/apps/gnome-pomodoro/preferences/">
+    <child name="timer" schema="org.gnome.pomodoro.preferences.timer"/>
+    <child name="keybindings" schema="org.gnome.pomodoro.preferences.keybindings"/>
+    <child name="notifications" schema="org.gnome.pomodoro.preferences.notifications"/>
+    <child name="presence" schema="org.gnome.pomodoro.preferences.presence"/>
+    <child name="sounds" schema="org.gnome.pomodoro.preferences.sounds"/>
+  </schema>
+  <schema id="org.gnome.pomodoro.preferences.timer" path="/apps/gnome-pomodoro/preferences/timer/">
+    <key name="pomodoro-time" type="u">
+      <default>1500</default>
+      <range min="1" max="36000"/>
+      <summary>Pomodoro duration</summary>
+      <description>Time in seconds you are supposed to be working.</description>
+    </key>
+    <key name="short-pause-time" type="u">
+      <default>300</default>
+      <range min="1" max="36000"/>
+      <summary>Short pause duration</summary>
+      <description>Time in seconds you are supposed to take a short break.</description>
+    </key>
+    <key name="long-pause-time" type="u">
+      <default>900</default>
+      <range min="1" max="36000"/>
+      <summary>Long pause duration</summary>
+      <description>Time in seconds you are supposed to take a longer break.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.pomodoro.preferences.keybindings" path="/apps/gnome-pomodoro/preferences/keybindings/">
+    <key type="as" name="toggle-timer">
+      <default><![CDATA[["<Ctrl><Alt>p"]]]></default>
+      <summary>Timer toggle key</summary>
+      <description>Key to toggle the timer.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.pomodoro.preferences.notifications" path="/apps/gnome-pomodoro/preferences/notifications/">
+    <key name="screen-notifications" type="b">
+      <default>true</default>
+      <summary>Screen notifications</summary>
+      <description>Whether to show a notification dialog when pause starts.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.pomodoro.preferences.presence" path="/apps/gnome-pomodoro/preferences/presence/">
+    <key name="enabled" type="b">
+      <default>true</default>
+      <summary>Change presence status</summary>
+      <description>Whether to change user and IM presence to busy.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.pomodoro.preferences.sounds" path="/apps/gnome-pomodoro/preferences/sounds/">
+    <key name="enabled" type="b">
+      <default>true</default>
+      <summary>Play sounds</summary>
+      <description>Whether to play sounds.</description>
+    </key>
+    <key name="pomodoro-start-uri" type="s">
+      <default>""</default>
+      <summary>Pomodoro start sound</summary>
+      <description>Sound file to notify of pomodoro start.</description>
+    </key>
+    <key name="pomodoro-end-uri" type="s">
+      <default>""</default>
+      <summary>Pomodoro end sound</summary>
+      <description>Sound file to notify of pomodoro end.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.pomodoro.state" path="/apps/gnome-pomodoro/state/">
+    <key name="timer-session-count" type="d">
+      <default>0</default>
+      <summary>Timer session count</summary>
+      <description>Number of sessions since long break.</description>
+    </key>
+    <key name="timer-state" type="s">
+      <choices>
+        <choice value="null"/>
+        <choice value="pomodoro"/>
+        <choice value="pause"/>
+        <choice value="idle"/>
+      </choices>
+      <default>"null"</default>
+      <summary>Timer state</summary>
+      <description>Last used timer state.</description>
+    </key>
+    <key name="timer-state-changed-date" type="s">
+      <default>""</default>
+      <summary>Timer state changed date</summary>
+      <description>Date of the last state change.</description>
+    </key>
+  </schema>
+</schemalist>

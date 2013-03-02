@@ -86,7 +86,7 @@ const Indicator = new Lang.Class({
                                     Lang.bind(this, this._onNameVanished));
         this._propertiesChangedId = 0;
 
-        this._settings = Utils.getSettings();
+        this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
 
         // Timer label
@@ -110,8 +110,8 @@ const Indicator = new Lang.Class({
         this.menu.addMenuItem(this._optionsMenu);
 
         // Register keybindings to toggle
-        global.display.add_keybinding('toggle-pomodoro-timer',
-                                      this._settings,
+        global.display.add_keybinding('toggle-timer',
+                                      this._settings.get_child('keybindings'),
                                       Meta.KeyBindingFlags.NONE,
                                       Lang.bind(this, this.toggle));
 
@@ -127,31 +127,24 @@ const Indicator = new Lang.Class({
         this._resetCountButton.connect('activate', Lang.bind(this, this.reset));
         this._optionsMenu.menu.addMenuItem(this._resetCountButton);
 
-        // Away from desk toggle
-        this._awayFromDeskToggle = new PopupMenu.PopupSwitchMenuItem(_("Away From Desk"));
-        this._awayFromDeskToggle.connect('toggled', Lang.bind(this, function(item) {
-            this._settings.set_boolean('away-from-desk', item.state);
-        }));
-        this._optionsMenu.menu.addMenuItem(this._awayFromDeskToggle);
-
         // Presence status toggle
         this._changePresenceStatusToggle = new PopupMenu.PopupSwitchMenuItem(_("Control Presence Status"));
         this._changePresenceStatusToggle.connect('toggled', Lang.bind(this, function(item) {
-            this._settings.set_boolean('change-presence-status', item.state);
+            this._settings.get_child('presence').set_boolean('enabled', item.state);
         }));
         this._optionsMenu.menu.addMenuItem(this._changePresenceStatusToggle);
 
         // Notification dialog toggle
         this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Fullscreen Notifications"));
         this._showDialogsToggle.connect('toggled', Lang.bind(this, function(item) {
-            this._settings.set_boolean('show-notification-dialogs', item.state);
+            this._settings.get_child('notifications').set_boolean('screen-notifications', item.state);
         }));
         this._optionsMenu.menu.addMenuItem(this._showDialogsToggle);
 
         // Notify with a sound toggle
         this._playSoundsToggle = new PopupMenu.PopupSwitchMenuItem(_("Sound Notifications"));
         this._playSoundsToggle.connect('toggled', Lang.bind(this, function(item) {
-            this._settings.set_boolean('play-sounds', item.state);
+            this._settings.get_child('sounds').set_boolean('enabled', item.state);
         }));
         this._optionsMenu.menu.addMenuItem(this._playSoundsToggle);
 
@@ -212,22 +205,20 @@ const Indicator = new Lang.Class({
     },
 
     _onSettingsChanged: function() {
-        this._awayFromDeskToggle.setToggleState(
-                                this._settings.get_boolean('away-from-desk'));
         this._showDialogsToggle.setToggleState(
-                                this._settings.get_boolean('show-notification-dialogs'));
+                                this._settings.get_child('notifications').get_boolean('screen-notifications'));
         this._changePresenceStatusToggle.setToggleState(
-                                this._settings.get_boolean('change-presence-status'));
+                                this._settings.get_child('presence').get_boolean('enabled'));
         this._playSoundsToggle.setToggleState(
-                                this._settings.get_boolean('play-sounds'));
+                                this._settings.get_child('sounds').get_boolean('enabled'));
 
-        this._pomodoroTimeSlider.setValue(_secondsToValue(this._settings.get_int('pomodoro-time')));
+        this._pomodoroTimeSlider.setValue(_secondsToValue(this._settings.get_child('timer').get_uint('pomodoro-time')));
         this._pomodoroTimeLabel.set_text(_formatTime(_valueToSeconds(this._pomodoroTimeSlider.value)));
 
-        this._shortPauseTimeSlider.setValue(_secondsToValue(this._settings.get_int('short-pause-time')));
+        this._shortPauseTimeSlider.setValue(_secondsToValue(this._settings.get_child('timer').get_uint('short-pause-time')));
         this._shortPauseTimeLabel.set_text(_formatTime(_valueToSeconds(this._shortPauseTimeSlider.value)));
 
-        this._longPauseTimeSlider.setValue(_secondsToValue(this._settings.get_int('long-pause-time')));
+        this._longPauseTimeSlider.setValue(_secondsToValue(this._settings.get_child('timer').get_uint('long-pause-time')));
         this._longPauseTimeLabel.set_text(_formatTime(_valueToSeconds(this._longPauseTimeSlider.value)));
 
         this._shortPauseTimeValue = this._shortPauseTimeSlider.value;
@@ -237,7 +228,7 @@ const Indicator = new Lang.Class({
     },
 
     _onPomodoroTimeChanged: function() {
-        this._settings.set_int('pomodoro-time', _valueToSeconds(this._pomodoroTimeSlider.value));
+        this._settings.get_child('timer').set_uint('pomodoro-time', _valueToSeconds(this._pomodoroTimeSlider.value));
     },
 
     _onShortPauseTimeChanged: function() {
@@ -246,9 +237,9 @@ const Indicator = new Lang.Class({
         if (this._shortPauseTimeSlider.value > this._longPauseTimeValue) {
             this._longPauseTimeLabel.set_text(this._shortPauseTimeLabel.text);
             this._longPauseTimeSlider.setValue(this._shortPauseTimeSlider.value);
-            this._settings.set_int('long-pause-time', seconds);
+            this._settings.get_child('timer').set_uint('long-pause-time', seconds);
         }
-        this._settings.set_int('short-pause-time', seconds);
+        this._settings.get_child('timer').set_uint('short-pause-time', seconds);
     },
 
     _onLongPauseTimeChanged: function() {
@@ -257,9 +248,9 @@ const Indicator = new Lang.Class({
         if (this._shortPauseTimeValue > this._longPauseTimeSlider.value) {
             this._shortPauseTimeLabel.set_text(this._longPauseTimeLabel.text);
             this._shortPauseTimeSlider.setValue(this._longPauseTimeSlider.value);
-            this._settings.set_int('short-pause-time', seconds);
+            this._settings.get_child('timer').set_uint('short-pause-time', seconds);
         }
-        this._settings.set_int('long-pause-time', seconds);
+        this._settings.get_child('timer').set_uint('long-pause-time', seconds);
     },
 
     _getPreferredWidth: function(actor, forHeight, alloc) {
@@ -400,7 +391,7 @@ const Indicator = new Lang.Class({
     },
 
     destroy: function() {
-        global.display.remove_keybinding('toggle-pomodoro-timer');
+        global.display.remove_keybinding('toggle-timer');
 
         if (this._nameWatcherId) {
             Gio.DBus.session.unwatch_name(this._nameWatcherId);

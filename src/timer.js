@@ -54,7 +54,6 @@ const Timer = new Lang.Class({
     _init: function() {
         this._elapsed = 0;
         this._elapsed_limit = 0;
-        this._session_part_count = 0;
         this._session_count = 0;
         this._state = State.NULL;
         this._state_timestamp = 0;
@@ -63,8 +62,10 @@ const Timer = new Lang.Class({
         this._power = new UPowerGlib.Client();
         this._power.connect('notify-resume', Lang.bind(this, this.restore));
 
-        this.settings = new Gio.Settings({ schema: 'org.gnome.shell.extensions.pomodoro' });
-        this.settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+        this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences.timer' });
+        this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+
+        this._state_settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.state' });
     },
 
     _onSettingsChanged: function (settings, key) {
@@ -74,21 +75,21 @@ const Timer = new Lang.Class({
         switch(key) {
             case 'pomodoro-time':
                 if (this._state == State.POMODORO)
-                    this._elapsed_limit = settings.get_int('pomodoro-time');
+                    this._elapsed_limit = settings.get_uint('pomodoro-time');
 
                 this._elapsed = Math.min(this._elapsed, this._elapsed_limit);
                 break;
 
             case 'short-pause-time':
-                if (this._state == State.PAUSE && this._session_part_count < 4)
-                    this._elapsed_limit = settings.get_int('short-pause-time');
+                if (this._state == State.PAUSE && this._session_count < 4)
+                    this._elapsed_limit = settings.get_uint('short-pause-time');
 
                 this._elapsed = Math.min(this._elapsed, this._elapsed_limit);
                 break;
 
             case 'long-pause-time':
-                if (this._state == State.PAUSE && this._session_part_count >= 4)
-                    this._elapsed_limit = settings.get_int('long-pause-time');
+                if (this._state == State.PAUSE && this._session_count >= 4)
+                    this._elapsed_limit = settings.get_uint('long-pause-time');
 
                 this._elapsed = Math.min(this._elapsed, this._elapsed_limit);
                 break;
@@ -111,7 +112,6 @@ const Timer = new Lang.Class({
         let is_running = (this._state != State.NULL);
 
         this._session_count = 0;
-        this._session_part_count = 0;
         this.set_state(State.NULL);
 
         if (is_running)
@@ -146,12 +146,13 @@ const Timer = new Lang.Class({
             return;
 
         if (this._state == State.POMODORO) {
-            if (this._elapsed >= POMODORO_ACCEPTANCE * this.settings.get_int('pomodoro-time')) {
+            if (this._elapsed >= POMODORO_ACCEPTANCE * this._settings.get_uint('pomodoro-time')) {
                 this._session_count += 1;
-                this._session_part_count += 1;
+                this.emit('pomodoro-completed');
             }
             else {
                 // Pomodoro not completed, sorry
+                this.emit('pomodoro-cancelled');
             }
         }
 
@@ -160,29 +161,29 @@ const Timer = new Lang.Class({
                 break;
 
             case State.POMODORO:
-                let long_pause_acceptance_time = (1.0 - SHORT_LONG_PAUSE_ACCEPTANCE) * this.settings.get_int('short-pause-time')
-                                                     + (SHORT_LONG_PAUSE_ACCEPTANCE) * this.settings.get_int('long-pause-time');
+                let long_pause_acceptance_time = (1.0 - SHORT_LONG_PAUSE_ACCEPTANCE) * this._settings.get_uint('short-pause-time')
+                                                     + (SHORT_LONG_PAUSE_ACCEPTANCE) * this._settings.get_uint('long-pause-time');
 
                 if (this._state == State.PAUSE || this._state == State.IDLE) {
                     // If skipped a break make long break sooner
-                    if (this._elapsed < SHORT_PAUSE_ACCEPTANCE * this.settings.get_int('short-pause-time'))
-                        this._session_part_count += 1;
+                    if (this._elapsed < SHORT_PAUSE_ACCEPTANCE * this._settings.get_uint('short-pause-time'))
+                        this._session_count += 1;
 
                     // Reset work cycle when finished long break or was too lazy on a short one,
                     // and if skipped a long break try again next time.
                     if (this._elapsed >= long_pause_acceptance_time)
-                        this._session_part_count = 0;
+                        this._session_count = 0;
                 }
                 if (this._state == State.NULL) {
                     // Reset work cycle when disabled for some time
                     let idle_time = (timestamp - this._state_timestamp) / 1000;
 
                     if (this._state_timestamp > 0 && idle_time >= long_pause_acceptance_time)
-                        this._session_part_count = 0;
+                        this._session_count = 0;
                 }
 
                 this._elapsed = 0;
-                this._elapsed_limit = this.settings.get_int('pomodoro-time');
+                this._elapsed_limit = this._settings.get_uint('pomodoro-time');
                 break;
 
             case State.PAUSE:
@@ -193,10 +194,10 @@ const Timer = new Lang.Class({
                     this._elapsed = 0;
 
                 // Determine which pause type user should have
-                if (this._session_part_count >= 4)
-                    this._elapsed_limit = this.settings.get_int('long-pause-time');
+                if (this._session_count >= 4)
+                    this._elapsed_limit = this._settings.get_uint('long-pause-time');
                 else
-                    this._elapsed_limit = this.settings.get_int('short-pause-time');
+                    this._elapsed_limit = this._settings.get_uint('short-pause-time');
 
                 break;
 
@@ -214,17 +215,15 @@ const Timer = new Lang.Class({
         this._state_timestamp = timestamp;
         this._state = new_state;
 
-        this.settings.set_int('saved-session-count', this._session_count);
-        this.settings.set_int('saved-session-part-count', this._session_part_count);
-        this.settings.set_string('saved-state', this._state);
-        this.settings.set_string('saved-state-date', new Date(timestamp).toString());
+        this._state_settings.set_double('timer-session-count', this._session_count);
+        this._state_settings.set_string('timer-state', this._state);
+        this._state_settings.set_string('timer-state-changed-date', new Date(timestamp).toString());
     },
 
     restore: function() {
-        let session_count      = this.settings.get_int('saved-session-count');
-        let session_part_count = this.settings.get_int('saved-session-part-count');
-        let state              = this.settings.get_string('saved-state');
-        let state_timestamp    = Date.parse(this.settings.get_string('saved-state-date'));
+        let session_count = this._state_settings.get_double('timer-session-count');
+        let state = this._state_settings.get_string('timer-state');
+        let state_timestamp = Date.parse(this._state_settings.get_string('timer-state-changed-date'));
 
         if (isNaN(state_timestamp)) {
             log('Pomodoro: Failed to restore timer state, date string is funny.');
@@ -232,7 +231,6 @@ const Timer = new Lang.Class({
         }
 
         this._session_count = session_count;
-        this._session_part_count = session_part_count;
         this._state_timestamp = state_timestamp;
 
         this._do_set_state(state, state_timestamp);
@@ -253,7 +251,7 @@ const Timer = new Lang.Class({
             }
 
             if (this._state == State.PAUSE)
-                this.notify_pomodoro_end();
+                this.emit('pomodoro-end');
         }
 
         this.emit('state-changed', this._state);
@@ -279,7 +277,7 @@ const Timer = new Lang.Class({
                 if (this._elapsed >= this._elapsed_limit) {
                     // TODO: Enable IDLE state
                     this.set_state(State.POMODORO);
-                    this.notify_pomodoro_start();
+                    this.emit('pomodoro-start');
                 }
                 break;
 
@@ -287,7 +285,7 @@ const Timer = new Lang.Class({
                 // Pomodoro is over, a pause is needed :)
                 if (this._elapsed >= this._elapsed_limit) {
                     this.set_state(State.PAUSE);
-                    this.notify_pomodoro_end();
+                    this.emit('pomodoro-end');
                 }
                 break;
         }
@@ -312,14 +310,6 @@ const Timer = new Lang.Class({
             this.set_elapsed(this._elapsed + 1);
 
         return true;
-    },
-
-    notify_pomodoro_start: function() {
-        this.emit('notify-pomodoro-start');
-    },
-
-    notify_pomodoro_end: function() {
-        this.emit('notify-pomodoro-end');
     },
 
     destroy: function() {
