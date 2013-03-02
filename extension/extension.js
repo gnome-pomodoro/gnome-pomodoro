@@ -29,7 +29,7 @@ const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 
 const DBus = Extension.imports.dbus;
-const Notification = Extension.imports.notification;
+const Notifications = Extension.imports.notifications;
 const Utils = Extension.imports.utils;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
@@ -391,7 +391,7 @@ const Indicator = new Lang.Class({
     _getNotificationSource: function() {
         let source = this._notificationSource;
         if (!source) {
-            source = new Notification.NotificationSource();
+            source = new Notifications.NotificationSource();
             source.connect('destroy', Lang.bind(this, function() {
                 this._notificationSource = null;
             }));

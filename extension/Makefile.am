@@ -4,7 +4,7 @@ dist_extension_DATA = \
     dbus.js \
     extension.js \
     metadata.json \
-    notification.js \
+    notifications.js \
     stylesheet.css \
     utils.js \
     $(NULL)
