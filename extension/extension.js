@@ -30,7 +30,7 @@ const Tweener = imports.ui.tweener;
 
 const DBus = Extension.imports.dbus;
 const Notification = Extension.imports.notification;
-const Utils = Extension.imports.util;
+const Utils = Extension.imports.utils;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;

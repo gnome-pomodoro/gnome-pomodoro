@@ -35,7 +35,7 @@ const Tweener = imports.ui.tweener;
 const ExtensionUtils = imports.misc.extensionUtils;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const PomodoroUtil = Extension.imports.util;
+const Utils = Extension.imports.utils;
 
 const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
 const _ = Gettext.gettext;
@@ -85,7 +85,7 @@ const NotificationSource = new Lang.Class({
         let iconTheme = Gtk.IconTheme.get_default();
 
         if (!iconTheme.has_icon(this.iconName))
-            iconTheme.append_search_path (PomodoroUtil.getExtensionPath());
+            iconTheme.append_search_path (Utils.getExtensionPath());
 
         return new St.Icon({ icon_name: this.iconName,
                              icon_size: size });

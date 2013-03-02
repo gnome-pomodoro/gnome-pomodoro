@@ -6,7 +6,7 @@ dist_extension_DATA = \
     metadata.json \
     notification.js \
     stylesheet.css \
-    util.js \
+    utils.js \
     $(NULL)
 
 nodist_extension_DATA = \
