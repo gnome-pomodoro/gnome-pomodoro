@@ -21,6 +21,8 @@
 
 const Gio = imports.gi.Gio;
 
+const POMODORO_SERVICE_NAME = 'org.gnome.Pomodoro';
+
 const PomodoroInterface = <interface name="org.gnome.Pomodoro">
     <property name="Elapsed" type="i" access="read"/>
     <property name="ElapsedLimit" type="i" access="read"/>

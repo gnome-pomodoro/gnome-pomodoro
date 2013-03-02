@@ -3,6 +3,7 @@ include ../Makefile.include
 dist_extension_DATA = \
     dbus.js \
     extension.js \
+    indicator.js \
     metadata.json \
     notifications.js \
     stylesheet.css \
