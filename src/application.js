@@ -32,6 +32,7 @@ const GLib = imports.gi.GLib;
 const MainWindow = imports.mainWindow;
 const Config = imports.config;
 const DBus = imports.dbus;
+const Sounds = imports.sounds;
 const Timer = imports.timer;
 
 
@@ -55,6 +56,10 @@ const Application = new Lang.Class({
 
         this.timer = new Timer.Timer();
         this.timer.restore();
+
+        this.plugins = [
+            new Sounds.Sounds(this.timer),
+        ];
 
         this._initActions();
     },

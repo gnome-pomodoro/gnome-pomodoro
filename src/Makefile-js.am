@@ -10,6 +10,7 @@ gnome_shell_pomodoro_sources = \
     dbus.js \
     main.js \
     mainWindow.js \
+    sounds.js \
     timer.js \
     utils.js \
     widgets.js \

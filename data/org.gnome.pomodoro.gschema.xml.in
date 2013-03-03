@@ -57,12 +57,12 @@
       <summary>Play sounds</summary>
       <description>Whether to play sounds.</description>
     </key>
-    <key name="pomodoro-start-uri" type="s">
-      <default>""</default>
+    <key name="pomodoro-start-sound" type="s">
+      <default>"pomodoro-start.wav"</default>
       <summary>Pomodoro start sound</summary>
       <description>Sound file to notify of pomodoro start.</description>
     </key>
-    <key name="pomodoro-end-uri" type="s">
+    <key name="pomodoro-end-sound" type="s">
       <default>""</default>
       <summary>Pomodoro end sound</summary>
       <description>Sound file to notify of pomodoro end.</description>
