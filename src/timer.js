@@ -71,9 +71,9 @@ const Timer = new Lang.Class({
 
         this.connect('state-changed', Lang.bind(this, function() {
             switch (this._state) {
-                case Timer.State.IDLE:
-                case Timer.State.POMODORO:
-                    if (this._state_notified == Timer.State.PAUSE)
+                case State.IDLE:
+                case State.POMODORO:
+                    if (this._state_notified == State.PAUSE)
                         this.emit('notify-pomodoro-start');
                     break;
             }
