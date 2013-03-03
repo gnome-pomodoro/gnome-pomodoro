@@ -8,4 +8,6 @@ Icon=
 StartupNotify=true
 Terminal=false
 Type=Application
-Categories=Accessories
+Categories=GNOME;GTK;Accessories
+NoDisplay=true
+OnlyShowIn=GNOME;
