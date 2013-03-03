@@ -55,11 +55,12 @@ const Application = new Lang.Class({
         this.settings = new Gio.Settings({ schema: 'org.gnome.pomodoro' });
 
         this.timer = new Timer.Timer();
-        this.timer.restore();
 
         this.plugins = [
             new Sounds.Sounds(this.timer),
         ];
+
+        this.timer.restore();
 
         this._initActions();
     },
