@@ -35,6 +35,9 @@ const DBus = imports.dbus;
 const Sounds = imports.sounds;
 const Timer = imports.timer;
 
+// Time in milliseconds after which application should quit
+const APPLICATION_INACTIVITY_TIMEOUT = 10000;
+
 
 const Application = new Lang.Class({
     Name: 'Application',
@@ -51,14 +54,32 @@ const Application = new Lang.Class({
         this.parent({ application_id: 'org.gnome.Pomodoro',
                       flags: Gio.ApplicationFlags.IS_SERVICE });
 
-        this.service = null;
+        this.set_inactivity_timeout(APPLICATION_INACTIVITY_TIMEOUT);
+
         this.settings = new Gio.Settings({ schema: 'org.gnome.pomodoro' });
+        this.dbus = null;
 
         this.timer = new Timer.Timer();
 
+        // Setup Plugins
         this.plugins = [
             new Sounds.Sounds(this.timer),
         ];
+
+        // Quit service if not used
+        this._has_hold = false;
+
+        this.timer.connect('state-changed', Lang.bind(this, function(timer) {
+            let is_running = timer.state != Timer.State.NULL;
+            if (is_running != this._has_hold) {
+                if (is_running)
+                    this.hold();
+                else
+                    this.release();
+
+                this._has_hold = is_running;
+            }
+        }));
 
         this.timer.restore();
 
@@ -124,7 +145,7 @@ const Application = new Lang.Class({
 
         this._initAppMenu();
 
-        this._mainWindow = new MainWindow.MainWindow(this);
+        //this._mainWindow = new MainWindow.MainWindow(this);
     },
 
     // Save the state before exit.
@@ -146,23 +167,16 @@ const Application = new Lang.Class({
         if (!this.parent(connection, object_path))
             return false;
 
-        if (!this.service) {
-            // Increase the usecount
-            this.hold();
-
-            this.service = new DBus.Pomodoro(this.timer);
-        }
+        if (!this.dbus)
+            this.dbus = new DBus.Pomodoro(this.timer);
 
         return true;
     },
 
     vfunc_dbus_unregister: function(connection, object_path) {
-        if (this.service) {
-            this.service.destroy();
-            this.service = null;
-
-            // Release the hold added when creating the app
-            this.release();
+        if (this.dbus) {
+            this.dbus.destroy();
+            this.dbus = null;
         }
 
         this.parent(connection, object_path);
