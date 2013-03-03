@@ -66,6 +66,25 @@ const Timer = new Lang.Class({
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
 
         this._state_settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.state' });
+
+        this._state_notified = this._state;
+
+        this.connect('state-changed', Lang.bind(this, function() {
+            switch (this._state) {
+                case Timer.State.IDLE:
+                case Timer.State.POMODORO:
+                    if (this._state_notified == Timer.State.PAUSE)
+                        this.emit('notify-pomodoro-start');
+                    break;
+            }
+
+            this._state_notified = this._state;
+        }));
+
+        this.connect('pomodoro-end', Lang.bind(this, function(timer, completed) {
+            if (this._state == State.PAUSE)
+                this.emit('notify-pomodoro-end', completed);
+        }));
     },
 
     _onSettingsChanged: function (settings, key) {
