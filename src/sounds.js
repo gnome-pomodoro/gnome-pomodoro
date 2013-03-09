@@ -80,9 +80,9 @@ const Sounds = new Lang.Class({
     },
 
     destroy: function() {
-        if (this.timer) {
-            this.timer.disconnect(this._notifyPomodoroStartId);
-            this.timer.disconnect(this._notifyPomodoroEndId);
+        if (this._timer) {
+            this._timer.disconnect(this._notifyPomodoroStartId);
+            this._timer.disconnect(this._notifyPomodoroEndId);
         }
     },
 });
