@@ -39,8 +39,8 @@ const PomodoroInterface = <interface name="org.gnome.Pomodoro">
     <signal name="StateChanged">
         <arg type="s" name="state"/>
     </signal>
-    <signal name="PomodoroStart"/>
-    <signal name="PomodoroEnd">
+    <signal name="NotifyPomodoroStart"/>
+    <signal name="NotifyPomodoroEnd">
         <arg type="b" name="completed"/>
     </signal>
 </interface>;
@@ -86,12 +86,12 @@ const Pomodoro = new Lang.Class({
             this.dbus.flush();
         }));
 
-        this.timer.connect('pomodoro-start', Lang.bind(this, function(timer) {
-            this.dbus.emit_signal('PomodoroStart', null);
+        this.timer.connect('notify-pomodoro-start', Lang.bind(this, function(timer) {
+            this.dbus.emit_signal('NotifyPomodoroStart', null);
         }));
 
-        this.timer.connect('pomodoro-end', Lang.bind(this, function(timer, completed) {
-            this.dbus.emit_signal('PomodoroEnd', GLib.Variant.new('(b)', [completed]));
+        this.timer.connect('notify-pomodoro-end', Lang.bind(this, function(timer, completed) {
+            this.dbus.emit_signal('NotifyPomodoroEnd', GLib.Variant.new('(b)', [completed]));
         }));
     },
 
@@ -144,7 +144,7 @@ const Pomodoro = new Lang.Class({
     set State(value) {
         try {
             if (this.timer)
-                this.timer.setState(value);
+                this.timer.set_state(value);
         }
         catch (error) {
             log(error.fileName + ':' + error.lineNumber + ' ' + error.name + ': ' + error.message);

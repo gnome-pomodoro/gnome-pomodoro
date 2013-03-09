@@ -38,7 +38,9 @@ const PomodoroInterface = <interface name="org.gnome.Pomodoro">
         <arg type="s" name="state"/>
     </signal>
     <signal name="NotifyPomodoroStart"/>
-    <signal name="NotifyPomodoroEnd"/>
+    <signal name="NotifyPomodoroEnd">
+        <arg type="b" name="completed"/>
+    </signal>
 </interface>;
 
 var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
