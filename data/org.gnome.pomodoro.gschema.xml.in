@@ -48,6 +48,11 @@
       <summary>Screen notifications</summary>
       <description>Whether to show a notification dialog when pause starts.</description>
     </key>
+    <key name="reminders" type="b">
+      <default>true</default>
+      <summary>Reminders</summary>
+      <description>Whether to remind about ongoing break.</description>
+    </key>
   </schema>
   <schema id="org.gnome.pomodoro.preferences.presence" path="/apps/gnome-pomodoro/preferences/presence/">
     <key name="enabled" type="b">

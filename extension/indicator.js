@@ -235,6 +235,14 @@ const Indicator = new Lang.Class({
         this._shortPauseTimeText  = this._shortPauseTimeLabel.text;
         this._longPauseTimeValue  = this._longPauseTimeSlider.value;
         this._longPauseTimeText   = this._longPauseTimeLabel.text;
+
+        if (this._reminder && !this._settings.get_child('notifications').get_boolean('reminders'))
+            this._reminder.destroy();
+
+        if (this._notificationDialog && !this._settings.get_child('notifications').get_boolean('screen-notifications')) {
+            this._notificationDialog.close();
+            this._notificationDialog.setOpenWhenIdle(false);
+        }
     },
 
     _onPomodoroTimeChanged: function() {
@@ -552,6 +560,9 @@ const Indicator = new Lang.Class({
 
     _schedulePomodoroEndReminder: function() {
         let source = this._ensureNotificationSource();
+
+        if (!this._settings.get_child('notifications').get_boolean('reminders'))
+            return;
 
         if (this._reminder)
             this._reminder.destroy();
