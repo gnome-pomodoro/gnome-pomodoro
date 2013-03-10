@@ -66,25 +66,6 @@ const Timer = new Lang.Class({
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
 
         this._state_settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.state' });
-
-        this._state_notified = this._state;
-
-        this.connect('state-changed', Lang.bind(this, function() {
-            switch (this._state) {
-                case State.IDLE:
-                case State.POMODORO:
-                    if (this._state_notified == State.PAUSE)
-                        this.emit('notify-pomodoro-start');
-                    break;
-            }
-
-            this._state_notified = this._state;
-        }));
-
-        this.connect('pomodoro-end', Lang.bind(this, function(timer, completed) {
-            if (this._state == State.PAUSE)
-                this.emit('notify-pomodoro-end', completed);
-        }));
     },
 
     _onSettingsChanged: function (settings, key) {
@@ -155,14 +136,21 @@ const Timer = new Lang.Class({
 
         if (this._state != state) {
             let completed = this._session_count != session_count;
+            let requested = elapsed < elapsed_limit;
 
             this.emit('state-changed');
 
             if (this._state == State.POMODORO)
-                this.emit('pomodoro-start');
+                this.emit('pomodoro-start', requested);
+
+            if (state == State.PAUSE)
+                this.emit('notify-pomodoro-start', requested);
 
             if (state == State.POMODORO)
                 this.emit('pomodoro-end', completed);
+
+            if (this._state == State.PAUSE)
+                this.emit('notify-pomodoro-end', completed);
         }
 
         if (this._elapsed != elapsed || this._elapsed_limit != elapsed_limit)
@@ -288,9 +276,10 @@ const Timer = new Lang.Class({
 
         if (this._state != State.NULL) {
             let completed = this._session_count != session_count;
+            let requested = false;
 
             if (this._state == State.POMODORO)
-                this.emit('pomodoro-start');
+                this.emit('pomodoro-start', requested);
 
             if (this._state == State.PAUSE)
                 this.emit('pomodoro-end', completed);

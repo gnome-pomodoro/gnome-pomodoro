@@ -37,7 +37,9 @@ const PomodoroInterface = <interface name="org.gnome.Pomodoro">
     <signal name="StateChanged">
         <arg type="s" name="state"/>
     </signal>
-    <signal name="NotifyPomodoroStart"/>
+    <signal name="NotifyPomodoroStart">
+        <arg type="b" name="requested"/>
+    </signal>
     <signal name="NotifyPomodoroEnd">
         <arg type="b" name="completed"/>
     </signal>

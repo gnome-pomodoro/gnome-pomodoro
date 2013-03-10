@@ -456,8 +456,14 @@ const Indicator = new Lang.Class({
         return this._notificationSource;
     },
 
-    _notifyPomodoroStart: function(proxy, senderName) {
+    _notifyPomodoroStart: function(proxy, senderName, [requested]) {
         let source = this._ensureNotificationSource();
+
+        if (requested) {
+            if (this._notification)
+                this._notification.destroy();
+            return;
+        }
 
         if (this._notification instanceof Notifications.PomodoroStart) {
             this._notification.show();
