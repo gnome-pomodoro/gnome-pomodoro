@@ -514,20 +514,25 @@ const Indicator = new Lang.Class({
                 this._notificationDialog.close();
                 this._notificationDialog.setOpenWhenIdle(false);
             }
+
+            if (this._reminder) {
+                this._reminder.destroy();
+                this._reminder = null;
+            }
         }));
 
         if (!this._notificationDialog) {
             this._notificationDialog = new Notifications.PomodoroEndDialog();
             this._notificationDialog.connect('opening', Lang.bind(this, function() {
-//                this._unscheduleReminder();
+                if (this._reminder)
+                    this._reminder.destroy();
             }));
             this._notificationDialog.connect('closing', Lang.bind(this, function() {
                 if (this._notification)
                     this._notification.show();
             }));
             this._notificationDialog.connect('closed', Lang.bind(this, function() {
-//                this._unscheduleReminder(); // reset reminder count
-//                this._scheduleReminder();
+                this._schedulePomodoroEndReminder();
             }));
             this._notificationDialog.connect('destroy', Lang.bind(this, function() {
                 this._notificationDialog = null;
@@ -536,10 +541,42 @@ const Indicator = new Lang.Class({
             this._notificationDialog.setOpenWhenIdle(screenNotifications);
         }
 
-        if (screenNotifications)
+        if (screenNotifications) {
             this._notificationDialog.open();
-        else
+        }
+        else {
             this._notification.show();
+            this._schedulePomodoroEndReminder();
+        }
+    },
+
+    _schedulePomodoroEndReminder: function() {
+        let source = this._ensureNotificationSource();
+
+        if (this._reminder)
+            this._reminder.destroy();
+
+        this._reminder = new Notifications.PomodoroEndReminder(source);
+        this._reminder.connect('show', Lang.bind(this, function(notification) {
+            if (!this._proxy || this._proxy.State != State.PAUSE)
+                notification.destroy();
+            else
+                // Don't show reminder if only 90 seconds remain to next pomodoro
+                if (this._proxy.ElapsedLimit - this._proxy.Elapsed < 90)
+                    notification.destroy();
+        }));
+        this._reminder.connect('clicked', Lang.bind(this, function() {
+            if (this._notificationDialog) {
+                this._notificationDialog.open();
+                this._notificationDialog.pushModal();
+            }
+        }));
+        this._reminder.connect('destroy', Lang.bind(this, function(notification) {
+            if (this._reminder === notification)
+                this._reminder = null;
+        }));
+
+        this._reminder.schedule();
     },
 
     _notifyIssue: function() {

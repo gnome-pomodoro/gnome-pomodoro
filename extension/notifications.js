@@ -66,6 +66,12 @@ const NOTIFICATION_DIALOG_OPACITY = 0.55;
 
 const ICON_NAME = 'timer-symbolic';
 
+// Remind about ongoing break in given delays
+const REMINDER_INTERVALS = [75];
+// Ratio between user idle time and time between reminders to determine
+// whether user is away
+const REMINDER_ACCEPTANCE = 0.66
+
 const State = {
     OPENED: 0,
     CLOSED: 1,
@@ -458,8 +464,10 @@ const Notification = new Lang.Class({
         if (!Main.messageTray.contains(this.source))
             Main.messageTray.add(this.source);
 
-        if (this.source)
+        if (this.source) {
             this.source.notify(this);
+            this.emit('show');
+        }
     },
 
     hide: function() {
@@ -504,6 +512,74 @@ const PomodoroEnd = new Lang.Class({
                                                "You have %d minutes left\n", minutes).format(minutes);
 
         this.update(this.title, message, {});
+    }
+});
+
+const PomodoroEndReminder = new Lang.Class({
+    Name: 'PomodoroEndReminderNotification',
+    Extends: Notification,
+
+    _init: function(source) {
+        let title = _("Hey, you're missing out on a break")
+        let description = '';
+
+        this.parent(source, title, description, null);
+
+        this.setTransient(true);
+        this.setUrgency(MessageTray.Urgency.LOW);
+
+        this._timeoutSource = 0;
+        this._interval = 0;
+        this._timeout = 0;
+    },
+
+    _onTimeout: function() {
+        let display = global.screen.get_display();
+        let idleTime = parseInt((display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000);
+
+        // No need to notify if user seems to be away. We only monitor idle time
+        // based on X11, and not Clutter scene which should better reflect to real work
+        if (idleTime < this._timeout * REMINDER_ACCEPTANCE)
+            this.show();
+        else
+            this.unschedule();
+
+        this.schedule();
+        return false;
+    },
+
+    schedule: function() {
+        let intervals = REMINDER_INTERVALS;
+        let reschedule = this._timeoutSource != 0;
+
+        if (this._timeoutSource) {
+            GLib.source_remove(this._timeoutSource);
+            this._timeoutSource = 0;
+        }
+
+        if (this._interval < intervals.length) {
+            this._timeout = intervals[this._interval];
+            this._timeoutSource = Mainloop.timeout_add_seconds(this._timeout,
+                                                                Lang.bind(this, this._onTimeout));
+        }
+
+        if (!reschedule)
+            this._interval += 1;
+    },
+
+    unschedule: function() {
+        if (this._timeoutSource) {
+            GLib.source_remove(this._timeoutSource);
+            this._timeoutSource = 0;
+        }
+
+        this._interval = 0;
+        this._timeout = 0;
+    },
+
+    destroy: function() {
+        this.unschedule();
+        this.parent();
     }
 });
 
