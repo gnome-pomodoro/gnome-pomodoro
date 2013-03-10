@@ -140,16 +140,19 @@ const Timer = new Lang.Class({
 
             this.emit('state-changed');
 
+            let notify_start = (this._state == State.POMODORO) ||
+                               (this._state == State.IDLE && this._settings.get_boolean('idle-monitor'));
+
             if (this._state == State.POMODORO)
                 this.emit('pomodoro-start', requested);
 
-            if (state == State.PAUSE)
+            if (state == State.PAUSE && notify_start)
                 this.emit('notify-pomodoro-start', requested);
 
             if (state == State.POMODORO)
                 this.emit('pomodoro-end', completed);
 
-            if (this._state == State.PAUSE)
+            if (state == State.POMODORO && this._state == State.PAUSE)
                 this.emit('notify-pomodoro-end', completed);
         }
 
@@ -305,9 +308,9 @@ const Timer = new Lang.Class({
             case State.PAUSE:
                 // Pause is over
                 if (this._elapsed >= this._elapsed_limit)
-                    // TODO: Enable IDLE state
-                    this.set_state(State.POMODORO);
-
+                    this.set_state(this._settings.get_boolean('idle-monitor')
+                                   ? State.IDLE
+                                   : State.POMODORO);
                 break;
 
             case State.POMODORO:
