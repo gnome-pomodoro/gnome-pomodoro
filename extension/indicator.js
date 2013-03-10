@@ -83,6 +83,10 @@ const Indicator = new Lang.Class({
                                     Lang.bind(this, this._onNameAppeared),
                                     Lang.bind(this, this._onNameVanished));
         this._propertiesChangedId = 0;
+        this._notifyPomodoroStartId = 0;
+        this._notifyPomodoroEndId = 0;
+        this._notificationDialog = null;
+        this._notification = null;
 
         this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
 
@@ -142,6 +146,8 @@ const Indicator = new Lang.Class({
         this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Fullscreen Notifications"));
         this._showDialogsToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.get_child('notifications').set_boolean('screen-notifications', item.state);
+            if (this._notificationDialog)
+                this._notificationDialog.setOpenWhenIdle(item.state);
         }));
         this._optionsMenu.menu.addMenuItem(this._showDialogsToggle);
 
@@ -282,10 +288,14 @@ const Indicator = new Lang.Class({
     },
 
     refresh: function() {
+        let remaining, minutes, seconds;
+
         let state = this._proxy ? this._proxy.State : null;
         let toggled = state !== null && state !== State.NULL;
 
         if (this._state !== state) {
+            this._state = state;
+
             if (state == State.POMODORO || state == State.IDLE)
                 Tweener.addTween(this.label,
                                  { opacity: 255,
@@ -296,25 +306,37 @@ const Indicator = new Lang.Class({
                                  { opacity: FADE_OPACITY,
                                    transition: 'easeOutQuad',
                                    time: FADE_ANIMATION_TIME });
-            this._state = state;
+
+            if (this._timerToggle.toggled !== toggled)
+                this._timerToggle.setToggleState(toggled);
         }
 
         if (toggled) {
-            let secondsLeft = Math.max(this._proxy.ElapsedLimit - this._proxy.Elapsed, 0);
+            remaining = state != State.IDLE
+                    ? Math.max(this._proxy.ElapsedLimit - this._proxy.Elapsed, 0)
+                    : this._proxy.ElapsedLimit;
 
-            if (state == State.IDLE)
-                secondsLeft = this._proxy.ElapsedLimit;
+            minutes = parseInt(remaining / 60);
+            seconds = parseInt(remaining % 60);
 
-            let minutes = parseInt(secondsLeft / 60);
-            let seconds = parseInt(secondsLeft % 60);
-
-            this.label.set_text('%02d:%02d'.format(minutes, seconds));
+            if (this._notification && (this._notification instanceof Notifications.PomodoroEnd)) {
+                this._notification.setRemainingTime(remaining);
+                this._notificationDialog.setRemainingTime(remaining);
+            }
         }
-        else
-            this.label.set_text('00:00');
+        else {
+            minutes = 0;
+            seconds = 0;
 
-        if (this._timerToggle.toggled !== toggled)
-            this._timerToggle.setToggleState(toggled);
+            if ((this._notification instanceof Notifications.PomodoroStart) ||
+                (this._notification instanceof Notifications.PomodoroEnd))
+            {
+                this._notification.destroy();
+                this._notification = null;
+            }
+        }
+
+        this.label.set_text('%02d:%02d'.format(minutes, seconds));
     },
 
     start: function() {
@@ -348,22 +370,65 @@ const Indicator = new Lang.Class({
             this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error)
             {
                 if (!error) {
-                    this._propertiesChangedId = this._proxy.connect('g-properties-changed',
+                    if (!this._propertiesChangedId)
+                        this._propertiesChangedId = this._proxy.connect('g-properties-changed',
                                                                     Lang.bind(this, this.refresh));
-                    this.refresh();
+                    if (!this._notifyPomodoroStartId)
+                        this._notifyPomodoroStartId = this._proxy.connectSignal('NotifyPomodoroStart',
+                                                                    Lang.bind(this, this._notifyPomodoroStart));
+                    if (!this._notifyPomodoroEndId)
+                        this._notifyPomodoroEndId = this._proxy.connectSignal('NotifyPomodoroEnd',
+                                                                    Lang.bind(this, this._notifyPomodoroEnd));
+
+                    if (this._proxy.State == State.POMODORO)
+                        this._notifyPomodoroStart(this._proxy);
+
+                    if (this._proxy.State == State.PAUSE)
+                        this._notifyPomodoroEnd(this._proxy, null, [true]);
 
                     if (callback)
                         callback.call(this);
                 }
                 else {
-                    this._notifyError(_("Could not run pomodoro timer"));
                     global.log('Pomodoro: ' + error.message);
+
+                    this._destroyProxy();
+                    this._notifyIssue();
                 }
+
+                this.refresh();
             }));
         }
         else {
-            if (callback)
+            if (callback) {
                 callback.call(this);
+
+                this.refresh();
+            }
+        }
+    },
+
+    _destroyProxy: function() {
+        if (this._proxy) {
+            if (this._propertiesChangedId) {
+                this._proxy.disconnect(this._propertiesChangedId);
+                this._propertiesChangedId = 0;
+            }
+
+            if (this._notifyPomodoroStartId) {
+                this._proxy.disconnectSignal(this._notifyPomodoroStartId);
+                this._notifyPomodoroStartId = 0;
+            }
+
+            if (this._notifyPomodoroEndId) {
+                this._proxy.disconnectSignal(this._notifyPomodoroEndId);
+                this._notifyPomodoroEndId = 0;
+            }
+
+            // TODO: not sure whether proxy gets destroyed by garbage collector
+            //       there is no destroy method
+            // this._proxy.destroy();
+            this._proxy = null;
         }
     },
 
@@ -372,15 +437,7 @@ const Indicator = new Lang.Class({
     },
 
     _onNameVanished: function() {
-        if (this._proxy && this._propertiesChangedId) {
-            this._proxy.disconnect(this._propertiesChangedId);
-            this._propertiesChangedId = 0;
-        }
-
-        if (this._proxy) {
-            this._proxy = null;
-        }
-
+        this._destroyProxy();
         this.refresh();
     },
 
@@ -389,40 +446,130 @@ const Indicator = new Lang.Class({
             global.log('Pomodoro: ' + error.message)
     },
 
-    _getNotificationSource: function() {
-        let source = this._notificationSource;
-        if (!source) {
-            source = new Notifications.NotificationSource();
-            source.connect('destroy', Lang.bind(this, function() {
+    _ensureNotificationSource: function() {
+        if (!this._notificationSource) {
+            this._notificationSource = new Notifications.Source();
+            this._notificationSource.connect('destroy', Lang.bind(this, function(reason) {
                 this._notificationSource = null;
             }));
-            Main.messageTray.add(source);
         }
-        return source;
+        return this._notificationSource;
     },
 
-    _notifyError: function(title, text, urgency) {
-        let source = this._getNotificationSource();
+    _notifyPomodoroStart: function(proxy, senderName) {
+        let source = this._ensureNotificationSource();
 
-        let notification = new MessageTray.Notification(source, title, text);
-        notification.setTransient(true);
-        notification.setUrgency(urgency !== undefined ? urgency : MessageTray.Urgency.HIGH);
+        if (this._notification instanceof Notifications.PomodoroStart) {
+            this._notification.show();
+            return;
+        }
 
-        source.notify(notification);
+        if (this._notification)
+            this._notification.destroy();
+
+        this._notification = new Notifications.PomodoroStart(source);
+        this._notification.connect('destroy', Lang.bind(this, function(notification) {
+            if (this._notification === notification)
+                this._notification = null;
+        }));
+        this._notification.show();
+    },
+
+    _notifyPomodoroEnd: function(proxy, senderName, [completed]) {
+        let source = this._ensureNotificationSource();
+        let screenNotifications = this._settings.get_child('notifications')
+                                                .get_boolean('screen-notifications');
+
+        if (this._notification instanceof Notifications.PomodoroEnd) {
+            this._notification.show();
+            return;
+        }
+
+        if (this._notification)
+            this._notification.destroy();
+
+        this._notification = new Notifications.PomodoroEnd(source);
+        this._notification.connect('action-invoked', Lang.bind(this, function(notification, action) {
+            notification.destroy();
+            if (action == Notifications.Action.START_POMODORO && this._proxy)
+                this._proxy.State = State.POMODORO;
+        }));
+        this._notification.connect('clicked', Lang.bind(this, function() {
+            if (this._notificationDialog) {
+                this._notificationDialog.open();
+                this._notificationDialog.pushModal();
+            }
+        }));
+        this._notification.connect('destroy', Lang.bind(this, function(notification) {
+            if (this._notification === notification)
+                this._notification = null;
+
+            if (this._notificationDialog) {
+                this._notificationDialog.close();
+                this._notificationDialog.setOpenWhenIdle(false);
+            }
+        }));
+
+        if (!this._notificationDialog) {
+            this._notificationDialog = new Notifications.PomodoroEndDialog();
+            this._notificationDialog.connect('opening', Lang.bind(this, function() {
+//                this._unscheduleReminder();
+            }));
+            this._notificationDialog.connect('closing', Lang.bind(this, function() {
+                if (this._notification)
+                    this._notification.show();
+            }));
+            this._notificationDialog.connect('closed', Lang.bind(this, function() {
+//                this._unscheduleReminder(); // reset reminder count
+//                this._scheduleReminder();
+            }));
+            this._notificationDialog.connect('destroy', Lang.bind(this, function() {
+                this._notificationDialog = null;
+            }));
+
+            this._notificationDialog.setOpenWhenIdle(screenNotifications);
+        }
+
+        if (screenNotifications)
+            this._notificationDialog.open();
+        else
+            this._notification.show();
+    },
+
+    _notifyIssue: function() {
+        let source = this._ensureNotificationSource();
+
+        if (this._notification instanceof Notifications.Issue)
+            return;
+
+        if (this._notification)
+            this._notification.destroy();
+
+        this._notification = new Notifications.Issue(source);
+        this._notification.connect('destroy', Lang.bind(this, function(notification) {
+            if (this._notification === notification)
+                this._notification = null;
+        }));
+        this._notification.show();
     },
 
     destroy: function() {
         global.display.remove_keybinding('toggle-timer');
 
-        if (this._nameWatcherId) {
+        if (this._nameWatcherId)
             Gio.DBus.session.unwatch_name(this._nameWatcherId);
-            this._nameWatcherId = 0;
-        }
 
-        if (this._notificationSource) {
-            this._notificationSource.destroy();
-            this._notificationSource = null;
-        }
+        if (this._proxy)
+            this._destroyProxy();
+
+        if (this._notificationDialog)
+            this._notificationDialog.destroy();
+
+        if (this._notification)
+            this._notification.destroy();
+
+        if (this._notificationSource)
+            this._notificationSource.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
 
         this.parent();
     }

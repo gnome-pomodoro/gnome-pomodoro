@@ -1,5 +1,5 @@
 // A simple pomodoro timer for Gnome-shell
-// Copyright (C) 2011,2012 Gnome-shell pomodoro extension contributors
+// Copyright (C) 2011-2013 Gnome-shell pomodoro extension contributors
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const Tweener = imports.ui.tweener;
 const ExtensionUtils = imports.misc.extensionUtils;
+const Util = imports.misc.util;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;
@@ -63,6 +64,8 @@ const OPEN_AND_CLOSE_TIME = 0.15;
 
 const NOTIFICATION_DIALOG_OPACITY = 0.55;
 
+const ICON_NAME = 'timer-symbolic';
+
 const State = {
     OPENED: 0,
     CLOSED: 1,
@@ -70,34 +73,15 @@ const State = {
     CLOSING: 3
 };
 
+const Action = {
+    START_POMODORO: 1,
+    REPORT_BUG: 2,
+};
 
-const NotificationSource = new Lang.Class({
-    Name: 'PomodoroNotificationSource',
-    Extends: MessageTray.Source,
 
-    _init: function() {
-        this.parent(_("Pomodoro"));
-
-        this.iconName = 'timer-symbolic';
-    },
-
-    createIcon: function(size) {
-        let iconTheme = Gtk.IconTheme.get_default();
-
-        if (!iconTheme.has_icon(this.iconName))
-            iconTheme.append_search_path (Utils.getExtensionPath());
-
-        return new St.Icon({ icon_name: this.iconName,
-                             icon_size: size });
-    },
-
-    open: function(notification) {
-        this.destroyNonResidentNotifications();
-    }
-});
-
-// ModalDialog class is based on ModalDialog from GNOME Shell. We need our own thing to have
-// more event signals, different fade in/out times, and different event blocking behavior
+// ModalDialog class is based on ModalDialog from GNOME Shell. We need our own
+// class to have more event signals, different fade in/out times, and different
+// event blocking behavior
 const ModalDialog = new Lang.Class({
     Name: 'PomodoroModalDialog',
 
@@ -279,8 +263,8 @@ const ModalDialog = new Lang.Class({
             Main.popModal(this._group, timestamp);
             global.gdk_screen.get_display().sync();
         }
-        catch (e) {
-            // For some reason modal might have been popped externally.
+        catch (error) {
+            // For some reason modal might have been popped externally
         }
 
         let focus = global.stage.key_focus;
@@ -328,15 +312,14 @@ const ModalDialog = new Lang.Class({
 Signals.addSignalMethods(ModalDialog.prototype);
 
 
-const NotificationDialog = new Lang.Class({
-    Name: 'PomodoroNotificationDialog',
+const PomodoroEndDialog = new Lang.Class({
+    Name: 'PomodoroEndDialog',
     Extends: ModalDialog,
 
     _init: function() {
         this.parent();
 
-        this._timer = '';
-        this._description = '';
+        this._description = _("It's time to take a break!");
 
         this._openWhenIdle = false;
         this._openWhenIdleWatchId = 0;
@@ -349,11 +332,10 @@ const NotificationDialog = new Lang.Class({
         let messageBox = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-message-layout',
                                             vertical: true });
 
-        this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-timer',
-                                          text: '' });
+        this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-timer' });
 
         this._descriptionLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-description',
-                                                text: '' });
+                                                text: this._description });
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
 
@@ -369,10 +351,12 @@ const NotificationDialog = new Lang.Class({
         this.contentLayout.add(mainLayout,
                             { x_fill: true,
                               y_fill: true });
+
+        this.setRemainingTime(0);
     },
 
     open: function(timestamp) {
-        ModalDialog.prototype.open.call(this, timestamp);
+        this.parent(timestamp);
 
         Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this, function() {
                 if (this.state == State.OPENED || this.state == State.OPENING)
@@ -384,7 +368,7 @@ const NotificationDialog = new Lang.Class({
     close: function(timestamp) {
         this.setCloseWhenActive(false);
 
-        ModalDialog.prototype.close.call(this, timestamp);
+        this.parent(timestamp);
     },
 
     setOpenWhenIdle: function(enabled) {
@@ -412,16 +396,18 @@ const NotificationDialog = new Lang.Class({
         }
         if (enabled) {
             this._closeWhenActiveWatchId = this._idleMonitor.add_watch(IDLE_TIME_TO_CLOSE,
-                                            Lang.bind(this, function(monitor, id, userBecameIdle) {
+                                           Lang.bind(this, function(monitor, id, userBecameIdle) {
                 if (!userBecameIdle)
                     this.close();
             }));
         }
     },
 
-    setTimer: function(text) {
-        this._timer = text;
-        this._timerLabel.text = text;
+    setRemainingTime: function(remaining) {
+        let minutes = parseInt(remaining / 60);
+        let seconds = parseInt(remaining % 60);
+
+        this._timerLabel.set_text('%02d:%02d'.format(minutes, seconds));
     },
 
     setDescription: function(text) {
@@ -433,6 +419,127 @@ const NotificationDialog = new Lang.Class({
         this.setOpenWhenIdle(false);
         this.setCloseWhenActive(false);
 
-        ModalDialog.prototype.destroy.call(this);
+        this.parent();
+    }
+});
+
+const Source = new Lang.Class({
+    Name: 'PomodoroNotificationSource',
+    Extends: MessageTray.Source,
+
+    _init: function() {
+        this.parent(_("Pomodoro"));
+    },
+
+    createIcon: function(size) {
+        return new St.Icon({ icon_name: ICON_NAME,
+                             icon_size: size });
+    }
+});
+
+const Notification = new Lang.Class({
+    Name: 'PomodoroNotification',
+    Extends: MessageTray.Notification,
+
+    _init: function(source, title, description, params) {
+        this.parent(source, title, description, params);
+
+        // Force to show description along with title,
+        // as this is private property, API might change
+        try {
+            this._titleFitsInBannerMode = true;
+        }
+        catch (error) {
+            global.log('Pomodoro: ' + error.message);
+        }
+    },
+
+    show: function() {
+        if (!Main.messageTray.contains(this.source))
+            Main.messageTray.add(this.source);
+
+        if (this.source)
+            this.source.notify(this);
+    },
+
+    hide: function() {
+        this.emit('done-displaying');
+    }
+});
+
+const PomodoroStart = new Lang.Class({
+    Name: 'PomodoroStartNotification',
+    Extends: Notification,
+
+    _init: function(source) {
+        this.parent(source,
+                    _("Pause finished"),
+                    _("A new pomodoro is starting"),
+                    null);
+        this.setTransient(true);
+    }
+});
+
+const PomodoroEnd = new Lang.Class({
+    Name: 'PomodoroEndNotification',
+    Extends: Notification,
+
+    _init: function(source) {
+        let title = _("Take a break!");
+        let description = '';
+
+        this.parent(source, title, description, null);
+
+        this.setResident(true);
+        this.addButton(Action.START_POMODORO, _("Start a new pomodoro"));
+    },
+
+    setRemainingTime: function(remaining) {
+        let seconds = Math.floor(remaining % 60);
+        let minutes = Math.round(remaining / 60);
+        let message = (remaining <= 45)
+                                    ? ngettext("You have %d second left\n",
+                                               "You have %d seconds left\n", seconds).format(seconds)
+                                    : ngettext("You have %d minute left\n",
+                                               "You have %d minutes left\n", minutes).format(minutes);
+
+        this.update(this.title, message, {});
+    }
+});
+
+const Issue = new Lang.Class({
+    Name: 'PomodoroIssueNotification',
+    Extends: Notification,
+
+    _init: function(source) {
+        let extension = ExtensionUtils.getCurrentExtension();
+        let service   = extension.metadata['service'];
+        let url       = extension.metadata['url'];
+        let installed = Gio.file_new_for_path(service).query_exists(null);
+
+        let title = _("Could not run pomodoro");
+        let description = installed
+                    ? _("Something went badly wrong...")
+                    : _("Looks like the app is not installed");
+
+        this.parent(source, title, description, {});
+        this.setUrgency(MessageTray.Urgency.HIGH);
+        this.setTransient(true);
+
+        // TODO: Check which distro running, install via package manager
+
+        // FIXME: Gnome Shell crashes due to missing schema file,
+        //        so offer to install the app doesn't work right now
+
+        if (installed)
+            this.addButton(Action.REPORT_BUG, _("Report issue"));
+        else
+            this.addButton(Action.VISIT_WEBSITE, _("Install it"));
+
+        this.connect('action-invoked', Lang.bind(this, function(notification, action) {
+            notification.hide();
+            if (action == Action.REPORT_BUG)
+                Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
+        }));
     }
 });
