@@ -133,15 +133,14 @@ const MainWindow = new Lang.Class({
 
     setup_views: function() {
         this.views = [
-            new TimerView(),
             new TasksView(),
             new StatisticsView(),
+            new PreferencesView(),
         ];
 
         this._busy = false;
 
-        for (let page in this.views)
-        {
+        for (let page in this.views) {
             let view = this.views[page];
 
             this.notebook.append_page(view.widget, null);
@@ -149,16 +148,29 @@ const MainWindow = new Lang.Class({
         }
 
         this.mode_button.connect('changed', Lang.bind(this, function() {
-            this._busy = true;
-            this.notebook.set_current_page(this.mode_button.selected);
-            this.notebook.grab_focus();
-            this._busy = false;
+            if (!this._busy) {
+                this._busy = true;
+                this.notebook.set_current_page(this.mode_button.selected);
+                this.notebook.grab_focus();
+                this._busy = false;
+            }
         }));
 
-        this.notebook.connect('switch-page', Lang.bind(this, function() {
+        this.notebook.connect('switch-page', Lang.bind(this, function(notebook, page_widget, page_num) {
             if (!this._busy)
-                this.mode_button.selected = this.notebook.get_current_page();
+                this.mode_button.selected = page_num;
         }));
+    },
+
+    set_view: function(name) {
+        for (let page in this.views) {
+            let view = this.views[page];
+            if (view && view.name == name) {
+                this.notebook.set_current_page(parseInt(page));
+                this.notebook.grab_focus();
+                return;
+            }
+        }
     },
 
     _onKeyPressEvent: function(widget, event) {
@@ -211,6 +223,7 @@ with this program; if not, write to the Free Software Foundation, Inc., \
 const View = new Lang.Class({
     Name: 'View',
 
+    name: '',
     title: null,
     widget: null,
 
@@ -225,6 +238,7 @@ const TimerView = new Lang.Class({
     Name: 'TimerView',
     Extends: View,
 
+    name: 'timer',
     title: _("Timer"),
 
     _init: function() {
@@ -291,12 +305,29 @@ const TasksView = new Lang.Class({
     Name: 'TasksView',
     Extends: View,
 
+    name: 'tasks',
     title: _("Tasks"),
+});
+
+const PreferencesView = new Lang.Class({
+    Name: 'PreferencesView',
+    Extends: View,
+
+    name: 'preferences',
+    title: _("Preferences"),
+
+    _init: function() {
+        this.parent();
+
+        let label = new Gtk.Label({ label: 'Preferences' });
+        this.widget.pack_start(label, true, true, 0);
+    }
 });
 
 const StatisticsView = new Lang.Class({
     Name: 'StatisticsView',
     Extends: View,
 
+    name: 'statistics',
     title: _("Statistics"),
 });

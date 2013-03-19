@@ -52,7 +52,7 @@ const Application = new Lang.Class({
         // is already running, and the application will stay around for a while
         // when the use count falls to zero.
         this.parent({ application_id: 'org.gnome.Pomodoro',
-                      flags: Gio.ApplicationFlags.IS_SERVICE });
+                      flags: Gio.ApplicationFlags.IS_SERVICE | Gio.ApplicationFlags.HANDLES_COMMAND_LINE });
 
         this.set_inactivity_timeout(APPLICATION_INACTIVITY_TIMEOUT);
 
@@ -65,6 +65,8 @@ const Application = new Lang.Class({
         this.plugins = [
             new Sounds.Sounds(this.timer),
         ];
+
+        this._window = null;
 
         // Quit service if not used
         this._has_hold = false;
@@ -83,52 +85,46 @@ const Application = new Lang.Class({
 
         this.timer.restore();
 
-        this._initActions();
+        this._setup_actions();
     },
 
-    _onActionQuit: function() {
-        this._mainWindow.window.destroy();
+    _action_preferences: function(action) {
+        this._create_window();
+        if (this._window) {
+            this._window.set_view('preferences');
+            this._window.window.present();
+        }
     },
 
-    _onActionAbout: function() {
-        this._mainWindow.showAboutDialog();
+    _action_about: function() {
+        this._create_window();
+        if (this._window)
+            this._window.showAboutDialog();
     },
 
-    _initActions: function() {
-        let actionEntries = [
-            { name: 'quit',
-              callback: this._onActionQuit,
-              accel: '<Primary>q' },
-            { name: 'about',
-              callback: this._onActionAbout }
-        ];
-
-        actionEntries.forEach(Lang.bind(this, function(actionEntry) {
-            let parameterType = actionEntry.parameter_type ?
-                GLib.VariantType.new(actionEntry.parameter_type) : null;
-            let action;
-
-            if (actionEntry.state != undefined)
-                action = Gio.SimpleAction.new_stateful(actionEntry.name,
-                                                       parameterType,
-                                                       actionEntry.state);
-            else
-                action = new Gio.SimpleAction({ name: actionEntry.name });
-
-            if (actionEntry.create_hook)
-                actionEntry.create_hook.apply(this, [action]);
-
-            if (actionEntry.callback)
-                action.connect('activate', Lang.bind(this, actionEntry.callback));
-
-            if (actionEntry.accel)
-                this.add_accelerator(actionEntry.accel, 'app.' + actionEntry.name, null);
-
-            this.add_action(action);
-        }));
+    _action_quit: function() {
+        this.timer.stop();
+        this._destroy_window();
     },
 
-    _initAppMenu: function() {
+    _setup_actions: function() {
+        let preferences_action = new Gio.SimpleAction({ name: 'preferences' });
+        preferences_action.connect('activate', Lang.bind(this, this._action_preferences));
+
+        let about_action = new Gio.SimpleAction({ name: 'about' });
+        about_action.connect('activate', Lang.bind(this, this._action_about));
+
+        let quit_action = new Gio.SimpleAction({ name: 'quit' });
+        quit_action.connect('activate', Lang.bind(this, this._action_quit));
+
+        this.add_accelerator('<Primary>q', 'app.quit', null);
+
+        this.add_action(preferences_action);
+        this.add_action(about_action);
+        this.add_action(quit_action);
+    },
+
+    _setup_menu: function() {
         let builder = new Gtk.Builder();
         builder.add_from_resource('/org/gnome/pomodoro/app-menu.ui');
 
@@ -143,9 +139,7 @@ const Application = new Lang.Class({
         let resource = Gio.Resource.load(Config.PACKAGE_DATADIR + '/gnome-shell-pomodoro.gresource');
         resource._register();
 
-        this._initAppMenu();
-
-        //this._mainWindow = new MainWindow.MainWindow(this);
+        this._setup_menu();
     },
 
     // Save the state before exit.
@@ -160,7 +154,34 @@ const Application = new Lang.Class({
     // Emitted on the primary instance when an activation occurs.
     // The application must be registered before calling this function.
     vfunc_activate: function() {
-        this.parent();
+        if (this._window)
+            this._window.window.present();
+    },
+
+    _create_window: function() {
+        if (this._window)
+            return;
+
+        this._window = new MainWindow.MainWindow(this);
+        this._window.window.connect('destroy', Lang.bind(this, function() {
+            this._window = null;
+        }));
+    },
+
+    _destroy_window: function() {
+        if (this._window) {
+            this._window.window.destroy();
+            this._window = null;
+        }
+    },
+
+    vfunc_command_line: function(cmdline) {
+        let args = cmdline.get_arguments();
+        if (args.indexOf('--no-default-window') == -1)
+            this._create_window();
+
+        this.activate();
+        return 0;
     },
 
     vfunc_dbus_register: function(connection, object_path) {

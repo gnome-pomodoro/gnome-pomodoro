@@ -47,20 +47,17 @@ const ModeButton = new Lang.Class({
         if (value < 0 || value >= children.length)
             return;
 
-        if (!this._busy)
-        {
+        if (!this._busy) {
             this._busy = true;
 
             for (let index in children) {
                 children[index].active = (index == value);
             }
 
+            this._selected = value;
             this._busy = false;
 
-            if (this._selected != value) {
-                this._selected = value;
-                this.emit('changed');
-            }
+            this.emit('changed');
         }
     },
 

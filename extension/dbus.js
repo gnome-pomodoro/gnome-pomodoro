@@ -50,3 +50,18 @@ var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
 function Pomodoro(init_callback, cancellable) {
     return new PomodoroProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', init_callback, cancellable);
 }
+
+
+const GtkActionsInterface = <interface name="org.gtk.Actions">
+    <method name="Activate">
+        <arg type="s" name="action_name" direction="in"/>
+        <arg type="av" name="parameter" direction="in"/>
+        <arg type="a{sv}" name="platform_data" direction="in"/>
+    </method>
+</interface>;
+
+var GtkActionsProxy = Gio.DBusProxy.makeProxyWrapper(GtkActionsInterface);
+
+function GtkActions(init_callback, cancellable) {
+    return new GtkActionsProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', init_callback, cancellable);
+}

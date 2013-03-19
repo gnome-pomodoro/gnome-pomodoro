@@ -109,7 +109,8 @@ const Indicator = new Lang.Class({
         this.actor.add_actor(this.label);
 
         // Toggle timer state button
-        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'popup-subtitle-menu-item' });
+        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Timer"), false);
+//        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'popup-subtitle-menu-item' });
         this._timerToggle.connect('toggled', Lang.bind(this, this.toggle));
         this.menu.addMenuItem(this._timerToggle);
 
@@ -119,7 +120,13 @@ const Indicator = new Lang.Class({
         // Options SubMenu
         this._optionsMenu = new PopupMenu.PopupSubMenuMenuItem(_("Options"));
         this._buildOptionsMenu();
-        this.menu.addMenuItem(this._optionsMenu);
+//        this.menu.addMenuItem(this._optionsMenu);
+
+        // Settings
+        this._settingsButton =  new PopupMenu.PopupMenuItem(_("Pomodoro Settings"));
+        this._settingsButton.connect('activate', Lang.bind(this, this._showPreferences));
+        this.menu.addMenuItem(this._settingsButton);
+
 
         // Register keybindings to toggle
         global.display.add_keybinding('toggle-timer',
@@ -133,6 +140,12 @@ const Indicator = new Lang.Class({
 
         this._onSettingsChanged();
         this._ensureProxy();
+    },
+
+    _showPreferences: function() {
+        this._ensureActionsProxy(Lang.bind(this, function() {
+            this._actionsProxy.ActivateRemote('preferences', GLib.VariantType.new('s'), null);
+        }));
     },
 
     _buildOptionsMenu: function() {
@@ -384,9 +397,7 @@ const Indicator = new Lang.Class({
 
     _ensureProxy: function(callback) {
         if (!this._proxy)
-        {
-            this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error)
-            {
+            this._proxy = new DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
                 if (!error) {
                     if (!this._propertiesChangedId)
                         this._propertiesChangedId = this._proxy.connect('g-properties-changed',
@@ -419,14 +430,12 @@ const Indicator = new Lang.Class({
 
                 this.refresh();
             }));
-        }
-        else {
+        else
             if (callback) {
                 callback.call(this);
 
                 this.refresh();
             }
-        }
     },
 
     _destroyProxy: function() {
@@ -450,7 +459,28 @@ const Indicator = new Lang.Class({
             //       there is no destroy method
             // this._proxy.destroy();
             this._proxy = null;
+            this._actionsProxy = null;
         }
+    },
+
+    _ensureActionsProxy: function(callback) {
+        if (!this._actionsProxy)
+            this._actionsProxy = new DBus.GtkActions(Lang.bind(this, function(proxy, error)
+            {
+                if (!error) {
+                    if (callback)
+                        callback.call(this);
+                }
+                else {
+                    global.log('Pomodoro: ' + error.message);
+
+                    this._actionsProxy = null;
+                    this._notifyIssue();
+                }
+            }));
+        else
+            if (callback)
+                callback.call(this);
     },
 
     _onNameAppeared: function() {
