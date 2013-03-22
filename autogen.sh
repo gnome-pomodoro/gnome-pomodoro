@@ -13,11 +13,15 @@ PKG_NAME="gnome-shell-pomodoro"
 }
 
 which gnome-autogen.sh || {
-    echo "You need to install gnome-common from GNOME Git (or from"
+    echo "You need to install gnome-common from GNOME git (or from"
     echo "your OS vendor's package manager)."
     exit 1
 }
 
-mkdir -p config m4
+git submodule update --init --recursive
 
+REQUIRED_AUTOCONF_VERSION=2.59
+REQUIRED_AUTOMAKE_VERSION=1.9
+REQUIRED_INTLTOOL_VERSION=0.40.0
+REQUIRED_PKG_CONFIG_VERSION=0.22
 . gnome-autogen.sh

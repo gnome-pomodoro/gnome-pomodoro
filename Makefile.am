@@ -2,7 +2,13 @@ include Makefile.include
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
-SUBDIRS = src extension data po
+SUBDIRS = \
+    egg-list-box \
+    src \
+    extension \
+    data \
+    po \
+    $(NULL)
 
 EXTRA_DIST = \
     autogen.sh \
@@ -16,6 +22,9 @@ MAINTAINERCLEANFILES = \
     config.log \
     config.status \
     configure
+
+stale-files-clean-local:
+	-$(RM) $(abs_top_builddir)/*.la $(abs_top_builddir)/*.gir $(abs_top_builddir)/*.typelib
 
 zip: local-build
 	gsettings_SCHEMA=$(builddir)/usr/share/glib-2.0/schemas/*.xml; \
