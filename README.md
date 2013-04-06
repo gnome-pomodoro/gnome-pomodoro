@@ -1,3 +1,6 @@
+[*Leia a documentação em português*](https://github.com/aleborba/gnome-shell-pomodoro/blob/master/README-pt_BR.md)
+-----------------
+
 # Pomodoro extension for GNOME Shell
 
 This [GNOME Shell](http://www.gnome.org/gnome-3/) extension intends to help manage time according to [Pomodoro Technique](http://en.wikipedia.org/wiki/Pomodoro_technique).
