@@ -59,7 +59,7 @@ const DEFAULT_SOUND_FILE = 'bell.wav';
 const SCREENSAVER_DEACTIVATE_COMMAND = 'xdg-screensaver reset';
 
 // Remind about ongoing break in given delays
-const PAUSE_REMIND_TIMES = [60, 120, 240, 480];
+const PAUSE_REMIND_TIMES = [60];
 // Ratio between user idle time and time between reminders to determine if user
 // is finally away
 const PAUSE_REMINDER_ACCEPTANCE = 0.8
