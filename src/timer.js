@@ -302,9 +302,14 @@ const PomodoroTimer = new Lang.Class({
                     else
                         break;
             }
-            
-            if (this._state == State.PAUSE)
+
+            if (this._state == State.PAUSE) {
                 this._notifyPomodoroEnd();
+                if (this._notificationDialog) {
+                    this._notificationDialog.open();
+                    this._notificationDialog.pushModal();
+                }
+            }
         }
         
         this._updatePresenceStatus();
@@ -382,11 +387,11 @@ const PomodoroTimer = new Lang.Class({
         let display = global.screen.get_display();
         let pointer = global.get_pointer();
         let idleTime = parseInt((display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000);
-        
+
         if (idleTime < 1 || (this._eventCapturePointer && (
             pointer[0] != this._eventCapturePointer[0] || pointer[1] != this._eventCapturePointer[1]))) {
             this.setState(State.POMODORO);
-            
+
             // Treat last non-idle second as if timer was running.
             this._onTimeout();
             return false;

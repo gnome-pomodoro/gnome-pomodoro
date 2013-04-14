@@ -27,6 +27,7 @@ const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Pango = imports.gi.Pango;
 
+const GrabHelper = imports.ui.grabHelper;
 const Layout = imports.ui.layout;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
@@ -59,7 +60,7 @@ const IDLE_TIME_TO_CLOSE = 600;
 // Time before user activity is being monitored
 const MIN_DISPLAY_TIME = 200;
 // Time to fade-in or fade-out notification in seconds
-const OPEN_AND_CLOSE_TIME = 0.15;
+const OPEN_AND_CLOSE_TIME = 180;
 
 const NOTIFICATION_DIALOG_OPACITY = 0.55;
 
@@ -103,13 +104,11 @@ const ModalDialog = new Lang.Class({
 
     _init: function() {
         this.state = State.CLOSED;
-        this._hasModal = false;
 
         this._idleMonitor = Shell.IdleMonitor.get();
         this._pushModalWatchId = 0;
-        this._pushModalSource = 0;
+        this._pushModalFallbackSource = 0;
         this._pushModalTries = 0;
-        this._capturedEventId = 0;
 
         this._group = new St.Widget({ visible: false,
                                       x: 0,
@@ -136,6 +135,7 @@ const ModalDialog = new Lang.Class({
                                                  inhibitEvents: false });
         this._lightbox.highlight(this._backgroundBin);
         this._lightbox.actor.style_class = 'extension-pomodoro-lightbox';
+        this._lightbox.show();
 
         this._backgroundBin.child = this._dialogLayout;
 
@@ -146,8 +146,10 @@ const ModalDialog = new Lang.Class({
                                  x_align: St.Align.MIDDLE,
                                  y_align: St.Align.START });
 
-        global.focus_manager.add_group(this._dialogLayout);
-        this._savedKeyFocus = null;
+        this._grabHelper = new GrabHelper.GrabHelper(this._group);
+        this._grabHelper.addActor(this._lightbox.actor);
+
+        global.focus_manager.add_group(this._group);
     },
 
     destroy: function() {
@@ -155,46 +157,133 @@ const ModalDialog = new Lang.Class({
     },
 
     _onGroupDestroy: function() {
+        this.close();
         this.emit('destroy');
     },
 
-    _fadeOpen: function() {
-        this._monitorConstraint.index = global.screen.get_current_monitor();
-
-        this.state = State.OPENING;
-
-        if (this._lightbox)
-            this._lightbox.show();
-
-        this._group.show();
-        Tweener.addTween(this._group,
-                         { opacity: 255,
-                           time: OPEN_AND_CLOSE_TIME,
-                           transition: 'easeOutQuad',
-                           onComplete: Lang.bind(this, this._onFadeOpenComplete)
-                         });
+    _onUngrab: function() {
+        this.close();
     },
 
-    _onFadeOpenComplete: function() {
-        if (this.statue == State.OPENING) {
-            this.state = State.OPENED;
-            this.emit('opened');
+    _pushModal: function(timestamp) {
+        if (this.state == State.CLOSED || this.state == State.CLOSING)
+            return false;
 
-            if (this._capturedEventId == 0)
-                this._capturedEventId = global.stage.connect('captured-event', Lang.bind(this, this._onCapturedEvent));
+        this._lightbox.actor.reactive = true;
+
+        this._grabHelper.ignoreRelease();
+
+        return this._grabHelper.grab({
+            actor: this._lightbox.actor,
+            modal: true,
+            grabFocus: true,
+            onUngrab: Lang.bind(this, this._onUngrab)
+        });
+    },
+
+    _onPushModalFallbackTimeout: function() {
+        if (this.state == State.CLOSED || this.state == State.CLOSING) {
+            return false;
         }
+
+        this._pushModalTries += 1;
+
+        if (this._pushModal(global.get_current_time())) {
+            return false; // dialog finally opened
+        }
+        else {
+            if (this._pushModalTries > FALLBACK_TIME * FALLBACK_RATE) {
+                this.close(); // dialog can't become modal
+                return false;
+            }
+        }
+        return true;
+    },
+
+    _tryPushModal: function() {
+        this._disconnectInternals();
+
+        if (this.state == State.CLOSED || this.state == State.CLOSING) {
+            return;
+        }
+
+        this._pushModalTries = 1;
+
+        if (this._pushModal(global.get_current_time())) {
+            // dialog became modal
+        }
+        else {
+            this._pushModalFallbackSource = Mainloop.timeout_add(parseInt(1000/FALLBACK_RATE),
+                                                                 Lang.bind(this, this._onPushModalFallbackTimeout));
+        }
+    },
+
+    pushModal: function(timestamp) {
+        // delay pushModal to ignore current events
+        Mainloop.idle_add(Lang.bind(this, function() {
+            this._tryPushModal();
+            return false;
+        }));
+    },
+
+    // Drop modal status without closing the dialog; this makes the
+    // dialog insensitive as well, so it needs to be followed shortly
+    // by either a close() or a pushModal()
+    popModal: function(timestamp) {
+        this._disconnectInternals();
+
+        this._grabHelper.ungrab({
+            actor: this._lightbox.actor
+        });
+
+        this._lightbox.actor.reactive = false;
+    },
+
+    _onPushModalWatch: function(monitor, id, userBecameIdle) {
+        if (userBecameIdle)
+            this._tryPushModal();
+    },
+
+    _onPushModalTimeout: function() {
+        if (this._idleMonitor.get_idletime() >= BLOCK_EVENTS_TIME)
+            this._tryPushModal();
+
+        return false;
     },
 
     open: function(timestamp) {
         if (this.state == State.OPENED || this.state == State.OPENING)
             return;
 
+        this.state = State.OPENING;
+
         // Don't become modal and block events just yet, monitor when user becomes idle.
         if (this._pushModalWatchId == 0)
             this._pushModalWatchId = this._idleMonitor.add_watch(BLOCK_EVENTS_TIME,
                                                                  Lang.bind(this, this._onPushModalWatch));
 
-        this._fadeOpen();
+        // Fallback to a timeout when there is no activity
+        if (this._pushModalTimeoutSource != 0)
+            GLib.source_remove(this._pushModalTimeoutSource);
+
+        this._pushModalTimeoutSource = Mainloop.timeout_add(BLOCK_EVENTS_TIME,
+                                                            Lang.bind(this, this._onPushModalTimeout));
+
+        this._monitorConstraint.index = global.screen.get_current_monitor();
+        this._group.show();
+
+        Tweener.addTween(this._group,
+                         { opacity: 255,
+                           time: OPEN_AND_CLOSE_TIME / 1000.0,
+                           transition: 'easeOutQuad',
+                           onComplete: Lang.bind(this,
+                                function() {
+                                    if (this.state == State.OPENING) {
+                                        this.state = State.OPENED;
+                                        this.emit('opened');
+                                    }
+                                })
+                         });
         this.emit('opening');
     },
 
@@ -204,11 +293,10 @@ const ModalDialog = new Lang.Class({
 
         this.state = State.CLOSING;
         this.popModal(timestamp);
-        this._savedKeyFocus = null;
 
         Tweener.addTween(this._group,
                          { opacity: 0,
-                           time: OPEN_AND_CLOSE_TIME,
+                           time: OPEN_AND_CLOSE_TIME / 1000.0,
                            transition: 'easeOutQuad',
                            onComplete: Lang.bind(this,
                                function() {
@@ -222,106 +310,18 @@ const ModalDialog = new Lang.Class({
         this.emit('closing');
     },
 
-    _onPushModalWatch: function(monitor, id, userBecameIdle) {
-        if (userBecameIdle) {
-            this._idleMonitor.remove_watch(this._pushModalWatchId);
-            this._pushModalWatchId = 0;
-
-            if (this.pushModal(global.get_current_time())) {
-                // dialog became modal
-            }
-            else
-                if (this._timeoutSource == 0) {
-                    this._pushModalTries = 1;
-                    this._pushModalSource = Mainloop.timeout_add(parseInt(1000/FALLBACK_RATE),
-                                                                 Lang.bind(this, this._onPushModalTimeout));
-                }
-        }
-    },
-
-    _onPushModalTimeout: function() {
-        this._pushModalTries += 1;
-
-        if (this.pushModal(global.get_current_time())) {
-            return false; // dialog finally opened
-        }
-        else
-            if (this._pushModalTries > FALLBACK_TIME * FALLBACK_RATE) {
-                this.close(); // dialog can't become modal
-                return false;
-            }
-        return true; 
-    },
-
-    _onCapturedEvent: function(actor, event) {
-        switch (event.type()) {
-            case Clutter.EventType.KEY_PRESS:
-                let symbol = event.get_key_symbol();
-                if (symbol == Clutter.Escape) {
-                    this.close();
-                    return true;
-                }
-                break;
-        }
-        return false;
-    },
-
-    // Drop modal status without closing the dialog; this makes the
-    // dialog insensitive as well, so it needs to be followed shortly
-    // by either a close() or a pushModal()
-    popModal: function(timestamp) {
-        this._disconnectInternals();
-
-        if (!this._hasModal)
-            return;
-
-        try {
-            Main.popModal(this._group, timestamp);
-            global.gdk_screen.get_display().sync();
-        }
-        catch (e) {
-            // For some reason modal might have been popped externally.
-        }
-
-        let focus = global.stage.key_focus;
-        if (focus && this._group.contains(focus))
-            this._savedKeyFocus = focus;
-        else
-            this._savedKeyFocus = null;
-
-        this._hasModal = false;
-        this._lightbox.actor.reactive = false;
-    },
-
-    pushModal: function (timestamp) {
-        if (this._hasModal)
-            return true;
-        if (!Main.pushModal(this._group, timestamp))
-            return false;
-
-        this._hasModal = true;
-        this._lightbox.actor.reactive = true;
-
-        if (this._savedKeyFocus) {
-            this._savedKeyFocus.grab_key_focus();
-            this._savedKeyFocus = null;
-        }
-
-        return true;
-    },
-
     _disconnectInternals: function() {
         if (this._pushModalWatchId != 0) {
             this._idleMonitor.remove_watch(this._pushModalWatchId);
             this._pushModalWatchId = 0;
         }
-        if (this._pushModalSource != 0) {
-            GLib.source_remove(this._pushModalSource);
-            this._pushModalSource = 0;
+        if (this._pushModalFallbackSource != 0) {
+            GLib.source_remove(this._pushModalFallbackSource);
+            this._pushModalFallbackSource = 0;
         }
-        if (this._capturedEventId != 0) {
-            global.stage.disconnect(this._capturedEventId);
-            this._capturedEventId = 0;
+        if (this._pushModalTimeoutSource != 0) {
+            GLib.source_remove(this._pushModalTimeoutSource);
+            this._pushModalTimeoutSource = 0;
         }
     }
 });
