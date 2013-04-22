@@ -106,7 +106,6 @@ const ModalDialog = new Lang.Class({
     _init: function() {
         this.state = State.CLOSED;
 
-        //this._idleMonitor = Shell.IdleMonitor.get();
         this._idleMonitor = new GnomeDesktop.IdleMonitor();
         this._pushModalWatchId = 0;
         this._pushModalFallbackSource = 0;
