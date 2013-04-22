@@ -29,6 +29,7 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const GnomeSession = imports.misc.gnomeSession;
 const ScreenShield = imports.ui.screenShield;
+const LoginManager = imports.misc.loginManager;
 const Util = imports.misc.util;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
@@ -98,8 +99,7 @@ const PomodoroTimer = new Lang.Class({
         this._power = null;
         this._presence = null;
         this._presenceChangeEnabled = false;
-        this._screenShield = null;
-        
+
         this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
     },
@@ -457,7 +457,9 @@ const PomodoroTimer = new Lang.Class({
                                                           _("Take a break!"),
                                                           null);
         this._notification.setResident(true);
-        this._notification.addButton(1, _("Start a new pomodoro"));
+
+        //button had to be disabled due a bug in gnome-shell
+        //this._notification.addButton(1, _("Start a new pomodoro"));
 
         // Force to show description along with title,
         // as this is private property, API might change
@@ -567,7 +569,7 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _onScreenShieldChanged: function() {
-        if (!this._screenShield.locked && this._state == State.PAUSE) {
+        if (!Main.screenShield.locked && this._state == State.PAUSE) {
             if (this._notificationDialog && this._settings.get_boolean('show-notification-dialogs')) {
                 this._notificationDialog.open();
                 this._notificationDialog.pushModal();
@@ -705,8 +707,8 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _deactivateScreenSaver: function() {
-        if (this._screenShield && this._screenShield.locked)
-            this._screenShield.unlock();
+        if (Main.screenShield && Main.screenShield.locked)
+            Main.screenShield.unlock();
         
         try {
             Util.trySpawnCommandLine(SCREENSAVER_DEACTIVATE_COMMAND);
@@ -717,9 +719,8 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _load: function() {
-        if (!this._screenShield) {
-            this._screenShield = new ScreenShield.ScreenShieldFallback();
-            this._screenShield.connect('lock-status-changed', Lang.bind(this, this._onScreenShieldChanged));
+        if (Main.screenShield) {
+            Main.screenShield.connect('lock-status-changed', Lang.bind(this, this._onScreenShieldChanged));
         }
         if (!this._power) {
             this._power = new UPowerGlib.Client();

@@ -23,6 +23,7 @@ const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
+const GnomeDesktop = imports.gi.GnomeDesktop;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Pango = imports.gi.Pango;
@@ -105,7 +106,8 @@ const ModalDialog = new Lang.Class({
     _init: function() {
         this.state = State.CLOSED;
 
-        this._idleMonitor = Shell.IdleMonitor.get();
+        //this._idleMonitor = Shell.IdleMonitor.get();
+        this._idleMonitor = new GnomeDesktop.IdleMonitor();
         this._pushModalWatchId = 0;
         this._pushModalFallbackSource = 0;
         this._pushModalTries = 0;
@@ -259,7 +261,7 @@ const ModalDialog = new Lang.Class({
 
         // Don't become modal and block events just yet, monitor when user becomes idle.
         if (this._pushModalWatchId == 0)
-            this._pushModalWatchId = this._idleMonitor.add_watch(BLOCK_EVENTS_TIME,
+            this._pushModalWatchId = this._idleMonitor.add_idle_watch(BLOCK_EVENTS_TIME,
                                                                  Lang.bind(this, this._onPushModalWatch));
 
         // Fallback to a timeout when there is no activity
@@ -395,7 +397,7 @@ const NotificationDialog = new Lang.Class({
             this._openWhenIdleWatchId = 0;
         }
         if (enabled) {
-            this._openWhenIdleWatchId = this._idleMonitor.add_watch(IDLE_TIME_TO_OPEN,
+            this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN,
                                             Lang.bind(this, function(monitor, id, userBecameIdle) {
                 if (userBecameIdle)
                     this.open();
@@ -411,7 +413,7 @@ const NotificationDialog = new Lang.Class({
             this._closeWhenActiveWatchId = 0;
         }
         if (enabled) {
-            this._closeWhenActiveWatchId = this._idleMonitor.add_watch(IDLE_TIME_TO_CLOSE,
+            this._closeWhenActiveWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_CLOSE,
                                             Lang.bind(this, function(monitor, id, userBecameIdle) {
                 if (!userBecameIdle)
                     this.close();
