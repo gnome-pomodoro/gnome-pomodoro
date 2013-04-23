@@ -21,6 +21,7 @@ const Signals = imports.signals;
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
+const GnomeDesktop = imports.gi.GnomeDesktop;
 const Meta = imports.gi.Meta;
 const St = imports.gi.St;
 const UPowerGlib = imports.gi.UPowerGlib;
@@ -86,7 +87,6 @@ const PomodoroTimer = new Lang.Class({
         this._timeoutSource = 0;
         this._eventCaptureId = 0;
         this._eventCaptureSource = 0;
-        this._eventCapturePointer = null;
         this._reminderSource = 0;
         this._reminderTime = 0;
         this._reminderCount = 0;
@@ -98,7 +98,8 @@ const PomodoroTimer = new Lang.Class({
         this._power = null;
         this._presence = null;
         this._presenceChangeEnabled = false;
-
+        this._idleMonitor = new GnomeDesktop.IdleMonitor();
+        
         this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
     },
@@ -383,19 +384,15 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _onX11EventCapture: function() {
-        let display = global.screen.get_display();
-        let pointer = global.get_pointer();
-        let idleTime = parseInt((display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000);
+        let idleTime = this._idleMonitor.get_idletime();
 
-        if (idleTime < 1 || (this._eventCapturePointer && (
-            pointer[0] != this._eventCapturePointer[0] || pointer[1] != this._eventCapturePointer[1]))) {
+        if (idleTime < 1500) {
             this.setState(State.POMODORO);
 
             // Treat last non-idle second as if timer was running.
             this._onTimeout();
             return false;
         }
-        this._eventCapturePointer = pointer;
         return true;
     },
 
@@ -689,7 +686,6 @@ const PomodoroTimer = new Lang.Class({
             this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
         }
         if (this._eventCaptureSource == 0) {
-            this._eventCapturePointer = global.get_pointer();
             this._eventCaptureSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onX11EventCapture));
         }
     },
