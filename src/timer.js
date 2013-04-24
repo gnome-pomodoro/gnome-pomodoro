@@ -29,7 +29,6 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const GnomeSession = imports.misc.gnomeSession;
 const ScreenShield = imports.ui.screenShield;
-const LoginManager = imports.misc.loginManager;
 const Util = imports.misc.util;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
