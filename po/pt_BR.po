@@ -1,4 +1,4 @@
-# pt_BR translation for gnome-shell-pomodoro
+# Brazilian Portuguese translation for gnome-shell-pomodoro
 # Copyright (c) 2012 gnome-shell-pomodoro contributors
 # This file is distributed under the same license as the gnome-shell-pomodoro package.
 # Alê Borba <ale.alvesborba@gmail.com>, 2013.
@@ -113,15 +113,15 @@ msgstr "Ei, você esta perdendo o seu intervalo."
 #, c-format
 msgid "You have %d second left.\n"
 msgid_plural "You have %d seconds left.\n"
-msgstr[0] "Você tem %d segundo restante."
-msgstr[1] "Você tem %d segundos restantes."
+msgstr[0] "Você tem %d segundo restante.\n"
+msgstr[1] "Você tem %d segundos restantes.\n"
 
 #: ../src/timer.js:658
 #, c-format
 msgid "You have %d minute left.\n"
 msgid_plural "You have %d minutes left.\n"
-msgstr[0] "Você tem %d minuto restante."
-msgstr[1] "Você tem %d minutos restantes."
+msgstr[0] "Você tem %d minuto restante.\n"
+msgstr[1] "Você tem %d minutos restantes.\n"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
 msgid "Pomodoro duration"
