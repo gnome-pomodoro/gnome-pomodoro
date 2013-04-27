@@ -100,6 +100,7 @@ const PomodoroTimer = new Lang.Class({
         this._presence = null;
         this._presenceChangeEnabled = false;
         this._idleMonitor = new GnomeDesktop.IdleMonitor();
+        this._becameActiveId = 0;
         
         this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
@@ -370,33 +371,6 @@ const PomodoroTimer = new Lang.Class({
         return true;
     },
 
-    _onEventCapture: function(actor, event) {
-        // When notification dialog fades out, can trigger an event.
-        // To avoid that we need to capture just these event types:
-        switch(event.type()) {
-            case Clutter.EventType.KEY_PRESS:
-            case Clutter.EventType.BUTTON_PRESS:
-            case Clutter.EventType.MOTION:
-            case Clutter.EventType.SCROLL:
-                this.setState(State.POMODORO);
-                break;
-        }
-        return false;
-    },
-
-    _onX11EventCapture: function() {
-        let idleTime = this._idleMonitor.get_idletime();
-
-        if (idleTime < 1500) {
-            this.setState(State.POMODORO);
-
-            // Treat last non-idle second as if timer was running.
-            this._onTimeout();
-            return false;
-        }
-        return true;
-    },
-
     _notifyPomodoroStart: function() {
         this._closeNotifications();
         this._playNotificationSound();
@@ -550,8 +524,7 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _onReminderTimeout: function() {
-        let display = global.screen.get_display();
-        let idleTime = parseInt((display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000);
+        let idleTime = this._idleMonitor.get_idletime();
         
         // No need to notify if user seems to be away. We only monitor idle time 
         // based on X11, and not Clutter scene which better reflects to real work
@@ -680,25 +653,19 @@ const PomodoroTimer = new Lang.Class({
         this._presenceChangeEnabled = enabled;
     },
 
+    _onIdleMonitorBecameActive: function(monitor) {
+        this.setState(State.POMODORO);
+    },
+
     _enableEventCapture: function() {
-        // We use meta_display_get_last_user_time() which determines any user interaction 
-        // with X11/Mutter windows but not with GNOME Shell UI, for that we handle 'captured-event'.
-        if (this._eventCaptureId == 0) {
-            this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
-        }
-        if (this._eventCaptureSource == 0) {
-            this._eventCaptureSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onX11EventCapture));
-        }
+        if (this._becameActiveId == 0)
+            this._becameActiveId = this._idleMonitor.add_user_active_watch(Lang.bind(this, this._onIdleMonitorBecameActive));
     },
 
     _disableEventCapture: function() {
-        if (this._eventCaptureId != 0) {
-            global.stage.disconnect(this._eventCaptureId);
-            this._eventCaptureId = 0;
-        }
-        if (this._eventCaptureSource != 0) {
-            GLib.source_remove(this._eventCaptureSource);
-            this._eventCaptureSource = 0;
+        if (this._becameActiveId != 0) {
+            this._idleMonitor.remove_watch(this._becameActiveId);
+            this._becameActiveId = 0;
         }
     },
 

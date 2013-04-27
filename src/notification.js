@@ -241,9 +241,8 @@ const ModalDialog = new Lang.Class({
         this._lightbox.actor.reactive = false;
     },
 
-    _onPushModalWatch: function(monitor, id, userBecameIdle) {
-        if (userBecameIdle)
-            this._tryPushModal();
+    _onPushModalWatch: function(monitor) {
+        this._tryPushModal();
     },
 
     _onPushModalTimeout: function() {
@@ -344,7 +343,8 @@ const NotificationDialog = new Lang.Class({
         this._openWhenIdleWatchId = 0;
         this._closeWhenActive = false;
         this._closeWhenActiveWatchId = 0;
-        
+        this._openIdleWatchId = 0;
+
         let mainLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-main-layout',
                                             vertical: false });
         
@@ -376,9 +376,24 @@ const NotificationDialog = new Lang.Class({
     open: function(timestamp) {
         ModalDialog.prototype.open.call(this, timestamp);
 
-        Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this, function() {
-                if (this.state == State.OPENED || this.state == State.OPENING)
+        Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this,
+            function() {
+                if (this._openIdleWatchId != 0) {
+                    this._idleMonitor.remove_watch(this._openIdleWatchId);
+                    this._openIdleWatchId = 0;
+                }
+
+                if (this._idleMonitor.get_idletime() >= IDLE_TIME_TO_CLOSE) {
                     this.setCloseWhenActive(true);
+                }
+                else {
+                    this._openIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_CLOSE, Lang.bind(this,
+                        function(monitor) {
+                            if (this.state == State.OPENED || this.state == State.OPENING)
+                                this.setCloseWhenActive(true);
+                        }
+                    ));
+                }
                 return false;
             }));
     },
@@ -397,11 +412,11 @@ const NotificationDialog = new Lang.Class({
             this._openWhenIdleWatchId = 0;
         }
         if (enabled) {
-            this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN,
-                                            Lang.bind(this, function(monitor, id, userBecameIdle) {
-                if (userBecameIdle)
+            this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN, Lang.bind(this,
+                function(monitor) {
                     this.open();
-            }));
+                }
+            ));
         }
     },
 
@@ -413,11 +428,11 @@ const NotificationDialog = new Lang.Class({
             this._closeWhenActiveWatchId = 0;
         }
         if (enabled) {
-            this._closeWhenActiveWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_CLOSE,
-                                            Lang.bind(this, function(monitor, id, userBecameIdle) {
-                if (!userBecameIdle)
+            this._closeWhenActiveWatchId = this._idleMonitor.add_user_active_watch(Lang.bind(this,
+                function(monitor) {
                     this.close();
-            }));
+                }
+            ));
         }
     },
 
@@ -434,6 +449,11 @@ const NotificationDialog = new Lang.Class({
     destroy: function() {
         this.setOpenWhenIdle(false);
         this.setCloseWhenActive(false);
+
+        if (this._openIdleWatchId != 0) {
+            this._idleMonitor.remove_watch(this._openIdleWatchId);
+            this._openIdleWatchId = 0;
+        }
 
         ModalDialog.prototype.destroy.call(this);
     }
