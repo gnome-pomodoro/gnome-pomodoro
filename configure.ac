@@ -1,5 +1,5 @@
 AC_PREREQ(2.63)
-AC_INIT([gnome-shell-pomodoro],[0.7],[https://github.com/codito/gnome-shell-pomodoro])
+AC_INIT([gnome-shell-pomodoro],[0.8],[https://github.com/codito/gnome-shell-pomodoro])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([config])
