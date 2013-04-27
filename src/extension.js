@@ -19,6 +19,7 @@ const Lang = imports.lang;
 const Gio = imports.gi.Gio;
 const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
+const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
 const Main = imports.ui.main;
@@ -102,9 +103,12 @@ const Indicator = new Lang.Class({
         
         
         // Register keybindings to toggle
-        global.display.add_keybinding('toggle-pomodoro-timer', this._settings, Meta.KeyBindingFlags.NONE,
-                Lang.bind(this, this._onKeyPressed));
-        
+        Main.wm.addKeybinding('toggle-pomodoro-timer',
+                                      this._settings,
+                                      Meta.KeyBindingFlags.NONE,
+                                      Shell.KeyBindingMode.ALL,
+                                      Lang.bind(this, this._onKeyPressed));
+
         this.connect('destroy', Lang.bind(this, this._onDestroy));
         
         // Initialize
@@ -348,7 +352,7 @@ const Indicator = new Lang.Class({
     },
     
     _onDestroy: function() {
-        global.display.remove_keybinding('toggle-pomodoro-timer');
+        Main.wm.removeKeybinding('toggle-pomodoro-timer');
 
         this._timer.destroy();
         this._dbus.destroy();
