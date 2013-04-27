@@ -189,12 +189,11 @@ const PomodoroTimer = new Lang.Class({
             if (this._timeoutSource == 0) {
                 this._timeoutSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onTimeout));
             }
+            if (this._state == newState) {
+                return;
+            }
         }
-        
-        if (this._state == newState) {
-            return;
-        }
-        
+
         if (this._state == State.POMODORO) {
             if (this._elapsed >= POMODORO_ACCEPTANCE * this._settings.get_int('pomodoro-time')) {
                 this._sessionCount += 1;
