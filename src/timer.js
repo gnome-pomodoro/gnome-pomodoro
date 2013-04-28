@@ -165,7 +165,7 @@ const Timer = new Lang.Class({
             timestamp = new Date().getTime();
 
         if (this._timeout_source == 0 && new_state != State.NULL)
-            this._timeout_source = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._on_timeout));
+            this._timeout_source = Mainloop.timeout_add(1000, Lang.bind(this, this._on_timeout));
 
         if (this._state == new_state)
             return;
@@ -184,6 +184,7 @@ const Timer = new Lang.Class({
                 break;
 
             case State.POMODORO:
+                let elapsed = 0;
                 let long_pause_acceptance_time = (1.0 - SHORT_LONG_PAUSE_ACCEPTANCE) * this._settings.get_uint('short-pause-time')
                                                      + (SHORT_LONG_PAUSE_ACCEPTANCE) * this._settings.get_uint('long-pause-time');
 
@@ -197,6 +198,7 @@ const Timer = new Lang.Class({
                     if (this._elapsed >= long_pause_acceptance_time)
                         this._session_count = 0;
                 }
+
                 if (this._state == State.NULL) {
                     // Reset work cycle when disabled for some time
                     let idle_time = (timestamp - this._state_timestamp) / 1000;
@@ -205,8 +207,9 @@ const Timer = new Lang.Class({
                         this._session_count = 0;
                 }
 
-                this._elapsed = 0;
+                this._elapsed = elapsed;
                 this._elapsed_limit = this._settings.get_uint('pomodoro-time');
+
                 break;
 
             case State.PAUSE:

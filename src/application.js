@@ -19,6 +19,7 @@
  *
  */
 
+const Format = imports.format;
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 const Gettext = imports.gettext;
@@ -38,6 +39,9 @@ const Timer = imports.timer;
 // Time in milliseconds after which application should quit
 const APPLICATION_INACTIVITY_TIMEOUT = 10000;
 
+function get_default() {
+    return Application.instance;
+}
 
 const Application = new Lang.Class({
     Name: 'Application',
@@ -48,6 +52,8 @@ const Application = new Lang.Class({
         Gettext.textdomain(Config.GETTEXT_PACKAGE);
         GLib.set_prgname(Config.PACKAGE_NAME);
 
+        Application.instance = this;
+        
         // Run as a service. In this mode, registration fails if the service
         // is already running, and the application will stay around for a while
         // when the use count falls to zero.
@@ -136,6 +142,8 @@ const Application = new Lang.Class({
     vfunc_startup: function() {
         this.parent();
 
+        String.prototype.format = Format.format;
+
         let resource = Gio.Resource.load(Config.PACKAGE_DATADIR + '/gnome-shell-pomodoro.gresource');
         resource._register();
 
@@ -154,8 +162,10 @@ const Application = new Lang.Class({
     // Emitted on the primary instance when an activation occurs.
     // The application must be registered before calling this function.
     vfunc_activate: function() {
-        if (this._window)
+        if (this._window) {
+            this._window.set_view('preferences'); // FIXME: default should be task list
             this._window.window.present();
+        }
     },
 
     _create_window: function() {

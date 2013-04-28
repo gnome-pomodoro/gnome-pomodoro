@@ -1,8 +1,8 @@
 .pomodoro-toolbar.toolbar {
     border-style: solid;
     border-color: @borders;
-    border-width: 0 0 1px 0;
-    border-radius: 0;
+    border-width: 0px 0px 1px 0px;
+    border-radius: 0px;
 }
 
 .pomodoro-toolbar.toolbar .button {
@@ -13,14 +13,14 @@
     padding: 4px 6px;
 }
 
-.pomodoro-timer .button.active {
+.button.active {
     font-weight: bold;
 }
 
 .pomodoro-timer .label {
     padding: 0pt 0pt 0pt 0pt;
     font-family: "Droid Sans";
-    font-size: 80;
+    font-size: 80px;
 }
 
 .pomodoro-timer .label:insensitive {
@@ -35,3 +35,19 @@
 .pomodoro-window {
     background-color: #f1f2f1
 }
+
+.section-header {
+    font-weight: bold;
+}
+
+.list {
+    background-color: @background;
+}
+
+.list-item {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
