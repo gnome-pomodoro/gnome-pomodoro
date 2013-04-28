@@ -27,20 +27,26 @@ https://extensions.gnome.org/extension/53/pomodoro/
 ## Archlinux
 Get from [AUR](http://aur.archlinux.org/packages.php?ID=49967)
 
+## Fedora 17 and later
+Install using yum:
+
+        $ su -c 'yum install gnome-shell-extension-pomodoro'
+
 ## Gentoo
 Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github.com/mgrela/dropzone/tree/master/gnome-extra/gnome-shell-extensions-pomodoro). Instructions [here](http://mgrela.rootnode.net/doku.php?id=wiki:gentoo:dropzone).
 
 ## Direct from source
 1. Get zipball
-    * [for GNOME Shell 3.4](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-3.4)
+    * [for GNOME Shell 3.8](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-3.8)
     * [for GNOME Shell 3.6](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-3.6)
+    * [for GNOME Shell 3.4](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-3.4)
     * [Unstable – our master branch](https://github.com/codito/gnome-shell-pomodoro/zipball/master)
 
 2. Build it and install
 
         ./autogen.sh --prefix=/usr
         make zip
-        unzip _build/gnome-shell-pomodoro.0.7.zip -d ~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in
+        unzip _build/gnome-shell-pomodoro.0.8.zip -d ~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in
 
     To install it system-wide, you could do
 
@@ -72,20 +78,27 @@ Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodo
 
 # Changelog
 
+**Version 0.8**
+
++ Support for GNOME Shell 3.8 (thanks @haaja)
++ Brazilian Portuguese translation (thanks @aleborba)
++ Minor bug fixes
+
 **Version 0.7**
 
-+ Czech translation
 + Support for GNOME Shell 3.4 and 3.6
-+ Full screen notifications
-+ Added reminders
++ Feature: Full screen notifications
++ Feature: Reminders
++ Chinese translation (thanks @mengzhuo)
++ Czech translation (thanks @veverjak)
 
 **Version 0.6**
 
-+ New translation: Persian (thanks @arashm)
-+ Feature: Support for GNOME Shell 3.4
++ Support for GNOME Shell 3.4
 + Breaking change: Dropped support for older gnome-shell versions due to incompatible APIs
 + Feature: Support for "Away from desk" mode
 + Feature: Ability to change IM presence status based on pomodoro activity
++ New translation: Persian (thanks @arashm)
 + Fixed issues #38, #39, #41, #42, #45 and [more](https://github.com/codito/gnome-shell-pomodoro/issues?sort=created&direction=desc&state=closed&page=1)
 
 **Version 0.5**
@@ -98,4 +111,5 @@ Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodo
 + Sound notification at end of a pomodoro break [Issue #26, Patch from @kamilprusko]
 + System wide config file support [Patch from @mgrela]
 + Support to skip breaks in case of persistent message [Patch from @amanbh]
-- Some minor bug fixes, and keybinder3 requirement is now optional
++ Some minor bug fixes, and keybinder3 requirement is now optional
+

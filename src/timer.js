@@ -25,6 +25,7 @@ const Signals = imports.signals;
 
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
+const GnomeDesktop = imports.gi.GnomeDesktop;
 const UPowerGlib = imports.gi.UPowerGlib;
 
 
@@ -58,6 +59,8 @@ const Timer = new Lang.Class({
         this._state = State.NULL;
         this._state_timestamp = 0;
         this._timeout_source = 0;
+        this._idle_monitor = new GnomeDesktop.IdleMonitor();
+        this._became_active_id = 0;
 
         this._power = new UPowerGlib.Client();
         this._power.connect('notify-resume', Lang.bind(this, this.restore));
@@ -170,6 +173,8 @@ const Timer = new Lang.Class({
         if (this._state == new_state)
             return;
 
+        this._disable_event_capture();
+
         if (this._state == State.POMODORO) {
             if (this._elapsed >= POMODORO_ACCEPTANCE * this._settings.get_uint('pomodoro-time')) {
                 this._session_count += 1;
@@ -181,6 +186,7 @@ const Timer = new Lang.Class({
 
         switch (new_state) {
             case State.IDLE:
+                this._enable_event_capture();
                 break;
 
             case State.POMODORO:
@@ -345,6 +351,21 @@ const Timer = new Lang.Class({
             this.set_elapsed(this._elapsed + 1);
 
         return true;
+
+    _on_idle_monitor_became_active: function(monitor) {
+        this.set_state(State.POMODORO);
+    },
+
+    _enable_event_capture: function() {
+        if (this._became_active_id == 0)
+            this._became_active_id = this._idle_monitor.add_user_active_watch(Lang.bind(this, this._on_idle_monitor_became_active));
+    },
+
+    _disable_event_capture: function() {
+        if (this._became_active_id != 0) {
+            this._idle_monitor.remove_watch(this._became_active_id);
+            this._became_active_id = 0;
+        }
     },
 
     destroy: function() {
