@@ -64,32 +64,11 @@ const Application = new Lang.Class({
 
         this.settings = new Gio.Settings({ schema: 'org.gnome.pomodoro' });
         this.dbus = null;
-
-        this.timer = new Timer.Timer();
-
-        // Setup Plugins
-        this.plugins = [
-            new Sounds.Sounds(this.timer),
-        ];
-
+        this.timer = null;
         this._window = null;
 
         // Quit service if not used
         this._has_hold = false;
-
-        this.timer.connect('state-changed', Lang.bind(this, function(timer) {
-            let is_running = timer.state != Timer.State.NULL;
-            if (is_running != this._has_hold) {
-                if (is_running)
-                    this.hold();
-                else
-                    this.release();
-
-                this._has_hold = is_running;
-            }
-        }));
-
-        this.timer.restore();
 
         this._setup_actions();
     },
@@ -109,8 +88,14 @@ const Application = new Lang.Class({
     },
 
     _action_quit: function() {
-        this.timer.stop();
-        this._destroy_window();
+        if (this.timer) {
+            this.timer.destroy();
+            this.timer = null;
+        }
+        if (this._window) {
+            this._window.window.destroy();
+            this._window = null;
+        }
     },
 
     _setup_actions: function() {
@@ -141,11 +126,42 @@ const Application = new Lang.Class({
     // Emitted on the primary instance immediately after registration.
     vfunc_startup: function() {
         this.parent();
-
         String.prototype.format = Format.format;
+
+        Gtk.init(null);
 
         let resource = Gio.Resource.load(Config.PACKAGE_DATADIR + '/gnome-shell-pomodoro.gresource');
         resource._register();
+
+        this.timer = new Timer.Timer();
+
+        this.timer.connect('destroy', Lang.bind(this, function(timer) {
+            if (this._has_hold) {
+                this.release();
+                this._has_hold = false;
+            }
+        }));
+
+        this.timer.connect('state-changed', Lang.bind(this, function(timer) {
+            let is_running = timer.state != Timer.State.NULL;
+            if (is_running != this._has_hold) {
+                if (is_running)
+                    this.hold();
+                else
+                    this.release();
+
+                this._has_hold = is_running;
+            }
+        }));
+
+        // Setup Plugins
+        this.plugins = [
+            new Sounds.Sounds(this.timer),
+        ];
+
+        this.timer.restore();
+
+        this.dbus.set_timer(this.timer);
 
         this._setup_menu();
     },
@@ -178,13 +194,6 @@ const Application = new Lang.Class({
         }));
     },
 
-    _destroy_window: function() {
-        if (this._window) {
-            this._window.window.destroy();
-            this._window = null;
-        }
-    },
-
     vfunc_command_line: function(cmdline) {
         let args = cmdline.get_arguments();
         if (args.indexOf('--no-default-window') == -1)
@@ -199,7 +208,7 @@ const Application = new Lang.Class({
             return false;
 
         if (!this.dbus)
-            this.dbus = new DBus.Pomodoro(this.timer);
+            this.dbus = new DBus.Pomodoro(null);
 
         return true;
     },

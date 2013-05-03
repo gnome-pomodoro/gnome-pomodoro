@@ -351,6 +351,7 @@ const Timer = new Lang.Class({
             this.set_elapsed(this._elapsed + 1);
 
         return true;
+    },
 
     _on_idle_monitor_became_active: function(monitor) {
         this.set_state(State.POMODORO);
@@ -369,6 +370,7 @@ const Timer = new Lang.Class({
     },
 
     destroy: function() {
+        this.emit('destroy');
         this.disconnectAll();
 
         if (this._timeout_source != 0) {

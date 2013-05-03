@@ -91,9 +91,6 @@ const Indicator = new Lang.Class({
         this._notifyPomodoroEndId = 0;
         this._notificationDialog = null;
         this._notification = null;
-//        this._eventCaptureId = 0;
-//        this._eventCaptureSource = 0;
-//        this._eventCapturePointer = null;
 
         this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
 
@@ -323,7 +320,6 @@ const Indicator = new Lang.Class({
         let toggled = state !== null && state !== State.NULL;
 
         if (this._state !== state) {
-//            this._disableEventCapture();
             this._state = state;
 
             if (state == State.POMODORO || state == State.IDLE)
@@ -336,9 +332,6 @@ const Indicator = new Lang.Class({
                                  { opacity: FADE_OPACITY,
                                    transition: 'easeOutQuad',
                                    time: FADE_ANIMATION_TIME });
-
-//            if (state == State.IDLE)
-//                this._enableEventCapture();
 
             if (this._timerToggle.toggled !== toggled)
                 this._timerToggle.setToggleState(toggled);
@@ -499,60 +492,6 @@ const Indicator = new Lang.Class({
             global.log('Pomodoro: ' + error.message)
     },
 
-//    _enableEventCapture: function() {
-//        // We use meta_display_get_last_user_time() which determines any user interaction
-//        // with X11/Mutter windows but not with GNOME Shell UI, for that we handle 'captured-event'.
-//        if (!this._eventCaptureId) {
-//            this._eventCaptureId = global.stage.connect('captured-event', Lang.bind(this, this._onEventCapture));
-//        }
-//        if (!this._eventCaptureSource) {
-//            this._eventCapturePointer = global.get_pointer();
-//            this._eventCaptureSource = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._onX11EventCapture));
-//        }
-//    },
-
-//    _disableEventCapture: function() {
-//        if (this._eventCaptureId) {
-//            global.stage.disconnect(this._eventCaptureId);
-//            this._eventCaptureId = 0;
-//        }
-//        if (this._eventCaptureSource) {
-//            GLib.source_remove(this._eventCaptureSource);
-//            this._eventCaptureSource = 0;
-//        }
-//    },
-
-//    _onEventCapture: function(actor, event) {
-//        // When notification dialog fades out, can trigger an event.
-//        // To avoid that we need to capture just these event types:
-//        switch(event.type()) {
-//            case Clutter.EventType.KEY_PRESS:
-//            case Clutter.EventType.BUTTON_PRESS:
-//            case Clutter.EventType.MOTION:
-//            case Clutter.EventType.SCROLL:
-//                this.start();
-//                break;
-//        }
-//        return false;
-//    },
-
-//    _onX11EventCapture: function() {
-//        let display = global.screen.get_display();
-//        let pointer = global.get_pointer();
-//        let idleTime = parseInt((display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000);
-//
-//        if (idleTime < 1 || (this._eventCapturePointer && (
-//            pointer[0] != this._eventCapturePointer[0] || pointer[1] != this._eventCapturePointer[1]))) {
-//            this.start();
-//
-//            // TODO: Treat last non-idle second as if timer was running.
-//            // this._onTimeout();
-//            return false;
-//        }
-//        this._eventCapturePointer = pointer;
-//        return true;
-//    },
-
     _ensureNotificationSource: function() {
         if (!this._notificationSource) {
             this._notificationSource = new Notifications.Source();
@@ -708,8 +647,6 @@ const Indicator = new Lang.Class({
 
     destroy: function() {
         Main.wm.removeKeybinding('toggle-timer');
-
-//        this._disableEventCapture();
 
         if (this._nameWatcherId)
             Gio.DBus.session.unwatch_name(this._nameWatcherId);

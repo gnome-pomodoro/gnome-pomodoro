@@ -55,7 +55,13 @@ const Pomodoro = new Lang.Class({
         this.dbus = Gio.DBusExportedObject.wrapJSObject(PomodoroInterface, this);
         this.dbus.export(Gio.DBus.session, '/org/gnome/Pomodoro');
 
+        this.set_timer(timer);
+    },
+
+    set_timer: function(timer) {
         this.timer = timer;
+        if (!timer)
+            return;
 
         this.timer.connect('elapsed-changed', Lang.bind(this, function(timer)
         {
