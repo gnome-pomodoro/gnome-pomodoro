@@ -232,9 +232,12 @@ const ModalDialog = new Lang.Class({
     popModal: function(timestamp) {
         this._disconnectInternals();
 
-        this._grabHelper.ungrab({
-            actor: this._lightbox.actor
-        });
+        try {
+            this._grabHelper.ungrab();
+        }
+        catch (error) {
+            global.log('Pomodoro: ' + error.message);
+        }
 
         this._lightbox.actor.reactive = false;
     },
