@@ -68,7 +68,27 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 - Use toggle switch (or *Ctrl+Alt+P*) to toggle timer on/off
 - You can configure behavior of the extension in *Options* menu
 
-For a list of configurable options, please refer [wiki](https://github.com/codito/gnome-shell-pomodoro/wiki/Configuration)
+...and there are a couple of options:
+- _Reset Counts and Timers_: Resets your pomodoro session count.
+- _Away From Desk_: Automatically start next pomodoro session after pause. Useful if you're sitting away from computer.
+- _Control Presence Status_: During a pomodoro session, mark your IM presence status to Busy.
+- _Fullscreen Notifications_: After completion of a pomodoro session, show a dialog box (system modal) that will force you to take a break :)
+- _Sound Notifications_: Notify completion of pomodoro by playing a sound.
+
+# Settings
+We recommend you use the Options menu to configure Pomodoro extension. If you still want to tinker with settings, you can use dconf-editor or gsettings via commandline. Settings for Pomodoro are in */org/gnome/shell/extensions/pomodoro* tree.
+
+**Change notification sound**
+
+You can customize notification sound with:
+
+        gsettings [--schemadir=~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in/schemas/] set org.gnome.shell.extensions.pomodoro sound-uri "file:///usr/share/sounds/freedesktop/stereo/complete.oga"
+
+**Change keyboard shortcut**
+
+Hotkey to toggle the timer *Ctrl+Alt+P* may be used in one of your apps (Emacs, Sublime Text, etc.), in which case it will toggle the timer. You can change the shortcut by:
+
+        gsettings [--schemadir=~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in/schemas/] set org.gnome.shell.extensions.pomodoro toggle-key "['<Super>p']"
 
 # License
 GPL3. See [COPYING](https://raw.github.com/codito/gnome-shell-pomodoro/master/COPYING) for details.
