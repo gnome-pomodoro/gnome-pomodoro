@@ -32,7 +32,7 @@ msgstr "Temporizador Pomodoro"
 #. Options SubMenu
 #: ../src/extension.js:99
 msgid "Options"
-msgstr "Opciones"
+msgstr "Opciónes"
 
 #. Reset counters
 #: ../src/extension.js:122
@@ -53,7 +53,7 @@ msgstr "Control del estado de presencia"
 #: ../src/extension.js:141
 #, fuzzy
 msgid "Fullscreen Notifications"
-msgstr "Notificación de sonido"
+msgstr "Notificaciones a pantalla completa"
 
 #. Notify with a sound toggle
 #: ../src/extension.js:148
@@ -88,16 +88,16 @@ msgstr[1] "%d sesiones completadas"
 
 #: ../src/timer.js:422
 msgid "Pause finished."
-msgstr ""
+msgstr "La pausa ha finalizado"
 
 #: ../src/timer.js:423
 #, fuzzy
 msgid "A new pomodoro is starting."
-msgstr "La pausa ha finalizado, un nuevo pomodoro está comenzando!"
+msgstr "Un nuevo pomodoro está comenzando!"
 
 #: ../src/timer.js:440
 msgid "It's time to take a break!"
-msgstr ""
+msgstr "¡Es la hora de hacer una pausa!"
 
 #: ../src/timer.js:462
 msgid "Take a break!"
