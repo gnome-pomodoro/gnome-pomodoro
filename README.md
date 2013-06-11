@@ -118,6 +118,15 @@ If you ever need to reset settings, you can use
 For more options see *gsettings --help*
 
 
+# Debugging
+
+If you experience the extension causing problems, please run *gnome-shell* with error log redirected to a file:
+
+        DISPLAY=:0 gnome-shell --replace > gnome-shell.log 2>&1
+
+You can also recover from most *gnome-shell* crashes using the same command.
+
+
 # License
 GPL3. See [COPYING](https://raw.github.com/codito/gnome-shell-pomodoro/master/COPYING) for details.
 
