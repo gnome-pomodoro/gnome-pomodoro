@@ -104,6 +104,20 @@ Hotkey to toggle the timer *Ctrl+Alt+P* may be used in one of your apps (Emacs, 
         gsettings set org.gnome.shell.extensions.pomodoro toggle-pomodoro-timer "['<Super>p']"
 
 
+**Reset settings to default**
+
+If you ever need to reset settings, you can use
+
+        SCHEMADIR=~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in/schemas/
+        gsettings --schemadir $SCHEMADIR reset-recursively org.gnome.shell.extensions.pomodoro
+
+…or if installed system-wide
+
+        gsettings reset-recursively org.gnome.shell.extensions.pomodoro
+
+For more options see *gsettings --help*
+
+
 # License
 GPL3. See [COPYING](https://raw.github.com/codito/gnome-shell-pomodoro/master/COPYING) for details.
 
