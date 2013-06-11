@@ -1,4 +1,4 @@
-# LANGUAGE translation for gnome-shell-pomodoro
+# Russian translation for gnome-shell-pomodoro
 # Copyright (c) 2012 gnome-shell-pomodoro contributors
 # This file is distributed under the same license as the gnome-shell-pomodoro package.
 # liberumed <liberumed@gmail.com>, 2013.
@@ -10,20 +10,20 @@ msgstr ""
 "POT-Creation-Date: 2012-03-18 16:22+0100\n"
 "PO-Revision-Date: 2013-06-03 12:11+0200\n"
 "Last-Translator: liberumed <liberumed@gmail.com>\n"
-"Language-Team: ru <EMAIL@ADDRESS>\n"
-"Language: \n"
+"Language-Team: ru <>\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bits\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: ../src/extension.js:61
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d минута" # 1, 21, 31
-msgstr[1] "%d минуты" # 2-4, 22-24
-msgstr[2] "%d минут" # 5-20, 25-30
+msgstr[0] "%d минута"
+msgstr[1] "%d минуты"
+msgstr[2] "%d минут"
 
 #. Toggle timer state button
 #: ../src/extension.js:96 ../src/notification.js:54
@@ -104,10 +104,9 @@ msgstr "Нет Завершенных Сессий"
 #, c-format
 msgid "%d Completed Session"
 msgid_plural "%d Completed Sessions"
-msgstr[0] "%d Завершенная Сессия" # 1, 21 ...
-msgstr[1] "%d Завершенные Сессии" # 2-4, 22-24 ...
-msgstr[2] "%d Завершенных Сессий" # 5-20, 25-30 ...
-
+msgstr[0] "%d Завершенная Сессия"
+msgstr[1] "%d Завершенные Сессии"
+msgstr[2] "%d Завершенных Сессий"
 
 #: ../src/timer.js:411
 msgid "Pause finished, a new pomodoro is starting!"
