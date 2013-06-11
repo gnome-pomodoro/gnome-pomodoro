@@ -82,13 +82,27 @@ We recommend you use the Options menu to configure Pomodoro extension. If you st
 
 You can customize notification sound with:
 
-        gsettings [--schemadir=~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in/schemas/] set org.gnome.shell.extensions.pomodoro sound-uri "file:///usr/share/sounds/freedesktop/stereo/complete.oga"
+        SCHEMADIR=~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in/schemas/
+        gsettings --schemadir $SCHEMADIR set org.gnome.shell.extensions.pomodoro sound-uri "/usr/share/sounds/freedesktop/stereo/complete.oga"
+
+…or if installed system-wide
+
+        gsettings set org.gnome.shell.extensions.pomodoro sound-uri "/usr/share/sounds/freedesktop/stereo/complete.oga"
+
+For the sound file used in this example you may need to install package *sound-theme-freedesktop*.
+
 
 **Change keyboard shortcut**
 
 Hotkey to toggle the timer *Ctrl+Alt+P* may be used in one of your apps (Emacs, Sublime Text, etc.), in which case it will toggle the timer. You can change the shortcut by:
 
-        gsettings [--schemadir=~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in/schemas/] set org.gnome.shell.extensions.pomodoro toggle-key "['<Super>p']"
+        SCHEMADIR=~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in/schemas/
+        gsettings --schemadir $SCHEMADIR set org.gnome.shell.extensions.pomodoro toggle-pomodoro-timer "['<Super>p']"
+
+…or if installed system-wide
+
+        gsettings set org.gnome.shell.extensions.pomodoro toggle-pomodoro-timer "['<Super>p']"
+
 
 # License
 GPL3. See [COPYING](https://raw.github.com/codito/gnome-shell-pomodoro/master/COPYING) for details.
