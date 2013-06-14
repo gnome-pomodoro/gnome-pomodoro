@@ -24,7 +24,7 @@ const Utils = Extension.imports.utils;
 let indicator;
 
 function init(metadata) {
-    Utils.initTranslations('gnome-shell-pomodoro');
+    Utils.initTranslations('gnome-pomodoro');
 }
 
 function enable() {

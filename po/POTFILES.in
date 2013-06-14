@@ -1,6 +1,13 @@
 extension/dbus.js
 extension/extension.js
-extension/metadata.json
-extension/notification.js
-extension/timer.js
-data/org.gnome.shell.extensions.pomodoro.gschema.xml.in
+extension/metadata.json.in
+extension/notifications.js
+extension/utils.js
+src/application.vala
+src/main.vala
+src/service.vala
+src/timer.vala
+src/utils.vala
+data/gnome-pomodoro.desktop.in
+data/org.gnome.Pomodoro.service.in
+data/org.gnome.pomodoro.gschema.xml.in

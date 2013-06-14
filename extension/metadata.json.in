@@ -1,10 +1,8 @@
 {
-  "extension-id": "pomodoro",
+  "extension-id": "@PACKAGE@",
   "uuid": "@UUID@",
-  "settings-schema": "org.gnome.shell.extensions.pomodoro",
-  "name": "Pomodoro",
+  "name": "@PACKAGE_NAME@",
   "description": "A simple pomodoro timer",
   "shell-version": ["3.8", "3.7.92", "3.7.91"],
-  "service": "@bindir@/gnome-shell-pomodoro",
-  "url": "https://github.com/codito/gnome-shell-pomodoro"
+  "url": "@PACKAGE_URL@"
 }

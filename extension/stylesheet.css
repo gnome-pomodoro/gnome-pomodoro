@@ -18,11 +18,14 @@
 .extension-pomodoro-label {
 }
 
+.extension-pomodoro-toggle {
+}
+
 .extension-pomodoro-lightbox {
     background-color: black;
 }
 
-.extension-pomodoro-dialog {
+.extension-pomodoro-dialog-layout {
     padding-bottom: 12px;
 }
 
@@ -42,7 +45,7 @@
     color: white;
 }
 
-.extension-pomodoro-dialog-description {
+.extension-pomodoro-dialog-message {
     font-size: 12pt;
     font-weight: normal;
     text-align: center;

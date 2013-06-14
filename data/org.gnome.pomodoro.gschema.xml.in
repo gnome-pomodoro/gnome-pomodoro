@@ -29,11 +29,6 @@
       <summary>Long pause duration</summary>
       <description>Time in seconds you are supposed to take a longer break.</description>
     </key>
-    <key name="idle-monitor" type="b">
-      <default>true</default>
-      <summary>Wait after break</summary>
-      <description>Postpone pomodoro start until there is some activity.</description>
-    </key>
   </schema>
   <schema id="org.gnome.pomodoro.preferences.keybindings" path="/apps/gnome-pomodoro/preferences/keybindings/">
     <key type="as" name="toggle-timer">
@@ -55,6 +50,11 @@
     </key>
   </schema>
   <schema id="org.gnome.pomodoro.preferences.presence" path="/apps/gnome-pomodoro/preferences/presence/">
+    <key name="pause-when-idle" type="b">
+      <default>true</default>
+      <summary>Wait after break</summary>
+      <description>Postpone pomodoro start until there is some activity.</description>
+    </key>
     <key name="enabled" type="b">
       <default>true</default>
       <summary>Change presence status</summary>

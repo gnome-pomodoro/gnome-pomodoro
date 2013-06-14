@@ -40,7 +40,7 @@ const Util = imports.misc.util;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;
 
-const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
+const Gettext = imports.gettext.domain('gnome-pomodoro');
 const _ = Gettext.gettext;
 const ngettext = Gettext.ngettext;
 
@@ -118,7 +118,7 @@ const ModalDialog = new Lang.Class({
         this._backgroundBin.add_constraint(this._monitorConstraint);
         this._group.add_actor(this._backgroundBin);
 
-        this._dialogLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog',
+        this._dialogLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-layout',
                                                 vertical:    true });
 
         this._lightbox = new Lightbox.Lightbox(this._group,
@@ -230,17 +230,6 @@ const ModalDialog = new Lang.Class({
         this._lightbox.actor.reactive = false;
     },
 
-    _onPushModalWatch: function(monitor) {
-        this._tryPushModal();
-    },
-
-    _onPushModalTimeout: function() {
-        if (this._idleMonitor.get_idletime() >= BLOCK_EVENTS_TIME)
-            this._tryPushModal();
-
-        return false;
-    },
-
     open: function(timestamp) {
         if (this.state == State.OPENED || this.state == State.OPENING)
             return;
@@ -331,63 +320,6 @@ const ModalDialog = new Lang.Class({
         return true;
     },
 
-    _onCapturedEvent: function(actor, event) {
-        switch (event.type()) {
-            case Clutter.EventType.KEY_PRESS:
-                let symbol = event.get_key_symbol();
-                if (symbol == Clutter.Escape) {
-                    this.close();
-                    return true;
-                }
-                break;
-        }
-        return false;
-    },
-
-    // Drop modal status without closing the dialog; this makes the
-    // dialog insensitive as well, so it needs to be followed shortly
-    // by either a close() or a pushModal()
-    popModal: function(timestamp) {
-        this._disconnectInternals();
-
-        if (!this._hasModal)
-            return;
-
-        try {
-            Main.popModal(this._group, timestamp);
-            global.gdk_screen.get_display().sync();
-        }
-        catch (error) {
-            // For some reason modal might have been popped externally
-        }
-
-        let focus = global.stage.key_focus;
-        if (focus && this._group.contains(focus))
-            this._savedKeyFocus = focus;
-        else
-            this._savedKeyFocus = null;
-
-        this._hasModal = false;
-        this._lightbox.actor.reactive = false;
-    },
-
-    pushModal: function (timestamp) {
-        if (this._hasModal)
-            return true;
-        if (!Main.pushModal(this._group, timestamp))
-            return false;
-
-        this._hasModal = true;
-        this._lightbox.actor.reactive = true;
-
-        if (this._savedKeyFocus) {
-            this._savedKeyFocus.grab_key_focus();
-            this._savedKeyFocus = null;
-        }
-
-        return true;
-    },
-
     _disconnectInternals: function() {
         if (this._pushModalWatchId != 0) {
             this._idleMonitor.remove_watch(this._pushModalWatchId);
@@ -429,7 +361,7 @@ const PomodoroEndDialog = new Lang.Class({
 
         this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-timer' });
 
-        this._descriptionLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-description',
+        this._descriptionLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-message',
                                                 text: this._description });
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
@@ -608,7 +540,7 @@ const PomodoroEnd = new Lang.Class({
         this.parent(source, title, description, null);
 
         this.setResident(true);
-        this.addButton(Action.START_POMODORO, _("Start a new pomodoro"));
+//        this.addButton(Action.START_POMODORO, _("Start a new pomodoro")); // TODO FIXME
     },
 
     setRemainingTime: function(remaining) {
@@ -705,7 +637,7 @@ const Issue = new Lang.Class({
         let title = _("Could not run pomodoro");
         let description = installed
                     ? _("Something went badly wrong...")
-                    : _("Looks like the app is not installed");
+                    : _("Looks like gnome-pomodoro is not installed");
 
         this.parent(source, title, description, {});
         this.setUrgency(MessageTray.Urgency.HIGH);
@@ -719,7 +651,7 @@ const Issue = new Lang.Class({
         if (installed)
             this.addButton(Action.REPORT_BUG, _("Report issue"));
         else
-            this.addButton(Action.VISIT_WEBSITE, _("Install it"));
+            this.addButton(Action.VISIT_WEBSITE, _("Install"));
 
         this.connect('action-invoked', Lang.bind(this, function(notification, action) {
             notification.hide();

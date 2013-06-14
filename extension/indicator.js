@@ -15,9 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const Lang = imports.lang;
-//const Mainloop = imports.mainloop;
 
-//const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Meta = imports.gi.Meta;
@@ -36,7 +34,7 @@ const DBus = Extension.imports.dbus;
 const Notifications = Extension.imports.notifications;
 const Utils = Extension.imports.utils;
 
-const Gettext = imports.gettext.domain('gnome-shell-pomodoro');
+const Gettext = imports.gettext.domain('gnome-pomodoro');
 const _ = Gettext.gettext;
 const ngettext = Gettext.ngettext;
 
@@ -82,8 +80,8 @@ const Indicator = new Lang.Class({
         this._proxy = null;
 
         this._nameWatcherId = Gio.DBus.session.watch_name(
-                                    DBus.POMODORO_SERVICE_NAME,
-                                    Gio.BusNameWatcherFlags.NONE,
+                                    DBus.SERVICE_NAME,
+                                    Gio.BusNameWatcherFlags.AUTO_START,
                                     Lang.bind(this, this._onNameAppeared),
                                     Lang.bind(this, this._onNameVanished));
         this._propertiesChangedId = 0;
@@ -100,15 +98,15 @@ const Indicator = new Lang.Class({
         }
 
         // Timer label
-        this.label = new St.Label({ style_class: 'extension-pomodoro-label' });
+        this.label = new St.Label({ opacity: FADE_OPACITY,
+                                    style_class: 'extension-pomodoro-label' });
         this.label.clutter_text.set_line_wrap(false);
         this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
 
         this.actor.add_actor(this.label);
 
         // Toggle timer state button
-        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Timer"), false);
-//        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'popup-subtitle-menu-item' });
+        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Timer"), false, { style_class: 'extension-pomodoro-toggle' });
         this._timerToggle.connect('toggled', Lang.bind(this, this.toggle));
         this.menu.addMenuItem(this._timerToggle);
 
@@ -121,7 +119,7 @@ const Indicator = new Lang.Class({
 //        this.menu.addMenuItem(this._optionsMenu);
 
         // Settings
-        this._settingsButton =  new PopupMenu.PopupMenuItem(_("Pomodoro Settings"));
+        this._settingsButton = new PopupMenu.PopupMenuItem(_("Pomodoro Settings"));
         this._settingsButton.connect('activate', Lang.bind(this, this._showPreferences));
         this.menu.addMenuItem(this._settingsButton);
 
@@ -135,10 +133,10 @@ const Indicator = new Lang.Class({
 
         this.menu.actor.connect('notify::visible', Lang.bind(this, this.refresh));
 
-        this.refresh();
-
         this._onSettingsChanged();
         this._ensureProxy();
+
+        this.refresh();
     },
 
     _showPreferences: function() {
@@ -320,8 +318,6 @@ const Indicator = new Lang.Class({
         let toggled = state !== null && state !== State.NULL;
 
         if (this._state !== state) {
-            this._state = state;
-
             if (state == State.POMODORO || state == State.IDLE)
                 Tweener.addTween(this.label,
                                  { opacity: 255,
@@ -333,6 +329,14 @@ const Indicator = new Lang.Class({
                                    transition: 'easeOutQuad',
                                    time: FADE_ANIMATION_TIME });
 
+            if (this._state == State.IDLE &&
+                this._notification instanceof Notifications.PomodoroStart)
+            {
+                this._notification.hide();
+            }
+
+            this._state = state;
+
             if (this._timerToggle.toggled !== toggled)
                 this._timerToggle.setToggleState(toggled);
         }
@@ -340,12 +344,12 @@ const Indicator = new Lang.Class({
         if (toggled) {
             remaining = state != State.IDLE
                     ? Math.max(this._proxy.ElapsedLimit - this._proxy.Elapsed, 0)
-                    : this._proxy.ElapsedLimit;
+                    : this._settings.get_child('timer').get_uint('pomodoro-time');
 
             minutes = parseInt(remaining / 60);
             seconds = parseInt(remaining % 60);
 
-            if (this._notification && (this._notification instanceof Notifications.PomodoroEnd)) {
+            if (this._notification instanceof Notifications.PomodoroEnd) {
                 this._notification.setRemainingTime(remaining);
                 this._notificationDialog.setRemainingTime(remaining);
             }
@@ -354,8 +358,8 @@ const Indicator = new Lang.Class({
             minutes = 0;
             seconds = 0;
 
-            if ((this._notification instanceof Notifications.PomodoroStart) ||
-                (this._notification instanceof Notifications.PomodoroEnd))
+            if (this._notification instanceof Notifications.PomodoroStart ||
+                this._notification instanceof Notifications.PomodoroEnd)
             {
                 this._notification.destroy();
                 this._notification = null;
@@ -391,46 +395,54 @@ const Indicator = new Lang.Class({
     },
 
     _ensureProxy: function(callback) {
-        if (!this._proxy)
-            this._proxy = new DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
-                if (!error) {
-                    if (!this._propertiesChangedId)
-                        this._propertiesChangedId = this._proxy.connect('g-properties-changed',
-                                                                    Lang.bind(this, this.refresh));
-                    if (!this._notifyPomodoroStartId)
-                        this._notifyPomodoroStartId = this._proxy.connectSignal('NotifyPomodoroStart',
-                                                                    Lang.bind(this, this._notifyPomodoroStart));
-                    if (!this._notifyPomodoroEndId)
-                        this._notifyPomodoroEndId = this._proxy.connectSignal('NotifyPomodoroEnd',
-                                                                    Lang.bind(this, this._notifyPomodoroEnd));
-
-//                    if (this._proxy.State == State.IDLE)
-//                        this._enableEventCapture();
-
-                    if (this._proxy.State == State.POMODORO)
-                        this._notifyPomodoroStart(this._proxy, null, [false]);
-
-                    if (this._proxy.State == State.PAUSE)
-                        this._notifyPomodoroEnd(this._proxy, null, [true]);
-
-                    if (callback)
-                        callback.call(this);
-                }
-                else {
-                    global.log('Pomodoro: ' + error.message);
-
-                    this._destroyProxy();
-                    this._notifyIssue();
-                }
-
-                this.refresh();
-            }));
-        else
+        if (this._proxy) {
             if (callback) {
                 callback.call(this);
 
                 this.refresh();
             }
+            return;
+        }
+        else
+        {
+            this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
+                if (error) {
+                    global.log('Pomodoro: ' + error.message);
+
+                    this._destroyProxy();
+                    this._notifyIssue();
+                    return;
+                }
+
+                if (!this._proxy) {
+                    global.log('Pomodoro: Callback called when proxy has been destroyed');
+                    return;
+                }
+
+                // Keep in mind that signals won't be called right after initialization
+                // when gnome-pomodoro comes back and gets restored
+                if (!this._propertiesChangedId)
+                    this._propertiesChangedId = this._proxy.connect('g-properties-changed',
+                                                                Lang.bind(this, this._onPropertiesChanged));
+                if (!this._notifyPomodoroStartId)
+                    this._notifyPomodoroStartId = this._proxy.connectSignal('NotifyPomodoroStart',
+                                                                Lang.bind(this, this._onNotifyPomodoroStart));
+                if (!this._notifyPomodoroEndId)
+                    this._notifyPomodoroEndId = this._proxy.connectSignal('NotifyPomodoroEnd',
+                                                                Lang.bind(this, this._onNotifyPomodoroEnd));
+
+                if (callback)
+                    callback.call(this);
+
+                if (this._proxy.State == State.POMODORO || this._proxy.State == State.IDLE)
+                    this._onNotifyPomodoroStart(this._proxy, null, [false]);
+
+                if (this._proxy.State == State.PAUSE)
+                    this._onNotifyPomodoroEnd(this._proxy, null, [true]);
+
+                this.refresh();
+            }));
+        }
     },
 
     _destroyProxy: function() {
@@ -454,6 +466,9 @@ const Indicator = new Lang.Class({
             //       there is no destroy method
             // this._proxy.destroy();
             this._proxy = null;
+        }
+
+        if (this._actionsProxy) {
             this._actionsProxy = null;
         }
     },
@@ -478,6 +493,16 @@ const Indicator = new Lang.Class({
                 callback.call(this);
     },
 
+    _ensureNotificationSource: function() {
+        if (!this._notificationSource) {
+            this._notificationSource = new Notifications.Source();
+            this._notificationSource.connect('destroy', Lang.bind(this, function(reason) {
+                this._notificationSource = null;
+            }));
+        }
+        return this._notificationSource;
+    },
+
     _onNameAppeared: function() {
         this._ensureProxy();
     },
@@ -492,20 +517,25 @@ const Indicator = new Lang.Class({
             global.log('Pomodoro: ' + error.message)
     },
 
-    _ensureNotificationSource: function() {
-        if (!this._notificationSource) {
-            this._notificationSource = new Notifications.Source();
-            this._notificationSource.connect('destroy', Lang.bind(this, function(reason) {
-                this._notificationSource = null;
-            }));
+    _onPropertiesChanged: function(proxy, properties) {
+        // DBus implementation in gjs enforces properties to be cached,
+        // but does not update them properly...
+        //
+        // TODO: This walkaround may not bee needed in the future
+        //
+        properties = properties.deep_unpack();
+
+        for (var name in properties) {
+            proxy.set_cached_property(name, properties[name]);
         }
-        return this._notificationSource;
+
+        this.refresh();
     },
 
-    _notifyPomodoroStart: function(proxy, senderName, [requested]) {
+    _onNotifyPomodoroStart: function(proxy, senderName, [is_requested]) {
         let source = this._ensureNotificationSource();
 
-        if (requested) {
+        if (is_requested) {
             if (this._notification)
                 this._notification.destroy();
             return;
@@ -524,10 +554,11 @@ const Indicator = new Lang.Class({
             if (this._notification === notification)
                 this._notification = null;
         }));
+
         this._notification.show();
     },
 
-    _notifyPomodoroEnd: function(proxy, senderName, [completed]) {
+    _onNotifyPomodoroEnd: function(proxy, senderName, [is_completed]) {
         let source = this._ensureNotificationSource();
         let screenNotifications = this._settings.get_child('notifications')
                                                 .get_boolean('screen-notifications');

@@ -21,34 +21,35 @@
 
 const Gio = imports.gi.Gio;
 
-const POMODORO_SERVICE_NAME = 'org.gnome.Pomodoro';
+const SERVICE_NAME = 'org.gnome.Pomodoro';
 
 const PomodoroInterface = <interface name="org.gnome.Pomodoro">
-    <property name="Elapsed" type="i" access="read"/>
-    <property name="ElapsedLimit" type="i" access="read"/>
-    <property name="SessionCount" type="i" access="read"/>
-    <property name="State" type="s" access="readwrite"/>
+    <property name="Elapsed" type="u" access="read"/>
+    <property name="ElapsedLimit" type="u" access="read"/>
+    <property name="Session" type="u" access="read"/>
+    <property name="SessionLimit" type="u" access="read"/>
+    <property name="State" type="s" access="read"/>
     <method name="Start"/>
     <method name="Stop"/>
     <method name="Reset"/>
     <signal name="ElapsedChanged">
-        <arg type="i" name="elapsed"/>
+        <arg type="u" name="elapsed"/>
     </signal>
     <signal name="StateChanged">
         <arg type="s" name="state"/>
     </signal>
     <signal name="NotifyPomodoroStart">
-        <arg type="b" name="requested"/>
+        <arg type="b" name="is_requested"/>
     </signal>
     <signal name="NotifyPomodoroEnd">
-        <arg type="b" name="completed"/>
+        <arg type="b" name="is_completed"/>
     </signal>
 </interface>;
 
 var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
 
 function Pomodoro(init_callback, cancellable) {
-    return new PomodoroProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', init_callback, cancellable);
+    return new PomodoroProxy(Gio.DBus.session, SERVICE_NAME, '/org/gnome/Pomodoro', init_callback, cancellable);
 }
 
 
@@ -63,5 +64,5 @@ const GtkActionsInterface = <interface name="org.gtk.Actions">
 var GtkActionsProxy = Gio.DBusProxy.makeProxyWrapper(GtkActionsInterface);
 
 function GtkActions(init_callback, cancellable) {
-    return new GtkActionsProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', init_callback, cancellable);
+    return new GtkActionsProxy(Gio.DBus.session, SERVICE_NAME, '/org/gnome/Pomodoro', init_callback, cancellable);
 }

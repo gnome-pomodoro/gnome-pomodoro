@@ -4,6 +4,7 @@ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 SUBDIRS = \
     egg-list-box \
+    vapi \
     src \
     extension \
     data \

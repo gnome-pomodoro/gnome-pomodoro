@@ -1,5 +1,5 @@
 # -*- mode: makefile -*-
-uuid = pomodoro@arun.codito.in
+uuid = gnome-pomodoro@arun.codito.in
 extensiondir = $(datadir)/gnome-shell/extensions/$(uuid)
 localdir = $(HOME)/.local/share/gnome-shell/extensions
 builddir = $(abs_builddir)/build
@@ -22,4 +22,5 @@ do_subst = sed -e 's|@abs_top_srcdir[@]|$(abs_top_srcdir)|g' \
                -e 's|@PACKAGE_TARNAME[@]|$(PACKAGE_TARNAME)|g' \
                -e 's|@PACKAGE_URL[@]|$(PACKAGE_URL)|g' \
                -e 's|@PACKAGE_VERSION[@]|$(PACKAGE_VERSION)|g' \
+               -e 's|@PACKAGE[@]|$(PACKAGE)|g' \
                -e 's|@UUID[@]|$(uuid)|g'

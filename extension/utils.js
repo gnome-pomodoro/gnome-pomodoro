@@ -48,8 +48,6 @@ function getExtensionPath() {
 function getSettings(schema) {
     let extension = ExtensionUtils.getCurrentExtension();
 
-    schema = schema || extension.metadata['settings-schema'];
-
     // check if this extension is installed locally, in that case it has the
     // schema files in a subfolder otherwise assume that extension has been
     // installed in the same prefix as gnome-shell (and therefore schemas are
