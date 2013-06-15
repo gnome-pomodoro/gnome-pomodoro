@@ -139,6 +139,8 @@ public class Pomodoro.Application : Gtk.Application
         this.set_app_menu (menu);
     }
 
+    private List<Object> modules;
+
     // Emitted on the primary instance immediately after registration.
     public override void startup ()
     {
@@ -156,6 +158,9 @@ public class Pomodoro.Application : Gtk.Application
             else
                 this.release (HoldReason.TIMER);
         });
+
+        this.modules = new List<Object>();
+        this.modules.prepend (new Pomodoro.Sounds (this.timer));
 
         this.timer.restore();
 

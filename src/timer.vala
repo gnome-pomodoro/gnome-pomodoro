@@ -395,7 +395,7 @@ public class Pomodoro.Timer : Object
 
         if (this._state != State.NULL)
         {
-            var is_completed = true;
+            var is_completed = false;
             var is_requested = false;
 
             if ((this._state == State.POMODORO) ||

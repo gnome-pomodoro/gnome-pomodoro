@@ -23,6 +23,7 @@ gnome_pomodoro_SOURCES = \
 	main.vala \
     resources.c \
     service.vala \
+    sounds.vala \
 	timer.vala \
 	utils.vala
 
@@ -37,7 +38,8 @@ gnome_pomodoro_VALAFLAGS = \
 	--pkg pango \
 	--pkg cairo \
 	--pkg gnome-desktop-3.0 \
-	--pkg upower-glib
+	--pkg upower-glib \
+	--pkg libcanberra
 
 gnome_pomodoro_LDFLAGS = \
 	-Wl,--export-dynamic
