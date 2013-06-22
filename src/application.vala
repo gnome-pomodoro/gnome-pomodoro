@@ -124,11 +124,17 @@ public class Pomodoro.Application : Gtk.Application
     {
     }
 
-    private void action_quit (Action action)
+    private void action_quit (SimpleAction action, Variant? parameter)
     {
-        if (this.timer != null) {
-            this.timer.destroy();
-            this.timer = null;
+        // For now application gui and the service uses same process
+        // so if service is running we don't want to close both
+        if (this.timer.state != State.NULL) {
+            foreach (var window in this.get_windows()) {
+                window.destroy();
+            }
+        }
+        else {
+            this.quit ();
         }
     }
 
@@ -140,14 +146,14 @@ public class Pomodoro.Application : Gtk.Application
 //        var about_action = new Gio.SimpleAction({ name: 'about' });
 //        about_action.connect('activate', Lang.bind(this, this._action_about));
 
-//        var quit_action = new Gio.SimpleAction({ name: 'quit' });
-//        quit_action.connect('activate', Lang.bind(this, this._action_quit));
+        var quit_action = new GLib.SimpleAction("quit", null);
+        quit_action.activate.connect (this.action_quit);
 
-//        this.add_accelerator('<Primary>q', 'app.quit', null);
+        this.add_accelerator ("<Primary>q", "app.quit", null);
 
         this.add_action (preferences_action);
 //        this.add_action(about_action);
-//        this.add_action(quit_action);
+        this.add_action (quit_action);
     }
 
     private void setup_menu ()
