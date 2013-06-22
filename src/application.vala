@@ -38,6 +38,8 @@ public class Pomodoro.Application : Gtk.Application
     public Pomodoro.Timer timer;
     public Gtk.Window window;
 
+    private Gtk.Window preferences_dialog;
+
     private int hold_reasons;
 
     // The flags can only be modified if application has not yet been registered
@@ -102,8 +104,20 @@ public class Pomodoro.Application : Gtk.Application
             }
     }
 
-    private void action_preferences (Action action)
+    private void action_preferences (SimpleAction action, Variant? parameter)
     {
+        if (this.preferences_dialog == null) {
+            this.preferences_dialog = new Pomodoro.PreferencesDialog();
+            this.preferences_dialog.destroy.connect (() => {
+                this.remove_window (this.preferences_dialog);
+                this.preferences_dialog = null;
+            });
+            this.add_window (this.preferences_dialog);
+        }
+
+        if (this.preferences_dialog != null) {
+            this.preferences_dialog.present();
+        }
     }
 
     private void action_about (Action action)
@@ -120,6 +134,20 @@ public class Pomodoro.Application : Gtk.Application
 
     private void setup_actions ()
     {
+        var preferences_action = new GLib.SimpleAction ("preferences", VariantType.STRING);
+        preferences_action.activate.connect (this.action_preferences);
+
+//        var about_action = new Gio.SimpleAction({ name: 'about' });
+//        about_action.connect('activate', Lang.bind(this, this._action_about));
+
+//        var quit_action = new Gio.SimpleAction({ name: 'quit' });
+//        quit_action.connect('activate', Lang.bind(this, this._action_quit));
+
+//        this.add_accelerator('<Primary>q', 'app.quit', null);
+
+        this.add_action (preferences_action);
+//        this.add_action(about_action);
+//        this.add_action(quit_action);
     }
 
     private void setup_menu ()
@@ -132,7 +160,7 @@ public class Pomodoro.Application : Gtk.Application
             builder.add_from_resource ("/org/gnome/pomodoro/app-menu.ui");
         }
         catch (GLib.Error error) {
-            GLib.error("Failed to load app-menu.ui from the resource file");
+            GLib.error ("Failed to load app-menu.ui from the resource file.");
         }
 
         menu = builder.get_object("app-menu") as GLib.MenuModel;

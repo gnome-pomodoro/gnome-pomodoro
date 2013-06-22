@@ -141,7 +141,7 @@ const Indicator = new Lang.Class({
 
     _showPreferences: function() {
         this._ensureActionsProxy(Lang.bind(this, function() {
-            this._actionsProxy.ActivateRemote('preferences', GLib.VariantType.new('s'), null);
+            this._actionsProxy.ActivateRemote('preferences', [GLib.Variant.new_string('timer')], null);
         }));
     },
 

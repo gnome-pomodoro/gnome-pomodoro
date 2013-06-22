@@ -1,9 +1,10 @@
 include ../Makefile.include
 
 AM_CPPFLAGS = \
-	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
-	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
-	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
+    -DGETTEXT_PACKAGE="\"$(GETTEXT_PACKAGE)\"" \
+	-DPACKAGE_LOCALE_DIR="$(localedir)" \
+	-DPACKAGE_SRC_DIR="$(srcdir)" \
+	-DPACKAGE_DATA_DIR="\"$(pkgdatadir)\"" \
 	-DGNOME_DESKTOP_USE_UNSTABLE_API \
 	$(GNOME_POMODORO_CFLAGS)
 
@@ -21,6 +22,7 @@ bin_PROGRAMS = gnome-pomodoro
 gnome_pomodoro_SOURCES = \
 	application.vala \
 	main.vala \
+	preferences-dialog.vala \
     resources.c \
     service.vala \
     sounds.vala \
