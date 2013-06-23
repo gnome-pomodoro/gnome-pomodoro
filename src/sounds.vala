@@ -133,17 +133,22 @@ internal class Pomodoro.Sounds : Object
     private string? get_file_path (string settings_key)
     {
         string uri = this.settings.get_string (settings_key);
-        string path;
+        string path = null;
 
-        try {
-            path = Filename.from_uri (uri);
-        }
-        catch (ConvertError error) {
-            path = uri;
-        }
+        if (uri != "")
+        {
+            try {
+                path = Filename.from_uri (uri);
+            }
+            catch (ConvertError error) {
+                path = uri;
+            }
 
-        if (!Path.is_absolute (path))
-            path = Path.build_filename (Config.PACKAGE_DATA_DIR, "sounds", path);
+            if (!Path.is_absolute (path)) {
+                path = Path.build_filename (Config.PACKAGE_DATA_DIR,
+                                            "sounds", path);
+            }
+        }
 
         return path;
     }
@@ -160,6 +165,8 @@ internal class Pomodoro.Sounds : Object
         if (this.context != null)
         {
             var file_path = this.get_file_path ("pomodoro-start-sound");
+            if (file_path == null)
+                return;
 
             status = this.context.play (EventType.POMODORO_START,
                     Canberra.PROP_EVENT_ID, "pomodoro-start",
@@ -182,6 +189,8 @@ internal class Pomodoro.Sounds : Object
         if (this.context != null && is_completed)
         {
             var file_path = this.get_file_path ("pomodoro-end-sound");
+            if (file_path == null)
+                return;
 
             status = this.context.play (EventType.POMODORO_END,
                     Canberra.PROP_EVENT_ID, "pomodoro-end",
