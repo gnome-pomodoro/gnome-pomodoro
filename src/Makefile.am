@@ -20,6 +20,7 @@ endif
 bin_PROGRAMS = gnome-pomodoro
 
 gnome_pomodoro_SOURCES = \
+    about-dialog.vala \
 	application.vala \
 	main.vala \
 	preferences-dialog.vala \

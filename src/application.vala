@@ -39,6 +39,7 @@ public class Pomodoro.Application : Gtk.Application
     public Gtk.Window window;
 
     private Gtk.Window preferences_dialog;
+    private Gtk.Window about_dialog;
 
     private int hold_reasons;
 
@@ -104,6 +105,12 @@ public class Pomodoro.Application : Gtk.Application
             }
     }
 
+    private unowned Gtk.Window get_last_focused_window ()
+    {
+        unowned List<weak Gtk.Window> windows = this.get_windows();
+        return windows.first().data;
+    }
+
     private void action_preferences (SimpleAction action, Variant? parameter)
     {
         if (this.preferences_dialog == null) {
@@ -120,8 +127,25 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
-    private void action_about (Action action)
+    private void action_about (SimpleAction action, Variant? parameter)
     {
+        if (this.about_dialog == null)
+        {
+            var window = this.get_last_focused_window();
+
+            this.about_dialog = new Pomodoro.AboutDialog();
+            this.about_dialog.destroy.connect (() => {
+                this.remove_window (this.about_dialog);
+                this.about_dialog = null;
+            });
+
+            if (window != null)
+                this.about_dialog.set_transient_for (window);
+
+            this.add_window (this.about_dialog);
+        }
+
+        this.about_dialog.present();
     }
 
     private void action_quit (SimpleAction action, Variant? parameter)
@@ -143,8 +167,8 @@ public class Pomodoro.Application : Gtk.Application
         var preferences_action = new GLib.SimpleAction ("preferences", VariantType.STRING);
         preferences_action.activate.connect (this.action_preferences);
 
-//        var about_action = new Gio.SimpleAction({ name: 'about' });
-//        about_action.connect('activate', Lang.bind(this, this._action_about));
+        var about_action = new GLib.SimpleAction("about", null);
+        about_action.activate.connect (this.action_about);
 
         var quit_action = new GLib.SimpleAction("quit", null);
         quit_action.activate.connect (this.action_quit);
@@ -152,7 +176,7 @@ public class Pomodoro.Application : Gtk.Application
         this.add_accelerator ("<Primary>q", "app.quit", null);
 
         this.add_action (preferences_action);
-//        this.add_action(about_action);
+        this.add_action(about_action);
         this.add_action (quit_action);
     }
 
