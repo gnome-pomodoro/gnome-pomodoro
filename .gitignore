@@ -16,8 +16,12 @@ config.log
 config.status
 config
 configure
-data/org.gnome.shell.extensions.pomodoro.gschema.valid
-data/org.gnome.shell.extensions.pomodoro.gschema.xml
+data/gnome-pomodoro.desktop
+data/org.gnome.Pomodoro.service
+data/org.gnome.pomodoro.gschema.valid
+data/org.gnome.pomodoro.gschema.xml
+egg-list-box/*.gir
+egg-list-box/*.typelib
 extension/metadata.json
 extension/Makefile
 extension/Makefile.in
@@ -37,15 +41,20 @@ po/Makevars.template
 po/POTFILES
 po/Rules-quot
 po/stamp-it
+src/*.c
 src/*.gir
+src/*.h
 src/*.typelib
 src/config.js
 src/Makefile
 src/Makefile.in
 stamp-h1
+vapi/gnome-desktop-3.0.vapi
+vapi/upower-glib.vapi
 xmldocs.make
 *~
 *.patch
+*.stamp
 *.sw?
 
 Build/*
