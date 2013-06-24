@@ -22,6 +22,7 @@ bin_PROGRAMS = gnome-pomodoro
 gnome_pomodoro_SOURCES = \
     about-dialog.vala \
 	application.vala \
+	command-line.vala \
 	main.vala \
 	preferences-dialog.vala \
     resources.c \

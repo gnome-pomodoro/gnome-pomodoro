@@ -21,68 +21,46 @@
 
 using GLib;
 
-internal class Pomodoro.Main
+public int main (string[] args)
 {
-    static bool no_default_window;
+    Pomodoro.Application application;
+    Pomodoro.CommandLine command_line;
+    int exit_status = 0;
 
-	const OptionEntry[] options = {
-		{ "no-default-window", 0, 0, OptionArg.NONE, ref no_default_window,
-		  "Run as background service", null},
-		{ null }
-	};
+    GLib.Environment.set_application_name (Config.PACKAGE);
+
+    #if ENABLE_NLS
+        Intl.bindtextdomain (Config.GETTEXT_PACKAGE,
+                             Config.PACKAGE_LOCALE_DIR);
+        Intl.textdomain (Config.GETTEXT_PACKAGE);
+    #endif
+
+    Gtk.init (ref args);
 
 
-    public static int main (string[] args)
+    command_line = new Pomodoro.CommandLine();
+
+    // Arguments are also parsed by application.command_line signal handler,
+    // so here we work on a copy. Though parsed arguments should be freed.
+    if (command_line.parse (args))
     {
-        Pomodoro.Application application;
-        GLib.OptionContext   option_context;
-        int                  status = 0;
-
-        GLib.Environment.set_application_name (Config.PACKAGE);
-
-        #if ENABLE_NLS
-            Intl.bindtextdomain (Config.GETTEXT_PACKAGE,
-                                 Config.PACKAGE_LOCALE_DIR);
-            Intl.textdomain (Config.GETTEXT_PACKAGE);
-        #endif
-
-        Gtk.init (ref args);
-
-        /* Setup command line options */
-        option_context = new GLib.OptionContext ("- A simple pomodoro timer");
-        option_context.set_help_enabled (true);
-        option_context.add_group (Gtk.get_option_group (true));
-        option_context.add_main_entries (options, Config.GETTEXT_PACKAGE);
-
-		try {
-			if (!option_context.parse(ref args)) {
-				return 1;
-			}
-		}
-		catch (GLib.OptionError e) {
-            stdout.printf ("Could not parse arguments: %s\n", e.message);
-			stdout.printf ("Run '%s --help' to see a full list of available command line options.\n", args[0]);
-			return 1;
-		}
-
         application = new Pomodoro.Application();
+        application.is_service = command_line.no_default_window;
         application.set_default();
 
-        if (no_default_window) {
-            application.is_service = true;
-        }
-
         try {
-            if (application.register ()) {
-                status = application.run (args);
-            }
+            if (application.register())
+                exit_status = application.run (args);
         }
         catch (Error e) {
             GLib.critical ("%s", e.message);
-            status = 1;
+            exit_status = 1;
         }
-
-        return status;
     }
+    else {
+        exit_status = 1;
+    }
+
+    return exit_status;
 }
 

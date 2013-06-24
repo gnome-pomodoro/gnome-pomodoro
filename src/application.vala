@@ -67,7 +67,8 @@ public class Pomodoro.Application : Gtk.Application
 
     public Application ()
     {
-        GLib.Object (application_id: "org.gnome.Pomodoro");
+        GLib.Object (application_id: "org.gnome.Pomodoro",
+                     flags: GLib.ApplicationFlags.HANDLES_COMMAND_LINE);
 
         /* register with session manager */
         this.register_session = true;
@@ -223,6 +224,38 @@ public class Pomodoro.Application : Gtk.Application
         this.timer.restore();
 
         this.setup_menu ();
+    }
+
+    private int do_command_line (ApplicationCommandLine command_line)
+    {
+        var arguments = new CommandLine();
+
+        if (arguments.parse (command_line.get_arguments ()))
+        {
+            if (arguments.preferences)
+                this.activate_action ("preferences", "");
+
+            if (arguments.no_default_window)
+                this.hold (HoldReason.SERVICE);
+
+            if (!arguments.preferences && !arguments.no_default_window)
+                this.activate();
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    public override int command_line (ApplicationCommandLine command_line)
+    {
+        int status = 0;
+
+        this.hold();
+        status = this.do_command_line (command_line);
+        this.release();
+
+        return status;
     }
 
     // Save the state before exit.
