@@ -75,7 +75,7 @@ internal class Pomodoro.Sounds : Object
                 file_path = this.get_file_path ("pomodoro-end-sound");
                 this.ensure_context();
 
-                if (this.context != null) {
+                if (this.context != null && file_path != null) {
                     status = this.context.cache(
                             Canberra.PROP_EVENT_ID, "pomodoro-end",
                             Canberra.PROP_MEDIA_FILENAME, file_path);
@@ -88,7 +88,7 @@ internal class Pomodoro.Sounds : Object
                 file_path = this.get_file_path ("pomodoro-start-sound");
                 this.ensure_context();
 
-                if (this.context != null) {
+                if (this.context != null && file_path != null) {
                     status = this.context.cache(
                             Canberra.PROP_EVENT_ID, "pomodoro-start",
                             Canberra.PROP_MEDIA_FILENAME, file_path);

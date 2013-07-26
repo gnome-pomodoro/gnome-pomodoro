@@ -23,13 +23,15 @@ gnome_pomodoro_SOURCES = \
     about-dialog.vala \
     application.vala \
     command-line.vala \
+    keybindings.vala \
     main.vala \
     preferences-dialog.vala \
     resources.c \
     service.vala \
     sounds.vala \
     timer.vala \
-    utils.vala
+    utils.vala \
+    widgets.vala
 
 gnome_pomodoro_VALAFLAGS = \
     --vapidir=$(srcdir)/../vapi \
@@ -50,8 +52,9 @@ gnome_pomodoro_VALAFLAGS = \
 gnome_pomodoro_LDFLAGS = \
     -Wl,--export-dynamic
 
+# FIXME: include libm more gracefully
 gnome_pomodoro_LDADD = \
-    $(GNOME_POMODORO_LIBS)
+    $(GNOME_POMODORO_LIBS) -lm
 
 BUILT_SOURCES = \
     resources.c \

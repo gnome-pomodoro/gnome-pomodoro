@@ -72,5 +72,25 @@ namespace Pomodoro
     {
         return datetime.to_utc().format (DATETIME_FORMAT_RFC_2822);
     }
+
+    internal string format_time (long seconds)
+    {
+        var minutes = (seconds / 60) % 60;
+        var hours = (seconds / 3600);
+        var str = "";
+
+        if (hours > 0)
+            str = ngettext ("%d hour", "%d hours", hours)
+                            .printf (hours);
+
+        if (minutes > 0 && str != null)
+            str += " ";
+
+        if (minutes > 0)
+            str += ngettext ("%d minute", "%d minutes", minutes)
+                            .printf (minutes);
+
+        return str;
+    }
 }
 

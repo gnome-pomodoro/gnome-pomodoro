@@ -1,6 +1,6 @@
 .pomodoro-toolbar.toolbar {
     border-style: solid;
-    border-color: @borders;
+    border-color: @border_color;
     border-width: 0px 0px 1px 0px;
     border-radius: 0px;
 }
@@ -33,21 +33,35 @@
 }
 
 .pomodoro-window {
-    background-color: #f1f2f1
 }
 
-.section-header {
+.preferences-dialog {
+}
+
+.preferences-dialog EggListBox {
+    -GtkWidget-focus-line-width: 0;
+    -GtkWidget-focus-padding: 0;
+}
+
+.preferences-dialog .list {
+    background-color: @base_color;
+}
+
+.preferences-dialog .list-section-label {
+    color: #888;
     font-weight: bold;
+    text-shadow: 1px 1px #EEEEEE;
+    padding-top: 20pt;
+    padding-bottom: 5px;
 }
 
-.list {
-    background-color: @background;
+.preferences-dialog .list-section-label.first {
+    padding-top: 0px;
 }
 
-.list-item {
-    padding-top: 6px;
-    padding-bottom: 6px;
-    padding-left: 12px;
-    padding-right: 12px;
+.preferences-dialog .list-label {
+}
+
+.preferences-dialog .list-item {
 }
 
