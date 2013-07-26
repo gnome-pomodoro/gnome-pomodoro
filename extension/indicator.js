@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const Lang = imports.lang;
+const Mainloop = imports.mainloop;
 
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
@@ -76,53 +77,56 @@ const Indicator = new Lang.Class({
     _init: function() {
         this.parent(St.Align.START);
 
-        this._state = State.NULL;
-        this._proxy = null;
-
-        this._nameWatcherId = Gio.DBus.session.watch_name(
-                                    DBus.SERVICE_NAME,
-                                    Gio.BusNameWatcherFlags.AUTO_START,
-                                    Lang.bind(this, this._onNameAppeared),
-                                    Lang.bind(this, this._onNameVanished));
+        this._initialized = false;
         this._propertiesChangedId = 0;
         this._notifyPomodoroStartId = 0;
         this._notifyPomodoroEndId = 0;
         this._notificationDialog = null;
         this._notification = null;
-
-        this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
-
-        let children = ['timer', 'sounds', 'presence', 'notifications'];
-        for (childId in children) {
-            this._settings.get_child(children[childId]).connect('changed', Lang.bind(this, this._onSettingsChanged));
-        }
+        this._settings = null;
+        this._state = State.NULL;
+        this._proxy = null;
 
         // Timer label
         this.label = new St.Label({ opacity: FADE_OPACITY,
                                     style_class: 'extension-pomodoro-label' });
         this.label.clutter_text.set_line_wrap(false);
         this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
-
         this.actor.add_actor(this.label);
 
         // Toggle timer state button
-        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Timer"), false, { style_class: 'extension-pomodoro-toggle' });
+        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'extension-pomodoro-toggle' });
         this._timerToggle.connect('toggled', Lang.bind(this, this.toggle));
         this.menu.addMenuItem(this._timerToggle);
 
         // Separator
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-        // Options SubMenu
-        this._optionsMenu = new PopupMenu.PopupSubMenuMenuItem(_("Options"));
-        this._buildOptionsMenu();
+//        // Options SubMenu
+//        this._optionsMenu = new PopupMenu.PopupSubMenuMenuItem(_("Options"));
+//        this._buildOptionsMenu();
 //        this.menu.addMenuItem(this._optionsMenu);
 
         // Settings
-        this._settingsButton = new PopupMenu.PopupMenuItem(_("Pomodoro Settings"));
+        this._settingsButton = new PopupMenu.PopupMenuItem(_("Preferences"));
         this._settingsButton.connect('activate', Lang.bind(this, this._showPreferences));
         this.menu.addMenuItem(this._settingsButton);
 
+        this.menu.actor.connect('notify::visible', Lang.bind(this, this.refresh));
+
+        // We can init most of the stuff later
+        //Mainloop.idle_add(Lang.bind(this, this._doInit));
+        //this.refresh();
+        this._doInit();
+    },
+
+    _doInit: function() {
+        this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
+
+        let children = ['timer', 'sounds', 'presence', 'notifications'];
+        for (childId in children) {
+            this._settings.get_child(children[childId]).connect('changed', Lang.bind(this, this._onSettingsChanged));
+        }
 
         // Register keybindings to toggle
         Main.wm.addKeybinding('toggle-timer',
@@ -131,12 +135,20 @@ const Indicator = new Lang.Class({
                               Shell.KeyBindingMode.ALL,
                               Lang.bind(this, this.toggle));
 
-        this.menu.actor.connect('notify::visible', Lang.bind(this, this.refresh));
+        this._nameWatcherId = Gio.DBus.session.watch_name(
+                                    DBus.SERVICE_NAME,
+                                    Gio.BusNameWatcherFlags.AUTO_START,
+                                    Lang.bind(this, this._onNameAppeared),
+                                    Lang.bind(this, this._onNameVanished));
 
         this._onSettingsChanged();
         this._ensureProxy();
 
+        this._initialized = true;
+
         this.refresh();
+
+        return false;
     },
 
     _showPreferences: function() {
@@ -145,112 +157,112 @@ const Indicator = new Lang.Class({
         }));
     },
 
-    _buildOptionsMenu: function() {
-        // Reset counters
-        this._resetCountButton =  new PopupMenu.PopupMenuItem(_("Reset Counts and Timer"));
-        this._resetCountButton.connect('activate', Lang.bind(this, this.reset));
-        this._optionsMenu.menu.addMenuItem(this._resetCountButton);
-
-        // Presence status toggle
-        this._changePresenceStatusToggle = new PopupMenu.PopupSwitchMenuItem(_("Control Presence Status"));
-        this._changePresenceStatusToggle.connect('toggled', Lang.bind(this, function(item) {
-            this._settings.get_child('presence').set_boolean('enabled', item.state);
-        }));
-        this._optionsMenu.menu.addMenuItem(this._changePresenceStatusToggle);
-
-        // Notification dialog toggle
-        this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Fullscreen Notifications"));
-        this._showDialogsToggle.connect('toggled', Lang.bind(this, function(item) {
-            this._settings.get_child('notifications').set_boolean('screen-notifications', item.state);
-            if (this._notificationDialog)
-                this._notificationDialog.setOpenWhenIdle(item.state);
-        }));
-        this._optionsMenu.menu.addMenuItem(this._showDialogsToggle);
-
-        // Notify with a sound toggle
-        this._playSoundsToggle = new PopupMenu.PopupSwitchMenuItem(_("Sound Notifications"));
-        this._playSoundsToggle.connect('toggled', Lang.bind(this, function(item) {
-            this._settings.get_child('sounds').set_boolean('enabled', item.state);
-        }));
-        this._optionsMenu.menu.addMenuItem(this._playSoundsToggle);
-
-        // Pomodoro duration
-        this._pomodoroTimeTitle = new PopupMenu.PopupMenuItem(_("Pomodoro Duration"), { reactive: false });
-        this._pomodoroTimeLabel = new St.Label({ text: '' });
-        this._pomodoroTimeSlider = new PopupMenu.PopupSliderMenuItem(0);
-        this._pomodoroTimeSlider.connect('value-changed', Lang.bind(this, function(item) {
-            this._pomodoroTimeLabel.set_text(_formatTime(_valueToSeconds(item.value)));
-        }));
-        this._pomodoroTimeSlider.connect('drag-end', Lang.bind(this, this._onPomodoroTimeChanged));
-        this._pomodoroTimeSlider.actor.connect('scroll-event', Lang.bind(this, this._onPomodoroTimeChanged));
-        this._pomodoroTimeTitle.addActor(this._pomodoroTimeLabel, { align: St.Align.END });
-        this._optionsMenu.menu.addMenuItem(this._pomodoroTimeTitle);
-        this._optionsMenu.menu.addMenuItem(this._pomodoroTimeSlider);
-
-        // Short pause duration
-        this._shortPauseTimeTitle = new PopupMenu.PopupMenuItem(_("Short Break Duration"), { reactive: false });
-        this._shortPauseTimeLabel = new St.Label({ text: '' });
-        this._shortPauseTimeSlider = new PopupMenu.PopupSliderMenuItem(0);
-        this._shortPauseTimeSlider.connect('value-changed', Lang.bind(this, function(item) {
-            this._shortPauseTimeLabel.set_text(_formatTime(_valueToSeconds(item.value)));
-            if (item.value > this._longPauseTimeValue) {
-                this._longPauseTimeLabel.set_text(this._shortPauseTimeLabel.text);
-                this._longPauseTimeSlider.setValue(this._shortPauseTimeSlider.value);
-            }
-            else if (this._longPauseTimeSlider.value != this._longPauseTimeValue) {
-                this._longPauseTimeLabel.set_text(this._longPauseTimeText);
-                this._longPauseTimeSlider.setValue(this._longPauseTimeValue);
-            }
-        }));
-        this._shortPauseTimeSlider.connect('drag-end', Lang.bind(this, this._onShortPauseTimeChanged));
-        this._shortPauseTimeSlider.actor.connect('scroll-event', Lang.bind(this, this._onShortPauseTimeChanged));
-        this._shortPauseTimeTitle.addActor(this._shortPauseTimeLabel, { align: St.Align.END });
-        this._optionsMenu.menu.addMenuItem(this._shortPauseTimeTitle);
-        this._optionsMenu.menu.addMenuItem(this._shortPauseTimeSlider);
-
-        // Long pause duration
-        this._longPauseTimeTitle = new PopupMenu.PopupMenuItem(_("Long Break Duration"), { reactive: false });
-        this._longPauseTimeLabel = new St.Label({ text: '' });
-        this._longPauseTimeSlider = new PopupMenu.PopupSliderMenuItem(0);
-        this._longPauseTimeSlider.connect('value-changed', Lang.bind(this, function(item) {
-            this._longPauseTimeLabel.set_text(_formatTime(_valueToSeconds(item.value)));
-            if (this._shortPauseTimeValue > item.value) {
-                this._shortPauseTimeLabel.set_text(this._longPauseTimeLabel.text);
-                this._shortPauseTimeSlider.setValue(this._longPauseTimeSlider.value);
-            }
-            else if (this._shortPauseTimeSlider.value != this._shortPauseTimeValue) {
-                this._shortPauseTimeLabel.set_text(this._shortPauseTimeText);
-                this._shortPauseTimeSlider.setValue(this._shortPauseTimeValue);
-            }
-        }));
-        this._longPauseTimeSlider.connect('drag-end', Lang.bind(this, this._onLongPauseTimeChanged));
-        this._longPauseTimeSlider.actor.connect('scroll-event', Lang.bind(this, this._onLongPauseTimeChanged));
-        this._longPauseTimeTitle.addActor(this._longPauseTimeLabel, { align: St.Align.END });
-        this._optionsMenu.menu.addMenuItem(this._longPauseTimeTitle);
-        this._optionsMenu.menu.addMenuItem(this._longPauseTimeSlider);
-    },
+//    _buildOptionsMenu: function() {
+//        // Reset counters
+//        this._resetCountButton =  new PopupMenu.PopupMenuItem(_("Reset Counts and Timer"));
+//        this._resetCountButton.connect('activate', Lang.bind(this, this.reset));
+//        this._optionsMenu.menu.addMenuItem(this._resetCountButton);
+//
+//        // Presence status toggle
+//        this._changePresenceStatusToggle = new PopupMenu.PopupSwitchMenuItem(_("Control Presence Status"));
+//        this._changePresenceStatusToggle.connect('toggled', Lang.bind(this, function(item) {
+//            this._settings.get_child('presence').set_boolean('enabled', item.state);
+//        }));
+//        this._optionsMenu.menu.addMenuItem(this._changePresenceStatusToggle);
+//
+//        // Notification dialog toggle
+//        this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Fullscreen Notifications"));
+//        this._showDialogsToggle.connect('toggled', Lang.bind(this, function(item) {
+//            this._settings.get_child('notifications').set_boolean('screen-notifications', item.state);
+//            if (this._notificationDialog)
+//                this._notificationDialog.setOpenWhenIdle(item.state);
+//        }));
+//        this._optionsMenu.menu.addMenuItem(this._showDialogsToggle);
+//
+//        // Notify with a sound toggle
+//        this._playSoundsToggle = new PopupMenu.PopupSwitchMenuItem(_("Sound Notifications"));
+//        this._playSoundsToggle.connect('toggled', Lang.bind(this, function(item) {
+//            this._settings.get_child('sounds').set_boolean('enabled', item.state);
+//        }));
+//        this._optionsMenu.menu.addMenuItem(this._playSoundsToggle);
+//
+//        // Pomodoro duration
+//        this._pomodoroTimeTitle = new PopupMenu.PopupMenuItem(_("Pomodoro Duration"), { reactive: false });
+//        this._pomodoroTimeLabel = new St.Label({ text: '' });
+//        this._pomodoroTimeSlider = new PopupMenu.PopupSliderMenuItem(0);
+//        this._pomodoroTimeSlider.connect('value-changed', Lang.bind(this, function(item) {
+//            this._pomodoroTimeLabel.set_text(_formatTime(_valueToSeconds(item.value)));
+//        }));
+//        this._pomodoroTimeSlider.connect('drag-end', Lang.bind(this, this._onPomodoroTimeChanged));
+//        this._pomodoroTimeSlider.actor.connect('scroll-event', Lang.bind(this, this._onPomodoroTimeChanged));
+//        this._pomodoroTimeTitle.addActor(this._pomodoroTimeLabel, { align: St.Align.END });
+//        this._optionsMenu.menu.addMenuItem(this._pomodoroTimeTitle);
+//        this._optionsMenu.menu.addMenuItem(this._pomodoroTimeSlider);
+//
+//        // Short pause duration
+//        this._shortPauseTimeTitle = new PopupMenu.PopupMenuItem(_("Short Break Duration"), { reactive: false });
+//        this._shortPauseTimeLabel = new St.Label({ text: '' });
+//        this._shortPauseTimeSlider = new PopupMenu.PopupSliderMenuItem(0);
+//        this._shortPauseTimeSlider.connect('value-changed', Lang.bind(this, function(item) {
+//            this._shortPauseTimeLabel.set_text(_formatTime(_valueToSeconds(item.value)));
+//            if (item.value > this._longPauseTimeValue) {
+//                this._longPauseTimeLabel.set_text(this._shortPauseTimeLabel.text);
+//                this._longPauseTimeSlider.setValue(this._shortPauseTimeSlider.value);
+//            }
+//            else if (this._longPauseTimeSlider.value != this._longPauseTimeValue) {
+//                this._longPauseTimeLabel.set_text(this._longPauseTimeText);
+//                this._longPauseTimeSlider.setValue(this._longPauseTimeValue);
+//            }
+//        }));
+//        this._shortPauseTimeSlider.connect('drag-end', Lang.bind(this, this._onShortPauseTimeChanged));
+//        this._shortPauseTimeSlider.actor.connect('scroll-event', Lang.bind(this, this._onShortPauseTimeChanged));
+//        this._shortPauseTimeTitle.addActor(this._shortPauseTimeLabel, { align: St.Align.END });
+//        this._optionsMenu.menu.addMenuItem(this._shortPauseTimeTitle);
+//        this._optionsMenu.menu.addMenuItem(this._shortPauseTimeSlider);
+//
+//        // Long pause duration
+//        this._longPauseTimeTitle = new PopupMenu.PopupMenuItem(_("Long Break Duration"), { reactive: false });
+//        this._longPauseTimeLabel = new St.Label({ text: '' });
+//        this._longPauseTimeSlider = new PopupMenu.PopupSliderMenuItem(0);
+//        this._longPauseTimeSlider.connect('value-changed', Lang.bind(this, function(item) {
+//            this._longPauseTimeLabel.set_text(_formatTime(_valueToSeconds(item.value)));
+//            if (this._shortPauseTimeValue > item.value) {
+//                this._shortPauseTimeLabel.set_text(this._longPauseTimeLabel.text);
+//                this._shortPauseTimeSlider.setValue(this._longPauseTimeSlider.value);
+//            }
+//            else if (this._shortPauseTimeSlider.value != this._shortPauseTimeValue) {
+//                this._shortPauseTimeLabel.set_text(this._shortPauseTimeText);
+//                this._shortPauseTimeSlider.setValue(this._shortPauseTimeValue);
+//            }
+//        }));
+//        this._longPauseTimeSlider.connect('drag-end', Lang.bind(this, this._onLongPauseTimeChanged));
+//        this._longPauseTimeSlider.actor.connect('scroll-event', Lang.bind(this, this._onLongPauseTimeChanged));
+//        this._longPauseTimeTitle.addActor(this._longPauseTimeLabel, { align: St.Align.END });
+//        this._optionsMenu.menu.addMenuItem(this._longPauseTimeTitle);
+//        this._optionsMenu.menu.addMenuItem(this._longPauseTimeSlider);
+//    },
 
     _onSettingsChanged: function() {
-        this._showDialogsToggle.setToggleState(
-                                this._settings.get_child('notifications').get_boolean('screen-notifications'));
-        this._changePresenceStatusToggle.setToggleState(
-                                this._settings.get_child('presence').get_boolean('enabled'));
-        this._playSoundsToggle.setToggleState(
-                                this._settings.get_child('sounds').get_boolean('enabled'));
+//        this._showDialogsToggle.setToggleState(
+//                                this._settings.get_child('notifications').get_boolean('screen-notifications'));
+//        this._changePresenceStatusToggle.setToggleState(
+//                                this._settings.get_child('presence').get_boolean('enabled'));
+//        this._playSoundsToggle.setToggleState(
+//                                this._settings.get_child('sounds').get_boolean('enabled'));
 
-        this._pomodoroTimeSlider.setValue(_secondsToValue(this._settings.get_child('timer').get_uint('pomodoro-time')));
-        this._pomodoroTimeLabel.set_text(_formatTime(_valueToSeconds(this._pomodoroTimeSlider.value)));
+//        this._pomodoroTimeSlider.setValue(_secondsToValue(this._settings.get_child('timer').get_uint('pomodoro-time')));
+//        this._pomodoroTimeLabel.set_text(_formatTime(_valueToSeconds(this._pomodoroTimeSlider.value)));
 
-        this._shortPauseTimeSlider.setValue(_secondsToValue(this._settings.get_child('timer').get_uint('short-pause-time')));
-        this._shortPauseTimeLabel.set_text(_formatTime(_valueToSeconds(this._shortPauseTimeSlider.value)));
+//        this._shortPauseTimeSlider.setValue(_secondsToValue(this._settings.get_child('timer').get_uint('short-pause-time')));
+//        this._shortPauseTimeLabel.set_text(_formatTime(_valueToSeconds(this._shortPauseTimeSlider.value)));
 
-        this._longPauseTimeSlider.setValue(_secondsToValue(this._settings.get_child('timer').get_uint('long-pause-time')));
-        this._longPauseTimeLabel.set_text(_formatTime(_valueToSeconds(this._longPauseTimeSlider.value)));
+//        this._longPauseTimeSlider.setValue(_secondsToValue(this._settings.get_child('timer').get_uint('long-pause-time')));
+//        this._longPauseTimeLabel.set_text(_formatTime(_valueToSeconds(this._longPauseTimeSlider.value)));
 
-        this._shortPauseTimeValue = this._shortPauseTimeSlider.value;
-        this._shortPauseTimeText  = this._shortPauseTimeLabel.text;
-        this._longPauseTimeValue  = this._longPauseTimeSlider.value;
-        this._longPauseTimeText   = this._longPauseTimeLabel.text;
+//        this._shortPauseTimeValue = this._shortPauseTimeSlider.value;
+//        this._shortPauseTimeText  = this._shortPauseTimeLabel.text;
+//        this._longPauseTimeValue  = this._longPauseTimeSlider.value;
+//        this._longPauseTimeText   = this._longPauseTimeLabel.text;
 
         if (this._reminder && !this._settings.get_child('notifications').get_boolean('reminders'))
             this._reminder.destroy();
@@ -261,31 +273,31 @@ const Indicator = new Lang.Class({
         }
     },
 
-    _onPomodoroTimeChanged: function() {
-        this._settings.get_child('timer').set_uint('pomodoro-time', _valueToSeconds(this._pomodoroTimeSlider.value));
-    },
+//    _onPomodoroTimeChanged: function() {
+//        this._settings.get_child('timer').set_uint('pomodoro-time', _valueToSeconds(this._pomodoroTimeSlider.value));
+//    },
 
-    _onShortPauseTimeChanged: function() {
-        let seconds = _valueToSeconds(this._shortPauseTimeSlider.value);
+//    _onShortPauseTimeChanged: function() {
+//        let seconds = _valueToSeconds(this._shortPauseTimeSlider.value);
+//
+//        if (this._shortPauseTimeSlider.value > this._longPauseTimeValue) {
+//            this._longPauseTimeLabel.set_text(this._shortPauseTimeLabel.text);
+//            this._longPauseTimeSlider.setValue(this._shortPauseTimeSlider.value);
+//            this._settings.get_child('timer').set_uint('long-pause-time', seconds);
+//        }
+//        this._settings.get_child('timer').set_uint('short-pause-time', seconds);
+//    },
 
-        if (this._shortPauseTimeSlider.value > this._longPauseTimeValue) {
-            this._longPauseTimeLabel.set_text(this._shortPauseTimeLabel.text);
-            this._longPauseTimeSlider.setValue(this._shortPauseTimeSlider.value);
-            this._settings.get_child('timer').set_uint('long-pause-time', seconds);
-        }
-        this._settings.get_child('timer').set_uint('short-pause-time', seconds);
-    },
-
-    _onLongPauseTimeChanged: function() {
-        let seconds = _valueToSeconds(this._longPauseTimeSlider.value);
-
-        if (this._shortPauseTimeValue > this._longPauseTimeSlider.value) {
-            this._shortPauseTimeLabel.set_text(this._longPauseTimeLabel.text);
-            this._shortPauseTimeSlider.setValue(this._longPauseTimeSlider.value);
-            this._settings.get_child('timer').set_uint('short-pause-time', seconds);
-        }
-        this._settings.get_child('timer').set_uint('long-pause-time', seconds);
-    },
+//    _onLongPauseTimeChanged: function() {
+//        let seconds = _valueToSeconds(this._longPauseTimeSlider.value);
+//
+//        if (this._shortPauseTimeValue > this._longPauseTimeSlider.value) {
+//            this._shortPauseTimeLabel.set_text(this._longPauseTimeLabel.text);
+//            this._shortPauseTimeSlider.setValue(this._longPauseTimeSlider.value);
+//            this._settings.get_child('timer').set_uint('short-pause-time', seconds);
+//        }
+//        this._settings.get_child('timer').set_uint('long-pause-time', seconds);
+//    },
 
     _getPreferredWidth: function(actor, forHeight, alloc) {
         let theme_node = actor.get_theme_node();
@@ -317,7 +329,7 @@ const Indicator = new Lang.Class({
         let state = this._proxy ? this._proxy.State : null;
         let toggled = state !== null && state !== State.NULL;
 
-        if (this._state !== state) {
+        if (this._state !== state && this._initialized) {
             if (state == State.POMODORO || state == State.IDLE)
                 Tweener.addTween(this.label,
                                  { opacity: 255,
