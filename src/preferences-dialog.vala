@@ -377,17 +377,31 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.contents.add (
             this.create_field (_("Start of pomodoro sound"), pomodoro_start_sound));
 
-        pomodoro_start_sound.add_bookmark (
-                _("Bell"),
-                File.new_for_uri ("file:///usr/share/sounds/freedesktop/stereo/bell.oga"));
+        var default_sound_file_uri = GLib.Path.build_filename (
+                "file://",
+                Config.PACKAGE_DATA_DIR,
+                "sounds",
+                "pomodoro-start.wav");
 
         pomodoro_start_sound.add_bookmark (
-                _("Complete"),
-                File.new_for_uri ("file:///usr/share/sounds/freedesktop/stereo/complete.oga"));
+                _("(None)"),
+                File.new_for_uri (""));
+
+        pomodoro_start_sound.add_bookmark (
+                _("Bell"),
+                File.new_for_uri (default_sound_file_uri));
 
         var pomodoro_end_sound = new Pomodoro.SoundChooserButton ();
         this.contents.add (
             this.create_field (_("Start of break sound"), pomodoro_end_sound));
+
+        pomodoro_end_sound.add_bookmark (
+                _("(None)"),
+                File.new_for_uri (""));
+
+        pomodoro_end_sound.add_bookmark (
+                _("Bell"),
+                File.new_for_uri (default_sound_file_uri));
 
         this.notifications_settings.bind ("screen-notifications",
                                           notifications_toggle,
