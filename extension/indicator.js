@@ -99,18 +99,14 @@ const Indicator = new Lang.Class({
         this._timerToggle.connect('toggled', Lang.bind(this, this.toggle));
         this.menu.addMenuItem(this._timerToggle);
 
-        // Separator
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-
 //        // Options SubMenu
 //        this._optionsMenu = new PopupMenu.PopupSubMenuMenuItem(_("Options"));
 //        this._buildOptionsMenu();
 //        this.menu.addMenuItem(this._optionsMenu);
 
         // Settings
-        this._settingsButton = new PopupMenu.PopupMenuItem(_("Preferences"));
-        this._settingsButton.connect('activate', Lang.bind(this, this._showPreferences));
-        this.menu.addMenuItem(this._settingsButton);
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        this.menu.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
 
         this.menu.actor.connect('notify::visible', Lang.bind(this, this.refresh));
 
@@ -152,7 +148,16 @@ const Indicator = new Lang.Class({
     },
 
     _showPreferences: function() {
+        Main.overview.hide();
+
         this._ensureActionsProxy(Lang.bind(this, function() {
+            //let app = Shell.AppSystem.get_default().lookup_app('gnome-pomodoro.desktop');
+            //
+            //if (app)
+            //    app.activate();
+            //else
+            //   log('Pomodoro: App could not be found.');
+
             this._actionsProxy.ActivateRemote('preferences', [GLib.Variant.new_string('timer')], null);
         }));
     },

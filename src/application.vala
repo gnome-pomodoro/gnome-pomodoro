@@ -124,7 +124,25 @@ public class Pomodoro.Application : Gtk.Application
         }
 
         if (this.preferences_dialog != null) {
-            this.preferences_dialog.present();
+            this.preferences_dialog.present ();
+
+            /* FIXME
+             * It looks like there is a bug gtk/gnome-shell/mutter when calling
+             * window.present() - after user activates menu item in gnome-shell
+             * window should be brought to front.
+             *
+             * The present() method presents a window to the user. This may mean
+             * raising the window in the stacking order, deiconifying it, moving
+             * it to the current desktop, and/or giving it the keyboard focus,
+             * possibly dependent on the user's platform, window manager, and
+             * preferences. If the window is hidden, this method calls the the
+             * gtk.Widget.show() method as well. This method should be used when
+             * the user tries to open a window that's already open. Say for
+             * example the preferences dialog is currently open, and the user
+             * chooses Preferences from the menu a second time; use the
+             * present() method to move the already-open dialog where the user
+             * can see it.
+             */
         }
     }
 
