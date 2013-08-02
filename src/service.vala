@@ -29,11 +29,11 @@ public class Pomodoro.Service : Object
     private HashTable<string, Variant> changed_properties;
     private uint idle_id;
 
-    public uint elapsed {
+    public uint64 elapsed {
         get { return this.timer.elapsed; }
     }
 
-    public uint elapsed_limit {
+    public uint64 elapsed_limit {
         get { return this.timer.elapsed_limit; }
     }
 
@@ -141,12 +141,12 @@ public class Pomodoro.Service : Object
         {
             case "elapsed":
                 this.send_property_changed ("Elapsed",
-                                            new Variant.uint32 (this.elapsed));
+                                            new Variant.uint64 (this.elapsed));
                 break;
 
             case "elapsed-limit":
                 this.send_property_changed ("ElapsedLimit",
-                                            new Variant.uint32 (this.elapsed_limit));
+                                            new Variant.uint64 (this.elapsed_limit));
                 break;
 
             case "session":
@@ -166,7 +166,7 @@ public class Pomodoro.Service : Object
         }
     }
 
-    public signal void elapsed_changed (uint elapsed);
+    public signal void elapsed_changed (uint64 elapsed);
     public signal void state_changed (string state);
     public signal void notify_pomodoro_end (bool is_requested);
     public signal void notify_pomodoro_start (bool is_completed);
