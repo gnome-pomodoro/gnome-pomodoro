@@ -65,6 +65,7 @@ PANGO_MIN_VERSION=1.34.0
 GNOME_DESKTOP_MIN_VERSION=3.8.0
 UPOWER_GLIB_MIN_VERSION=0.9.20
 CANBERRA_MIN_VERSION=0.30
+GSTREAMER_MIN_VERSION=0.10
 
 PKG_CHECK_MODULES(GNOME_POMODORO,
                   gio-2.0 >= $GLIB_MIN_VERSION
@@ -76,8 +77,9 @@ PKG_CHECK_MODULES(GNOME_POMODORO,
                   clutter-gtk-1.0 >= $CLUTTER_GTK_MIN_VERSION
                   pango >= $PANGO_MIN_VERSION
                   gnome-desktop-3.0 >= $GNOME_DESKTOP_MIN_VERSION
-                  upower-glib >= UPOWER_GLIB_MIN_VERSION
+                  upower-glib >= $UPOWER_GLIB_MIN_VERSION
                   libcanberra >= $CANBERRA_MIN_VERSION
+                  gstreamer-0.10 >= $GSTREAMER_MIN_VERSION
                   )
 
 # egg-list-box

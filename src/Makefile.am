@@ -21,6 +21,7 @@ bin_PROGRAMS = gnome-pomodoro
 gnome_pomodoro_SOURCES = \
     $(srcdir)/../egg-list-box/egg-list-box.c \
     about-dialog.vala \
+    animation.vala \
     application.vala \
     command-line.vala \
     keybindings.vala \
@@ -47,7 +48,8 @@ gnome_pomodoro_VALAFLAGS = \
     --pkg gnome-desktop-3.0 \
     --pkg upower-glib \
     --pkg libcanberra \
-    --pkg egglistbox
+    --pkg egglistbox \
+    --pkg gstreamer-0.10
 
 gnome_pomodoro_LDFLAGS = \
     -Wl,--export-dynamic

@@ -403,6 +403,10 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                 _("Bell"),
                 File.new_for_uri (default_sound_file_uri));
 
+        var background_sound = new Pomodoro.SoundChooserButton ();
+        this.contents.add (
+            this.create_field (_("Background sound"), background_sound));
+
         this.notifications_settings.bind ("screen-notifications",
                                           notifications_toggle,
                                           "active",
@@ -417,8 +421,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                                 pomodoro_start_sound,
                                                 "file",
                                                 binding_flags,
-                                                get_file_mapping, 
-                                                set_file_mapping,
+                                                Sounds.get_file_mapping,
+                                                Sounds.set_file_mapping,
                                                 null,
                                                 null);
 
@@ -426,15 +430,19 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                                 pomodoro_end_sound,
                                                 "file",
                                                 binding_flags,
-                                                get_file_mapping, 
-                                                set_file_mapping,
+                                                Sounds.get_file_mapping,
+                                                Sounds.set_file_mapping,
                                                 null,
                                                 null);
 
-        //var background_sound = new Pomodoro.SoundChooserButton ();
-        //vbox.pack_start (
-        //    this.create_field (_("Background sound"), background_sound),
-        //    false, true, 0);
+        this.sounds_settings.bind_with_mapping ("background-sound",
+                                                background_sound,
+                                                "file",
+                                                binding_flags,
+                                                Sounds.get_file_mapping,
+                                                Sounds.set_file_mapping,
+                                                null,
+                                                null);
 
         //var sounds_toggle = new Gtk.Switch ();
         //this.contents.add (

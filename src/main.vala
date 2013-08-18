@@ -21,6 +21,7 @@
 
 using GLib;
 
+
 public int main (string[] args)
 {
     Pomodoro.Application application;
@@ -36,7 +37,7 @@ public int main (string[] args)
     #endif
 
     Gtk.init (ref args);
-
+    Gst.init (ref args);
 
     command_line = new Pomodoro.CommandLine();
 

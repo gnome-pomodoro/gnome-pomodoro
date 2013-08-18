@@ -77,6 +77,16 @@
       <summary>Pomodoro end sound</summary>
       <description>Sound file to notify of pomodoro end.</description>
     </key>
+    <key name="background-sound" type="s">
+      <default>""</default>
+      <summary>Background sound</summary>
+      <description>Sound to play during pomodoro.</description>
+    </key>
+    <key name="background-sound-volume" type="d">
+      <default>0.2</default>
+      <summary>Background sound volume</summary>
+      <description>Volume of background sound.</description>
+    </key>
   </schema>
   <schema id="org.gnome.pomodoro.state" path="/apps/gnome-pomodoro/state/">
     <key name="timer-session-count" type="d">
