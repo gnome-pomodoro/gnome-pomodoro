@@ -68,7 +68,64 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 - Use toggle switch (or *Ctrl+Alt+P*) to toggle timer on/off
 - You can configure behavior of the extension in *Options* menu
 
-For a list of configurable options, please refer [wiki](https://github.com/codito/gnome-shell-pomodoro/wiki/Configuration)
+...and there are a couple of options:
+- _Reset Counts and Timers_: Resets your pomodoro session count.
+- _Away From Desk_: Automatically start next pomodoro session after pause. Useful if you're sitting away from computer.
+- _Control Presence Status_: During a pomodoro session, mark your IM presence status to Busy.
+- _Fullscreen Notifications_: After completion of a pomodoro session, show a dialog box (system modal) that will force you to take a break :)
+- _Sound Notifications_: Notify completion of pomodoro by playing a sound.
+
+# Settings
+We recommend you use the Options menu to configure Pomodoro extension. If you still want to tinker with settings, you can use dconf-editor or gsettings via commandline. Settings for Pomodoro are in */org/gnome/shell/extensions/pomodoro* tree.
+
+**Change notification sound**
+
+You can customize notification sound with:
+
+        SCHEMADIR=~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in/schemas/
+        gsettings --schemadir $SCHEMADIR set org.gnome.shell.extensions.pomodoro sound-uri "/usr/share/sounds/freedesktop/stereo/complete.oga"
+
+…or if installed system-wide
+
+        gsettings set org.gnome.shell.extensions.pomodoro sound-uri "/usr/share/sounds/freedesktop/stereo/complete.oga"
+
+For the sound file used in this example you may need to install package *sound-theme-freedesktop*.
+
+
+**Change keyboard shortcut**
+
+Hotkey to toggle the timer *Ctrl+Alt+P* may be used in one of your apps (Emacs, Sublime Text, etc.), in which case it will toggle the timer. You can change the shortcut by:
+
+        SCHEMADIR=~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in/schemas/
+        gsettings --schemadir $SCHEMADIR set org.gnome.shell.extensions.pomodoro toggle-pomodoro-timer "['<Super>p']"
+
+…or if installed system-wide
+
+        gsettings set org.gnome.shell.extensions.pomodoro toggle-pomodoro-timer "['<Super>p']"
+
+
+**Reset settings to default**
+
+If you ever need to reset settings, you can use
+
+        SCHEMADIR=~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in/schemas/
+        gsettings --schemadir $SCHEMADIR reset-recursively org.gnome.shell.extensions.pomodoro
+
+…or if installed system-wide
+
+        gsettings reset-recursively org.gnome.shell.extensions.pomodoro
+
+For more options see *gsettings --help*
+
+
+# Debugging
+
+If you experience the extension causing problems, please run *gnome-shell* with error log redirected to a file:
+
+        DISPLAY=:0 gnome-shell --replace > gnome-shell.log 2>&1
+
+You can also recover from most *gnome-shell* crashes using the same command.
+
 
 # License
 GPL3. See [COPYING](https://raw.github.com/codito/gnome-shell-pomodoro/master/COPYING) for details.
