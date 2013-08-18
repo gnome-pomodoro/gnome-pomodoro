@@ -32,7 +32,7 @@ msgstr "Temporizador Pomodoro"
 #. Options SubMenu
 #: ../src/extension.js:99
 msgid "Options"
-msgstr "Opciones"
+msgstr "Opciónes"
 
 #. Reset counters
 #: ../src/extension.js:122
@@ -53,7 +53,7 @@ msgstr "Control del estado de presencia"
 #: ../src/extension.js:141
 #, fuzzy
 msgid "Fullscreen Notifications"
-msgstr "Notificación de sonido"
+msgstr "Notificaciones a pantalla completa"
 
 #. Notify with a sound toggle
 #: ../src/extension.js:148
@@ -88,20 +88,20 @@ msgstr[1] "%d sesiones completadas"
 
 #: ../src/timer.js:422
 msgid "Pause finished."
-msgstr ""
+msgstr "El descanso ha finalizado"
 
 #: ../src/timer.js:423
 #, fuzzy
 msgid "A new pomodoro is starting."
-msgstr "La pausa ha finalizado, un nuevo pomodoro está comenzando!"
+msgstr "Un nuevo pomodoro está comenzando!"
 
 #: ../src/timer.js:440
 msgid "It's time to take a break!"
-msgstr ""
+msgstr "¡Es la hora de tomar un descanso!"
 
 #: ../src/timer.js:462
 msgid "Take a break!"
-msgstr ""
+msgstr "¡Tómese un descanso!"
 
 #: ../src/timer.js:465
 msgid "Start a new pomodoro"
@@ -109,21 +109,21 @@ msgstr "Comenzar un nuevo pomodoro"
 
 #: ../src/timer.js:543
 msgid "Hey, you're missing out on a break."
-msgstr ""
+msgstr "¡Se te está pasando el descanso!"
 
 #: ../src/timer.js:656
 #, fuzzy, c-format
 msgid "You have %d second left.\n"
 msgid_plural "You have %d seconds left.\n"
-msgstr[0] "Tómese un descanso, tiene %d segundo\n"
-msgstr[1] "Tómese un descanso, tiene %d segundos\n"
+msgstr[0] "Tiene %d segundo\n"
+msgstr[1] "Tiene %d segundos\n"
 
 #: ../src/timer.js:658
 #, fuzzy, c-format
 msgid "You have %d minute left.\n"
 msgid_plural "You have %d minutes left.\n"
-msgstr[0] "Tómese un descanso, tiene %d minuto\n"
-msgstr[1] "Tómese un descanso, tiene %d minutos\n"
+msgstr[0] "Tiene %d minuto\n"
+msgstr[1] "Tiene %d minutos\n"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
 msgid "Pomodoro duration"
