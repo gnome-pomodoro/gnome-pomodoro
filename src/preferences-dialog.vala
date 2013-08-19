@@ -161,6 +161,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         this.setup_notifications_page ();
 
+        this.setup_sounds_page ();
+
         this.setup_presence_page ();
 
         this.add (vbox);
@@ -373,6 +375,25 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.contents.add (
             this.create_field (_("Break reminder"), reminders_toggle));
 
+        this.notifications_settings.bind ("screen-notifications",
+                                          notifications_toggle,
+                                          "active",
+                                          binding_flags);
+
+        this.notifications_settings.bind ("reminders",
+                                          reminders_toggle,
+                                          "active",
+                                          binding_flags);
+    }
+
+    private void setup_sounds_page ()
+    {
+        var binding_flags = GLib.SettingsBindFlags.DEFAULT |
+                            GLib.SettingsBindFlags.GET |
+                            GLib.SettingsBindFlags.SET;
+
+        this.contents.add (this.create_section_label (_("Sounds")));
+
         var pomodoro_start_sound = new Pomodoro.SoundChooserButton();
         this.contents.add (
             this.create_field (_("Pomodoro start sound"), pomodoro_start_sound));
@@ -407,15 +428,6 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.contents.add (
             this.create_field (_("Background sound"), background_sound));
 
-        this.notifications_settings.bind ("screen-notifications",
-                                          notifications_toggle,
-                                          "active",
-                                          binding_flags);
-
-        this.notifications_settings.bind ("reminders",
-                                          reminders_toggle,
-                                          "active",
-                                          binding_flags);
 
         this.sounds_settings.bind_with_mapping ("pomodoro-start-sound",
                                                 pomodoro_start_sound,
