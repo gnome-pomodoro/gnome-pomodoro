@@ -326,17 +326,17 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         //this.timer_settings.delay ();
         //this.timer_settings.apply ();
 
-        this.contents.add (this.create_scale_field (_("Pomodoro time"), pomodoro_adjustment));
+        this.contents.add (this.create_scale_field (_("Pomodoro duration"), pomodoro_adjustment));
 
-        this.contents.add (this.create_scale_field (_("Short break time"), short_break_adjustment));
+        this.contents.add (this.create_scale_field (_("Short break duration"), short_break_adjustment));
 
-        this.contents.add (this.create_scale_field (_("Long break time"), long_break_adjustment));
+        this.contents.add (this.create_scale_field (_("Long break duration"), long_break_adjustment));
 
         var toggle_key_button = new Pomodoro.KeybindingButton (keybinding);
         toggle_key_button.show ();
 
         this.contents.add (
-            this.create_field (_("Toggle timer shortcut"), toggle_key_button));
+            this.create_field (_("Shortcut to toggle timer"), toggle_key_button));
     }
 
     private void setup_notifications_page ()
@@ -371,11 +371,11 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         var reminders_toggle = new Gtk.Switch ();
         this.contents.add (
-            this.create_field (_("Reminders"), reminders_toggle));
+            this.create_field (_("Break reminder"), reminders_toggle));
 
         var pomodoro_start_sound = new Pomodoro.SoundChooserButton();
         this.contents.add (
-            this.create_field (_("Start of pomodoro sound"), pomodoro_start_sound));
+            this.create_field (_("Pomodoro start sound"), pomodoro_start_sound));
 
         var default_sound_file_uri = GLib.Path.build_filename (
                 "file://",
@@ -465,7 +465,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.contents.add (this.create_section_label (_("Presence")));
 
         this.contents.add (
-            this.create_field (_("Wait after break"), pause_when_idle_toggle));
+            this.create_field (_("Postpone pomodoro when idle"), pause_when_idle_toggle));
 
         this.presence_settings.bind ("pause-when-idle",
                                      pause_when_idle_toggle,
