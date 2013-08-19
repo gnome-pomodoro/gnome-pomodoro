@@ -98,7 +98,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
     public PreferencesDialog ()
     {
         this.title = _("Preferences");
-        this.set_default_size (400, 500);
+        this.set_default_size (440, 600);
         this.set_modal (true);
         this.set_destroy_with_parent (true);
         this.set_position (Gtk.WindowPosition.CENTER);
@@ -141,8 +141,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         scrolled_window.vscrollbar_policy = Gtk.PolicyType.AUTOMATIC;
         this.notebook.append_page (scrolled_window, null);
 
-        var alignment = new Gtk.Alignment (0.5f, 0.0f, 0.3f, 1.0f);
-        alignment.set_padding (10, 10, 20, 20);
+        var alignment = new Gtk.Alignment (0.5f, 0.0f, 0.25f, 1.0f);
+        alignment.set_padding (10, 15, 30, 30);
         scrolled_window.add (alignment);
 
         this.contents = new Egg.ListBox();
@@ -223,7 +223,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         var widget_bin = new Gtk.Alignment (1.0f, 0.5f, 0.0f, 0.0f);
         widget_bin.add (widget);
 
-        var hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 20);
+        var hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 30);
         hbox.pack_start (label, true, true, 0);
         hbox.pack_start (widget_bin, false, false, 0);        
 
