@@ -44,7 +44,7 @@
 }
 
 .preferences-dialog .list {
-    background-color: @base_color;
+    background-color: @background;
 }
 
 .preferences-dialog .list-section-label {
