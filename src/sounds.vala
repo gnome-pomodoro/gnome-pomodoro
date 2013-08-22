@@ -416,22 +416,23 @@ internal class Pomodoro.Sounds : Object
     {
         var path = variant.get_string ();
 
-        try {
-            path = Filename.from_uri (path);
-        }
-        catch (ConvertError error) {
-            path = path;
-        }
+        if (path != "")
+        {
+            try {
+                path = Filename.from_uri (path);
+            }
+            catch (ConvertError error) {
+                path = path;
+            }
 
-        if (!Path.is_absolute (path)) {
-            path = Path.build_filename ("file://",
-                                        Config.PACKAGE_DATA_DIR,
-                                        "sounds",
-                                        path);
-        }
-        else {
-            if (Uri.parse_scheme (path) == null)
-                path = "file://" + path;
+            if (!Path.is_absolute (path))
+                path = Path.build_filename ("file://",
+                                            Config.PACKAGE_DATA_DIR,
+                                            "sounds",
+                                            path);
+            else
+                if (Uri.parse_scheme (path) == null)
+                    path = "file://" + path;
         }
 
         value.set_object (GLib.File.new_for_uri (path));
@@ -449,13 +450,12 @@ internal class Pomodoro.Sounds : Object
         {
             var uri = file.get_uri ();
             var prefix = Path.build_filename ("file://",
-                                                   Config.PACKAGE_DATA_DIR,
-                                                   "sounds",
-                                                   "");
+                                              Config.PACKAGE_DATA_DIR,
+                                              "sounds",
+                                              "");
             if (uri.has_prefix (prefix))
                 uri = uri.substring (prefix.length);
             
-            message ("file.get_url() = '%s'", file.get_uri ());
             return new Variant.string (uri);
         }
 

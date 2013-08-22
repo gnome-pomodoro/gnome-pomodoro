@@ -395,6 +395,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.contents.add (this.create_section_label (_("Sounds")));
 
         var pomodoro_start_sound = new Pomodoro.SoundChooserButton();
+        pomodoro_start_sound.title = _("Select sound for pomodoro start");
         this.contents.add (
             this.create_field (_("Pomodoro start sound"), pomodoro_start_sound));
 
@@ -405,26 +406,21 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                 "pomodoro-start.wav");
 
         pomodoro_start_sound.add_bookmark (
-                _("(None)"),
-                File.new_for_uri (""));
-
-        pomodoro_start_sound.add_bookmark (
                 _("Bell"),
                 File.new_for_uri (default_sound_file_uri));
 
         var pomodoro_end_sound = new Pomodoro.SoundChooserButton ();
+        pomodoro_end_sound.title = _("Select sound for start of break");
         this.contents.add (
             this.create_field (_("Start of break sound"), pomodoro_end_sound));
-
-        pomodoro_end_sound.add_bookmark (
-                _("(None)"),
-                File.new_for_uri (""));
 
         pomodoro_end_sound.add_bookmark (
                 _("Bell"),
                 File.new_for_uri (default_sound_file_uri));
 
         var background_sound = new Pomodoro.SoundChooserButton ();
+        background_sound.title = _("Select background sound");
+        background_sound.backend = SoundBackend.GSTREAMER;
         this.contents.add (
             this.create_field (_("Background sound"), background_sound));
 

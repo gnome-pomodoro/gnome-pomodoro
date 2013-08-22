@@ -204,13 +204,16 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
     {
         var dialog = new Gtk.FileChooserDialog (null, null,
                             Gtk.FileChooserAction.OPEN,
+                            _("_No sound"),
+                            Gtk.ResponseType.NONE,
                             _("_Cancel"),
                             Gtk.ResponseType.CANCEL,
                             _("_Open"),
                             Gtk.ResponseType.ACCEPT);
 
         dialog.set_default_response (Gtk.ResponseType.ACCEPT);
-        dialog.set_alternative_button_order (Gtk.ResponseType.ACCEPT,
+        dialog.set_alternative_button_order (Gtk.ResponseType.NONE,
+                                             Gtk.ResponseType.ACCEPT,
 					                         Gtk.ResponseType.CANCEL);
         dialog.title = _("Select a file");
         dialog.local_only = true;
@@ -249,6 +252,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
                                         typeof (string),
                                         typeof (GLib.File));
         this.model_add_other ();
+        this.model_add_none ();
 
         /* ComboBox */
         this.name_cell = new Gtk.CellRendererText ();
@@ -352,10 +356,10 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         model.get (b, Column.ROW_TYPE, out b_type);
 
         if (a_type < b_type)
-            return 1;
+            return -1;
 
         if (a_type > b_type)
-            return -1;
+            return 1;
 
         model.get (a, Column.DISPLAY_NAME, out a_display_name);
         model.get (b, Column.DISPLAY_NAME, out b_display_name);
@@ -372,13 +376,19 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         this.model.insert (out iter, pos);
         this.model.set (iter,
                         Column.ROW_TYPE, RowType.OTHER,
-                        Column.DISPLAY_NAME, "Other\xE2\x80\xA6");        
+                        Column.DISPLAY_NAME, _("Other\xE2\x80\xA6"));
 
         this.has_other_separator = true;
 
         this.model.insert (out iter, pos);
         this.model.set (iter,
                         Column.ROW_TYPE, RowType.OTHER_SEPARATOR);
+    }
+
+    private void model_add_none ()
+    {
+        this.add_bookmark (_("None"),
+                           File.new_for_uri (""));
     }
 
     private void model_add_bookmark (string    display_name,
@@ -398,6 +408,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
 
             if (!this.model.iter_next (ref next_iter))
                 break;
+
 
             this.model.get (iter,
                             Column.ROW_TYPE, out type,
@@ -536,7 +547,9 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
             {
                 case RowType.BOOKMARK:
                 case RowType.CUSTOM:
-                    row_found = (file != null && file.equal (selected_file));
+                    row_found = (file != null)
+                            ? selected_file != null && file.equal (selected_file)
+                            : selected_file == null;
                     break;
 
                 default:
@@ -593,8 +606,8 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
             {
                 case RowType.BOOKMARK:
                 case RowType.CUSTOM:
-                    if (data != null)
-                        this.file = data;
+                case RowType.EMPTY_SELECTION:
+                    this.file = data;
                     break;
 
                 case RowType.OTHER:
@@ -621,14 +634,20 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         this.dialog.hide ();
         this.combo_box.set_sensitive (true);            
 
-        if (response == Gtk.ResponseType.ACCEPT ||
-            response == Gtk.ResponseType.OK)
+        switch (response)
         {
-            this.file = this.dialog.get_file();
-        }
-        else
-        {
-            this.update_combo_box ();
+            case Gtk.ResponseType.ACCEPT:
+            case Gtk.ResponseType.OK:
+                this.file = this.dialog.get_file();
+                break;
+
+            case Gtk.ResponseType.NONE:
+                this.file = File.new_for_uri ("");
+                break;
+
+            default:
+                this.update_combo_box ();
+                break;
         }
     }
 
