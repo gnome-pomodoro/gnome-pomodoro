@@ -2,5 +2,6 @@
 <gresources>
   <gresource prefix="/org/gnome/pomodoro">
     <file alias="app-menu.ui" preprocess="xml-stripblanks">resources/app-menu.ui</file>
+    <file alias="gtk-style.css">resources/gtk-style.css</file>
   </gresource>
 </gresources>

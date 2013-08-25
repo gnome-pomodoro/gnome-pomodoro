@@ -118,8 +118,9 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
     {
         var css_provider = new Gtk.CssProvider ();
         try {
-            // TODO: can we put it into the resource file?
-            css_provider.load_from_path (Config.PACKAGE_DATA_DIR + "/gtk-style.css");
+           var css_file = File.new_for_uri ("resource:///org/gnome/pomodoro/gtk-style.css");
+
+           css_provider.load_from_file (css_file);
         }
         catch (Error e) {
             GLib.warning ("Error while loading css file: %s", e.message);

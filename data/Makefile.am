@@ -19,17 +19,10 @@ service_in_files = \
     $(NULL)
 service_DATA = $(service_in_files:.service.in=.service)
 
-styledir = $(pkgdatadir)
-style_files = \
-    gtk-style.css \
-    $(NULL)
-style_DATA = $(style_files)
-
 EXTRA_DIST = \
     $(desktop_in_files) \
     $(gsettings_in_files) \
     $(service_in_files) \
-    $(style_files) \
     $(NULL)
 
 CLEANFILES = \
