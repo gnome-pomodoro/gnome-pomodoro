@@ -777,21 +777,15 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
 
 internal class Pomodoro.LogScale : Gtk.Scale
 {
-    const double SLIDER_LOWER = 60.0;
-    const double SLIDER_UPPER = 14400.0;
-    const double SLIDER_EXP = 2.0;
+    // TODO: This widget is quite bad. We need custom GtkRange to
+    //       get true log scale.
 
-    static double value_to_seconds (double value) {
-        return SLIDER_LOWER + 60.0 * Math.floor(
-            Math.pow (value, SLIDER_EXP) * (SLIDER_UPPER - SLIDER_LOWER) / 60.0);
-    }
+    public double exponent { get; set; default = 1.0; }
 
-    static double seconds_to_value (double seconds) {
-        return Math.pow ((seconds - SLIDER_LOWER) / (SLIDER_UPPER - SLIDER_LOWER), 1.0 / SLIDER_EXP);
-    }
+    private Gtk.Adjustment base_adjustment;
 
-
-    public LogScale (Gtk.Adjustment adjustment) //, value_to_func=null, value_from_func=null)
+    public LogScale (Gtk.Adjustment adjustment,
+                     double         exponent)
     {
         GLib.Object (
             orientation: Gtk.Orientation.HORIZONTAL,
@@ -801,15 +795,69 @@ internal class Pomodoro.LogScale : Gtk.Scale
             halign: Gtk.Align.FILL
         );
 
-        //this.value_to_func = value_to_func;
-        //this.value_from_func = value_from_func;
+        this.exponent = exponent;
 
-        this.adjustment = adjustment;
+        this.do_set_adjustment (adjustment);
+
         //this.update_policy = Gtk.UpdateType.DISCONTINUOUS;
     }
 
-//    public override grab_notify (bool was_grabbed) {
-//    }
+    private void do_set_adjustment (Gtk.Adjustment base_adjustment)
+    {
+        var adjustment = new Gtk.Adjustment (
+                0.0,
+                0.0,
+                1.0,
+                0.0001,
+                0.001,
+                0.0);
+
+        var binding_flags =
+                GLib.BindingFlags.DEFAULT |
+                GLib.BindingFlags.BIDIRECTIONAL |
+                GLib.BindingFlags.SYNC_CREATE;
+
+        this.base_adjustment = base_adjustment;
+        this.adjustment = adjustment;
+
+        this.base_adjustment.bind_property ("value",
+                                            this.adjustment,
+                                            "value",
+                                            binding_flags,
+                                            this.transform_to,
+                                            this.transform_from);
+    }
+
+    private bool transform_from (Binding   binding,
+                                 Value     source_value,
+                                 ref Value target_value)
+    {
+        var lower = this.base_adjustment.lower;
+        var upper = this.base_adjustment.upper;
+        var step_increment = this.base_adjustment.step_increment;
+
+        var value = Math.pow (source_value.get_double(), this.exponent) * (upper - lower) + lower;
+
+        target_value.set_double (step_increment * Math.floor (value / step_increment));
+
+        return true;
+    }
+
+    private bool transform_to (Binding   binding,
+                               Value     source_value,
+                               ref Value target_value)
+    {
+        var lower = this.base_adjustment.lower;
+        var upper = this.base_adjustment.upper;
+
+        target_value.set_double (Math.pow (
+                (source_value.get_double() - lower) / (upper - lower),
+                1.0 / this.exponent));
+
+        return true;
+    }
+
+//    public override void add_mark (double value, Gtk.PositionType position, string? markup);
 
 //    public override string format_value (double value) {
 //        return format_time ((long) value);

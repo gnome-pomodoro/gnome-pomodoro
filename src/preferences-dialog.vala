@@ -250,7 +250,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                            Gtk.Adjustment adjustment)
     {
         var value_label = new Gtk.Label (null);
-        var scale = new LogScale (adjustment);
+        var scale = new LogScale (adjustment, 2.0);
         var widget = this.create_field (text, value_label, scale);
         
         adjustment.value_changed.connect (() => {
