@@ -65,3 +65,7 @@
 .preferences-dialog .list-item {
 }
 
+PomodoroSymbolicButton {
+    icon-shadow: none;
+}
+

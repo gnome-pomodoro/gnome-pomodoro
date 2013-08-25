@@ -19,17 +19,61 @@
  *
  */
 
-internal class Pomodoro.KeybindingButton : Gtk.ToggleButton
+internal class Pomodoro.KeybindingButton : Gtk.Box
 {
+    public bool active
+    {
+        get {
+            return this.keybinding_button.active;
+        }
+        set {
+            this.keybinding_button.active = value;
+        }
+    }
+
+    public string label
+    {
+        get {
+            return this.keybinding_button.label;
+        }
+        set {
+            this.keybinding_button.label = value;
+        }
+    }
+
     public Keybinding keybinding { get; set; }
     private Keybinding tmp_keybinding;
 
+    private Gtk.ToggleButton keybinding_button;
+    private Gtk.Button clear_button;
+
     public KeybindingButton (Keybinding keybinding)
     {
-        this.set_events (this.events |
-                         Gdk.EventMask.KEY_PRESS_MASK |
-                         Gdk.EventMask.FOCUS_CHANGE_MASK);
-        this.can_focus = true;
+        GLib.Object (orientation: Gtk.Orientation.HORIZONTAL,
+                     spacing: 0,
+                     halign: Gtk.Align.CENTER,
+                     homogeneous: false,
+                     can_focus: false);
+
+        this.keybinding_button = new Gtk.ToggleButton ();
+        this.keybinding_button.set_events (this.events |
+                                           Gdk.EventMask.KEY_PRESS_MASK |
+                                           Gdk.EventMask.FOCUS_CHANGE_MASK);
+        this.keybinding_button.can_focus = true;
+
+        this.clear_button = new SymbolicButton ("edit-clear-symbolic");
+        this.clear_button.can_focus = true;
+        this.clear_button.no_show_all = true;
+        this.clear_button.clicked.connect (() => {
+            this.keybinding.accelerator = null;
+            this.active = false;
+        });
+
+        this.pack_start (this.keybinding_button, true, true, 0);
+        this.pack_start (this.clear_button, false, true, 0);
+
+        var style_context = this.get_style_context ();
+        style_context.add_class ("linked");
 
         this.keybinding = keybinding;
         this.keybinding.changed.connect (() => {
@@ -49,18 +93,19 @@ internal class Pomodoro.KeybindingButton : Gtk.ToggleButton
             this.label = label;
         else
             this.label = _("Disabled");
+
+        this.clear_button.set_visible (this.keybinding.accelerator != "");
     }
 
-    public override void toggled ()
+    public void toggled ()
     {
-        if (this.active) {
+        if (this.active)
             this.grab_focus ();
-        }
     }
 
     public override bool focus_out_event (Gdk.EventFocus event)
     {
-        this.set_active (false);
+        this.active = false;
 
         return base.focus_out_event (event);
     }
@@ -75,12 +120,12 @@ internal class Pomodoro.KeybindingButton : Gtk.ToggleButton
         {
             case Gdk.Key.BackSpace:
                     this.keybinding.accelerator = null;
-                    this.set_active (false);
+                    this.active = false;
                     return true;
 
             case Gdk.Key.Escape:
             case Gdk.Key.Return:
-                    this.set_active (false);
+                    this.active = false;
                     return true;
         }
 
@@ -93,7 +138,7 @@ internal class Pomodoro.KeybindingButton : Gtk.ToggleButton
         {
             if (error is KeybindingError.TYPING_COLLISION)
             {
-                this.set_active (false);
+                this.active = false;
 
                 var dialog = new Gtk.MessageDialog (
                         this.get_toplevel () as Gtk.Window,
@@ -113,7 +158,7 @@ internal class Pomodoro.KeybindingButton : Gtk.ToggleButton
                 this.tmp_keybinding.key,
                 this.tmp_keybinding.modifiers);
 
-        this.set_active (false);
+        this.active = false;
 
         return true;
     }
@@ -862,5 +907,21 @@ internal class Pomodoro.LogScale : Gtk.Scale
 //    public override string format_value (double value) {
 //        return format_time ((long) value);
 //    }
+}
+
+
+public class Pomodoro.SymbolicButton : Gtk.Button
+{
+    public SymbolicButton (string icon_name)
+    {
+        this.set_alignment (0.5f, 0.5f);
+        this.set_relief (Gtk.ReliefStyle.NORMAL);
+
+        var icon = new Gtk.Image ();
+        icon.set_from_icon_name (icon_name, Gtk.IconSize.MENU);
+        icon.show ();
+
+        this.add (icon);
+    }
 }
 
