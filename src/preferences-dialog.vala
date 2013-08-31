@@ -114,6 +114,9 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.setup();
     }
 
+    private ModeButton mode_button;
+    private Gtk.Toolbar toolbar;
+
     private void setup ()
     {
         var css_provider = new Gtk.CssProvider ();
@@ -155,6 +158,9 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.contents.can_focus = false;
         alignment.add (this.contents);
 
+        this.setup_toolbar ();        
+
+        vbox.pack_start (this.toolbar, false, true);
         vbox.pack_start (this.notebook, true, true);
         vbox.show_all ();
 
@@ -167,6 +173,47 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.setup_presence_page ();
 
         this.add (vbox);
+    }
+
+    private void setup_toolbar ()
+    {
+        this.toolbar = new Gtk.Toolbar();
+        this.toolbar.icon_size = Gtk.IconSize.MENU;
+        this.toolbar.show_arrow = false;
+        this.toolbar.get_style_context().add_class ("pomodoro-toolbar");
+        this.toolbar.get_style_context().add_class (Gtk.STYLE_CLASS_MENUBAR);
+
+        this.mode_button = new ModeButton (Gtk.Orientation.HORIZONTAL);
+        this.mode_button.set_size_request (34, 34);
+        
+        this.mode_button.append_text (_("Timer"));
+        this.mode_button.append_text (_("Notifications"));
+        this.mode_button.append_text (_("Presence"));
+
+        var left_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+//        left_box.set_homogeneous (true);
+//        left_box.get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
+
+        var center_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);        
+        center_box.pack_start (this.mode_button, true, false, 0);
+
+        var right_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+
+
+        var left_item = new Gtk.ToolItem ();
+        left_item.add (left_box);
+        this.toolbar.insert (left_item, -1);
+
+        var center_item = new Gtk.ToolItem ();
+        center_item.set_expand (true);
+        center_item.add (center_box);
+        this.toolbar.insert (center_item, -1);
+
+        var right_item = new Gtk.ToolItem ();
+        right_item.add (right_box);
+        this.toolbar.insert (right_item, -1);
+        
+        this.toolbar.show_all ();
     }
 
     private void contents_separator_func (ref Gtk.Widget? separator,
@@ -221,7 +268,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         var label = new Gtk.Label (text);
         label.xalign = 0.0f;
         label.yalign = 0.5f;
-        label.get_style_context ().add_class ("list-label");
+//        label.get_style_context ().add_class (Gtk.STYLE_CLASS_HEADER); // "list-label");
 
         var widget_bin = new Gtk.Alignment (1.0f, 0.5f, 0.0f, 0.0f);
         widget_bin.add (widget);

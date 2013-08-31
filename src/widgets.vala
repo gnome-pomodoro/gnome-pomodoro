@@ -19,6 +19,208 @@
  *
  */
 
+
+public class Pomodoro.ModeButton : Gtk.Box
+{
+    private int _selected = -1;
+
+    public int selected {
+        get {
+            return this._selected;
+        }
+        set {
+            var children = this.get_children ();
+            var index = 0;
+
+            if (value < 0 || value >= children.length()) {
+                return;
+            }
+
+            foreach (var child in children)
+            {
+                if (child is Gtk.ToggleButton)
+                {
+                    var item = child as Item;
+
+                    item.can_toggle = true;
+                    item.active = (index == value);
+
+                    if (item.active)
+                        item.can_toggle = false;
+                }
+
+                index++;
+            }
+
+            if (value != this._selected) {
+                this._selected = value;
+                this.changed ();
+            }
+        }
+    }
+
+    public ModeButton (Gtk.Orientation orientation)
+    {
+        GLib.Object (
+            orientation: orientation,
+            homogeneous: true,
+            spacing: 0
+        );
+
+        this.halign = Gtk.Align.CENTER;
+        this.can_focus = false;
+
+        var style_context = this.get_style_context ();
+        style_context.add_class (Gtk.STYLE_CLASS_LINKED);
+    }
+
+    public new void add (Gtk.Widget child)
+    {
+        var style_context = child.get_style_context ();
+        style_context.add_class (Gtk.STYLE_CLASS_RAISED);
+
+        var button = child as Gtk.ToggleButton;
+
+        button.set_alignment (0.5f, 0.5f);
+        button.can_focus = true;
+        button.add_events (Gdk.EventMask.SCROLL_MASK);
+
+        button.toggled.connect (this.on_child_toggled);
+
+        this.pack_start (button, true, true, 0);
+
+        if (this.selected < 0)
+            this.selected = 0;
+    }
+
+    private void on_child_toggled (Gtk.Widget child)
+    {
+        var button = child as Gtk.ToggleButton;
+
+        if (button.active)
+            this.selected = this.get_children().index (child);
+    }
+
+    public unowned Gtk.Widget append_text (string text)
+    {
+        var item = new Item.with_label (text);
+        item.set_focus_on_click (false);
+        item.show();
+
+        this.add (item);
+
+        return item as Gtk.Widget;
+    }
+
+    public override bool scroll_event (Gdk.EventScroll event)
+    {
+        switch (event.direction)
+        {
+            case Gdk.ScrollDirection.RIGHT:
+            case Gdk.ScrollDirection.DOWN:
+                this.selected += 1;
+                break;
+
+            case Gdk.ScrollDirection.LEFT:
+            case Gdk.ScrollDirection.UP:
+                this.selected -= 1;
+                break;
+        }
+        return false;
+    }
+
+    public signal void changed ();
+
+
+    class Item : Gtk.ToggleButton
+    {
+        public bool can_toggle { get; set; default=true; }
+
+        private Pango.Layout layout_bold;
+
+        public Item.with_label (string label)
+        {
+            this.label = label;
+
+            var style_context = this.get_style_context ();
+            style_context.add_class ("text-button");
+        }
+
+        private void set_bold_attribute (bool is_bold)
+        {
+            var child = this.get_child();
+
+            if (child is Gtk.Label)
+            {
+                var label = child as Gtk.Label;
+ 
+                if (is_bold) {
+                    var attr = Pango.attr_weight_new (Pango.Weight.BOLD);
+
+		            label.attributes = new Pango.AttrList ();
+		            label.attributes.insert (attr.copy ());
+                }
+                else {
+                    label.attributes = null;
+                }
+            }
+        }
+
+        public override void get_preferred_width (out int minimum_width,
+                                                  out int natural_width)
+        {
+            var child = this.get_child();
+            var width = 0;
+            var width_bold = 0;
+
+            base.get_preferred_width (out minimum_width, out natural_width);
+
+            if (child is Gtk.Label)
+            {
+                var label = child as Gtk.Label;
+                var layout = label.get_layout ();
+
+                layout.get_pixel_size (out width, null);
+
+                if (this.layout_bold == null)
+                {
+                    var font = child.get_style_context ()
+                                    .get_font (Gtk.StateFlags.NORMAL);
+                    font.set_weight (Pango.Weight.BOLD);
+
+                    this.layout_bold = layout.copy ();
+                    this.layout_bold.set_font_description (font);
+                }
+
+                this.layout_bold.get_pixel_size (out width_bold, null);
+
+                minimum_width += int.max (width_bold - width, 0);
+            }
+
+            if (natural_width < minimum_width)
+                natural_width = minimum_width;
+        }
+
+        public override void style_updated ()
+        {
+            this.layout_bold = null;
+            base.style_updated ();
+        }
+
+        public override void clicked ()
+        {
+            if (this.can_toggle)
+                base.clicked ();
+        }
+
+        public override void toggled ()
+        {
+            this.set_bold_attribute (this.active);
+        }
+    }
+}
+
+
 internal class Pomodoro.KeybindingButton : Gtk.Box
 {
     public bool active
@@ -61,7 +263,8 @@ internal class Pomodoro.KeybindingButton : Gtk.Box
                                            Gdk.EventMask.FOCUS_CHANGE_MASK);
         this.keybinding_button.can_focus = true;
 
-        this.clear_button = new SymbolicButton ("edit-clear-symbolic");
+        this.clear_button = new SymbolicButton ("edit-clear-symbolic",
+                                                Gtk.IconSize.MENU);
         this.clear_button.can_focus = true;
         this.clear_button.no_show_all = true;
         this.clear_button.clicked.connect (() => {
@@ -73,7 +276,7 @@ internal class Pomodoro.KeybindingButton : Gtk.Box
         this.pack_start (this.clear_button, false, true, 0);
 
         var style_context = this.get_style_context ();
-        style_context.add_class ("linked");
+        style_context.add_class (Gtk.STYLE_CLASS_LINKED);
 
         this.keybinding = keybinding;
         this.keybinding.changed.connect (() => {
@@ -912,16 +1115,23 @@ internal class Pomodoro.LogScale : Gtk.Scale
 
 public class Pomodoro.SymbolicButton : Gtk.Button
 {
-    public SymbolicButton (string icon_name)
+    public SymbolicButton (string icon_name, Gtk.IconSize icon_size)
     {
         this.set_alignment (0.5f, 0.5f);
         this.set_relief (Gtk.ReliefStyle.NORMAL);
 
-        var icon = new Gtk.Image ();
-        icon.set_from_icon_name (icon_name, Gtk.IconSize.MENU);
+        var icon = new Gtk.Image.from_icon_name (icon_name, icon_size);
+//        icon.show ();
+//        var icon = Gtk.Image.new_from_icon_name (icon_name, icon_size);
+//        item.add (icon);
+
+
+//        var icon = new Gtk.Image ();
+//        icon.set_from_icon_name (icon_name, icon_size);
         icon.show ();
 
-        this.add (icon);
+        this.image = icon;
+//        this.add (icon);
     }
 }
 

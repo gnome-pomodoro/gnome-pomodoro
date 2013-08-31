@@ -5,16 +5,12 @@
     border-radius: 0px;
 }
 
-.pomodoro-toolbar.toolbar .button {
+.pomodoro-toolbar .button {
     padding: 1.0pt 5.0pt;
 }
 
 .pomodoro-timer .button {
     padding: 4px 6px;
-}
-
-.button.active {
-    font-weight: bold;
 }
 
 .pomodoro-timer .label {
