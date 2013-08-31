@@ -1,12 +1,5 @@
-.pomodoro-toolbar.toolbar {
-    border-style: solid;
-    border-color: @border_color;
-    border-width: 0px 0px 1px 0px;
-    border-radius: 0px;
-}
-
-.pomodoro-toolbar .button {
-    padding: 1.0pt 5.0pt;
+.toolbar .button {
+    padding: 1.0pt 4.0pt;
 }
 
 .pomodoro-timer .button {

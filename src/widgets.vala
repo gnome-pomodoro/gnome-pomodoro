@@ -19,6 +19,29 @@
  *
  */
 
+public class Pomodoro.MainToolbar : Gtk.Toolbar
+{
+    construct {
+        this.show_arrow = false;
+
+        var context =  this.get_style_context();
+
+        context.add_class (Gtk.STYLE_CLASS_MENUBAR);
+        context.add_class ("header-bar");
+    }
+
+    public override bool draw (Cairo.Context cr)
+    {
+        var context = this.get_style_context ();
+        var width = this.get_allocated_width ();
+        var height = this.get_allocated_height ();
+
+        Gtk.render_background (context, cr, 0.0, 0.0, width, height);
+        Gtk.render_frame (context, cr, 0.0, 0.0, width, height);
+
+        return base.draw (cr);
+    }
+}
 
 public class Pomodoro.ModeButton : Gtk.Box
 {
@@ -101,7 +124,7 @@ public class Pomodoro.ModeButton : Gtk.Box
             this.selected = this.get_children().index (child);
     }
 
-    public unowned Gtk.Widget append_text (string text)
+    public unowned Gtk.Widget add_label (string text)
     {
         var item = new Item.with_label (text);
         item.set_focus_on_click (false);
