@@ -95,11 +95,23 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
     public Egg.ListBox contents { get; set; }
 
+    public enum Mode {
+        TIMER,
+        NOTIFICATION,
+        PRESENCE
+    }
+
+    private const GLib.SettingsBindFlags SETTINGS_BIND_FLAGS =
+                            GLib.SettingsBindFlags.DEFAULT |
+                            GLib.SettingsBindFlags.GET |
+                            GLib.SettingsBindFlags.SET;
+
     public PreferencesDialog ()
     {
         this.title = _("Preferences");
-        this.set_default_size (440, 600);
+        this.set_default_size (380, 500);
         this.set_modal (true);
+        this.set_hide_titlebar_when_maximized (true);
         this.set_destroy_with_parent (true);
         this.set_position (Gtk.WindowPosition.CENTER);
 
@@ -133,57 +145,41 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                          css_provider,
                                          Gtk.STYLE_PROVIDER_PRIORITY_USER);
         context.add_class ("preferences-dialog");
-        
+
+        this.combo_box_size_group = new Gtk.SizeGroup (Gtk.SizeGroupMode.BOTH);
+
         this.notebook = new Gtk.Notebook ();
         this.notebook.set_show_tabs (false);
         this.notebook.set_show_border (false);
 
+        this.setup_toolbar ();
+
         var vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-
-        var scrolled_window = new Gtk.ScrolledWindow (null, null);
-        scrolled_window.hscrollbar_policy = Gtk.PolicyType.NEVER;
-        scrolled_window.vscrollbar_policy = Gtk.PolicyType.AUTOMATIC;
-        this.notebook.append_page (scrolled_window, null);
-
-        var alignment = new Gtk.Alignment (0.5f, 0.0f, 0.25f, 1.0f);
-        alignment.set_padding (10, 15, 30, 30);
-        scrolled_window.add (alignment);
-
-        this.contents = new Egg.ListBox();
-        this.contents.set_selection_mode (Gtk.SelectionMode.NONE);
-        this.contents.set_activate_on_single_click (false);
-        this.contents.get_style_context ().add_class ("list");
-        this.contents.set_separator_funcs (this.contents_separator_func);
-        this.contents.width_request = 320;
-        this.contents.can_focus = false;
-        alignment.add (this.contents);
-
-        this.setup_toolbar ();        
-
         vbox.pack_start (this.toolbar, false, true);
         vbox.pack_start (this.notebook, true, true);
         vbox.show_all ();
+        this.add (vbox);
 
         this.setup_timer_page ();
-
         this.setup_notifications_page ();
-
-        this.setup_sounds_page ();
-
         this.setup_presence_page ();
 
-        this.add (vbox);
+        this.mode_button.changed.connect (this.on_mode_changed);
+
+        this.notebook.page = Mode.TIMER;
+    }
+
+
+    private void on_mode_changed ()
+    {
+        this.notebook.page = this.mode_button.selected;
     }
 
     private void setup_toolbar ()
     {
-        this.toolbar = new MainToolbar();
+        this.toolbar = new Pomodoro.Toolbar();
 
         this.mode_button = new ModeButton (Gtk.Orientation.HORIZONTAL);
-
-        this.mode_button.add_label (_("Timer"));
-        this.mode_button.add_label (_("Notifications"));
-        this.mode_button.add_label (_("Presence"));
 
         var center_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
         center_box.pack_start (this.mode_button, true, false, 0);
@@ -216,46 +212,72 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         }
     }
 
-    private Gtk.Widget create_section_label (string text,
-                                             bool   is_first = false)
+    private Gtk.Widget create_section_label (string text)
     {
         var label = new Gtk.Label (text);
         label.halign = Gtk.Align.START;
         label.valign = Gtk.Align.END;
-        label.get_style_context().add_class ("list-section-label");
-        if (is_first)
-            label.get_style_context().add_class ("first");
+        label.get_style_context().add_class (Gtk.STYLE_CLASS_HEADER);
         label.show ();
 
-        return label;        
+        return label;
     }
 
     private Gtk.Widget create_section_separator ()
     {
         var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
-        separator.get_style_context ().add_class ("list-section-separator");
         separator.show ();
 
         return separator;
     }
 
+    private Egg.ListBox create_list_box ()
+    {
+        var list_box = new Egg.ListBox();
+        list_box.set_selection_mode (Gtk.SelectionMode.NONE);
+        list_box.set_activate_on_single_click (false);
+        list_box.get_style_context ().add_class ("list");
+        list_box.set_separator_funcs (this.contents_separator_func);
+        list_box.can_focus = false;
+        list_box.show ();
+
+        return list_box;
+    }
+
+    private Gtk.Container add_page (string label, Gtk.Widget contents)
+    {
+        //var scrolled_window = new Gtk.ScrolledWindow (null, null);
+        //scrolled_window.hscrollbar_policy = Gtk.PolicyType.NEVER;
+        //scrolled_window.vscrollbar_policy = Gtk.PolicyType.AUTOMATIC;
+
+        var alignment = new Gtk.Alignment (0.5f, 0.0f, 1.0f, 1.0f);
+        alignment.set_padding (10, 10, 22, 22);
+        //scrolled_window.add (alignment);
+        alignment.add (contents);
+        alignment.show ();
+
+        this.mode_button.add_label (label);
+        this.notebook.append_page (alignment, null);
+
+        return alignment as Gtk.Container;
+    }
+
     private Gtk.Widget create_field (string text, Gtk.Widget widget, Gtk.Widget? bottom_widget=null)
     {
         var bin = new Gtk.Alignment (0.0f, 0.0f, 1.0f, 1.0f);
-        bin.set_padding (5, 5, 0, 0);
+        bin.set_padding (10, 10, 3, 3);
         bin.get_style_context ().add_class ("list-item");
 
         var label = new Gtk.Label (text);
         label.xalign = 0.0f;
         label.yalign = 0.5f;
-//        label.get_style_context ().add_class (Gtk.STYLE_CLASS_HEADER); // "list-label");
 
-        var widget_bin = new Gtk.Alignment (1.0f, 0.5f, 0.0f, 0.0f);
-        widget_bin.add (widget);
+        var widget_alignment = new Gtk.Alignment (1.0f, 0.5f, 0.0f, 0.0f);
+        widget_alignment.add (widget);
 
         var hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 30);
         hbox.pack_start (label, true, true, 0);
-        hbox.pack_start (widget_bin, false, false, 0);        
+        hbox.pack_start (widget_alignment, false, true, 0);
 
         if (bottom_widget != null)
         {
@@ -292,6 +314,9 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
     private void setup_timer_page ()
     {
+        var contents = this.create_list_box ();
+        var page = this.add_page (_("Timer"), contents);
+
         var pomodoro_adjustment = new Gtk.Adjustment (
             0.0,
             TIMER_SCALE_LOWER,
@@ -318,24 +343,20 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         var keybinding = new Keybinding ();
 
-        var binding_flags = GLib.SettingsBindFlags.DEFAULT |
-                            GLib.SettingsBindFlags.GET |
-                            GLib.SettingsBindFlags.SET;
-
         this.timer_settings.bind ("pomodoro-time",
                                   pomodoro_adjustment,
                                   "value",
-                                  binding_flags);
+                                  SETTINGS_BIND_FLAGS);
 
         this.timer_settings.bind ("short-pause-time",
                                   short_break_adjustment,
                                   "value",
-                                  binding_flags);
+                                  SETTINGS_BIND_FLAGS);
 
         this.timer_settings.bind ("long-pause-time",
                                   long_break_adjustment,
                                   "value",
-                                  binding_flags);
+                                  SETTINGS_BIND_FLAGS);
 
         //this.timer_settings.bind ("session-limit",
         //                          session_limit_adjustment,
@@ -345,29 +366,46 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.keybindings_settings.bind_with_mapping ("toggle-timer",
                                                      keybinding,
                                                      "accelerator",
-                                                     binding_flags,
+                                                     SETTINGS_BIND_FLAGS,
                                                      get_keybinding_mapping, 
                                                      set_keybinding_mapping,
                                                      null,
                                                      null);
-
-        this.contents.add (this.create_section_label (_("Timer"), true));
-
         //this.timer_settings.delay ();
         //this.timer_settings.apply ();
 
-        this.contents.add (this.create_scale_field (_("Pomodoro duration"), pomodoro_adjustment));
+        contents.add (this.create_scale_field (_("Pomodoro duration"), pomodoro_adjustment));
 
-        this.contents.add (this.create_scale_field (_("Short break duration"), short_break_adjustment));
+        contents.add (this.create_scale_field (_("Short break duration"), short_break_adjustment));
 
-        this.contents.add (this.create_scale_field (_("Long break duration"), long_break_adjustment));
+        contents.add (this.create_scale_field (_("Long break duration"), long_break_adjustment));
 
         var toggle_key_button = new Pomodoro.KeybindingButton (keybinding);
         toggle_key_button.show ();
 
-        this.contents.add (
+        contents.add (
             this.create_field (_("Shortcut to toggle timer"), toggle_key_button));
+
+        var background_sound = new Pomodoro.SoundChooserButton ();
+        background_sound.title = _("Select background sound");
+        background_sound.backend = SoundBackend.GSTREAMER;
+
+        contents.add (
+            this.create_field (_("Background sound"), background_sound));
+
+        this.sounds_settings.bind_with_mapping ("background-sound",
+                                                background_sound,
+                                                "file",
+                                                SETTINGS_BIND_FLAGS,
+                                                Sounds.get_file_mapping,
+                                                Sounds.set_file_mapping,
+                                                null,
+                                                null);
+
+        this.combo_box_size_group.add_widget (background_sound.combo_box);
     }
+
+    private Gtk.SizeGroup combo_box_size_group;
 
     private void setup_notifications_page ()
     {
@@ -389,43 +427,28 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 //            'cafe': _("Cafe"),
 //        };
 
-        var binding_flags = GLib.SettingsBindFlags.DEFAULT |
-                            GLib.SettingsBindFlags.GET |
-                            GLib.SettingsBindFlags.SET;
-
-        this.contents.add (this.create_section_label (_("Notifications")));
+        var contents = this.create_list_box ();
+        var page = this.add_page (_("Notifications"), contents);
 
         var notifications_toggle = new Gtk.Switch ();
-        this.contents.add (
+        contents.add (
             this.create_field (_("Screen notifications"), notifications_toggle));
 
         var reminders_toggle = new Gtk.Switch ();
-        this.contents.add (
+        contents.add (
             this.create_field (_("Break reminder"), reminders_toggle));
 
         this.notifications_settings.bind ("screen-notifications",
                                           notifications_toggle,
                                           "active",
-                                          binding_flags);
+                                          SETTINGS_BIND_FLAGS);
 
         this.notifications_settings.bind ("reminders",
                                           reminders_toggle,
                                           "active",
-                                          binding_flags);
-    }
+                                          SETTINGS_BIND_FLAGS);
 
-    private void setup_sounds_page ()
-    {
-        var binding_flags = GLib.SettingsBindFlags.DEFAULT |
-                            GLib.SettingsBindFlags.GET |
-                            GLib.SettingsBindFlags.SET;
-
-        this.contents.add (this.create_section_label (_("Sounds")));
-
-        var pomodoro_start_sound = new Pomodoro.SoundChooserButton();
-        pomodoro_start_sound.title = _("Select sound for pomodoro start");
-        this.contents.add (
-            this.create_field (_("Pomodoro start sound"), pomodoro_start_sound));
+        /* Sound notifications */
 
         var default_sound_file_uri = GLib.Path.build_filename (
                 "file://",
@@ -433,80 +456,60 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                 "sounds",
                 "pomodoro-start.wav");
 
-        pomodoro_start_sound.add_bookmark (
-                _("Bell"),
-                File.new_for_uri (default_sound_file_uri));
-
         var pomodoro_end_sound = new Pomodoro.SoundChooserButton ();
         pomodoro_end_sound.title = _("Select sound for start of break");
-        this.contents.add (
+        contents.add (
             this.create_field (_("Start of break sound"), pomodoro_end_sound));
 
         pomodoro_end_sound.add_bookmark (
                 _("Bell"),
                 File.new_for_uri (default_sound_file_uri));
 
-        var background_sound = new Pomodoro.SoundChooserButton ();
-        background_sound.title = _("Select background sound");
-        background_sound.backend = SoundBackend.GSTREAMER;
-        this.contents.add (
-            this.create_field (_("Background sound"), background_sound));
+        var pomodoro_start_sound = new Pomodoro.SoundChooserButton();
+        pomodoro_start_sound.title = _("Select sound for pomodoro start");
+        contents.add (
+            this.create_field (_("Pomodoro start sound"), pomodoro_start_sound));
 
-
-        this.sounds_settings.bind_with_mapping ("pomodoro-start-sound",
-                                                pomodoro_start_sound,
-                                                "file",
-                                                binding_flags,
-                                                Sounds.get_file_mapping,
-                                                Sounds.set_file_mapping,
-                                                null,
-                                                null);
+        pomodoro_start_sound.add_bookmark (
+                _("Bell"),
+                File.new_for_uri (default_sound_file_uri));
 
         this.sounds_settings.bind_with_mapping ("pomodoro-end-sound",
                                                 pomodoro_end_sound,
                                                 "file",
-                                                binding_flags,
+                                                SETTINGS_BIND_FLAGS,
                                                 Sounds.get_file_mapping,
                                                 Sounds.set_file_mapping,
                                                 null,
                                                 null);
 
-        this.sounds_settings.bind_with_mapping ("background-sound",
-                                                background_sound,
+        this.sounds_settings.bind_with_mapping ("pomodoro-start-sound",
+                                                pomodoro_start_sound,
                                                 "file",
-                                                binding_flags,
+                                                SETTINGS_BIND_FLAGS,
                                                 Sounds.get_file_mapping,
                                                 Sounds.set_file_mapping,
                                                 null,
                                                 null);
 
-        //var sounds_toggle = new Gtk.Switch ();
-        //this.contents.add (
-        //    this.create_field (_("Play sounds"), sounds_toggle));
-        //
-        //this.sounds_settings.bind ("enabled",
-        //                           sounds_toggle,
-        //                           "active",
-        //                           binding_flags);
+        this.combo_box_size_group.add_widget (pomodoro_end_sound.combo_box);
+        this.combo_box_size_group.add_widget (pomodoro_start_sound.combo_box);
     }
 
     private void setup_presence_page ()
     {
-        var binding_flags = GLib.SettingsBindFlags.DEFAULT |
-                            GLib.SettingsBindFlags.GET |
-                            GLib.SettingsBindFlags.SET;
+        var contents = this.create_list_box ();
+        var page = this.add_page (_("Presence"), contents);
 
         var pause_when_idle_toggle = new Gtk.Switch ();
-
-        this.contents.add (this.create_section_label (_("Presence")));
-
-        this.contents.add (
-            this.create_field (_("Postpone pomodoro when idle"), pause_when_idle_toggle));
-
         this.presence_settings.bind ("pause-when-idle",
                                      pause_when_idle_toggle,
                                      "active",
-                                     binding_flags);
+                                     SETTINGS_BIND_FLAGS);
+
+        var field = this.create_field (_("Postpone pomodoro when idle"),
+                                       pause_when_idle_toggle);
+        contents.add (field);
 
         //presence_section.add_toggle_item(_("Delay system notifications"), true);
         //presence_section.add_toggle_item(_("Change presence status"), true);

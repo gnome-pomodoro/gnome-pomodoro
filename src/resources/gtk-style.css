@@ -2,6 +2,11 @@
     padding: 1.0pt 4.0pt;
 }
 
+.header {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
 .pomodoro-timer .button {
     padding: 4px 6px;
 }
@@ -34,24 +39,6 @@
 
 .preferences-dialog .list {
     background-color: @background;
-}
-
-.preferences-dialog .list-section-label {
-    color: #888;
-    font-weight: bold;
-    text-shadow: 1px 1px #EEEEEE;
-    padding-top: 20pt;
-    padding-bottom: 5px;
-}
-
-.preferences-dialog .list-section-label.first {
-    padding-top: 0px;
-}
-
-.preferences-dialog .list-label {
-}
-
-.preferences-dialog .list-item {
 }
 
 PomodoroSymbolicButton {

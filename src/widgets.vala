@@ -19,7 +19,7 @@
  *
  */
 
-public class Pomodoro.MainToolbar : Gtk.Toolbar
+public class Pomodoro.Toolbar : Gtk.Toolbar
 {
     construct {
         this.show_arrow = false;
@@ -36,8 +36,8 @@ public class Pomodoro.MainToolbar : Gtk.Toolbar
         var width = this.get_allocated_width ();
         var height = this.get_allocated_height ();
 
-        Gtk.render_background (context, cr, 0.0, 0.0, width, height);
-        Gtk.render_frame (context, cr, 0.0, 0.0, width, height);
+        context.render_background (cr, 0.0, 0.0, width, height);
+        context.render_frame (cr, 0.0, 0.0, width, height);
 
         return base.draw (cr);
     }
@@ -465,7 +465,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         }
     }
 
-    private Gtk.ComboBox combo_box;
+    public Gtk.ComboBox combo_box;
     private ulong combo_box_changed_handler_id;
     private Gtk.FileFilter filter;
     private Gtk.ListStore model;
@@ -505,9 +505,9 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
             dialog: create_dialog ()
         );
     }
-    
+
     private Gtk.CellRendererText name_cell;
-    
+
     construct
     {
         /* Dialog */
@@ -527,6 +527,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
 
         /* ComboBox */
         this.name_cell = new Gtk.CellRendererText ();
+        this.name_cell.width = 120;  // TODO: make it adjustable
 
         this.combo_box = new Gtk.ComboBox.with_model (this.model);
         this.combo_box.can_focus = false;
@@ -536,9 +537,6 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         this.combo_box.set_row_separator_func (this.row_separator_func);
         this.combo_box.set_cell_data_func (this.name_cell, this.name_cell_data_func);       
         this.combo_box.show ();
-
-        /* Set the first item in the list to be selected (active). */
-        this.combo_box.set_active (0);
 
         this.combo_box_changed_handler_id = 
                 this.combo_box.changed.connect (this.on_combo_box_changed);
