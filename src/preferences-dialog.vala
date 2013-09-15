@@ -88,6 +88,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
     private GLib.Settings settings;
     private Gtk.Notebook  notebook;
 
+    private Gtk.SizeGroup combo_box_size_group;
+    private Gtk.SizeGroup field_size_group;
     private Gtk.Label presence_notice;
 
     public Egg.ListBox contents { get; set; }
@@ -138,6 +140,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         context.add_class ("preferences-dialog");
 
         this.combo_box_size_group = new Gtk.SizeGroup (Gtk.SizeGroupMode.BOTH);
+        this.field_size_group = new Gtk.SizeGroup (Gtk.SizeGroupMode.VERTICAL);
 
         this.notebook = new Gtk.Notebook ();
         this.notebook.set_show_tabs (false);
@@ -279,7 +282,9 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
             bin.add (vbox);
         }
         else
-        {        
+        {
+            this.field_size_group.add_widget (widget);
+
             bin.add (hbox);
         }
 
@@ -401,8 +406,6 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         this.combo_box_size_group.add_widget (ticking_sound.combo_box);
     }
-
-    private Gtk.SizeGroup combo_box_size_group;
 
     private void setup_notifications_page ()
     {
@@ -546,8 +549,6 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         contents.add (this.create_field (_("Status during pomodoro"),
                                          pomodoro_presence));
 
-        var last_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 10);
-        contents.add (last_box);
 
         var break_presence = this.create_presence_status_combo_box ();
         this.settings.bind_with_mapping ("presence-during-break",
@@ -558,10 +559,6 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                          Presence.set_status_mapping,
                                          null,
                                          null);
-        last_box.pack_start (this.create_field (_("Status during break"),
-                                                break_presence), false, true);
-
-
 
         var notice_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
         var notice_label = new Gtk.Label (null);
@@ -580,12 +577,12 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
 
         var notice_alignment = new Gtk.Alignment (0.5f, 0.0f, 0.0f, 0.0f);
-        notice_alignment.set_padding (10, 10, 5, 5);
+        notice_alignment.set_padding (20, 20, 5, 5);
         notice_alignment.add (notice_box);
 
-        last_box.pack_start (notice_alignment, false, true);
-        last_box.show_all ();
-
+        contents.add (this.create_field (_("Status during break"),
+                                         break_presence,
+                                         notice_alignment));
 
         pomodoro_presence.changed.connect (this.update_presence_notice);
         break_presence.changed.connect (this.update_presence_notice);
