@@ -112,7 +112,6 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
     {
         this.title = _("Preferences");
         this.set_default_size (380, 500);
-        this.set_modal (true);
         this.set_hide_titlebar_when_maximized (true);
         this.set_destroy_with_parent (true);
         this.set_position (Gtk.WindowPosition.CENTER);
@@ -391,6 +390,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         var background_sound = new Pomodoro.SoundChooserButton ();
         background_sound.title = _("Select background sound");
         background_sound.backend = SoundBackend.GSTREAMER;
+        background_sound.has_volume_button = true;
 
         contents.add (
             this.create_field (_("Background sound"), background_sound));
@@ -403,6 +403,11 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                                 Sounds.set_file_mapping,
                                                 null,
                                                 null);
+
+        this.sounds_settings.bind ("background-sound-volume",
+                                   background_sound,
+                                   "volume",
+                                   SETTINGS_BIND_FLAGS);
 
         this.combo_box_size_group.add_widget (background_sound.combo_box);
     }

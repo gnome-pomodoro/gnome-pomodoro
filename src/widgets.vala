@@ -446,6 +446,8 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         }
     }
 
+    public double volume { get; set; default=0.5; }
+
     public string title {
         owned get {
             return this.dialog.title;
@@ -465,11 +467,14 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         }
     }
 
+    public bool has_volume_button { get; set; default=false; }
+
     public Gtk.ComboBox combo_box;
     private ulong combo_box_changed_handler_id;
     private Gtk.FileFilter filter;
     private Gtk.ListStore model;
     private Gtk.TreeModelFilter filter_model;
+    private Gtk.VolumeButton volume_button;
 
     private static Gtk.FileChooserDialog create_dialog ()
     {
@@ -510,6 +515,8 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
 
     construct
     {
+        this.spacing = 5;
+
         /* Dialog */
         this.dialog.response.connect (this.on_dialog_response);
         this.dialog.delete_event.connect (this.on_dialog_delete_event);
@@ -560,6 +567,23 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         target_list.add_uri_targets (TargetType.TEXT_URI_LIST);
         target_list.add_text_targets (TargetType.TEXT_PLAIN);
         Gtk.drag_dest_set_target_list (this, target_list);
+
+        this.volume_button = new Gtk.VolumeButton ();
+        this.volume_button.no_show_all = true;
+        this.volume_button.use_symbolic = true;
+        this.volume_button.relief = Gtk.ReliefStyle.NORMAL;
+
+        this.bind_property ("volume",
+                            this.volume_button.adjustment,
+                            "value",
+                            GLib.BindingFlags.SYNC_CREATE | GLib.BindingFlags.BIDIRECTIONAL);
+
+        this.bind_property ("has-volume-button",
+                            this.volume_button,
+                            "visible",
+                            GLib.BindingFlags.DEFAULT);
+
+        this.pack_start (this.volume_button, false, true);
     }
 
     private bool has_bookmark_separator = false;
