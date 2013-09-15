@@ -334,17 +334,17 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         var keybinding = new Keybinding ();
 
-        this.settings.bind ("pomodoro-time",
+        this.settings.bind ("pomodoro-duration",
                             pomodoro_adjustment,
                             "value",
                             SETTINGS_BIND_FLAGS);
 
-        this.settings.bind ("short-pause-time",
+        this.settings.bind ("short-break-duration",
                             short_break_adjustment,
                             "value",
                             SETTINGS_BIND_FLAGS);
 
-        this.settings.bind ("long-pause-time",
+        this.settings.bind ("long-break-duration",
                             long_break_adjustment,
                             "value",
                             SETTINGS_BIND_FLAGS);
@@ -354,7 +354,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         //                    "value",
         //                    binding_flags);
 
-        this.settings.bind_with_mapping ("toggle-timer",
+        this.settings.bind_with_mapping ("toggle-timer-key",
                                          keybinding,
                                          "accelerator",
                                          SETTINGS_BIND_FLAGS,
@@ -377,16 +377,16 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         contents.add (
             this.create_field (_("Shortcut to toggle timer"), toggle_key_button));
 
-        var background_sound = new Pomodoro.SoundChooserButton ();
-        background_sound.title = _("Select background sound");
-        background_sound.backend = SoundBackend.GSTREAMER;
-        background_sound.has_volume_button = true;
+        var ticking_sound = new Pomodoro.SoundChooserButton ();
+        ticking_sound.title = _("Select ticking sound");
+        ticking_sound.backend = SoundBackend.GSTREAMER;
+        ticking_sound.has_volume_button = true;
 
         contents.add (
-            this.create_field (_("Background sound"), background_sound));
+            this.create_field (_("Ticking sound"), ticking_sound));
 
-        this.settings.bind_with_mapping ("background-sound",
-                                         background_sound,
+        this.settings.bind_with_mapping ("ticking-sound",
+                                         ticking_sound,
                                          "file",
                                          SETTINGS_BIND_FLAGS,
                                          Sounds.get_file_mapping,
@@ -394,12 +394,12 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                          null,
                                          null);
 
-        this.settings.bind ("background-sound-volume",
-                            background_sound,
+        this.settings.bind ("ticking-sound-volume",
+                            ticking_sound,
                             "volume",
                             SETTINGS_BIND_FLAGS);
 
-        this.combo_box_size_group.add_widget (background_sound.combo_box);
+        this.combo_box_size_group.add_widget (ticking_sound.combo_box);
     }
 
     private Gtk.SizeGroup combo_box_size_group;
@@ -435,12 +435,12 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         contents.add (
             this.create_field (_("Break reminder"), reminders_toggle));
 
-        this.settings.bind ("screen-notifications",
+        this.settings.bind ("show-screen-notifications",
                             notifications_toggle,
                             "active",
                             SETTINGS_BIND_FLAGS);
 
-        this.settings.bind ("reminders",
+        this.settings.bind ("show-reminders",
                             reminders_toggle,
                             "active",
                             SETTINGS_BIND_FLAGS);

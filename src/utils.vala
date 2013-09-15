@@ -33,7 +33,7 @@ namespace Pomodoro
         PARSE
     }
 
-    internal DateTime datetime_from_string (string date_str) throws Error
+    internal DateTime datetime_from_string (string date_str) throws DateTimeError
     {
         // strptime() works okay for local timezone, otherwise it's crap,
         // so we need to parse date string ourselves.
@@ -63,7 +63,7 @@ namespace Pomodoro
                 }
 
         if (length < 7 || month == 0)
-            throw new DateTimeError.PARSE ("Could not parse date");
+            throw new DateTimeError.PARSE ("Could not parse string '%s'", date_str);
 
         return new DateTime.utc (year, month, day, hour, minutes, seconds);
     }

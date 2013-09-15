@@ -165,9 +165,9 @@ public class Pomodoro.Timer : Object
 
             this.do_set_state (value, timestamp);
 
-            this.settings_state.set_double ("timer-session-count", (double) this.session);
-            this.settings_state.set_string ("timer-state", state_to_string (this.state));
-            this.settings_state.set_string ("timer-state-changed-date", datetime_to_string(state_changed_date));
+            this.settings_state.set_double ("session-count", (double) this.session);
+            this.settings_state.set_string ("state", state_to_string (this.state));
+            this.settings_state.set_string ("state-changed-date", datetime_to_string(state_changed_date));
 
             if (this._state != state_tmp) {
                 var is_completed = this._session != session_tmp;
@@ -269,7 +269,7 @@ public class Pomodoro.Timer : Object
         this.freeze_notify();
 
         if (this._state == State.POMODORO) {
-            if (this._elapsed >= SESSION_ACCEPTANCE * this.settings.get_uint("pomodoro-time")) {
+            if (this._elapsed >= SESSION_ACCEPTANCE * this.settings.get_uint("pomodoro-duration")) {
                 this.session += 1;
             }
             else {
@@ -288,12 +288,12 @@ public class Pomodoro.Timer : Object
                 break;
 
             case State.POMODORO:
-                var long_pause_acceptance_time = (uint64)((1.0 - SHORT_LONG_PAUSE_ACCEPTANCE) * this.settings.get_uint ("short-pause-time") * 1000
-                                                     + (SHORT_LONG_PAUSE_ACCEPTANCE) * this.settings.get_uint ("long-pause-time") * 1000);
+                var long_pause_acceptance_time = (uint64)((1.0 - SHORT_LONG_PAUSE_ACCEPTANCE) * this.settings.get_uint ("short-break-duration") * 1000
+                                                     + (SHORT_LONG_PAUSE_ACCEPTANCE) * this.settings.get_uint ("long-break-duration") * 1000);
 
                 if (this._state == State.PAUSE || this._state == State.IDLE) {
                     // If skipped a break make long break sooner
-                    if (this._elapsed < SHORT_PAUSE_ACCEPTANCE * this.settings.get_uint ("short-pause-time") * 1000)
+                    if (this._elapsed < SHORT_PAUSE_ACCEPTANCE * this.settings.get_uint ("short-break-duration") * 1000)
                         this.session += 1;
 
                     // Reset work cycle when finished long break or was too lazy on a short one,
@@ -311,7 +311,7 @@ public class Pomodoro.Timer : Object
                 }
 
                 new_elapsed = 0;
-                new_elapsed_limit = this.settings.get_uint ("pomodoro-time") * 1000;
+                new_elapsed_limit = this.settings.get_uint ("pomodoro-duration") * 1000;
                 break;
 
             case State.PAUSE:
@@ -323,9 +323,9 @@ public class Pomodoro.Timer : Object
 
                 // Determine which pause type user should have
                 if (this._session >= this._session_limit)
-                    new_elapsed_limit = this.settings.get_uint ("long-pause-time") * 1000;
+                    new_elapsed_limit = this.settings.get_uint ("long-break-duration") * 1000;
                 else
-                    new_elapsed_limit = this.settings.get_uint ("short-pause-time") * 1000;
+                    new_elapsed_limit = this.settings.get_uint ("short-break-duration") * 1000;
 
                 break;
 
@@ -357,20 +357,20 @@ public class Pomodoro.Timer : Object
 
     public void restore()
     {
-        var session = this.settings_state.get_double ("timer-session-count");
-        var state = string_to_state (this.settings_state.get_string ("timer-state"));
+        var session = this.settings_state.get_double ("session-count");
+        var state = string_to_state (this.settings_state.get_string ("state"));
         var timestamp = GLib.get_real_time() / 1000;
         DateTime state_changed_date;
 
         try {
             state_changed_date = datetime_from_string (
-                this.settings_state.get_string ("timer-state-changed-date"));
+                this.settings_state.get_string ("state-changed-date"));
         }
-        catch (Error error) {
+        catch (DateTimeError error) {
             // In case there is no valid state-changed-date, elapsed time
             // will be lost.
             GLib.warning ("Could not restore state time");
-            state_changed_date = new DateTime.from_unix_utc (timestamp);
+            return;
         }
 
         this.freeze_notify();
@@ -404,9 +404,9 @@ public class Pomodoro.Timer : Object
         // Update timestamp to the beginning of current state
         state_changed_date = new DateTime.from_unix_utc ((int64)(timestamp - this._elapsed) / 1000);
 
-        this.settings_state.set_double ("timer-session-count", (double) this._session);
-        this.settings_state.set_string ("timer-state", state_to_string (this._state));
-        this.settings_state.set_string ("timer-state-changed-date", datetime_to_string(state_changed_date));
+        this.settings_state.set_double ("session-count", (double) this._session);
+        this.settings_state.set_string ("state", state_to_string (this._state));
+        this.settings_state.set_string ("state-changed-date", datetime_to_string(state_changed_date));
 
         this.thaw_notify();
         this.state_changed();
@@ -480,23 +480,23 @@ public class Pomodoro.Timer : Object
         var elapsed_limit_tmp = this._elapsed_limit;
 
         switch (key) {
-            case "pomodoro-time":
+            case "pomodoro-duration":
                 if (this.state == State.POMODORO)
-                    elapsed_limit = this.settings.get_uint ("pomodoro-time") * 1000;
+                    elapsed_limit = this.settings.get_uint (key) * 1000;
 
                 elapsed = uint64.min (elapsed, elapsed_limit);
                 break;
 
-            case "short-pause-time":
+            case "short-break-duration":
                 if (this.state == State.PAUSE && this.session < this.session_limit)
-                    elapsed_limit = this.settings.get_uint ("short-pause-time") * 1000;
+                    elapsed_limit = this.settings.get_uint (key) * 1000;
 
                 elapsed = uint64.min (elapsed, elapsed_limit);
                 break;
 
-            case "long-pause-time":
+            case "long-break-duration":
                 if (this.state == State.PAUSE && this.session >= this.session_limit)
-                    elapsed_limit = this.settings.get_uint ("long-pause-time") * 1000;
+                    elapsed_limit = this.settings.get_uint (key) * 1000;
 
                 elapsed = uint64.min (elapsed, elapsed_limit);
                 break;

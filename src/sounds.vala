@@ -275,12 +275,12 @@ internal class Pomodoro.Sounds : Object
         this.player = new Player ();
         this.player.repeat = true;
 
-        this.settings.bind ("background-sound-volume",
+        this.settings.bind ("ticking-sound-volume",
                             this.player,
                             "volume",
                             binding_flags);
 
-        this.settings.bind_with_mapping ("background-sound",
+        this.settings.bind_with_mapping ("ticking-sound",
                                          this.player,
                                          "file",
                                          binding_flags,
@@ -353,10 +353,10 @@ internal class Pomodoro.Sounds : Object
         switch (key)
         {
             case "pomodoro-end-sound":
-                file_path = this.get_file_path ("pomodoro-end-sound");
+                file_path = this.get_file_path (key);
                 this.ensure_context();
 
-                if (this.context != null && file_path != null) {
+                if (this.context != null && file_path != "") {
                     status = this.context.cache(
                             Canberra.PROP_EVENT_ID, "pomodoro-end",
                             Canberra.PROP_MEDIA_FILENAME, file_path);
@@ -366,10 +366,10 @@ internal class Pomodoro.Sounds : Object
                 break;
   
             case "pomodoro-start-sound":
-                file_path = this.get_file_path ("pomodoro-start-sound");
+                file_path = this.get_file_path (key);
                 this.ensure_context();
 
-                if (this.context != null && file_path != null) {
+                if (this.context != null && file_path != "") {
                     status = this.context.cache(
                             Canberra.PROP_EVENT_ID, "pomodoro-start",
                             Canberra.PROP_MEDIA_FILENAME, file_path);
