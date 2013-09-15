@@ -253,7 +253,6 @@ internal class Pomodoro.Sounds : Object
     private Canberra.Context context;
 
     private unowned Pomodoro.Timer timer;
-    private bool is_enabled = false;
     private uint fade_out_timeout_id;
 
 
@@ -267,12 +266,10 @@ internal class Pomodoro.Sounds : Object
                             GLib.SettingsBindFlags.GET;
 
         this.settings = application.settings as GLib.Settings;
-        this.settings = this.settings.get_child ("preferences").get_child ("sounds");
+        this.settings = this.settings.get_child ("preferences");
         this.settings.changed.connect (this.on_settings_changed);
 
         this.ensure_context();
-
-        this.on_settings_changed (this.settings, "enabled");
 
 
         this.player = new Player ();
@@ -293,6 +290,13 @@ internal class Pomodoro.Sounds : Object
                                          null);
 
         this.timer.notify["elapsed-limit"].connect (this.on_elapsed_limit_changed);
+
+        this.enable ();
+    }
+
+    ~Sounds ()
+    {
+        this.disable ();
     }
 
     private void schedule_fade_out ()
@@ -318,6 +322,29 @@ internal class Pomodoro.Sounds : Object
         }
     }
 
+    public void enable ()
+    {
+        this.timer.state_changed.connect (this.on_state_changed);
+        this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
+        this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
+        this.timer.pomodoro_end.connect (this.on_pomodoro_end);
+        this.timer.pomodoro_start.connect (this.on_pomodoro_start);
+    }
+
+    public void disable ()
+    {
+        SignalHandler.disconnect_by_func (this.timer,
+                  (void*) this.on_state_changed, (void*) this);
+        SignalHandler.disconnect_by_func (this.timer,
+                  (void*) this.on_notify_pomodoro_end, (void*) this);
+        SignalHandler.disconnect_by_func (this.timer,
+                  (void*) this.on_notify_pomodoro_start, (void*) this);
+        SignalHandler.disconnect_by_func (this.timer,
+                  (void*) this.on_pomodoro_end, (void*) this);
+        SignalHandler.disconnect_by_func (this.timer,
+                  (void*) this.on_pomodoro_start, (void*) this);
+    }
+
     private void on_settings_changed (GLib.Settings settings, string key)
     {
         int status;
@@ -325,34 +352,6 @@ internal class Pomodoro.Sounds : Object
 
         switch (key)
         {
-            case "enabled":
-                var enabled = settings.get_boolean ("enabled");
-
-                if (enabled && !this.is_enabled) {
-                    this.timer.state_changed.connect (this.on_state_changed);
-                    this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
-                    this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
-                    this.timer.pomodoro_end.connect (this.on_pomodoro_end);
-                    this.timer.pomodoro_start.connect (this.on_pomodoro_start);
-                }
-                if (!enabled && this.is_enabled) {
-                    SignalHandler.disconnect_by_func (this.timer,
-                              (void*) this.on_state_changed, (void*) this);
-                    SignalHandler.disconnect_by_func (this.timer,
-                              (void*) this.on_notify_pomodoro_end, (void*) this);
-                    SignalHandler.disconnect_by_func (this.timer,
-                              (void*) this.on_notify_pomodoro_start, (void*) this);
-                    SignalHandler.disconnect_by_func (this.timer,
-                              (void*) this.on_pomodoro_end, (void*) this);
-                    SignalHandler.disconnect_by_func (this.timer,
-                              (void*) this.on_pomodoro_start, (void*) this);
-                }
-
-                // TODO: enable/disable player
-
-                this.is_enabled = enabled;
-                break;
-
             case "pomodoro-end-sound":
                 file_path = this.get_file_path ("pomodoro-end-sound");
                 this.ensure_context();

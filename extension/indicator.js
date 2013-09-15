@@ -118,15 +118,11 @@ const Indicator = new Lang.Class({
 
     _doInit: function() {
         this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
-
-        let children = ['timer', 'sounds', 'presence', 'notifications'];
-        for (childId in children) {
-            this._settings.get_child(children[childId]).connect('changed', Lang.bind(this, this._onSettingsChanged));
-        }
+        this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
 
         // Register keybindings to toggle
         Main.wm.addKeybinding('toggle-timer',
-                              this._settings.get_child('keybindings'),
+                              this._settings,
                               Meta.KeyBindingFlags.NONE,
                               Shell.KeyBindingMode.ALL,
                               Lang.bind(this, this.toggle));
@@ -163,10 +159,10 @@ const Indicator = new Lang.Class({
     },
 
     _onSettingsChanged: function() {
-        if (this._reminder && !this._settings.get_child('notifications').get_boolean('reminders'))
+        if (this._reminder && !this._settings.get_boolean('reminders'))
             this._reminder.destroy();
 
-        if (this._notificationDialog && !this._settings.get_child('notifications').get_boolean('screen-notifications')) {
+        if (this._notificationDialog && !this._settings.get_boolean('screen-notifications')) {
             this._notificationDialog.close();
             this._notificationDialog.setOpenWhenIdle(false);
         }
@@ -229,7 +225,7 @@ const Indicator = new Lang.Class({
         if (toggled) {
             remaining = state != State.IDLE
                     ? Math.max(this._proxy.ElapsedLimit - this._proxy.Elapsed, 0)
-                    : this._settings.get_child('timer').get_uint('pomodoro-time');
+                    : this._settings.get_uint('pomodoro-time');
 
             minutes = parseInt(remaining / 60);
             seconds = parseInt(remaining % 60);
@@ -445,8 +441,7 @@ const Indicator = new Lang.Class({
 
     _onNotifyPomodoroEnd: function(proxy, senderName, [is_completed]) {
         let source = this._ensureNotificationSource();
-        let screenNotifications = this._settings.get_child('notifications')
-                                                .get_boolean('screen-notifications');
+        let screenNotifications = this._settings.get_boolean('screen-notifications');
 
         if (this._notification instanceof Notifications.PomodoroEnd) {
             this._notification.show();
@@ -515,7 +510,7 @@ const Indicator = new Lang.Class({
     _schedulePomodoroEndReminder: function() {
         let source = this._ensureNotificationSource();
 
-        if (!this._settings.get_child('notifications').get_boolean('reminders'))
+        if (!this._settings.get_boolean('reminders'))
             return;
 
         if (this._reminder)

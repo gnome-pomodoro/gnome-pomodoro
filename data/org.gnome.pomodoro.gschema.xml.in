@@ -4,13 +4,8 @@
     <child name="state" schema="org.gnome.pomodoro.state"/>
   </schema>
   <schema id="org.gnome.pomodoro.preferences" path="/apps/gnome-pomodoro/preferences/">
-    <child name="timer" schema="org.gnome.pomodoro.preferences.timer"/>
-    <child name="keybindings" schema="org.gnome.pomodoro.preferences.keybindings"/>
-    <child name="notifications" schema="org.gnome.pomodoro.preferences.notifications"/>
-    <child name="presence" schema="org.gnome.pomodoro.preferences.presence"/>
-    <child name="sounds" schema="org.gnome.pomodoro.preferences.sounds"/>
-  </schema>
-  <schema id="org.gnome.pomodoro.preferences.timer" path="/apps/gnome-pomodoro/preferences/timer/">
+
+    <!-- Timer -->
     <key name="pomodoro-time" type="u">
       <default>1500</default>
       <range min="1" max="36000"/>
@@ -29,15 +24,15 @@
       <summary>Long pause duration</summary>
       <description>Time in seconds you are supposed to take a longer break.</description>
     </key>
-  </schema>
-  <schema id="org.gnome.pomodoro.preferences.keybindings" path="/apps/gnome-pomodoro/preferences/keybindings/">
+
+    <!-- Keybindings -->
     <key type="as" name="toggle-timer">
       <default><![CDATA[["<Ctrl><Alt>p"]]]></default>
       <summary>Timer toggle key</summary>
       <description>Key to toggle the timer.</description>
     </key>
-  </schema>
-  <schema id="org.gnome.pomodoro.preferences.notifications" path="/apps/gnome-pomodoro/preferences/notifications/">
+
+    <!-- Notifications -->
     <key name="screen-notifications" type="b">
       <default>true</default>
       <summary>Screen notifications</summary>
@@ -48,8 +43,8 @@
       <summary>Reminders</summary>
       <description>Whether to remind about ongoing break.</description>
     </key>
-  </schema>
-  <schema id="org.gnome.pomodoro.preferences.presence" path="/apps/gnome-pomodoro/preferences/presence/">
+
+    <!-- Presence -->
     <key name="pause-when-idle" type="b">
       <default>true</default>
       <summary>Wait after break</summary>
@@ -79,18 +74,8 @@
       <summary>Presence during break</summary>
       <description>Presence during break.</description>
     </key>
-    <key name="enabled" type="b">
-      <default>true</default>
-      <summary>Change presence status</summary>
-      <description>Whether to change user and IM presence to busy.</description>
-    </key>
-  </schema>
-  <schema id="org.gnome.pomodoro.preferences.sounds" path="/apps/gnome-pomodoro/preferences/sounds/">
-    <key name="enabled" type="b">
-      <default>true</default>
-      <summary>Play sounds</summary>
-      <description>Whether to play sounds.</description>
-    </key>
+
+    <!-- Sounds -->
     <key name="pomodoro-start-sound" type="s">
       <default>"pomodoro-start.wav"</default>
       <summary>Pomodoro start sound</summary>

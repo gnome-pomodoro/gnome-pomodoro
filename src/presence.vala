@@ -102,7 +102,7 @@ class Pomodoro.Presence : Object
                             GLib.SettingsBindFlags.GET;
 
         this.settings = application.settings as GLib.Settings;
-        this.settings = this.settings.get_child ("preferences").get_child ("presence");
+        this.settings = this.settings.get_child ("preferences");
         this.settings.changed.connect (this.on_settings_changed);
 
         this.ignore_next_status = false;
