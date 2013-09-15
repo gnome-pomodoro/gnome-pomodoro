@@ -238,6 +238,7 @@ public class Pomodoro.Application : Gtk.Application
 
         this.modules = new List<Object>();
         this.modules.prepend (new Pomodoro.Sounds (this.timer));
+        this.modules.prepend (new Pomodoro.Presence (this.timer));
 
         this.timer.restore();
 

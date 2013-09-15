@@ -55,6 +55,30 @@
       <summary>Wait after break</summary>
       <description>Postpone pomodoro start until there is some activity.</description>
     </key>
+    <key name="presence-during-pomodoro" type="s">
+      <choices>
+        <choice value=""/>
+        <choice value="available"/>
+        <choice value="invisible"/>
+        <choice value="busy"/>
+        <choice value="idle"/>
+      </choices>
+      <default>"busy"</default>
+      <summary>Presence during pomodoro</summary>
+      <description>Presence during pomodoro.</description>
+    </key>
+    <key name="presence-during-break" type="s">
+      <choices>
+        <choice value=""/>
+        <choice value="available"/>
+        <choice value="invisible"/>
+        <choice value="busy"/>
+        <choice value="idle"/>
+      </choices>
+      <default>"available"</default>
+      <summary>Presence during break</summary>
+      <description>Presence during break.</description>
+    </key>
     <key name="enabled" type="b">
       <default>true</default>
       <summary>Change presence status</summary>

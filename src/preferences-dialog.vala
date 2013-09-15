@@ -93,6 +93,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
     private GLib.Settings presence_settings;
     private Gtk.Notebook  notebook;
 
+    private Gtk.Label presence_notice;
+
     public Egg.ListBox contents { get; set; }
 
     public enum Mode {
@@ -496,6 +498,33 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.combo_box_size_group.add_widget (pomodoro_start_sound.combo_box);
     }
 
+    private Gtk.ComboBox create_presence_status_combo_box ()
+    {
+        var combo_box = new Pomodoro.EnumComboBox ();
+
+        combo_box.add_option (Gnome.SessionManager.PresenceStatus.DEFAULT,
+                              "");
+
+        combo_box.add_option (Gnome.SessionManager.PresenceStatus.AVAILABLE,
+                              _("Available"));
+
+        combo_box.add_option (Gnome.SessionManager.PresenceStatus.BUSY,
+                              _("Busy"));
+
+        // Currently gnome-shell does not handle invisible status properly
+        combo_box.add_option (Gnome.SessionManager.PresenceStatus.INVISIBLE,
+                              _("Invisible"));
+
+        // Idle status is used by gnome-shell/screensaver,
+        // it's not ment to be set by user
+        // combo_box.add_option (Gnome.SessionManager.PresenceStatus.IDLE,
+        //                       _("Idle"));
+
+        combo_box.show ();
+
+        return combo_box as Gtk.ComboBox;
+    }
+
     private void setup_presence_page ()
     {
         var contents = this.create_list_box ();
@@ -506,17 +535,106 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                      pause_when_idle_toggle,
                                      "active",
                                      SETTINGS_BIND_FLAGS);
+        contents.add (this.create_field (_("Postpone pomodoro when idle"),
+                                         pause_when_idle_toggle));
 
-        var field = this.create_field (_("Postpone pomodoro when idle"),
-                                       pause_when_idle_toggle);
-        contents.add (field);
 
-        //presence_section.add_toggle_item(_("Delay system notifications"), true);
-        //presence_section.add_toggle_item(_("Change presence status"), true);
-        //presence_section.add_combo_box_item(_("Status during pomodoro"), status_options, '');
-        //presence_section.add_combo_box_item(_("Status during break"), status_options, '');
-        //presence_section.add_toggle_item(_("Change status to busy during session"), true);
-        //presence_section.add_toggle_item(_("Change status to away during break"), true);
+        var pomodoro_presence = this.create_presence_status_combo_box ();
+        this.presence_settings.bind_with_mapping ("presence-during-pomodoro",
+                                                  pomodoro_presence,
+                                                  "value",
+                                                  SETTINGS_BIND_FLAGS,
+                                                  Presence.get_status_mapping,
+                                                  Presence.set_status_mapping,
+                                                  null,
+                                                  null);
+        contents.add (this.create_field (_("Status during pomodoro"),
+                                         pomodoro_presence));
+
+        var last_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 10);
+        contents.add (last_box);
+
+        var break_presence = this.create_presence_status_combo_box ();
+        this.presence_settings.bind_with_mapping ("presence-during-break",
+                                                  break_presence,
+                                                  "value",
+                                                  SETTINGS_BIND_FLAGS,
+                                                  Presence.get_status_mapping,
+                                                  Presence.set_status_mapping,
+                                                  null,
+                                                  null);
+        last_box.pack_start (this.create_field (_("Status during break"),
+                                                break_presence), false, true);
+
+
+
+        var notice_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
+        var notice_label = new Gtk.Label (null);
+        notice_label.wrap = true;
+        notice_label.wrap_mode = Pango.WrapMode.WORD;
+        notice_label.xalign = 0.0f;
+        notice_label.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
+        this.presence_notice = notice_label;
+
+        var notice_icon = new Gtk.Image.from_icon_name ("dialog-warning-symbolic",
+                                                        Gtk.IconSize.MENU);
+        notice_icon.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
+
+        notice_box.pack_start (notice_icon, false, true);
+        notice_box.pack_start (notice_label, false, false);
+
+
+        var notice_alignment = new Gtk.Alignment (0.5f, 0.0f, 0.0f, 0.0f);
+        notice_alignment.set_padding (10, 10, 5, 5);
+        notice_alignment.add (notice_box);
+
+        last_box.pack_start (notice_alignment, false, true);
+        last_box.show_all ();
+
+
+        pomodoro_presence.changed.connect (this.update_presence_notice);
+        break_presence.changed.connect (this.update_presence_notice);
+
+        this.update_presence_notice ();
+    }
+
+    private void update_presence_notice ()
+    {
+        var presence_during_pomodoro = Gnome.SessionManager.string_to_presence_status (
+                    this.presence_settings.get_string ("presence-during-pomodoro"));
+
+        var presence_during_break = Gnome.SessionManager.string_to_presence_status (
+                    this.presence_settings.get_string ("presence-during-break"));
+
+        var has_notifications_during_pomodoro = (
+            presence_during_pomodoro == Gnome.SessionManager.PresenceStatus.DEFAULT ||
+            presence_during_pomodoro == Gnome.SessionManager.PresenceStatus.AVAILABLE);
+
+        var has_notifications_during_break = (
+            presence_during_break == Gnome.SessionManager.PresenceStatus.DEFAULT ||
+            presence_during_break == Gnome.SessionManager.PresenceStatus.AVAILABLE);
+
+        var text = "";
+
+        if (!has_notifications_during_pomodoro && has_notifications_during_break) {
+            text = _("System notifications including chat messages will be disabled during pomodoro.");
+        }
+
+        if (has_notifications_during_pomodoro && !has_notifications_during_break) {
+            text = _("System notifications including chat messages will be disabled during break.");
+        }
+
+        if (!has_notifications_during_pomodoro && !has_notifications_during_break) {
+            text = _("System notifications including chat messages will be disabled.");
+        }
+
+        if (text != "") {
+            this.presence_notice.set_text (text);
+            this.presence_notice.parent.show ();
+        }
+        else {
+            this.presence_notice.parent.hide ();
+        }
     }
 }
 
