@@ -45,9 +45,9 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 
 2. Build it and install
 
-    Install development tools:
+    Install development tools
 
-        sudo apt-get install gnome-common intltool
+        sudo apt-get install gnome-common intltool libglib2.0-dev
 
     Build Pomodoro and install it in your users directory
 
