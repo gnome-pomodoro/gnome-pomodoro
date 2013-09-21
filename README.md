@@ -37,6 +37,7 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 
 ## Direct from source
 1. Get zipball
+    * [for GNOME Shell 3.10](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-3.10)
     * [for GNOME Shell 3.8](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-3.8)
     * [for GNOME Shell 3.6](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-3.6)
     * [for GNOME Shell 3.4](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-3.4)
@@ -137,7 +138,7 @@ Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodo
 
 **Version 0.8**
 
-+ Support for GNOME Shell 3.8 (thanks @haaja)
++ Support for GNOME Shell 3.8 and 3.10 (thanks @haaja)
 + Brazilian Portuguese translation (thanks @aleborba)
 + Minor bug fixes
 

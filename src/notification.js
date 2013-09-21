@@ -176,8 +176,6 @@ const ModalDialog = new Lang.Class({
 
         return this._grabHelper.grab({
             actor: this._lightbox.actor,
-            modal: true,
-            grabFocus: true,
             onUngrab: Lang.bind(this, this._onUngrab)
         });
     },

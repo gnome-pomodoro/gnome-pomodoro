@@ -16,6 +16,7 @@
 
 const Lang = imports.lang;
 
+const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
@@ -25,6 +26,7 @@ const St = imports.gi.St;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+const Slider = imports.ui.slider;
 const Tweener = imports.ui.tweener;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
@@ -75,9 +77,15 @@ const Indicator = new Lang.Class({
         this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         
+        this.menu.connect('get-prefered-width', Lang.bind(this, function(actor, for_height, allocation) {
+            let [min_size, natural_size] = actor.get_prefered_width(for_height);
+            alloc.min_size = Math.max(min_size, 250);
+            alloc.natural_size = Math.max(min_size, natural_size);
+        }));
         
         // Timer label
-        this.label = new St.Label({ style_class: 'extension-pomodoro-label' });
+        this.label = new St.Label({ style_class: 'extension-pomodoro-label',
+                                    y_align: Clutter.ActorAlign.CENTER });
         this.label.clutter_text.set_line_wrap(false);
         this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
         
@@ -121,6 +129,9 @@ const Indicator = new Lang.Class({
     },
 
     _buildOptionsMenu: function() {
+        var item;
+        var bin;
+
         // Reset counters
         this._resetCountButton =  new PopupMenu.PopupMenuItem(_("Reset Counts and Timer"));
         this._resetCountButton.connect('activate', Lang.bind(this, this._onReset));
@@ -155,22 +166,33 @@ const Indicator = new Lang.Class({
         this._optionsMenu.menu.addMenuItem(this._playSoundsToggle);
         
         // Pomodoro duration
-        this._pomodoroTimeTitle = new PopupMenu.PopupMenuItem(_("Pomodoro Duration"), { reactive: false });
+        item = new PopupMenu.PopupMenuItem(_("Pomodoro Duration"), { reactive: false });
         this._pomodoroTimeLabel = new St.Label({ text: '' });
-        this._pomodoroTimeSlider = new PopupMenu.PopupSliderMenuItem(0);
+        bin = new St.Bin({ x_align: St.Align.END });
+        bin.child = this._pomodoroTimeLabel;
+        item.actor.add(bin, { expand: true, x_align: St.Align.END });
+        this._optionsMenu.menu.addMenuItem(item);
+
+        item = new PopupMenu.PopupBaseMenuItem({ activate: false });
+        this._pomodoroTimeSlider = new Slider.Slider(0);
         this._pomodoroTimeSlider.connect('value-changed', Lang.bind(this, function(item) {
             this._pomodoroTimeLabel.set_text(_formatTime(_valueToSeconds(item.value)));
         }));
         this._pomodoroTimeSlider.connect('drag-end', Lang.bind(this, this._onPomodoroTimeChanged));
         this._pomodoroTimeSlider.actor.connect('scroll-event', Lang.bind(this, this._onPomodoroTimeChanged));
-        this._pomodoroTimeTitle.addActor(this._pomodoroTimeLabel, { align: St.Align.END });
-        this._optionsMenu.menu.addMenuItem(this._pomodoroTimeTitle);
-        this._optionsMenu.menu.addMenuItem(this._pomodoroTimeSlider);
-        
+        item.actor.add(this._pomodoroTimeSlider.actor, { expand: true });
+        this._optionsMenu.menu.addMenuItem(item);
+
         // Short pause duration
-        this._shortPauseTimeTitle = new PopupMenu.PopupMenuItem(_("Short Break Duration"), { reactive: false });
+        item = new PopupMenu.PopupMenuItem(_("Short Break Duration"), { reactive: false });
         this._shortPauseTimeLabel = new St.Label({ text: '' });
-        this._shortPauseTimeSlider = new PopupMenu.PopupSliderMenuItem(0);
+        bin = new St.Bin({ x_align: St.Align.END });
+        bin.child = this._shortPauseTimeLabel;
+        item.actor.add(bin, { expand: true, x_align: St.Align.END });
+        this._optionsMenu.menu.addMenuItem(item);
+
+        item = new PopupMenu.PopupBaseMenuItem({ activate: false });
+        this._shortPauseTimeSlider = new Slider.Slider(0);
         this._shortPauseTimeSlider.connect('value-changed', Lang.bind(this, function(item) {
             this._shortPauseTimeLabel.set_text(_formatTime(_valueToSeconds(item.value)));
             if (item.value > this._longPauseTimeValue) {
@@ -184,14 +206,19 @@ const Indicator = new Lang.Class({
         }));
         this._shortPauseTimeSlider.connect('drag-end', Lang.bind(this, this._onShortPauseTimeChanged));
         this._shortPauseTimeSlider.actor.connect('scroll-event', Lang.bind(this, this._onShortPauseTimeChanged));
-        this._shortPauseTimeTitle.addActor(this._shortPauseTimeLabel, { align: St.Align.END });
-        this._optionsMenu.menu.addMenuItem(this._shortPauseTimeTitle);
-        this._optionsMenu.menu.addMenuItem(this._shortPauseTimeSlider);
-        
+        item.actor.add(this._shortPauseTimeSlider.actor, { expand: true });
+        this._optionsMenu.menu.addMenuItem(item);
+
         // Long pause duration
-        this._longPauseTimeTitle = new PopupMenu.PopupMenuItem(_("Long Break Duration"), { reactive: false });
+        item = new PopupMenu.PopupMenuItem(_("Long Break Duration"), { reactive: false });
         this._longPauseTimeLabel = new St.Label({ text: '' });
-        this._longPauseTimeSlider = new PopupMenu.PopupSliderMenuItem(0);
+        bin = new St.Bin({ x_align: St.Align.END });
+        bin.child = this._longPauseTimeLabel;
+        item.actor.add(bin, { expand: true, x_align: St.Align.END });
+        this._optionsMenu.menu.addMenuItem(item);
+
+        item = new PopupMenu.PopupBaseMenuItem({ activate: false });
+        this._longPauseTimeSlider = new Slider.Slider(0);
         this._longPauseTimeSlider.connect('value-changed', Lang.bind(this, function(item) {
             this._longPauseTimeLabel.set_text(_formatTime(_valueToSeconds(item.value)));
             if (this._shortPauseTimeValue > item.value) {
@@ -205,9 +232,8 @@ const Indicator = new Lang.Class({
         }));
         this._longPauseTimeSlider.connect('drag-end', Lang.bind(this, this._onLongPauseTimeChanged));
         this._longPauseTimeSlider.actor.connect('scroll-event', Lang.bind(this, this._onLongPauseTimeChanged));
-        this._longPauseTimeTitle.addActor(this._longPauseTimeLabel, { align: St.Align.END });
-        this._optionsMenu.menu.addMenuItem(this._longPauseTimeTitle);
-        this._optionsMenu.menu.addMenuItem(this._longPauseTimeSlider);
+        item.actor.add(this._longPauseTimeSlider.actor, { expand: true });
+        this._optionsMenu.menu.addMenuItem(item);
     },
 
     _onSettingsChanged: function() {
