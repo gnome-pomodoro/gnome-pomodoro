@@ -45,9 +45,15 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 
 2. Build it and install
 
-        ./autogen.sh --prefix=/usr
+    Install development tools:
+
+        sudo apt-get install gnome-common intltool
+
+    Build Pomodoro and install it in your users directory
+
+        ./autogen.sh
         make zip
-        unzip _build/gnome-shell-pomodoro.0.8.zip -d ~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in
+        unzip _build/*.zip -d ~/.local/share/gnome-shell/extensions/pomodoro@arun.codito.in
 
     To install it system-wide, you could do
 
@@ -61,7 +67,7 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 3. Enable the extension using `gnome-tweak-tool` (Shell Extensions → Pomodoro) or via following commandline:
 
         gsettings get org.gnome.shell enabled-extensions
-        gsettings set org.gnome.shell enabled-extensions [<values from get above>, pomodoro@arun.codito.in]
+        gsettings set org.gnome.shell enabled-extensions "@as [<values from get above>, 'pomodoro@arun.codito.in']"
 
 4. Press *Alt + F2*, and `r` in command to restart GNOME Shell
 
