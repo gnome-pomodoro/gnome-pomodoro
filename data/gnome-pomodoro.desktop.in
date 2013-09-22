@@ -3,7 +3,7 @@
 _Name=Pomodoro
 _Comment=Manage your time and tasks
 _Keywords=time;timer;tasks;manage;organize;
-Exec=gnome-pomodoro
+Exec=gnome-pomodoro --preferences
 Icon=gnome-pomodoro
 StartupNotify=true
 Terminal=false
