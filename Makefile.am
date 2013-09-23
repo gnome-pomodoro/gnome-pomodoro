@@ -8,15 +8,13 @@ SUBDIRS = \
     src \
     extension \
     data \
-    po \
-    $(NULL)
+    po
 
 EXTRA_DIST = \
     autogen.sh \
     COPYING \
     Makefile.include \
-    README.md \
-    $(NULL)
+    README.md
 
 MAINTAINERCLEANFILES = \
     aclocal.m4 \

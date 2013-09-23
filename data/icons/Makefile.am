@@ -1,22 +1,18 @@
 
 public_icon_themes = \
-    hicolor	\
-    $(NULL)
+    hicolor
 
 public_icons = \
     hicolor_apps_48x48_gnome-pomodoro.png \
     hicolor_apps_256x256_gnome-pomodoro.png \
-    hicolor_status_scalable_timer-symbolic.svg \
-    $(NULL)
+    hicolor_status_scalable_timer-symbolic.svg
 
 noinst_DATA = \
-    gnome-pomodoro.svg \
-    $(NULL)
+    gnome-pomodoro.svg
 
 EXTRA_DIST = \
     $(public_icons) \
-    $(noinst_DATA) \
-    $(NULL)
+    $(noinst_DATA)
 
 gtk_update_icon_cache = gtk-update-icon-cache -f -t
 

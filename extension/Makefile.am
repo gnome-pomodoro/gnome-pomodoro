@@ -7,22 +7,18 @@ dist_extension_DATA = \
     metadata.json \
     notifications.js \
     stylesheet.css \
-    utils.js \
-    $(NULL)
+    utils.js
 
 nodist_extension_DATA = \
-    metadata.json \
-    $(NULL)
+    metadata.json
 
 EXTRA_DIST = \
-    metadata.json.in \
-    $(NULL)
+    metadata.json.in
 
 CLEANFILES = \
-    metadata.json \
-    $(NULL)
+    metadata.json
 
-metadata.json: metadata.json.in $(top_builddir)/config.status
+metadata.json: metadata.json.in Makefile
 	$(AM_V_GEN) $(do_subst) $(srcdir)/metadata.json.in > $@
 
 uninstall-hook:

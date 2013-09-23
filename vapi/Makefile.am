@@ -8,4 +8,3 @@ upower-glib.vapi: /usr/share/gir-1.0/UPowerGlib-1.0.gir
 
 gnome-desktop-3.0.vapi: /usr/share/gir-1.0/GnomeDesktop-3.0.gir
 	vapigen --library gnome-desktop-3.0 --pkg gio-2.0 --pkg gtk+-3.0 --metadatadir=$(srcdir) $<
-

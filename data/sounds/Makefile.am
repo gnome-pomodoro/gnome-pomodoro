@@ -1,11 +1,9 @@
 
 public_sounds = \
-    pomodoro-start.wav \
-    $(NULL)
+    pomodoro-start.wav
 
 EXTRA_DIST = \
-    $(public_sounds) \
-    $(NULL)
+    $(public_sounds)
 
 install-sounds:
 	for sound in $(public_sounds); do \

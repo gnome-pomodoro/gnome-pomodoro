@@ -15,22 +15,18 @@ gsettings_SCHEMAS = $(gsettings_in_files:.xml.in=.xml)
 
 servicedir = $(datadir)/dbus-1/services
 service_in_files = \
-    org.gnome.Pomodoro.service.in \
-    $(NULL)
+    org.gnome.Pomodoro.service.in
 service_DATA = $(service_in_files:.service.in=.service)
 
 EXTRA_DIST = \
     $(desktop_in_files) \
     $(gsettings_in_files) \
-    $(service_in_files) \
-    $(NULL)
+    $(service_in_files)
 
 CLEANFILES = \
     $(desktop_DATA) \
     $(gsettings_SCHEMAS) \
-    $(service_DATA) \
-    $(NULL)
-
+    $(service_DATA)
 
 $(service_DATA): $(service_in_files) Makefile
 	@$(do_subst) $<> $@
