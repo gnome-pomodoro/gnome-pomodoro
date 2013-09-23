@@ -10,3 +10,4 @@ Terminal=false
 Type=Application
 Categories=GNOME;GTK;Accessories
 OnlyShowIn=GNOME;
+NoDisplay=true
