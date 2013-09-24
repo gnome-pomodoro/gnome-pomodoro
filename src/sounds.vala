@@ -89,7 +89,6 @@ public class Pomodoro.Player : Object
 
         if (uri != null) {
             this.pipeline.set ("uri", uri);
-
             this.pipeline.set_state (Gst.State.PLAYING);
 
             this.fade_in (fade_duration);
@@ -116,7 +115,7 @@ public class Pomodoro.Player : Object
                                  Gst.CLOCK_TIME_NONE);
 
         if (state != Gst.State.NULL && state != Gst.State.READY)
-            this.fade_out (fade_duration); 
+            this.fade_out (fade_duration);
    }
 
     private void update_volume () {
@@ -245,6 +244,7 @@ public class Pomodoro.Player : Object
     }
 }
 
+
 internal class Pomodoro.Sounds : Object
 {
     public Player player;
@@ -260,7 +260,7 @@ internal class Pomodoro.Sounds : Object
     {
         this.timer = timer;
 
-        var application = GLib.Application.get_default() as Pomodoro.Application;
+        var application = GLib.Application.get_default () as Pomodoro.Application;
 
         var binding_flags = GLib.SettingsBindFlags.DEFAULT |
                             GLib.SettingsBindFlags.GET;
@@ -269,7 +269,7 @@ internal class Pomodoro.Sounds : Object
         this.settings = this.settings.get_child ("preferences");
         this.settings.changed.connect (this.on_settings_changed);
 
-        this.ensure_context();
+        this.ensure_context ();
 
 
         this.player = new Player ();
@@ -354,28 +354,34 @@ internal class Pomodoro.Sounds : Object
         {
             case "pomodoro-end-sound":
                 file_path = this.get_file_path (key);
-                this.ensure_context();
+                this.ensure_context ();
 
                 if (this.context != null && file_path != "") {
-                    status = this.context.cache(
-                            Canberra.PROP_EVENT_ID, "pomodoro-end",
-                            Canberra.PROP_MEDIA_FILENAME, file_path);
+                    status = this.context.cache
+                                (Canberra.PROP_EVENT_ID, "pomodoro-end",
+                                 Canberra.PROP_MEDIA_FILENAME, file_path);
+
                     if (status != Canberra.SUCCESS)
-                        GLib.warning ("Couldn't update canberra cache - %s", Canberra.strerror(status));
+                        GLib.warning ("Couldn't update canberra cache - %s",
+                                      Canberra.strerror (status));
                 }
+
                 break;
-  
+
             case "pomodoro-start-sound":
                 file_path = this.get_file_path (key);
-                this.ensure_context();
+                this.ensure_context ();
 
                 if (this.context != null && file_path != "") {
-                    status = this.context.cache(
-                            Canberra.PROP_EVENT_ID, "pomodoro-start",
-                            Canberra.PROP_MEDIA_FILENAME, file_path);
+                    status = this.context.cache
+                                (Canberra.PROP_EVENT_ID, "pomodoro-start",
+                                 Canberra.PROP_MEDIA_FILENAME, file_path);
+
                     if (status != Canberra.SUCCESS)
-                        GLib.warning ("Couldn't update canberra cache - %s", Canberra.strerror(status));
+                        GLib.warning ("Couldn't update canberra cache - %s",
+                                      Canberra.strerror (status));
                 }
+
                 break;
         }
     }
@@ -386,7 +392,9 @@ internal class Pomodoro.Sounds : Object
         var status = Canberra.Context.create (out this.context);
 
         if (status != Canberra.SUCCESS) {
-            GLib.warning ("Couldn't create canberra context - %s", Canberra.strerror(status));
+            GLib.warning ("Couldn't create canberra context - %s",
+                          Canberra.strerror (status));
+
             return;
         }
 
@@ -396,7 +404,9 @@ internal class Pomodoro.Sounds : Object
                 Canberra.PROP_APPLICATION_ID, "org.gnome.Pomodoro");
 
         if (status != Canberra.SUCCESS) {
-            GLib.warning ("Couldn't setup canberra context - %s", Canberra.strerror(status));
+            GLib.warning ("Couldn't setup canberra context - %s",
+                          Canberra.strerror (status));
+
             return;
         }
 
@@ -404,7 +414,9 @@ internal class Pomodoro.Sounds : Object
         status = this.context.open ();
 
         if (status != Canberra.SUCCESS) {
-            GLib.warning ("Couldn't open canberra context - %s", Canberra.strerror(status));
+            GLib.warning ("Couldn't open canberra context - %s",
+                          Canberra.strerror (status));
+
             return;
         }
     }
@@ -444,7 +456,7 @@ internal class Pomodoro.Sounds : Object
                                             void* user_data)
     {
         var file = value.get_object () as GLib.File;
-        
+
         if (file != null)
         {
             var uri = file.get_uri ();
@@ -454,7 +466,7 @@ internal class Pomodoro.Sounds : Object
                                               "");
             if (uri.has_prefix (prefix))
                 uri = uri.substring (prefix.length);
-            
+
             return new Variant.string (uri);
         }
 
@@ -493,7 +505,7 @@ internal class Pomodoro.Sounds : Object
         // Notify pomodoro start whether it was requested or not to take
         // advantage of Pavlovian conditioning
 
-        this.ensure_context();
+        this.ensure_context ();
 
         if (this.context != null)
         {
@@ -509,7 +521,9 @@ internal class Pomodoro.Sounds : Object
                     Canberra.PROP_CANBERRA_CACHE_CONTROL, "permanent");
 
             if (status != Canberra.SUCCESS)
-                GLib.warning ("Couldn't play sound '%s' - %s", file_path, Canberra.strerror(status));
+                GLib.warning ("Couldn't play sound '%s' - %s",
+                              file_path,
+                              Canberra.strerror (status));
         }
     }
 
@@ -517,7 +531,7 @@ internal class Pomodoro.Sounds : Object
     {
         int status;
 
-        this.ensure_context();
+        this.ensure_context ();
 
         if (this.context != null && is_completed)
         {
@@ -533,7 +547,9 @@ internal class Pomodoro.Sounds : Object
                     Canberra.PROP_CANBERRA_CACHE_CONTROL, "permanent");
 
             if (status != Canberra.SUCCESS)
-                GLib.warning ("Couldn't play sound '%s' - %s", file_path, Canberra.strerror(status));
+                GLib.warning ("Couldn't play sound '%s' - %s",
+                              file_path,
+                              Canberra.strerror (status));
         }
     }
 
@@ -566,7 +582,7 @@ internal class Pomodoro.Sounds : Object
         this.unschedule_fade_out ();
 
         this.player.stop (PLAYER_FADE_OUT_TIME);
+
         return false;
     }
 }
-

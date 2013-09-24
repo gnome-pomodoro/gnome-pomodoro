@@ -96,7 +96,7 @@ class Pomodoro.Presence : Object
     {
         this.timer = timer;
 
-        var application = GLib.Application.get_default() as Pomodoro.Application;
+        var application = GLib.Application.get_default () as Pomodoro.Application;
 
         var binding_flags = GLib.SettingsBindFlags.DEFAULT |
                             GLib.SettingsBindFlags.GET;
@@ -119,6 +119,7 @@ class Pomodoro.Presence : Object
         }
         catch (Error e) {
             stderr.printf ("%s\n", e.message);
+
             return;
         }
 
@@ -213,7 +214,7 @@ class Pomodoro.Presence : Object
     {
         var status = SessionManager.PresenceStatus.DEFAULT;
 
-        status = (SessionManager.PresenceStatus) value.get_int();
+        status = (SessionManager.PresenceStatus) value.get_int ();
 
         return new Variant.string (SessionManager.presence_status_to_string (status));
     }

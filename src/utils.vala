@@ -20,6 +20,7 @@
 
 using GLib;
 
+
 namespace Pomodoro
 {
     private const string DATETIME_FORMAT_RFC_2822 = "%a, %d %b %Y %H:%M:%S GMT";
@@ -70,7 +71,7 @@ namespace Pomodoro
 
     internal string datetime_to_string (DateTime datetime)
     {
-        return datetime.to_utc().format (DATETIME_FORMAT_RFC_2822);
+        return datetime.to_utc ().format (DATETIME_FORMAT_RFC_2822);
     }
 
     internal string format_time (long seconds)
@@ -93,4 +94,3 @@ namespace Pomodoro
         return str;
     }
 }
-

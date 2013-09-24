@@ -21,6 +21,7 @@
 
 using GLib;
 
+
 [DBus (name = "org.gnome.Pomodoro")]
 public class Pomodoro.Service : Object
 {
@@ -53,7 +54,7 @@ public class Pomodoro.Service : Object
     {
         this.connection = connection;
         this.timer = timer;
-        this.changed_properties = new HashTable<string, Variant>(str_hash, str_equal);
+        this.changed_properties = new HashTable<string, Variant> (str_hash, str_equal);
         this.idle_id = 0;
 
         this.timer.notify.connect (this.on_property_notify);
@@ -75,19 +76,19 @@ public class Pomodoro.Service : Object
         });
     }
 
-    public void start() {
+    public void start () {
         if (this.timer != null)
-            this.timer.start();
+            this.timer.start ();
     }
 
-    public void stop() {
+    public void stop () {
         if (this.timer != null)
-            this.timer.stop();
+            this.timer.stop ();
     }
 
-    public void reset() {
+    public void reset () {
         if (this.timer != null)
-            this.timer.reset();
+            this.timer.reset ();
     }
 
     private void flush ()
@@ -99,7 +100,7 @@ public class Pomodoro.Service : Object
             builder_properties.add ("{sv}", key, value);
         });
 
-        this.changed_properties.remove_all();
+        this.changed_properties.remove_all ();
 
         try {
             this.connection.emit_signal (null,
@@ -111,7 +112,7 @@ public class Pomodoro.Service : Object
                                                       builder_properties,
                                                       builder_invalid)
                                          );
-            this.connection.flush();
+            this.connection.flush ();
         }
         catch (Error e) {
             GLib.warning ("%s\n", e.message);
@@ -129,7 +130,8 @@ public class Pomodoro.Service : Object
 
         if (this.idle_id == 0) {
             this.idle_id = Idle.add (() => {
-                this.flush();
+                this.flush ();
+
                 return false;
             });
         }
@@ -171,4 +173,3 @@ public class Pomodoro.Service : Object
     public signal void notify_pomodoro_end (bool is_requested);
     public signal void notify_pomodoro_start (bool is_completed);
 }
-

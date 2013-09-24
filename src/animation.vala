@@ -20,6 +20,7 @@
 
 using GLib;
 
+
 public delegate double Pomodoro.AnimationFunc (double progress);
 
 public enum Pomodoro.AnimationMode
@@ -153,12 +154,13 @@ public class Pomodoro.Animation : Object
     public double compute_value (double progress)
     {
         var easing = func (progress.clamp (0.0, 1.0));
-        return this.value_from + easing * (this.value_to - this.value_from);    
+
+        return this.value_from + easing * (this.value_to - this.value_from);
     }
 
     private bool on_timeout ()
     {
-        var timestamp = GLib.get_real_time() / 1000;
+        var timestamp = GLib.get_real_time () / 1000;
 
         if (this.duration > 0)
             this.progress = ((double)(timestamp - this.timestamp)
@@ -188,13 +190,13 @@ public class Pomodoro.Animation : Object
         this.value_to = value_to;
 
         this.progress = 0.0;
-        this.timestamp = GLib.get_real_time() / 1000;
+        this.timestamp = GLib.get_real_time () / 1000;
 
         if (this.timeout_id == 0)
         {
             if (this.duration > 0)
                 this.timeout_id = GLib.Timeout.add (
-                        uint.min(this.interval, this.duration),
+                        uint.min (this.interval, this.duration),
                         (GLib.SourceFunc) this.on_timeout);
 
             this.started ();
@@ -214,11 +216,10 @@ public class Pomodoro.Animation : Object
 
     public virtual signal void destroy ()
     {
-        this.stop();
+        this.stop ();
     }
 
     public signal void started ();
     public signal void value_changed (double value);
     public signal void completed ();
 }
-

@@ -21,6 +21,7 @@
 
 using GLib;
 
+
 namespace Pomodoro
 {
     const double TIMER_SCALE_LOWER = 60.0;
@@ -41,10 +42,12 @@ namespace Pomodoro
         foreach (var accelerator in accelerators)
         {
             value.set_string (accelerator);
+
             return true;
         }
 
         value.set_string ("");
+
         return true;
     }
 
@@ -56,6 +59,7 @@ namespace Pomodoro
         var accelerator = value.get_string ();
         //if (accelerator != "") {
         string[] strv = { accelerator };
+
         return new Variant.strv (strv);
         //}
 
@@ -68,6 +72,7 @@ namespace Pomodoro
                                   void* user_data)
     {
         value.set_object (GLib.File.new_for_uri (variant.get_string ()));
+
         return true;
     }
 
@@ -77,6 +82,7 @@ namespace Pomodoro
                                      void* user_data)
     {
         var file = value.get_object () as GLib.File;
+
         return new Variant.string (file != null
                                    ? file.get_uri () : "");
     }
@@ -113,10 +119,10 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.set_destroy_with_parent (true);
         this.set_position (Gtk.WindowPosition.CENTER);
 
-        var application = GLib.Application.get_default() as Pomodoro.Application;
-        this.settings = application.settings.get_child("preferences");
+        var application = GLib.Application.get_default () as Pomodoro.Application;
+        this.settings = application.settings.get_child ("preferences");
 
-        this.setup();
+        this.setup ();
     }
 
     private ModeButton mode_button;
@@ -134,7 +140,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
             GLib.warning ("Error while loading css file: %s", e.message);
         }
         var context = this.get_style_context ();
-        context.add_provider_for_screen (Gdk.Screen.get_default(),
+        context.add_provider_for_screen (Gdk.Screen.get_default (),
                                          css_provider,
                                          Gtk.STYLE_PROVIDER_PRIORITY_USER);
         context.add_class ("preferences-dialog");
@@ -171,7 +177,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
     private void setup_toolbar ()
     {
-        this.toolbar = new Pomodoro.Toolbar();
+        this.toolbar = new Pomodoro.Toolbar ();
 
         this.mode_button = new ModeButton (Gtk.Orientation.HORIZONTAL);
 
@@ -211,7 +217,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         var label = new Gtk.Label (text);
         label.halign = Gtk.Align.START;
         label.valign = Gtk.Align.END;
-        label.get_style_context().add_class (Gtk.STYLE_CLASS_HEADER);
+        label.get_style_context ().add_class (Gtk.STYLE_CLASS_HEADER);
         label.show ();
 
         return label;
@@ -227,7 +233,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
     private Egg.ListBox create_list_box ()
     {
-        var list_box = new Egg.ListBox();
+        var list_box = new Egg.ListBox ();
         list_box.set_selection_mode (Gtk.SelectionMode.NONE);
         list_box.set_activate_on_single_click (false);
         list_box.get_style_context ().add_class ("list");
@@ -289,6 +295,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         }
 
         bin.show_all ();
+
         return bin;
     }
 
@@ -298,7 +305,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         var value_label = new Gtk.Label (null);
         var scale = new LogScale (adjustment, 2.0);
         var widget = this.create_field (text, value_label, scale);
-        
+
         adjustment.value_changed.connect (() => {
             value_label.set_text (format_time ((long) adjustment.value));
         });
@@ -313,29 +320,26 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         var contents = this.create_list_box ();
         var page = this.add_page (_("Timer"), contents);
 
-        var pomodoro_adjustment = new Gtk.Adjustment (
-            0.0,
-            TIMER_SCALE_LOWER,
-            TIMER_SCALE_UPPER,
-            60.0,
-            300.0,
-            0.0);
+        var pomodoro_adjustment = new Gtk.Adjustment (0.0,
+                                                      TIMER_SCALE_LOWER,
+                                                      TIMER_SCALE_UPPER,
+                                                      60.0,
+                                                      300.0,
+                                                      0.0);
 
-        var short_break_adjustment = new Gtk.Adjustment(
-            0.0,
-            TIMER_SCALE_LOWER,
-            TIMER_SCALE_UPPER,
-            60.0,
-            300.0,
-            0.0);
+        var short_break_adjustment = new Gtk.Adjustment (0.0,
+                                                         TIMER_SCALE_LOWER,
+                                                         TIMER_SCALE_UPPER,
+                                                         60.0,
+                                                         300.0,
+                                                         0.0);
 
-        var long_break_adjustment = new Gtk.Adjustment(
-            0.0,
-            TIMER_SCALE_LOWER,
-            TIMER_SCALE_UPPER,
-            60.0,
-            300.0,
-            0.0);
+        var long_break_adjustment = new Gtk.Adjustment (0.0,
+                                                        TIMER_SCALE_LOWER,
+                                                        TIMER_SCALE_UPPER,
+                                                        60.0,
+                                                        300.0,
+                                                        0.0);
 
         var keybinding = new Keybinding ();
 
@@ -363,7 +367,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                          keybinding,
                                          "accelerator",
                                          SETTINGS_BIND_FLAGS,
-                                         get_keybinding_mapping, 
+                                         get_keybinding_mapping,
                                          set_keybinding_mapping,
                                          null,
                                          null);
@@ -465,7 +469,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                 _("Bell"),
                 File.new_for_uri (default_sound_file_uri));
 
-        var pomodoro_start_sound = new Pomodoro.SoundChooserButton();
+        var pomodoro_start_sound = new Pomodoro.SoundChooserButton ();
         pomodoro_start_sound.title = _("Select sound for pomodoro start");
         contents.add (
             this.create_field (_("Pomodoro start sound"), pomodoro_start_sound));
@@ -629,4 +633,3 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         }
     }
 }
-

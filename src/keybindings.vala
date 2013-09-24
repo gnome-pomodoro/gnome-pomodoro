@@ -22,14 +22,14 @@
  *          Thomas Wood <thomas.wood@intel.com>
  *          Rodrigo Moya <rodrigo@gnome.org>
  */
- 
+
 /* TODO:
  * Handle integration with window manager
  *  - suppress any keybings from being triggered
  *  - if keybinding is taken, notify about it
  *
  * For now gnome-shell extension is responsible for setting it.
- * 
+ *
  * We could use Gtk accelerators or keybindings, but they are active only with
  * application in focus and we need system wide keybindings.
  */
@@ -55,6 +55,7 @@ internal class Pomodoro.Keybinding : GLib.Object
             foreach (var element in elements) {
                 accelerator.append (element);
             }
+
             return accelerator.str;
         }
         set {
@@ -208,7 +209,8 @@ internal class Pomodoro.Keybinding : GLib.Object
             var keyval = Gdk.keyval_to_upper (this.key);
             elements.append (Gdk.keyval_name (keyval));
         }
-        return elements;        
+
+        return elements;
     }
 
     public string get_label ()
@@ -216,7 +218,7 @@ internal class Pomodoro.Keybinding : GLib.Object
         var elements = this.get_string_list (false);
         var is_first = true;
         var label = new StringBuilder ();
-        
+
         foreach (var element in elements)
         {
             if (!is_first)
@@ -232,4 +234,3 @@ internal class Pomodoro.Keybinding : GLib.Object
 
     public signal void changed ();
 }
-

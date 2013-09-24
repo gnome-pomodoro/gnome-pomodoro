@@ -21,6 +21,7 @@
 
 using GLib;
 
+
 [Compact]
 internal class Pomodoro.CommandLine
 {
@@ -33,10 +34,11 @@ internal class Pomodoro.CommandLine
         // that it can remove strings from the array without freeing them.
         string*[] tmp = new string[args.length];
         for (int i = 0; i < args.length; i++) {
-	        tmp[i] = args[i];
+            tmp[i] = args[i];
         }
 
         unowned string[] unowned_args = tmp;
+
         return this.parse_ref (ref unowned_args);
     }
 
@@ -44,11 +46,11 @@ internal class Pomodoro.CommandLine
     {
         GLib.OptionContext  option_context;
 
-		OptionEntry[] options = new OptionEntry[2];
-		options[0] = { "preferences", 0, 0, OptionArg.NONE, ref this.preferences,
-		               "Show preferences", null };
-		options[1] = { "no-default-window", 0, 0, OptionArg.NONE, ref this.no_default_window,
-		               "Run as background service", null };
+        OptionEntry[] options = new OptionEntry[2];
+        options[0] = { "preferences", 0, 0, OptionArg.NONE, ref this.preferences,
+                       "Show preferences", null };
+        options[1] = { "no-default-window", 0, 0, OptionArg.NONE, ref this.no_default_window,
+                       "Run as background service", null };
 
         /* Setup command line options */
         option_context = new GLib.OptionContext ("- A simple pomodoro timer");
@@ -59,15 +61,15 @@ internal class Pomodoro.CommandLine
         try {
             if (!option_context.parse (ref args)) {
                 return false;
-	        }
+            }
         }
         catch (GLib.OptionError e) {
             stdout.printf ("Could not parse arguments: %s\n", e.message);
-	        stdout.printf ("Run '%s --help' to see a full list of available command line options.\n", args[0]);
-	        return false;
+            stdout.printf ("Run '%s --help' to see a full list of available command line options.\n", args[0]);
+
+            return false;
         }
 
         return true;
     }
 }
-

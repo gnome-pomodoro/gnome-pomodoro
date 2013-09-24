@@ -50,7 +50,7 @@ public class Pomodoro.Application : Gtk.Application
         }
         set {
             if (this.is_registered) {
-                warning("Could not change service state, app already registered.");
+                warning ("Could not change service state, app already registered.");
                 return;
             }
 
@@ -81,41 +81,41 @@ public class Pomodoro.Application : Gtk.Application
         this.window = null;
         this.hold_reasons = HoldReason.NONE;
 
-        this.setup_actions();
+        this.setup_actions ();
     }
 
     public new void hold (HoldReason reason = 0)
     {
         if (reason == 0)
-            base.hold();
+            base.hold ();
         else
             if ((this.hold_reasons & reason) == 0) {
                 this.hold_reasons |= reason;
-                base.hold();
+                base.hold ();
             }
     }
 
     public new void release (HoldReason reason = 0)
     {
         if (reason == 0)
-            base.release();
+            base.release ();
         else
             if ((this.hold_reasons & reason) != 0) {
                 this.hold_reasons &= ~reason;
-                base.release();
+                base.release ();
             }
     }
 
     private unowned Gtk.Window get_last_focused_window ()
     {
-        unowned List<weak Gtk.Window> windows = this.get_windows();
-        return windows.first().data;
+        unowned List<weak Gtk.Window> windows = this.get_windows ();
+        return windows.first ().data;
     }
 
     private void action_preferences (SimpleAction action, Variant? parameter)
     {
         if (this.preferences_dialog == null) {
-            this.preferences_dialog = new Pomodoro.PreferencesDialog();
+            this.preferences_dialog = new Pomodoro.PreferencesDialog ();
             this.preferences_dialog.destroy.connect (() => {
                 this.remove_window (this.preferences_dialog);
                 this.preferences_dialog = null;
@@ -150,9 +150,9 @@ public class Pomodoro.Application : Gtk.Application
     {
         if (this.about_dialog == null)
         {
-            var window = this.get_last_focused_window();
+            var window = this.get_last_focused_window ();
 
-            this.about_dialog = new Pomodoro.AboutDialog();
+            this.about_dialog = new Pomodoro.AboutDialog ();
             this.about_dialog.destroy.connect (() => {
                 this.remove_window (this.about_dialog);
                 this.about_dialog = null;
@@ -164,7 +164,7 @@ public class Pomodoro.Application : Gtk.Application
             this.add_window (this.about_dialog);
         }
 
-        this.about_dialog.present();
+        this.about_dialog.present ();
     }
 
     private void action_quit (SimpleAction action, Variant? parameter)
@@ -172,8 +172,8 @@ public class Pomodoro.Application : Gtk.Application
         // For now application gui and the service uses same process
         // so if service is running we don't want to close both
         if (this.timer.state != State.NULL) {
-            foreach (var window in this.get_windows()) {
-                window.destroy();
+            foreach (var window in this.get_windows ()) {
+                window.destroy ();
             }
         }
         else {
@@ -186,16 +186,16 @@ public class Pomodoro.Application : Gtk.Application
         var preferences_action = new GLib.SimpleAction ("preferences", VariantType.STRING);
         preferences_action.activate.connect (this.action_preferences);
 
-        var about_action = new GLib.SimpleAction("about", null);
+        var about_action = new GLib.SimpleAction ("about", null);
         about_action.activate.connect (this.action_about);
 
-        var quit_action = new GLib.SimpleAction("quit", null);
+        var quit_action = new GLib.SimpleAction ("quit", null);
         quit_action.activate.connect (this.action_quit);
 
         this.add_accelerator ("<Primary>q", "app.quit", null);
 
         this.add_action (preferences_action);
-        this.add_action(about_action);
+        this.add_action (about_action);
         this.add_action (quit_action);
     }
 
@@ -204,7 +204,7 @@ public class Pomodoro.Application : Gtk.Application
         Gtk.Builder builder;
         GLib.MenuModel menu;
 
-        builder = new Gtk.Builder();
+        builder = new Gtk.Builder ();
         try {
             builder.add_from_resource ("/org/gnome/pomodoro/app-menu.ui");
         }
@@ -212,7 +212,7 @@ public class Pomodoro.Application : Gtk.Application
             GLib.error ("Failed to load app-menu.ui from the resource file.");
         }
 
-        menu = builder.get_object("app-menu") as GLib.MenuModel;
+        menu = builder.get_object ("app-menu") as GLib.MenuModel;
         this.set_app_menu (menu);
     }
 
@@ -221,7 +221,7 @@ public class Pomodoro.Application : Gtk.Application
     // Emitted on the primary instance immediately after registration.
     public override void startup ()
     {
-        base.startup();
+        base.startup ();
 
         this.timer.destroy.connect ((timer) => {
             this.release (HoldReason.TIMER);
@@ -236,18 +236,18 @@ public class Pomodoro.Application : Gtk.Application
                 this.release (HoldReason.TIMER);
         });
 
-        this.modules = new List<Object>();
+        this.modules = new List<Object> ();
         this.modules.prepend (new Pomodoro.Sounds (this.timer));
         this.modules.prepend (new Pomodoro.Presence (this.timer));
 
-        this.timer.restore();
+        this.timer.restore ();
 
         this.setup_menu ();
     }
 
     private int do_command_line (ApplicationCommandLine command_line)
     {
-        var arguments = new CommandLine();
+        var arguments = new CommandLine ();
 
         if (arguments.parse (command_line.get_arguments ()))
         {
@@ -258,7 +258,7 @@ public class Pomodoro.Application : Gtk.Application
                 this.hold (HoldReason.SERVICE);
 
             if (!arguments.preferences && !arguments.no_default_window)
-                this.activate();
+                this.activate ();
 
             return 0;
         }
@@ -270,9 +270,9 @@ public class Pomodoro.Application : Gtk.Application
     {
         int status = 0;
 
-        this.hold();
+        this.hold ();
         status = this.do_command_line (command_line);
-        this.release();
+        this.release ();
 
         return status;
     }
@@ -282,7 +282,7 @@ public class Pomodoro.Application : Gtk.Application
     // after the main loop terminates.
     public override void shutdown ()
     {
-        base.shutdown();
+        base.shutdown ();
     }
 
     // Emitted on the primary instance when an activation occurs.
@@ -299,7 +299,7 @@ public class Pomodoro.Application : Gtk.Application
         }
 
         if (this.timer == null) {
-            this.timer = new Pomodoro.Timer();
+            this.timer = new Pomodoro.Timer ();
         }
 
         if (this.service == null) {
@@ -323,12 +323,12 @@ public class Pomodoro.Application : Gtk.Application
         base.dbus_unregister (connection, object_path);
 
         if (this.service != null) {
-            this.service.dispose();
+            this.service.dispose ();
             this.service = null;
         }
 
         if (this.timer != null) {
-            this.timer.destroy();
+            this.timer.destroy ();
             this.timer = null;
         }
     }

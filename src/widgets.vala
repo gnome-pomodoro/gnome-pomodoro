@@ -19,12 +19,13 @@
  *
  */
 
+
 public class Pomodoro.Toolbar : Gtk.Toolbar
 {
     construct {
         this.show_arrow = false;
 
-        var context =  this.get_style_context();
+        var context =  this.get_style_context ();
 
         context.add_class (Gtk.STYLE_CLASS_MENUBAR);
         context.add_class ("header-bar");
@@ -43,6 +44,7 @@ public class Pomodoro.Toolbar : Gtk.Toolbar
     }
 }
 
+
 public class Pomodoro.ModeButton : Gtk.Box
 {
     private int _selected = -1;
@@ -55,7 +57,7 @@ public class Pomodoro.ModeButton : Gtk.Box
             var children = this.get_children ();
             var index = 0;
 
-            if (value < 0 || value >= children.length()) {
+            if (value < 0 || value >= children.length ()) {
                 return;
             }
 
@@ -121,14 +123,14 @@ public class Pomodoro.ModeButton : Gtk.Box
         var button = child as Gtk.ToggleButton;
 
         if (button.active)
-            this.selected = this.get_children().index (child);
+            this.selected = this.get_children ().index (child);
     }
 
     public unowned Gtk.Widget add_label (string text)
     {
         var item = new Item.with_label (text);
         item.set_focus_on_click (false);
-        item.show();
+        item.show ();
 
         this.add (item);
 
@@ -171,17 +173,17 @@ public class Pomodoro.ModeButton : Gtk.Box
 
         private void set_bold_attribute (bool is_bold)
         {
-            var child = this.get_child();
+            var child = this.get_child ();
 
             if (child is Gtk.Label)
             {
                 var label = child as Gtk.Label;
- 
+
                 if (is_bold) {
                     var attr = Pango.attr_weight_new (Pango.Weight.BOLD);
 
-		            label.attributes = new Pango.AttrList ();
-		            label.attributes.insert (attr.copy ());
+                    label.attributes = new Pango.AttrList ();
+                    label.attributes.insert (attr.copy ());
                 }
                 else {
                     label.attributes = null;
@@ -192,7 +194,7 @@ public class Pomodoro.ModeButton : Gtk.Box
         public override void get_preferred_width (out int minimum_width,
                                                   out int natural_width)
         {
-            var child = this.get_child();
+            var child = this.get_child ();
             var width = 0;
             var width_bold = 0;
 
@@ -347,11 +349,13 @@ internal class Pomodoro.KeybindingButton : Gtk.Box
             case Gdk.Key.BackSpace:
                     this.keybinding.accelerator = null;
                     this.active = false;
+
                     return true;
 
             case Gdk.Key.Escape:
             case Gdk.Key.Return:
                     this.active = false;
+
                     return true;
         }
 
@@ -490,7 +494,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         dialog.set_default_response (Gtk.ResponseType.ACCEPT);
         dialog.set_alternative_button_order (Gtk.ResponseType.NONE,
                                              Gtk.ResponseType.ACCEPT,
-					                         Gtk.ResponseType.CANCEL);
+                                             Gtk.ResponseType.CANCEL);
         dialog.title = _("Select a file");
         dialog.local_only = true;
 
@@ -542,10 +546,10 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
 
         this.combo_box.set_attributes (this.name_cell, "text", Column.DISPLAY_NAME);
         this.combo_box.set_row_separator_func (this.row_separator_func);
-        this.combo_box.set_cell_data_func (this.name_cell, this.name_cell_data_func);       
+        this.combo_box.set_cell_data_func (this.name_cell, this.name_cell_data_func);
         this.combo_box.show ();
 
-        this.combo_box_changed_handler_id = 
+        this.combo_box_changed_handler_id =
                 this.combo_box.changed.connect (this.on_combo_box_changed);
 
         this.pack_start (combo_box, true, true, 0);
@@ -635,6 +639,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
             return retval;
 
         assert_not_reached ();
+
         return -1;
     }
 
@@ -706,7 +711,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
             this.model.get (iter,
                             Column.ROW_TYPE, out type,
                             Column.DISPLAY_NAME, out name);
-            
+
             if (type != RowType.BOOKMARK)
                 break;
 
@@ -773,7 +778,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
                         Column.FILE, file);
     }
 
-    /* Combo Box */    
+    /* Combo Box */
 
     private bool row_separator_func (Gtk.TreeModel model,
                                      Gtk.TreeIter  iter)
@@ -788,9 +793,9 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
     }
 
     private void name_cell_data_func (Gtk.CellLayout   layout,
-		                              Gtk.CellRenderer cell,
-		                              Gtk.TreeModel    model,
-		                              Gtk.TreeIter     iter)
+                                      Gtk.CellRenderer cell,
+                                      Gtk.TreeModel    model,
+                                      Gtk.TreeIter     iter)
     {
         var type = RowType.INVALID;
         var name_cell = cell as Gtk.CellRendererText;
@@ -851,14 +856,14 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
             }
 
             if (row_found)
-            {                
-		        SignalHandler.block (this.combo_box,
-		                             this.combo_box_changed_handler_id);
+            {
+                SignalHandler.block (this.combo_box,
+                                     this.combo_box_changed_handler_id);
 
                 this.combo_box.set_active_iter (iter);
 
-		        SignalHandler.unblock (this.combo_box,
-		                               this.combo_box_changed_handler_id);
+                SignalHandler.unblock (this.combo_box,
+                                       this.combo_box_changed_handler_id);
             }
         }
         while (!row_found && this.model.iter_next (ref iter));
@@ -882,7 +887,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
             this.select_combo_box_row_no_notify (pos);
         }
     }
-    
+
     private void on_combo_box_changed ()
     {
         var type = RowType.INVALID;
@@ -917,7 +922,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
 
     private void on_dialog_notify (GLib.ParamSpec property)
     {
-        if (this.get_class().find_property (property.name) != null)
+        if (this.get_class ().find_property (property.name) != null)
             this.notify_property (property.name);
     }
 
@@ -925,13 +930,13 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
                                      int        response)
     {
         this.dialog.hide ();
-        this.combo_box.set_sensitive (true);            
+        this.combo_box.set_sensitive (true);
 
         switch (response)
         {
             case Gtk.ResponseType.ACCEPT:
             case Gtk.ResponseType.OK:
-                this.file = this.dialog.get_file();
+                this.file = this.dialog.get_file ();
                 break;
 
             case Gtk.ResponseType.NONE:
@@ -945,8 +950,9 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
     }
 
     private bool on_dialog_delete_event (Gdk.EventAny event)
-    {            
+    {
         this.dialog.response (Gtk.ResponseType.DELETE_EVENT);
+
         return true;
     }
 
@@ -986,7 +992,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
                 this.filter.add_mime_type ("audio/x-vorbis+ogg");
                 this.filter.add_mime_type ("audio/x-wav");
                 this.add_filter (this.filter);
-                this.set_filter(this.filter);
+                this.set_filter (this.filter);
                 break;
 
             case SoundBackend.GSTREAMER:
@@ -994,7 +1000,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
                 this.filter.set_filter_name (_("Supported audio files"));
                 this.filter.add_mime_type ("audio/*");
                 this.add_filter (this.filter);
-                this.set_filter(this.filter);
+                this.set_filter (this.filter);
                 break;
 
             default:
@@ -1004,11 +1010,11 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
     }
 
     public override void drag_data_received (Gdk.DragContext   context,
-					                         int	           x,
-					                         int	           y,
-					                         Gtk.SelectionData data,
-					                         uint	           type,
-					                         uint	           drag_time)
+                                             int               x,
+                                             int               y,
+                                             Gtk.SelectionData data,
+                                             uint               type,
+                                             uint               drag_time)
     {
         GLib.File file = null;
 
@@ -1046,7 +1052,7 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
             }
             catch (Error e) {
                 GLib.warning (e.message);
-            }            
+            }
         }
 
         Gtk.drag_finish (context, true, false, drag_time);
@@ -1097,22 +1103,19 @@ internal class Pomodoro.LogScale : Gtk.Scale
 
     private void do_set_adjustment (Gtk.Adjustment base_adjustment)
     {
-        var adjustment = new Gtk.Adjustment (
-                0.0,
-                0.0,
-                1.0,
-                0.0001,
-                0.001,
-                0.0);
-
         var binding_flags =
                 GLib.BindingFlags.DEFAULT |
                 GLib.BindingFlags.BIDIRECTIONAL |
                 GLib.BindingFlags.SYNC_CREATE;
 
-        this.base_adjustment = base_adjustment;
-        this.adjustment = adjustment;
+        this.adjustment = new Gtk.Adjustment (0.0,
+                                              0.0,
+                                              1.0,
+                                              0.0001,
+                                              0.001,
+                                              0.0);
 
+        this.base_adjustment = base_adjustment;
         this.base_adjustment.bind_property ("value",
                                             this.adjustment,
                                             "value",
@@ -1129,7 +1132,7 @@ internal class Pomodoro.LogScale : Gtk.Scale
         var upper = this.base_adjustment.upper;
         var step_increment = this.base_adjustment.step_increment;
 
-        var value = Math.pow (source_value.get_double(), this.exponent) * (upper - lower) + lower;
+        var value = Math.pow (source_value.get_double (), this.exponent) * (upper - lower) + lower;
 
         target_value.set_double (step_increment * Math.floor (value / step_increment));
 
@@ -1144,7 +1147,7 @@ internal class Pomodoro.LogScale : Gtk.Scale
         var upper = this.base_adjustment.upper;
 
         target_value.set_double (Math.pow (
-                (source_value.get_double() - lower) / (upper - lower),
+                (source_value.get_double () - lower) / (upper - lower),
                 1.0 / this.exponent));
 
         return true;
@@ -1250,4 +1253,3 @@ public class Pomodoro.EnumComboBox : Gtk.ComboBox
                    Column.DISPLAY_NAME, display_name);
     }
 }
-

@@ -39,18 +39,18 @@ public int main (string[] args)
     Gtk.init (ref args);
     Gst.init (ref args);
 
-    command_line = new Pomodoro.CommandLine();
+    command_line = new Pomodoro.CommandLine ();
 
     // Arguments are also parsed by application.command_line signal handler,
     // so here we work on a copy. Though parsed arguments should be freed.
     if (command_line.parse (args))
     {
-        application = new Pomodoro.Application();
+        application = new Pomodoro.Application ();
         application.is_service = command_line.no_default_window;
-        application.set_default();
+        application.set_default ();
 
         try {
-            if (application.register())
+            if (application.register ())
                 exit_status = application.run (args);
         }
         catch (Error e) {
