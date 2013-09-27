@@ -23,7 +23,7 @@ const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
-const GnomeDesktop = imports.gi.GnomeDesktop;
+const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Pango = imports.gi.Pango;
@@ -106,7 +106,7 @@ const ModalDialog = new Lang.Class({
     _init: function() {
         this.state = State.CLOSED;
 
-        this._idleMonitor = new GnomeDesktop.IdleMonitor();
+        this._idleMonitor = Meta.IdleMonitor.get_core();
         this._pushModalWatchId = 0;
         this._pushModalFallbackSource = 0;
         this._pushModalTries = 0;

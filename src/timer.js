@@ -21,7 +21,6 @@ const Signals = imports.signals;
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
-const GnomeDesktop = imports.gi.GnomeDesktop;
 const Meta = imports.gi.Meta;
 const St = imports.gi.St;
 const UPowerGlib = imports.gi.UPowerGlib;
@@ -98,7 +97,7 @@ const PomodoroTimer = new Lang.Class({
         this._power = null;
         this._presence = null;
         this._presenceChangeEnabled = false;
-        this._idleMonitor = new GnomeDesktop.IdleMonitor();
+        this._idleMonitor = Meta.IdleMonitor.get_core();
         this._becameActiveId = 0;
         
         this._settings = PomodoroUtil.getSettings();
@@ -396,7 +395,8 @@ const PomodoroTimer = new Lang.Class({
             this._playNotificationSound();
         }
 
-        this._openNotificationSource();
+        if (this._notification)
+            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
 
         if (!this._notificationDialog) {
             this._notificationDialog = new Notification.NotificationDialog();
@@ -419,16 +419,14 @@ const PomodoroTimer = new Lang.Class({
                 }));
         }
 
-        if (this._notification)
-            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-
+        this._openNotificationSource();
         this._notification = new MessageTray.Notification(this._notificationSource,
                                                           _("Take a break!"),
                                                           null);
         this._notification.setResident(true);
 
         //button had to be disabled due a bug in gnome-shell
-        //this._notification.addButton(1, _("Start a new pomodoro"));
+        this._notification.addButton('start-pomodoro', _("Start a new pomodoro"));
 
         // Force to show description along with title,
         // as this is private property, API might change
@@ -440,7 +438,7 @@ const PomodoroTimer = new Lang.Class({
         }
 
         this._notification.connect('action-invoked', Lang.bind(this, function(object, id) {
-                if (id == 1)
+                if (id == 'start-pomodoro')
                     this.startPomodoro();
             }));
         this._notification.connect('clicked', Lang.bind(this, function() {
