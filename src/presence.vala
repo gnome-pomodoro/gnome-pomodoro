@@ -19,7 +19,7 @@
  */
 
 using GLib;
-using Gnome;
+using Gnome.SessionManager;
 
 
 namespace Gnome.SessionManager
@@ -86,9 +86,9 @@ class Pomodoro.Presence : Object
 {
     private unowned Pomodoro.Timer timer;
     private GLib.Settings settings;
-    private SessionManager.Presence proxy;
-    private SessionManager.PresenceStatus previous_status;
-    private SessionManager.PresenceStatus status;
+    private Gnome.SessionManager.Presence proxy;
+    private PresenceStatus previous_status;
+    private PresenceStatus status;
 
     private bool ignore_next_status;
 
@@ -97,9 +97,6 @@ class Pomodoro.Presence : Object
         this.timer = timer;
 
         var application = GLib.Application.get_default () as Pomodoro.Application;
-
-        var binding_flags = GLib.SettingsBindFlags.DEFAULT |
-                            GLib.SettingsBindFlags.GET;
 
         this.settings = application.settings as GLib.Settings;
         this.settings = this.settings.get_child ("preferences");
@@ -112,7 +109,7 @@ class Pomodoro.Presence : Object
                                                   "org.gnome.SessionManager",
                                                   "/org/gnome/SessionManager/Presence");
 
-            this.status = (SessionManager.PresenceStatus) this.proxy.status;
+            this.status = (PresenceStatus) this.proxy.status;
             this.previous_status = this.status;
 
             this.proxy.status_changed.connect (this.on_status_changed);
@@ -129,27 +126,28 @@ class Pomodoro.Presence : Object
 
     ~Presence ()
     {
-        // TODO: Restore user status on exit
-        // this.set_status (this.previous_status);
+        /* TODO: Restore user status on exit */
     }
 
-    private void on_settings_changed (GLib.Settings settings, string key)
+    private void on_settings_changed (GLib.Settings settings,
+                                      string        key)
     {
-        switch (key) {
+        switch (key)
+        {
             case "presence-during-pomodoro":
-                var status = SessionManager.string_to_presence_status (
+                var status = string_to_presence_status (
                                                 this.settings.get_string (key));
-                if (timer.state == State.POMODORO)
+                if (timer.state == State.POMODORO) {
                     this.set_status (status);
-
+                }
                 break;
 
             case "presence-during-break":
-                var status = SessionManager.string_to_presence_status (
+                var status = string_to_presence_status (
                                                 this.settings.get_string (key));
-                if (timer.state != State.POMODORO)
+                if (timer.state != State.POMODORO) {
                     this.set_status (status);
-
+                }
                 break;
         }
     }
@@ -159,7 +157,7 @@ class Pomodoro.Presence : Object
         if (!this.ignore_next_status)
         {
             this.previous_status = this.status;
-            this.status = (SessionManager.PresenceStatus) status;
+            this.status = (PresenceStatus) status;
 
             this.ignore_next_status = false;
         }
@@ -167,7 +165,7 @@ class Pomodoro.Presence : Object
 
     private void on_timer_pomodoro_start (bool is_requested)
     {
-        var status = SessionManager.string_to_presence_status (
+        var status = string_to_presence_status (
                 this.settings.get_string ("presence-during-pomodoro"));
 
         this.set_status (status);
@@ -175,19 +173,19 @@ class Pomodoro.Presence : Object
 
     private void on_timer_pomodoro_end (bool is_completed)
     {
-        var status = SessionManager.string_to_presence_status (
+        var status = string_to_presence_status (
                 this.settings.get_string ("presence-during-break"));
 
         this.set_status (status);
     }
 
-    public void set_status (SessionManager.PresenceStatus status)
+    public void set_status (PresenceStatus status)
     {
         assert (this.proxy != null);
 
         this.ignore_next_status = true;
 
-        if (status == SessionManager.PresenceStatus.DEFAULT) {
+        if (status == PresenceStatus.DEFAULT) {
             this.proxy.status = this.previous_status;
         }
         else {
@@ -196,11 +194,11 @@ class Pomodoro.Presence : Object
     }
 
     /* mapping from settings to presence combobox */
-    public static bool get_status_mapping (GLib.Value value,
-                                                    GLib.Variant variant,
-                                                    void* user_data)
+    public static bool get_status_mapping (GLib.Value   value,
+                                           GLib.Variant variant,
+                                           void*        user_data)
     {
-        var status = SessionManager.string_to_presence_status (variant.get_string ());
+        var status = string_to_presence_status (variant.get_string ());
 
         value.set_int ((int) status);
 
@@ -208,14 +206,14 @@ class Pomodoro.Presence : Object
     }
 
     /* mapping from presence combobox to settings */
-    public static Variant set_status_mapping (GLib.Value value,
+    public static Variant set_status_mapping (GLib.Value       value,
                                               GLib.VariantType expected_type,
-                                              void* user_data)
+                                              void*            user_data)
     {
-        var status = SessionManager.PresenceStatus.DEFAULT;
+        var status = PresenceStatus.DEFAULT;
 
-        status = (SessionManager.PresenceStatus) value.get_int ();
+        status = (PresenceStatus) value.get_int ();
 
-        return new Variant.string (SessionManager.presence_status_to_string (status));
+        return new Variant.string (presence_status_to_string (status));
     }
 }

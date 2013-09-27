@@ -29,9 +29,8 @@ public class Pomodoro.AboutDialog : Gtk.AboutDialog
         this.title = _("About Pomodoro");
         this.program_name = _("Pomodoro");
         this.comments = _("A simple time management utility");
-        this.logo_icon_name = "gnome-pomodoro";
+        this.logo_icon_name = Config.PACKAGE;
         this.version = Config.PACKAGE_VERSION;
-        // this.website = Config.PACKAGE_URL;
 
         this.authors = {
             "Arun Mahapatra <pratikarun@gmail.com>",
@@ -49,8 +48,8 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,  MA 02110-1301  USA");
 
-        this.set_destroy_with_parent (true);
-        this.set_modal (true);
+        this.destroy_with_parent = true;
+        this.modal = true;
 
         this.response.connect (() => {
             this.destroy ();

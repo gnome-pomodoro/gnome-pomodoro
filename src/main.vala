@@ -22,12 +22,15 @@
 using GLib;
 
 
+private enum ExitStatus
+{
+    SUCCESS = 0,
+    FAILURE = 1
+}
+
+
 public int main (string[] args)
 {
-    Pomodoro.Application application;
-    Pomodoro.CommandLine command_line;
-    int exit_status = 0;
-
     GLib.Environment.set_application_name (Config.PACKAGE);
 
     #if ENABLE_NLS
@@ -39,29 +42,30 @@ public int main (string[] args)
     Gtk.init (ref args);
     Gst.init (ref args);
 
-    command_line = new Pomodoro.CommandLine ();
+    var command_line = new Pomodoro.CommandLine ();
 
-    // Arguments are also parsed by application.command_line signal handler,
-    // so here we work on a copy. Though parsed arguments should be freed.
+    /* Arguments are also parsed by application.command_line signal handler,
+     * so here we work on a copy.
+     */
     if (command_line.parse (args))
     {
-        application = new Pomodoro.Application ();
-        application.is_service = command_line.no_default_window;
+        var application = new Pomodoro.Application ();
         application.set_default ();
 
         try {
             if (application.register ())
-                exit_status = application.run (args);
+            {
+                // if (!command_line.no_default_window) {
+                //     application.activate_action ("preferences", "");
+                // }
+
+                return application.run (args);
+            }
         }
         catch (Error e) {
             GLib.critical ("%s", e.message);
-            exit_status = 1;
         }
     }
-    else {
-        exit_status = 1;
-    }
 
-    return exit_status;
+    return ExitStatus.FAILURE;
 }
-

@@ -114,16 +114,18 @@ public class Pomodoro.ModeButton : Gtk.Box
 
         this.pack_start (button, true, true, 0);
 
-        if (this.selected < 0)
+        if (this.selected < 0) {
             this.selected = 0;
+        }
     }
 
     private void on_child_toggled (Gtk.Widget child)
     {
         var button = child as Gtk.ToggleButton;
 
-        if (button.active)
+        if (button.active) {
             this.selected = this.get_children ().index (child);
+        }
     }
 
     public unowned Gtk.Widget add_label (string text)
@@ -151,6 +153,7 @@ public class Pomodoro.ModeButton : Gtk.Box
                 this.selected -= 1;
                 break;
         }
+
         return false;
     }
 
@@ -246,7 +249,7 @@ public class Pomodoro.ModeButton : Gtk.Box
 }
 
 
-internal class Pomodoro.KeybindingButton : Gtk.Box
+public class Pomodoro.KeybindingButton : Gtk.Box
 {
     public bool active
     {
@@ -317,18 +320,21 @@ internal class Pomodoro.KeybindingButton : Gtk.Box
     private void refresh ()
     {
         var label = this.keybinding.get_label ();
-        if (label != "")
+        if (label != "") {
             this.label = label;
-        else
+        }
+        else {
             this.label = _("Disabled");
+        }
 
         this.clear_button.set_visible (this.keybinding.accelerator != "");
     }
 
     public void toggled ()
     {
-        if (this.active)
+        if (this.active) {
             this.grab_focus ();
+        }
     }
 
     public override bool focus_out_event (Gdk.EventFocus event)
@@ -395,14 +401,14 @@ internal class Pomodoro.KeybindingButton : Gtk.Box
 }
 
 
-internal enum Pomodoro.SoundBackend {
+public enum Pomodoro.SoundBackend {
     CANBERRA,
     GSTREAMER
 }
 
-internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
+public class Pomodoro.SoundChooserButton : Gtk.Box
 {
-    internal enum RowType {
+    private enum RowType {
         BOOKMARK_SEPARATOR,
         BOOKMARK,
         CUSTOM_SEPARATOR,
@@ -414,13 +420,13 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         INVALID = -1
     }
 
-    internal enum Column {
+    private enum Column {
         ROW_TYPE,
         DISPLAY_NAME,
         FILE
     }
 
-    internal enum TargetType {
+    private enum TargetType {
         TEXT_PLAIN,
         TEXT_URI_LIST
     }
@@ -477,7 +483,6 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
     private ulong combo_box_changed_handler_id;
     private Gtk.FileFilter filter;
     private Gtk.ListStore model;
-    private Gtk.TreeModelFilter filter_model;
     private Gtk.VolumeButton volume_button;
 
     private static Gtk.FileChooserDialog create_dialog ()
@@ -605,38 +610,45 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
     {
         int retval = 0;
 
-        if (row_type == RowType.BOOKMARK_SEPARATOR)
+        if (row_type == RowType.BOOKMARK_SEPARATOR) {
             return retval;
+        }
 
         retval += this.has_bookmark_separator ? 1 : 0;
 
-        if (row_type == RowType.BOOKMARK)
+        if (row_type == RowType.BOOKMARK) {
             return retval;
+        }
 
         retval += this.n_bookmarks;
 
-        if (row_type == RowType.CUSTOM_SEPARATOR)
+        if (row_type == RowType.CUSTOM_SEPARATOR) {
             return retval;
+        }
 
         retval += this.has_custom_separator ? 1 : 0;
 
-        if (row_type == RowType.CUSTOM)
+        if (row_type == RowType.CUSTOM) {
             return retval;
+        }
 
         retval += this.has_custom ? 1 : 0;
 
-        if (row_type == RowType.OTHER_SEPARATOR)
+        if (row_type == RowType.OTHER_SEPARATOR) {
             return retval;
+        }
 
         retval += this.has_other_separator ? 1 : 0;
 
-        if (row_type == RowType.OTHER)
+        if (row_type == RowType.OTHER) {
             return retval;
+        }
 
         retval++;
 
-        if (row_type == RowType.EMPTY_SELECTION)
+        if (row_type == RowType.EMPTY_SELECTION) {
             return retval;
+        }
 
         assert_not_reached ();
 
@@ -653,11 +665,13 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         model.get (a, Column.ROW_TYPE, out a_type);
         model.get (b, Column.ROW_TYPE, out b_type);
 
-        if (a_type < b_type)
+        if (a_type < b_type) {
             return -1;
+        }
 
-        if (a_type > b_type)
+        if (a_type > b_type) {
             return 1;
+        }
 
         model.get (a, Column.DISPLAY_NAME, out a_display_name);
         model.get (b, Column.DISPLAY_NAME, out b_display_name);
@@ -704,19 +718,21 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
             var name = "";
             var next_iter = iter;
 
-            if (!this.model.iter_next (ref next_iter))
+            if (!this.model.iter_next (ref next_iter)) {
                 break;
-
+            }
 
             this.model.get (iter,
                             Column.ROW_TYPE, out type,
                             Column.DISPLAY_NAME, out name);
 
-            if (type != RowType.BOOKMARK)
+            if (type != RowType.BOOKMARK) {
                 break;
+            }
 
-            if (model_sort_func (this.model, iter, next_iter) < 0)
+            if (model_sort_func (this.model, iter, next_iter) < 0) {
                 break;
+            }
 
             iter = next_iter;
             pos += 1;
@@ -729,18 +745,6 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
                         Column.FILE, file);
 
         this.n_bookmarks += 1;
-
-        // if (this.n_bookmarks > 0 &&
-        //     !this.has_bookmark_separator)
-        // {
-        //     pos = this.model_get_type_position (RowType.BOOKMARK_SEPARATOR);
-        //
-        //     this.model.insert (out iter, pos);
-        //     this.model.set (iter,
-        //                     Column.ROW_TYPE, RowType.BOOKMARK_SEPARATOR);
-        //
-        //     this.has_bookmark_separator = true;
-        // }
     }
 
     private void model_update_custom (GLib.File? file)
@@ -748,8 +752,9 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         Gtk.TreeIter iter;
         int pos;
 
-        if (file == null)
+        if (file == null) {
             return;
+        }
 
         if (!this.has_custom_separator)
         {
@@ -761,15 +766,13 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         }
 
         pos = this.model_get_type_position (RowType.CUSTOM);
-        if (!this.has_custom)
-        {
+
+        if (!this.has_custom) {
             this.model.insert (out iter, pos);
             this.has_custom = true;
         }
-        else
-        {
+        else {
             this.model.iter_nth_child (out iter, null, pos);
-            // this.model.remove (iter);
         }
 
         this.model.set (iter,
@@ -803,10 +806,12 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
         model.get (iter,
                    Column.ROW_TYPE, out type);
 
-        if (type == RowType.CUSTOM)
+        if (type == RowType.CUSTOM) {
             name_cell.ellipsize = Pango.EllipsizeMode.END;
-        else
+        }
+        else {
             name_cell.ellipsize = Pango.EllipsizeMode.NONE;
+        }
     }
 
     private void select_combo_box_row_no_notify (int pos)
@@ -922,8 +927,9 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
 
     private void on_dialog_notify (GLib.ParamSpec property)
     {
-        if (this.get_class ().find_property (property.name) != null)
+        if (this.get_class ().find_property (property.name) != null) {
             this.notify_property (property.name);
+        }
     }
 
     private void on_dialog_response (Gtk.Dialog dialog,
@@ -1018,14 +1024,16 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
     {
         GLib.File file = null;
 
-        if (base.drag_data_received != null)
+        if (base.drag_data_received != null) {
             base.drag_data_received (context,
                                      x, y,
                                      data, type,
                                      drag_time);
+        }
 
-        if (context == null || data == null || data.get_length () < 0)
+        if (context == null || data == null || data.get_length () < 0) {
             return;
+        }
 
         switch (type)
         {
@@ -1074,10 +1082,11 @@ internal class Pomodoro.SoundChooserButton : Gtk.Box //, Gtk.FileChooser
 }
 
 
-internal class Pomodoro.LogScale : Gtk.Scale
+public class Pomodoro.LogScale : Gtk.Scale
 {
-    // TODO: This widget is quite bad. We need custom GtkRange to
-    //       get true log scale.
+    /* TODO: This widget is quite bad. We need custom GtkRange to
+     *       do it right.
+     */
 
     public double exponent { get; set; default = 1.0; }
 
@@ -1097,8 +1106,6 @@ internal class Pomodoro.LogScale : Gtk.Scale
         this.exponent = exponent;
 
         this.do_set_adjustment (adjustment);
-
-        //this.update_policy = Gtk.UpdateType.DISCONTINUOUS;
     }
 
     private void do_set_adjustment (Gtk.Adjustment base_adjustment)
@@ -1152,12 +1159,6 @@ internal class Pomodoro.LogScale : Gtk.Scale
 
         return true;
     }
-
-//    public override void add_mark (double value, Gtk.PositionType position, string? markup);
-
-//    public override string format_value (double value) {
-//        return format_time ((long) value);
-//    }
 }
 
 
@@ -1169,17 +1170,9 @@ public class Pomodoro.SymbolicButton : Gtk.Button
         this.set_relief (Gtk.ReliefStyle.NORMAL);
 
         var icon = new Gtk.Image.from_icon_name (icon_name, icon_size);
-//        icon.show ();
-//        var icon = Gtk.Image.new_from_icon_name (icon_name, icon_size);
-//        item.add (icon);
-
-
-//        var icon = new Gtk.Image ();
-//        icon.set_from_icon_name (icon_name, icon_size);
         icon.show ();
 
         this.image = icon;
-//        this.add (icon);
     }
 }
 
@@ -1198,7 +1191,7 @@ public class Pomodoro.EnumComboBox : Gtk.ComboBox
         this.model = model;
 
         var cell = new Gtk.CellRendererText ();
-        cell.width = 120;  // TODO: make it adjustable
+        cell.width = 120;  /* TODO: make it adjustable */
 
         this.pack_start (cell, false);
         this.set_attributes (cell, "text", Column.DISPLAY_NAME);

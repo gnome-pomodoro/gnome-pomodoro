@@ -29,6 +29,7 @@ public class Pomodoro.Service : Object
     private Pomodoro.Timer timer;
     private HashTable<string, Variant> changed_properties;
     private uint idle_id;
+    private GLib.Cancellable cancellable;
 
     public uint64 elapsed {
         get { return this.timer.elapsed; }
@@ -57,6 +58,8 @@ public class Pomodoro.Service : Object
         this.changed_properties = new HashTable<string, Variant> (str_hash, str_equal);
         this.idle_id = 0;
 
+        this.cancellable = new GLib.Cancellable ();
+
         this.timer.notify.connect (this.on_property_notify);
 
         this.timer.elapsed_changed.connect ((timer) => {
@@ -76,19 +79,19 @@ public class Pomodoro.Service : Object
         });
     }
 
-    public void start () {
-        if (this.timer != null)
-            this.timer.start ();
+    public void start ()
+    {
+        this.timer.start ();
     }
 
-    public void stop () {
-        if (this.timer != null)
-            this.timer.stop ();
+    public void stop ()
+    {
+        this.timer.stop ();
     }
 
-    public void reset () {
-        if (this.timer != null)
-            this.timer.reset ();
+    public void reset ()
+    {
+        this.timer.reset ();
     }
 
     private void flush ()
@@ -96,10 +99,10 @@ public class Pomodoro.Service : Object
         var builder_properties = new VariantBuilder (VariantType.ARRAY);
         var builder_invalid = new VariantBuilder (VariantType.STRING_ARRAY);
 
+        /* FIXME: There are compile warnings from C compiler */
         this.changed_properties.foreach ((key, value) => {
             builder_properties.add ("{sv}", key, value);
         });
-
         this.changed_properties.remove_all ();
 
         try {
@@ -112,7 +115,7 @@ public class Pomodoro.Service : Object
                                                       builder_properties,
                                                       builder_invalid)
                                          );
-            this.connection.flush ();
+            this.connection.flush_sync (this.cancellable);
         }
         catch (Error e) {
             GLib.warning ("%s\n", e.message);

@@ -21,85 +21,62 @@
 using GLib;
 
 
-public delegate double Pomodoro.AnimationFunc (double progress);
-
-public enum Pomodoro.AnimationMode
+namespace Pomodoro
 {
-    LINEAR,
-    EASE_IN,
-    EASE_OUT,
-    EASE_IN_CUBIC,
-    EASE_OUT_CUBIC,
-    EASE_IN_OUT
+    public enum AnimationMode
+    {
+        LINEAR,
+        EASE_IN,
+        EASE_OUT,
+        EASE_IN_CUBIC,
+        EASE_OUT_CUBIC,
+        EASE_IN_OUT
+    }
+
+    public delegate double AnimationFunc (double progress);
+
+
+    private double calculate_linear (double t)
+    {
+        return t;
+    }
+
+    private double calculate_ease_in (double t)
+    {
+        return t * t;
+    }
+
+    private double calculate_ease_out (double t)
+    {
+        return (2.0 - t) * t;
+    }
+
+    private double calculate_ease_in_cubic (double t)
+    {
+        return t * t * t;
+    }
+
+    private double calculate_ease_out_cubic (double t)
+    {
+        return ((t - 3.0) * t + 3.0) * t;
+    }
+
+    private double calculate_ease_in_out (double t)
+    {
+        return ((1.0 - t) + (2.0 - t)) * (t * t);
+    }
 }
 
-private double calculate_linear (double t)
-{
-    return t;
-}
-
-//private double calculate_bezier (double t, double b, double c)
-//{
-////    Px = (1-t)^3(P1x) + 3t(1-t)^2(P2x) + 3t^2(1-t)(P3x) + t^3(P4x)
-//    return (3 * (1.0 - t) * ((1.0 - t)*b + t*c) + t * t) * t;
-//}
-
-//private double calculate_ease_in (double t)
-//{
-//    return calculate_bezier (double t, );
-//}
-
-//private double calculate_ease_out (double t)
-//{
-//    return 1.0 - calculate_bezier (1.0 - t, );
-//}
-
-private double calculate_ease_in (double t)
-{
-    return t * t;
-}
-
-private double calculate_ease_out (double t)
-{
-    return (2.0 - t) * t;
-}
-
-private double calculate_ease_in_cubic (double t)
-{
-    return t * t * t;
-}
-
-private double calculate_ease_out_cubic (double t)
-{
-    return ((t - 3.0) * t + 3.0) * t;
-}
-
-private double calculate_ease_in_out (double t)
-{
-    return ((1.0 - t) + (2.0 - t)) * (t * t);
-    // return (1.0 - t) * calculate_ease_in(t)
-    //             + t * calculate_ease_out(t);
-}
-
-//private double calculate_ease_in_power (double t, double power)
-//{
-//    return Math.pow (t, power);
-//}
-
-//private double calculate_ease_out_power (double t, double power)
-//{
-//    return 1.0 - Math.pow (1.0 - t, power);
-//}
 
 public class Pomodoro.Animation : Object
 {
-    public uint duration;
-    public uint interval;
     public double value_from = 0.0;
     public double value_to = 1.0;
-
-    public double progress = 0.0;
     public double value = 0.0;
+    public double progress = 0.0;
+
+    public uint duration;
+    public uint interval;
 
     private uint64 timestamp;
     private uint timeout_id;
@@ -109,7 +86,7 @@ public class Pomodoro.Animation : Object
     public Animation (uint duration, AnimationMode mode)
     {
         this.duration = duration;
-        this.interval = 20;  // 50 fps
+        this.interval = 20;  /* 50 fps */
 
         this.progress = 0.0;
         this.timeout_id = 0;
@@ -146,9 +123,17 @@ public class Pomodoro.Animation : Object
         }
     }
 
+    public void stop ()
+    {
+        if (this.timeout_id != 0) {
+            GLib.Source.remove (this.timeout_id);
+            this.timeout_id = 0;
+        }
+    }
+
     ~Animation ()
     {
-        this.stop ();
+        this.destroy ();
     }
 
     public double compute_value (double progress)
@@ -158,20 +143,27 @@ public class Pomodoro.Animation : Object
         return this.value_from + easing * (this.value_to - this.value_from);
     }
 
-    private bool on_timeout ()
+    public void update ()
     {
         var timestamp = GLib.get_real_time () / 1000;
 
-        if (this.duration > 0)
+        if (this.duration > 0) {
             this.progress = ((double)(timestamp - this.timestamp)
-                        / (double) this.duration).clamp (0.0, 1.0);
-        else
+                            / (double) this.duration).clamp (0.0, 1.0);
+        }
+        else {
             this.progress = 1.0;
+        }
 
         this.value = this.compute_value (this.progress);
 
+        // TODO: use a callback function directly instead of a signal
         this.value_changed (this.value);
-        // this.func (this); // TODO: use function instead of signal
+    }
+
+    private bool on_timeout ()
+    {
+        this.update ();
 
         if (this.progress == 1.0)
         {
@@ -194,24 +186,16 @@ public class Pomodoro.Animation : Object
 
         if (this.timeout_id == 0)
         {
-            if (this.duration > 0)
+            if (this.duration > 0) {
                 this.timeout_id = GLib.Timeout.add (
-                        uint.min (this.interval, this.duration),
-                        (GLib.SourceFunc) this.on_timeout);
+                                    uint.min (this.interval, this.duration),
+                                    (GLib.SourceFunc) this.on_timeout);
+            }
 
             this.started ();
         }
 
-        this.on_timeout (); // TODO rename to update and make public?
-
-    }
-
-    public void stop ()
-    {
-        if (this.timeout_id != 0) {
-            GLib.Source.remove (this.timeout_id);
-            this.timeout_id = 0;
-        }
+        this.update ();
     }
 
     public virtual signal void destroy ()

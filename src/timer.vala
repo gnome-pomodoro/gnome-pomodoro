@@ -24,18 +24,23 @@ using GLib;
 
 namespace Pomodoro
 {
-    // Pomodoro acceptance factor is useful in cases of disabling the timer,
-    // accepted pomodoros increases session count and narrows time to long pause.
+    /* Pomodoro acceptance factor is useful in cases of disabling the timer,
+     * accepted pomodoros increases session count and narrows time to
+     * long pause.
+     */
     const double SESSION_ACCEPTANCE = 20.0 / 25.0;
 
-    // Short pause acceptance is used to catch quick "Start a new pomodoro" clicks,
-    // declining short pause narrows time to long pause.
+    /* Short pause acceptance is used to catch quick "Start a new pomodoro"
+     * clicks, declining short pause narrows time to long pause.
+     */
     const double SHORT_PAUSE_ACCEPTANCE = 1.0 / 5.0;
 
-    // Long pause acceptance is used to determine if user made or finished a long
-    // pause. If long pause hasn't finished, it's repeated next time. If user made
-    // a long pause during short one, it's treated as long one. Acceptance value here
-    // is a factor between short pause time and long pause time.
+    /* Long pause acceptance is used to determine if user made or finished
+     * a long pause. If long pause hasn't finished, it's repeated next time.
+     * If user made a long pause during short one, it's treated as long one.
+     * Acceptance value here is a factor between short pause time and long
+     * pause time.
+     */
     const double SHORT_LONG_PAUSE_ACCEPTANCE = 0.5;
 
     public enum State {
@@ -184,21 +189,26 @@ public class Pomodoro.Timer : Object
                 var notify_start = (this._state == State.POMODORO) ||
                                    (this._state == State.IDLE && this.settings.get_boolean ("pause-when-idle"));
 
-                if (this._state == State.POMODORO)
+                if (this._state == State.POMODORO) {
                     this.pomodoro_start (is_requested);
+                }
 
-                if (state_tmp == State.PAUSE && notify_start)
+                if (state_tmp == State.PAUSE && notify_start) {
                     this.notify_pomodoro_start (is_requested);
+                }
 
-                if (state_tmp == State.POMODORO)
+                if (state_tmp == State.POMODORO) {
                     this.pomodoro_end (is_completed);
+                }
 
-                if (state_tmp == State.POMODORO && this._state == State.PAUSE)
+                if (state_tmp == State.POMODORO && this._state == State.PAUSE) {
                     this.notify_pomodoro_end (is_completed);
+                }
             }
 
-            if (this._elapsed != elapsed_tmp || this._elapsed_limit != elapsed_limit_tmp)
+            if (this._elapsed != elapsed_tmp || this._elapsed_limit != elapsed_limit_tmp) {
                 this.elapsed_changed ();
+            }
         }
     }
 
@@ -232,44 +242,50 @@ public class Pomodoro.Timer : Object
     {
         var state_tmp = this._state;
 
-        if (this._elapsed == value)
+        if (this._elapsed == value) {
             return;
+        }
 
         this._elapsed = value;
 
         this.notify_property ("elapsed");
 
-        switch (this._state) {
+        switch (this._state)
+        {
             case State.IDLE:
                 break;
 
             case State.PAUSE:
-                // Pause is over
-                if (this._elapsed >= this._elapsed_limit)
+                /* Pause is over */
+                if (this._elapsed >= this._elapsed_limit) {
                     this.state = this.settings.get_boolean ("pause-when-idle")
                                    ? State.IDLE
                                    : State.POMODORO;
+                }
                 break;
 
             case State.POMODORO:
-                // Pomodoro is over, a pause is needed :)
-                if (this._elapsed >= this._elapsed_limit)
+                /* Pomodoro is over, a pause is needed :) */
+                if (this._elapsed >= this._elapsed_limit) {
                     this.state = State.PAUSE;
-
+                }
                 break;
         }
 
-        if (this._state == state_tmp)
+        if (this._state == state_tmp) {
             this.elapsed_changed ();
+        }
     }
 
     private void do_set_state (State new_state, int64 timestamp)
     {
-        if (this.timeout_source == 0 && new_state != State.NULL)
+        if (this.timeout_source == 0 && new_state != State.NULL) {
             this.timeout_source = Timeout.add (1000, this.on_timeout);
+        }
 
-        if (this._state == new_state)
+        if (this._state == new_state) {
             return;
+        }
 
         this.disable_idle_monitor ();
         this.freeze_notify ();
@@ -279,7 +295,7 @@ public class Pomodoro.Timer : Object
                 this.session += 1;
             }
             else {
-                // Pomodoro not completed, sorry
+                /* Pomodoro not completed, it doesn't get counted */
             }
         }
 
@@ -297,23 +313,29 @@ public class Pomodoro.Timer : Object
                 var long_pause_acceptance_time = (uint64)((1.0 - SHORT_LONG_PAUSE_ACCEPTANCE) * this.settings.get_uint ("short-break-duration") * 1000
                                                      + (SHORT_LONG_PAUSE_ACCEPTANCE) * this.settings.get_uint ("long-break-duration") * 1000);
 
-                if (this._state == State.PAUSE || this._state == State.IDLE) {
-                    // If skipped a break make long break sooner
-                    if (this._elapsed < SHORT_PAUSE_ACCEPTANCE * this.settings.get_uint ("short-break-duration") * 1000)
+                if (this._state == State.PAUSE || this._state == State.IDLE)
+                {
+                    /* If skipped a break make long break sooner */
+                    if (this._elapsed < SHORT_PAUSE_ACCEPTANCE * this.settings.get_uint ("short-break-duration") * 1000) {
                         this.session += 1;
+                    }
 
-                    // Reset work cycle when finished long break or was too lazy on a short one,
-                    // and if skipped a long break try again next time.
-                    if (this._elapsed >= long_pause_acceptance_time)
+                    /* Reset work cycle when finished long break or was too lazy on a short one,
+                     * and if skipped a long break try again next time.
+                     */
+                    if (this._elapsed >= long_pause_acceptance_time) {
                         this.session = 0;
+                    }
                 }
 
-                if (this._state == State.NULL) {
-                    // Reset work cycle when disabled for some time
-                    var idle_time = (timestamp - this._state_timestamp); // / 1000;
+                if (this._state == State.NULL)
+                {
+                    /* Reset work cycle when disabled for some time */
+                    var idle_time = (timestamp - this._state_timestamp);
 
-                    if (this._state_timestamp > 0 && idle_time >= long_pause_acceptance_time)
+                    if (this._state_timestamp > 0 && idle_time >= long_pause_acceptance_time) {
                         this.session = 0;
+                    }
                 }
 
                 new_elapsed = 0;
@@ -321,17 +343,21 @@ public class Pomodoro.Timer : Object
                 break;
 
             case State.PAUSE:
-                // Wrap time to pause
-                if (this._state == State.POMODORO && this._elapsed > this._elapsed_limit)
+                /* Wrap time to pause */
+                if (this._state == State.POMODORO && this._elapsed > this._elapsed_limit) {
                     new_elapsed = this._elapsed - this._elapsed_limit;
-                else
+                }
+                else {
                     new_elapsed = 0;
+                }
 
-                // Determine which pause type user should have
-                if (this._session >= this._session_limit)
+                /* Determine which pause type user should have */
+                if (this._session >= this._session_limit) {
                     new_elapsed_limit = this.settings.get_uint ("long-break-duration") * 1000;
-                else
+                }
+                else {
                     new_elapsed_limit = this.settings.get_uint ("short-break-duration") * 1000;
+                }
 
                 break;
 
@@ -373,8 +399,9 @@ public class Pomodoro.Timer : Object
                 this.settings_state.get_string ("state-changed-date"));
         }
         catch (DateTimeError error) {
-            // In case there is no valid state-changed-date, elapsed time
-            // will be lost.
+            /* In case there is no valid state-changed-date, elapsed time
+             * will be lost.
+             */
             GLib.warning ("Could not restore state time");
 
             return;
@@ -390,8 +417,9 @@ public class Pomodoro.Timer : Object
         {
             this.set_elapsed_milliseconds (timestamp - this._state_timestamp);
 
-            // Skip through states silently to avoid unnecessary notifications
-            // and signal emits stacking up
+            /* Skip through states silently to avoid unnecessary notifications
+             * and signal emits stacking up
+             */
             while (this._elapsed >= this._elapsed_limit)
             {
                 if (this._state == State.POMODORO) {
@@ -408,7 +436,7 @@ public class Pomodoro.Timer : Object
             }
         }
 
-        // Update timestamp to the beginning of current state
+        /* Update timestamp to the beginning of current state */
         state_changed_date = new DateTime.from_unix_utc ((int64)(timestamp - this._elapsed) / 1000);
 
         this.settings_state.set_double ("session-count",
@@ -444,8 +472,9 @@ public class Pomodoro.Timer : Object
 
     public void start ()
     {
-        if (this._state == State.NULL || this._state == State.IDLE)
+        if (this._state == State.NULL || this._state == State.IDLE) {
             this.state = State.POMODORO;
+        }
     }
 
     public void stop ()
@@ -462,16 +491,18 @@ public class Pomodoro.Timer : Object
         this.session = 0;
         this.state = State.NULL;
 
-        if (is_running)
+        if (is_running) {
             this.state = State.POMODORO;
+        }
 
         this.thaw_notify ();
     }
 
     protected void enable_idle_monitor ()
     {
-        if (this.became_active_id == 0)
+        if (this.became_active_id == 0) {
             this.became_active_id = this.idle_monitor.add_user_active_watch (this.on_idle_monitor_became_active);
+        }
     }
 
     protected void disable_idle_monitor ()
@@ -491,23 +522,23 @@ public class Pomodoro.Timer : Object
 
         switch (key) {
             case "pomodoro-duration":
-                if (this.state == State.POMODORO)
+                if (this.state == State.POMODORO) {
                     elapsed_limit = this.settings.get_uint (key) * 1000;
-
+                }
                 elapsed = uint64.min (elapsed, elapsed_limit);
                 break;
 
             case "short-break-duration":
-                if (this.state == State.PAUSE && this.session < this.session_limit)
+                if (this.state == State.PAUSE && this.session < this.session_limit) {
                     elapsed_limit = this.settings.get_uint (key) * 1000;
-
+                }
                 elapsed = uint64.min (elapsed, elapsed_limit);
                 break;
 
             case "long-break-duration":
-                if (this.state == State.PAUSE && this.session >= this.session_limit)
+                if (this.state == State.PAUSE && this.session >= this.session_limit) {
                     elapsed_limit = this.settings.get_uint (key) * 1000;
-
+                }
                 elapsed = uint64.min (elapsed, elapsed_limit);
                 break;
         }
@@ -519,8 +550,9 @@ public class Pomodoro.Timer : Object
 
         this.set_elapsed_milliseconds (elapsed);
 
-        if (this._elapsed != elapsed_tmp || this._elapsed_limit != elapsed_limit_tmp)
+        if (this._elapsed != elapsed_tmp || this._elapsed_limit != elapsed_limit_tmp) {
             this.elapsed_changed ();
+        }
     }
 
     private bool on_timeout ()
@@ -535,8 +567,9 @@ public class Pomodoro.Timer : Object
 
     private void on_idle_monitor_became_active (Gnome.IdleMonitor monitor)
     {
-        if (this.state == State.IDLE)
+        if (this.state == State.IDLE) {
             this.state = State.POMODORO;
+        }
     }
 
     public override void dispose ()

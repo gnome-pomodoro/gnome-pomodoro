@@ -7,28 +7,6 @@
     margin-bottom: 6px;
 }
 
-.pomodoro-timer .button {
-    padding: 4px 6px;
-}
-
-.pomodoro-timer .label {
-    padding: 0pt 0pt 0pt 0pt;
-    font-family: "Droid Sans";
-    font-size: 80px;
-}
-
-.pomodoro-timer .label:insensitive {
-    text-shadow: -1.0px -1.5px #B0B0B0;
-    color: #CCC;
-}
-
-.pomodoro-timer .text-inset {
-    text-shadow: 1px 1px white;
-}
-
-.pomodoro-window {
-}
-
 .preferences-dialog {
 }
 

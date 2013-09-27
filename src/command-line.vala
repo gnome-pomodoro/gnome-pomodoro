@@ -23,39 +23,23 @@ using GLib;
 
 
 [Compact]
-internal class Pomodoro.CommandLine
+public class Pomodoro.CommandLine
 {
     public bool no_default_window = false;
     public bool preferences = false;
 
-    public bool parse (string[]? args)
-    {
-        // We have to make an extra copy of the array, since .parse assumes
-        // that it can remove strings from the array without freeing them.
-        string*[] tmp = new string[args.length];
-        for (int i = 0; i < args.length; i++) {
-            tmp[i] = args[i];
-        }
-
-        unowned string[] unowned_args = tmp;
-
-        return this.parse_ref (ref unowned_args);
-    }
-
     public bool parse_ref ([CCode (array_length_pos = 0.9)] ref unowned string[]? args)
     {
-        GLib.OptionContext  option_context;
-
-        OptionEntry[] options = new OptionEntry[2];
-        options[0] = { "preferences", 0, 0, OptionArg.NONE, ref this.preferences,
-                       "Show preferences", null };
-        options[1] = { "no-default-window", 0, 0, OptionArg.NONE, ref this.no_default_window,
-                       "Run as background service", null };
-
-        /* Setup command line options */
-        option_context = new GLib.OptionContext ("- A simple pomodoro timer");
+        var option_context = new GLib.OptionContext ("- A simple pomodoro timer");
         option_context.set_help_enabled (true);
         option_context.add_group (Gtk.get_option_group (true));
+
+        var options = new GLib.OptionEntry[2];
+        options[0] = { "preferences", 0, 0, GLib.OptionArg.NONE, ref this.preferences,
+                       "Show preferences", null };
+        options[1] = { "no-default-window", 0, 0, GLib.OptionArg.NONE, ref this.no_default_window,
+                       "Run as background service", null };
+
         option_context.add_main_entries (options, Config.GETTEXT_PACKAGE);
 
         try {
@@ -71,5 +55,20 @@ internal class Pomodoro.CommandLine
         }
 
         return true;
+    }
+
+    public bool parse (string[]? args)
+    {
+        /* We have to make an extra copy of the array, since parse() assumes
+         * that it can remove strings from the array without freeing them.
+         */
+        var tmp = new string[args.length];
+        for (int i = 0; i < args.length; i++) {
+            tmp[i] = args[i];
+        }
+
+        unowned string[] unowned_args = tmp;
+
+        return this.parse_ref (ref unowned_args);
     }
 }

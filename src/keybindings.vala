@@ -29,19 +29,18 @@
  *  - if keybinding is taken, notify about it
  *
  * For now gnome-shell extension is responsible for setting it.
- *
- * We could use Gtk accelerators or keybindings, but they are active only with
- * application in focus and we need system wide keybindings.
  */
 
-internal errordomain Pomodoro.KeybindingError
+
+public errordomain Pomodoro.KeybindingError
 {
     INVALID,
     FORBIDDEN,
     TYPING_COLLISION
 }
 
-internal class Pomodoro.Keybinding : GLib.Object
+
+public class Pomodoro.Keybinding : GLib.Object
 {
     public uint key { get; private set; }
     public Gdk.ModifierType modifiers { get; private set; }
@@ -50,9 +49,8 @@ internal class Pomodoro.Keybinding : GLib.Object
     {
         owned get {
             var accelerator = new StringBuilder ();
-            var elements = this.get_string_list (true);
 
-            foreach (var element in elements) {
+            foreach (var element in this.get_string_list (true)) {
                 accelerator.append (element);
             }
 
@@ -71,7 +69,7 @@ internal class Pomodoro.Keybinding : GLib.Object
         }
     }
 
-    public Keybinding (uint key = 0,
+    public Keybinding (uint             key = 0,
                        Gdk.ModifierType modifiers = 0)
     {
         this.key = key;
@@ -83,8 +81,8 @@ internal class Pomodoro.Keybinding : GLib.Object
         this.accelerator = str;
     }
 
-    public static void parse (string? str,
-                              out uint keyval,
+    public static void parse (string?              str,
+                              out uint             keyval,
                               out Gdk.ModifierType modifiers)
     {
         int pos = 0;
@@ -95,56 +93,54 @@ internal class Pomodoro.Keybinding : GLib.Object
         keyval = 0;
         modifiers = 0;
 
-        if (str != null)
+        if (str == null) {
+            return;
+        }
+
+        while ((chr = str[pos]) != '\0')
         {
-            while ((chr = str[pos]) != '\0')
+            if (chr == '<') {
+                start = pos + 1;
+                is_modifier = true;
+            }
+            else if (chr == '>' && is_modifier)
             {
-                if (chr == '<') {
-                    start = pos + 1;
-                    is_modifier = true;
-                }
-                else if (chr == '>' && is_modifier)
-                {
-                    var modifier = str.slice (start, pos);
+                var modifier = str.slice (start, pos);
 
-                    if (modifier == "Ctrl" || modifier == "Control")
-                        modifiers |= Gdk.ModifierType.CONTROL_MASK;
-
-                    if (modifier == "Alt")
-                        modifiers |= Gdk.ModifierType.MOD1_MASK;
-
-                    if (modifier == "Shift")
-                        modifiers |= Gdk.ModifierType.SHIFT_MASK;
-
-                    if (modifier == "Super")
-                        modifiers |= Gdk.ModifierType.SUPER_MASK;
-
-                    is_modifier = false;
-                    start = pos + 1;
+                if (modifier == "Ctrl" || modifier == "Control") {
+                    modifiers |= Gdk.ModifierType.CONTROL_MASK;
                 }
 
-                pos++;
+                if (modifier == "Alt") {
+                    modifiers |= Gdk.ModifierType.MOD1_MASK;
+                }
+
+                if (modifier == "Shift") {
+                    modifiers |= Gdk.ModifierType.SHIFT_MASK;
+                }
+
+                if (modifier == "Super") {
+                    modifiers |= Gdk.ModifierType.SUPER_MASK;
+                }
+
+                is_modifier = false;
+                start = pos + 1;
             }
 
-            keyval = Gdk.keyval_from_name (str.slice (start, pos));
+            pos++;
         }
+
+        keyval = Gdk.keyval_from_name (str.slice (start, pos));
     }
 
-    public void set_values (uint key,
+    public void set_values (uint             key,
                             Gdk.ModifierType modifiers)
     {
-        modifiers = modifiers & (
+        this.key = key;
+        this.modifiers = modifiers & (
                 Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK |
                 Gdk.ModifierType.SUPER_MASK | Gdk.ModifierType.MOD1_MASK);
 
-//        this.freeze_notify ();
-
-        this.key = key;
-        this.modifiers = modifiers;
-
-//        this.throw_notify ();
-
-        // TODO: emit changed signal in a smarter way...
         this.notify_property ("accelerator");
         this.changed ();
     }
@@ -193,17 +189,21 @@ internal class Pomodoro.Keybinding : GLib.Object
     {
         var elements = new List<string> ();
 
-        if ((this.modifiers & Gdk.ModifierType.SHIFT_MASK) > 0)
+        if (Gdk.ModifierType.SHIFT_MASK in this.modifiers) {
             elements.append (escape_modifiers ? "<Shift>" : "Shift");
+        }
 
-        if ((this.modifiers & Gdk.ModifierType.SUPER_MASK) > 0)
+        if (Gdk.ModifierType.SUPER_MASK in this.modifiers) {
             elements.append (escape_modifiers ? "<Super>" : "Super");
+        }
 
-        if ((this.modifiers & Gdk.ModifierType.CONTROL_MASK) > 0)
+        if (Gdk.ModifierType.CONTROL_MASK in this.modifiers) {
             elements.append (escape_modifiers ? "<Ctrl>" : "Ctrl");
+        }
 
-        if ((this.modifiers & Gdk.ModifierType.MOD1_MASK) > 0)
+        if (Gdk.ModifierType.MOD1_MASK in this.modifiers) {
             elements.append (escape_modifiers ? "<Alt>" : "Alt");
+        }
 
         if (this.key != 0) {
             var keyval = Gdk.keyval_to_upper (this.key);
@@ -215,16 +215,16 @@ internal class Pomodoro.Keybinding : GLib.Object
 
     public string get_label ()
     {
-        var elements = this.get_string_list (false);
-        var is_first = true;
         var label = new StringBuilder ();
+        var is_first = true;
 
-        foreach (var element in elements)
+        foreach (var element in this.get_string_list (false))
         {
-            if (!is_first)
+            if (!is_first) {
                 label.append ("+");
-            else
+            } else {
                 is_first = false;
+            }
 
             label.append (element);
         }
