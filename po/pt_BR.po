@@ -95,11 +95,11 @@ msgstr "Um novo pomodoro esta começando."
 
 #: ../src/timer.js:440
 msgid "It's time to take a break!"
-msgstr "É hora de descançar!"
+msgstr "É hora de descansar!"
 
 #: ../src/timer.js:462
 msgid "Take a break!"
-msgstr "Descance!"
+msgstr "Descanse!"
 
 #: ../src/timer.js:465
 msgid "Start a new pomodoro"
@@ -149,7 +149,7 @@ msgstr "Tempo, em segundos, que você deveria estar em um intervalo longo."
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:7
 msgid "Show dialog notifications during breaks"
-msgstr "Monstrar notificações durante os intervalos"
+msgstr "Mostrar notificações durante os intervalos"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:8
 msgid "Whether to show a notification dialog when pause starts."
@@ -189,7 +189,7 @@ msgstr "Arquivo de áudio para tocar no início ou no final do pomodoro."
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:17
 msgid "Restore timer state"
-msgstr "Rescuperar o estado do tempo"
+msgstr "Recuperar o estado do tempo"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:18
 msgid "Whether to restore state on startup."
