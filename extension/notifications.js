@@ -82,8 +82,12 @@ const State = {
 };
 
 const Action = {
-    START_POMODORO: 1,
-    REPORT_BUG: 2,
+    SWITCH_TO_POMODORO: 'switch-to-pomodoro',
+    SWITCH_TO_PAUSE: 'switch-to-pause',
+    SWITCH_TO_SHORT_PAUSE: 'switch-to-short-pause',
+    SWITCH_TO_LONG_PAUSE: 'switch-to-long-pause',
+    REPORT_BUG: 'report-bug',
+    VISIT_WEBSITE: 'visit-website'
 };
 
 
@@ -379,7 +383,7 @@ const PomodoroEndDialog = new Lang.Class({
                             { x_fill: true,
                               y_fill: true });
 
-        this.setRemainingTime(0);
+        this.setElapsedTime(0, 0);
     },
 
     open: function(timestamp) {
@@ -445,7 +449,8 @@ const PomodoroEndDialog = new Lang.Class({
         }
     },
 
-    setRemainingTime: function(remaining) {
+    setElapsedTime: function(elapsed, elapsed_limit) {
+        let remaining = elapsed_limit - elapsed;
         let minutes = parseInt(remaining / 60);
         let seconds = parseInt(remaining % 60);
 
@@ -539,11 +544,54 @@ const PomodoroEnd = new Lang.Class({
 
         this.parent(source, title, description, null);
 
+        this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
+
+        this._short_break_duration = this._settings.get_uint('short-break-duration');
+
         this.setResident(true);
-//        this.addButton(Action.START_POMODORO, _("Start a new pomodoro")); // TODO FIXME
+        this.addButton(Action.SWITCH_TO_PAUSE, "");
+        this.addButton(Action.SWITCH_TO_POMODORO, _("Start pomodoro"));
+
+        this._pause_switch_button = this.getButton(Action.SWITCH_TO_PAUSE);
+        this._pause_switch_button.hide();
     },
 
-    setRemainingTime: function(remaining) {
+    getButton: function(id) {
+        let button = this._buttonBox.get_children().filter(function(b) {
+            return b._actionId == id;
+        })[0];
+
+        return button;
+    },
+
+    updateButtons: function(is_long_pause, can_switch_pause) {
+        let changed = false;
+        let action_id = this._pause_switch_button._actionId;
+
+        if (this._pause_switch_button.reactive != can_switch_pause) {
+            this._pause_switch_button.reactive = can_switch_pause;
+            this._pause_switch_button.can_focus = can_switch_pause;
+        }
+
+        if (is_long_pause && action_id != Action.SWITCH_TO_SHORT_PAUSE) {
+            this._pause_switch_button._actionId = Action.SWITCH_TO_SHORT_PAUSE;
+            this._pause_switch_button.set_label(_("Take shorter break"));
+            changed = true;
+        }
+
+        if (!is_long_pause && action_id != Action.SWITCH_TO_LONG_PAUSE) {
+            this._pause_switch_button._actionId = Action.SWITCH_TO_LONG_PAUSE;
+            this._pause_switch_button.set_label(_("Take longer break"));
+            changed = true;
+        }
+
+        if (changed) {
+            this._pause_switch_button.show();
+        }
+    },
+
+    setElapsedTime: function(elapsed, elapsed_limit) {
+        let remaining = elapsed_limit - elapsed;
         let seconds = Math.floor(remaining % 60);
         let minutes = Math.round(remaining / 60);
         let message = (remaining <= 45)
@@ -552,7 +600,11 @@ const PomodoroEnd = new Lang.Class({
                                     : ngettext("You have %d minute left\n",
                                                "You have %d minutes left\n", minutes).format(minutes);
 
+        let is_long_pause = elapsed_limit > this._short_break_duration;
+        let can_switch_pause = elapsed < this._short_break_duration;
+
         this.update(this.title, message, {});
+        this.updateButtons(is_long_pause, can_switch_pause);
     }
 });
 

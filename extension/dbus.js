@@ -29,6 +29,10 @@ const PomodoroInterface = <interface name="org.gnome.Pomodoro">
     <property name="Session" type="u" access="read"/>
     <property name="SessionLimit" type="u" access="read"/>
     <property name="State" type="s" access="read"/>
+    <method name="SetState">
+        <arg type="s" name="state" direction="in" />
+        <arg type="t" name="elapsed_limit" direction="in" />
+    </method>
     <method name="Start"/>
     <method name="Stop"/>
     <method name="Reset"/>

@@ -231,8 +231,8 @@ const Indicator = new Lang.Class({
             seconds = parseInt(remaining % 60);
 
             if (this._notification instanceof Notifications.PomodoroEnd) {
-                this._notification.setRemainingTime(remaining);
-                this._notificationDialog.setRemainingTime(remaining);
+                this._notification.setElapsedTime(this._proxy.Elapsed, this._proxy.ElapsedLimit);
+                this._notificationDialog.setElapsedTime(this._proxy.Elapsed, this._proxy.ElapsedLimit);
             }
         }
         else {
@@ -452,11 +452,38 @@ const Indicator = new Lang.Class({
             this._notification.destroy();
 
         this._notification = new Notifications.PomodoroEnd(source);
-        this._notification.connect('action-invoked', Lang.bind(this, function(notification, action) {
-            notification.destroy();
-            if (action == Notifications.Action.START_POMODORO && this._proxy)
-                this._proxy.State = State.POMODORO;
-        }));
+        this._notification.connect('action-invoked', Lang.bind(this,
+            function(notification, action)
+            {
+                /* Get current action of a pause switch button */
+                if (action == Notifications.Action.SWITCH_TO_PAUSE) {
+                    action = notification._pause_switch_button._actionId;
+                }
+
+                switch (action)
+                {
+                    case Notifications.Action.SWITCH_TO_POMODORO:
+                        this._proxy.SetStateRemote (State.POMODORO, 0);
+                        break;
+
+                    case Notifications.Action.SWITCH_TO_PAUSE:
+                        this._proxy.SetStateRemote (State.PAUSE, 0);
+                        break;
+
+                    case Notifications.Action.SWITCH_TO_SHORT_PAUSE:
+                        this._proxy.SetStateRemote (State.PAUSE, this._settings.get_uint('short-break-duration'));
+                        break;
+
+                    case Notifications.Action.SWITCH_TO_LONG_PAUSE:
+                        this._proxy.SetStateRemote (State.PAUSE, this._settings.get_uint('long-break-duration'));
+                        break;
+
+                    default:
+                        notification.hide();
+                        notification.destroy();
+                        break;
+                }
+            }));
         this._notification.connect('clicked', Lang.bind(this, function() {
             if (this._notificationDialog) {
                 this._notificationDialog.open();

@@ -84,6 +84,13 @@ public class Pomodoro.Service : Object
         this.timer.start ();
     }
 
+    public void set_state (string state,
+                           uint64 elapsed_limit)
+    {
+        this.timer.set_state_full (string_to_state (state),
+                                   elapsed_limit);
+    }
+
     public void stop ()
     {
         this.timer.stop ();
