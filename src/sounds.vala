@@ -87,7 +87,7 @@ public class Pomodoro.Player : Object
                   ? this.file.get_uri ()
                   : null;
 
-        if (uri != null) {
+        if (uri != "") {
             this.pipeline.set ("uri", uri);
             this.pipeline.set_state (Gst.State.PLAYING);
 
