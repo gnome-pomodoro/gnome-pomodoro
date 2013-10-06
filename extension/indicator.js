@@ -47,7 +47,7 @@ const ngettext = Gettext.ngettext;
 
 // Time in seconds to fade timer label when pause starts or ends
 const FADE_ANIMATION_TIME = 0.25;
-const FADE_OPACITY = 100;
+const FADE_OPACITY = 120;
 
 const State = {
     NULL: 'null',
