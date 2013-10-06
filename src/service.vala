@@ -31,11 +31,11 @@ public class Pomodoro.Service : Object
     private uint idle_id;
     private GLib.Cancellable cancellable;
 
-    public uint64 elapsed {
+    public double elapsed {
         get { return this.timer.elapsed; }
     }
 
-    public uint64 state_duration {
+    public double state_duration {
         get { return this.timer.state_duration; }
     }
 
@@ -85,7 +85,7 @@ public class Pomodoro.Service : Object
     }
 
     public void set_state (string state,
-                           uint64 state_duration)
+                           double state_duration)
     {
         this.timer.set_state_full (string_to_state (state),
                                    state_duration);
@@ -153,7 +153,7 @@ public class Pomodoro.Service : Object
         {
             case "elapsed":
                 this.send_property_changed ("Elapsed",
-                                            new Variant.uint64 (this.elapsed));
+                                            new Variant.double (this.elapsed));
                 break;
 
             case "session":
@@ -173,12 +173,12 @@ public class Pomodoro.Service : Object
 
             case "state-duration":
                 this.send_property_changed ("StateDuration",
-                                            new Variant.uint64 (this.state_duration));
+                                            new Variant.double (this.state_duration));
                 break;
         }
     }
 
-    public signal void elapsed_changed (uint64 elapsed);
+    public signal void elapsed_changed (double elapsed);
     public signal void state_changed (string state);
     public signal void notify_pomodoro_end (bool is_requested);
     public signal void notify_pomodoro_start (bool is_completed);

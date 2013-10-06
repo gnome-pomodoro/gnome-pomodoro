@@ -198,7 +198,7 @@ const Indicator = new Lang.Class({
         if (toggled) {
             remaining = state != State.IDLE
                     ? Math.max(this._proxy.StateDuration - this._proxy.Elapsed, 0)
-                    : this._settings.get_uint('pomodoro-duration');
+                    : this._settings.get_double('pomodoro-duration');
 
             minutes = parseInt(remaining / 60);
             seconds = parseInt(remaining % 60);
@@ -442,11 +442,11 @@ const Indicator = new Lang.Class({
                         break;
 
                     case Notifications.Action.SWITCH_TO_SHORT_PAUSE:
-                        this._proxy.SetStateRemote (State.PAUSE, this._settings.get_uint('short-break-duration'));
+                        this._proxy.SetStateRemote (State.PAUSE, this._settings.get_double('short-break-duration'));
                         break;
 
                     case Notifications.Action.SWITCH_TO_LONG_PAUSE:
-                        this._proxy.SetStateRemote (State.PAUSE, this._settings.get_uint('long-break-duration'));
+                        this._proxy.SetStateRemote (State.PAUSE, this._settings.get_double('long-break-duration'));
                         break;
 
                     default:

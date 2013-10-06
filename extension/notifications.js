@@ -554,7 +554,7 @@ const PomodoroEnd = new Lang.Class({
 
         this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
 
-        this._short_break_duration = this._settings.get_uint('short-break-duration');
+        this._short_break_duration = this._settings.get_double('short-break-duration');
 
         this.setResident(true);
         this.addButton(Action.SWITCH_TO_PAUSE, "");

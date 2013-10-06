@@ -25,20 +25,20 @@ const Gio = imports.gi.Gio;
 const SERVICE_NAME = 'org.gnome.Pomodoro';
 
 const PomodoroInterface = <interface name="org.gnome.Pomodoro">
-    <property name="Elapsed" type="t" access="read"/>
+    <property name="Elapsed" type="d" access="read"/>
     <property name="Session" type="u" access="read"/>
     <property name="SessionLimit" type="u" access="read"/>
     <property name="State" type="s" access="read"/>
-    <property name="StateDuration" type="t" access="read"/>
+    <property name="StateDuration" type="d" access="read"/>
     <method name="SetState">
         <arg type="s" name="state" direction="in" />
-        <arg type="t" name="duration" direction="in" />
+        <arg type="d" name="duration" direction="in" />
     </method>
     <method name="Start"/>
     <method name="Stop"/>
     <method name="Reset"/>
     <signal name="ElapsedChanged">
-        <arg type="t" name="elapsed"/>
+        <arg type="d" name="elapsed"/>
     </signal>
     <signal name="StateChanged">
         <arg type="s" name="state"/>
