@@ -1,18 +1,23 @@
-// A simple pomodoro timer for Gnome-shell
-// Copyright (C) 2011,2012 Arun Mahapatra, Gnome-shell pomodoro extension contributors
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (c) 2011-2013 gnome-shell-pomodoro contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * Authors: Arun Mahapatra <pratikarun@gmail.com>
+ *          Kamil Prusko <kamilprusko@gmail.com>
+ */
 
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
@@ -44,30 +49,12 @@ const ngettext = Gettext.ngettext;
 const FADE_ANIMATION_TIME = 0.25;
 const FADE_OPACITY = 100;
 
-// Slider helper functions
-const SLIDER_UPPER = 2700;
-const SLIDER_LOWER = 60;
-
 const State = {
     NULL: 'null',
     POMODORO: 'pomodoro',
     PAUSE: 'pause',
     IDLE: 'idle'
 };
-
-
-function _valueToSeconds(value) {
-    return Math.floor(value * (SLIDER_UPPER - SLIDER_LOWER) / 60) * 60 + SLIDER_LOWER;
-}
-
-function _secondsToValue(seconds) {
-    return (seconds - SLIDER_LOWER) / (SLIDER_UPPER - SLIDER_LOWER);
-}
-
-function _formatTime(seconds) {
-    let minutes = Math.floor(seconds / 60);
-    return ngettext("%d minute", "%d minutes", minutes).format(minutes);
-}
 
 
 const Indicator = new Lang.Class({
@@ -99,24 +86,12 @@ const Indicator = new Lang.Class({
         this._timerToggle.connect('toggled', Lang.bind(this, this.toggle));
         this.menu.addMenuItem(this._timerToggle);
 
-//        // Options SubMenu
-//        this._optionsMenu = new PopupMenu.PopupSubMenuMenuItem(_("Options"));
-//        this._buildOptionsMenu();
-//        this.menu.addMenuItem(this._optionsMenu);
-
         // Settings
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.menu.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
 
         this.menu.actor.connect('notify::visible', Lang.bind(this, this.refresh));
 
-        // We can init most of the stuff later
-        //Mainloop.idle_add(Lang.bind(this, this._doInit));
-        //this.refresh();
-        this._doInit();
-    },
-
-    _doInit: function() {
         this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
 
@@ -128,10 +103,10 @@ const Indicator = new Lang.Class({
                               Lang.bind(this, this.toggle));
 
         this._nameWatcherId = Gio.DBus.session.watch_name(
-                                    DBus.SERVICE_NAME,
-                                    Gio.BusNameWatcherFlags.AUTO_START,
-                                    Lang.bind(this, this._onNameAppeared),
-                                    Lang.bind(this, this._onNameVanished));
+                                       DBus.SERVICE_NAME,
+                                       Gio.BusNameWatcherFlags.AUTO_START,
+                                       Lang.bind(this, this._onNameAppeared),
+                                       Lang.bind(this, this._onNameVanished));
 
         this._onSettingsChanged();
         this._ensureProxy();
@@ -139,8 +114,6 @@ const Indicator = new Lang.Class({
         this._initialized = true;
 
         this.refresh();
-
-        return false;
     },
 
     _showPreferences: function() {
@@ -399,11 +372,9 @@ const Indicator = new Lang.Class({
     },
 
     _onPropertiesChanged: function(proxy, properties) {
-        // DBus implementation in gjs enforces properties to be cached,
-        // but does not update them properly...
-        //
-        // TODO: This walkaround may not bee needed in the future
-        //
+        // TODO: DBus implementation in gjs enforces properties to be cached,
+        //       but does not update them properly...
+        //       This walkaround may not bee needed in the future
         properties = properties.deep_unpack();
 
         for (var name in properties) {

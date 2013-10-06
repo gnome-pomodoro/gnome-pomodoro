@@ -1,10 +1,8 @@
 <schemalist gettext-domain="gnome-shell-pomodoro">
-
   <schema id="org.gnome.pomodoro" path="/apps/gnome-pomodoro/">
     <child name="preferences" schema="org.gnome.pomodoro.preferences"/>
     <child name="state" schema="org.gnome.pomodoro.state"/>
   </schema>
-
   <schema id="org.gnome.pomodoro.preferences" path="/apps/gnome-pomodoro/preferences/">
     <key name="pomodoro-duration" type="u">
       <default>1500</default>
@@ -24,13 +22,11 @@
       <summary>Long pause duration</summary>
       <description>Time in seconds you are supposed to take a longer break.</description>
     </key>
-
     <key type="as" name="toggle-timer-key">
       <default><![CDATA[["<Ctrl><Alt>p"]]]></default>
       <summary>Timer toggle key</summary>
       <description>Key to toggle the timer.</description>
     </key>
-
     <key name="show-screen-notifications" type="b">
       <default>true</default>
       <summary>Screen notifications</summary>
@@ -41,7 +37,6 @@
       <summary>Reminders</summary>
       <description>Whether to remind about ongoing break.</description>
     </key>
-
     <key name="pause-when-idle" type="b">
       <default>true</default>
       <summary>Wait after a break</summary>
@@ -71,7 +66,6 @@
       <summary>Presence during break</summary>
       <description>Presence during break.</description>
     </key>
-
     <key name="pomodoro-start-sound" type="s">
       <default>"loud-bell.ogg"</default>
       <summary>Pomodoro start sound</summary>
@@ -93,7 +87,6 @@
       <description>Volume of ticking sound.</description>
     </key>
   </schema>
-
   <schema id="org.gnome.pomodoro.state" path="/apps/gnome-pomodoro/state/">
     <key name="session-count" type="d">
       <default>0</default>
@@ -122,5 +115,4 @@
       <description>Date of the last state change.</description>
     </key>
   </schema>
-
 </schemalist>

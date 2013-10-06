@@ -31,11 +31,11 @@ namespace Pomodoro
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
 
-    internal errordomain DateTimeError {
+    private errordomain DateTimeError {
         PARSE
     }
 
-    internal DateTime datetime_from_string (string date_str) throws DateTimeError
+    private DateTime datetime_from_string (string date_str) throws DateTimeError
     {
         /* strptime() works okay for local timezone, otherwise it's crap,
          * so we need to parse date string ourselves.
@@ -77,12 +77,12 @@ namespace Pomodoro
         return new DateTime.utc (year, month, day, hour, minutes, seconds);
     }
 
-    internal string datetime_to_string (DateTime datetime)
+    private string datetime_to_string (DateTime datetime)
     {
         return datetime.to_utc ().format (DATETIME_FORMAT_RFC_2822);
     }
 
-    internal string format_time (long seconds)
+    private string format_time (long seconds)
     {
         var minutes = (seconds / 60) % 60;
         var hours = (seconds / 3600);

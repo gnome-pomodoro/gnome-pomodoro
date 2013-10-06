@@ -241,7 +241,7 @@ public class Pomodoro.Player : Object
 }
 
 
-internal class Pomodoro.Sounds : Object
+public class Pomodoro.Sounds : Object
 {
     public Player player;
 

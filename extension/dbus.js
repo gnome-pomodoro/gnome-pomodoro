@@ -21,6 +21,7 @@
 
 const Gio = imports.gi.Gio;
 
+
 const SERVICE_NAME = 'org.gnome.Pomodoro';
 
 const PomodoroInterface = <interface name="org.gnome.Pomodoro">
@@ -50,13 +51,6 @@ const PomodoroInterface = <interface name="org.gnome.Pomodoro">
     </signal>
 </interface>;
 
-var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
-
-function Pomodoro(init_callback, cancellable) {
-    return new PomodoroProxy(Gio.DBus.session, SERVICE_NAME, '/org/gnome/Pomodoro', init_callback, cancellable);
-}
-
-
 const GtkActionsInterface = <interface name="org.gtk.Actions">
     <method name="Activate">
         <arg type="s" name="action_name" direction="in"/>
@@ -65,8 +59,14 @@ const GtkActionsInterface = <interface name="org.gtk.Actions">
     </method>
 </interface>;
 
-var GtkActionsProxy = Gio.DBusProxy.makeProxyWrapper(GtkActionsInterface);
 
+var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
+function Pomodoro(init_callback, cancellable) {
+    return new PomodoroProxy(Gio.DBus.session, SERVICE_NAME, '/org/gnome/Pomodoro', init_callback, cancellable);
+}
+
+
+var GtkActionsProxy = Gio.DBusProxy.makeProxyWrapper(GtkActionsInterface);
 function GtkActions(init_callback, cancellable) {
     return new GtkActionsProxy(Gio.DBus.session, SERVICE_NAME, '/org/gnome/Pomodoro', init_callback, cancellable);
 }

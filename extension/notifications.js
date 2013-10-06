@@ -1,18 +1,23 @@
-// A simple pomodoro timer for Gnome-shell
-// Copyright (C) 2011-2013 Gnome-shell pomodoro extension contributors
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/*
+ * Copyright (c) 2011-2013 gnome-shell-pomodoro contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ *
+ */
 
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
@@ -22,7 +27,6 @@ const Atk = imports.gi.Atk;
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
-const Gtk = imports.gi.Gtk;
 const GnomeDesktop = imports.gi.GnomeDesktop;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
@@ -475,6 +479,7 @@ const PomodoroEndDialog = new Lang.Class({
     }
 });
 
+
 const Source = new Lang.Class({
     Name: 'PomodoroNotificationSource',
     Extends: MessageTray.Source,
@@ -488,6 +493,7 @@ const Source = new Lang.Class({
                              icon_size: size });
     }
 });
+
 
 const Notification = new Lang.Class({
     Name: 'PomodoroNotification',
@@ -521,6 +527,7 @@ const Notification = new Lang.Class({
     }
 });
 
+
 const PomodoroStart = new Lang.Class({
     Name: 'PomodoroStartNotification',
     Extends: Notification,
@@ -533,6 +540,7 @@ const PomodoroStart = new Lang.Class({
         this.setTransient(true);
     }
 });
+
 
 const PomodoroEnd = new Lang.Class({
     Name: 'PomodoroEndNotification',
@@ -608,6 +616,7 @@ const PomodoroEnd = new Lang.Class({
     }
 });
 
+
 const PomodoroEndReminder = new Lang.Class({
     Name: 'PomodoroEndReminderNotification',
     Extends: Notification,
@@ -675,6 +684,7 @@ const PomodoroEndReminder = new Lang.Class({
         this.parent();
     }
 });
+
 
 const Issue = new Lang.Class({
     Name: 'PomodoroIssueNotification',
