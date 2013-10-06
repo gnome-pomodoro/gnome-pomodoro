@@ -525,15 +525,18 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                        "dialog-warning-symbolic",
                                        Gtk.IconSize.MENU);
         notice_icon.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
+        notice_icon.show ();
 
         var notice_label = new Gtk.Label (null);
         notice_label.wrap = true;
         notice_label.wrap_mode = Pango.WrapMode.WORD;
         notice_label.xalign = 0.0f;
         notice_label.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
+        notice_label.show ();
         this.presence_notice = notice_label;
 
         var notice_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
+        notice_box.no_show_all = true;
         notice_box.pack_start (notice_icon, false, true);
         notice_box.pack_start (notice_label, false, false);
 
@@ -608,8 +611,9 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
             text = _("System notifications including chat messages will be disabled.");
         }
 
+        this.presence_notice.set_text (text);
+
         if (text != "") {
-            this.presence_notice.set_text (text);
             this.presence_notice.parent.show ();
         }
         else {
