@@ -453,8 +453,8 @@ const PomodoroEndDialog = new Lang.Class({
         }
     },
 
-    setElapsedTime: function(elapsed, elapsed_limit) {
-        let remaining = elapsed_limit - elapsed;
+    setElapsedTime: function(elapsed, state_duration) {
+        let remaining = state_duration - elapsed;
         let minutes = parseInt(remaining / 60);
         let seconds = parseInt(remaining % 60);
 
@@ -598,8 +598,8 @@ const PomodoroEnd = new Lang.Class({
         }
     },
 
-    setElapsedTime: function(elapsed, elapsed_limit) {
-        let remaining = elapsed_limit - elapsed;
+    setElapsedTime: function(elapsed, state_duration) {
+        let remaining = state_duration - elapsed;
         let seconds = Math.floor(remaining % 60);
         let minutes = Math.round(remaining / 60);
         let message = (remaining <= 45)
@@ -608,7 +608,7 @@ const PomodoroEnd = new Lang.Class({
                                     : ngettext("You have %d minute left\n",
                                                "You have %d minutes left\n", minutes).format(minutes);
 
-        let is_long_pause = elapsed_limit > this._short_break_duration;
+        let is_long_pause = state_duration > this._short_break_duration;
         let can_switch_pause = elapsed < this._short_break_duration;
 
         this.update(this.title, message, {});

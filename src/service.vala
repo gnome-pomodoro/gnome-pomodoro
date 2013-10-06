@@ -35,8 +35,8 @@ public class Pomodoro.Service : Object
         get { return this.timer.elapsed; }
     }
 
-    public uint64 elapsed_limit {
-        get { return this.timer.elapsed_limit; }
+    public uint64 state_duration {
+        get { return this.timer.state_duration; }
     }
 
     public uint session {
@@ -85,10 +85,10 @@ public class Pomodoro.Service : Object
     }
 
     public void set_state (string state,
-                           uint64 elapsed_limit)
+                           uint64 state_duration)
     {
         this.timer.set_state_full (string_to_state (state),
-                                   elapsed_limit);
+                                   state_duration);
     }
 
     public void stop ()
@@ -156,11 +156,6 @@ public class Pomodoro.Service : Object
                                             new Variant.uint64 (this.elapsed));
                 break;
 
-            case "elapsed-limit":
-                this.send_property_changed ("ElapsedLimit",
-                                            new Variant.uint64 (this.elapsed_limit));
-                break;
-
             case "session":
                 this.send_property_changed ("Session",
                                             new Variant.uint32 (this.session));
@@ -174,6 +169,11 @@ public class Pomodoro.Service : Object
             case "state":
                 this.send_property_changed ("State",
                                             new Variant.string (this.state));
+                break;
+
+            case "state-duration":
+                this.send_property_changed ("StateDuration",
+                                            new Variant.uint64 (this.state_duration));
                 break;
         }
     }

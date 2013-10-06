@@ -285,7 +285,7 @@ public class Pomodoro.Sounds : Object
                                          (void *) this,
                                          null);
 
-        this.timer.notify["elapsed-limit"].connect (this.on_elapsed_limit_changed);
+        this.timer.notify["state-duration"].connect (this.on_state_duration_changed);
 
         this.enable ();
     }
@@ -300,7 +300,7 @@ public class Pomodoro.Sounds : Object
         this.unschedule_fade_out ();
 
         var remaining_time =
-            (uint) (this.timer.elapsed_limit - this.timer.elapsed) * 1000;
+            (uint) (this.timer.state_duration - this.timer.elapsed) * 1000;
 
         if (remaining_time > PLAYER_FADE_OUT_TIME) {
             this.fade_out_timeout_id = GLib.Timeout.add (
@@ -563,7 +563,7 @@ public class Pomodoro.Sounds : Object
         }
     }
 
-    private void on_elapsed_limit_changed ()
+    private void on_state_duration_changed ()
     {
         if (this.timer.state == State.POMODORO) {
             this.schedule_fade_out ();

@@ -197,15 +197,15 @@ const Indicator = new Lang.Class({
 
         if (toggled) {
             remaining = state != State.IDLE
-                    ? Math.max(this._proxy.ElapsedLimit - this._proxy.Elapsed, 0)
+                    ? Math.max(this._proxy.StateDuration - this._proxy.Elapsed, 0)
                     : this._settings.get_uint('pomodoro-duration');
 
             minutes = parseInt(remaining / 60);
             seconds = parseInt(remaining % 60);
 
             if (this._notification instanceof Notifications.PomodoroEnd) {
-                this._notification.setElapsedTime(this._proxy.Elapsed, this._proxy.ElapsedLimit);
-                this._notificationDialog.setElapsedTime(this._proxy.Elapsed, this._proxy.ElapsedLimit);
+                this._notification.setElapsedTime(this._proxy.Elapsed, this._proxy.StateDuration);
+                this._notificationDialog.setElapsedTime(this._proxy.Elapsed, this._proxy.StateDuration);
             }
         }
         else {
@@ -520,7 +520,7 @@ const Indicator = new Lang.Class({
                 notification.destroy();
             else
                 // Don't show reminder if only 90 seconds remain to next pomodoro
-                if (this._proxy.ElapsedLimit - this._proxy.Elapsed < 90)
+                if (this._proxy.StateDuration - this._proxy.Elapsed < 90)
                     notification.destroy();
         }));
         this._reminder.connect('clicked', Lang.bind(this, function() {

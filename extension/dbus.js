@@ -26,13 +26,13 @@ const SERVICE_NAME = 'org.gnome.Pomodoro';
 
 const PomodoroInterface = <interface name="org.gnome.Pomodoro">
     <property name="Elapsed" type="t" access="read"/>
-    <property name="ElapsedLimit" type="t" access="read"/>
     <property name="Session" type="u" access="read"/>
     <property name="SessionLimit" type="u" access="read"/>
     <property name="State" type="s" access="read"/>
+    <property name="StateDuration" type="t" access="read"/>
     <method name="SetState">
         <arg type="s" name="state" direction="in" />
-        <arg type="t" name="elapsed_limit" direction="in" />
+        <arg type="t" name="duration" direction="in" />
     </method>
     <method name="Start"/>
     <method name="Stop"/>

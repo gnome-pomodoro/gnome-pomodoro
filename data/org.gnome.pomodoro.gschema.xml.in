@@ -104,7 +104,7 @@
       <summary>Timer state</summary>
       <description>Last used timer state.</description>
     </key>
-    <key name="elapsed-limit" type="u">
+    <key name="state-duration" type="u">
       <default>0</default>
       <summary>State time limit</summary>
       <description>Time limit in seconds of a last state.</description>
