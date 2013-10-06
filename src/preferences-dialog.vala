@@ -418,10 +418,14 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         /* Sounds */
         string[] notification_sounds = {
+            _("Loud bell"), GLib.Path.build_filename ("file://",
+                                                      Config.PACKAGE_DATA_DIR,
+                                                      "sounds",
+                                                      "loud-bell.ogg"),
             _("Bell"), GLib.Path.build_filename ("file://",
                                                  Config.PACKAGE_DATA_DIR,
                                                  "sounds",
-                                                 "pomodoro-start.wav"),
+                                                 "bell.ogg"),
         };
 
 

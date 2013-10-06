@@ -1,6 +1,7 @@
 
 public_sounds = \
-    pomodoro-start.wav
+    bell.ogg \
+    loud-bell.ogg
 
 EXTRA_DIST = \
     $(public_sounds)

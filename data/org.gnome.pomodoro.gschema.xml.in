@@ -73,12 +73,12 @@
     </key>
 
     <key name="pomodoro-start-sound" type="s">
-      <default>"pomodoro-start.wav"</default>
+      <default>"loud-bell.ogg"</default>
       <summary>Pomodoro start sound</summary>
       <description>Sound file to notify of pomodoro start.</description>
     </key>
     <key name="pomodoro-end-sound" type="s">
-      <default>""</default>
+      <default>"bell.ogg"</default>
       <summary>Pomodoro end sound</summary>
       <description>Sound file to notify of pomodoro end.</description>
     </key>
