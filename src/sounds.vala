@@ -424,30 +424,34 @@ public class Pomodoro.Sounds : Object
                                          GLib.Variant variant,
                                          void* user_data)
     {
-        var path = variant.get_string ();
+        var uri = variant.get_string ();
+        var path = "";
 
-        if (path != "")
+        if (uri != "")
         {
             try {
-                path = Filename.from_uri (path);
+                if (Uri.parse_scheme (uri) == null) {
+                    path = uri;
+                }
+                else {
+                    path = Filename.from_uri (uri);
+                }
             }
             catch (ConvertError error) {
             }
 
             if (!Path.is_absolute (path)) {
-                path = Path.build_filename ("file://",
-                                            Config.PACKAGE_DATA_DIR,
+                path = Path.build_filename (Config.PACKAGE_DATA_DIR,
                                             "sounds",
                                             path);
             }
-            else {
-                if (Uri.parse_scheme (path) == null) {
-                    path = "file://" + path;
-                }
+
+            if (path != "") {
+                uri = "file://" + path;
             }
         }
 
-        value.set_object (GLib.File.new_for_uri (path));
+        value.set_object (GLib.File.new_for_uri (uri));
 
         return true;
     }
@@ -457,14 +461,13 @@ public class Pomodoro.Sounds : Object
                                             void* user_data)
     {
         var file = value.get_object () as GLib.File;
+        var prefix = "file://" +
+                     Path.build_filename (Config.PACKAGE_DATA_DIR, "sounds") +
+                     Path.DIR_SEPARATOR_S;
 
         if (file != null)
         {
             var uri = file.get_uri ();
-            var prefix = Path.build_filename ("file://",
-                                              Config.PACKAGE_DATA_DIR,
-                                              "sounds",
-                                              "");
             if (uri.has_prefix (prefix)) {
                 uri = uri.substring (prefix.length);
             }
@@ -475,10 +478,10 @@ public class Pomodoro.Sounds : Object
         return new Variant.string ("");
     }
 
-    private string? get_file_path (string settings_key)
+    private string get_file_path (string settings_key)
     {
         string uri = this.settings.get_string (settings_key);
-        string path = null;
+        string path = "";
 
         if (uri != "")
         {
@@ -490,8 +493,7 @@ public class Pomodoro.Sounds : Object
             }
 
             if (!Path.is_absolute (path)) {
-                path = Path.build_filename ("file://",
-                                            Config.PACKAGE_DATA_DIR,
+                path = Path.build_filename (Config.PACKAGE_DATA_DIR,
                                             "sounds",
                                             path);
             }
@@ -511,7 +513,7 @@ public class Pomodoro.Sounds : Object
         if (this.context != null)
         {
             var file_path = this.get_file_path ("pomodoro-start-sound");
-            if (file_path == null) {
+            if (file_path == "") {
                 return;
             }
 
@@ -537,7 +539,7 @@ public class Pomodoro.Sounds : Object
         if (this.context != null && is_completed)
         {
             var file_path = this.get_file_path ("pomodoro-end-sound");
-            if (file_path == null) {
+            if (file_path == "") {
                 return;
             }
 
