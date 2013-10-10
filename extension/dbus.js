@@ -37,12 +37,6 @@ const PomodoroInterface = <interface name="org.gnome.Pomodoro">
     <method name="Start"/>
     <method name="Stop"/>
     <method name="Reset"/>
-    <signal name="ElapsedChanged">
-        <arg type="d" name="elapsed"/>
-    </signal>
-    <signal name="StateChanged">
-        <arg type="s" name="state"/>
-    </signal>
     <signal name="NotifyPomodoroStart">
         <arg type="b" name="is_requested"/>
     </signal>

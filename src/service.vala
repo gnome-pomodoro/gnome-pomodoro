@@ -62,14 +62,6 @@ public class Pomodoro.Service : Object
 
         this.timer.notify.connect (this.on_property_notify);
 
-        this.timer.elapsed_changed.connect ((timer) => {
-            this.elapsed_changed (this.elapsed);
-        });
-
-        this.timer.state_changed.connect ((timer) => {
-            this.state_changed (this.state);
-        });
-
         this.timer.notify_pomodoro_start.connect ((timer, is_requested) => {
             this.notify_pomodoro_start (is_requested);
         });
@@ -106,7 +98,7 @@ public class Pomodoro.Service : Object
         var builder_properties = new VariantBuilder (VariantType.ARRAY);
         var builder_invalid = new VariantBuilder (VariantType.STRING_ARRAY);
 
-        /* FIXME: There are compile warnings from C compiler */
+        /* FIXME: Compile warnings from C compiler */
         this.changed_properties.foreach ((key, value) => {
             builder_properties.add ("{sv}", key, value);
         });
@@ -125,7 +117,7 @@ public class Pomodoro.Service : Object
             this.connection.flush_sync (this.cancellable);
         }
         catch (Error e) {
-            GLib.warning ("%s\n", e.message);
+            GLib.warning ("%s", e.message);
         }
 
         if (this.idle_id != 0) {
@@ -178,8 +170,6 @@ public class Pomodoro.Service : Object
         }
     }
 
-    public signal void elapsed_changed (double elapsed);
-    public signal void state_changed (string state);
     public signal void notify_pomodoro_end (bool is_requested);
     public signal void notify_pomodoro_start (bool is_completed);
 }

@@ -196,12 +196,12 @@ const Indicator = new Lang.Class({
         }
 
         if (toggled) {
-            remaining = state != State.IDLE
-                    ? Math.max(this._proxy.StateDuration - this._proxy.Elapsed, 0)
-                    : this._settings.get_double('pomodoro-duration');
+            remaining = Math.max(state != State.IDLE
+                    ? Math.ceil(this._proxy.StateDuration - this._proxy.Elapsed)
+                    : this._settings.get_double('pomodoro-duration'), 0);
 
-            minutes = parseInt(remaining / 60);
-            seconds = parseInt(remaining % 60);
+            minutes = Math.floor(remaining / 60);
+            seconds = Math.floor(remaining % 60);
 
             if (this._notification instanceof Notifications.PomodoroEnd) {
                 this._notification.setElapsedTime(this._proxy.Elapsed, this._proxy.StateDuration);

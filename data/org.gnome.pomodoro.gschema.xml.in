@@ -109,9 +109,9 @@
       <summary>State time limit</summary>
       <description>Time limit in seconds of a last state.</description>
     </key>
-    <key name="state-changed-date" type="s">
+    <key name="state-date" type="s">
       <default>""</default>
-      <summary>Timer state changed date</summary>
+      <summary>Timer state date</summary>
       <description>Date of the last state change.</description>
     </key>
   </schema>

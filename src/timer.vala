@@ -100,25 +100,18 @@ public class Pomodoro.Timer : Object
     private Up.Client power;
     private GLib.Settings settings;
     private GLib.Settings settings_state;
+    private double current_timestamp;
+    private bool is_long_break;
 
-    private double _elapsed;
-    private uint _session;
-    private uint _session_limit;
     private State _state;
-    private double _state_duration;
-    private int64 _state_timestamp;
-
-    /*
-     * Intenally all time values are in milliseconds, but public API exposes
-     * them as seconds for simplicity.
-     */
+    private double _elapsed;
 
     public double elapsed {
         get {
-            return this._elapsed / 1000;
+            return this._elapsed + this.current_timestamp - this.state_timestamp;
         }
         set {
-            this.set_elapsed_milliseconds (value * 1000);
+            this._elapsed = value - this.current_timestamp + this.state_timestamp;
         }
     }
 
@@ -131,50 +124,22 @@ public class Pomodoro.Timer : Object
         }
     }
 
-    public double state_duration {
-        get {
-            return this._state_duration / 1000;
-        }
-        set {
-            this._state_duration = value * 1000;
-        }
-    }
-
-    public int64 state_timestamp {
-        get {
-            return this._state_timestamp / 1000;
-        }
-        set {
-            this._state_timestamp = value * 1000;
-        }
-    }
-
-    public uint session {
-        get {
-            return this._session;
-        }
-        set {
-            this._session = value;
-        }
-    }
-
-    public uint session_limit {
-        get {
-            return this._session_limit;
-        }
-        set {
-            this._session_limit = value;
-        }
-    }
+    public double state_duration { get; set; }
+    public double state_timestamp { get; set; }
+    public uint session { get; set; }
+    public uint session_limit { get; set; }
 
     public Timer ()
     {
-        this._elapsed = 0;
-        this._state_duration = 0;
-        this._session = 0;
-        this._session_limit = 4;
         this._state = State.NULL;
-        this._state_timestamp = 0;
+        this._elapsed = 0.0;
+
+        this.current_timestamp = 0.0;
+        this.session = 0;
+        this.session_limit = 4;
+        this.state_duration = 0.0;
+        this.state_timestamp = 0.0;
+        this.is_long_break = false;
 
         this.timeout_source = 0;
         this.idle_monitor = new Gnome.IdleMonitor ();
@@ -193,102 +158,53 @@ public class Pomodoro.Timer : Object
         this.settings_state = settings.get_child ("state");
     }
 
-    private void set_elapsed_milliseconds (double value)
+    private bool do_set_state_full (State state,
+                                    double duration = 0,
+                                    double timestamp = 0)
     {
-        var state_tmp = this._state;
+        this.current_timestamp = get_real_time ();
 
-        if (this._elapsed == value) {
-            return;
+        var elapsed = this.elapsed;
+        var wrap_elapsed = false;
+
+        var is_long_break = false;
+        var is_requested = this.elapsed < this.state_duration ||
+                           this.state == State.IDLE;
+
+        if (timestamp > this.current_timestamp) {
+            timestamp = this.current_timestamp;
         }
 
-        this._elapsed = value;
-
-        this.notify_property ("elapsed");
-
-        switch (this._state)
+        if (state == this.state)
         {
-            case State.IDLE:
-                break;
-
-            case State.PAUSE:
-                /* Pause is over */
-                if (this._elapsed >= this._state_duration) {
-                    this.state = this.settings.get_boolean ("pause-when-idle")
-                                   ? State.IDLE
-                                   : State.POMODORO;
-                }
-                break;
-
-            case State.POMODORO:
-                /* Pomodoro is over, a pause is needed :) */
-                if (this._elapsed >= this._state_duration) {
-                    this.state = State.PAUSE;
-                }
-                break;
-        }
-
-        if (this._state == state_tmp) {
-            this.elapsed_changed ();
-        }
-    }
-
-    private bool do_set_state_full (State new_state,
-                                    double state_duration = 0,
-                                    int64 timestamp = 0)
-    {
-        var current_timestamp = GLib.get_real_time () / 1000;
-        var is_requested = (this._elapsed < this._state_duration);
-
-        var new_elapsed = 0.0;
-        var new_state_duration = state_duration;
-
-        if (timestamp > current_timestamp) {
-            timestamp = current_timestamp;
-        }
-
-        this.disable_idle_monitor ();
-        this.freeze_notify ();
-
-        /* Reset timeout when change was requested by user,
-         * run smoothly otherwise.
-         */
-        if (this.timeout_source != 0 && is_requested) {
-            GLib.Source.remove (this.timeout_source);
-            this.timeout_source = 0;
-        }
-
-        if (this.timeout_source == 0 && new_state != State.NULL) {
-            this.timeout_source = Timeout.add (1000, this.on_timeout);
-        }
-
-        if (new_state == this._state)
-        {
-            if (new_state_duration == 0) {
-                new_state_duration = this._state_duration;
+            if (duration == 0) {
+                duration = this.state_duration;
             }
 
             if (timestamp == 0) {
-                timestamp = this._state_timestamp;
+                timestamp = this.state_timestamp;
             }
 
-            new_elapsed = current_timestamp - timestamp;
+            wrap_elapsed = true;
         }
         else
         {
+            if (this.timeout_source != 0 && is_requested) {
+                GLib.Source.remove (this.timeout_source);
+                this.timeout_source = 0;
+            }
+
+            if (state != State.IDLE) {
+                this.disable_idle_monitor ();
+            }
+
             if (timestamp == 0) {
-                timestamp = current_timestamp;
+                timestamp = this.current_timestamp;
             }
 
-            if (this._state == State.IDLE)
+            if (this.state == State.POMODORO)
             {
-                /* TODO: Move this compensation to 'on_become_active' callback */
-
-                timestamp -= (current_timestamp - this._state_timestamp).clamp (0, 1000);
-            }
-
-            if (this._state == State.POMODORO)
-            {
-                if (this._elapsed >= SESSION_ACCEPTANCE * this.settings.get_double ("pomodoro-duration")) {
+                if (this.elapsed >= SESSION_ACCEPTANCE * this.settings.get_double ("pomodoro-duration")) {
                     this.session += 1;
                 }
                 else {
@@ -296,74 +212,64 @@ public class Pomodoro.Timer : Object
                 }
             }
 
-            new_elapsed = current_timestamp - timestamp;
-            new_state_duration = state_duration;
-
-            switch (new_state)
+            switch (state)
             {
                 case State.IDLE:
                     this.enable_idle_monitor ();
-                    new_elapsed = 0;
-                    new_state_duration = 0;
+
                     break;
 
                 case State.POMODORO:
-                    var long_pause_acceptance_time = (uint64)(
-                            (1.0 - SHORT_LONG_PAUSE_ACCEPTANCE) * this.settings.get_double ("short-break-duration") * 1000 +
-                            SHORT_LONG_PAUSE_ACCEPTANCE * this.settings.get_double ("long-break-duration") * 1000);
+                    if (duration == 0) {
+                        duration = this.settings.get_double ("pomodoro-duration");
+                    }
 
-                    if (this._state == State.PAUSE || this._state == State.IDLE)
+                    var long_pause_acceptance_time =
+                            (1.0 - SHORT_LONG_PAUSE_ACCEPTANCE) * this.settings.get_double ("short-break-duration") +
+                            SHORT_LONG_PAUSE_ACCEPTANCE * this.settings.get_double ("long-break-duration");
+
+                    if (this.state == State.PAUSE)
                     {
                         /* If skipped a break make long break sooner */
-                        if (this._elapsed < SHORT_PAUSE_ACCEPTANCE * this.settings.get_double ("short-break-duration") * 1000) {
+                        if (this.elapsed < SHORT_PAUSE_ACCEPTANCE * this.settings.get_double ("short-break-duration")) {
                             this.session += 1;
                         }
 
-                        /* Reset work cycle when finished long break or was too lazy on a short one,
-                         * and if skipped a long break try again next time.
+                        /* Reset work cycle when finished long break
+                         * or was too lazy on a short one.
                          */
-                        if (this._elapsed >= long_pause_acceptance_time) {
+                        if (this.elapsed >= long_pause_acceptance_time) {
                             this.session = 0;
                         }
                     }
 
-                    if (this._state == State.NULL)
+                    if (this.state == State.NULL)
                     {
                         /* Reset work cycle when disabled for some time */
-                        var idle_time = timestamp - this._state_timestamp;
+                        var idle_time = this.current_timestamp - this.state_timestamp; // TODO: it actually is the same as this.elapsed
 
-                        if (this._state_timestamp > 0 && idle_time >= long_pause_acceptance_time) {
+                        if (this.state_timestamp > 0.0 && idle_time >= long_pause_acceptance_time) {
                             this.session = 0;
                         }
-                    }
-
-                    if (new_state_duration == 0) {
-                        new_state_duration = this.settings.get_double ("pomodoro-duration") * 1000;
                     }
 
                     break;
 
                 case State.PAUSE:
-                    if (new_elapsed < 0)
-                    {
-                        /* Wrap time to pause */
-                        if (this._state == State.POMODORO && this._elapsed > this._state_duration) {
-                            new_elapsed = this._elapsed - this._state_duration;
-                        }
-                        else {
-                            new_elapsed = 0;
-                        }
+                    /* Wrap time */
+                    if (this.state == State.POMODORO && this.elapsed > this.state_duration) {
+                        elapsed -= this.state_duration;
+                        wrap_elapsed = true;
                     }
 
-                    if (new_state_duration == 0)
+                    /* Determine which pause type user should have */
+                    if (duration == 0)
                     {
-                        /* Determine which pause type user should have */
-                        if (this._session >= this._session_limit) {
-                            new_state_duration = this.settings.get_double ("long-break-duration") * 1000;
-                        }
-                        else {
-                            new_state_duration = this.settings.get_double ("short-break-duration") * 1000;;
-                        }
+                        is_long_break = this.session >= this.session_limit;
+
+                        duration = is_long_break
+                                ? this.settings.get_double ("long-break-duration")
+                                : this.settings.get_double ("short-break-duration");
                     }
 
                     break;
@@ -374,54 +280,69 @@ public class Pomodoro.Timer : Object
                         this.timeout_source = 0;
                     }
 
-                    new_elapsed = 0;
-                    new_state_duration = 0;
                     break;
             }
         }
 
-        this._state = new_state;
-        this._state_timestamp = timestamp;
-        this._state_duration = new_state_duration;
+        if (this.timeout_source == 0 && state != State.NULL) {
+            this.timeout_source = Timeout.add (1000, this.on_timeout);
+        }
+
+        if (state == State.NULL || state == State.IDLE) {
+            duration = 0.0;
+            wrap_elapsed = false;
+        }
+
+        this.freeze_notify ();
+
+        this._state = state;
+        this._elapsed = 0.0;
+
+        this.state_timestamp = timestamp;
+        this.state_duration = duration;
+        this.is_long_break = is_long_break;
+
+//        if (wrap_elapsed) {
+//            this.elapsed = elapsed;
+//        }
 
         this.notify_property ("state");
-        this.notify_property ("state-timestamp");
-        this.notify_property ("state-duration");
-
-        this.set_elapsed_milliseconds (new_elapsed);
 
         this.thaw_notify ();
 
         this.state_changed ();
 
+        this.update ();
+
         return true;
     }
 
     public void set_state_full (State state,
-                                double duration)
+                                double duration,
+                                double timestamp = 0.0)
     {
         var state_tmp = this._state;
-        var state_duration_tmp = this._state_duration;
-        var elapsed_tmp = this._elapsed;
-        var session_tmp = this._session;
-        var changed_state = this.do_set_state_full (state,
-                                                    duration * 1000);
+        var state_duration_tmp = this.state_duration;
+        var elapsed_tmp = this.elapsed;
+        var session_tmp = this.session;
 
-        if (changed_state)
+        var changed = this.do_set_state_full (state, duration, timestamp);
+
+        if (changed)
         {
-            var state_changed_date = new DateTime.from_unix_utc ((int64) (this._state_timestamp / 1000));
+            var state_date = new DateTime.from_unix_utc ((int64) Math.floor (this.state_timestamp));
             var notify_start = (this._state == State.POMODORO) ||
                                (this._state == State.IDLE && this.settings.get_boolean ("pause-when-idle"));
 
-            var is_completed = this._session != session_tmp;
+            var is_completed = this.session != session_tmp;
             var is_requested = elapsed_tmp < state_duration_tmp;
 
             this.settings_state.set_double ("session-count",
                                             (double) this.session);
             this.settings_state.set_string ("state",
                                             state_to_string (this.state));
-            this.settings_state.set_string ("state-changed-date",
-                                            datetime_to_string (state_changed_date));
+            this.settings_state.set_string ("state-date",
+                                            datetime_to_string (state_date));
 
             this.state_changed ();
 
@@ -442,30 +363,29 @@ public class Pomodoro.Timer : Object
             }
         }
 
-        if (this._elapsed != elapsed_tmp || this._state_duration != state_duration_tmp) {
-            this.elapsed_changed ();
-        }
+        this.update ();
     }
 
     public void restore ()
     {
-        var session = this.settings_state.get_double ("session-count");
         var state = string_to_state (this.settings_state.get_string ("state"));
-        var state_duration = this.settings_state.get_double ("state-duration") * 1000; /* TODO: Rename to 'state-duration' */
-        var current_timestamp = GLib.get_real_time () / 1000;
+        var state_duration = this.settings_state.get_double ("state-duration");
+        var session = this.settings_state.get_double ("session-count");
+
+        var current_timestamp = get_real_time ();
         var state_timestamp = current_timestamp;
 
         try {
-            var state_changed_date = datetime_from_string (
-                    this.settings_state.get_string ("state-changed-date"));
+            var state_date = datetime_from_string (
+                    this.settings_state.get_string ("state-date"));
 
-            state_timestamp = state_changed_date.to_unix () * 1000;
+            state_timestamp = (double) state_date.to_unix ();
         }
         catch (DateTimeError error) {
-            /* In case there is no valid state-changed-date, elapsed time
+            /* In case there is no valid state-date, elapsed time
              * will be lost.
              */
-            GLib.warning ("Could not restore state time");
+            GLib.warning ("Could not restore time");
 
             return;
         }
@@ -473,69 +393,16 @@ public class Pomodoro.Timer : Object
         this.freeze_notify ();
 
         /* Set timer initial state */
-        this._elapsed = 0;
-        this._state_duration = 0;
         this._state = State.NULL;
-        this._state_timestamp = state_timestamp;
+        this._elapsed = 0.0;
+
+        this.state_duration = 0.0;
+        this.state_timestamp = state_timestamp;
         this.session = (uint) session;
 
-        this.do_set_state_full (state, state_duration, state_timestamp);
-
-        if (this._state != State.NULL)
-        {
-            /* Skip through states silently to avoid unnecessary notifications
-             * and signal emits stacking up
-             */
-            while (this._elapsed >= this._state_duration)
-            {
-                if (this._state == State.POMODORO) {
-                    this.do_set_state_full (State.PAUSE);
-                    continue;
-                }
-
-                if (this._state == State.PAUSE) {
-                    this.do_set_state_full (State.IDLE);
-                    continue;
-                }
-
-                break;
-            }
-        }
-
-        /* Update timestamp to the beginning of current state */
-        var state_changed_date = new DateTime.from_unix_utc ((int64) (this._state_timestamp / 1000));
-
-        this.settings_state.set_double ("session-count",
-                                        (double) this._session);
-        this.settings_state.set_string ("state",
-                                        state_to_string (this._state));
-        this.settings_state.set_string ("state-changed-date",
-                                        datetime_to_string (state_changed_date));
-        this.settings_state.set_double ("state-duration",
-                                        this._state_duration / 1000);
+        this.set_state_full (state, state_duration, state_timestamp);
 
         this.thaw_notify ();
-        this.state_changed ();
-        this.elapsed_changed ();
-
-        if (this._state != State.NULL)
-        {
-            var is_completed = false;
-            var is_requested = false;
-
-            if ((this._state == State.POMODORO) ||
-                (this._state == State.IDLE && this.settings.get_boolean ("pause-when-idle")))
-            {
-                this.pomodoro_start (is_requested);
-                this.notify_pomodoro_start (is_requested);
-            }
-
-            if (this._state == State.PAUSE)
-            {
-                this.pomodoro_end (is_completed);
-                this.notify_pomodoro_end (is_completed);
-            }
-        }
     }
 
     public void start ()
@@ -566,6 +433,39 @@ public class Pomodoro.Timer : Object
         this.thaw_notify ();
     }
 
+    public void update ()
+    {
+        this.current_timestamp = get_real_time ();
+
+        switch (this.state)
+        {
+            case State.IDLE:
+                break;
+
+            case State.PAUSE:
+                this.notify_property ("elapsed");
+
+                /* Pause is over */
+                if (this.elapsed >= this.state_duration) {
+                    this.state = this.settings.get_boolean ("pause-when-idle")
+                                   ? State.IDLE
+                                   : State.POMODORO;
+                }
+                break;
+
+            case State.POMODORO:
+                this.notify_property ("elapsed");
+
+                /* Pomodoro is over, a pause is needed :) */
+                if (this.elapsed >= this.state_duration) {
+                    this.state = State.PAUSE;
+                }
+                break;
+        }
+
+        this.updated ();
+    }
+
     protected void enable_idle_monitor ()
     {
         if (this.became_active_id == 0) {
@@ -583,51 +483,40 @@ public class Pomodoro.Timer : Object
 
     private void on_settings_changed (GLib.Settings settings, string key)
     {
-        var elapsed = this._elapsed;
-        var state_duration = this._state_duration;
-        var elapsed_tmp = this._elapsed;
-        var state_duration_tmp = this._state_duration;
+        var state_duration = this.state_duration;
 
-        switch (key) {
+        switch (key)
+        {
             case "pomodoro-duration":
                 if (this.state == State.POMODORO) {
-                    state_duration = this.settings.get_double (key) * 1000;
+                    state_duration = this.settings.get_double (key);
                 }
-                elapsed = double.min (elapsed, state_duration);
                 break;
 
             case "short-break-duration":
-                if (this.state == State.PAUSE && this.session < this.session_limit) {
-                    state_duration = this.settings.get_double (key) * 1000;
+                if (this.state == State.PAUSE && !this.is_long_break) {
+                    state_duration = this.settings.get_double (key);
                 }
-                elapsed = double.min (elapsed, state_duration);
                 break;
 
             case "long-break-duration":
-                if (this.state == State.PAUSE && this.session >= this.session_limit) {
-                    state_duration = this.settings.get_double (key) * 1000;
+                if (this.state == State.PAUSE && this.is_long_break) {
+                    state_duration = this.settings.get_double (key);
                 }
-                elapsed = double.min (elapsed, state_duration);
                 break;
         }
 
-        if (state_duration != state_duration_tmp) {
-            this._state_duration = state_duration;
-            this.notify_property ("state-duration");
-        }
-
-        this.set_elapsed_milliseconds (elapsed);
-
-        if (this._elapsed != elapsed_tmp || this._state_duration != state_duration_tmp) {
-            this.elapsed_changed ();
+        if (state_duration != this.state_duration) {
+            this.state_duration = double.max (state_duration, this.elapsed);
+            this.update ();
         }
     }
 
     private bool on_timeout ()
     {
-        if (this.state != State.NULL) {
-            var timestamp = GLib.get_real_time () / 1000;
-            this.set_elapsed_milliseconds ((double) (timestamp - this._state_timestamp));
+        if (this.state != State.NULL)
+        {
+            this.update ();
         }
 
         return true;
@@ -635,8 +524,15 @@ public class Pomodoro.Timer : Object
 
     private void on_idle_monitor_became_active (Gnome.IdleMonitor monitor)
     {
-        if (this.state == State.IDLE) {
-            this.state = State.POMODORO;
+        if (this.state == State.IDLE)
+        {
+            this.current_timestamp = get_real_time ();
+
+            /* Treat last second as if it were already pomodoro */
+            var elapsed = this.current_timestamp - this.state_timestamp;
+            var timestamp = this.current_timestamp - elapsed.clamp (0.0, 1.0);
+
+            this.set_state_full (State.POMODORO, 0.0, timestamp);
         }
     }
 
@@ -657,8 +553,8 @@ public class Pomodoro.Timer : Object
         base.dispose ();
     }
 
+    public signal void updated ();
     public signal void state_changed ();
-    public signal void elapsed_changed ();
     public signal void pomodoro_start (bool is_requested);
     public signal void pomodoro_end (bool is_completed);
     public signal void notify_pomodoro_start (bool is_requested);

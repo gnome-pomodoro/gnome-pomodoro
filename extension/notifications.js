@@ -454,9 +454,9 @@ const PomodoroEndDialog = new Lang.Class({
     },
 
     setElapsedTime: function(elapsed, state_duration) {
-        let remaining = state_duration - elapsed;
-        let minutes = parseInt(remaining / 60);
-        let seconds = parseInt(remaining % 60);
+        let remaining = Math.ceil(state_duration - elapsed);
+        let minutes = Math.floor(remaining / 60);
+        let seconds = Math.floor(remaining % 60);
 
         this._timerLabel.set_text('%02d:%02d'.format(minutes, seconds));
     },
@@ -553,8 +553,7 @@ const PomodoroEnd = new Lang.Class({
         this.parent(source, title, description, null);
 
         this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
-
-        this._short_break_duration = this._settings.get_double('short-break-duration');
+        this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
 
         this.setResident(true);
         this.addButton(Action.SWITCH_TO_PAUSE, "");
@@ -562,6 +561,12 @@ const PomodoroEnd = new Lang.Class({
 
         this._pause_switch_button = this.getButton(Action.SWITCH_TO_PAUSE);
         this._pause_switch_button.hide();
+
+        this._short_break_duration = this._settings.get_double('short-break-duration');
+    },
+
+    _onSettingsChanged: function() {
+        this._short_break_duration = this._settings.get_double('short-break-duration');
     },
 
     getButton: function(id) {
@@ -599,14 +604,14 @@ const PomodoroEnd = new Lang.Class({
     },
 
     setElapsedTime: function(elapsed, state_duration) {
-        let remaining = state_duration - elapsed;
-        let seconds = Math.floor(remaining % 60);
+        let remaining = Math.ceil(state_duration - elapsed);
         let minutes = Math.round(remaining / 60);
+        let seconds = Math.floor(remaining % 60);
         let message = (remaining <= 45)
-                                    ? ngettext("You have %d second left\n",
-                                               "You have %d seconds left\n", seconds).format(seconds)
-                                    : ngettext("You have %d minute left\n",
-                                               "You have %d minutes left\n", minutes).format(minutes);
+                ? ngettext("You have %d second left\n",
+                           "You have %d seconds left\n", seconds).format(seconds)
+                : ngettext("You have %d minute left\n",
+                           "You have %d minutes left\n", minutes).format(minutes);
 
         let is_long_pause = state_duration > this._short_break_duration;
         let can_switch_pause = elapsed < this._short_break_duration;
