@@ -353,7 +353,7 @@ const PomodoroEndDialog = new Lang.Class({
     _init: function() {
         this.parent();
 
-        this._description = _("It's time to take a break!");
+        this._description = _("It's time to take a break");
 
         this._openWhenIdle = false;
         this._openWhenIdleWatchId = 0;
