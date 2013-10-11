@@ -564,6 +564,10 @@ const PomodoroEnd = new Lang.Class({
         this.addButton(Action.SWITCH_TO_PAUSE, "");
         this.addButton(Action.SWITCH_TO_POMODORO, _("Start pomodoro"));
 
+        if (!this._bodyLabel) {
+            this._bodyLabel = this.addBody("", null, null);
+        }
+
         this._pause_switch_button = this.getButton(Action.SWITCH_TO_PAUSE);
         this._pause_switch_button.hide();
 
@@ -620,15 +624,17 @@ const PomodoroEnd = new Lang.Class({
         let minutes = Math.round(remaining / 60);
         let seconds = Math.floor(remaining % 60);
         let message = (remaining <= 45)
-                ? ngettext("You have %d second left\n",
-                           "You have %d seconds left\n", seconds).format(seconds)
-                : ngettext("You have %d minute left\n",
-                           "You have %d minutes left\n", minutes).format(minutes);
+                ? ngettext("You have %d second left",
+                           "You have %d seconds left", seconds).format(seconds)
+                : ngettext("You have %d minute left",
+                           "You have %d minutes left", minutes).format(minutes);
 
         let is_long_pause = state_duration > this._short_break_duration;
         let can_switch_pause = elapsed < this._short_break_duration;
 
-        this.update(this.title, message, {});
+        this._bannerLabel.set_text(message);
+        this._bodyLabel.set_text(message);
+
         this.updateButtons(is_long_pause, can_switch_pause);
     }
 });
