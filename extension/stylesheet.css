@@ -27,29 +27,29 @@
 }
 
 .extension-pomodoro-dialog-layout {
-    padding-bottom: 12px;
+    padding-bottom: 15px;
 }
 
 .extension-pomodoro-dialog-main-layout {
 }
 
 .extension-pomodoro-dialog-message-layout {
-    spacing: 2px;
+    spacing: 5px;
 }
 
 .extension-pomodoro-dialog-timer {
-    font-size: 68pt;
+    font-size: 70pt;
     font-weight: normal;
     font-family: Droid Sans, Droid Sans Mono, DejaVu Sans, Bitstream Vera Sans, monospace, sans-serif;
     text-align: center;
-    text-shadow: rgba(0, 0, 0, 0.15) 2px 4px 14px;
+    text-shadow: 0.0px 5.0px 8.0px rgba(0, 0, 0, 0.10);
     color: white;
 }
 
 .extension-pomodoro-dialog-message {
-    font-size: 12pt;
+    font-size: 13pt;
     font-weight: normal;
     text-align: center;
-    text-shadow: rgba(0, 0, 0, 0.50) 1px 1px 12px;
+    text-shadow: 0.0px 1.0px 2.0px rgba(0, 0, 0, 0.35);
     color: white;
 }
