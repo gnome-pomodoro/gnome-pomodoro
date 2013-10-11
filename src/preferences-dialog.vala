@@ -361,7 +361,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         toggle_key_button.show ();
 
         contents.add (
-            this.create_field (_("Shortcut to toggle timer"), toggle_key_button));
+            this.create_field (_("Shortcut to toggle the timer"), toggle_key_button));
 
         var ticking_sound = new Pomodoro.SoundChooserButton ();
         ticking_sound.title = _("Select ticking sound");
@@ -400,7 +400,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         var reminders_toggle = new Gtk.Switch ();
         var reminders_field = this.create_field (
-                                       _("Break reminder"),
+                                       _("Remind to take a break"),
                                        reminders_toggle);
 
         this.settings.bind ("show-screen-notifications",

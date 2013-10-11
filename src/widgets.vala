@@ -524,7 +524,7 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
 
     construct
     {
-        this.spacing = 5;
+        this.spacing = 6;
 
         /* Dialog */
         this.dialog.response.connect (this.on_dialog_response);

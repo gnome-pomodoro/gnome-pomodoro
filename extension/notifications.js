@@ -563,10 +563,12 @@ const PomodoroEnd = new Lang.Class({
         this._pause_switch_button.hide();
 
         this._short_break_duration = this._settings.get_double('short-break-duration');
+        this._long_break_duration = this._settings.get_double('long-break-duration');
     },
 
     _onSettingsChanged: function() {
         this._short_break_duration = this._settings.get_double('short-break-duration');
+        this._long_break_duration = this._settings.get_double('long-break-duration');
     },
 
     getButton: function(id) {
@@ -581,6 +583,11 @@ const PomodoroEnd = new Lang.Class({
         let changed = false;
         let action_id = this._pause_switch_button._actionId;
 
+        if (this._short_break_duration >= this._long_break_duration) {
+            this._pause_switch_button.hide();
+            return;
+        }
+
         if (this._pause_switch_button.reactive != can_switch_pause) {
             this._pause_switch_button.reactive = can_switch_pause;
             this._pause_switch_button.can_focus = can_switch_pause;
@@ -588,13 +595,13 @@ const PomodoroEnd = new Lang.Class({
 
         if (is_long_pause && action_id != Action.SWITCH_TO_SHORT_PAUSE) {
             this._pause_switch_button._actionId = Action.SWITCH_TO_SHORT_PAUSE;
-            this._pause_switch_button.set_label(_("Take shorter break"));
+            this._pause_switch_button.set_label(_("Shorten it"));
             changed = true;
         }
 
         if (!is_long_pause && action_id != Action.SWITCH_TO_LONG_PAUSE) {
             this._pause_switch_button._actionId = Action.SWITCH_TO_LONG_PAUSE;
-            this._pause_switch_button.set_label(_("Take longer break"));
+            this._pause_switch_button.set_label(_("Lengthen it"));
             changed = true;
         }
 
