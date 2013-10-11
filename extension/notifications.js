@@ -485,12 +485,17 @@ const Source = new Lang.Class({
     Extends: MessageTray.Source,
 
     _init: function() {
+        this._icon_sizes = {};
+
         this.parent(_("Pomodoro"));
     },
 
     createIcon: function(size) {
-        return new St.Icon({ icon_name: ICON_NAME,
-                             icon_size: size });
+        if (this._icon_sizes[size] === undefined) {
+            this._icon_sizes[size] = new St.Icon({ icon_name: ICON_NAME,
+                                                   icon_size: size });
+        }
+        return this._icon_sizes[size];
     }
 });
 
