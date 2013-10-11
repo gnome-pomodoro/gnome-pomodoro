@@ -485,17 +485,23 @@ const Source = new Lang.Class({
     Extends: MessageTray.Source,
 
     _init: function() {
-        this._icon_sizes = {};
+        this._icons = {};
 
         this.parent(_("Pomodoro"));
     },
 
     createIcon: function(size) {
-        if (this._icon_sizes[size] === undefined) {
-            this._icon_sizes[size] = new St.Icon({ icon_name: ICON_NAME,
-                                                   icon_size: size });
+        if (this._icons[size] === undefined)
+        {
+            let icon = new St.Icon({ icon_name: ICON_NAME,
+                                     icon_size: size });
+            icon.connect('destroy', Lang.bind(this, function() {
+                delete this._icons[size];
+            }));
+            this._icons[size] = icon;
         }
-        return this._icon_sizes[size];
+
+        return this._icons[size];
     }
 });
 
