@@ -175,7 +175,6 @@ const ModalDialog = new Lang.Class({
         return this._grabHelper.grab({
             actor: this._lightbox.actor,
             modal: true,
-            grabFocus: true,
             onUngrab: Lang.bind(this, this._onUngrab)
         });
     },
@@ -244,17 +243,10 @@ const ModalDialog = new Lang.Class({
 
         this.state = State.OPENING;
 
-        // Don't become modal and block events just yet, monitor when user becomes idle.
+        // Don't become modal and block events just yet, waint until user becomes idle.
         if (this._pushModalWatchId == 0)
             this._pushModalWatchId = this._idleMonitor.add_idle_watch(BLOCK_EVENTS_TIME,
-                                                                 Lang.bind(this, this._onPushModalWatch));
-
-        // Fallback to a timeout when there is no activity
-        if (this._pushModalTimeoutSource != 0)
-            GLib.source_remove(this._pushModalTimeoutSource);
-
-        this._pushModalTimeoutSource = Mainloop.timeout_add(BLOCK_EVENTS_TIME,
-                                                            Lang.bind(this, this._onPushModalTimeout));
+                                                                      Lang.bind(this, this._onPushModalWatch));
 
         this._monitorConstraint.index = global.screen.get_current_monitor();
         this._group.show();
@@ -299,20 +291,19 @@ const ModalDialog = new Lang.Class({
         this.emit('closing');
     },
 
-    _onPushModalWatch: function(monitor, id, userBecameIdle) {
-        if (userBecameIdle) {
-            this._idleMonitor.remove_watch(this._pushModalWatchId);
-            this._pushModalWatchId = 0;
+    _onPushModalWatch: function(monitor, id) {
+        this._idleMonitor.remove_watch(this._pushModalWatchId);
+        this._pushModalWatchId = 0;
 
-            if (this.pushModal(global.get_current_time())) {
-                // dialog became modal
+        if (this.pushModal(global.get_current_time())) {
+            // dialog became modal
+        }
+        else {
+            if (this._timeoutSource == 0) {
+                this._pushModalTries = 1;
+                this._pushModalSource = Mainloop.timeout_add(parseInt(1000/FALLBACK_RATE),
+                                                             Lang.bind(this, this._onPushModalTimeout));
             }
-            else
-                if (this._timeoutSource == 0) {
-                    this._pushModalTries = 1;
-                    this._pushModalSource = Mainloop.timeout_add(parseInt(1000/FALLBACK_RATE),
-                                                                 Lang.bind(this, this._onPushModalTimeout));
-                }
         }
     },
 
@@ -338,10 +329,6 @@ const ModalDialog = new Lang.Class({
         if (this._pushModalFallbackSource != 0) {
             GLib.source_remove(this._pushModalFallbackSource);
             this._pushModalFallbackSource = 0;
-        }
-        if (this._pushModalTimeoutSource != 0) {
-            GLib.source_remove(this._pushModalTimeoutSource);
-            this._pushModalTimeoutSource = 0;
         }
     }
 });
