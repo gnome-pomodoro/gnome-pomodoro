@@ -487,23 +487,7 @@ const Source = new Lang.Class({
     Extends: MessageTray.Source,
 
     _init: function() {
-        this._icons = {};
-
-        this.parent(_("Pomodoro"));
-    },
-
-    createIcon: function(size) {
-        if (this._icons[size] === undefined)
-        {
-            let icon = new St.Icon({ icon_name: ICON_NAME,
-                                     icon_size: size });
-            icon.connect('destroy', Lang.bind(this, function() {
-                delete this._icons[size];
-            }));
-            this._icons[size] = icon;
-        }
-
-        return this._icons[size];
+        this.parent(_("Pomodoro"), ICON_NAME);
     },
 
     close: function(close_tray) {
