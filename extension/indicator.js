@@ -139,7 +139,6 @@ const Indicator = new Lang.Class({
 
         if (this._notificationDialog && !this._settings.get_boolean('show-screen-notifications')) {
             this._notificationDialog.close();
-            this._notificationDialog.setOpenWhenIdle(false);
         }
     },
 
@@ -473,7 +472,6 @@ const Indicator = new Lang.Class({
 
             if (this._notificationDialog) {
                 this._notificationDialog.close();
-                this._notificationDialog.setOpenWhenIdle(false);
             }
 
             if (this._reminder) {
@@ -491,8 +489,10 @@ const Indicator = new Lang.Class({
                 }
             }));
             this._notificationDialog.connect('closing', Lang.bind(this, function() {
-                if (this._notification)
+                if (this._notification) {
                     this._notification.show();
+                }
+                this._notificationDialog.openWhenIdle();
             }));
             this._notificationDialog.connect('closed', Lang.bind(this, function() {
                 this._schedulePomodoroEndReminder();
@@ -500,8 +500,6 @@ const Indicator = new Lang.Class({
             this._notificationDialog.connect('destroy', Lang.bind(this, function() {
                 this._notificationDialog = null;
             }));
-
-            this._notificationDialog.setOpenWhenIdle(screenNotifications);
         }
 
         if (screenNotifications) {
