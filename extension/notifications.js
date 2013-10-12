@@ -553,7 +553,7 @@ const PomodoroStart = new Lang.Class({
     _init: function(source) {
         this.parent(source,
                     _("Starting pomodoro"),
-                    _("Now focus on your thing"),
+                    _("Now focus on your task"),
                     null);
         this.setTransient(true);
     }
@@ -617,13 +617,13 @@ const PomodoroEnd = new Lang.Class({
 
         if (is_long_pause && action_id != Action.SWITCH_TO_SHORT_PAUSE) {
             this._pause_switch_button._actionId = Action.SWITCH_TO_SHORT_PAUSE;
-            this._pause_switch_button.set_label(_("Shorten it"));
+            this._pause_switch_button.set_label(_("Shorten the break"));
             changed = true;
         }
 
         if (!is_long_pause && action_id != Action.SWITCH_TO_LONG_PAUSE) {
             this._pause_switch_button._actionId = Action.SWITCH_TO_LONG_PAUSE;
-            this._pause_switch_button.set_label(_("Lengthen it"));
+            this._pause_switch_button.set_label(_("Lengthen the break"));
             changed = true;
         }
 
