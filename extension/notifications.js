@@ -272,6 +272,8 @@ const ModalDialog = new Lang.Class({
                                 })
                          });
         this.emit('opening');
+
+        Main.messageTray.close();
     },
 
     close: function(timestamp) {
@@ -502,6 +504,10 @@ const Source = new Lang.Class({
         }
 
         return this._icons[size];
+    },
+
+    close: function(close_tray) {
+        source.emit('done-displaying-content', close_tray == true);
     }
 });
 
@@ -533,8 +539,25 @@ const Notification = new Lang.Class({
         }
     },
 
-    hide: function() {
+    hide: function(close_tray) {
+        if (close_tray) {
+            Main.messageTray.close();
+        }
+
         this.emit('done-displaying');
+
+        if (!this.resident) {
+            this.destroy();
+        }
+    },
+
+    close: function(close_tray) {
+        if (close_tray) {
+            Main.messageTray.close();
+        }
+
+        this.emit('done-displaying');
+        this.destroy();
     }
 });
 
@@ -545,8 +568,8 @@ const PomodoroStart = new Lang.Class({
 
     _init: function(source) {
         this.parent(source,
-                    _("Pause finished"),
-                    _("A new pomodoro is starting"),
+                    _("Starting pomodoro"),
+                    _("Now focus on your thing"),
                     null);
         this.setTransient(true);
     }

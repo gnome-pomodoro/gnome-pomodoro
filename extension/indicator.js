@@ -132,8 +132,10 @@ const Indicator = new Lang.Class({
     },
 
     _onSettingsChanged: function() {
-        if (this._reminder && !this._settings.get_boolean('show-reminders'))
-            this._reminder.destroy();
+        if (this._reminder && !this._settings.get_boolean('show-reminders')) {
+            this._reminder.close();
+            this._reminder = null;
+        }
 
         if (this._notificationDialog && !this._settings.get_boolean('show-screen-notifications')) {
             this._notificationDialog.close();
@@ -183,12 +185,6 @@ const Indicator = new Lang.Class({
                                    transition: 'easeOutQuad',
                                    time: FADE_ANIMATION_TIME });
 
-            if (this._state == State.IDLE &&
-                this._notification instanceof Notifications.PomodoroStart)
-            {
-                this._notification.hide();
-            }
-
             this._state = state;
 
             if (this._timerToggle.toggled !== toggled)
@@ -215,7 +211,7 @@ const Indicator = new Lang.Class({
             if (this._notification instanceof Notifications.PomodoroStart ||
                 this._notification instanceof Notifications.PomodoroEnd)
             {
-                this._notification.destroy();
+                this._notification.close();
                 this._notification = null;
             }
         }
@@ -385,13 +381,6 @@ const Indicator = new Lang.Class({
     },
 
     _onNotifyPomodoroStart: function(proxy, senderName, [is_requested]) {
-        let source = this._ensureNotificationSource();
-
-        if (is_requested) {
-            if (this._notification)
-                this._notification.destroy();
-            return;
-        }
 
         if (this._notification instanceof Notifications.PomodoroStart) {
             this._notification.show();
@@ -399,7 +388,16 @@ const Indicator = new Lang.Class({
         }
 
         if (this._notification)
-            this._notification.destroy();
+        {
+            if (Main.messageTray._trayState == MessageTray.State.SHOWN) {
+                this._notification.close();
+            }
+            else {
+                this._notification.destroy();
+            }
+        }
+
+        let source = this._ensureNotificationSource();
 
         this._notification = new Notifications.PomodoroStart(source);
         this._notification.connect('destroy', Lang.bind(this, function(notification) {
@@ -411,8 +409,6 @@ const Indicator = new Lang.Class({
     },
 
     _onNotifyPomodoroEnd: function(proxy, senderName, [is_completed]) {
-        let source = this._ensureNotificationSource();
-        let screenNotifications = this._settings.get_boolean('show-screen-notifications');
 
         if (this._notification instanceof Notifications.PomodoroEnd) {
             this._notification.show();
@@ -420,7 +416,17 @@ const Indicator = new Lang.Class({
         }
 
         if (this._notification)
-            this._notification.destroy();
+        {
+            if (Main.messageTray._trayState == MessageTray.State.SHOWN) {
+                this._notification.close();
+            }
+            else {
+                this._notification.destroy();
+            }
+        }
+
+        let source = this._ensureNotificationSource();
+        let screenNotifications = this._settings.get_boolean('show-screen-notifications');
 
         this._notification = new Notifications.PomodoroEnd(source);
         this._notification.connect('action-invoked', Lang.bind(this,
@@ -450,16 +456,16 @@ const Indicator = new Lang.Class({
                         break;
 
                     default:
-                        notification.hide();
                         notification.destroy();
                         break;
                 }
             }));
-        this._notification.connect('clicked', Lang.bind(this, function() {
+        this._notification.connect('clicked', Lang.bind(this, function(notification) {
             if (this._notificationDialog) {
                 this._notificationDialog.open();
                 this._notificationDialog.pushModal();
             }
+            notification.hide(true);
         }));
         this._notification.connect('destroy', Lang.bind(this, function(notification) {
             if (this._notification === notification)
@@ -471,7 +477,7 @@ const Indicator = new Lang.Class({
             }
 
             if (this._reminder) {
-                this._reminder.destroy();
+                this._reminder.close();
                 this._reminder = null;
             }
         }));
@@ -479,8 +485,10 @@ const Indicator = new Lang.Class({
         if (!this._notificationDialog) {
             this._notificationDialog = new Notifications.PomodoroEndDialog();
             this._notificationDialog.connect('opening', Lang.bind(this, function() {
-                if (this._reminder)
-                    this._reminder.destroy();
+                if (this._reminder) {
+                    this._reminder.close();
+                    this._reminder = null;
+                }
             }));
             this._notificationDialog.connect('closing', Lang.bind(this, function() {
                 if (this._notification)
@@ -506,22 +514,25 @@ const Indicator = new Lang.Class({
     },
 
     _schedulePomodoroEndReminder: function() {
-        let source = this._ensureNotificationSource();
-
         if (!this._settings.get_boolean('show-reminders'))
             return;
 
-        if (this._reminder)
-            this._reminder.destroy();
+        if (this._reminder) {
+            return;
+        }
+
+        let source = this._ensureNotificationSource();
 
         this._reminder = new Notifications.PomodoroEndReminder(source);
         this._reminder.connect('show', Lang.bind(this, function(notification) {
-            if (!this._proxy || this._proxy.State != State.PAUSE)
-                notification.destroy();
-            else
+            if (!this._proxy || this._proxy.State != State.PAUSE) {
+                notification.close();
+            }
+            else {
                 // Don't show reminder if only 90 seconds remain to next pomodoro
                 if (this._proxy.StateDuration - this._proxy.Elapsed < 90)
-                    notification.destroy();
+                    notification.close();
+            }
         }));
         this._reminder.connect('clicked', Lang.bind(this, function() {
             if (this._notificationDialog) {
@@ -538,13 +549,15 @@ const Indicator = new Lang.Class({
     },
 
     _notifyIssue: function() {
-        let source = this._ensureNotificationSource();
-
         if (this._notification instanceof Notifications.Issue)
             return;
 
-        if (this._notification)
-            this._notification.destroy();
+        if (this._notificationSource) {
+            this._notificationSource.close();
+            this._notificationSource = null;
+        }
+
+        let source = this._ensureNotificationSource();
 
         this._notification = new Notifications.Issue(source);
         this._notification.connect('destroy', Lang.bind(this, function(notification) {
