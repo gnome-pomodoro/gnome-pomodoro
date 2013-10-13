@@ -554,7 +554,9 @@ const PomodoroStart = new Lang.Class({
                     _("A new pomodoro is starting"),
                     null,
                     null);
+
         this.setTransient(true);
+        this.setUrgency(MessageTray.Urgency.HIGH);
     }
 });
 
@@ -573,6 +575,8 @@ const PomodoroEnd = new Lang.Class({
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
 
         this.setResident(true);
+        this.setUrgency(MessageTray.Urgency.HIGH);
+
         this.addButton(Action.SWITCH_TO_PAUSE, "");
         this.addButton(Action.SWITCH_TO_POMODORO, _("Start pomodoro"));
 
