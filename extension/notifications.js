@@ -188,12 +188,11 @@ const ModalDialog = new Lang.Class({
     },
 
     close: function(timestamp) {
-        this.popModal(timestamp);
-
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             return;
         }
 
+        this.popModal(timestamp);
         this.state = State.CLOSING;
 
         Tweener.addTween(this._group,
@@ -552,8 +551,8 @@ const PomodoroStart = new Lang.Class({
 
     _init: function(source) {
         this.parent(source,
-                    _("Starting pomodoro"),
-                    _("Now focus on your task"),
+                    _("A new pomodoro is starting"),
+                    null,
                     null);
         this.setTransient(true);
     }

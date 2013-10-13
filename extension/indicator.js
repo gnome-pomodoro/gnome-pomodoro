@@ -172,22 +172,30 @@ const Indicator = new Lang.Class({
         let state = this._proxy ? this._proxy.State : null;
         let toggled = state !== null && state !== State.NULL;
 
-        if (this._state !== state && this._initialized) {
-            if (state == State.POMODORO || state == State.IDLE)
+        if (this._state !== state && this._initialized)
+        {
+            this._state = state;
+
+            if (state == State.POMODORO || state == State.IDLE) {
                 Tweener.addTween(this.label,
                                  { opacity: 255,
                                    transition: 'easeOutQuad',
                                    time: FADE_ANIMATION_TIME });
-            else
+            }
+            else {
                 Tweener.addTween(this.label,
                                  { opacity: FADE_OPACITY,
                                    transition: 'easeOutQuad',
                                    time: FADE_ANIMATION_TIME });
+            }
 
-            this._state = state;
+            if (state != State.PAUSE && this._notificationDialog) {
+                this._notificationDialog.close();
+            }
 
-            if (this._timerToggle.toggled !== toggled)
+            if (this._timerToggle.toggled !== toggled) {
                 this._timerToggle.setToggleState(toggled);
+            }
         }
 
         if (toggled) {
@@ -212,6 +220,10 @@ const Indicator = new Lang.Class({
             {
                 this._notification.close();
                 this._notification = null;
+            }
+
+            if (this._notificationDialog) {
+                this._notificationDialog.close();
             }
         }
 
