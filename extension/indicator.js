@@ -354,16 +354,6 @@ const Indicator = new Lang.Class({
                 callback.call(this);
     },
 
-    _ensureNotificationSource: function() {
-        if (!this._notificationSource) {
-            this._notificationSource = new Notifications.Source();
-            this._notificationSource.connect('destroy', Lang.bind(this, function(reason) {
-                this._notificationSource = null;
-            }));
-        }
-        return this._notificationSource;
-    },
-
     _onNameAppeared: function() {
         this._ensureProxy();
     },
@@ -408,9 +398,7 @@ const Indicator = new Lang.Class({
             }
         }
 
-        let source = this._ensureNotificationSource();
-
-        this._notification = new Notifications.PomodoroStart(source);
+        this._notification = new Notifications.PomodoroStart();
         this._notification.connect('destroy', Lang.bind(this, function(notification) {
             if (this._notification === notification)
                 this._notification = null;
@@ -436,10 +424,9 @@ const Indicator = new Lang.Class({
             }
         }
 
-        let source = this._ensureNotificationSource();
         let screenNotifications = this._settings.get_boolean('show-screen-notifications');
 
-        this._notification = new Notifications.PomodoroEnd(source);
+        this._notification = new Notifications.PomodoroEnd();
         this._notification.connect('action-invoked', Lang.bind(this,
             function(notification, action)
             {
@@ -531,9 +518,7 @@ const Indicator = new Lang.Class({
             return;
         }
 
-        let source = this._ensureNotificationSource();
-
-        this._reminder = new Notifications.PomodoroEndReminder(source);
+        this._reminder = new Notifications.PomodoroEndReminder();
         this._reminder.connect('show', Lang.bind(this, function(notification) {
             if (!this._proxy || this._proxy.State != State.PAUSE) {
                 notification.close();
@@ -562,14 +547,7 @@ const Indicator = new Lang.Class({
         if (this._notification instanceof Notifications.Issue)
             return;
 
-        if (this._notificationSource) {
-            this._notificationSource.close();
-            this._notificationSource = null;
-        }
-
-        let source = this._ensureNotificationSource();
-
-        this._notification = new Notifications.Issue(source);
+        this._notification = new Notifications.Issue();
         this._notification.connect('destroy', Lang.bind(this, function(notification) {
             if (this._notification === notification)
                 this._notification = null;
@@ -591,9 +569,6 @@ const Indicator = new Lang.Class({
 
         if (this._notification)
             this._notification.destroy();
-
-        if (this._notificationSource)
-            this._notificationSource.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
 
         this.parent();
     }

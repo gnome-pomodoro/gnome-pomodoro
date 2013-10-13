@@ -97,6 +97,56 @@ const Action = {
 };
 
 
+let source = null;
+
+
+function get_default_source()
+{
+    if (!source)
+    {
+        source = new Source();
+        source.connect('destroy', function(reason) {
+            source = null;
+        });
+    }
+
+    return source;
+}
+
+
+const Source = new Lang.Class({
+    Name: 'PomodoroNotificationSource',
+    Extends: MessageTray.Source,
+
+    _init: function() {
+        this.parent(_("Pomodoro"), ICON_NAME);
+
+        this.connect('notification-added',
+                     Lang.bind(this, this._onNotificationAdded));
+    },
+
+    _onNotificationAdded: function(source, notification) {
+        notification.connect('destroy', Lang.bind(this,
+            function() {
+                let notifications = source.notifications;
+
+                if ((notifications.length == 0) ||
+                    (notifications.length == 1 && notifications.indexOf(notification) == 0))
+                {
+                    source.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+                    source.emit('done-displaying-content', false);
+                }
+            }
+        ));
+    },
+
+    close: function(close_tray) {
+        this.destroy();
+        this.emit('done-displaying-content', close_tray == true);
+    }
+});
+
+
 // ModalDialog class is based on ModalDialog from GNOME Shell. We need our own
 // class to have more event signals, different fade in/out times, and different
 // event blocking behavior
@@ -481,26 +531,12 @@ const PomodoroEndDialog = new Lang.Class({
 });
 
 
-const Source = new Lang.Class({
-    Name: 'PomodoroNotificationSource',
-    Extends: MessageTray.Source,
-
-    _init: function() {
-        this.parent(_("Pomodoro"), ICON_NAME);
-    },
-
-    close: function(close_tray) {
-        source.emit('done-displaying-content', close_tray == true);
-    }
-});
-
-
 const Notification = new Lang.Class({
     Name: 'PomodoroNotification',
     Extends: MessageTray.Notification,
 
-    _init: function(source, title, description, params) {
-        this.parent(source, title, description, params);
+    _init: function(title, description, params) {
+        this.parent(get_default_source(), title, description, params);
 
         // Force to show description along with title,
         // as this is private property, API might change
@@ -513,13 +549,11 @@ const Notification = new Lang.Class({
     },
 
     show: function() {
-        if (!Main.messageTray.contains(this.source))
+        if (!Main.messageTray.contains(this.source)) {
             Main.messageTray.add(this.source);
-
-        if (this.source) {
-            this.source.notify(this);
-            this.emit('show');
         }
+
+        this.source.notify(this);
     },
 
     hide: function(close_tray) {
@@ -549,9 +583,8 @@ const PomodoroStart = new Lang.Class({
     Name: 'PomodoroStartNotification',
     Extends: Notification,
 
-    _init: function(source) {
-        this.parent(source,
-                    _("A new pomodoro is starting"),
+    _init: function() {
+        this.parent(_("A new pomodoro is starting"),
                     null,
                     null);
 
@@ -565,11 +598,11 @@ const PomodoroEnd = new Lang.Class({
     Name: 'PomodoroEndNotification',
     Extends: Notification,
 
-    _init: function(source) {
+    _init: function() {
         let title = _("Take a break!");
         let description = '';
 
-        this.parent(source, title, description, null);
+        this.parent(title, description, null);
 
         this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
@@ -660,11 +693,11 @@ const PomodoroEndReminder = new Lang.Class({
     Name: 'PomodoroEndReminderNotification',
     Extends: Notification,
 
-    _init: function(source) {
+    _init: function() {
         let title = _("Hey, you're missing out on a break")
         let description = '';
 
-        this.parent(source, title, description, null);
+        this.parent(title, description, null);
 
         this.setTransient(true);
         this.setUrgency(MessageTray.Urgency.LOW);
@@ -729,7 +762,7 @@ const Issue = new Lang.Class({
     Name: 'PomodoroIssueNotification',
     Extends: Notification,
 
-    _init: function(source) {
+    _init: function() {
         let extension = ExtensionUtils.getCurrentExtension();
         let service   = extension.metadata['service'];
         let url       = extension.metadata['url'];
@@ -740,7 +773,7 @@ const Issue = new Lang.Class({
                     ? _("Something went badly wrong...")
                     : _("Looks like gnome-pomodoro is not installed");
 
-        this.parent(source, title, description, {});
+        this.parent(title, description, {});
         this.setUrgency(MessageTray.Urgency.HIGH);
         this.setTransient(true);
 
