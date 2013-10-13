@@ -32,14 +32,18 @@ function initTranslations(domain) {
 
     domain = domain || extension.metadata['gettext-domain'];
 
-    // check if this extension is installed locally,
-    // otherwise assume that extension has been installed in the
-    // same prefix as gnome-shell
-    let localeDir = extension.dir.get_child('locale');
-    if (localeDir.query_exists(null))
-        Gettext.bindtextdomain(domain, localeDir.get_path());
-    else
+    /* check if this extension is installed locally,
+     * otherwise assume that extension has been installed in the
+     * same prefix as gnome-shell
+     */
+    let locale_dir = extension.dir.get_child('locale');
+
+    if (locale_dir.query_exists(null)) {
+        Gettext.bindtextdomain(domain, locale_dir.get_path());
+    }
+    else {
         Gettext.bindtextdomain(domain, Config.LOCALEDIR);
+    }
 }
 
 
@@ -52,23 +56,28 @@ function getExtensionPath() {
 function getSettings(schema) {
     let extension = ExtensionUtils.getCurrentExtension();
 
-    // check if this extension is installed locally, in that case it has the
-    // schema files in a subfolder otherwise assume that extension has been
-    // installed in the same prefix as gnome-shell (and therefore schemas are
-    // available in the standard folders)
-    let schemaDir = extension.dir.get_child('schemas');
-    let schemaSource;
-    if (schemaDir.query_exists(null))
-        schemaSource = Gio.SettingsSchemaSource.new_from_directory(schemaDir.get_path(),
-                                                                   Gio.SettingsSchemaSource.get_default(),
-                                                                   false);
-    else
-        schemaSource = Gio.SettingsSchemaSource.get_default();
+    /* check if this extension is installed locally, in that case it has the
+     * schema files in a subfolder otherwise assume that extension has been
+     * installed in the same prefix as gnome-shell (and therefore schemas are
+     * available in the standard folders)
+     */
+    let schema_dir = extension.dir.get_child('schemas');
+    let schema_source;
+
+    if (schema_dir.query_exists(null)) {
+        schema_source = Gio.SettingsSchemaSource.new_from_directory(schema_dir.get_path(),
+                                                                    Gio.SettingsSchemaSource.get_default(),
+                                                                    false);
+    }
+    else {
+        schema_source = Gio.SettingsSchemaSource.get_default();
+    }
 
     let schemaObj = schemaSource.lookup(schema, true);
-    if (!schemaObj)
+    if (!schemaObj) {
         throw new Error('Schema ' + schema + ' could not be found for extension '
                         + extension.metadata.uuid + '. Please check your installation.');
+    }
 
     return new Gio.Settings({ settings_schema: schemaObj });
 }

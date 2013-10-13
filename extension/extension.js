@@ -28,7 +28,7 @@ const Indicator = Extension.imports.indicator;
 const Utils = Extension.imports.utils;
 
 
-let indicator;
+let indicator = null;
 
 
 function init(metadata) {

@@ -42,42 +42,37 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Util = imports.misc.util;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Utils = Extension.imports.utils;
 
 const Gettext = imports.gettext.domain('gnome-pomodoro');
 const _ = Gettext.gettext;
 const ngettext = Gettext.ngettext;
 
 
-// Notification dialog blocks user input for a time corresponding to slow typing speed
-// of 23 words per minute which translates to 523 miliseconds between key presses,
-// and moderate typing speed of 35 words per minute / 343 miliseconds.
-// Pressing Enter key takes longer, so more time needed.
+/* Time between user input events before making dialog modal.
+ * Value is a little higher than:
+ *   - slow typing speed of 23 words per minute which translates
+ *     to 523 miliseconds between key presses
+ *   - moderate typing speed of 35 words per minute, 343 miliseconds.
+ */
 const IDLE_TIME_TO_PUSH_MODAL = 600;
-// Time after which stop trying to open a dialog and open a notification
 const PUSH_MODAL_TIME_LIMIT = 1000;
-// Rate per second at which try opening a dialog
 const PUSH_MODAL_RATE = Clutter.get_default_frame_rate();
 
-// Time to (re)open notification dialog if user is idle
 const IDLE_TIME_TO_OPEN = 60000;
-// Time to determine activity after which notification dialog is closed
 const IDLE_TIME_TO_CLOSE = 600;
-// Time before user activity is being monitored
 const MIN_DISPLAY_TIME = 300;
-// Time to fade-in screen notification
+
 const FADE_IN_TIME = 180;
-// Time to fade-out screen notification
+const FADE_IN_OPACITY = 0.55;
+
 const FADE_OUT_TIME = 180;
 
-const NOTIFICATION_DIALOG_OPACITY = 0.55;
+/* Remind about ongoing break in given delays */
+const REMINDER_INTERVALS = [75000];
 
-const ICON_NAME = 'timer-symbolic';
-
-// Remind about ongoing break in given delays
-const REMINDER_INTERVALS = [75];
-// Ratio between user idle time and time between reminders to determine
-// whether user is away
+/* Ratio between user idle time and time between reminders to determine
+ * whether user is away
+ */
 const REMINDER_ACCEPTANCE = 0.66
 
 const State = {
@@ -100,16 +95,13 @@ const Action = {
 let source = null;
 
 
-function get_default_source()
-{
-    if (!source)
-    {
+function get_default_source() {
+    if (!source) {
         source = new Source();
         source.connect('destroy', function(reason) {
             source = null;
         });
     }
-
     return source;
 }
 
@@ -118,8 +110,10 @@ const Source = new Lang.Class({
     Name: 'PomodoroNotificationSource',
     Extends: MessageTray.Source,
 
+    ICON_NAME: 'timer-symbolic',
+
     _init: function() {
-        this.parent(_("Pomodoro"), ICON_NAME);
+        this.parent(_("Pomodoro"), this.ICON_NAME);
 
         this.connect('notification-added',
                      Lang.bind(this, this._onNotificationAdded));
@@ -147,9 +141,11 @@ const Source = new Lang.Class({
 });
 
 
-// ModalDialog class is based on ModalDialog from GNOME Shell. We need our own
-// class to have more event signals, different fade in/out times, and different
-// event blocking behavior
+/**
+ * ModalDialog class based on ModalDialog from GNOME Shell. We need our own
+ * class to have more event signals, different fade in/out times, and different
+ * event blocking behavior.
+ */
 const ModalDialog = new Lang.Class({
     Name: 'PomodoroModalDialog',
 
@@ -171,7 +167,7 @@ const ModalDialog = new Lang.Class({
         let constraint = new Clutter.BindConstraint({ source: global.stage,
                                                       coordinate: Clutter.BindCoordinate.ALL });
         this._group.add_constraint(constraint);
-        this._group.opacity = 0;
+        this._group.opacity = 0.0;
         this._group.connect('destroy', Lang.bind(this, this._onGroupDestroy));
 
         this._backgroundBin = new St.Bin();
@@ -180,10 +176,10 @@ const ModalDialog = new Lang.Class({
         this._group.add_actor(this._backgroundBin);
 
         this._dialogLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-layout',
-                                                vertical:    true });
+                                                vertical: true });
 
         this._lightbox = new Lightbox.Lightbox(this._group,
-                                               { fadeFactor: NOTIFICATION_DIALOG_OPACITY,
+                                               { fadeFactor: FADE_IN_OPACITY,
                                                  inhibitEvents: false });
         this._lightbox.highlight(this._backgroundBin);
         this._lightbox.actor.style_class = 'extension-pomodoro-lightbox';
@@ -222,7 +218,7 @@ const ModalDialog = new Lang.Class({
 
         Tweener.addTween(this._group,
                          { opacity: 255,
-                           time: FADE_IN_TIME / 1000.0,
+                           time: FADE_IN_TIME / 1000,
                            transition: 'easeOutQuad',
                            onComplete: Lang.bind(this,
                                 function() {
@@ -247,7 +243,7 @@ const ModalDialog = new Lang.Class({
 
         Tweener.addTween(this._group,
                          { opacity: 0,
-                           time: FADE_OUT_TIME / 1000.0,
+                           time: FADE_OUT_TIME / 1000,
                            transition: 'easeOutQuad',
                            onComplete: Lang.bind(this,
                                function() {
@@ -330,7 +326,7 @@ const ModalDialog = new Lang.Class({
                     /* dialog became modal */
                 }
                 else {
-                    this._pushModalSource = Mainloop.timeout_add(parseInt(1000 / PUSH_MODAL_RATE),
+                    this._pushModalSource = Mainloop.timeout_add(Math.floor(1000 / PUSH_MODAL_RATE),
                                                                  Lang.bind(this, this._onPushModalTimeout));
                 }
 
@@ -392,7 +388,7 @@ const PomodoroEndDialog = new Lang.Class({
     _init: function() {
         this.parent();
 
-        this._description = _("It's time to take a break");
+        this.description = _("It's time to take a break");
 
         this._openIdleWatchId = 0;
         this._openWhenIdleWatchId = 0;
@@ -407,22 +403,22 @@ const PomodoroEndDialog = new Lang.Class({
         this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-timer' });
 
         this._descriptionLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-message',
-                                                text: this._description });
+                                                text: this.description });
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
 
         messageBox.add(this._timerLabel,
-                            { y_fill:  false,
-                              y_align: St.Align.START });
+                       { y_fill:  false,
+                         y_align: St.Align.START });
         messageBox.add(this._descriptionLabel,
-                            { y_fill:  true,
-                              y_align: St.Align.START });
+                       { y_fill:  true,
+                         y_align: St.Align.START });
         mainLayout.add(messageBox,
-                            { x_fill: true,
-                              y_align: St.Align.START });
+                       { x_fill: true,
+                         y_align: St.Align.START });
         this.contentLayout.add(mainLayout,
-                            { x_fill: true,
-                              y_fill: true });
+                       { x_fill: true,
+                         y_fill: true });
 
         this.setElapsedTime(0, 0);
     },
@@ -513,7 +509,7 @@ const PomodoroEndDialog = new Lang.Class({
     },
 
     setDescription: function(text) {
-        this._description = text;
+        this.description = text;
         this._descriptionLabel.text = text;
     },
 
@@ -538,14 +534,7 @@ const Notification = new Lang.Class({
     _init: function(title, description, params) {
         this.parent(get_default_source(), title, description, params);
 
-        // Force to show description along with title,
-        // as this is private property, API might change
-        try {
-            this._titleFitsInBannerMode = true;
-        }
-        catch (error) {
-            global.log('Pomodoro: ' + error.message);
-        }
+        this._titleFitsInBannerMode = true;
     },
 
     show: function() {
@@ -584,9 +573,7 @@ const PomodoroStart = new Lang.Class({
     Extends: Notification,
 
     _init: function() {
-        this.parent(_("A new pomodoro is starting"),
-                    null,
-                    null);
+        this.parent(_("A new pomodoro is starting"), null, null);
 
         this.setTransient(true);
         this.setUrgency(MessageTray.Urgency.HIGH);
@@ -599,10 +586,7 @@ const PomodoroEnd = new Lang.Class({
     Extends: Notification,
 
     _init: function() {
-        let title = _("Take a break!");
-        let description = '';
-
-        this.parent(title, description, null);
+        this.parent(_("Take a break!"), null, null);
 
         this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
@@ -694,10 +678,7 @@ const PomodoroEndReminder = new Lang.Class({
     Extends: Notification,
 
     _init: function() {
-        let title = _("Hey, you're missing out on a break")
-        let description = '';
-
-        this.parent(title, description, null);
+        this.parent(_("Hey, you're missing out on a break"), null, null);
 
         this.setTransient(true);
         this.setUrgency(MessageTray.Urgency.LOW);
@@ -709,16 +690,21 @@ const PomodoroEndReminder = new Lang.Class({
 
     _onTimeout: function() {
         let display = global.screen.get_display();
-        let idleTime = parseInt((display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000);
+        let idle_time = (display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000;
 
-        // No need to notify if user seems to be away. We only monitor idle time
-        // based on X11, and not Clutter scene which should better reflect to real work
-        if (idleTime < this._timeout * REMINDER_ACCEPTANCE)
+        /* No need to notify if user seems to be away. We only monitor idle
+         * time based on X11, and not Clutter scene which should better reflect
+         * to real work.
+         */
+        if (idleTime < this._timeout * REMINDER_ACCEPTANCE) {
             this.show();
-        else
+        }
+        else {
             this.unschedule();
+        }
 
         this.schedule();
+
         return false;
     },
 
@@ -732,13 +718,17 @@ const PomodoroEndReminder = new Lang.Class({
         }
 
         if (this._interval < intervals.length) {
-            this._timeout = intervals[this._interval];
-            this._timeoutSource = Mainloop.timeout_add_seconds(this._timeout,
-                                                                Lang.bind(this, this._onTimeout));
+            let interval = Math.ceil(intervals[this._interval] / 1000);
+
+            this._timeout = interval;
+            this._timeoutSource = Mainloop.timeout_add_seconds(
+                                       interval,
+                                       Lang.bind(this, this._onTimeout));
         }
 
-        if (!reschedule)
+        if (!reschedule) {
             this._interval += 1;
+        }
     },
 
     unschedule: function() {
@@ -777,20 +767,20 @@ const Issue = new Lang.Class({
         this.setUrgency(MessageTray.Urgency.HIGH);
         this.setTransient(true);
 
-        // TODO: Check which distro running, install via package manager
+        /* TODO: Check which distro running, install via package manager */
 
-        // FIXME: Gnome Shell crashes due to missing schema file,
-        //        so offer to install the app doesn't work right now
-
-        if (installed)
+        if (installed) {
             this.addButton(Action.REPORT_BUG, _("Report issue"));
-        else
+        }
+        else {
             this.addButton(Action.VISIT_WEBSITE, _("Install"));
+        }
 
-        this.connect('action-invoked', Lang.bind(this, function(notification, action) {
-            notification.hide();
-            if (action == Action.REPORT_BUG)
-                Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
-        }));
+        this.connect('action-invoked', Lang.bind(this,
+            function(notification, action) {
+                notification.hide();
+                if (action == Action.REPORT_BUG)
+                    Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
+            }));
     }
 });
