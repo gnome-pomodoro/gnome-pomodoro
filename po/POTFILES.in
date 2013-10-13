@@ -10,6 +10,7 @@ src/application.vala
 src/command-line.vala
 src/keybindings.vala
 src/main.vala
+src/power.vala
 src/preferences-dialog.vala
 src/presence.vala
 src/service.vala

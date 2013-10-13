@@ -26,6 +26,7 @@ gnome_pomodoro_SOURCES = \
     command-line.vala \
     keybindings.vala \
     main.vala \
+    power.vala \
     preferences-dialog.vala \
     presence.vala \
     resources.c \

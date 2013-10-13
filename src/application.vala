@@ -207,6 +207,7 @@ public class Pomodoro.Application : Gtk.Application
         this.modules = new List<Object> ();
         this.modules.prepend (new Pomodoro.Sounds (this.timer));
         this.modules.prepend (new Pomodoro.Presence (this.timer));
+        this.modules.prepend (new Pomodoro.Power (this.timer));
 
         this.timer.state_changed.connect (this.on_timer_state_changed);
         this.timer.destroy.connect (this.on_timer_destroy);

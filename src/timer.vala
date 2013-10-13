@@ -97,7 +97,6 @@ public class Pomodoro.Timer : Object
     private uint timeout_source;
     private Gnome.IdleMonitor idle_monitor;
     private uint became_active_id;
-    private Up.Client power;
     private GLib.Settings settings;
     private GLib.Settings settings_state;
     private double current_timestamp;
@@ -144,9 +143,6 @@ public class Pomodoro.Timer : Object
         this.timeout_source = 0;
         this.idle_monitor = new Gnome.IdleMonitor ();
         this.became_active_id = 0;
-
-        this.power = new Up.Client ();
-        this.power.notify_resume.connect (this.restore);
 
         var application = GLib.Application.get_default () as Pomodoro.Application;
 
@@ -302,9 +298,9 @@ public class Pomodoro.Timer : Object
         this.state_duration = duration;
         this.is_long_break = is_long_break;
 
-//        if (wrap_elapsed) {
-//            this.elapsed = elapsed;
-//        }
+        if (wrap_elapsed) {
+            this.elapsed = elapsed;
+        }
 
         this.notify_property ("state");
 
@@ -545,7 +541,6 @@ public class Pomodoro.Timer : Object
             this.timeout_source = 0;
         }
 
-        this.power = null;
         this.settings = null;
         this.settings_state = null;
         this.idle_monitor = null;
