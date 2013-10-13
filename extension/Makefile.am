@@ -6,8 +6,7 @@ dist_extension_DATA = \
     indicator.js \
     metadata.json \
     notifications.js \
-    stylesheet.css \
-    utils.js
+    stylesheet.css
 
 nodist_extension_DATA = \
     metadata.json

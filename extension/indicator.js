@@ -38,11 +38,9 @@ const Tweener = imports.ui.tweener;
 
 const DBus = Extension.imports.dbus;
 const Notifications = Extension.imports.notifications;
-const Utils = Extension.imports.utils;
 
 const Gettext = imports.gettext.domain('gnome-pomodoro');
 const _ = Gettext.gettext;
-const ngettext = Gettext.ngettext;
 
 
 const FADE_IN_TIME = 250;

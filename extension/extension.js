@@ -21,18 +21,20 @@
  *          Kamil Prusko <kamilprusko@gmail.com>
  */
 
+const Gettext = imports.gettext;
+
 const Main = imports.ui.main;
+const Config = imports.misc.config;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Indicator = Extension.imports.indicator;
-const Utils = Extension.imports.utils;
 
 
 let indicator = null;
 
 
 function init(metadata) {
-    Utils.initTranslations('gnome-pomodoro');
+    Gettext.bindtextdomain('gnome-pomodoro', Config.LOCALEDIR);
 }
 
 

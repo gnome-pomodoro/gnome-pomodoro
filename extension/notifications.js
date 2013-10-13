@@ -38,7 +38,6 @@ const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const Tweener = imports.ui.tweener;
-const ExtensionUtils = imports.misc.extensionUtils;
 const Util = imports.misc.util;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
@@ -753,9 +752,8 @@ const Issue = new Lang.Class({
     Extends: Notification,
 
     _init: function() {
-        let extension = ExtensionUtils.getCurrentExtension();
-        let service   = extension.metadata['service'];
-        let url       = extension.metadata['url'];
+        let service   = Extension.metadata['service'];
+        let url       = Extension.metadata['url'];
         let installed = Gio.file_new_for_path(service).query_exists(null);
 
         let title = _("Could not run pomodoro");
