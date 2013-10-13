@@ -1,4 +1,4 @@
-<schemalist gettext-domain="gnome-shell-pomodoro">
+<schemalist gettext-domain="gnome-pomodoro">
   <schema id="org.gnome.pomodoro" path="/apps/gnome-pomodoro/">
     <child name="preferences" schema="org.gnome.pomodoro.preferences"/>
     <child name="state" schema="org.gnome.pomodoro.state"/>

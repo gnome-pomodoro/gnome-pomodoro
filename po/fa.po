@@ -1,11 +1,11 @@
-# Persian translation for gnome-shell-pomodoro
-# Copyright (c) 2012 gnome-shell-pomodoro contributors
-# This file is distributed under the same license as the gnome-shell-pomodoro package.
+# Persian translation for gnome-pomodoro
+# Copyright (c) 2012 gnome-pomodoro contributors
+# This file is distributed under the same license as the gnome-pomodoro package.
 # Arash Mousavi <mousavi.arash@gmail.com>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-shell-pomodoro\n"
+"Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-18 16:22+0100\n"
 "PO-Revision-Date: 2012-12-25 20:56+0330\n"

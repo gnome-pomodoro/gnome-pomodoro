@@ -1,11 +1,11 @@
-# Polish translation for gnome-shell-pomodoro
-# Copyright (c) 2012 gnome-shell-pomodoro contributors
-# This file is distributed under the same license as the gnome-shell-pomodoro package.
+# Polish translation for gnome-pomodoro
+# Copyright (c) 2012 gnome-pomodoro contributors
+# This file is distributed under the same license as the gnome-pomodoro package.
 # Kamil Prusko <kamilprusko@gmail.com>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-shell-pomodoro\n"
+"Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-14 14:14+0200\n"
 "PO-Revision-Date: 2012-01-30 16:35+0100\n"

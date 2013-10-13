@@ -1,7 +1,7 @@
 /*
  * based on keyboard-shortcuts.c from gnome-control-center
  *
- * Copyright (c) 2013 gnome-shell-pomodoro contributors
+ * Copyright (c) 2013 gnome-pomodoro contributors
  *               2010 Intel, Inc
  *
  * This program is free software: you can redistribute it and/or modify

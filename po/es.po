@@ -1,11 +1,11 @@
-# Spanish translation for gnome-shell-pomodoro
-# Copyright (c) 2012 gnome-shell-pomodoro contributors
-# This file is distributed under the same license as the gnome-shell-pomodoro package.
+# Spanish translation for gnome-pomodoro
+# Copyright (c) 2012 gnome-pomodoro contributors
+# This file is distributed under the same license as the gnome-pomodoro package.
 # juanmah <juanmah@gmail.com>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-shell-pomodoro\n"
+"Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-10-14 14:43+0200\n"
 "PO-Revision-Date: 2012-03-19 10:58+0100\n"
