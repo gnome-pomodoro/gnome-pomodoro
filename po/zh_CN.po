@@ -51,7 +51,7 @@ msgstr "控制在线状态"
 
 #. Notification dialog toggle
 #: ../src/extension.js:141
-msgid "Fullscreen Notifications"
+msgid "Screen Notifications"
 msgstr "全屏通知"
 
 #. Notify with a sound toggle
@@ -93,7 +93,7 @@ msgid "A new pomodoro is starting."
 msgstr "暂停结束，新的番茄时间开始了～"
 
 #: ../src/timer.js:440
-msgid "It's time to take a break!"
+msgid "It's time to take a break"
 msgstr "现在是时候要休息一下了～"
 
 #: ../src/timer.js:462
@@ -110,15 +110,15 @@ msgstr "嘿，你忘过了休息下"
 
 #: ../src/timer.js:656
 #, c-format
-msgid "You have %d second left.\n"
-msgid_plural "You have %d seconds left.\n"
-msgstr[0] "休息一会, 你有%d秒的休息时间\n"
+msgid "You have %d second left."
+msgid_plural "You have %d seconds left."
+msgstr[0] "休息一会, 你有%d秒的休息时间"
 
 #: ../src/timer.js:658
 #, c-format
-msgid "You have %d minute left.\n"
-msgid_plural "You have %d minutes left.\n"
-msgstr[0] "休息一会, 你有%d分的休息时间\n"
+msgid "You have %d minute left."
+msgid_plural "You have %d minutes left."
+msgstr[0] "休息一会, 你有%d分的休息时间"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
 msgid "Pomodoro duration"

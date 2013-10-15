@@ -72,7 +72,7 @@ Available at [Maciej's](https://github.com/mgrela) overlay [here](https://github
 - _Reset Counts and Timers_: Resets your pomodoro session count.
 - _Away From Desk_: Automatically start next pomodoro session after pause. Useful if you're sitting away from computer.
 - _Control Presence Status_: During a pomodoro session, mark your IM presence status to Busy.
-- _Fullscreen Notifications_: After completion of a pomodoro session, show a dialog box (system modal) that will force you to take a break :)
+- _Screen Notifications_: After completion of a pomodoro session, show a dialog box (system modal) that will force you to take a break :)
 - _Sound Notifications_: Notify completion of pomodoro by playing a sound.
 
 # Settings

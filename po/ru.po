@@ -130,19 +130,19 @@ msgstr "Показать сообщение"
 
 #: ../src/timer.js:514
 #, c-format
-msgid "Take a break, you have %d second\n"
-msgid_plural "Take a break, you have %d seconds\n"
-msgstr[0] "Сделайте перерыв, у Вас %d секунда\n"
-msgstr[1] "Сделайте перерыв, у Вас %d секунды\n"
-msgstr[2] "Сделайте перерыв, у Вас %d секунд\n"
+msgid "Take a break, you have %d second."
+msgid_plural "Take a break, you have %d seconds."
+msgstr[0] "Сделайте перерыв, у Вас %d секунда"
+msgstr[1] "Сделайте перерыв, у Вас %d секунды"
+msgstr[2] "Сделайте перерыв, у Вас %d секунд"
 
 #: ../src/timer.js:516
 #, c-format
-msgid "Take a break, you have %d minute\n"
-msgid_plural "Take a break, you have %d minutes\n"
-msgstr[0] "Сделайте перерыв, у Вас %d минута\n"
-msgstr[1] "Сделайте перерыв, у Вас %d минуты\n"
-msgstr[2] "Сделайте перерыв, у Вас %d минут\n"
+msgid "Take a break, you have %d minute."
+msgid_plural "Take a break, you have %d minutes."
+msgstr[0] "Сделайте перерыв, у Вас %d минута"
+msgstr[1] "Сделайте перерыв, у Вас %d минуты"
+msgstr[2] "Сделайте перерыв, у Вас %d минут"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
 msgid "Timer toggle key"

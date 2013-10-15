@@ -129,17 +129,17 @@ msgstr "Mostra diàleg"
 
 #: ../src/timer.js:514
 #, c-format
-msgid "Take a break, you have %d second\n"
-msgid_plural "Take a break, you have %d seconds\n"
-msgstr[0] "Prengui's un descans, té %d segon\n"
-msgstr[1] "Prengui's un descans, té %d segons\n"
+msgid "Take a break, you have %d second"
+msgid_plural "Take a break, you have %d seconds"
+msgstr[0] "Prengui's un descans, té %d segon"
+msgstr[1] "Prengui's un descans, té %d segons"
 
 #: ../src/timer.js:516
 #, c-format
-msgid "Take a break, you have %d minute\n"
-msgid_plural "Take a break, you have %d minutes\n"
-msgstr[0] "Prengui's un descans, té %d minut\n"
-msgstr[1] "Prengui's un descans, té %d minuts\n"
+msgid "Take a break, you have %d minute"
+msgid_plural "Take a break, you have %d minutes"
+msgstr[0] "Prengui's un descans, té %d minut"
+msgstr[1] "Prengui's un descans, té %d minuts"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
 msgid "Timer toggle key"

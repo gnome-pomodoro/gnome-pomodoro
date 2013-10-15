@@ -51,7 +51,7 @@ msgstr "کنترل وضعیت حضور"
 
 #. Notification dialog toggle
 #: ../src/extension.js:141
-msgid "Fullscreen Notifications"
+msgid "Screen Notifications"
 msgstr "نمایش محاوره‌ی پیام‌ها"
 
 #. Notify with a sound toggle
@@ -93,8 +93,8 @@ msgid "A new pomodoro is starting."
 msgstr "یک پومودورو دیگه شروع شد."
 
 #: ../src/timer.js:440
-msgid "It's time to take a break!"
-msgstr "حالا وقت استراحت است!"
+msgid "It's time to take a break"
+msgstr "حالا وقت استراحت است"
 
 #: ../src/timer.js:462
 msgid "Take a break!"
@@ -110,15 +110,15 @@ msgstr "ای بابا. داری یک زمان استراحت رو از دست م
 
 #: ../src/timer.js:656
 #, c-format
-msgid "You have %d second left.\n"
-msgid_plural "You have %d seconds left.\n"
-msgstr[0] "شما %Id ثانیه زمان دارید\n"
+msgid "You have %d second left."
+msgid_plural "You have %d seconds left."
+msgstr[0] "شما %Id ثانیه زمان دارید"
 
 #: ../src/timer.js:658
 #, c-format
-msgid "You have %d minute left.\n"
-msgid_plural "You have %d minutes left.\n"
-msgstr[0] "شما %Id دقیقه زمان دارید\n"
+msgid "You have %d minute left."
+msgid_plural "You have %d minutes left."
+msgstr[0] "شما %Id دقیقه زمان دارید"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
 msgid "Pomodoro duration"
