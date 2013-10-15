@@ -38,7 +38,7 @@
     font-weight: normal;
     font-family: Droid Sans, Droid Sans Mono, DejaVu Sans, Bitstream Vera Sans, monospace, sans-serif;
     text-align: center;
-    text-shadow: rgba(0, 0, 0, 0.15) 2px 4px 14px;
+    text-shadow: 0.0px 5.0px 8.0px rgba(0, 0, 0, 0.10);
     color: white;
 }
 
@@ -46,6 +46,6 @@
     font-size: 12pt;
     font-weight: normal;
     text-align: center;
-    text-shadow: rgba(0, 0, 0, 0.50) 1px 1px 12px;
+    text-shadow: 0.0px 1.0px 2.0px rgba(0, 0, 0, 0.35);
     color: white;
 }

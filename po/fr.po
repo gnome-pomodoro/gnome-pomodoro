@@ -55,7 +55,7 @@ msgstr "Gérer le statut de présence"
 #. Notification dialog toggle
 #: ../src/extension.js:141
 #, fuzzy
-msgid "Fullscreen Notifications"
+msgid "Screen Notifications"
 msgstr "Afficher la boîte de dialogue"
 
 #. Notify with a sound toggle
@@ -104,7 +104,7 @@ msgstr "La pause est terminée, un nouveau pomodoro démarre!"
 
 #: ../src/timer.js:440
 #, fuzzy
-msgid "It's time to take a break!"
+msgid "It's time to take a break"
 msgstr ""
 
 #: ../src/timer.js:462
@@ -123,17 +123,17 @@ msgstr "Hey, vous êtes absent dehors sur une pause."
 
 #: ../src/timer.js:656
 #, fuzzy, c-format
-msgid "You have %d second left.\n"
-msgid_plural "You have %d seconds left.\n"
-msgstr[0] "Prenez une pause, vous avez %d seconde\n"
-msgstr[1] "Prenez une pause, vous avez %d secondes\n"
+msgid "You have %d second left."
+msgid_plural "You have %d seconds left."
+msgstr[0] "Prenez une pause, vous avez %d seconde"
+msgstr[1] "Prenez une pause, vous avez %d secondes"
 
 #: ../src/timer.js:658
 #, fuzzy, c-format
-msgid "You have %d minute left.\n"
-msgid_plural "You have %d minutes left.\n"
-msgstr[0] "Prenez une pause, vous avez %d minute\n"
-msgstr[1] "Prenez une pause, vous avez %d minutes\n"
+msgid "You have %d minute left."
+msgid_plural "You have %d minutes left."
+msgstr[0] "Prenez une pause, vous avez %d minute"
+msgstr[1] "Prenez une pause, vous avez %d minutes"
 
 #: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
 msgid "Pomodoro duration"

@@ -59,7 +59,7 @@ const DEFAULT_SOUND_FILE = 'bell.wav';
 const SCREENSAVER_DEACTIVATE_COMMAND = 'xdg-screensaver reset';
 
 // Remind about ongoing break in given delays
-const PAUSE_REMIND_TIMES = [60];
+const PAUSE_REMIND_TIMES = [90];
 // Ratio between user idle time and time between reminders to determine if user
 // is finally away
 const PAUSE_REMINDER_ACCEPTANCE = 0.8
@@ -91,7 +91,6 @@ const PomodoroTimer = new Lang.Class({
         this._reminderCount = 0;
         
         this._notification = null;
-        this._notificationSource = null;
         this._notificationDialog = null;
         this._playbin = null;
         this._power = null;
@@ -150,7 +149,6 @@ const PomodoroTimer = new Lang.Class({
     },
 
     startPomodoro: function() {
-        this._closeNotifications();
         if (this._state == State.PAUSE || this._state == State.IDLE)
             this._playNotificationSound();
         
@@ -375,9 +373,7 @@ const PomodoroTimer = new Lang.Class({
         // if (!this._settings.get_boolean('away-from-desk'))
         //     this._deactivateScreenSaver();
 
-        this._openNotificationSource();
-
-        let notification = new MessageTray.Notification(this._notificationSource,
+        let notification = new MessageTray.Notification(Notification.get_default_source(),
                                                         _("Pause finished."),
                                                         _("A new pomodoro is starting."),
                                                         null);
@@ -395,13 +391,10 @@ const PomodoroTimer = new Lang.Class({
             this._playNotificationSound();
         }
 
-        if (this._notification)
-            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-
         if (!this._notificationDialog) {
             this._notificationDialog = new Notification.NotificationDialog();
             this._notificationDialog.setTimer('00:00');
-            this._notificationDialog.setDescription(_("It's time to take a break!"));
+            this._notificationDialog.setDescription(_("It's time to take a break"));
 
             this._notificationDialog.connect('opening', Lang.bind(this, function() {
                     this._unscheduleReminder();
@@ -419,25 +412,25 @@ const PomodoroTimer = new Lang.Class({
                 }));
         }
 
-        this._openNotificationSource();
-        this._notification = new MessageTray.Notification(this._notificationSource,
+        if (this._notification)
+            this._notification.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+
+        this._notification = new MessageTray.Notification(Notification.get_default_source(),
                                                           _("Take a break!"),
                                                           null);
         this._notification.setResident(true);
 
-        //button had to be disabled due a bug in gnome-shell
         this._notification.addButton('start-pomodoro', _("Start a new pomodoro"));
 
-        // Force to show description along with title,
-        // as this is private property, API might change
-        try {
-            this._notification._titleFitsInBannerMode = true;
-        }
-        catch(e) {
-            global.log('Pomodoro: ' + e.message);
+        this._notification._titleFitsInBannerMode = true;
+
+        if (!this._notification._bodyLabel) {
+            this._notification._bodyLabel = this._notification.addBody("", null, null);
         }
 
         this._notification.connect('action-invoked', Lang.bind(this, function(object, id) {
+                Main.messageTray.close();
+
                 if (id == 'start-pomodoro')
                     this.startPomodoro();
             }));
@@ -463,15 +456,6 @@ const PomodoroTimer = new Lang.Class({
         this.emit('notify-pomodoro-end');
     },
 
-    _openNotificationSource: function() {
-        if (!this._notificationSource) {
-            this._notificationSource = new Notification.NotificationSource();
-            this._notificationSource.connect('destroy', Lang.bind(this, function(reason) {
-                    this._notificationSource = null;
-                }));
-        }
-    },
-
     _openNotification: function(notification) {
         if (notification) {
             if (!Main.messageTray.contains(notification.source))
@@ -483,13 +467,16 @@ const PomodoroTimer = new Lang.Class({
     },
 
     _closeNotifications: function() {
-        if (this._notificationSource) {
-            this._notificationSource.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-            this._notificationSource = null;
-        }
         if (this._notificationDialog) {
             this._notificationDialog.close();
             this._notificationDialog.setOpenWhenIdle(false);
+        }
+        if (this._notification) {
+            let notification = this._notification;
+            if (Main.messageTray._trayState == MessageTray.State.SHOWN)
+                notification.emit('done-displaying-content', false);
+
+            notification.destroy();
         }
         this._unscheduleReminder();
     },
@@ -503,9 +490,8 @@ const PomodoroTimer = new Lang.Class({
             return;
         
         if (!this._notificationDialog || this._notificationDialog.state == Notification.State.CLOSED) {
-            this._openNotificationSource();
 
-            let notification = new MessageTray.Notification(this._notificationSource,
+            let notification = new MessageTray.Notification(Notification.get_default_source(),
                                                             _("Hey, you're missing out on a break."),
                                                             null);
             notification.setTransient(true);
@@ -622,12 +608,13 @@ const PomodoroTimer = new Lang.Class({
             let seconds = Math.floor(remaining % 60);
             let minutes = Math.round(remaining / 60);
             let message = (remaining <= 45)
-                                    ? ngettext("You have %d second left.\n",
-                                               "You have %d seconds left.\n", seconds).format(seconds)
-                                    : ngettext("You have %d minute left.\n",
-                                               "You have %d minutes left.\n", minutes).format(minutes);
+                        ? ngettext("You have %d second left.",
+                                   "You have %d seconds left.", seconds).format(seconds)
+                        : ngettext("You have %d minute left.",
+                                   "You have %d minutes left.", minutes).format(minutes);
 
-            this._notification.update(this._notification.title, message, {});
+            this._notification._bannerLabel.set_text(message);
+            this._notification._bodyLabel.set_text(message);
         }
     },
 

@@ -18,6 +18,7 @@ const Lang = imports.lang;
 
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
+const Gtk = imports.gi.Gtk;
 const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
 const Shell = imports.gi.Shell;
@@ -41,7 +42,7 @@ const ngettext = Gettext.ngettext;
 
 // Time in seconds to fade timer label when pause starts or ends
 const FADE_ANIMATION_TIME = 0.25;
-const FADE_OPACITY = 150;
+const FADE_OPACITY = 120;
 
 // Slider helper functions
 const SLIDER_UPPER = 2700;
@@ -152,7 +153,7 @@ const Indicator = new Lang.Class({
         this._optionsMenu.menu.addMenuItem(this._changePresenceStatusToggle);
         
         // Notification dialog toggle
-        this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Fullscreen Notifications"));
+        this._showDialogsToggle = new PopupMenu.PopupSwitchMenuItem(_("Screen Notifications"));
         this._showDialogsToggle.connect('toggled', Lang.bind(this, function(item) {
             this._settings.set_boolean('show-notification-dialogs', item.state);
         }));
@@ -359,7 +360,7 @@ const Indicator = new Lang.Class({
         this._updateLabel();
         this._updateSessionCount();
         
-        if (state == PomodoroTimer.State.PAUSE)
+        if (state == PomodoroTimer.State.PAUSE || state == PomodoroTimer.State.NULL)
             Tweener.addTween(this.label,
                              { opacity: FADE_OPACITY,
                                transition: 'easeOutQuad',
@@ -390,6 +391,11 @@ let indicator;
 
 function init(metadata) {
     PomodoroUtil.initTranslations('gnome-shell-pomodoro');
+
+    let iconTheme = Gtk.IconTheme.get_default();
+
+    if (!iconTheme.has_icon('timer-symbolic'))
+        iconTheme.append_search_path (PomodoroUtil.getExtensionPath());
 }
 
 function enable() {

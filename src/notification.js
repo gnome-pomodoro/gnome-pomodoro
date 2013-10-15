@@ -22,7 +22,6 @@ const Atk = imports.gi.Atk;
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
-const Gtk = imports.gi.Gtk;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
@@ -59,7 +58,7 @@ const IDLE_TIME_TO_OPEN = 60000;
 // Time to determine activity after which notification dialog is closed
 const IDLE_TIME_TO_CLOSE = 600;
 // Time before user activity is being monitored
-const MIN_DISPLAY_TIME = 200;
+const MIN_DISPLAY_TIME = 30;
 // Time to fade-in or fade-out notification in seconds
 const OPEN_AND_CLOSE_TIME = 180;
 
@@ -73,28 +72,49 @@ const State = {
 };
 
 
-const NotificationSource = new Lang.Class({
+let source = null;
+
+
+function get_default_source() {
+    if (!source) {
+        source = new Source();
+        source.connect('destroy', function(reason) {
+            source = null;
+        });
+    }
+    return source;
+}
+
+
+const Source = new Lang.Class({
     Name: 'PomodoroNotificationSource',
     Extends: MessageTray.Source,
 
     _init: function() {
-        this.parent(_("Pomodoro Timer"));
-
-        this.iconName = 'timer-symbolic';
+        this.parent(_("Pomodoro"), 'timer-symbolic');
+ 
+        this.connect('notification-added',
+                     Lang.bind(this, this._onNotificationAdded));
     },
 
-    createIcon: function(size) {
-        let iconTheme = Gtk.IconTheme.get_default();
+    _onNotificationAdded: function(source, notification) {
+        notification.connect('destroy', Lang.bind(this,
+            function() {
+                let notifications = source.notifications;
 
-        if (!iconTheme.has_icon(this.iconName))
-            iconTheme.append_search_path (PomodoroUtil.getExtensionPath());
-
-        return new St.Icon({ icon_name: this.iconName,
-                             icon_size: size });
+                if ((notifications.length == 0) ||
+                    (notifications.length == 1 && notifications.indexOf(notification) == 0))
+                {
+                    source.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
+                    source.emit('done-displaying-content', false);
+                }
+            }
+        ));
     },
 
-    open: function(notification) {
-        this.destroyNonResidentNotifications();
+    close: function(close_tray) {
+        this.destroy();
+        this.emit('done-displaying-content', close_tray == true);
     }
 });
 
@@ -283,6 +303,8 @@ const ModalDialog = new Lang.Class({
                                 })
                          });
         this.emit('opening');
+
+        Main.messageTray.close();
     },
 
     close: function(timestamp) {
