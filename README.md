@@ -16,7 +16,7 @@ This [GNOME](http://www.gnome.org/gnome-3/) utility intends to help manage time 
 
 ### Screenshots
 
-![Screenshot](http://kamilprusko.org/files/gnome-pomodoro-0.9.0.png)
+![Screenshot](http://kamilprusko.org/files/gnome-pomodoro-0.9.0-indicator.png)
 
 
 ### What is the pomodoro technique?
@@ -28,7 +28,7 @@ You can read more on pomodoro technique [here](http://www.pomodorotechnique.com/
 *This project is not affiliated with, authorized by, sponsored by, or otherwise approved by GNOME Foundation and/or the Pomodoro Technique®. The GNOME logo and GNOME name are registered trademarks or trademarks of GNOME Foundation in the United States or other countries. The Pomodoro Technique® and Pomodoro™ are registered trademarks of Francesco Cirillo.*
 
 
-# Installation
+## Installation
 
 
 ### From repositories
@@ -72,7 +72,7 @@ Available at Maciej's overlay [here](https://github.com/mgrela/dropzone/tree/mas
 You can install older version via [extensions.gnome.org](https://extensions.gnome.org/extension/53/pomodoro/). We will maintain it until more packages will be available.
 
 
-# Advanced settings
+## Advanced settings
 
 If you still want to tinker with settings, you can use *dconf-editor* or *gsettings* from commandline. Settings for Pomodoro are in */org/gnome/pomodoro* tree.
 
@@ -93,7 +93,7 @@ If you ever need to bring the app to original settings or state, you can do it b
 For more options see *gsettings --help*
 
 
-# Debugging
+## Debugging
 
 If you experience the extension causing problems, please run *gnome-shell* with an incantation:
 
@@ -102,17 +102,17 @@ If you experience the extension causing problems, please run *gnome-shell* with 
 and send us *gnome-shell.log* file. To comfort you, you can recover from most *gnome-shell* crashes using the same command. 
 
 
-# License
+## License
 
 GPL3. See [COPYING](https://raw.github.com/codito/gnome-shell-pomodoro/master/COPYING) for details.
 
 
-# Thanks
+## Thanks
 
 Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodoro/contributors).
 
 
-# Changelog
+## Changelog
 
 **Version 0.9.0**
 
