@@ -14,6 +14,7 @@ This [GNOME](http://www.gnome.org/gnome-3/) utility intends to help manage time 
 * Option to quickly shorten/lenghten the break
 * Nagging to take a break
 
+
 ### Screenshots
 
 ![Screenshot](http://kamilprusko.org/files/gnome-pomodoro-0.9.0-indicator.png)
@@ -46,13 +47,13 @@ Available at Maciej's overlay [here](https://github.com/mgrela/dropzone/tree/mas
 
 1. You may need to install some dependencies before building it.
 
-    For Ubuntu:
+    On Ubuntu:
 
-        sudo apt-get install gnome-common intltool libglib2.0-dev
+        sudo apt-get install gnome-common intltool libglib2.0-dev gobject-introspection
 
-    For Fedora:
+    On Fedora:
 
-        sudo yum install gnome-common intltool glib2-devel
+        sudo yum install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel clutter-gtk-devel gnome-desktop3-devel libcanberra-devel libgdata-devel gstreamer-devel upower-devel
 
 2. Build it and install:
 
