@@ -1,9 +1,9 @@
 <schemalist gettext-domain="gnome-pomodoro">
-  <schema id="org.gnome.pomodoro" path="/apps/gnome-pomodoro/">
+  <schema id="org.gnome.pomodoro" path="/org/gnome/pomodoro/">
     <child name="preferences" schema="org.gnome.pomodoro.preferences"/>
     <child name="state" schema="org.gnome.pomodoro.state"/>
   </schema>
-  <schema id="org.gnome.pomodoro.preferences" path="/apps/gnome-pomodoro/preferences/">
+  <schema id="org.gnome.pomodoro.preferences" path="/org/gnome/pomodoro/preferences/">
     <key name="pomodoro-duration" type="d">
       <default>1500</default>
       <range min="1" max="36000"/>
@@ -87,7 +87,7 @@
       <description>Volume of ticking sound.</description>
     </key>
   </schema>
-  <schema id="org.gnome.pomodoro.state" path="/apps/gnome-pomodoro/state/">
+  <schema id="org.gnome.pomodoro.state" path="/org/gnome/pomodoro/state/">
     <key name="session-count" type="d">
       <default>0</default>
       <summary>Timer session count</summary>
