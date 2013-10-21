@@ -45,15 +45,15 @@ Available at Maciej's overlay [here](https://github.com/mgrela/dropzone/tree/mas
 
 ### From source
 
-1. You may need to install some dependencies before building it.
+1. You may need to install some tools and dependencies before building it
 
     On Ubuntu:
 
-        sudo apt-get install gnome-common intltool libglib2.0-dev gobject-introspection
+        sudo apt-get install gnome-common intltool valac libglib2.0-dev gobject-introspection libgirepository1.0-dev libgtk-3-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev libcanberra-dev libgdata-dev libgstreamer0.10-dev libupower-glib-dev fonts-droid
 
     On Fedora:
 
-        sudo yum install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel clutter-gtk-devel gnome-desktop3-devel libcanberra-devel libgdata-devel gstreamer-devel upower-devel
+        sudo yum install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel clutter-gtk-devel gnome-desktop3-devel libcanberra-devel libgdata-devel gstreamer-devel upower-devel google-droid-sans-fonts
 
 2. Build it and install:
 
@@ -82,14 +82,14 @@ If you still want to tinker with settings, you can use *dconf-editor* or *gsetti
 
 As it's not possible to select a shortcut having a [Super key](http://en.wikipedia.org/wiki/Windows_key), you need to use the commandline:
 
-        gsettings set org.gnome.shell.extensions.pomodoro toggle-pomodoro-timer "['<Super>p']"
+    gsettings set org.gnome.shell.extensions.pomodoro toggle-pomodoro-timer "['<Super>p']"
 
 
 **Reset settings to default**
 
 If you ever need to bring the app to original settings or state, you can do it by:
 
-        gsettings reset-recursively org.gnome.pomodoro
+    gsettings reset-recursively org.gnome.pomodoro
 
 For more options see *gsettings --help*
 
@@ -98,7 +98,7 @@ For more options see *gsettings --help*
 
 If you experience the extension causing problems, please run *gnome-shell* with an incantation:
 
-        DISPLAY=:0 gnome-shell --replace > gnome-shell.log 2>&1
+    DISPLAY=:0 gnome-shell --replace > gnome-shell.log 2>&1
 
 and send us *gnome-shell.log* file. To comfort you, you can recover from most *gnome-shell* crashes using the same command. 
 
@@ -124,9 +124,7 @@ Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodo
 
 **Version 0.8.1**
 
-* Support for GNOME Shell 3.8 (thanks @haaja)
-* Brazilian Portuguese translation (thanks @aleborba)
-* Minor bug fixes
+* Support for GNOME Shell 3.10
 
 **Version 0.8**
 
