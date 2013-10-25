@@ -61,11 +61,11 @@ Available at Maciej's overlay [here](https://github.com/mgrela/dropzone/tree/mas
         make
         sudo make install
 
-3. Press *Alt + F2*, and type *r* in command to restart GNOME Shell
-
-4. Run it to enable GNOME Shell extension:
+3. Launch it, it should enable Pomodoro extension for GNOME Shell:
 
         gnome-pomodoro
+
+4. If extension doesn't show up in top panel, restart GNOME Shell by hitting *Alt + F2* and typing *r* in command
 
 
 ### From extensions.gnome.org

@@ -8,6 +8,7 @@ src/about-dialog.vala
 src/animation.vala
 src/application.vala
 src/command-line.vala
+src/gnome-desktop.vala
 src/keybindings.vala
 src/main.vala
 src/power.vala

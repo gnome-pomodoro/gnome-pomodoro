@@ -91,8 +91,13 @@ const Indicator = new Lang.Class({
 
         this.menu.actor.connect('notify::visible', Lang.bind(this, this.refresh));
 
-        this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
-        this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+        try {
+            this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
+            this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+        }
+        catch (e) {
+            log('Pomodoro: ' + e);
+        }
 
         /* Register keybindings to toggle the timer */
         Main.wm.addKeybinding('toggle-timer-key',

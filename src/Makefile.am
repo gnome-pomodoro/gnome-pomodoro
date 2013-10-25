@@ -24,6 +24,7 @@ gnome_pomodoro_SOURCES = \
     animation.vala \
     application.vala \
     command-line.vala \
+    gnome-desktop.vala \
     keybindings.vala \
     main.vala \
     power.vala \
