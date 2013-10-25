@@ -33,6 +33,7 @@ public class Pomodoro.CommandLine
         var option_context = new GLib.OptionContext ("- A simple pomodoro timer");
         option_context.set_help_enabled (true);
         option_context.add_group (Gtk.get_option_group (true));
+        option_context.add_group (Gst.init_get_option_group ());
 
         var options = new GLib.OptionEntry[2];
         options[0] = { "preferences", 0, 0, GLib.OptionArg.NONE, ref this.preferences,
