@@ -306,10 +306,6 @@ public class Pomodoro.Timer : Object
 
         this.thaw_notify ();
 
-        this.state_changed ();
-
-        this.update ();
-
         return true;
     }
 

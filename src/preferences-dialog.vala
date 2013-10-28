@@ -74,7 +74,14 @@ namespace Pomodoro
                                   GLib.Variant variant,
                                   void*        user_data)
     {
-        value.set_object (GLib.File.new_for_uri (variant.get_string ()));
+        var uri = variant.get_string ();
+
+        if (uri != null) {
+            value.set_object (GLib.File.new_for_uri (uri));
+        }
+        else {
+            value.set_object (null);
+        }
 
         return true;
     }

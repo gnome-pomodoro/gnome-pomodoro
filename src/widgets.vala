@@ -601,7 +601,7 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
     private bool has_custom = false;
     private int n_bookmarks;
 
-    public void add_bookmark (string display_name, GLib.File file)
+    public void add_bookmark (string display_name, GLib.File? file)
     {
         this.model_add_bookmark (display_name, file);
     }
@@ -699,12 +699,11 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
 
     private void model_add_none ()
     {
-        this.add_bookmark (_("None"),
-                           File.new_for_uri (""));
+        this.add_bookmark (_("None"), null);
     }
 
-    private void model_add_bookmark (string    display_name,
-                                     GLib.File file)
+    private void model_add_bookmark (string     display_name,
+                                     GLib.File? file)
     {
         Gtk.TreeIter iter;
 
@@ -739,10 +738,18 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
         }
 
         this.model.insert (out iter, pos);
-        this.model.set (iter,
-                        Column.ROW_TYPE, RowType.BOOKMARK,
-                        Column.DISPLAY_NAME, display_name,
-                        Column.FILE, file);
+
+        if (file != null) {
+            this.model.set (iter,
+                            Column.ROW_TYPE, RowType.BOOKMARK,
+                            Column.DISPLAY_NAME, display_name,
+                            Column.FILE, file);
+        }
+        else {
+            this.model.set (iter,
+                            Column.ROW_TYPE, RowType.BOOKMARK,
+                            Column.DISPLAY_NAME, display_name);
+        }
 
         this.n_bookmarks += 1;
     }
@@ -946,7 +953,7 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
                 break;
 
             case Gtk.ResponseType.NONE:
-                this.file = File.new_for_uri ("");
+                this.file = null;
                 break;
 
             default:

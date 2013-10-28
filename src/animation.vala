@@ -133,7 +133,10 @@ public class Pomodoro.Animation : Object
 
     ~Animation ()
     {
-        this.destroy ();
+        if (this.timeout_id != 0) {
+            GLib.Source.remove (this.timeout_id);
+            this.timeout_id = 0;
+        }
     }
 
     public double compute_value (double progress)

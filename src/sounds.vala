@@ -28,36 +28,74 @@ namespace Pomodoro
         POMODORO_END = 2
     }
 
-    private const uint PLAYER_FADE_IN_TIME = 45000;
-    private const uint PLAYER_FADE_OUT_TIME = 30000;
+    private const uint PLAYER_FADE_IN_TIME = 25000;
+    private const uint PLAYER_FADE_OUT_TIME = 15000;
 
     /* As pomodoro is mostly a background app, we don't want interval time
      * to be too short
      */
-    private const uint PLAYER_FADE_INTERVAL = 800;
+    private const uint PLAYER_FADE_INTERVAL = 100;
 }
 
 
 public class Pomodoro.Player : Object
 {
     private double _volume = 0.5;
-
     public double volume {
         get {
             return this._volume;
         }
         set {
-            this.do_set_volume (value);
+            this._volume = value.clamp (0.0, 1.0);
+
+            this.update_volume ();
         }
     }
 
-    public File file { get; set; }
+    private double fade_value = 1.0;
+    private bool is_playing = false;
+
+    private File _file;
+    public File file {
+        get {
+            return this._file;
+        }
+        set {
+            Gst.State state;
+            Gst.State pending_state;
+
+            if (value != null && value.query_file_type (FileQueryInfoFlags.NONE) != FileType.REGULAR) {
+                value = null;
+            }
+
+            var uri = value != null ? value.get_uri () : "";
+
+            this._file = value;
+
+            this.pipeline.get_state (out state,
+                                     out pending_state,
+                                     Gst.CLOCK_TIME_NONE);
+
+            if (this.is_playing) {
+                this.pipeline.set_state (Gst.State.READY);
+            }
+
+            if (uri != "")
+            {
+                this.pipeline.set ("uri", uri);
+
+                if (this.is_playing) {
+                    this.pipeline.set_state (Gst.State.PLAYING);
+                }
+            }
+        }
+    }
+
     public bool repeat { get; set; default=false; }
 
     private Gst.Element pipeline;
     private Gst.Bus bus;
-    private Pomodoro.Animation fade_in_animation;
-    private Pomodoro.Animation fade_out_animation;
+    private Pomodoro.Animation fade_animation;
 
     construct
     {
@@ -71,6 +109,9 @@ public class Pomodoro.Player : Object
 
         this.bus = this.pipeline.get_bus ();
         this.bus.add_watch (this.bus_callback);
+
+        this.fade_animation = null;
+        this.fade_value = 0.0;
     }
 
     ~Player ()
@@ -79,23 +120,22 @@ public class Pomodoro.Player : Object
 
         this.pipeline = null;
         this.bus = null;
+        this.fade_animation = null;
     }
 
-    public void play (uint fade_duration = 0)
+    public void play ()
     {
-        var uri = this.file != null
-                  ? this.file.get_uri ()
-                  : null;
+        this.is_playing = true;
+
+        var uri = this.file != null ? this.file.get_uri () : "";
 
         if (uri != "") {
             this.pipeline.set ("uri", uri);
             this.pipeline.set_state (Gst.State.PLAYING);
-
-            this.fade_in (fade_duration);
         }
     }
 
-    public void stop (uint fade_duration = 0)
+    public void stop ()
     {
         Gst.State state;
         Gst.State pending_state;
@@ -104,82 +144,47 @@ public class Pomodoro.Player : Object
                                  out pending_state,
                                  Gst.CLOCK_TIME_NONE);
 
-        if (state != Gst.State.NULL && state != Gst.State.READY) {
-            this.fade_out (fade_duration);
-        }
-   }
-
-    private void update_volume () {
-        this.do_set_volume (this._volume);
-    }
-
-    private void fade_in (uint duration)
-    {
-        this.destroy_fade_in_animation ();
-
-        if (duration > 0)
-        {
-            this.fade_in_animation = new Animation (duration,
-                                                    AnimationMode.EASE_OUT);
-            this.fade_in_animation.interval = PLAYER_FADE_INTERVAL;
-            this.fade_in_animation.value = 0.0;
-            this.fade_in_animation.value_changed.connect (() => {
-                this.update_volume ();
-            });
-            this.fade_in_animation.completed.connect (() => {
-                this.destroy_fade_in_animation ();
-            });
-
-            this.fade_in_animation.animate_to (1.0);
-        }
-
-        this.pipeline.set_state (Gst.State.PLAYING);
-    }
-
-    private void fade_out (uint duration)
-    {
-        this.destroy_fade_out_animation ();
-
-        if (duration > 0)
-        {
-            this.fade_out_animation = new Animation (duration,
-                                                     AnimationMode.EASE_IN_OUT);
-            this.fade_out_animation.interval = PLAYER_FADE_INTERVAL;
-            this.fade_out_animation.duration = duration;
-            this.fade_out_animation.value = 1.0;
-            this.fade_out_animation.value_changed.connect (() => {
-                this.update_volume ();
-            });
-            this.fade_out_animation.completed.connect (() => {
-                this.pipeline.set_state (Gst.State.READY);
-                this.destroy_fade_out_animation ();
-                this.destroy_fade_in_animation ();
-            });
-
-            this.fade_out_animation.animate_to (0.0);
-        }
-        else
+        if (state != Gst.State.NULL && state != Gst.State.READY)
         {
             this.pipeline.set_state (Gst.State.READY);
-            this.destroy_fade_in_animation ();
+        }
+
+        this.is_playing = false;
+    }
+
+    public void fade (double value, AnimationMode mode, uint duration=0)
+    {
+        this.destroy_fade_animation ();
+
+        if (duration > 0 && this.is_playing)
+        {
+            this.fade_animation = new Animation (duration, mode);
+            this.fade_animation.interval = PLAYER_FADE_INTERVAL;
+            this.fade_animation.value = this.fade_value;
+
+            this.fade_animation.value_changed.connect (() => {
+                this.fade_value = this.fade_animation.value;
+                this.update_volume ();
+            });
+            this.fade_animation.completed.connect (() => {
+                this.destroy_fade_animation ();
+            });
+
+            this.fade_animation.animate_to (value);
+        }
+        else {
+            this.fade_value = value;
+            this.update_volume ();
         }
     }
 
-    private void do_set_volume (double volume)
+    private void update_volume ()
     {
-        this._volume = volume.clamp (0.0, 1.0);
+        var real_volume = this.volume * this.fade_value;
 
-        var real_volume = this._volume;
-
-        if (this.fade_in_animation != null) {
-            real_volume = real_volume * this.fade_in_animation.value;
+        if (this.pipeline != null) {
+            this.pipeline.set ("volume", real_volume.clamp (0.0, 1.0));
         }
-
-        if (this.fade_out_animation != null) {
-            real_volume = real_volume * this.fade_out_animation.value;
-        }
-
-        this.pipeline.set ("volume", real_volume);
     }
 
     private void do_repeat ()
@@ -201,6 +206,7 @@ public class Pomodoro.Player : Object
             case Gst.MessageType.EOS:
                 if (!this.repeat) {
                     this.pipeline.set_state (Gst.State.READY);
+                    this.is_playing = false;
                 }
                 break;
 
@@ -223,19 +229,12 @@ public class Pomodoro.Player : Object
         }
     }
 
-    private void destroy_fade_in_animation ()
+    private void destroy_fade_animation ()
     {
-        if (this.fade_in_animation != null) {
-            this.fade_in_animation.destroy ();
-            this.fade_in_animation = null;
-        }
-    }
-
-    private void destroy_fade_out_animation ()
-    {
-        if (this.fade_out_animation != null) {
-            this.fade_out_animation.destroy ();
-            this.fade_out_animation = null;
+        if (this.fade_animation != null)
+        {
+            this.fade_animation.destroy ();
+            this.fade_animation = null;
         }
     }
 }
@@ -300,7 +299,7 @@ public class Pomodoro.Sounds : Object
         this.unschedule_fade_out ();
 
         var remaining_time =
-            (uint) (this.timer.state_duration - this.timer.elapsed) * 1000;
+            (uint) ((this.timer.state_duration - this.timer.elapsed) * 1000);
 
         if (remaining_time > PLAYER_FADE_OUT_TIME) {
             this.fade_out_timeout_id = GLib.Timeout.add (
@@ -325,7 +324,6 @@ public class Pomodoro.Sounds : Object
         this.timer.state_changed.connect (this.on_state_changed);
         this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
         this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
-        this.timer.pomodoro_end.connect (this.on_pomodoro_end);
         this.timer.pomodoro_start.connect (this.on_pomodoro_start);
     }
 
@@ -337,8 +335,6 @@ public class Pomodoro.Sounds : Object
                   (void*) this.on_notify_pomodoro_end, (void*) this);
         SignalHandler.disconnect_by_func (this.timer,
                   (void*) this.on_notify_pomodoro_start, (void*) this);
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_pomodoro_end, (void*) this);
         SignalHandler.disconnect_by_func (this.timer,
                   (void*) this.on_pomodoro_start, (void*) this);
     }
@@ -380,6 +376,12 @@ public class Pomodoro.Sounds : Object
                                       Canberra.strerror (status));
                     }
                 }
+
+                break;
+
+            case "ticking-sound":
+                var file_path = this.get_file_path (key);
+                this.player.file = GLib.File.new_for_path (file_path);
 
                 break;
         }
@@ -567,6 +569,8 @@ public class Pomodoro.Sounds : Object
 
     private void on_state_duration_changed ()
     {
+        this.unschedule_fade_out ();
+
         if (this.timer.state == State.POMODORO) {
             this.schedule_fade_out ();
         }
@@ -574,21 +578,17 @@ public class Pomodoro.Sounds : Object
 
     private void on_pomodoro_start (bool is_requested)
     {
-        this.player.play (PLAYER_FADE_IN_TIME);
+        this.player.play ();
+        this.player.fade (1.0, AnimationMode.EASE_OUT, PLAYER_FADE_IN_TIME);
 
         this.schedule_fade_out ();
     }
 
-    private void on_pomodoro_end (bool is_completed)
-    {
-        this.unschedule_fade_out ();
-    }
-
     private bool on_fade_out_timeout ()
     {
-        this.unschedule_fade_out ();
+        this.player.fade (0.0, AnimationMode.EASE_IN_OUT, PLAYER_FADE_OUT_TIME);
 
-        this.player.stop (PLAYER_FADE_OUT_TIME);
+        this.unschedule_fade_out ();
 
         return false;
     }
