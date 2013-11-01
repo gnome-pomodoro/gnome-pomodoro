@@ -74,7 +74,7 @@ Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodor
 
 ### From extensions.gnome.org
 
-You can install older version via [extensions.gnome.org](https://extensions.gnome.org/extension/53/pomodoro/). We will maintain it until more packages are be available.
+You can install older version via [extensions.gnome.org](https://extensions.gnome.org/extension/53/pomodoro/). We will maintain it until more packages are available.
 
 
 ## Advanced settings
