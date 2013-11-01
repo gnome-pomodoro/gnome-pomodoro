@@ -34,13 +34,7 @@ You can read more on pomodoro technique [here](http://www.pomodorotechnique.com/
 
 ### From repositories
 
-**Archlinux**
-
-Get from [AUR](http://aur.archlinux.org/packages.php?ID=49967).
-
-**Gentoo**
-
-Available at Maciej's overlay [here](https://github.com/mgrela/dropzone/tree/master/gnome-extra/gnome-shell-extensions-pomodoro).
+Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodoro*.
 
 
 ### From source
