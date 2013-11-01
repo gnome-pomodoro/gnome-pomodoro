@@ -45,32 +45,42 @@ Available at Maciej's overlay [here](https://github.com/mgrela/dropzone/tree/mas
 
 ### From source
 
-1. You may need to install some tools and dependencies before building it
+1. Download the right version
 
-    On Ubuntu:
+   **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-extension-3.10) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-shell-extension-3.10#direct-from-source).
+
+   **For GNOME 3.8** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-3.8).
+
+   **For GNOME 3.6** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-extension-3.6) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-shell-extension-3.6#direct-from-source).
+
+   **For GNOME 3.4** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-extension-3.4) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-shell-extension-3.4#direct-from-source).
+
+2. You may need to install tools and dependencies before building it
+
+   **On Ubuntu:**
 
         sudo apt-get install gnome-common intltool valac libglib2.0-dev gobject-introspection libgirepository1.0-dev libgtk-3-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev libcanberra-dev libgdata-dev libgstreamer0.10-dev libupower-glib-dev fonts-droid
 
-    On Fedora:
+   **On Fedora:**
 
         sudo yum install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel clutter-gtk-devel gnome-desktop3-devel libcanberra-devel libgdata-devel gstreamer-devel upower-devel google-droid-sans-fonts
 
-2. Build it and install:
+3. Build it and install:
 
         ./autogen.sh --prefix=/usr
         make
         sudo make install
 
-3. Launch it, it should enable Pomodoro extension for GNOME Shell:
+4. Launch it:
 
         gnome-pomodoro
 
-4. If extension doesn't show up in top panel, restart GNOME Shell by hitting *Alt + F2* and typing *r* in command
+   It will enable GNOME Shell extension. A new indicator should show up in the top panel. If it doesn't, restart GNOME Shell by hitting *Alt + F2* and typing *r* in command.
 
 
 ### From extensions.gnome.org
 
-You can install older version via [extensions.gnome.org](https://extensions.gnome.org/extension/53/pomodoro/). We will maintain it until more packages will be available.
+You can install older version via [extensions.gnome.org](https://extensions.gnome.org/extension/53/pomodoro/). We will maintain it until more packages are be available.
 
 
 ## Advanced settings
