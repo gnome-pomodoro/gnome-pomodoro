@@ -86,6 +86,7 @@ const Indicator = new Lang.Class({
         this.menu.addMenuItem(this._timerToggle);
 
         /* Preferences */
+        this.menu.actor.add_style_class_name('extension-pomodoro-indicator');
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.menu.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
 

@@ -22,6 +22,10 @@
 .extension-pomodoro-toggle {
 }
 
+.extension-pomodoro-indicator.popup-menu {
+    min-width: 250px;
+}
+
 .extension-pomodoro-lightbox {
     background-color: black;
 }
