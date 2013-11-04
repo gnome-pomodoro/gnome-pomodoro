@@ -18,6 +18,10 @@
 .extension-pomodoro-label {
 }
 
+.extension-pomodoro-menu.popup-menu {
+    min-width: 300px;
+}
+
 .extension-pomodoro-lightbox {
     background-color: black;
 }

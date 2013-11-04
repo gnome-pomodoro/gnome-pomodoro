@@ -77,12 +77,8 @@ const Indicator = new Lang.Class({
         
         this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
-        
-        this.menu.connect('get-prefered-width', Lang.bind(this, function(actor, for_height, allocation) {
-            let [min_size, natural_size] = actor.get_prefered_width(for_height);
-            alloc.min_size = Math.max(min_size, 250);
-            alloc.natural_size = Math.max(min_size, natural_size);
-        }));
+
+        this.menu.actor.add_style_class_name('extension-pomodoro-menu');
         
         // Timer label
         this.label = new St.Label({ style_class: 'extension-pomodoro-label',
