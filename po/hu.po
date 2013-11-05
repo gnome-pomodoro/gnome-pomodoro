@@ -1,0 +1,219 @@
+# Hungarian translation for gnome-pomodoro
+# Copyright (c) 2012 gnome-pomodoro contributors
+# This file is distributed under the same license as the gnome-pomodoro package.
+# juanmah <juanmah@gmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-pomodoro\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-14 14:43+0200\n"
+"PO-Revision-Date: 2013-10-29 15:14+0100\n"
+"Last-Translator: Róbert Nagy <onlyhuman83@gmail.com>\n"
+"Language-Team: hu <>\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Poedit-Language: Hungarian\n"
+"X-Poedit-Country: HUNGARY\n"
+
+#: ../src/extension.js:57
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d perc"
+msgstr[1] "%d perc"
+
+#. Toggle timer state button
+#: ../src/extension.js:86
+#: ../src/notification.js:76
+msgid "Pomodoro Timer"
+msgstr "Pomodoro időzítő"
+
+#. Options SubMenu
+#: ../src/extension.js:99
+msgid "Options"
+msgstr "Opciók"
+
+#. Reset counters
+#: ../src/extension.js:122
+msgid "Reset Counts and Timer"
+msgstr "A számláló és az időzítő nullázása"
+
+#. Away from desk toggle
+#: ../src/extension.js:127
+msgid "Away From Desk"
+msgstr "Távol az asztaltól"
+
+#. Presence status toggle
+#: ../src/extension.js:134
+msgid "Control Presence Status"
+msgstr "Jelenléti státusz irányítása"
+
+#. Notification dialog toggle
+#: ../src/extension.js:141
+msgid "Fullscreen Notifications"
+msgstr "Teljesképernyős értesítések"
+
+#. Notify with a sound toggle
+#: ../src/extension.js:148
+msgid "Sound Notifications"
+msgstr "Hang értesítések"
+
+#. Pomodoro duration
+#: ../src/extension.js:155
+msgid "Pomodoro Duration"
+msgstr "Pomodoro időtartam"
+
+#. Short pause duration
+#: ../src/extension.js:168
+msgid "Short Break Duration"
+msgstr "Rövid szünet időtartam"
+
+#. Long pause duration
+#: ../src/extension.js:189
+msgid "Long Break Duration"
+msgstr "Hosszú szünet időtartam"
+
+#: ../src/extension.js:307
+msgid "No Completed Sessions"
+msgstr "Nincs befejezett periódus"
+
+#: ../src/extension.js:309
+#, c-format
+msgid "%d Completed Session"
+msgid_plural "%d Completed Sessions"
+msgstr[0] "%d befejezett periódus"
+msgstr[1] "%d befejezett periódus"
+
+#: ../src/timer.js:422
+msgid "Pause finished."
+msgstr "A szünet véget ért."
+
+#: ../src/timer.js:423
+msgid "A new pomodoro is starting."
+msgstr "Egy új pomodoro kezdődik!"
+
+#: ../src/timer.js:440
+msgid "It's time to take a break!"
+msgstr "Ideje szünetet tartani!"
+
+#: ../src/timer.js:462
+msgid "Take a break!"
+msgstr "Tartson szünetet!"
+
+#: ../src/timer.js:465
+msgid "Start a new pomodoro"
+msgstr "Egy új pomodoro kezdése"
+
+#: ../src/timer.js:543
+msgid "Hey, you're missing out on a break."
+msgstr "Hé, épp most hagysz ki egy szünetet!"
+
+#: ../src/timer.js:656
+#, c-format
+msgid "You have %d second left.\n"
+msgid_plural "You have %d seconds left.\n"
+msgstr[0] "%d másodperc van hátra\n"
+msgstr[1] "%d másodperc van hátra\n"
+
+#: ../src/timer.js:658
+#, c-format
+msgid "You have %d minute left.\n"
+msgid_plural "You have %d minutes left.\n"
+msgstr[0] "%d perc van hátra\n"
+msgstr[1] "%d perc van hátra\n"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
+msgid "Pomodoro duration"
+msgstr "Pomodoro időtartam"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:2
+msgid "Time in seconds you are supposed to be working."
+msgstr "Ennyi másodperce kellene dolgozni."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:3
+msgid "Short pause duration"
+msgstr "Rövid szünet időtartam"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:4
+msgid "Time in seconds you are supposed to have a short break."
+msgstr "Ennyi másodperce kellene rövid szünetet tartani."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:5
+msgid "Long pause duration"
+msgstr "Hosszú szünet időtartam"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:6
+msgid "Time in seconds you are supposed to have a longer break."
+msgstr "Ennyi másodperce kellene hosszú szünetet tartani."
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:7
+msgid "Show dialog notifications during breaks"
+msgstr "Értesítések mutatása a szünetek alatt"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:8
+msgid "Whether to show a notification dialog when pause starts."
+msgstr "Értesítési ablak mutatása amikor a szünet kezdődik"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:9
+msgid "Disable flexible breaks"
+msgstr "Flexibilis szünetek letiltása"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:10
+#, fuzzy
+msgid "Whether you are not using a computer to work."
+msgstr "Nem használja a számítógépet munkára"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:11
+msgid "Change user presence status to busy"
+msgstr "Jelenléti státuszod módosítása elfoglaltra"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:12
+msgid "Whether to change user and IM presence to busy."
+msgstr "A felhasználó- és a jelenléti státusz módosítása elfoglaltra"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:13
+msgid "Use notification sound"
+msgstr "Értesítési hangok használata"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:14
+msgid "Whether to play a sound to notify of events."
+msgstr "Hang lejátszása az éresítések során"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:15
+msgid "Notification sound file"
+msgstr "Értesítési hang fájl"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:16
+msgid "Sound file to play on pomodoro start or end."
+msgstr "Hang fájl amit lejátszunk a pomodoro kezdetén és végén"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:17
+msgid "Restore timer state"
+msgstr "Időzítő visszaállítása"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:18
+msgid "Whether to restore state on startup."
+msgstr "A mentett állapot visszaállítása induláskor"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:19
+msgid "Number of completed sessions"
+msgstr "Befejezett periódusok száma"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:20
+msgid "Number of completed sessions since long break"
+msgstr "A befejezett periódusok száma a hosszú szünet óta"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:21
+#, fuzzy
+msgid "Saved timer state"
+msgstr "A mentett időzítő állapota"
+
+#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:22
+#, fuzzy
+msgid "Time of saved state"
+msgstr "A mentés ideje"
+
