@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-09 22:18+0200\n"
+"POT-Creation-Date: 2013-11-05 23:18+0100\n"
 "PO-Revision-Date: 2012-03-19 10:56+0100\n"
 "Last-Translator: Jakub Veverka\n"
 "Language-Team:  <>\n"
@@ -17,212 +17,376 @@ msgstr ""
 "Content-Transfer-Encoding: 8bits\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: ../src/extension.js:57
+#. Toggle timer state button
+#: ../extension/indicator.js:84
+msgid "Pomodoro Timer"
+msgstr "Časovač Pomodoro"
+
+#: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
+msgid "Preferences"
+msgstr ""
+
+#: ../extension/notifications.js:115 ../src/about-dialog.vala:30
+#: ../data/gnome-pomodoro.desktop.in.h:1
+#, fuzzy
+msgid "Pomodoro"
+msgstr "Časovač Pomodoro"
+
+#: ../extension/notifications.js:390
+#, fuzzy
+msgid "It's time to take a break"
+msgstr "Čas udělat si přestávku!"
+
+#: ../extension/notifications.js:575
+#, fuzzy
+msgid "A new pomodoro is starting"
+msgstr "Konec pauzy, nové pomodoro začíná."
+
+#: ../extension/notifications.js:588
+msgid "Take a break!"
+msgstr "Dej si pauzu!"
+
+#: ../extension/notifications.js:602
+#, fuzzy
+msgid "Start pomodoro"
+msgstr "Začni nové pomodoro"
+
+#: ../extension/notifications.js:644
+msgid "Shorten the break"
+msgstr ""
+
+#: ../extension/notifications.js:650
+msgid "Lengthen the break"
+msgstr ""
+
+#: ../extension/notifications.js:664
+#, fuzzy, c-format
+msgid "You have %d second left"
+msgid_plural "You have %d seconds left"
+msgstr[0] "Dej si pauzu, máš %d vteřinu.\n"
+msgstr[1] "Dej si pauzu, máš %d vteřin.\n"
+
+#: ../extension/notifications.js:666
+#, fuzzy, c-format
+msgid "You have %d minute left"
+msgid_plural "You have %d minutes left"
+msgstr[0] "Dej si pauzu, máš %d minutu.\n"
+msgstr[1] "Dej si pauzu, máš %d minut.\n"
+
+#: ../extension/notifications.js:685
+#, fuzzy
+msgid "Hey, you're missing out on a break"
+msgstr "Hej, dejte si pauzu."
+
+#: ../extension/notifications.js:764
+msgid "Could not run pomodoro"
+msgstr ""
+
+#: ../extension/notifications.js:766
+msgid "Something went badly wrong..."
+msgstr ""
+
+#: ../extension/notifications.js:767
+msgid "Looks like gnome-pomodoro is not installed"
+msgstr ""
+
+#: ../extension/notifications.js:776
+msgid "Report issue"
+msgstr ""
+
+#: ../extension/notifications.js:779
+msgid "Install"
+msgstr ""
+
+#: ../src/about-dialog.vala:29
+msgid "About Pomodoro"
+msgstr ""
+
+#: ../src/about-dialog.vala:31
+msgid "A simple time management utility"
+msgstr ""
+
+#: ../src/about-dialog.vala:39
+msgid "translator-credits"
+msgstr ""
+
+#: ../src/about-dialog.vala:45
+msgid ""
+"This program is free software: you can  redistribute it and/or modify it "
+"under the terms of the GNU General Public License as published by the Free "
+"Software Foundation; either version 3 of the License, or (at your option) "
+"any later version."
+msgstr ""
+
+#: ../src/preferences-dialog.vala:306
+msgid "Timer"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:358
+msgid "Pomodoro duration"
+msgstr "Trvání pomodora"
+
+#: ../src/preferences-dialog.vala:361
+#, fuzzy
+msgid "Short break duration"
+msgstr "Krátká pauza"
+
+#: ../src/preferences-dialog.vala:364
+#, fuzzy
+msgid "Long break duration"
+msgstr "Dlouhá pauza"
+
+#: ../src/preferences-dialog.vala:371
+#, fuzzy
+msgid "Shortcut to toggle the timer"
+msgstr "Tlačítko na nastavení časovače"
+
+#: ../src/preferences-dialog.vala:374
+#, fuzzy
+msgid "Select ticking sound"
+msgstr "Používej notifikační zvuky"
+
+#: ../src/preferences-dialog.vala:379
+msgid "Ticking sound"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:401
+#, fuzzy
+msgid "Notifications"
+msgstr "Zvukové notifikace"
+
+#: ../src/preferences-dialog.vala:405
+#, fuzzy
+msgid "Screen notifications"
+msgstr "Ukaž dialogové zprávy"
+
+#: ../src/preferences-dialog.vala:410
+#, fuzzy
+msgid "Remind to take a break"
+msgstr "Čas udělat si přestávku!"
+
+#: ../src/preferences-dialog.vala:428
+msgid "Loud bell"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:432
+msgid "Bell"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:440
+msgid "Select sound for start of break"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:451
+msgid "Start of break sound"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:455
+#, fuzzy
+msgid "Select sound for pomodoro start"
+msgstr "Zvukový soubor pro přehrání při startu a konci."
+
+#: ../src/preferences-dialog.vala:465
+#, fuzzy
+msgid "Pomodoro start sound"
+msgstr "Trvání pomodora"
+
+#: ../src/preferences-dialog.vala:497
+msgid "Available"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:498
+msgid "Busy"
+msgstr ""
+
+#. Currently gnome-shell does not handle invisible status properly
+#: ../src/preferences-dialog.vala:501
+msgid "Invisible"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:517
+msgid "Presence"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:521
+msgid "Postpone pomodoro when idle"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:528
+#, fuzzy
+msgid "Status during pomodoro"
+msgstr "Začni nové pomodoro"
+
+#: ../src/preferences-dialog.vala:559
+#, fuzzy
+msgid "Status during break"
+msgstr "Ukazuj dialogové notifikace během přestávek"
+
+#: ../src/preferences-dialog.vala:614
+msgid ""
+"System notifications including chat messages will be disabled during "
+"pomodoro."
+msgstr ""
+
+#: ../src/preferences-dialog.vala:618
+msgid ""
+"System notifications including chat messages will be disabled during break."
+msgstr ""
+
+#: ../src/preferences-dialog.vala:622
+#, fuzzy
+msgid "System notifications including chat messages will be disabled."
+msgstr "Změň online stav a vypni notifikace včetně IMchat"
+
+#: ../src/utils.vala:92
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: ../src/utils.vala:101
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minut"
 msgstr[1] "%d minut"
 
-#. Toggle timer state button
-#: ../src/extension.js:86 ../src/notification.js:76
-msgid "Pomodoro Timer"
-msgstr "Časovač Pomodoro"
+#: ../src/widgets.vala:327
+msgid "Disabled"
+msgstr ""
 
-#. Options SubMenu
-#: ../src/extension.js:99
-msgid "Options"
-msgstr "Možnosti"
-
-#. Reset counters
-#: ../src/extension.js:122
-msgid "Reset Counts and Timer"
-msgstr "Vynulovat cykly a časovač"
-
-#. Away from desk toggle
-#: ../src/extension.js:127
-msgid "Away From Desk"
-msgstr "Nepřítomen"
-
-#. Presence status toggle
-#: ../src/extension.js:134
-msgid "Control Presence Status"
-msgstr "Zkontroluj stav dostupnosti"
-
-#. Notification dialog toggle
-#: ../src/extension.js:141
-msgid "Fullscreen Notifications"
-msgstr "Ukaž dialogové zprávy"
-
-#. Notify with a sound toggle
-#: ../src/extension.js:148
-msgid "Sound Notifications"
-msgstr "Zvukové notifikace"
-
-#. Pomodoro duration
-#: ../src/extension.js:155
-msgid "Pomodoro Duration"
-msgstr "Trvání pomodora"
-
-#. Short pause duration
-#: ../src/extension.js:168
-msgid "Short Break Duration"
-msgstr "Krátká pauza"
-
-#. Long pause duration
-#: ../src/extension.js:189
-msgid "Long Break Duration"
-msgstr "Dlouhá pauza"
-
-#: ../src/extension.js:307
-msgid "No Completed Sessions"
-msgstr "Žádný kompletní cyklus"
-
-#: ../src/extension.js:309
+#: ../src/widgets.vala:384
 #, c-format
-msgid "%d Completed Session"
-msgid_plural "%d Completed Sessions"
-msgstr[0] "%d kompletní cyklus"
-msgstr[1] "%d kompletních cyklů"
+msgid ""
+"The shortcut \"%s\" cannot be used because it will become impossible to type "
+"using this key.\n"
+"Please try with a key such as Control, Alt or Shift at the same time."
+msgstr ""
 
-#: ../src/timer.js:422
-msgid "Pause finished."
-msgstr "Konec pauzy."
+#: ../src/widgets.vala:492
+msgid "_No sound"
+msgstr ""
 
-#: ../src/timer.js:423
-#, fuzzy
-msgid "A new pomodoro is starting."
-msgstr "Konec pauzy, nové pomodoro začíná."
+#: ../src/widgets.vala:494
+msgid "_Cancel"
+msgstr ""
 
-#: ../src/timer.js:440
-#, fuzzy
-msgid "It's time to take a break!"
-msgstr "Čas udělat si přestávku!"
+#: ../src/widgets.vala:496
+msgid "_Open"
+msgstr ""
 
-#: ../src/timer.js:462
-msgid "Take a break!"
-msgstr "Dej si pauzu!"
+#: ../src/widgets.vala:503
+msgid "Select a file"
+msgstr ""
 
-#: ../src/timer.js:465
-msgid "Start a new pomodoro"
-msgstr "Začni nové pomodoro"
+#: ../src/widgets.vala:563
+msgid "All files"
+msgstr ""
 
-#: ../src/timer.js:543
-#, fuzzy
-msgid "Hey, you're missing out on a break."
-msgstr "Hej, dejte si pauzu."
+#: ../src/widgets.vala:691
+msgid "Other…"
+msgstr ""
 
-#: ../src/timer.js:656
-#, fuzzy, c-format
-msgid "You have %d second left.\n"
-msgid_plural "You have %d seconds left.\n"
-msgstr[0] "Dej si pauzu, máš %d vteřinu.\n"
-msgstr[1] "Dej si pauzu, máš %d vteřin.\n"
+#: ../src/widgets.vala:702
+msgid "None"
+msgstr ""
 
-#: ../src/timer.js:658
-#, fuzzy, c-format
-msgid "You have %d minute left.\n"
-msgid_plural "You have %d minutes left.\n"
-msgstr[0] "Dej si pauzu, máš %d minutu.\n"
-msgstr[1] "Dej si pauzu, máš %d minut.\n"
+#: ../src/widgets.vala:1004 ../src/widgets.vala:1013
+msgid "Supported audio files"
+msgstr ""
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
-msgid "Pomodoro duration"
-msgstr "Trvání pomodora"
+#: ../data/gnome-pomodoro.desktop.in.h:2
+msgid "Manage your time and tasks"
+msgstr ""
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:2
-msgid "Time in seconds you are supposed to be working."
-msgstr "Délka pracovní doby ve vteřinách."
+#: ../data/gnome-pomodoro.desktop.in.h:3
+msgid "time;timer;tasks;manage;organize;"
+msgstr ""
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:3
-msgid "Short pause duration"
-msgstr "Trvání krátké pauzy"
+#~ msgid "Options"
+#~ msgstr "Možnosti"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:4
-msgid "Time in seconds you are supposed to have a short break."
-msgstr "Délka krátké pauzy ve vteřinách."
+#~ msgid "Reset Counts and Timer"
+#~ msgstr "Vynulovat cykly a časovač"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:5
-msgid "Long pause duration"
-msgstr "Trvání dlouhé pauzy"
+#~ msgid "Away From Desk"
+#~ msgstr "Nepřítomen"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:6
-msgid "Time in seconds you are supposed to have a longer break."
-msgstr "Délka dlouhé pauzy ve vteřinách."
+#~ msgid "Control Presence Status"
+#~ msgstr "Zkontroluj stav dostupnosti"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:7
-msgid "Show dialog notifications during breaks"
-msgstr "Ukazuj dialogové notifikace během přestávek"
+#~ msgid "No Completed Sessions"
+#~ msgstr "Žádný kompletní cyklus"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:8
-msgid "Whether to show a notification dialog when pause starts."
-msgstr "Jestli ukazovat notifikační dialog když začíná pauza."
+#~ msgid "%d Completed Session"
+#~ msgid_plural "%d Completed Sessions"
+#~ msgstr[0] "%d kompletní cyklus"
+#~ msgstr[1] "%d kompletních cyklů"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:9
-msgid "Disable flexible breaks"
-msgstr "Zakaž upravitelné pauzy"
+#~ msgid "Pause finished."
+#~ msgstr "Konec pauzy."
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:10
-msgid "Whether you are not using a computer to work."
-msgstr "Jestli nepoužíváš k práci počítač."
+#~ msgid "Time in seconds you are supposed to be working."
+#~ msgstr "Délka pracovní doby ve vteřinách."
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:11
-msgid "Change user presence status to busy"
-msgstr "Změň status uživatele na zaneprázdněn"
+#~ msgid "Short pause duration"
+#~ msgstr "Trvání krátké pauzy"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:12
-msgid "Whether to change user and IM presence to busy."
-msgstr "Zdali změnit status uživatele a IM na zaneprázdněn."
+#~ msgid "Time in seconds you are supposed to have a short break."
+#~ msgstr "Délka krátké pauzy ve vteřinách."
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:13
-msgid "Use notification sound"
-msgstr "Používej notifikační zvuky"
+#~ msgid "Long pause duration"
+#~ msgstr "Trvání dlouhé pauzy"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:14
-msgid "Whether to play a sound to notify of events."
-msgstr "Zdali přehrát zvuk při notifikaci události."
+#~ msgid "Time in seconds you are supposed to have a longer break."
+#~ msgstr "Délka dlouhé pauzy ve vteřinách."
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:15
-msgid "Notification sound file"
-msgstr "Zvukový soubor pro notifikaci"
+#~ msgid "Whether to show a notification dialog when pause starts."
+#~ msgstr "Jestli ukazovat notifikační dialog když začíná pauza."
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:16
-msgid "Sound file to play on pomodoro start or end."
-msgstr "Zvukový soubor pro přehrání při startu a konci."
+#~ msgid "Disable flexible breaks"
+#~ msgstr "Zakaž upravitelné pauzy"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:17
-msgid "Restore timer state"
-msgstr "Obnovit stav časovače"
+#~ msgid "Whether you are not using a computer to work."
+#~ msgstr "Jestli nepoužíváš k práci počítač."
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:18
-msgid "Whether to restore state on startup."
-msgstr "Jestli obnovit stav při startu."
+#~ msgid "Change user presence status to busy"
+#~ msgstr "Změň status uživatele na zaneprázdněn"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:19
-msgid "Number of completed sessions"
-msgstr "Počet kompletních cyklů"
+#~ msgid "Whether to change user and IM presence to busy."
+#~ msgstr "Zdali změnit status uživatele a IM na zaneprázdněn."
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:20
-msgid "Number of completed sessions since long break"
-msgstr "Počet kompletních cyklů od dlouhé pauzy"
+#~ msgid "Whether to play a sound to notify of events."
+#~ msgstr "Zdali přehrát zvuk při notifikaci události."
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:21
-msgid "Saved timer state"
-msgstr "Uložený stav časovače"
+#~ msgid "Notification sound file"
+#~ msgstr "Zvukový soubor pro notifikaci"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:22
-msgid "Time of saved state"
-msgstr "Ćas uloženého stavu"
+#~ msgid "Restore timer state"
+#~ msgstr "Obnovit stav časovače"
+
+#~ msgid "Whether to restore state on startup."
+#~ msgstr "Jestli obnovit stav při startu."
+
+#~ msgid "Number of completed sessions"
+#~ msgstr "Počet kompletních cyklů"
+
+#~ msgid "Number of completed sessions since long break"
+#~ msgstr "Počet kompletních cyklů od dlouhé pauzy"
+
+#~ msgid "Saved timer state"
+#~ msgstr "Uložený stav časovače"
+
+#~ msgid "Time of saved state"
+#~ msgstr "Ćas uloženého stavu"
 
 #~ msgid "Click to reset session counts to zero"
 #~ msgstr "Klikni pro vynulování cyklů"
 
 #~ msgid "Set optimal settings for doing paperwork"
 #~ msgstr "Nastav optimální čas pro papírování"
-
-#~ msgid ""
-#~ "Change online status and disable notifications including chat messages"
-#~ msgstr "Změň online stav a vypni notifikace včetně IMchat"
 
 #~ msgid "Show a dialog message at the end of pomodoro session"
 #~ msgstr "Ukaž dialogové zprávy na konci pomodora"
@@ -241,6 +405,3 @@ msgstr "Ćas uloženého stavu"
 
 #~ msgid "Timer toggle key"
 #~ msgstr "Přepínací tlačítko časovače"
-
-#~ msgid "Key to toggle the timer."
-#~ msgstr "Tlačítko na nastavení časovače"

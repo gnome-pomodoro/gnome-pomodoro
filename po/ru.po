@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-18 16:22+0100\n"
+"POT-Creation-Date: 2013-11-05 23:18+0100\n"
 "PO-Revision-Date: 2013-06-03 12:11+0200\n"
 "Last-Translator: liberumed <liberumed@gmail.com>\n"
 "Language-Team: ru <>\n"
@@ -15,9 +15,238 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bits\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../src/extension.js:61
+#. Toggle timer state button
+#: ../extension/indicator.js:84
+msgid "Pomodoro Timer"
+msgstr "Помодоро Таймер"
+
+#: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
+msgid "Preferences"
+msgstr ""
+
+#: ../extension/notifications.js:115 ../src/about-dialog.vala:30
+#: ../data/gnome-pomodoro.desktop.in.h:1
+#, fuzzy
+msgid "Pomodoro"
+msgstr "Помодоро Таймер"
+
+#: ../extension/notifications.js:390
+msgid "It's time to take a break"
+msgstr ""
+
+#: ../extension/notifications.js:575
+#, fuzzy
+msgid "A new pomodoro is starting"
+msgstr "Пауза завершена, начало нового помодоро!"
+
+#: ../extension/notifications.js:588
+msgid "Take a break!"
+msgstr ""
+
+#: ../extension/notifications.js:602
+#, fuzzy
+msgid "Start pomodoro"
+msgstr "Начать новый помодоро"
+
+#: ../extension/notifications.js:644
+msgid "Shorten the break"
+msgstr ""
+
+#: ../extension/notifications.js:650
+msgid "Lengthen the break"
+msgstr ""
+
+#: ../extension/notifications.js:664
+#, fuzzy, c-format
+msgid "You have %d second left"
+msgid_plural "You have %d seconds left"
+msgstr[0] "Сделайте перерыв, у Вас %d секунда\n"
+msgstr[1] "Сделайте перерыв, у Вас %d секунды\n"
+msgstr[2] "Сделайте перерыв, у Вас %d секунд\n"
+
+#: ../extension/notifications.js:666
+#, fuzzy, c-format
+msgid "You have %d minute left"
+msgid_plural "You have %d minutes left"
+msgstr[0] "Сделайте перерыв, у Вас %d минута\n"
+msgstr[1] "Сделайте перерыв, у Вас %d минуты\n"
+msgstr[2] "Сделайте перерыв, у Вас %d минут\n"
+
+#: ../extension/notifications.js:685
+msgid "Hey, you're missing out on a break"
+msgstr ""
+
+#: ../extension/notifications.js:764
+msgid "Could not run pomodoro"
+msgstr ""
+
+#: ../extension/notifications.js:766
+msgid "Something went badly wrong..."
+msgstr ""
+
+#: ../extension/notifications.js:767
+msgid "Looks like gnome-pomodoro is not installed"
+msgstr ""
+
+#: ../extension/notifications.js:776
+msgid "Report issue"
+msgstr ""
+
+#: ../extension/notifications.js:779
+msgid "Install"
+msgstr ""
+
+#: ../src/about-dialog.vala:29
+msgid "About Pomodoro"
+msgstr ""
+
+#: ../src/about-dialog.vala:31
+msgid "A simple time management utility"
+msgstr ""
+
+#: ../src/about-dialog.vala:39
+msgid "translator-credits"
+msgstr ""
+
+#: ../src/about-dialog.vala:45
+msgid ""
+"This program is free software: you can  redistribute it and/or modify it "
+"under the terms of the GNU General Public License as published by the Free "
+"Software Foundation; either version 3 of the License, or (at your option) "
+"any later version."
+msgstr ""
+
+#: ../src/preferences-dialog.vala:306
+msgid "Timer"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:358
+msgid "Pomodoro duration"
+msgstr "Длительность Помодоро"
+
+#: ../src/preferences-dialog.vala:361
+#, fuzzy
+msgid "Short break duration"
+msgstr "Длительность Короткого Перерыва"
+
+#: ../src/preferences-dialog.vala:364
+#, fuzzy
+msgid "Long break duration"
+msgstr "Длительность Большого Перерыва"
+
+#: ../src/preferences-dialog.vala:371
+#, fuzzy
+msgid "Shortcut to toggle the timer"
+msgstr "Кнопка для запуска и остановки таймера"
+
+#: ../src/preferences-dialog.vala:374
+#, fuzzy
+msgid "Select ticking sound"
+msgstr "Использовать звуковое уведомление"
+
+#: ../src/preferences-dialog.vala:379
+msgid "Ticking sound"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:401
+#, fuzzy
+msgid "Notifications"
+msgstr "Звуковые Уведомления"
+
+#: ../src/preferences-dialog.vala:405
+#, fuzzy
+msgid "Screen notifications"
+msgstr "Звуковые Уведомления"
+
+#: ../src/preferences-dialog.vala:410
+msgid "Remind to take a break"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:428
+msgid "Loud bell"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:432
+msgid "Bell"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:440
+msgid "Select sound for start of break"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:451
+msgid "Start of break sound"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:455
+#, fuzzy
+msgid "Select sound for pomodoro start"
+msgstr "Звуковой файл для проигрывания при старте или завершении помодоро"
+
+#: ../src/preferences-dialog.vala:465
+#, fuzzy
+msgid "Pomodoro start sound"
+msgstr "Длительность Помодоро"
+
+#: ../src/preferences-dialog.vala:497
+msgid "Available"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:498
+msgid "Busy"
+msgstr ""
+
+#. Currently gnome-shell does not handle invisible status properly
+#: ../src/preferences-dialog.vala:501
+msgid "Invisible"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:517
+msgid "Presence"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:521
+msgid "Postpone pomodoro when idle"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:528
+#, fuzzy
+msgid "Status during pomodoro"
+msgstr "Начать новый помодоро"
+
+#: ../src/preferences-dialog.vala:559
+#, fuzzy
+msgid "Status during break"
+msgstr "Показывать сообщения во время перерыва"
+
+#: ../src/preferences-dialog.vala:614
+msgid ""
+"System notifications including chat messages will be disabled during "
+"pomodoro."
+msgstr ""
+
+#: ../src/preferences-dialog.vala:618
+msgid ""
+"System notifications including chat messages will be disabled during break."
+msgstr ""
+
+#: ../src/preferences-dialog.vala:622
+#, fuzzy
+msgid "System notifications including chat messages will be disabled."
+msgstr "Изменить онлайн статус и отключить уведомления, включая сообщения чата"
+
+#: ../src/utils.vala:92
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: ../src/utils.vala:101
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
@@ -25,217 +254,156 @@ msgstr[0] "%d минута"
 msgstr[1] "%d минуты"
 msgstr[2] "%d минут"
 
-#. Toggle timer state button
-#: ../src/extension.js:96 ../src/notification.js:54
-msgid "Pomodoro Timer"
-msgstr "Помодоро Таймер"
-
-#. Options SubMenu
-#: ../src/extension.js:109
-msgid "Options"
-msgstr "Параметры"
-
-#. Reset counters
-#: ../src/extension.js:132
-msgid "Reset Counts and Timer"
-msgstr "Сбросить Счётчик и Таймер"
-
-#: ../src/extension.js:133
-msgid "Click to reset session counts to zero"
-msgstr "Нажмите, чтобы сбросить счётчик на ноль"
-
-#. Away from desk toggle
-#: ../src/extension.js:138
-msgid "Away From Desk"
-msgstr "Удаленный Режим"
-
-#: ../src/extension.js:139
-msgid "Set optimal settings for doing paperwork"
-msgstr "Настройки для работы с бумагами"
-
-#. Presence status toggle
-#: ../src/extension.js:146
-msgid "Control Presence Status"
-msgstr "Управление Статусом Присутствия"
-
-#: ../src/extension.js:147
-msgid "Change online status and disable notifications including chat messages"
+#: ../src/widgets.vala:327
+msgid "Disabled"
 msgstr ""
-"Изменить онлайн статус и отключить уведомления, включая сообщения чата"
 
-#. Notification dialog toggle
-#: ../src/extension.js:154
-msgid "Show Dialog Messages"
-msgstr "Показывать Уведомления"
-
-#: ../src/extension.js:155
-msgid "Show a dialog message at the end of pomodoro session"
-msgstr "Показывать уведомления в конце помодоро сессии"
-
-#. Notify with a sound toggle
-#: ../src/extension.js:162
-msgid "Sound Notifications"
-msgstr "Звуковые Уведомления"
-
-#: ../src/extension.js:163
-msgid "Play a sound at start of pomodoro session"
-msgstr "Проигрывать звук в начале помодоро сессии"
-
-#. Pomodoro duration
-#: ../src/extension.js:170
-msgid "Pomodoro Duration"
-msgstr "Длительность Помодоро"
-
-#. Short pause duration
-#: ../src/extension.js:183
-msgid "Short Break Duration"
-msgstr "Длительность Короткого Перерыва"
-
-#. Long pause duration
-#: ../src/extension.js:204
-msgid "Long Break Duration"
-msgstr "Длительность Большого Перерыва"
-
-#: ../src/extension.js:322
-msgid "No Completed Sessions"
-msgstr "Нет Завершенных Сессий"
-
-#: ../src/extension.js:324
+#: ../src/widgets.vala:384
 #, c-format
-msgid "%d Completed Session"
-msgid_plural "%d Completed Sessions"
-msgstr[0] "%d Завершенная Сессия"
-msgstr[1] "%d Завершенные Сессии"
-msgstr[2] "%d Завершенных Сессий"
+msgid ""
+"The shortcut \"%s\" cannot be used because it will become impossible to type "
+"using this key.\n"
+"Please try with a key such as Control, Alt or Shift at the same time."
+msgstr ""
 
-#: ../src/timer.js:411
-msgid "Pause finished, a new pomodoro is starting!"
-msgstr "Пауза завершена, начало нового помодоро!"
+#: ../src/widgets.vala:492
+msgid "_No sound"
+msgstr ""
 
-#: ../src/timer.js:433
-msgid "Pomodoro Finished!"
-msgstr "Помодоро Завершен!"
+#: ../src/widgets.vala:494
+msgid "_Cancel"
+msgstr ""
 
-#: ../src/timer.js:435
-msgid "Hide"
-msgstr "Спрятать"
+#: ../src/widgets.vala:496
+msgid "_Open"
+msgstr ""
 
-#: ../src/timer.js:441 ../src/timer.js:451
-msgid "Start a new pomodoro"
-msgstr "Начать новый помодоро"
+#: ../src/widgets.vala:503
+msgid "Select a file"
+msgstr ""
 
-#: ../src/timer.js:446
-msgid "Show dialog"
-msgstr "Показать сообщение"
+#: ../src/widgets.vala:563
+msgid "All files"
+msgstr ""
 
-#: ../src/timer.js:514
-#, c-format
-msgid "Take a break, you have %d second\n"
-msgid_plural "Take a break, you have %d seconds\n"
-msgstr[0] "Сделайте перерыв, у Вас %d секунда\n"
-msgstr[1] "Сделайте перерыв, у Вас %d секунды\n"
-msgstr[2] "Сделайте перерыв, у Вас %d секунд\n"
+#: ../src/widgets.vala:691
+msgid "Other…"
+msgstr ""
 
-#: ../src/timer.js:516
-#, c-format
-msgid "Take a break, you have %d minute\n"
-msgid_plural "Take a break, you have %d minutes\n"
-msgstr[0] "Сделайте перерыв, у Вас %d минута\n"
-msgstr[1] "Сделайте перерыв, у Вас %d минуты\n"
-msgstr[2] "Сделайте перерыв, у Вас %d минут\n"
+#: ../src/widgets.vala:702
+msgid "None"
+msgstr ""
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:1
-msgid "Timer toggle key"
-msgstr "Кнопка запуска таймера"
+#: ../src/widgets.vala:1004 ../src/widgets.vala:1013
+msgid "Supported audio files"
+msgstr ""
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:2
-msgid "Key to toggle the timer."
-msgstr "Кнопка для запуска и остановки таймера"
+#: ../data/gnome-pomodoro.desktop.in.h:2
+msgid "Manage your time and tasks"
+msgstr ""
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:3
-msgid "Pomodoro duration"
-msgstr "Длительность Помодоро"
+#: ../data/gnome-pomodoro.desktop.in.h:3
+msgid "time;timer;tasks;manage;organize;"
+msgstr ""
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:4
-msgid "Time in seconds you are supposed to be working."
-msgstr "Время в секундах отведенное для работы"
+#~ msgid "Options"
+#~ msgstr "Параметры"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:5
-msgid "Short pause duration"
-msgstr "Длительность короткой паузы"
+#~ msgid "Reset Counts and Timer"
+#~ msgstr "Сбросить Счётчик и Таймер"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:6
-msgid "Time in seconds you are supposed to have a short break."
-msgstr "Время в секундах отведенное для короткого перерыва"
+#~ msgid "Click to reset session counts to zero"
+#~ msgstr "Нажмите, чтобы сбросить счётчик на ноль"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:7
-msgid "Long pause duration"
-msgstr "Длительонсть длинной паузы"
+#~ msgid "Away From Desk"
+#~ msgstr "Удаленный Режим"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:8
-msgid "Time in seconds you are supposed to have a longer break."
-msgstr "Время в секундах отведенное для большого перерыва"
+#~ msgid "Set optimal settings for doing paperwork"
+#~ msgstr "Настройки для работы с бумагами"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:9
-msgid "Show dialog notifications during breaks"
-msgstr "Показывать сообщения во время перерыва"
+#~ msgid "Control Presence Status"
+#~ msgstr "Управление Статусом Присутствия"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:10
-msgid "Whether to show a notification dialog when pause starts."
-msgstr "Следует ли показывать диалоговые сообщения во время паузы"
+#~ msgid "Show Dialog Messages"
+#~ msgstr "Показывать Уведомления"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:11
-msgid "Disable flexible breaks"
-msgstr "Отключить гибкие перерывы"
+#~ msgid "Show a dialog message at the end of pomodoro session"
+#~ msgstr "Показывать уведомления в конце помодоро сессии"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:12
-msgid "Whether you are not using a computer to work."
-msgstr "Если компьютер не используется во время работы."
+#~ msgid "Play a sound at start of pomodoro session"
+#~ msgstr "Проигрывать звук в начале помодоро сессии"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:13
-msgid "Change user presence status to busy"
-msgstr "Изменить статус присутствия на занят"
+#~ msgid "No Completed Sessions"
+#~ msgstr "Нет Завершенных Сессий"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:14
-msgid "Whether to change user and IM presence to busy."
-msgstr "Следует ли изменять статус присутствия пользователя и IM на занят."
+#~ msgid "%d Completed Session"
+#~ msgid_plural "%d Completed Sessions"
+#~ msgstr[0] "%d Завершенная Сессия"
+#~ msgstr[1] "%d Завершенные Сессии"
+#~ msgstr[2] "%d Завершенных Сессий"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:15
-msgid "Use notification sound"
-msgstr "Использовать звуковое уведомление"
+#~ msgid "Pomodoro Finished!"
+#~ msgstr "Помодоро Завершен!"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:16
-msgid "Whether to play a sound to notify of events."
-msgstr "Следует ли проигрывать звук для уведомлений и событий."
+#~ msgid "Hide"
+#~ msgstr "Спрятать"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:17
-msgid "Notification sound file"
-msgstr "Файл звукового уведоления"
+#~ msgid "Show dialog"
+#~ msgstr "Показать сообщение"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:18
-msgid "Sound file to play on pomodoro start or end."
-msgstr "Звуковой файл для проигрывания при старте или завершении помодоро"
+#~ msgid "Timer toggle key"
+#~ msgstr "Кнопка запуска таймера"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:19
-msgid "Restore timer state"
-msgstr "Востанавливать состояние таймера"
+#~ msgid "Time in seconds you are supposed to be working."
+#~ msgstr "Время в секундах отведенное для работы"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:20
-msgid "Whether to restore state on startup."
-msgstr "Следует ли востанавливать состояние при загрузке."
+#~ msgid "Short pause duration"
+#~ msgstr "Длительность короткой паузы"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:21
-msgid "Number of completed sessions"
-msgstr "Количество завершенных сессий"
+#~ msgid "Time in seconds you are supposed to have a short break."
+#~ msgstr "Время в секундах отведенное для короткого перерыва"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:22
-msgid "Number of completed sessions since long break"
-msgstr "Количество завершенных сессий после длительного перерыва"
+#~ msgid "Long pause duration"
+#~ msgstr "Длительонсть длинной паузы"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:23
-msgid "Saved timer state"
-msgstr "Сохраненное состояние таймера"
+#~ msgid "Time in seconds you are supposed to have a longer break."
+#~ msgstr "Время в секундах отведенное для большого перерыва"
 
-#: ../org.gnome.shell.extensions.pomodoro.gschema.xml.in.h:24
-msgid "Time of saved state"
-msgstr "Время сохраненного состояния"
+#~ msgid "Whether to show a notification dialog when pause starts."
+#~ msgstr "Следует ли показывать диалоговые сообщения во время паузы"
+
+#~ msgid "Disable flexible breaks"
+#~ msgstr "Отключить гибкие перерывы"
+
+#~ msgid "Whether you are not using a computer to work."
+#~ msgstr "Если компьютер не используется во время работы."
+
+#~ msgid "Change user presence status to busy"
+#~ msgstr "Изменить статус присутствия на занят"
+
+#~ msgid "Whether to change user and IM presence to busy."
+#~ msgstr "Следует ли изменять статус присутствия пользователя и IM на занят."
+
+#~ msgid "Whether to play a sound to notify of events."
+#~ msgstr "Следует ли проигрывать звук для уведомлений и событий."
+
+#~ msgid "Notification sound file"
+#~ msgstr "Файл звукового уведоления"
+
+#~ msgid "Restore timer state"
+#~ msgstr "Востанавливать состояние таймера"
+
+#~ msgid "Whether to restore state on startup."
+#~ msgstr "Следует ли востанавливать состояние при загрузке."
+
+#~ msgid "Number of completed sessions"
+#~ msgstr "Количество завершенных сессий"
+
+#~ msgid "Number of completed sessions since long break"
+#~ msgstr "Количество завершенных сессий после длительного перерыва"
+
+#~ msgid "Saved timer state"
+#~ msgstr "Сохраненное состояние таймера"
+
+#~ msgid "Time of saved state"
+#~ msgstr "Время сохраненного состояния"
