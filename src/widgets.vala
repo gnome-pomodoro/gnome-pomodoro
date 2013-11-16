@@ -415,6 +415,7 @@ private string get_default_current_folder_uri ()
     return settings.get_string ("open-uri");
 }
 
+
 private void set_default_current_folder_uri (string current_folder)
 {
     var application = GLib.Application.get_default () as Pomodoro.Application;
@@ -422,6 +423,7 @@ private void set_default_current_folder_uri (string current_folder)
 
     settings.set_string ("open-uri", current_folder);
 }
+
 
 public class Pomodoro.SoundChooserButton : Gtk.Box
 {
@@ -489,8 +491,9 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
             return this.combo_box.focus_on_click;
         }
         set {
-            if (this.combo_box.focus_on_click != value)
+            if (this.combo_box.focus_on_click != value) {
                 this.combo_box.focus_on_click = value;
+            }
         }
     }
 
