@@ -406,6 +406,23 @@ public enum Pomodoro.SoundBackend {
     GSTREAMER
 }
 
+
+private string get_default_current_folder_uri ()
+{
+    var application = GLib.Application.get_default () as Pomodoro.Application;
+    var settings = application.settings.get_child ("state");
+
+    return settings.get_string ("open-uri");
+}
+
+private void set_default_current_folder_uri (string current_folder)
+{
+    var application = GLib.Application.get_default () as Pomodoro.Application;
+    var settings = application.settings.get_child ("state");
+
+    settings.set_string ("open-uri", current_folder);
+}
+
 public class Pomodoro.SoundChooserButton : Gtk.Box
 {
     private enum RowType {
@@ -754,6 +771,22 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
         this.n_bookmarks += 1;
     }
 
+    private GLib.File? model_get_custom ()
+    {
+        GLib.File? file = null;
+        Gtk.TreeIter iter;
+
+        if (this.has_custom)
+        {
+            var pos = this.model_get_type_position (RowType.CUSTOM);
+
+            this.model.iter_nth_child (out iter, null, pos);
+            this.model.get (iter, Column.FILE, out file);
+        }
+
+        return file;
+    }
+
     private void model_update_custom (GLib.File? file)
     {
         Gtk.TreeIter iter;
@@ -949,6 +982,9 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
         {
             case Gtk.ResponseType.ACCEPT:
             case Gtk.ResponseType.OK:
+                var current_folder = this.dialog.get_current_folder_uri ();
+                set_default_current_folder_uri (current_folder);
+
                 this.file = this.dialog.get_file ();
                 break;
 
@@ -971,6 +1007,24 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
 
     private void open_dialog ()
     {
+        if (this.has_custom &&
+            this.file == this.model_get_custom () &&
+            this.file.query_exists ())
+        {
+            try {
+                this.dialog.set_current_folder_file (this.file.get_parent ());
+                this.dialog.select_file (this.file);
+            }
+            catch (Error error) {
+            }
+        }
+        else
+        {
+            var current_folder = get_default_current_folder_uri ();
+
+            this.dialog.set_current_folder_uri (current_folder);
+        }
+
         /* Setup the dialog parent to be chooser button's toplevel, and be modal
            as needed. */
         if (!this.dialog.visible)
@@ -988,7 +1042,8 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
         this.update_combo_box ();
 
         this.combo_box.set_sensitive (false);
-        this.dialog.present ();
+
+        this.dialog.run ();
     }
 
     private void update_filters ()

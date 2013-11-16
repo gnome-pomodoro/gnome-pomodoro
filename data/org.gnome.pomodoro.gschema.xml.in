@@ -114,5 +114,10 @@
       <summary>Timer state date</summary>
       <description>Date of the last state change.</description>
     </key>
+    <key name="open-uri" type="s">
+      <default>""</default>
+      <summary>Default location for the "Open…" dialogues</summary>
+      <description>Default location for the "Open…" dialogues.</description>
+    </key>
   </schema>
 </schemalist>
