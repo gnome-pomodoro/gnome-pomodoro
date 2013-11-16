@@ -76,7 +76,7 @@ namespace Pomodoro
     {
         var uri = variant.get_string ();
 
-        if (uri != null) {
+        if (uri != "") {
             value.set_object (GLib.File.new_for_uri (uri));
         }
         else {
@@ -87,7 +87,7 @@ namespace Pomodoro
     }
 
     /**
-     * Mapping from keybinding to file chooser
+     * Mapping from file chooser to settings
      */
     public Variant set_file_mapping (GLib.Value       value,
                                      GLib.VariantType expected_type,

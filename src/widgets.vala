@@ -875,12 +875,11 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
     private void update_combo_box ()
     {
         Gtk.TreeIter iter;
-        var row_found = false;
+        GLib.File? file = null;
 
         var selected_file = this.file;
-
+        var row_found = false;
         var type = RowType.INVALID;
-        GLib.File? file = null;
 
         this.model.get_iter_first (out iter);
 
@@ -894,8 +893,8 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
                 case RowType.BOOKMARK:
                 case RowType.CUSTOM:
                     row_found = (file != null)
-                            ? selected_file != null && file.equal (selected_file)
-                            : selected_file == null;
+                        ? selected_file != null && file.equal (selected_file)
+                        : selected_file == null || selected_file.get_uri () == "";
                     break;
 
                 default:
@@ -921,7 +920,7 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
         {
             int pos;
 
-            if (selected_file != null)
+            if (selected_file != null && selected_file.get_uri () != "")
             {
                 this.model_update_custom (selected_file);
                 pos = this.model_get_type_position (RowType.CUSTOM);
