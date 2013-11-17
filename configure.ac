@@ -1,5 +1,5 @@
 AC_INIT([Pomodoro],
-        [0.9],
+        [0.9.0],
         [https://github.com/codito/gnome-shell-pomodoro/issues],
         [gnome-pomodoro],
         [https://github.com/codito/gnome-shell-pomodoro])
@@ -120,7 +120,7 @@ AC_OUTPUT
 dnl ==========================================================================
 echo "
         ${PACKAGE_TARNAME} ${VERSION}
-        ==================
+        ====================
 
         prefix:    ${prefix}
         compiler:  ${CC}
