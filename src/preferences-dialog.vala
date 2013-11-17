@@ -370,10 +370,31 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         contents.add (
             this.create_field (_("Shortcut to toggle the timer"), toggle_key_button));
 
+        string[] sounds = {
+            _("Clock Ticking"), GLib.Path.build_filename ("file://",
+                                                          Config.PACKAGE_DATA_DIR,
+                                                          "sounds",
+                                                          "clock.ogg"),
+            _("Timer Ticking"), GLib.Path.build_filename ("file://",
+                                                          Config.PACKAGE_DATA_DIR,
+                                                          "sounds",
+                                                          "timer.ogg"),
+            _("Woodland Birds"), GLib.Path.build_filename ("file://",
+                                                           Config.PACKAGE_DATA_DIR,
+                                                           "sounds",
+                                                           "birds.ogg"),
+        };
+
         var ticking_sound = new Pomodoro.SoundChooserButton ();
         ticking_sound.title = _("Select ticking sound");
         ticking_sound.backend = SoundBackend.GSTREAMER;
         ticking_sound.has_volume_button = true;
+
+        for (var i = 0; i < sounds.length; i += 2)
+        {
+            ticking_sound.add_bookmark (sounds[i],
+                                        File.new_for_uri (sounds[i+1]));
+        }
 
         contents.add (
             this.create_field (_("Ticking sound"), ticking_sound));
@@ -423,8 +444,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         contents.add (notifications_field);
         contents.add (reminders_field);
 
-        /* Sounds */
-        string[] notification_sounds = {
+        string[] sounds = {
             _("Loud bell"), GLib.Path.build_filename ("file://",
                                                       Config.PACKAGE_DATA_DIR,
                                                       "sounds",
@@ -435,15 +455,13 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                                  "bell.ogg"),
         };
 
-
         var pomodoro_end_sound = new Pomodoro.SoundChooserButton ();
         pomodoro_end_sound.title = _("Select sound for start of break");
 
-        for (var i = 0; i < notification_sounds.length; i += 2)
+        for (var i = 0; i < sounds.length; i += 2)
         {
-            pomodoro_end_sound.add_bookmark (
-                            notification_sounds[i],
-                            File.new_for_uri (notification_sounds[i+1]));
+            pomodoro_end_sound.add_bookmark (sounds[i],
+                                             File.new_for_uri (sounds[i+1]));
         }
 
 
@@ -454,11 +472,10 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         var pomodoro_start_sound = new Pomodoro.SoundChooserButton ();
         pomodoro_start_sound.title = _("Select sound for pomodoro start");
 
-        for (var i = 0; i < notification_sounds.length; i += 2)
+        for (var i = 0; i < sounds.length; i += 2)
         {
-            pomodoro_start_sound.add_bookmark (
-                            notification_sounds[i],
-                            File.new_for_uri (notification_sounds[i+1]));
+            pomodoro_start_sound.add_bookmark (sounds[i],
+                                               File.new_for_uri (sounds[i+1]));
         }
 
         var pomodoro_start_sound_field = this.create_field (

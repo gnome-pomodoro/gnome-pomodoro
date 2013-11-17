@@ -1,7 +1,10 @@
 
 public_sounds = \
     bell.ogg \
-    loud-bell.ogg
+    birds.ogg \
+    clock.ogg \
+    loud-bell.ogg \
+    timer.ogg
 
 EXTRA_DIST = \
     $(public_sounds)
