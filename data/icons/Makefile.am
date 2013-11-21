@@ -51,3 +51,5 @@ uninstall-icons:
 install-data-local: install-icons update-icon-cache
 
 uninstall-local: uninstall-icons update-icon-cache
+
+-include $(top_srcdir)/git.mk

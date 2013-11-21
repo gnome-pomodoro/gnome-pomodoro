@@ -23,3 +23,5 @@ uninstall-sounds:
 install-data-local: install-sounds
 
 uninstall-local: uninstall-sounds
+
+-include $(top_srcdir)/git.mk

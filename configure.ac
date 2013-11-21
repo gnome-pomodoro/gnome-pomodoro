@@ -1,108 +1,163 @@
+AC_PREREQ(2.63)
+
 AC_INIT([Pomodoro],
         [0.9.0],
         [https://github.com/codito/gnome-shell-pomodoro/issues],
         [gnome-pomodoro],
         [https://github.com/codito/gnome-shell-pomodoro])
-AC_PREREQ(2.63)
 
-AM_CONFIG_HEADER(config/config.h)
 AC_CONFIG_SRCDIR([src])
+AM_CONFIG_HEADER([config/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([config])
 
-AC_CANONICAL_TARGET
-
 AM_INIT_AUTOMAKE([1.13 dist-xz no-dist-gzip tar-ustar foreign])
-AM_MAINTAINER_MODE([enable])
-
 AM_SILENT_RULES([yes])
+AM_MAINTAINER_MODE([enable])
+GNOME_MAINTAINER_MODE_DEFINES
 
-GETTEXT_PACKAGE=AC_PACKAGE_TARNAME
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AM_PROG_VALAC([0.20.0])
+
+AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+
+# Initialize libtool
+LT_PREREQ([2.2])
+LT_INIT([disable-static])
+
+
+GETTEXT_PACKAGE=gnome-pomodoro
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
                    [The name of the gettext domain])
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.17])
 
-IT_PROG_INTLTOOL(0.40.0)
-PKG_PROG_PKG_CONFIG([0.22])
-GOBJECT_INTROSPECTION_REQUIRE([1.36.0])
-
-## don't rerun to this point if we abort
-AC_CACHE_SAVE
-
-AC_PROG_CC
-AC_ISC_POSIX
-AC_HEADER_STDC
-
-LT_INIT
-
-# enable valac
-AM_PROG_VALAC([0.20.0])
-
-# no stupid static libraries
-AM_DISABLE_STATIC
-# enable libtool
-AC_PROG_LIBTOOL
-# avoid libtool for LTCOMPILE, use it only to link
-
-## don't rerun to this point if we abort
-AC_CACHE_SAVE
+AM_GLIB_GNU_GETTEXT
+GLIB_DEFINE_LOCALEDIR(GNOMELOCALEDIR)
 
 GLIB_GSETTINGS
 
-AC_CHECK_LIBM
-AC_SUBST(LIBM)
+IT_PROG_INTLTOOL([0.40.1])
 
-GLIB_MIN_VERSION=2.36.1
-GTK_MIN_VERSION=3.8.0
-GOBJECT_INTROSPECTION_MIN_VERSION=1.36.0
-GDATA_MIN_VERSION=0.13.3
-CAIRO_MIN_VERSION=1.12.14
-CLUTTER_MIN_VERSION=1.14.2
-CLUTTER_GTK_MIN_VERSION=1.4.4
-PANGO_MIN_VERSION=1.32.0
-GNOME_DESKTOP_MIN_VERSION=3.8.0
-UPOWER_GLIB_MIN_VERSION=0.9.20
-CANBERRA_MIN_VERSION=0.30
-GSTREAMER_MIN_VERSION=0.10
 
-PKG_CHECK_MODULES(GNOME_POMODORO,
-                  gio-2.0 >= $GLIB_MIN_VERSION
-                  glib-2.0 >= $GLIB_MIN_VERSION
-                  gtk+-3.0 >= $GTK_MIN_VERSION
-                  dbus-glib-1
-                  gobject-introspection-1.0 >= $GOBJECT_INTROSPECTION_MIN_VERSION
-                  libgdata >= $GDATA_MIN_VERSION
-                  cairo >= $CAIRO_MIN_VERSION
-                  clutter-gtk-1.0 >= $CLUTTER_GTK_MIN_VERSION
-                  pango >= $PANGO_MIN_VERSION
-                  gnome-desktop-3.0 >= $GNOME_DESKTOP_MIN_VERSION
-                  upower-glib >= $UPOWER_GLIB_MIN_VERSION
-                  libcanberra >= $CANBERRA_MIN_VERSION
-                  gstreamer-0.10 >= $GSTREAMER_MIN_VERSION
-                  )
+# Enable Debug
+AC_ARG_ENABLE(debug,
+  AS_HELP_STRING([--disable-debug],[Disable debugging code]),
+  [
+    case "${enableval}" in
+      yes|no) enable_debug="${enableval}" ;;
+      *)   AC_MSG_ERROR(bad value ${enableval} for --enable-debug) ;;
+    esac
+  ],
+  [enable_debug=yes])
+
+if test "$enable_debug" = yes; then
+  AC_DEFINE(ENABLE_DEBUG, [], [Enable debug code])
+else
+  enable_debug=no
+fi
+
+# Enable Profiling
+AC_ARG_ENABLE(profiling,
+        [AS_HELP_STRING([--enable-profiling],
+                        [turn on profiling])],
+        , enable_profiling=yes)
+
+if test "x$enable_profiling" = "xyes"; then
+    AC_DEFINE(ENABLE_PROFILING,1,[enable profiling])
+fi
+
+
+# Turn on the additional warnings last, so -Werror doesn't affect other tests.
+WARNING_CFLAGS=""
+
+AC_ARG_ENABLE(more-warnings,
+AS_HELP_STRING([--enable-more-warnings],[Maximum compiler warnings]),
+set_more_warnings="$enableval",[
+if test -d $srcdir/.git; then
+    is_cvs_version=true
+    set_more_warnings=yes
+else
+    set_more_warnings=no
+fi
+])
+AC_MSG_CHECKING(for more warnings, including -Werror)
+if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
+    AC_MSG_RESULT(yes)
+    WARNING_CFLAGS="\
+    -Wall \
+    -Wmissing-declarations -Wmissing-prototypes \
+    -Wnested-externs -Wpointer-arith \
+    -Wcast-align "
+
+    for option in -Wstrict-aliasing=0 -Wno-pointer-sign; do
+        SAVE_CFLAGS="$CFLAGS"
+        CFLAGS="$CFLAGS $option"
+        AC_MSG_CHECKING([whether gcc understands $option])
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],
+                          [has_option=yes],
+                          [has_option=no])
+        if test $has_option = yes; then
+               WARNING_CFLAGS="$WARNING_CFLAGS $option"
+        fi
+        AC_MSG_RESULT($has_option)
+        CFLAGS="$SAVE_CFLAGS"
+        unset has_option
+        unset SAVE_CFLAGS
+    done
+    unset option
+else
+    AC_MSG_RESULT(no)
+fi
+
+AC_SUBST(WARNING_CFLAGS)
+
+
+# don't rerun to this point if we abort
+AC_CACHE_SAVE
+
+m4_define(glib_minver,                 2.36.1)
+m4_define(gnome_desktop_minver,        3.8.0)
+m4_define(pango_minver,                1.32.0)
+m4_define(gtk_minver,                  3.8.0)
+m4_define(schemas_minver,              3.8.0)
+m4_define(upower_minver,               0.9.20)
+m4_define(canberra_minver,             0.30)
+m4_define(gstreamer_minver,            0.10)
+
+AC_CHECK_LIB(m, floor)
+AC_CHECK_HEADERS(malloc.h)
+AC_CHECK_FUNCS(mallopt)
+
+PKG_PROG_PKG_CONFIG([0.22])
+GOBJECT_INTROSPECTION_REQUIRE([1.36.0])
+
+PKG_CHECK_MODULES(GNOME_POMODORO, [
+    glib-2.0 >= glib_minver
+    gtk+-3.0 >= gtk_minver
+    gio-2.0 >= glib_minver
+    gio-unix-2.0 >= glib_minver
+    dbus-glib-1
+    gnome-desktop-3.0 >= gnome_desktop_minver
+    gthread-2.0 >= glib_minver
+    gmodule-no-export-2.0 >= glib_minver
+    gsettings-desktop-schemas >= schemas_minver
+    upower-glib >= upower_minver
+    libcanberra >= canberra_minver
+    gstreamer-0.10 >= gstreamer_minver
+])
 
 # egg-list-box
-pkg_modules="gtk+-3.0 >= 3.4.0
-	         glib-2.0 >= 2.31.10"
-PKG_CHECK_MODULES(LISTBOX, [$pkg_modules])
+PKG_CHECK_MODULES(LISTBOX, [
+    glib-2.0 >= 2.31.10
+    gtk+-3.0 >= 3.4.0
+])
 
 LISTBOX_PACKAGES="--pkg gtk+-3.0"
 AC_SUBST(LISTBOX_PACKAGES)
 
-GLIB_COMPILE_RESOURCES=`$PKG_CONFIG --variable glib_compile_resources gio-2.0`
-AC_SUBST(GLIB_COMPILE_RESOURCES)
-
-AC_ARG_ENABLE([debug],
-              AS_HELP_STRING([--enable-debug], [turn on debugging]),
-              [case "${enableval}" in
-                    yes) debug=true ;;
-                    no)  debug=false ;;
-                    *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
-               esac],
-               [debug=false])
-AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
 
 AC_CONFIG_FILES([
   Makefile
@@ -115,13 +170,15 @@ AC_CONFIG_FILES([
   data/sounds/Makefile
   po/Makefile.in
 ])
+
 AC_OUTPUT
 
-dnl ==========================================================================
 echo "
-        ${PACKAGE_TARNAME} ${VERSION}
-        ====================
+gnome-pomodoro ${VERSION}:
 
-        prefix:    ${prefix}
-        compiler:  ${CC}
+    prefix:                 ${prefix}
+    source code location:   ${srcdir}
+    compiler:               ${CC}
+    debugging support:      ${enable_debug}
+    profiling support:      ${enable_profiling}
 "

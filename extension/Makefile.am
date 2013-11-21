@@ -1,4 +1,4 @@
-include ../Makefile.include
+include $(top_srcdir)/Makefile.include
 
 dist_extension_DATA = \
     dbus.js \
@@ -22,3 +22,5 @@ metadata.json: metadata.json.in Makefile
 
 uninstall-hook:
 	rmdir --ignore-fail-on-non-empty $(extensiondir)
+
+-include $(top_srcdir)/git.mk

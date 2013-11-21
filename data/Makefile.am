@@ -1,6 +1,8 @@
-include ../Makefile.include
+include $(top_srcdir)/Makefile.include
 
-SUBDIRS = icons sounds
+SUBDIRS = \
+    icons \
+    sounds
 
 @INTLTOOL_DESKTOP_RULE@
 desktopdir = $(datadir)/applications
@@ -30,3 +32,5 @@ CLEANFILES = \
 
 $(service_DATA): $(service_in_files) Makefile
 	@$(do_subst) $<> $@
+
+-include $(top_srcdir)/git.mk

@@ -1,25 +1,35 @@
-include ../Makefile.include
+include $(top_srcdir)/Makefile.include
+
+bin_PROGRAMS = gnome-pomodoro
 
 AM_CFLAGS = \
+    -I$(top_srcdir) \
+    -I$(top_builddir) \
+    -I$(top_srcdir)/egg-list-box \
+    $(GNOME_POMODORO_CFLAGS) \
+    $(WARNING_CFLAGS) \
     -DGETTEXT_PACKAGE="\"$(GETTEXT_PACKAGE)\"" \
     -DPACKAGE_LOCALE_DIR="\"$(localedir)\"" \
     -DPACKAGE_SRC_DIR="\"$(srcdir)\"" \
     -DPACKAGE_DATA_DIR="\"$(pkgdatadir)\"" \
     -DGNOME_DESKTOP_USE_UNSTABLE_API \
     -Wall \
-    -Wno-unused \
-    -I$(srcdir)/../egg-list-box \
-    $(GNOME_POMODORO_CFLAGS)
+    -Wno-unused
 
-if DEBUG
-    AM_CFLAGS += -O0 -DDEBUG
-    AM_VALAFLAGS = -g -DDEBUG
-endif
+resource_files = $(shell glib-compile-resources --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gnome-pomodoro.gresource.xml)
 
-bin_PROGRAMS = gnome-pomodoro
+resources.c: gnome-pomodoro.gresource.xml $(resource_files)
+	glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-source --c-name pomodoro gnome-pomodoro.gresource.xml
+
+resources.h: gnome-pomodoro.gresource.xml $(resource_files)
+	glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-header --c-name pomodoro gnome-pomodoro.gresource.xml
+
+gnome_pomodoro_built_sources = \
+    resources.c \
+    resources.h
 
 gnome_pomodoro_SOURCES = \
-    $(srcdir)/../egg-list-box/egg-list-box.c \
+    $(top_srcdir)/egg-list-box/egg-list-box.c \
     about-dialog.vala \
     animation.vala \
     application.vala \
@@ -38,8 +48,8 @@ gnome_pomodoro_SOURCES = \
     widgets.vala
 
 gnome_pomodoro_VALAFLAGS = \
-    --vapidir=$(srcdir)/../vapi \
-    --vapidir=$(srcdir)/../egg-list-box \
+    --vapidir=$(top_srcdir)/vapi \
+    --vapidir=$(top_srcdir)/egg-list-box \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
@@ -54,21 +64,20 @@ gnome_pomodoro_VALAFLAGS = \
     --pkg egglistbox \
     --pkg gstreamer-0.10
 
-gnome_pomodoro_LDFLAGS = \
-    -Wl,--export-dynamic
-
-# FIXME: include libm more gracefully
 gnome_pomodoro_LDADD = \
-    $(GNOME_POMODORO_LIBS) -lm
+    $(GNOME_POMODORO_LIBS)
 
 BUILT_SOURCES = \
-    resources.c \
-    resources.h
+    $(gnome_pomodoro_built_sources)
 
-resource_files = $(shell glib-compile-resources --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gnome-pomodoro.gresource.xml)
+CLEANFILES = \
+    $(BUILT_SOURCES)
 
-resources.c: gnome-pomodoro.gresource.xml $(resource_files)
-	$(AM_V_GEN) glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-source --c-name pomodoro $<
+EXTRA_DIST = \
+    $(resource_files) \
+    gnome-pomodoro.gresource.xml
 
-resources.h: gnome-pomodoro.gresource.xml $(resource_files)
-	$(AM_V_GEN) glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-header --c-name pomodoro $<
+dist-hook:
+	cd $(distdir); rm -f $(CLEANFILES)
+
+-include $(top_srcdir)/git.mk
