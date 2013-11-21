@@ -1,0 +1,305 @@
+# German translation for gnome-pomodoro
+# Copyright (c) 2012 gnome-pomodoro contributors
+# This file is distributed under the same license as the gnome-pomodoro package.
+# Johannes Hermann <linuxrider@web.de>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-pomodoro\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-11-05 23:18+0100\n"
+"PO-Revision-Date: 2013-11-21 21:45+0100\n"
+"Last-Translator: Johannes Hermann <linuxrider@web.de>\n"
+"Language-Team: de\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#. Toggle timer state button
+#: ../extension/indicator.js:84
+msgid "Pomodoro Timer"
+msgstr "Pomodoro Timer"
+
+#: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: ../extension/notifications.js:115 ../src/about-dialog.vala:30
+#: ../data/gnome-pomodoro.desktop.in.h:1
+msgid "Pomodoro"
+msgstr "Pomodoro"
+
+#: ../extension/notifications.js:390
+msgid "It's time to take a break"
+msgstr "Es ist Zeit eine Pause einzulegen"
+
+#: ../extension/notifications.js:575
+msgid "A new pomodoro is starting"
+msgstr "Eine neue Pomodoro beginnt"
+
+#: ../extension/notifications.js:588
+msgid "Take a break!"
+msgstr "Mach Pause!"
+
+#: ../extension/notifications.js:602
+msgid "Start pomodoro"
+msgstr "Beginne Pomodoro"
+
+#: ../extension/notifications.js:644
+msgid "Shorten the break"
+msgstr "Verkürze Pause"
+
+#: ../extension/notifications.js:650
+msgid "Lengthen the break"
+msgstr "Verlängere Pause"
+
+#: ../extension/notifications.js:664
+#, c-format
+msgid "You have %d second left"
+msgid_plural "You have %d seconds left"
+msgstr[0] "Du hast noch %d Sekunde"
+msgstr[1] "Du hast noch %d Sekunden"
+
+#: ../extension/notifications.js:666
+#, c-format
+msgid "You have %d minute left"
+msgid_plural "You have %d minutes left"
+msgstr[0] "Du hast noch %d Minute"
+msgstr[1] "Du hast noch %d Minuten"
+
+#: ../extension/notifications.js:685
+msgid "Hey, you're missing out on a break"
+msgstr "He, du verpasst die Pause"
+
+#: ../extension/notifications.js:764
+msgid "Could not run pomodoro"
+msgstr "Konnte Pomodoro nicht ausführen"
+
+#: ../extension/notifications.js:766
+msgid "Something went badly wrong..."
+msgstr "Etwas ist schrecklich falsch gelaufen..."
+
+#: ../extension/notifications.js:767
+msgid "Looks like gnome-pomodoro is not installed"
+msgstr "Sieht so aus, als sei gnome-pomodoro nicht installiert"
+
+#: ../extension/notifications.js:776
+msgid "Report issue"
+msgstr "Problem melden"
+
+#: ../extension/notifications.js:779
+msgid "Install"
+msgstr "Installieren"
+
+#: ../src/about-dialog.vala:29
+msgid "About Pomodoro"
+msgstr "Über Pomodoro"
+
+#: ../src/about-dialog.vala:31
+msgid "A simple time management utility"
+msgstr "Ein einfaches Werkzeug für Zeitmanagement"
+
+#: ../src/about-dialog.vala:39
+#, fuzzy
+msgid "translator-credits"
+msgstr "Übersetzer"
+
+#: ../src/about-dialog.vala:45
+msgid ""
+"This program is free software: you can  redistribute it and/or modify it "
+"under the terms of the GNU General Public License as published by the Free "
+"Software Foundation; either version 3 of the License, or (at your option) "
+"any later version."
+msgstr ""
+"Dieses Programm ist freie Software: Sie können sie weiterverteilen und/oder "
+"verändern unter den Bedingungen der GNU General Public License, wie sie von "
+"der Free Software Foundation veröffentlicht ist; entweder Version 3 der "
+"Lizenz oder (nach Ihrer Wahl) jeder späteren."
+
+#: ../src/preferences-dialog.vala:306
+msgid "Timer"
+msgstr "Timer"
+
+#: ../src/preferences-dialog.vala:358
+msgid "Pomodoro duration"
+msgstr "Dauer einer Pomodoro"
+
+#: ../src/preferences-dialog.vala:361
+msgid "Short break duration"
+msgstr "Dauer einer kurzen Pause"
+
+#: ../src/preferences-dialog.vala:364
+msgid "Long break duration"
+msgstr "Dauer einer langen Pause"
+
+#: ../src/preferences-dialog.vala:371
+msgid "Shortcut to toggle the timer"
+msgstr "Shortcut zum Ein- und Ausschalten des Timers"
+
+#: ../src/preferences-dialog.vala:374
+msgid "Select ticking sound"
+msgstr "Wähle Ticken"
+
+#: ../src/preferences-dialog.vala:379
+msgid "Ticking sound"
+msgstr "Ticken"
+
+#: ../src/preferences-dialog.vala:401
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+#: ../src/preferences-dialog.vala:405
+msgid "Screen notifications"
+msgstr "Bildschirmbenachrichtigung"
+
+#: ../src/preferences-dialog.vala:410
+msgid "Remind to take a break"
+msgstr "Errinnere daran eine Pause zu machen"
+
+#: ../src/preferences-dialog.vala:428
+msgid "Loud bell"
+msgstr "Laute Glocke"
+
+#: ../src/preferences-dialog.vala:432
+msgid "Bell"
+msgstr "Glocke"
+
+#: ../src/preferences-dialog.vala:440
+msgid "Select sound for start of break"
+msgstr "Wähle Klang für den Pausenbeginn"
+
+#: ../src/preferences-dialog.vala:451
+msgid "Start of break sound"
+msgstr "Beginn des Pausenklangs"
+
+#: ../src/preferences-dialog.vala:455
+msgid "Select sound for pomodoro start"
+msgstr "Wähle Klang für den Beginn einer Pomodoro"
+
+#: ../src/preferences-dialog.vala:465
+msgid "Pomodoro start sound"
+msgstr "Dauer einer Pomodoro"
+
+#: ../src/preferences-dialog.vala:497
+msgid "Available"
+msgstr "Verfügbar"
+
+#: ../src/preferences-dialog.vala:498
+msgid "Busy"
+msgstr "Beschäftigt"
+
+#. Currently gnome-shell does not handle invisible status properly
+#: ../src/preferences-dialog.vala:501
+msgid "Invisible"
+msgstr "Unsichtbar"
+
+#: ../src/preferences-dialog.vala:517
+msgid "Presence"
+msgstr "Anwesenheit"
+
+#: ../src/preferences-dialog.vala:521
+msgid "Postpone pomodoro when idle"
+msgstr "Verschiebe Pomodoro, wenn untätig"
+
+#: ../src/preferences-dialog.vala:528
+msgid "Status during pomodoro"
+msgstr "Status während der Pomodoro"
+
+#: ../src/preferences-dialog.vala:559
+msgid "Status during break"
+msgstr "Status während der Pause"
+
+#: ../src/preferences-dialog.vala:614
+msgid ""
+"System notifications including chat messages will be disabled during "
+"pomodoro."
+msgstr ""
+"Systembenachrichtigungen inklusive Chat-Nachrichten werden während der "
+"Pomodoro abgeschaltet."
+
+#: ../src/preferences-dialog.vala:618
+msgid ""
+"System notifications including chat messages will be disabled during break."
+msgstr ""
+"Systembenachrichtigungen inklusive Chat-Nachrichten werden während der Pause "
+"abgeschaltet."
+
+#: ../src/preferences-dialog.vala:622
+msgid "System notifications including chat messages will be disabled."
+msgstr "Systembenachrichtigungen "
+
+#: ../src/utils.vala:92
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d Stunde"
+msgstr[1] "%d Stunden"
+
+#: ../src/utils.vala:101
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d Minute"
+msgstr[1] "%d Minuten"
+
+#: ../src/widgets.vala:327
+msgid "Disabled"
+msgstr "Abgeschaltet"
+
+#: ../src/widgets.vala:384
+#, c-format
+msgid ""
+"The shortcut \"%s\" cannot be used because it will become impossible to type "
+"using this key.\n"
+"Please try with a key such as Control, Alt or Shift at the same time."
+msgstr ""
+"Das Shortcut \"%s\" kann nicht verwendet werden, da hierdurch das Schreiben "
+"mit dieser Taste unmöglich wird.\n"
+" Bitte versuche mit gleichzeitig gedrücktem Strg, Alt oder Umschalt."
+
+#: ../src/widgets.vala:492
+msgid "_No sound"
+msgstr "_Ton aus"
+
+#: ../src/widgets.vala:494
+msgid "_Cancel"
+msgstr "_Abbrechen"
+
+#: ../src/widgets.vala:496
+msgid "_Open"
+msgstr "_Öffnen"
+
+#: ../src/widgets.vala:503
+msgid "Select a file"
+msgstr "Wähle Datei"
+
+#: ../src/widgets.vala:563
+msgid "All files"
+msgstr "Alle Dateien"
+
+#: ../src/widgets.vala:691
+#, fuzzy
+msgid "Other…"
+msgstr "Andere..."
+
+#: ../src/widgets.vala:702
+#, fuzzy
+msgid "None"
+msgstr "Keiner"
+
+#: ../src/widgets.vala:1004 ../src/widgets.vala:1013
+msgid "Supported audio files"
+msgstr "Unterstützte Audiodateien"
+
+#: ../data/gnome-pomodoro.desktop.in.h:2
+msgid "Manage your time and tasks"
+msgstr "Habe deine Zeit und Aufgabe im Griff"
+
+#: ../data/gnome-pomodoro.desktop.in.h:3
+#, fuzzy
+msgid "time;timer;tasks;manage;organize;"
+msgstr "Zeit;Timer;Aufgaben;Verwalte;Plane;"
