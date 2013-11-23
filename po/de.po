@@ -1,7 +1,7 @@
-# LANGUAGE translation for gnome-shell-pomodoro
+# German translation for gnome-shell-pomodoro
 # Copyright (c) 2012 gnome-shell-pomodoro contributors
 # This file is distributed under the same license as the gnome-shell-pomodoro package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Johannes Hermann <linuxrider@web.de>, 2013.
 #
 msgid ""
 msgstr ""
@@ -10,13 +10,13 @@ msgstr ""
 "POT-Creation-Date: 2012-10-14 14:41+0200\n"
 "PO-Revision-Date: 2013-11-21 20:43+0100\n"
 "Last-Translator: Johannes Hermann <linuxrider@web.de>\n"
-"Language-Team: Johannes Hermann <linuxrider@web.de>\n"
+"Language-Team: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.5.4\n"
-"Language: German\n"
+"Language: de_DE\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: ../src/extension.js:57
