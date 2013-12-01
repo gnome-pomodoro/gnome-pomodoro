@@ -22,6 +22,11 @@
       <summary>Long pause duration</summary>
       <description>Time in seconds you are supposed to take a longer break.</description>
     </key>
+    <key name="long-break-interval" type="d">
+      <default>4</default>
+      <summary>Long pause interval</summary>
+      <description>Number of pomodoros to a long break.</description>
+    </key>
     <key type="as" name="toggle-timer-key">
       <default><![CDATA[["<Ctrl><Alt>p"]]]></default>
       <summary>Timer toggle key</summary>
@@ -88,7 +93,7 @@
     </key>
   </schema>
   <schema id="org.gnome.pomodoro.state" path="/org/gnome/pomodoro/state/">
-    <key name="session-count" type="d">
+    <key name="session" type="d">
       <default>0</default>
       <summary>Timer session count</summary>
       <description>Number of sessions since long break.</description>
@@ -113,6 +118,11 @@
       <default>""</default>
       <summary>Timer state date</summary>
       <description>Date of the last state change.</description>
+    </key>
+    <key name="pomodoro-end-date" type="s">
+      <default>""</default>
+      <summary>Date of last pomodoro end</summary>
+      <description>Time and date when last pomodoro ended.</description>
     </key>
     <key name="open-uri" type="s">
       <default>""</default>

@@ -28,6 +28,9 @@ namespace Pomodoro
     const double TIMER_SCALE_LOWER = 60.0;
     const double TIMER_SCALE_UPPER = 60.0 * 120.0;
 
+    const double LONG_BREAK_INTERVAL_LOWER = 1.0;
+    const double LONG_BREAK_INTERVAL_UPPER = 10.0;
+
     const GLib.SettingsBindFlags BINDING_FLAGS =
                                        GLib.SettingsBindFlags.DEFAULT |
                                        GLib.SettingsBindFlags.GET |
@@ -329,6 +332,14 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                        300.0,
                                        0.0);
 
+        var long_break_interval_adjustment = new Gtk.Adjustment (
+                                       0.0,
+                                       LONG_BREAK_INTERVAL_LOWER,
+                                       LONG_BREAK_INTERVAL_UPPER,
+                                       1.0,
+                                       1.0,
+                                       0.0);
+
         var keybinding = new Keybinding ();
 
         this.settings.bind ("pomodoro-duration",
@@ -343,6 +354,11 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         this.settings.bind ("long-break-duration",
                             long_break_adjustment,
+                            "value",
+                            SETTINGS_BIND_FLAGS);
+
+        this.settings.bind ("long-break-interval",
+                            long_break_interval_adjustment,
                             "value",
                             SETTINGS_BIND_FLAGS);
 
@@ -363,6 +379,15 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         contents.add (this.create_scale_field (_("Long break duration"),
                                                long_break_adjustment));
+
+        var long_break_interval_entry = new Gtk.SpinButton (long_break_interval_adjustment, 1.0, 0);
+        long_break_interval_entry.snap_to_ticks = true;
+        long_break_interval_entry.update_policy = Gtk.SpinButtonUpdatePolicy.IF_VALID;
+        long_break_interval_entry.set_size_request (100, -1);
+
+        /* @translators: You can refer it to number of pomodoros in a cycle */
+        contents.add (this.create_field (_("Pomodoros to a long break"),
+                                         long_break_interval_entry));
 
         var toggle_key_button = new Pomodoro.KeybindingButton (keybinding);
         toggle_key_button.show ();

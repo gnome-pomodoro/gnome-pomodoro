@@ -39,11 +39,11 @@ public class Pomodoro.Service : Object
         get { return this.timer.state_duration; }
     }
 
-    public uint session {
+    public double session {
         get { return this.timer.session; }
     }
 
-    public uint session_limit {
+    public double session_limit {
         get { return this.timer.session_limit; }
     }
 
@@ -150,12 +150,12 @@ public class Pomodoro.Service : Object
 
             case "session":
                 this.send_property_changed ("Session",
-                                            new Variant.uint32 (this.session));
+                                            new Variant.double (this.session));
                 break;
 
             case "session-limit":
                 this.send_property_changed ("SessionLimit",
-                                            new Variant.uint32 (this.session_limit));
+                                            new Variant.double (this.session_limit));
                 break;
 
             case "state":

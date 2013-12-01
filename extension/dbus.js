@@ -26,8 +26,8 @@ const SERVICE_NAME = 'org.gnome.Pomodoro';
 
 const PomodoroInterface = <interface name="org.gnome.Pomodoro">
     <property name="Elapsed" type="d" access="read"/>
-    <property name="Session" type="u" access="read"/>
-    <property name="SessionLimit" type="u" access="read"/>
+    <property name="Session" type="d" access="read"/>
+    <property name="SessionLimit" type="d" access="read"/>
     <property name="State" type="s" access="read"/>
     <property name="StateDuration" type="d" access="read"/>
     <method name="SetState">
