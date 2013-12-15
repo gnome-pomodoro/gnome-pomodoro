@@ -41,6 +41,7 @@ gnome_pomodoro_SOURCES = \
     preferences-dialog.vala \
     presence.vala \
     resources.c \
+    screensaver.vala \
     service.vala \
     sounds.vala \
     timer.vala \

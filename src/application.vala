@@ -208,6 +208,7 @@ public class Pomodoro.Application : Gtk.Application
         this.modules.prepend (new Pomodoro.Sounds (this.timer));
         this.modules.prepend (new Pomodoro.Presence (this.timer));
         this.modules.prepend (new Pomodoro.Power (this.timer));
+        this.modules.prepend (new Pomodoro.ScreenSaver (this.timer));
         this.modules.prepend (new Pomodoro.GnomeDesktop (this.timer));
 
         this.timer.state_changed.connect (this.on_timer_state_changed);
