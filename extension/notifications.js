@@ -72,7 +72,7 @@ const REMINDER_INTERVALS = [75000];
 /* Ratio between user idle time and time between reminders to determine
  * whether user is away
  */
-const REMINDER_ACCEPTANCE = 0.66
+const REMINDER_ACCEPTANCE = 0.66;
 
 const State = {
     OPENED: 0,
@@ -700,7 +700,7 @@ const PomodoroEndReminder = new Lang.Class({
          * time based on X11, and not Clutter scene which should better reflect
          * to real work.
          */
-        if (idleTime < this._timeout * REMINDER_ACCEPTANCE) {
+        if (idle_time < this._timeout * REMINDER_ACCEPTANCE) {
             this.show();
         }
         else {
