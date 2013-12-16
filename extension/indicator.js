@@ -287,8 +287,7 @@ const Indicator = new Lang.Class({
                 return;
             }
 
-            if (!this._proxy) {
-                global.log('Pomodoro: Callback called when proxy has been destroyed');
+            if (proxy !== this._proxy) {
                 return;
             }
 
