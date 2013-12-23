@@ -100,7 +100,7 @@ const PomodoroTimer = new Lang.Class({
         this._becameActiveId = 0;
         
         this._settings = PomodoroUtil.getSettings();
-        this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+        this._settingsChangedId = this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
     },
 
     _onSettingsChanged: function (settings, key) {
@@ -685,6 +685,11 @@ const PomodoroTimer = new Lang.Class({
         this.disconnectAll();
         this._closeNotifications();
         this._disableEventCapture();
+
+        if (this._settingsChangedId != 0) {
+            this._settings.disconnect(this._settingsChangedId);
+            this._settingsChangedId = 0;
+        }
 
         if (this._timeoutSource != 0) {
             GLib.source_remove(this._timeoutSource);
