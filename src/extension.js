@@ -74,7 +74,6 @@ const Indicator = new Lang.Class({
         this._dbus = new PomodoroDBus.PomodoroTimer(this._timer);
         
         this._settings = PomodoroUtil.getSettings();
-        this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         
         
         // Timer label
@@ -114,10 +113,11 @@ const Indicator = new Lang.Class({
         
         // Initialize
         this._timer.restore();
-        
+
         this._updateLabel();
         this._updateSessionCount();
         
+        this._settingsChangedId = this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         this._onSettingsChanged();
     },
 
@@ -353,10 +353,15 @@ const Indicator = new Lang.Class({
     },
     
     _onDestroy: function() {
+        if (this._settingsChangedId != 0) {
+            this._settings.disconnect(this._settingsChangedId);
+            this._settingsChangedId = 0;
+        }
+
         Main.wm.removeKeybinding('toggle-pomodoro-timer');
 
-        this._timer.destroy();
         this._dbus.destroy();
+        this._timer.destroy();
     }
 });
 
