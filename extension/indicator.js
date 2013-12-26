@@ -71,6 +71,7 @@ const Indicator = new Lang.Class({
         this._notificationDialog = null;
         this._notification = null;
         this._settings = null;
+        this._settingsChangedId = 0;
         this._state = State.NULL;
         this._proxy = null;
 
@@ -94,7 +95,7 @@ const Indicator = new Lang.Class({
 
         try {
             this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
-            this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+            this._settingsChangedId = this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         }
         catch (e) {
             log('Pomodoro: ' + e);
@@ -607,6 +608,10 @@ const Indicator = new Lang.Class({
 
     destroy: function() {
         Main.wm.removeKeybinding('toggle-timer-key');
+
+        if (this._settingsChangedId) {
+            this._settings.disconnect(this._settingsChangedId);
+        }
 
         if (this._nameWatcherId) {
             Gio.DBus.session.unwatch_name(this._nameWatcherId);

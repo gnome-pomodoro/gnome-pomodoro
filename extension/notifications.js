@@ -587,13 +587,22 @@ const PomodoroEnd = new Lang.Class({
     _init: function() {
         this.parent(_("Take a break!"), null, null);
 
+        this._settingsChangedId = 0;
+
         try {
             this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
-            this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+            this._settingsChangedId = this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         }
         catch (e) {
             log('Pomodoro: ' + e);
         }
+
+        this.connect('destroy', Lang.bind(this,
+            function(notification) {
+                if (this._settingsChangedId) {
+                    this._settings.disconnect(this._settingsChangedId);
+                }
+            }));
 
         this.setResident(true);
         this.setUrgency(MessageTray.Urgency.HIGH);
