@@ -119,6 +119,14 @@ Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodo
 
 ## Changelog
 
+**Version 0.9.1**
+
+* Support for GNOME Shell 3.8
+* Improved long pause scheduling
+* Deactivate screensaver to notify start of pomodoro
+* German translation (thanks @linuxrider)
+* Bug fixes
+
 **Version 0.9.0**
 
 * Support for GNOME Shell 3.8
