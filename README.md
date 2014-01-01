@@ -41,7 +41,7 @@ Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodor
 
 1. Download the right version
 
-   **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-extension-3.10) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-shell-extension-3.10#direct-from-source).
+   **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-3.10).
 
    **For GNOME 3.8** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-3.8).
 
@@ -86,7 +86,7 @@ If you still want to tinker with settings, you can use *dconf-editor* or *gsetti
 
 As it's not possible to select a shortcut having a [Super key](http://en.wikipedia.org/wiki/Windows_key), you need to use the commandline:
 
-    gsettings set org.gnome.shell.extensions.pomodoro toggle-pomodoro-timer "['<Super>p']"
+    gsettings set org.gnome.pomodoro.preferences toggle-timer-key "['<Super>p']"
 
 
 **Reset settings to default**

@@ -22,6 +22,7 @@
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 
+const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Meta = imports.gi.Meta;
@@ -76,7 +77,8 @@ const Indicator = new Lang.Class({
         this._proxy = null;
 
         this.label = new St.Label({ opacity: FADE_OUT_OPACITY * 255,
-                                    style_class: 'extension-pomodoro-label' });
+                                    style_class: 'extension-pomodoro-label',
+                                    y_align: Clutter.ActorAlign.CENTER });
         this.label.clutter_text.set_line_wrap(false);
         this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
         this.actor.add_actor(this.label);

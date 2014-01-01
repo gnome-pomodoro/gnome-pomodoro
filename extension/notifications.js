@@ -27,7 +27,7 @@ const Atk = imports.gi.Atk;
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
-const GnomeDesktop = imports.gi.GnomeDesktop;
+const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Pango = imports.gi.Pango;
@@ -151,7 +151,7 @@ const ModalDialog = new Lang.Class({
     _init: function() {
         this.state = State.CLOSED;
 
-        this._idleMonitor = new GnomeDesktop.IdleMonitor();
+        this._idleMonitor = Meta.IdleMonitor.get_core();
         this._pushModalDelaySource = 0;
         this._pushModalWatchId = 0;
         this._pushModalSource = 0;
@@ -285,7 +285,6 @@ const ModalDialog = new Lang.Class({
 
         return this._grabHelper.grab({
             actor: this._lightbox.actor,
-            modal: true,
             onUngrab: Lang.bind(this, this._onUngrab)
         });
     },

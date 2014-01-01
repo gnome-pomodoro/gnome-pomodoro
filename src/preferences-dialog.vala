@@ -110,7 +110,6 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
     private Gtk.Notebook notebook;
 
     private Gtk.SizeGroup combo_box_size_group;
-    private Gtk.SizeGroup field_size_group;
     private Gtk.Label presence_notice;
     private Gtk.Box vbox;
 
@@ -164,7 +163,6 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         context.add_class ("preferences-dialog");
 
         this.combo_box_size_group = new Gtk.SizeGroup (Gtk.SizeGroupMode.BOTH);
-        this.field_size_group = new Gtk.SizeGroup (Gtk.SizeGroupMode.VERTICAL);
 
         this.setup_toolbar ();
         this.setup_notebook ();
@@ -277,8 +275,6 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
             bin.add (vbox);
         }
         else {
-            this.field_size_group.add_widget (widget);
-
             bin.add (hbox);
         }
 

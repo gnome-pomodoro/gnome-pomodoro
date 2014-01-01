@@ -3,4 +3,4 @@ BG.get_color skip
 BG.set_color skip
 BG.get_placement skip
 BG.set_placement skip
-
+RRScreen.new skip
