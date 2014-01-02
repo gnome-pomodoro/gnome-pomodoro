@@ -99,7 +99,7 @@ public class Pomodoro.Player : Object
 
     construct
     {
-        dynamic Gst.Element pipeline = Gst.ElementFactory.make ("playbin2", "player");
+        dynamic Gst.Element pipeline = Gst.ElementFactory.make ("playbin", "player");
 
         assert (pipeline != null);
 
@@ -190,7 +190,7 @@ public class Pomodoro.Player : Object
     private void do_repeat ()
     {
         var uri = "";
-        this.pipeline.get ("uri", out uri);
+        this.pipeline.get ("current-uri", out uri);
 
         if (uri != "") {
             this.pipeline.set ("uri", uri);

@@ -125,7 +125,7 @@ m4_define(gtk_minver,                  3.10.0)
 m4_define(schemas_minver,              3.10.0)
 m4_define(upower_minver,               0.9.20)
 m4_define(canberra_minver,             0.30)
-m4_define(gstreamer_minver,            0.10)
+m4_define(gstreamer_minver,            1.2.0)
 
 AC_CHECK_LIB(m, floor)
 AC_CHECK_HEADERS(malloc.h)
@@ -146,7 +146,7 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
     gsettings-desktop-schemas >= schemas_minver
     upower-glib >= upower_minver
     libcanberra >= canberra_minver
-    gstreamer-0.10 >= gstreamer_minver
+    gstreamer-1.0 >= gstreamer_minver
 ])
 
 # egg-list-box
