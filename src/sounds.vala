@@ -108,7 +108,7 @@ public class Pomodoro.Player : Object
         this.pipeline = pipeline;
 
         this.bus = this.pipeline.get_bus ();
-        this.bus.add_watch (this.bus_callback);
+        this.bus.add_watch (GLib.Priority.DEFAULT, this.bus_callback);
 
         this.fade_animation = null;
         this.fade_value = 0.0;

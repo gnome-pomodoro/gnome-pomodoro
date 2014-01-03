@@ -63,7 +63,7 @@ gnome_pomodoro_VALAFLAGS = \
     --pkg upower-glib \
     --pkg libcanberra \
     --pkg egglistbox \
-    --pkg gstreamer-0.10
+    --pkg gstreamer-1.0
 
 gnome_pomodoro_LDADD = \
     $(GNOME_POMODORO_LIBS)
