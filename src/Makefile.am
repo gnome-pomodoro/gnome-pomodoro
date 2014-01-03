@@ -5,7 +5,6 @@ bin_PROGRAMS = gnome-pomodoro
 AM_CFLAGS = \
     -I$(top_srcdir) \
     -I$(top_builddir) \
-    -I$(top_srcdir)/egg-list-box \
     $(GNOME_POMODORO_CFLAGS) \
     $(WARNING_CFLAGS) \
     -DGETTEXT_PACKAGE="\"$(GETTEXT_PACKAGE)\"" \
@@ -29,7 +28,6 @@ gnome_pomodoro_built_sources = \
     resources.h
 
 gnome_pomodoro_SOURCES = \
-    $(top_srcdir)/egg-list-box/egg-list-box.c \
     about-dialog.vala \
     animation.vala \
     application.vala \
@@ -50,7 +48,6 @@ gnome_pomodoro_SOURCES = \
 
 gnome_pomodoro_VALAFLAGS = \
     --vapidir=$(top_srcdir)/vapi \
-    --vapidir=$(top_srcdir)/egg-list-box \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
@@ -62,7 +59,6 @@ gnome_pomodoro_VALAFLAGS = \
     --pkg gnome-desktop-3.0 \
     --pkg upower-glib \
     --pkg libcanberra \
-    --pkg egglistbox \
     --pkg gstreamer-1.0
 
 gnome_pomodoro_LDADD = \

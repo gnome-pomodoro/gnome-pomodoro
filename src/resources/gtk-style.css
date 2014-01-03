@@ -10,15 +10,6 @@
 .preferences-dialog {
 }
 
-.preferences-dialog EggListBox {
-    -GtkWidget-focus-line-width: 0;
-    -GtkWidget-focus-padding: 0;
-}
-
-.preferences-dialog .list {
-    background-color: @background;
-}
-
 PomodoroSymbolicButton {
     icon-shadow: none;
 }

@@ -1,7 +1,6 @@
 include $(top_srcdir)/Makefile.include
 
 SUBDIRS = \
-    egg-list-box \
     vapi \
     src \
     extension \

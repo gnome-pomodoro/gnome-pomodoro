@@ -113,7 +113,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
     private Gtk.Label presence_notice;
     private Gtk.Box vbox;
 
-    public Egg.ListBox contents { get; set; }
+    public Gtk.ListBox contents { get; set; }
 
     public enum Mode {
         TIMER,
@@ -211,27 +211,11 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.notebook.page = Mode.TIMER;
     }
 
-    private void contents_separator_func (ref Gtk.Widget? separator,
-                                          Gtk.Widget      child,
-                                          Gtk.Widget?     before)
+    private Gtk.ListBox create_list_box ()
     {
-        if (before != null) {
-            if (separator == null) {
-                separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
-            }
-        }
-        else {
-            separator = null;
-        }
-    }
-
-    private Egg.ListBox create_list_box ()
-    {
-        var list_box = new Egg.ListBox ();
+        var list_box = new Gtk.ListBox ();
         list_box.set_selection_mode (Gtk.SelectionMode.NONE);
         list_box.set_activate_on_single_click (false);
-        list_box.get_style_context ().add_class ("list");
-        list_box.set_separator_funcs (this.contents_separator_func);
         list_box.can_focus = false;
         list_box.show ();
 
@@ -251,8 +235,10 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         return alignment as Gtk.Container;
     }
 
-    private Gtk.Widget create_field (string text, Gtk.Widget widget, Gtk.Widget? bottom_widget=null)
+    private Gtk.ListBoxRow create_field (string text, Gtk.Widget widget, Gtk.Widget? bottom_widget=null)
     {
+        var row = new Gtk.ListBoxRow ();
+
         var bin = new Gtk.Alignment (0.0f, 0.0f, 1.0f, 1.0f);
         bin.set_padding (10, 10, 3, 3);
 
@@ -278,9 +264,10 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
             bin.add (hbox);
         }
 
-        bin.show_all ();
+        row.add (bin);
+        row.show_all ();
 
-        return bin;
+        return row;
     }
 
     private Gtk.Widget create_scale_field (string text,

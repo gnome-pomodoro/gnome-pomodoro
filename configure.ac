@@ -149,19 +149,9 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
     gstreamer-1.0 >= gstreamer_minver
 ])
 
-# egg-list-box
-PKG_CHECK_MODULES(LISTBOX, [
-    glib-2.0 >= 2.31.10
-    gtk+-3.0 >= 3.4.0
-])
-
-LISTBOX_PACKAGES="--pkg gtk+-3.0"
-AC_SUBST(LISTBOX_PACKAGES)
-
 
 AC_CONFIG_FILES([
   Makefile
-  egg-list-box/Makefile
   vapi/Makefile
   src/Makefile
   extension/Makefile
