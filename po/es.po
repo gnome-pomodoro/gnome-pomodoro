@@ -40,7 +40,7 @@ msgstr "¡Es la hora de tomar un descanso!"
 #: ../extension/notifications.js:575
 #, fuzzy
 msgid "A new pomodoro is starting"
-msgstr "Un nuevo pomodoro está comenzando!"
+msgstr "Comenzando un nuevo pomodoro"
 
 #: ../extension/notifications.js:588
 msgid "Take a break!"
@@ -53,11 +53,11 @@ msgstr "Comenzar un nuevo pomodoro"
 
 #: ../extension/notifications.js:644
 msgid "Shorten the break"
-msgstr ""
+msgstr "Acortar el descanso"
 
 #: ../extension/notifications.js:650
 msgid "Lengthen the break"
-msgstr ""
+msgstr "Alargar el descanso"
 
 #: ../extension/notifications.js:664
 #, fuzzy, c-format
@@ -76,39 +76,39 @@ msgstr[1] "Tiene %d minutos\n"
 #: ../extension/notifications.js:685
 #, fuzzy
 msgid "Hey, you're missing out on a break"
-msgstr "¡Se te está pasando el descanso!"
+msgstr "¡Se le está pasando el descanso!"
 
 #: ../extension/notifications.js:764
 msgid "Could not run pomodoro"
-msgstr ""
+msgstr "No se pudo ejecutar el pomodoro"
 
 #: ../extension/notifications.js:766
 msgid "Something went badly wrong..."
-msgstr ""
+msgstr "Algo falló..."
 
 #: ../extension/notifications.js:767
 msgid "Looks like gnome-pomodoro is not installed"
-msgstr ""
+msgstr "Parece que gnome-pomodoro no está instalado"
 
 #: ../extension/notifications.js:776
 msgid "Report issue"
-msgstr ""
+msgstr "Informar problema"
 
 #: ../extension/notifications.js:779
 msgid "Install"
-msgstr ""
+msgstr "Instalar"
 
 #: ../src/about-dialog.vala:29
 msgid "About Pomodoro"
-msgstr ""
+msgstr "Acerca de Pomodoro"
 
 #: ../src/about-dialog.vala:31
 msgid "A simple time management utility"
-msgstr ""
+msgstr "Una sencilla utilidad de gestión del tiempo"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
-msgstr ""
+msgstr "Créditos de los traductores"
 
 #: ../src/about-dialog.vala:45
 msgid ""
@@ -116,11 +116,14 @@ msgid ""
 "under the terms of the GNU General Public License as published by the Free "
 "Software Foundation; either version 3 of the License, or (at your option) "
 "any later version."
-msgstr ""
+msgstr "Este programa es software libre: puede redistribuirlo y/o "
+"modificarlo bajo los términos de la Licencia General Pública de GNU publicada por la Free "
+"Software Foundation, ya sea la versión 3 de la Licencia, o (a su elección) "
+"cualquier versión posterior."
 
 #: ../src/preferences-dialog.vala:306
 msgid "Timer"
-msgstr ""
+msgstr "Cronómetro"
 
 #: ../src/preferences-dialog.vala:358
 msgid "Pomodoro duration"
@@ -144,47 +147,47 @@ msgstr "Tecla para conmutar el temporizador."
 #: ../src/preferences-dialog.vala:374
 #, fuzzy
 msgid "Select ticking sound"
-msgstr "Usar sonido de notificación"
+msgstr "Seleccionar sonido de tictac"
 
 #: ../src/preferences-dialog.vala:379
 msgid "Ticking sound"
-msgstr ""
+msgstr "Sonido de tictac"
 
 #: ../src/preferences-dialog.vala:401
 #, fuzzy
 msgid "Notifications"
-msgstr "Notificación de sonido"
+msgstr "Notificaciones"
 
 #: ../src/preferences-dialog.vala:405
 #, fuzzy
 msgid "Screen notifications"
-msgstr "Notificaciones a pantalla completa"
+msgstr "Notificaciones en pantalla"
 
 #: ../src/preferences-dialog.vala:410
 #, fuzzy
 msgid "Remind to take a break"
-msgstr "¡Es la hora de tomar un descanso!"
+msgstr "Recuerde tomar un descanso"
 
 #: ../src/preferences-dialog.vala:428
 msgid "Loud bell"
-msgstr ""
+msgstr "Alarma fuerte"
 
 #: ../src/preferences-dialog.vala:432
 msgid "Bell"
-msgstr ""
+msgstr "Alarma"
 
 #: ../src/preferences-dialog.vala:440
 msgid "Select sound for start of break"
-msgstr ""
+msgstr "Seleccionar sonido para el comienzo del descanso"
 
 #: ../src/preferences-dialog.vala:451
 msgid "Start of break sound"
-msgstr ""
+msgstr "Sonido del comienzo del descanso"
 
 #: ../src/preferences-dialog.vala:455
 #, fuzzy
 msgid "Select sound for pomodoro start"
-msgstr "Archivo de sonido para reproducir al iniciar o finalizar un pomodoro."
+msgstr "Archivo de sonido para reproducir al iniciar un pomodoro"
 
 #: ../src/preferences-dialog.vala:465
 #, fuzzy
@@ -193,24 +196,24 @@ msgstr "Duración del pomodoro"
 
 #: ../src/preferences-dialog.vala:497
 msgid "Available"
-msgstr ""
+msgstr "Disponible"
 
 #: ../src/preferences-dialog.vala:498
 msgid "Busy"
-msgstr ""
+msgstr "Ocupado"
 
 #. Currently gnome-shell does not handle invisible status properly
 #: ../src/preferences-dialog.vala:501
 msgid "Invisible"
-msgstr ""
+msgstr "Invisible"
 
 #: ../src/preferences-dialog.vala:517
 msgid "Presence"
-msgstr ""
+msgstr "Presencia"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Postpone pomodoro when idle"
-msgstr ""
+msgstr "Posponer pomodoro cuando esté ausente"
 
 #: ../src/preferences-dialog.vala:528
 #, fuzzy
@@ -227,25 +230,27 @@ msgid ""
 "System notifications including chat messages will be disabled during "
 "pomodoro."
 msgstr ""
+"Las notificaciones del sistema (incuyendo mensajes de chat) se desactivarán durante "
+"el pomodoro."
 
 #: ../src/preferences-dialog.vala:618
 msgid ""
 "System notifications including chat messages will be disabled during break."
 msgstr ""
+"Las notificaciones del sistema (incuyendo mensajes de chat) se desactivarán durante el descanso."
 
 #: ../src/preferences-dialog.vala:622
 #, fuzzy
 msgid "System notifications including chat messages will be disabled."
 msgstr ""
-"Cambiar el estado en línea e inhabilitar notificaciones incluyendo mensajes "
-"del chat"
+"Las notificaciones del sistema (incuyendo mensajes de chat) se desactivarán."
 
 #: ../src/utils.vala:92
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d hora"
+msgstr[1] "%d horas"
 
 #: ../src/utils.vala:101
 #, c-format
@@ -256,7 +261,7 @@ msgstr[1] "%d minutos"
 
 #: ../src/widgets.vala:327
 msgid "Disabled"
-msgstr ""
+msgstr "Desactivado"
 
 #: ../src/widgets.vala:384
 #, c-format
@@ -264,56 +269,58 @@ msgid ""
 "The shortcut \"%s\" cannot be used because it will become impossible to type "
 "using this key.\n"
 "Please try with a key such as Control, Alt or Shift at the same time."
-msgstr ""
+msgstr "El atajo de teclado '%s' no puede usarse porque sería imposible escribir "
+"usando esta tecla.\n"
+"Por favor, pruebe a combinarlo con una tecla como Ctrl, Alt o Mayús."
 
 #: ../src/widgets.vala:492
 msgid "_No sound"
-msgstr ""
+msgstr "_Silenciar"
 
 #: ../src/widgets.vala:494
 msgid "_Cancel"
-msgstr ""
+msgstr "_Cancelar"
 
 #: ../src/widgets.vala:496
 msgid "_Open"
-msgstr ""
+msgstr "_Abrir"
 
 #: ../src/widgets.vala:503
 msgid "Select a file"
-msgstr ""
+msgstr "Seleccione un archivo"
 
 #: ../src/widgets.vala:563
 msgid "All files"
-msgstr ""
+msgstr "Todos los archivos"
 
 #: ../src/widgets.vala:691
 msgid "Other…"
-msgstr ""
+msgstr "otros..."
 
 #: ../src/widgets.vala:702
 msgid "None"
-msgstr ""
+msgstr "Nada"
 
 #: ../src/widgets.vala:1004 ../src/widgets.vala:1013
 msgid "Supported audio files"
-msgstr ""
+msgstr "Ficheros de audio permitidos"
 
 #: ../data/gnome-pomodoro.desktop.in.h:2
 msgid "Manage your time and tasks"
-msgstr ""
+msgstr "Gestione su tiempo y tareas"
 
 #: ../data/gnome-pomodoro.desktop.in.h:3
 msgid "time;timer;tasks;manage;organize;"
-msgstr ""
+msgstr "tiempo;cronómetro;tareas;gestionar;organizar;"
 
 #~ msgid "Options"
-#~ msgstr "Opciónes"
+#~ msgstr "Opciones"
 
 #~ msgid "Reset Counts and Timer"
 #~ msgstr "Reiniciar el contador y el temporizador"
 
 #~ msgid "Away From Desk"
-#~ msgstr "Ausencia del escritorio"
+#~ msgstr "Ausente del escritorio"
 
 #~ msgid "Control Presence Status"
 #~ msgstr "Control del estado de presencia"
@@ -327,7 +334,7 @@ msgstr ""
 #~ msgstr[1] "%d sesiones completadas"
 
 #~ msgid "Pause finished."
-#~ msgstr "El descanso ha finalizado"
+#~ msgstr "El descanso ha finalizado."
 
 #~ msgid "Time in seconds you are supposed to be working."
 #~ msgstr "Tiempo en segundos que se supone que son de trabajo."
@@ -345,11 +352,10 @@ msgstr ""
 #~ msgstr "Tiempo en segundos que se supone que son de pausa larga."
 
 #~ msgid "Whether to show a notification dialog when pause starts."
-#~ msgstr ""
-#~ "Si se muestra un diálogo de notificación cuando se inicia una pausa."
+#~ msgstr "¿Mostrar un diálogo de notificación al comenzar un descanso?"
 
 #~ msgid "Disable flexible breaks"
-#~ msgstr "Inhabilitar pausas flexibles"
+#~ msgstr "Desactivar pausas flexibles"
 
 #~ msgid "Whether you are not using a computer to work."
 #~ msgstr "Si no se está usando un ordenador para trabajar."
@@ -358,7 +364,7 @@ msgstr ""
 #~ msgstr "Cambiar el estado de presencia del usuario a ocupado"
 
 #~ msgid "Whether to change user and IM presence to busy."
-#~ msgstr "Si se cambia el usuario y la presencia de MI a ocupado."
+#~ msgstr "Si se cambia el usuario y la presencia de chat a ocupado."
 
 #~ msgid "Whether to play a sound to notify of events."
 #~ msgstr "Si se reproduce un sonido para notificar los eventos."
@@ -400,7 +406,7 @@ msgstr ""
 #~ msgstr "Reproducir un sonido al comenzar la sesión de pomodoro"
 
 #~ msgid "Pomodoro Finished!"
-#~ msgstr "El pomodoro ha finalizado!"
+#~ msgstr "¡El pomodoro ha finalizado!"
 
 #~ msgid "Hide"
 #~ msgstr "Ocultar"
