@@ -17,8 +17,7 @@ This [GNOME](http://www.gnome.org/gnome-3/) utility intends to help manage time 
 
 ### Screenshots
 
-![Screenshot](http://kamilprusko.org/files/gnome-pomodoro-0.9.0-indicator.png)
-
+![Screenshot](http://kamilprusko.org/files/gnome-pomodoro-0.10.0.png)
 
 ### What is the pomodoro technique?
 
