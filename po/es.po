@@ -169,19 +169,19 @@ msgstr "Recuerde tomar un descanso"
 
 #: ../src/preferences-dialog.vala:459
 msgid "Sounds"
-msgstr ""
+msgstr "Sonidos"
 
 #: ../src/preferences-dialog.vala:464
 msgid "Clock Ticking"
-msgstr ""
+msgstr "Reloj"
 
 #: ../src/preferences-dialog.vala:468
 msgid "Timer Ticking"
-msgstr ""
+msgstr "Cronógrafo"
 
 #: ../src/preferences-dialog.vala:472
 msgid "Woodland Birds"
-msgstr ""
+msgstr "Pájaros"
 
 #: ../src/preferences-dialog.vala:479
 #, fuzzy
@@ -273,7 +273,7 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:707
 msgid "OK"
-msgstr ""
+msgstr "Aceptar"
 
 #: ../src/utils.vala:92
 #, c-format
