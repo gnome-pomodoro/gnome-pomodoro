@@ -126,20 +126,20 @@ msgstr "Minutnik"
 
 #: ../src/preferences-dialog.vala:396
 msgid "Pomodoro duration"
-msgstr "Czas pomodoro"
+msgstr "Długość pomodoro"
 
 #: ../src/preferences-dialog.vala:399
 msgid "Short break duration"
-msgstr "Czas krótkiej przerwy"
+msgstr "Długość krótkiej przerwy"
 
 #: ../src/preferences-dialog.vala:402
 msgid "Long break duration"
-msgstr "Czas długiej przerwy"
+msgstr "Długość długiej przerwy"
 
 #. @translators: You can refer it to number of pomodoros in a cycle
 #: ../src/preferences-dialog.vala:411
 msgid "Pomodoros to a long break"
-msgstr "Liczba sesji do długiej przerwy"
+msgstr "Liczba pomodoro w cyklu"
 
 #: ../src/preferences-dialog.vala:418
 msgid "Shortcut to toggle the timer"
@@ -151,7 +151,7 @@ msgstr "Powiadomienia"
 
 #: ../src/preferences-dialog.vala:432
 msgid "Screen notifications"
-msgstr "Powiadomienia pełnoekranowe"
+msgstr "Powiadomienia ekranowe"
 
 #: ../src/preferences-dialog.vala:437
 msgid "Remind to take a break"
@@ -159,7 +159,7 @@ msgstr "Przypomnaj o porzerwie"
 
 #: ../src/preferences-dialog.vala:459
 msgid "Sounds"
-msgstr ""
+msgstr "Dźwięki"
 
 #: ../src/preferences-dialog.vala:464
 msgid "Clock Ticking"
@@ -171,7 +171,7 @@ msgstr "Tykanie stopera"
 
 #: ../src/preferences-dialog.vala:472
 msgid "Woodland Birds"
-msgstr "Odgłos ptaków"
+msgstr "Głosy ptaków"
 
 #: ../src/preferences-dialog.vala:479
 msgid "Select ticking sound"
@@ -193,13 +193,13 @@ msgstr "Dzwonek"
 msgid "Select sound for start of break"
 msgstr "Wybierz dźwięk rozpoczęcia przerwy"
 
+#: ../src/preferences-dialog.vala:534
+msgid "Select sound for pomodoro start"
+msgstr "Wybierz dźwięk rozpoczęcia pomodoro"
+
 #: ../src/preferences-dialog.vala:530
 msgid "Start of break sound"
 msgstr "Dźwięk rozpoczęcia przerwy"
-
-#: ../src/preferences-dialog.vala:534
-msgid "Select sound for pomodoro start"
-msgstr "Plik dźwiękowy dla końca przerwy"
 
 #: ../src/preferences-dialog.vala:543
 msgid "Pomodoro start sound"
@@ -258,7 +258,7 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:707
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: ../src/utils.vala:92
 #, c-format
