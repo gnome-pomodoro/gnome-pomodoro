@@ -160,19 +160,19 @@ msgstr "Errinnere daran eine Pause zu machen"
 
 #: ../src/preferences-dialog.vala:459
 msgid "Sounds"
-msgstr ""
+msgstr "Klänge"
 
 #: ../src/preferences-dialog.vala:464
 msgid "Clock Ticking"
-msgstr ""
+msgstr "Uhr"
 
 #: ../src/preferences-dialog.vala:468
 msgid "Timer Ticking"
-msgstr ""
+msgstr "Stoppuhr"
 
 #: ../src/preferences-dialog.vala:472
 msgid "Woodland Birds"
-msgstr ""
+msgstr "Vögel"
 
 #: ../src/preferences-dialog.vala:479
 msgid "Select ticking sound"
@@ -258,7 +258,7 @@ msgstr "Systembenachrichtigungen "
 
 #: ../src/preferences-dialog.vala:707
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: ../src/utils.vala:92
 #, c-format
@@ -312,7 +312,7 @@ msgstr "Alle Dateien"
 #: ../src/widgets.vala:711
 #, fuzzy
 msgid "Other…"
-msgstr "Andere..."
+msgstr "Andere…"
 
 #: ../src/widgets.vala:722
 #, fuzzy
