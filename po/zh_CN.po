@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-05 23:18+0100\n"
+"POT-Creation-Date: 2014-01-10 14:23+0100\n"
 "PO-Revision-Date: 2013-01-11 19:14+0800\n"
 "Last-Translator: Meng Zhuo <mengzhuo1203@gmail.com>\n"
 "Language-Team: \n"
@@ -17,12 +17,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#. Toggle timer state button
-#: ../extension/indicator.js:84
+#. Toggle timer state button */
+#: ../extension/indicator.js:87
 msgid "Pomodoro Timer"
 msgstr "番茄计时器"
 
-#: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
+#: ../extension/indicator.js:94 ../src/preferences-dialog.vala:129
+#: ../src/preferences-dialog.vala:184
 msgid "Preferences"
 msgstr "首选项"
 
@@ -32,67 +33,67 @@ msgstr "首选项"
 msgid "Pomodoro"
 msgstr "番茄计时器"
 
-#: ../extension/notifications.js:390
+#: ../extension/notifications.js:389
 #, fuzzy
 msgid "It's time to take a break"
 msgstr "现在是时候要休息一下了～"
 
-#: ../extension/notifications.js:575
+#: ../extension/notifications.js:574
 #, fuzzy
 msgid "A new pomodoro is starting"
 msgstr "暂停结束，新的番茄时间开始了～"
 
-#: ../extension/notifications.js:588
+#: ../extension/notifications.js:587
 msgid "Take a break!"
 msgstr "休息一下吧～"
 
-#: ../extension/notifications.js:602
+#: ../extension/notifications.js:610
 #, fuzzy
 msgid "Start pomodoro"
 msgstr "开始新的番茄时间"
 
-#: ../extension/notifications.js:644
+#: ../extension/notifications.js:652
 msgid "Shorten the break"
 msgstr ""
 
-#: ../extension/notifications.js:650
+#: ../extension/notifications.js:658
 msgid "Lengthen the break"
 msgstr ""
 
-#: ../extension/notifications.js:664
-#, fuzzy, c-format
+#: ../extension/notifications.js:672
+#, fuzzy, javascript-format
 msgid "You have %d second left"
 msgid_plural "You have %d seconds left"
 msgstr[0] "休息一会, 你有%d秒的休息时间\n"
 
-#: ../extension/notifications.js:666
-#, fuzzy, c-format
+#: ../extension/notifications.js:674
+#, fuzzy, javascript-format
 msgid "You have %d minute left"
 msgid_plural "You have %d minutes left"
 msgstr[0] "休息一会, 你有%d分的休息时间\n"
 
-#: ../extension/notifications.js:685
+#: ../extension/notifications.js:693
 #, fuzzy
 msgid "Hey, you're missing out on a break"
 msgstr "嘿，你忘过了休息下"
 
-#: ../extension/notifications.js:764
+#: ../extension/notifications.js:772
 msgid "Could not run pomodoro"
 msgstr ""
 
-#: ../extension/notifications.js:766
+#: ../extension/notifications.js:774
 msgid "Something went badly wrong..."
 msgstr ""
 
-#: ../extension/notifications.js:767
+#: ../extension/notifications.js:775
 msgid "Looks like gnome-pomodoro is not installed"
 msgstr ""
 
-#: ../extension/notifications.js:776
+#: ../extension/notifications.js:784
 msgid "Report issue"
 msgstr ""
 
-#: ../extension/notifications.js:779
+#: ../extension/notifications.js:787
 msgid "Install"
 msgstr ""
 
@@ -116,123 +117,143 @@ msgid ""
 "any later version."
 msgstr ""
 
-#: ../src/preferences-dialog.vala:306
+#: ../src/preferences-dialog.vala:329
 msgid "Timer"
 msgstr "计时器"
 
-#: ../src/preferences-dialog.vala:358
+#: ../src/preferences-dialog.vala:396
 msgid "Pomodoro duration"
 msgstr "番茄时间时长"
 
-#: ../src/preferences-dialog.vala:361
+#: ../src/preferences-dialog.vala:399
 #, fuzzy
 msgid "Short break duration"
 msgstr "短休息时长"
 
-#: ../src/preferences-dialog.vala:364
+#: ../src/preferences-dialog.vala:402
 #, fuzzy
 msgid "Long break duration"
 msgstr "长休息时长"
 
-#: ../src/preferences-dialog.vala:371
+#. @translators: You can refer it to number of pomodoros in a cycle
+#: ../src/preferences-dialog.vala:411
+msgid "Pomodoros to a long break"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:418
 #, fuzzy
 msgid "Shortcut to toggle the timer"
 msgstr "开关计时器快捷键"
 
-#: ../src/preferences-dialog.vala:374
-#, fuzzy
-msgid "Select ticking sound"
-msgstr "使用声音提示"
-
-#: ../src/preferences-dialog.vala:379
-msgid "Ticking sound"
-msgstr ""
-
-#: ../src/preferences-dialog.vala:401
+#: ../src/preferences-dialog.vala:426
 #, fuzzy
 msgid "Notifications"
 msgstr "通知"
 
-#: ../src/preferences-dialog.vala:405
+#: ../src/preferences-dialog.vala:432
 #, fuzzy
 msgid "Screen notifications"
 msgstr "全屏通知"
 
-#: ../src/preferences-dialog.vala:410
+#: ../src/preferences-dialog.vala:437
 #, fuzzy
 msgid "Remind to take a break"
 msgstr "现在是时候要休息一下了～"
 
-#: ../src/preferences-dialog.vala:428
+#: ../src/preferences-dialog.vala:459
+msgid "Sounds"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:464
+msgid "Clock Ticking"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:468
+msgid "Timer Ticking"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:472
+msgid "Woodland Birds"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:479
+#, fuzzy
+msgid "Select ticking sound"
+msgstr "使用声音提示"
+
+#: ../src/preferences-dialog.vala:490
+msgid "Ticking sound"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:510
 msgid "Loud bell"
 msgstr ""
 
-#: ../src/preferences-dialog.vala:432
+#: ../src/preferences-dialog.vala:514
 msgid "Bell"
 msgstr ""
 
-#: ../src/preferences-dialog.vala:440
+#: ../src/preferences-dialog.vala:521
 msgid "Select sound for start of break"
 msgstr ""
 
-#: ../src/preferences-dialog.vala:451
+#: ../src/preferences-dialog.vala:530
 msgid "Start of break sound"
 msgstr ""
 
-#: ../src/preferences-dialog.vala:455
-#, fuzzy
+#: ../src/preferences-dialog.vala:534
 msgid "Select sound for pomodoro start"
 msgstr ""
 
-#: ../src/preferences-dialog.vala:465
-#, fuzzy
+#: ../src/preferences-dialog.vala:543
 msgid "Pomodoro start sound"
 msgstr ""
 
-#: ../src/preferences-dialog.vala:497
+#: ../src/preferences-dialog.vala:575
 msgid "Available"
 msgstr ""
 
-#: ../src/preferences-dialog.vala:498
+#: ../src/preferences-dialog.vala:576
 msgid "Busy"
 msgstr "忙碌"
 
 #. Currently gnome-shell does not handle invisible status properly
-#: ../src/preferences-dialog.vala:501
+#: ../src/preferences-dialog.vala:579
 msgid "Invisible"
 msgstr "不可见的"
 
-#: ../src/preferences-dialog.vala:517
+#: ../src/preferences-dialog.vala:597
 msgid "Presence"
 msgstr "外观"
 
-#: ../src/preferences-dialog.vala:521
+#: ../src/preferences-dialog.vala:603
 msgid "Postpone pomodoro when idle"
 msgstr ""
 
-#: ../src/preferences-dialog.vala:528
-#, fuzzy
+#: ../src/preferences-dialog.vala:608
 msgid "Status during pomodoro"
 msgstr ""
 
-#: ../src/preferences-dialog.vala:559
-#, fuzzy
+#: ../src/preferences-dialog.vala:613
 msgid "Status during break"
 msgstr ""
 
-#: ../src/preferences-dialog.vala:614
+#: ../src/preferences-dialog.vala:686
 msgid ""
-"System notifications including chat messages will be disabled during "
-"pomodoro."
+"System notifications including chat messages won't show up during pomodoro."
 msgstr ""
 
-#: ../src/preferences-dialog.vala:618
+#: ../src/preferences-dialog.vala:690
 msgid ""
-"System notifications including chat messages will be disabled during break."
+"System notifications including chat messages won't show up during break."
 msgstr ""
 
-#: ../src/preferences-dialog.vala:622
-msgid "System notifications including chat messages will be disabled."
+#: ../src/preferences-dialog.vala:694
+msgid "System notifications including chat messages won't show up."
+msgstr ""
+
+#: ../src/preferences-dialog.vala:707
+msgid "OK"
 msgstr ""
 
 #: ../src/utils.vala:92
@@ -259,35 +280,35 @@ msgid ""
 "Please try with a key such as Control, Alt or Shift at the same time."
 msgstr ""
 
-#: ../src/widgets.vala:492
+#: ../src/widgets.vala:512
 msgid "_No sound"
 msgstr "无声"
 
-#: ../src/widgets.vala:494
+#: ../src/widgets.vala:514
 msgid "_Cancel"
 msgstr "取消(_C)"
 
-#: ../src/widgets.vala:496
+#: ../src/widgets.vala:516
 msgid "_Open"
 msgstr "打开(_O)"
 
-#: ../src/widgets.vala:503
+#: ../src/widgets.vala:523
 msgid "Select a file"
 msgstr "选择文件"
 
-#: ../src/widgets.vala:563
+#: ../src/widgets.vala:583
 msgid "All files"
 msgstr ""
 
-#: ../src/widgets.vala:691
+#: ../src/widgets.vala:711
 msgid "Other…"
 msgstr "其它..."
 
-#: ../src/widgets.vala:702
+#: ../src/widgets.vala:722
 msgid "None"
 msgstr "无"
 
-#: ../src/widgets.vala:1004 ../src/widgets.vala:1013
+#: ../src/widgets.vala:1061 ../src/widgets.vala:1070
 msgid "Supported audio files"
 msgstr ""
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-05 23:18+0100\n"
+"POT-Creation-Date: 2014-01-10 14:23+0100\n"
 "PO-Revision-Date: 2013-11-23 05:57+0100\n"
 "Last-Translator: Johannes Hermann <linuxrider@web.de>\n"
 "Language-Team: de\n"
@@ -19,12 +19,13 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#. Toggle timer state button
-#: ../extension/indicator.js:84
+#. Toggle timer state button */
+#: ../extension/indicator.js:87
 msgid "Pomodoro Timer"
 msgstr "Pomodoro Timer"
 
-#: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
+#: ../extension/indicator.js:94 ../src/preferences-dialog.vala:129
+#: ../src/preferences-dialog.vala:184
 msgid "Preferences"
 msgstr "Einstellungen"
 
@@ -33,65 +34,65 @@ msgstr "Einstellungen"
 msgid "Pomodoro"
 msgstr "Pomodoro"
 
-#: ../extension/notifications.js:390
+#: ../extension/notifications.js:389
 msgid "It's time to take a break"
 msgstr "Es ist Zeit eine Pause einzulegen"
 
-#: ../extension/notifications.js:575
+#: ../extension/notifications.js:574
 msgid "A new pomodoro is starting"
 msgstr "Eine neue Pomodoro beginnt"
 
-#: ../extension/notifications.js:588
+#: ../extension/notifications.js:587
 msgid "Take a break!"
 msgstr "Mach Pause!"
 
-#: ../extension/notifications.js:602
+#: ../extension/notifications.js:610
 msgid "Start pomodoro"
 msgstr "Beginne Pomodoro"
 
-#: ../extension/notifications.js:644
+#: ../extension/notifications.js:652
 msgid "Shorten the break"
 msgstr "Verkürze Pause"
 
-#: ../extension/notifications.js:650
+#: ../extension/notifications.js:658
 msgid "Lengthen the break"
 msgstr "Verlängere Pause"
 
-#: ../extension/notifications.js:664
-#, c-format
+#: ../extension/notifications.js:672
+#, javascript-format
 msgid "You have %d second left"
 msgid_plural "You have %d seconds left"
 msgstr[0] "Du hast noch %d Sekunde"
 msgstr[1] "Du hast noch %d Sekunden"
 
-#: ../extension/notifications.js:666
-#, c-format
+#: ../extension/notifications.js:674
+#, javascript-format
 msgid "You have %d minute left"
 msgid_plural "You have %d minutes left"
 msgstr[0] "Du hast noch %d Minute"
 msgstr[1] "Du hast noch %d Minuten"
 
-#: ../extension/notifications.js:685
+#: ../extension/notifications.js:693
 msgid "Hey, you're missing out on a break"
 msgstr "He, du verpasst die Pause"
 
-#: ../extension/notifications.js:764
+#: ../extension/notifications.js:772
 msgid "Could not run pomodoro"
 msgstr "Konnte Pomodoro nicht ausführen"
 
-#: ../extension/notifications.js:766
+#: ../extension/notifications.js:774
 msgid "Something went badly wrong..."
 msgstr "Etwas ist schrecklich falsch gelaufen..."
 
-#: ../extension/notifications.js:767
+#: ../extension/notifications.js:775
 msgid "Looks like gnome-pomodoro is not installed"
 msgstr "Sieht so aus, als sei gnome-pomodoro nicht installiert"
 
-#: ../extension/notifications.js:776
+#: ../extension/notifications.js:784
 msgid "Report issue"
 msgstr "Problem melden"
 
-#: ../extension/notifications.js:779
+#: ../extension/notifications.js:787
 msgid "Install"
 msgstr "Installieren"
 
@@ -119,117 +120,145 @@ msgstr ""
 "der Free Software Foundation veröffentlicht ist; entweder Version 3 der "
 "Lizenz oder (nach Ihrer Wahl) jeder späteren."
 
-#: ../src/preferences-dialog.vala:306
+#: ../src/preferences-dialog.vala:329
 msgid "Timer"
 msgstr "Timer"
 
-#: ../src/preferences-dialog.vala:358
+#: ../src/preferences-dialog.vala:396
 msgid "Pomodoro duration"
 msgstr "Dauer einer Pomodoro"
 
-#: ../src/preferences-dialog.vala:361
+#: ../src/preferences-dialog.vala:399
 msgid "Short break duration"
 msgstr "Dauer einer kurzen Pause"
 
-#: ../src/preferences-dialog.vala:364
+#: ../src/preferences-dialog.vala:402
 msgid "Long break duration"
 msgstr "Dauer einer langen Pause"
 
-#: ../src/preferences-dialog.vala:371
+#. @translators: You can refer it to number of pomodoros in a cycle
+#: ../src/preferences-dialog.vala:411
+#, fuzzy
+msgid "Pomodoros to a long break"
+msgstr "Dauer einer Pomodoro"
+
+#: ../src/preferences-dialog.vala:418
 msgid "Shortcut to toggle the timer"
 msgstr "Shortcut zum Ein- und Ausschalten des Timers"
 
-#: ../src/preferences-dialog.vala:374
-msgid "Select ticking sound"
-msgstr "Wähle Ticken"
-
-#: ../src/preferences-dialog.vala:379
-msgid "Ticking sound"
-msgstr "Ticken"
-
-#: ../src/preferences-dialog.vala:401
+#: ../src/preferences-dialog.vala:426
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
-#: ../src/preferences-dialog.vala:405
+#: ../src/preferences-dialog.vala:432
 msgid "Screen notifications"
 msgstr "Bildschirmbenachrichtigung"
 
-#: ../src/preferences-dialog.vala:410
+#: ../src/preferences-dialog.vala:437
 msgid "Remind to take a break"
 msgstr "Errinnere daran eine Pause zu machen"
 
-#: ../src/preferences-dialog.vala:428
+#: ../src/preferences-dialog.vala:459
+msgid "Sounds"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:464
+msgid "Clock Ticking"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:468
+msgid "Timer Ticking"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:472
+msgid "Woodland Birds"
+msgstr ""
+
+#: ../src/preferences-dialog.vala:479
+msgid "Select ticking sound"
+msgstr "Wähle Ticken"
+
+#: ../src/preferences-dialog.vala:490
+msgid "Ticking sound"
+msgstr "Ticken"
+
+#: ../src/preferences-dialog.vala:510
 msgid "Loud bell"
 msgstr "Laute Glocke"
 
-#: ../src/preferences-dialog.vala:432
+#: ../src/preferences-dialog.vala:514
 msgid "Bell"
 msgstr "Glocke"
 
-#: ../src/preferences-dialog.vala:440
+#: ../src/preferences-dialog.vala:521
 msgid "Select sound for start of break"
 msgstr "Wähle Klang für den Pausenbeginn"
 
-#: ../src/preferences-dialog.vala:451
+#: ../src/preferences-dialog.vala:530
 msgid "Start of break sound"
 msgstr "Beginn des Pausenklangs"
 
-#: ../src/preferences-dialog.vala:455
+#: ../src/preferences-dialog.vala:534
 msgid "Select sound for pomodoro start"
 msgstr "Wähle Klang für den Beginn einer Pomodoro"
 
-#: ../src/preferences-dialog.vala:465
+#: ../src/preferences-dialog.vala:543
 msgid "Pomodoro start sound"
 msgstr "Dauer einer Pomodoro"
 
-#: ../src/preferences-dialog.vala:497
+#: ../src/preferences-dialog.vala:575
 msgid "Available"
 msgstr "Verfügbar"
 
-#: ../src/preferences-dialog.vala:498
+#: ../src/preferences-dialog.vala:576
 msgid "Busy"
 msgstr "Beschäftigt"
 
 #. Currently gnome-shell does not handle invisible status properly
-#: ../src/preferences-dialog.vala:501
+#: ../src/preferences-dialog.vala:579
 msgid "Invisible"
 msgstr "Unsichtbar"
 
-#: ../src/preferences-dialog.vala:517
+#: ../src/preferences-dialog.vala:597
 msgid "Presence"
 msgstr "Anwesenheit"
 
-#: ../src/preferences-dialog.vala:521
+#: ../src/preferences-dialog.vala:603
 msgid "Postpone pomodoro when idle"
 msgstr "Verschiebe Pomodoro, wenn untätig"
 
-#: ../src/preferences-dialog.vala:528
+#: ../src/preferences-dialog.vala:608
 msgid "Status during pomodoro"
 msgstr "Status während der Pomodoro"
 
-#: ../src/preferences-dialog.vala:559
+#: ../src/preferences-dialog.vala:613
 msgid "Status during break"
 msgstr "Status während der Pause"
 
-#: ../src/preferences-dialog.vala:614
+#: ../src/preferences-dialog.vala:686
+#, fuzzy
 msgid ""
-"System notifications including chat messages will be disabled during "
-"pomodoro."
+"System notifications including chat messages won't show up during pomodoro."
 msgstr ""
 "Systembenachrichtigungen inklusive Chat-Nachrichten werden während der "
 "Pomodoro abgeschaltet."
 
-#: ../src/preferences-dialog.vala:618
+#: ../src/preferences-dialog.vala:690
+#, fuzzy
 msgid ""
-"System notifications including chat messages will be disabled during break."
+"System notifications including chat messages won't show up during break."
 msgstr ""
 "Systembenachrichtigungen inklusive Chat-Nachrichten werden während der Pause "
 "abgeschaltet."
 
-#: ../src/preferences-dialog.vala:622
-msgid "System notifications including chat messages will be disabled."
+#: ../src/preferences-dialog.vala:694
+#, fuzzy
+msgid "System notifications including chat messages won't show up."
 msgstr "Systembenachrichtigungen "
+
+#: ../src/preferences-dialog.vala:707
+msgid "OK"
+msgstr ""
 
 #: ../src/utils.vala:92
 #, c-format
@@ -260,37 +289,37 @@ msgstr ""
 "mit dieser Taste unmöglich wird.\n"
 " Bitte versuche mit gleichzeitig gedrücktem Strg, Alt oder Umschalt."
 
-#: ../src/widgets.vala:492
+#: ../src/widgets.vala:512
 msgid "_No sound"
 msgstr "_Ton aus"
 
-#: ../src/widgets.vala:494
+#: ../src/widgets.vala:514
 msgid "_Cancel"
 msgstr "_Abbrechen"
 
-#: ../src/widgets.vala:496
+#: ../src/widgets.vala:516
 msgid "_Open"
 msgstr "_Öffnen"
 
-#: ../src/widgets.vala:503
+#: ../src/widgets.vala:523
 msgid "Select a file"
 msgstr "Wähle Datei"
 
-#: ../src/widgets.vala:563
+#: ../src/widgets.vala:583
 msgid "All files"
 msgstr "Alle Dateien"
 
-#: ../src/widgets.vala:691
+#: ../src/widgets.vala:711
 #, fuzzy
 msgid "Other…"
 msgstr "Andere..."
 
-#: ../src/widgets.vala:702
+#: ../src/widgets.vala:722
 #, fuzzy
 msgid "None"
 msgstr "Keiner"
 
-#: ../src/widgets.vala:1004 ../src/widgets.vala:1013
+#: ../src/widgets.vala:1061 ../src/widgets.vala:1070
 msgid "Supported audio files"
 msgstr "Unterstützte Audiodateien"
 
