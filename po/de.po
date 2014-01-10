@@ -104,9 +104,8 @@ msgid "A simple time management utility"
 msgstr "Ein einfaches Werkzeug für Zeitmanagement"
 
 #: ../src/about-dialog.vala:39
-#, fuzzy
 msgid "translator-credits"
-msgstr "Übersetzer"
+msgstr ""
 
 #: ../src/about-dialog.vala:45
 msgid ""

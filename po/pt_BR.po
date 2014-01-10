@@ -24,13 +24,13 @@ msgstr "Temporizador Pomodoro"
 
 #: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
 msgid "Preferences"
-msgstr ""
+msgstr "Preferências"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
 #, fuzzy
 msgid "Pomodoro"
-msgstr "Temporizador Pomodoro"
+msgstr "Temporizador"
 
 #: ../extension/notifications.js:390
 #, fuzzy
@@ -143,7 +143,7 @@ msgstr ""
 #: ../src/preferences-dialog.vala:374
 #, fuzzy
 msgid "Select ticking sound"
-msgstr "Usar sons de notificações"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:379
 msgid "Ticking sound"
@@ -152,7 +152,7 @@ msgstr ""
 #: ../src/preferences-dialog.vala:401
 #, fuzzy
 msgid "Notifications"
-msgstr "Sons de Notificações"
+msgstr "Notificações"
 
 #: ../src/preferences-dialog.vala:405
 #, fuzzy
@@ -162,7 +162,7 @@ msgstr "Notificações em Tela Cheia"
 #: ../src/preferences-dialog.vala:410
 #, fuzzy
 msgid "Remind to take a break"
-msgstr "É hora de descançar!"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:428
 msgid "Loud bell"
@@ -188,24 +188,24 @@ msgstr "Arquivo de áudio para tocar no início ou no final do pomodoro."
 #: ../src/preferences-dialog.vala:465
 #, fuzzy
 msgid "Pomodoro start sound"
-msgstr "Duração do Pomodoro"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:497
 msgid "Available"
-msgstr ""
+msgstr "Disponível"
 
 #: ../src/preferences-dialog.vala:498
 msgid "Busy"
-msgstr ""
+msgstr "Ocupado"
 
 #. Currently gnome-shell does not handle invisible status properly
 #: ../src/preferences-dialog.vala:501
 msgid "Invisible"
-msgstr ""
+msgstr "Invisível"
 
 #: ../src/preferences-dialog.vala:517
 msgid "Presence"
-msgstr ""
+msgstr "Presença"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Postpone pomodoro when idle"
@@ -214,12 +214,12 @@ msgstr ""
 #: ../src/preferences-dialog.vala:528
 #, fuzzy
 msgid "Status during pomodoro"
-msgstr "Começar um novo pomodoro"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:559
 #, fuzzy
 msgid "Status during break"
-msgstr "Monstrar notificações durante os intervalos"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:614
 msgid ""
@@ -264,31 +264,31 @@ msgstr ""
 
 #: ../src/widgets.vala:492
 msgid "_No sound"
-msgstr ""
+msgstr "_Sem áudio"
 
 #: ../src/widgets.vala:494
 msgid "_Cancel"
-msgstr ""
+msgstr "_Cancelar"
 
 #: ../src/widgets.vala:496
 msgid "_Open"
-msgstr ""
+msgstr "_Abrir"
 
 #: ../src/widgets.vala:503
 msgid "Select a file"
-msgstr ""
+msgstr "Selecionar um arquivo"
 
 #: ../src/widgets.vala:563
 msgid "All files"
-msgstr ""
+msgstr "Todos os arquivos"
 
 #: ../src/widgets.vala:691
 msgid "Other…"
-msgstr ""
+msgstr "Outro(s)…"
 
 #: ../src/widgets.vala:702
 msgid "None"
-msgstr ""
+msgstr "Nenhum"
 
 #: ../src/widgets.vala:1004 ../src/widgets.vala:1013
 msgid "Supported audio files"

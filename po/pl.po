@@ -75,7 +75,7 @@ msgstr "Hej, omija cię przerwa"
 
 #: ../extension/notifications.js:773
 msgid "Could not run pomodoro"
-msgstr "Błąd przy uruchomieniu Pomodoro"
+msgstr "Błąd przy uruchomieniu pomodoro"
 
 #: ../extension/notifications.js:775
 msgid "Something went badly wrong..."

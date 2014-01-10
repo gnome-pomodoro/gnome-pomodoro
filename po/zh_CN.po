@@ -24,7 +24,7 @@ msgstr "番茄计时器"
 
 #: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
 msgid "Preferences"
-msgstr ""
+msgstr "首选项"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
@@ -118,7 +118,7 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:306
 msgid "Timer"
-msgstr ""
+msgstr "计时器"
 
 #: ../src/preferences-dialog.vala:358
 msgid "Pomodoro duration"
@@ -151,7 +151,7 @@ msgstr ""
 #: ../src/preferences-dialog.vala:401
 #, fuzzy
 msgid "Notifications"
-msgstr "声音提示"
+msgstr "通知"
 
 #: ../src/preferences-dialog.vala:405
 #, fuzzy
@@ -182,12 +182,12 @@ msgstr ""
 #: ../src/preferences-dialog.vala:455
 #, fuzzy
 msgid "Select sound for pomodoro start"
-msgstr "在番茄时间开始或结束时播放的声音文件"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:465
 #, fuzzy
 msgid "Pomodoro start sound"
-msgstr "番茄时长"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:497
 msgid "Available"
@@ -195,16 +195,16 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:498
 msgid "Busy"
-msgstr ""
+msgstr "忙碌"
 
 #. Currently gnome-shell does not handle invisible status properly
 #: ../src/preferences-dialog.vala:501
 msgid "Invisible"
-msgstr ""
+msgstr "不可见的"
 
 #: ../src/preferences-dialog.vala:517
 msgid "Presence"
-msgstr ""
+msgstr "外观"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Postpone pomodoro when idle"
@@ -213,12 +213,12 @@ msgstr ""
 #: ../src/preferences-dialog.vala:528
 #, fuzzy
 msgid "Status during pomodoro"
-msgstr "开始新的番茄时间"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:559
 #, fuzzy
 msgid "Status during break"
-msgstr "休息时显示对话框提示"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:614
 msgid ""
@@ -261,19 +261,19 @@ msgstr ""
 
 #: ../src/widgets.vala:492
 msgid "_No sound"
-msgstr ""
+msgstr "无声"
 
 #: ../src/widgets.vala:494
 msgid "_Cancel"
-msgstr ""
+msgstr "取消(_C)"
 
 #: ../src/widgets.vala:496
 msgid "_Open"
-msgstr ""
+msgstr "打开(_O)"
 
 #: ../src/widgets.vala:503
 msgid "Select a file"
-msgstr ""
+msgstr "选择文件"
 
 #: ../src/widgets.vala:563
 msgid "All files"
@@ -281,11 +281,11 @@ msgstr ""
 
 #: ../src/widgets.vala:691
 msgid "Other…"
-msgstr ""
+msgstr "其它..."
 
 #: ../src/widgets.vala:702
 msgid "None"
-msgstr ""
+msgstr "无"
 
 #: ../src/widgets.vala:1004 ../src/widgets.vala:1013
 msgid "Supported audio files"

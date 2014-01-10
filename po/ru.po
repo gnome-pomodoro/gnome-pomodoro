@@ -25,13 +25,13 @@ msgstr "Помодоро Таймер"
 
 #: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
 msgid "Preferences"
-msgstr ""
+msgstr "Настройки"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
 #, fuzzy
 msgid "Pomodoro"
-msgstr "Помодоро Таймер"
+msgstr "Помодоро"
 
 #: ../extension/notifications.js:390
 msgid "It's time to take a break"
@@ -44,7 +44,7 @@ msgstr "Пауза завершена, начало нового помодор�
 
 #: ../extension/notifications.js:588
 msgid "Take a break!"
-msgstr ""
+msgstr "Сделайте перерыв!"
 
 #: ../extension/notifications.js:602
 #, fuzzy
@@ -121,7 +121,7 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:306
 msgid "Timer"
-msgstr ""
+msgstr "Таймер"
 
 #: ../src/preferences-dialog.vala:358
 msgid "Pomodoro duration"
@@ -154,7 +154,7 @@ msgstr ""
 #: ../src/preferences-dialog.vala:401
 #, fuzzy
 msgid "Notifications"
-msgstr "Звуковые Уведомления"
+msgstr "Уведомления"
 
 #: ../src/preferences-dialog.vala:405
 #, fuzzy
@@ -189,24 +189,24 @@ msgstr "Звуковой файл для проигрывания при ста�
 #: ../src/preferences-dialog.vala:465
 #, fuzzy
 msgid "Pomodoro start sound"
-msgstr "Длительность Помодоро"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:497
 msgid "Available"
-msgstr ""
+msgstr "Доступно"
 
 #: ../src/preferences-dialog.vala:498
 msgid "Busy"
-msgstr ""
+msgstr "Не беспокоить"
 
 #. Currently gnome-shell does not handle invisible status properly
 #: ../src/preferences-dialog.vala:501
 msgid "Invisible"
-msgstr ""
+msgstr "Невидимый"
 
 #: ../src/preferences-dialog.vala:517
 msgid "Presence"
-msgstr ""
+msgstr "Наличие"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Postpone pomodoro when idle"
@@ -215,12 +215,12 @@ msgstr ""
 #: ../src/preferences-dialog.vala:528
 #, fuzzy
 msgid "Status during pomodoro"
-msgstr "Начать новый помодоро"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:559
 #, fuzzy
 msgid "Status during break"
-msgstr "Показывать сообщения во время перерыва"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:614
 msgid ""
@@ -268,31 +268,31 @@ msgstr ""
 
 #: ../src/widgets.vala:492
 msgid "_No sound"
-msgstr ""
+msgstr "_Без звука"
 
 #: ../src/widgets.vala:494
 msgid "_Cancel"
-msgstr ""
+msgstr "О_тменить"
 
 #: ../src/widgets.vala:496
 msgid "_Open"
-msgstr ""
+msgstr "_Открыть"
 
 #: ../src/widgets.vala:503
 msgid "Select a file"
-msgstr ""
+msgstr "Выберите файл"
 
 #: ../src/widgets.vala:563
 msgid "All files"
-msgstr ""
+msgstr "Все файлы"
 
 #: ../src/widgets.vala:691
 msgid "Other…"
-msgstr ""
+msgstr "Другая…"
 
 #: ../src/widgets.vala:702
 msgid "None"
-msgstr ""
+msgstr "нет"
 
 #: ../src/widgets.vala:1004 ../src/widgets.vala:1013
 msgid "Supported audio files"

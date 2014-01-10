@@ -24,13 +24,13 @@ msgstr "Temporitzador Pomodoro"
 
 #: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
 msgid "Preferences"
-msgstr ""
+msgstr "Preferències"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
 #, fuzzy
 msgid "Pomodoro"
-msgstr "Temporitzador Pomodoro"
+msgstr "Pomodoro"
 
 #: ../extension/notifications.js:390
 msgid "It's time to take a break"
@@ -43,12 +43,12 @@ msgstr "La pausa ha finalitzat, un nou pomodoro està començant!"
 
 #: ../extension/notifications.js:588
 msgid "Take a break!"
-msgstr ""
+msgstr "Dejte si pauzu!"
 
 #: ../extension/notifications.js:602
 #, fuzzy
 msgid "Start pomodoro"
-msgstr "Comença un nou pomodoro"
+msgstr "Comença un pomodoro"
 
 #: ../extension/notifications.js:644
 msgid "Shorten the break"
@@ -94,15 +94,15 @@ msgstr ""
 
 #: ../extension/notifications.js:779
 msgid "Install"
-msgstr ""
+msgstr "Instal·la"
 
 #: ../src/about-dialog.vala:29
 msgid "About Pomodoro"
-msgstr ""
+msgstr "Sobre Pomodoro"
 
 #: ../src/about-dialog.vala:31
 msgid "A simple time management utility"
-msgstr ""
+msgstr "Una senzilla utilitat de gestió del temps"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
@@ -118,7 +118,7 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:306
 msgid "Timer"
-msgstr ""
+msgstr "Hora"
 
 #: ../src/preferences-dialog.vala:358
 msgid "Pomodoro duration"
@@ -151,12 +151,12 @@ msgstr ""
 #: ../src/preferences-dialog.vala:401
 #, fuzzy
 msgid "Notifications"
-msgstr "Notificació de so"
+msgstr "Notificacions"
 
 #: ../src/preferences-dialog.vala:405
 #, fuzzy
 msgid "Screen notifications"
-msgstr "Notificació de so"
+msgstr "Notificacions de la pantalla"
 
 #: ../src/preferences-dialog.vala:410
 msgid "Remind to take a break"
@@ -186,24 +186,24 @@ msgstr "Arxiu de so per reproduir en iniciar o finalitzar un pomodoro."
 #: ../src/preferences-dialog.vala:465
 #, fuzzy
 msgid "Pomodoro start sound"
-msgstr "Durada del pomodoro"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:497
 msgid "Available"
-msgstr ""
+msgstr "Disponible"
 
 #: ../src/preferences-dialog.vala:498
 msgid "Busy"
-msgstr ""
+msgstr "Ocupat"
 
 #. Currently gnome-shell does not handle invisible status properly
 #: ../src/preferences-dialog.vala:501
 msgid "Invisible"
-msgstr ""
+msgstr "Invisible"
 
 #: ../src/preferences-dialog.vala:517
 msgid "Presence"
-msgstr ""
+msgstr "Presència"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Postpone pomodoro when idle"
@@ -212,12 +212,12 @@ msgstr ""
 #: ../src/preferences-dialog.vala:528
 #, fuzzy
 msgid "Status during pomodoro"
-msgstr "Comença un nou pomodoro"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:559
 #, fuzzy
 msgid "Status during break"
-msgstr "Mostra notificacions de diàleg durant les pauses"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:614
 msgid ""
@@ -269,27 +269,27 @@ msgstr ""
 
 #: ../src/widgets.vala:494
 msgid "_Cancel"
-msgstr ""
+msgstr "_Cancel·la"
 
 #: ../src/widgets.vala:496
 msgid "_Open"
-msgstr ""
+msgstr "_Obre"
 
 #: ../src/widgets.vala:503
 msgid "Select a file"
-msgstr ""
+msgstr "Seleccioneu un fitxer"
 
 #: ../src/widgets.vala:563
 msgid "All files"
-msgstr ""
+msgstr "Tots els fitxers"
 
 #: ../src/widgets.vala:691
 msgid "Other…"
-msgstr ""
+msgstr "Altres…"
 
 #: ../src/widgets.vala:702
 msgid "None"
-msgstr ""
+msgstr "Cap"
 
 #: ../src/widgets.vala:1004 ../src/widgets.vala:1013
 msgid "Supported audio files"

@@ -23,14 +23,14 @@ msgid "Pomodoro Timer"
 msgstr "Temporizador Pomodoro"
 
 #: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
+#, fuzzy
 msgid "Preferences"
-msgstr ""
+msgstr "Preferencias"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
-#, fuzzy
 msgid "Pomodoro"
-msgstr "Temporizador Pomodoro"
+msgstr "Pomodoro"
 
 #: ../extension/notifications.js:390
 #, fuzzy
@@ -63,15 +63,15 @@ msgstr "Alargar el descanso"
 #, fuzzy, c-format
 msgid "You have %d second left"
 msgid_plural "You have %d seconds left"
-msgstr[0] "Tiene %d segundo\n"
-msgstr[1] "Tiene %d segundos\n"
+msgstr[0] "Tiene %d segundo"
+msgstr[1] "Tiene %d segundos"
 
 #: ../extension/notifications.js:666
 #, fuzzy, c-format
 msgid "You have %d minute left"
 msgid_plural "You have %d minutes left"
-msgstr[0] "Tiene %d minuto\n"
-msgstr[1] "Tiene %d minutos\n"
+msgstr[0] "Tiene %d minuto"
+msgstr[1] "Tiene %d minutos"
 
 #: ../extension/notifications.js:685
 #, fuzzy
@@ -108,7 +108,7 @@ msgstr "Una sencilla utilidad de gestión del tiempo"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
-msgstr "Créditos de los traductores"
+msgstr ""
 
 #: ../src/about-dialog.vala:45
 msgid ""
@@ -295,7 +295,7 @@ msgstr "Todos los archivos"
 
 #: ../src/widgets.vala:691
 msgid "Other…"
-msgstr "otros..."
+msgstr "Otros…"
 
 #: ../src/widgets.vala:702
 msgid "None"

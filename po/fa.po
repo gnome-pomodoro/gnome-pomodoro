@@ -25,13 +25,13 @@ msgstr "زمانسنج پومودورو"
 
 #: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
 msgid "Preferences"
-msgstr ""
+msgstr "ترجیحات"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
 #, fuzzy
 msgid "Pomodoro"
-msgstr "زمانسنج پومودورو"
+msgstr "پومودورو"
 
 #: ../extension/notifications.js:390
 #, fuzzy
@@ -99,7 +99,7 @@ msgstr ""
 
 #: ../src/about-dialog.vala:29
 msgid "About Pomodoro"
-msgstr ""
+msgstr "پومودورو دربارهٔ"
 
 #: ../src/about-dialog.vala:31
 msgid "A simple time management utility"
@@ -119,7 +119,7 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:306
 msgid "Timer"
-msgstr ""
+msgstr "زمانسنج"
 
 #: ../src/preferences-dialog.vala:358
 msgid "Pomodoro duration"
@@ -152,7 +152,7 @@ msgstr ""
 #: ../src/preferences-dialog.vala:401
 #, fuzzy
 msgid "Notifications"
-msgstr "اعلان‌های صوتی"
+msgstr "اعلان‌ها"
 
 #: ../src/preferences-dialog.vala:405
 #, fuzzy
@@ -192,20 +192,20 @@ msgstr "طول مدت پومودورو"
 
 #: ../src/preferences-dialog.vala:497
 msgid "Available"
-msgstr ""
+msgstr "در دسترس"
 
 #: ../src/preferences-dialog.vala:498
 msgid "Busy"
-msgstr ""
+msgstr "مشغول"
 
 #. Currently gnome-shell does not handle invisible status properly
 #: ../src/preferences-dialog.vala:501
 msgid "Invisible"
-msgstr ""
+msgstr "مخفی"
 
 #: ../src/preferences-dialog.vala:517
 msgid "Presence"
-msgstr ""
+msgstr "حضور"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Postpone pomodoro when idle"
@@ -250,7 +250,7 @@ msgstr[0] "%Id دقیقه"
 
 #: ../src/widgets.vala:327
 msgid "Disabled"
-msgstr ""
+msgstr "از کار افتاده"
 
 #: ../src/widgets.vala:384
 #, c-format
@@ -266,11 +266,11 @@ msgstr ""
 
 #: ../src/widgets.vala:494
 msgid "_Cancel"
-msgstr ""
+msgstr "_انصراف"
 
 #: ../src/widgets.vala:496
 msgid "_Open"
-msgstr ""
+msgstr "_بازکردن"
 
 #: ../src/widgets.vala:503
 msgid "Select a file"
@@ -282,11 +282,11 @@ msgstr ""
 
 #: ../src/widgets.vala:691
 msgid "Other…"
-msgstr ""
+msgstr "غیره..."
 
 #: ../src/widgets.vala:702
 msgid "None"
-msgstr ""
+msgstr "هیچ‌کدام"
 
 #: ../src/widgets.vala:1004 ../src/widgets.vala:1013
 msgid "Supported audio files"

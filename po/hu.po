@@ -26,13 +26,13 @@ msgstr "Pomodoro időzítő"
 
 #: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
 msgid "Preferences"
-msgstr ""
+msgstr "Beállítások"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
 #, fuzzy
 msgid "Pomodoro"
-msgstr "Pomodoro időzítő"
+msgstr "Pomodoro"
 
 #: ../extension/notifications.js:390
 #, fuzzy
@@ -122,7 +122,7 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:306
 msgid "Timer"
-msgstr ""
+msgstr "Időzítő"
 
 #: ../src/preferences-dialog.vala:358
 msgid "Pomodoro duration"
@@ -145,7 +145,7 @@ msgstr ""
 #: ../src/preferences-dialog.vala:374
 #, fuzzy
 msgid "Select ticking sound"
-msgstr "Értesítési hangok használata"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:379
 msgid "Ticking sound"
@@ -154,7 +154,7 @@ msgstr ""
 #: ../src/preferences-dialog.vala:401
 #, fuzzy
 msgid "Notifications"
-msgstr "Hang értesítések"
+msgstr "Értesítések"
 
 #: ../src/preferences-dialog.vala:405
 #, fuzzy
@@ -164,7 +164,7 @@ msgstr "Teljesképernyős értesítések"
 #: ../src/preferences-dialog.vala:410
 #, fuzzy
 msgid "Remind to take a break"
-msgstr "Ideje szünetet tartani!"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:428
 msgid "Loud bell"
@@ -185,29 +185,29 @@ msgstr ""
 #: ../src/preferences-dialog.vala:455
 #, fuzzy
 msgid "Select sound for pomodoro start"
-msgstr "Hang fájl amit lejátszunk a pomodoro kezdetén és végén"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:465
 #, fuzzy
 msgid "Pomodoro start sound"
-msgstr "Pomodoro időtartam"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:497
 msgid "Available"
-msgstr ""
+msgstr "Elérhető"
 
 #: ../src/preferences-dialog.vala:498
 msgid "Busy"
-msgstr ""
+msgstr "Elfoglalt"
 
 #. Currently gnome-shell does not handle invisible status properly
 #: ../src/preferences-dialog.vala:501
 msgid "Invisible"
-msgstr ""
+msgstr "Láthatatlan"
 
 #: ../src/preferences-dialog.vala:517
 msgid "Presence"
-msgstr ""
+msgstr "Jelenlét"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Postpone pomodoro when idle"
@@ -270,27 +270,27 @@ msgstr ""
 
 #: ../src/widgets.vala:494
 msgid "_Cancel"
-msgstr ""
+msgstr "_Mégsem"
 
 #: ../src/widgets.vala:496
 msgid "_Open"
-msgstr ""
+msgstr "_Megnyitás"
 
 #: ../src/widgets.vala:503
 msgid "Select a file"
-msgstr ""
+msgstr "Válasszon ki egy fájlt"
 
 #: ../src/widgets.vala:563
 msgid "All files"
-msgstr ""
+msgstr "Minden fájl"
 
 #: ../src/widgets.vala:691
 msgid "Other…"
-msgstr ""
+msgstr "Egyéb…"
 
 #: ../src/widgets.vala:702
 msgid "None"
-msgstr ""
+msgstr "Semmi"
 
 #: ../src/widgets.vala:1004 ../src/widgets.vala:1013
 msgid "Supported audio files"

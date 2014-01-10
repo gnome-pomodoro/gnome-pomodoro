@@ -24,13 +24,13 @@ msgstr "Minuteur Pomodoro"
 
 #: ../extension/indicator.js:91 ../src/preferences-dialog.vala:129
 msgid "Preferences"
-msgstr ""
+msgstr "Préférences"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
 #, fuzzy
 msgid "Pomodoro"
-msgstr "Minuteur Pomodoro"
+msgstr "Pomodoro"
 
 #: ../extension/notifications.js:390
 msgid "It's time to take a break"
@@ -39,7 +39,7 @@ msgstr ""
 #: ../extension/notifications.js:575
 #, fuzzy
 msgid "A new pomodoro is starting"
-msgstr "La pause est terminée, un nouveau pomodoro démarre!"
+msgstr "Un nouveau pomodoro démarre"
 
 #: ../extension/notifications.js:588
 #, fuzzy
@@ -49,7 +49,7 @@ msgstr "Faites une pause!"
 #: ../extension/notifications.js:602
 #, fuzzy
 msgid "Start pomodoro"
-msgstr "Démarrer un nouveau pomodoro"
+msgstr "Démarrer un pomodoro"
 
 #: ../extension/notifications.js:644
 msgid "Shorten the break"
@@ -96,7 +96,7 @@ msgstr ""
 
 #: ../extension/notifications.js:779
 msgid "Install"
-msgstr ""
+msgstr "Installer"
 
 #: ../src/about-dialog.vala:29
 msgid "About Pomodoro"
@@ -120,7 +120,7 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:306
 msgid "Timer"
-msgstr ""
+msgstr "Minuterie"
 
 #: ../src/preferences-dialog.vala:358
 msgid "Pomodoro duration"
@@ -144,7 +144,7 @@ msgstr "Raccourci pour activer ou désactiver le minuteur."
 #: ../src/preferences-dialog.vala:374
 #, fuzzy
 msgid "Select ticking sound"
-msgstr "Utiliser le son de notification"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:379
 msgid "Ticking sound"
@@ -153,17 +153,17 @@ msgstr ""
 #: ../src/preferences-dialog.vala:401
 #, fuzzy
 msgid "Notifications"
-msgstr "Notifications sonores"
+msgstr "Notifications"
 
 #: ../src/preferences-dialog.vala:405
 #, fuzzy
 msgid "Screen notifications"
-msgstr "Afficher la boîte de dialogue"
+msgstr "Notifications d'écran"
 
 #: ../src/preferences-dialog.vala:410
 #, fuzzy
 msgid "Remind to take a break"
-msgstr "Faites une pause!"
+msgstr "Rappeler de prendre une pause"
 
 #: ../src/preferences-dialog.vala:428
 msgid "Loud bell"
@@ -193,20 +193,20 @@ msgstr "Durée du pomodoro"
 
 #: ../src/preferences-dialog.vala:497
 msgid "Available"
-msgstr ""
+msgstr "Disponible"
 
 #: ../src/preferences-dialog.vala:498
 msgid "Busy"
-msgstr ""
+msgstr "Occupé"
 
 #. Currently gnome-shell does not handle invisible status properly
 #: ../src/preferences-dialog.vala:501
 msgid "Invisible"
-msgstr ""
+msgstr "Invisible"
 
 #: ../src/preferences-dialog.vala:517
 msgid "Presence"
-msgstr ""
+msgstr "Présence"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Postpone pomodoro when idle"
@@ -215,12 +215,12 @@ msgstr ""
 #: ../src/preferences-dialog.vala:528
 #, fuzzy
 msgid "Status during pomodoro"
-msgstr "Démarrer un nouveau pomodoro"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:559
 #, fuzzy
 msgid "Status during break"
-msgstr "Afficher les notifications pendant les pauses"
+msgstr ""
 
 #: ../src/preferences-dialog.vala:614
 msgid ""
@@ -268,31 +268,31 @@ msgstr ""
 
 #: ../src/widgets.vala:492
 msgid "_No sound"
-msgstr ""
+msgstr "Pas de so_n"
 
 #: ../src/widgets.vala:494
 msgid "_Cancel"
-msgstr ""
+msgstr "_Annuler"
 
 #: ../src/widgets.vala:496
 msgid "_Open"
-msgstr ""
+msgstr "_Ouvrir"
 
 #: ../src/widgets.vala:503
 msgid "Select a file"
-msgstr ""
+msgstr "Sélectionnez un fichier"
 
 #: ../src/widgets.vala:563
 msgid "All files"
-msgstr ""
+msgstr "Tous les fichiers"
 
 #: ../src/widgets.vala:691
 msgid "Other…"
-msgstr ""
+msgstr "Autre…"
 
 #: ../src/widgets.vala:702
 msgid "None"
-msgstr ""
+msgstr "Aucun"
 
 #: ../src/widgets.vala:1004 ../src/widgets.vala:1013
 msgid "Supported audio files"
