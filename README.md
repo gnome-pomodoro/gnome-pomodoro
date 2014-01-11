@@ -118,6 +118,13 @@ Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodo
 
 ## Changelog
 
+**Version 0.10.0**
+
+* Support for GNOME Shell 3.10
+* New layout in preferences dialog
+* Migrate to gsteramer-1.0
+* Updated translations
+
 **Version 0.9.1**
 
 * Support for GNOME Shell 3.8

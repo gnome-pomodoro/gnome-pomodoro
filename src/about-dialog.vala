@@ -38,7 +38,7 @@ public class Pomodoro.AboutDialog : Gtk.AboutDialog
         };
         this.translator_credits = _("translator-credits");
 
-        this.copyright = "Copyright \xc2\xa9 2011-2013 Arun Mahapatra, Kamil Prusko";
+        this.copyright = "Copyright \xc2\xa9 2011-2014 Arun Mahapatra, Kamil Prusko";
 
         this.wrap_license = true;
         this.license_type = Gtk.License.GPL_3_0;
