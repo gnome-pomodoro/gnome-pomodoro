@@ -153,6 +153,8 @@ public class Pomodoro.Timer : Object
         this.settings.changed.connect (this.on_settings_changed);
 
         this.settings_state = settings.get_child ("state");
+
+        this.session_limit = this.settings.get_double ("long-break-interval");
     }
 
     private bool do_set_state_full (State state,
@@ -245,6 +247,9 @@ public class Pomodoro.Timer : Object
                     break;
 
                 case State.PAUSE:
+                    /* If user chooses to have a shorter break,
+                     * is_long_break remains unchanged
+                     */
                     is_long_break = (this.session >= this.session_limit *
                                     LONG_BREAK_ACCEPTANCE);
 
