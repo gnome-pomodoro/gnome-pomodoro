@@ -117,11 +117,18 @@ const Indicator = new Lang.Class({
                                        Lang.bind(this, this._onNameVanished));
 
         this._onSettingsChanged();
-        this._ensureProxy();
 
-        this._initialized = true;
+        if (this._isRunning()) {
+            this._ensureProxy();
+        }
+        else {
+            this.refresh();
+        }
+    },
 
-        this.refresh();
+    _isRunning: function() {
+        let settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.state' });
+        return settings.get_string('state') != State.NULL;
     },
 
     _showPreferences: function() {
@@ -329,6 +336,7 @@ const Indicator = new Lang.Class({
                 this._onNotifyPomodoroEnd(this._proxy, null, [true]);
             }
 
+            this._initialized = true;
             this.refresh();
         }));
     },
