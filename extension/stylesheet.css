@@ -24,6 +24,37 @@
 
 .extension-pomodoro-indicator.popup-menu {
     min-width: 250px;
+    max-width: 350px;
+}
+
+.extension-pomodoro-task-entry {
+    color: rgb(128, 128, 128);
+    caret-color: rgb(128, 128, 128);
+    font-size: 12pt;
+    caret-size: 1px;
+
+    border: 2px solid rgba(245,245,245,0.2);
+    background-gradient-start: rgba(5,5,6,0.1);
+    background-gradient-end: rgba(254,254,254,0.1);
+    background-gradient-direction: vertical;
+    transition-duration: 300ms;
+    box-shadow: inset 0px 2px 4px rgba(0,0,0,0.6);
+
+    border-radius: 5px;
+    padding: 4px 4px;
+}
+
+.extension-pomodoro-task-entry:focus {
+    color: rgb(64, 64, 64);
+    caret-color: rgb(64, 64, 64);
+    border: 2px solid rgb(136,138,133);
+    background-gradient-start: rgb(200,200,200);
+    background-gradient-end: white;
+    background-gradient-direction: vertical;
+    box-shadow: inset 0px 2px 4px rgba(0,0,0,0.6);
+
+    font-weight: bold;
+    transition-duration: 0ms;
 }
 
 .extension-pomodoro-lightbox {

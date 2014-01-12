@@ -35,6 +35,7 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+const ShellEntry = imports.ui.shellEntry;
 const Tweener = imports.ui.tweener;
 
 const DBus = Extension.imports.dbus;
@@ -87,6 +88,29 @@ const Indicator = new Lang.Class({
         this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'extension-pomodoro-toggle' });
         this._timerToggle.connect('toggled', Lang.bind(this, this.toggle));
         this.menu.addMenuItem(this._timerToggle);
+
+        /* Task list */
+        let entry = new St.Entry({
+                                style_class: 'extension-pomodoro-task-entry',
+                                can_focus: true,
+                                hint_text: _("Enter new task") });
+        entry.clutter_text.set_max_length(200);
+        entry.clutter_text.connect('activate', Lang.bind(this, this._onEntryActivated));
+        this._taskEntry = entry;
+
+        ShellEntry.addContextMenu(entry);
+
+        /* TODO: Set key focus */
+        /* TODO: Lock focus on the entry once active */
+        /* TODO: Add history manager, just as in runDialog */
+        /* TODO: More items could be added to context menu */
+
+        let entry_box = new PopupMenu.PopupMenuSection();
+        entry_box.actor.set_style('padding: 0px 18px;');
+        entry_box.box.add(entry);
+
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        this.menu.addMenuItem(entry_box);
 
         /* Preferences */
         this.menu.actor.add_style_class_name('extension-pomodoro-indicator');
@@ -423,6 +447,16 @@ const Indicator = new Lang.Class({
         }
 
         this.refresh();
+    },
+
+    _onEntryActivated: function(entry) {
+        let text = entry.get_text();
+        if (text == '')
+            return;
+
+        /* TODO: Add task to the list */
+
+        entry.set_text('');
     },
 
     _onNotifyPomodoroStart: function(proxy, senderName, [is_requested]) {
