@@ -35,11 +35,11 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
-const ShellEntry = imports.ui.shellEntry;
 const Tweener = imports.ui.tweener;
 
 const DBus = Extension.imports.dbus;
 const Notifications = Extension.imports.notifications;
+const Tasklist = Extension.imports.tasklist;
 
 const Gettext = imports.gettext.domain('gnome-pomodoro');
 const _ = Gettext.gettext;
@@ -90,34 +90,27 @@ const Indicator = new Lang.Class({
         this.menu.addMenuItem(this._timerToggle);
 
         /* Task list */
-        let entry = new St.Entry({
-                                style_class: 'extension-pomodoro-task-entry',
-                                can_focus: true,
-                                hint_text: _("Enter new task") });
-        entry.clutter_text.set_max_length(200);
-        entry.clutter_text.connect('activate', Lang.bind(this, this._onEntryActivated));
-        this._taskEntry = entry;
+        this.entry = new Tasklist.TaskEntry();
+        this.entry.connect('task-entered', Lang.bind(this, this._onTaskEntered));
 
-        ShellEntry.addContextMenu(entry);
-
-        /* TODO: Set key focus */
         /* TODO: Lock focus on the entry once active */
         /* TODO: Add history manager, just as in runDialog */
         /* TODO: More items could be added to context menu */
 
-        let entry_box = new PopupMenu.PopupMenuSection();
-        entry_box.actor.set_style('padding: 0px 18px;');
-        entry_box.box.add(entry);
+        this.tasklist = new Tasklist.TaskList();
+        this.tasklist.connect('task-activated', Lang.bind(this, this._onTaskActivated));
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addMenuItem(entry_box);
+        this.menu.addMenuItem(this.tasklist);
+        this.menu.addMenuItem(this.entry);
 
         /* Preferences */
         this.menu.actor.add_style_class_name('extension-pomodoro-indicator');
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.menu.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
 
-        this.menu.actor.connect('notify::visible', Lang.bind(this, this.refresh));
+        this.menu.connect('open-state-changed',
+                          Lang.bind(this, this._onMenuOpenStateChanged));
 
         try {
             this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
@@ -205,6 +198,12 @@ const Indicator = new Lang.Class({
 
         if (alloc.natural_size < predicted_natural_size) {
             alloc.natural_size = predicted_natural_size;
+        }
+    },
+
+    _onMenuOpenStateChanged: function(menu, open) {
+        if (open) {
+            this.refresh();
         }
     },
 
@@ -449,14 +448,14 @@ const Indicator = new Lang.Class({
         this.refresh();
     },
 
-    _onEntryActivated: function(entry) {
-        let text = entry.get_text();
-        if (text == '')
-            return;
+    _onTaskEntered: function(entry, text) {
+        this.tasklist.addTask(new Tasklist.Task(text), {
+            animate: true
+        });
+    },
 
-        /* TODO: Add task to the list */
-
-        entry.set_text('');
+    _onTaskActivated: function(taskList, task) {
+        global.log("Activated task: " + task.name);
     },
 
     _onNotifyPomodoroStart: function(proxy, senderName, [is_requested]) {

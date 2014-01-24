@@ -23,11 +23,18 @@
 }
 
 .extension-pomodoro-indicator.popup-menu {
-    min-width: 250px;
-    max-width: 350px;
+    width: 300px;
 }
 
 .extension-pomodoro-task-entry {
+    padding: 9px 18px;
+}
+
+.extension-pomodoro-task-list {
+    max-height: 400px;
+}
+
+.extension-pomodoro-task-entry StEntry {
     color: rgb(128, 128, 128);
     caret-color: rgb(128, 128, 128);
     font-size: 12pt;
@@ -44,7 +51,7 @@
     padding: 4px 4px;
 }
 
-.extension-pomodoro-task-entry:focus {
+.extension-pomodoro-task-entry StEntry:focus {
     color: rgb(64, 64, 64);
     caret-color: rgb(64, 64, 64);
     border: 2px solid rgb(136,138,133);
