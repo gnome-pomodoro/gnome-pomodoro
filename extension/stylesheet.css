@@ -27,7 +27,7 @@
 }
 
 .extension-pomodoro-task-entry {
-    padding: 9px 18px;
+    padding: 11px 18px 6px 18px;
 }
 
 .extension-pomodoro-task-list .task-list-item:selected .name-label {

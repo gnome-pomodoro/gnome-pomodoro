@@ -84,6 +84,8 @@ const Indicator = new Lang.Class({
         this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
         this.actor.add_actor(this.label);
 
+        this.menu.actor.add_style_class_name('extension-pomodoro-indicator');
+
         /* Toggle timer state button */
         this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'extension-pomodoro-toggle' });
         this._timerToggle.connect('toggled', Lang.bind(this, this.toggle));
@@ -101,13 +103,11 @@ const Indicator = new Lang.Class({
         this.tasklist.connect('task-selected', Lang.bind(this, this._onTaskSelected));
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        this.menu.addAction(_("Manage Tasks"), Lang.bind(this, function() {}));
+        this.menu.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.menu.addMenuItem(this.tasklist);
         this.menu.addMenuItem(this.entry);
-
-        /* Preferences */
-        this.menu.actor.add_style_class_name('extension-pomodoro-indicator');
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
 
         this.menu.connect('open-state-changed',
                           Lang.bind(this, this._onMenuOpenStateChanged));
