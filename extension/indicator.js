@@ -98,7 +98,7 @@ const Indicator = new Lang.Class({
         /* TODO: More items could be added to context menu */
 
         this.tasklist = new Tasklist.TaskList();
-        this.tasklist.connect('task-activated', Lang.bind(this, this._onTaskActivated));
+        this.tasklist.connect('task-selected', Lang.bind(this, this._onTaskSelected));
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.menu.addMenuItem(this.tasklist);
@@ -454,8 +454,8 @@ const Indicator = new Lang.Class({
         });
     },
 
-    _onTaskActivated: function(taskList, task) {
-        global.log("Activated task: " + task.name);
+    _onTaskSelected: function(tasklist, task) {
+        global.log("Selected task: " + (task ? task.name : '-'));
     },
 
     _onNotifyPomodoroStart: function(proxy, senderName, [is_requested]) {

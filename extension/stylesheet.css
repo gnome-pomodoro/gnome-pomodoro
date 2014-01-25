@@ -30,6 +30,10 @@
     padding: 9px 18px;
 }
 
+.extension-pomodoro-task-list .task-list-item:selected .name-label {
+    font-weight: bold;
+}
+
 .extension-pomodoro-task-list {
     max-height: 400px;
 }

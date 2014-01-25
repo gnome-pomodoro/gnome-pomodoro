@@ -132,10 +132,6 @@ const TaskListItemMenu = new Lang.Class({
 
         this._source = source;
 
-//        let side = St.Side.LEFT;
-//        if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL)
-//            side = St.Side.RIGHT;
-
         // Chain our visibility and lifecycle to that of the source
         source.actor.connect('notify::mapped', Lang.bind(this, function () {
             if (!source.actor.mapped) {
@@ -159,11 +155,19 @@ const TaskListItem = new Lang.Class({
     _init: function (task, params) {
         this.parent(params);
 
+        this.actor.add_style_class_name('task-list-item');
+
         this.task = task;
+        this.selected = false;
+
+//        if (Clutter.get_default_text_direction() == Clutter.TextDirection.RTL) {
+//            this.actor.set_pack_start(false);
+//        }
 
         this.label = new St.Label({ text: task.name });
-        this.actor.add_child(this.label);
-        this.actor.label_actor = this.label;
+        this.label.add_style_class_name('name-label');
+
+        this.actor.add_actor(this.label, { expand: true });
 
         this._menu = null;
         this._menuManager = new PopupMenu.PopupMenuManager(this);
@@ -171,6 +175,21 @@ const TaskListItem = new Lang.Class({
         this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPressEvent));
         this.actor.connect('button-release-event', Lang.bind(this, this._onButtonReleaseEvent));
         this.actor.connect('popup-menu', Lang.bind(this, this._onKeyboardPopupMenu));
+    },
+
+    setSelected: function(selected) {
+        let selectedChanged = selected != this.selected;
+        if (selectedChanged) {
+            this.selected = selected;
+            if (selected) {
+                this.actor.add_style_pseudo_class('selected');
+                this.setOrnament(PopupMenu.Ornament.DOT);
+            } else {
+                this.actor.remove_style_pseudo_class('selected');
+                this.setOrnament(PopupMenu.Ornament.NONE);
+            }
+            this.emit('selected-changed', selected);
+        }
     },
 
     _removeMenuTimeout: function() {
@@ -290,6 +309,7 @@ const TaskList = new Lang.Class({
         // this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
 
         this._items = {};
+        this._selected = null;
 
         let tasks = [
             new Task("Walk the dog"),
@@ -363,7 +383,7 @@ const TaskList = new Lang.Class({
         let position = 0;
 
         let item = new TaskListItem(task);
-        item.connect('activate', Lang.bind(this, this._onItemActivated));
+        item.connect('activate', Lang.bind(this, this._onItemActivate));
         item.connect('focus-in', Lang.bind(this, this._onItemFocusIn));
         this.addMenuItem(item, position);
 
@@ -404,8 +424,20 @@ const TaskList = new Lang.Class({
         delete this._items[id];
     },
 
-    _onItemActivated: function(item, event) {
-        this.emit('task-activated', item.task);
+    _onItemActivate: function(item, event) {
+        if (this._selected) {
+            this._selected.setSelected(false);
+        }
+
+        if (!this._selected || this._selected != item) {
+            this._selected = item;
+            this._selected.setSelected(true);
+            this.emit('task-selected', item.task);
+        }
+        else {
+            this._selected = null;
+            this.emit('task-selected', null);
+        }
     },
 
     _onItemFocusIn: function(item, event) {
