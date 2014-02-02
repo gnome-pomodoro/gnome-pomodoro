@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <Project xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
          xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
          xmlns:foaf="http://xmlns.com/foaf/0.1/"
@@ -7,7 +8,18 @@
   <name xml:lang="en">Pomodoro</name>
   <shortdesc xml:lang="en">Time management utility for GNOME</shortdesc>
   <homepage rdf:resource="https://github.com/codito/gnome-shell-pomodoro" />
+  <license rdf:resource="http://www.gnu.org/licenses/gpl-3.0.html" />
   <category rdf:resource="http://api.gnome.org/doap-extensions#desktop" />
+
+  <programming-language>Vala</programming-language>
+  <programming-language>JavaScript</programming-language>
+
+  <repository>
+    <GitRepository>
+        <browse rdf:resource="https://github.com/codito/gnome-shell-pomodoro"/>
+      <location rdf:resource="git://git@github.com:codito/gnome-shell-pomodoro.git"/>
+    </GitRepository>
+  </repository>
 
   <maintainer>
     <foaf:Person>
@@ -15,4 +27,5 @@
       <foaf:mbox rdf:resource="mailto:kamilprusko@gmail.com" />
     </foaf:Person>
   </maintainer>
+
 </Project>
