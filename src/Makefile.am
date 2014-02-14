@@ -18,10 +18,10 @@ AM_CFLAGS = \
 resource_files = $(shell glib-compile-resources --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gnome-pomodoro.gresource.xml)
 
 resources.c: gnome-pomodoro.gresource.xml $(resource_files)
-	glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-source --c-name pomodoro gnome-pomodoro.gresource.xml
+	$(AM_V_GEN) glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-source --c-name pomodoro $<
 
 resources.h: gnome-pomodoro.gresource.xml $(resource_files)
-	glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-header --c-name pomodoro gnome-pomodoro.gresource.xml
+	$(AM_V_GEN) glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-header --c-name pomodoro $<
 
 gnome_pomodoro_built_sources = \
     resources.c \
@@ -68,7 +68,8 @@ BUILT_SOURCES = \
     $(gnome_pomodoro_built_sources)
 
 CLEANFILES = \
-    $(BUILT_SOURCES)
+    $(BUILT_SOURCES) \
+    gnome-pomodoro
 
 EXTRA_DIST = \
     $(resource_files) \

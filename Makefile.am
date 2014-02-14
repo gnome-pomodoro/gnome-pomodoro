@@ -1,5 +1,7 @@
 include $(top_srcdir)/Makefile.include
 
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+
 SUBDIRS = \
     vapi \
     src \
@@ -11,20 +13,26 @@ EXTRA_DIST = \
     autogen.sh \
     COPYING \
     Makefile.include \
-    README.md
+    README.md \
+    gnome-pomodoro.spec
 
-MAINTAINERCLEANFILES = \
-    $(srcdir)/aclocal.m4 \
-    $(srcdir)/config.log \
-    $(srcdir)/config.status \
-    $(srcdir)/configure
-
-stale-files-clean-local:
-	-$(RM) $(abs_top_builddir)/*.la $(abs_top_builddir)/*.gir $(abs_top_builddir)/*.typelib
+distdir = $(PACKAGE_TARNAME)-$(VERSION)
 
 uninstall-hook:
 	rm -Rf $(pkgdatadir)
 
-ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+rpmdefines = \
+	--define "_name $(PACKAGE_TARNAME)" \
+	--define "_version $(PACKAGE_VERSION)" \
+	--define "_distdir $(PACKAGE_TARNAME)" \
+	--define "_sourcedir $(abs_builddir)" \
+	--define "_specdir $(abs_srcdir)"
+
+rpm: dist
+	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \
+	rpmbuild $(rpmdefines) -ba $(top_srcdir)/gnome-pomodoro.spec
+
+clean-local:
+	rm -Rf $(builddir)/rpms
 
 -include $(top_srcdir)/git.mk

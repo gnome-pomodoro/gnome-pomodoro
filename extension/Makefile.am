@@ -22,6 +22,6 @@ metadata.json: metadata.json.in Makefile
 	$(AM_V_GEN) $(do_subst) $(srcdir)/metadata.json.in > $@
 
 uninstall-hook:
-	rmdir --ignore-fail-on-non-empty $(extensiondir)
+	rm -rf $(extensiondir)
 
 -include $(top_srcdir)/git.mk

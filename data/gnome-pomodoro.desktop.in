@@ -11,3 +11,4 @@ Type=Application
 Categories=GNOME;GTK;Utility;
 OnlyShowIn=GNOME;
 NoDisplay=true
+X-GNOME-UsesNotifications=true

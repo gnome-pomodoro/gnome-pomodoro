@@ -1,0 +1,3 @@
+src/about-dialog.c
+src/preferences-dialog.c
+src/widgets.c
