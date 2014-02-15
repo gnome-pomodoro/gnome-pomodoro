@@ -15,6 +15,10 @@ AM_CFLAGS = \
     -Wall \
     -Wno-unused
 
+BUILT_SOURCES = \
+    resources.c \
+    resources.h
+
 resource_files = $(shell glib-compile-resources --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gnome-pomodoro.gresource.xml)
 
 resources.c: gnome-pomodoro.gresource.xml $(resource_files)
@@ -22,10 +26,6 @@ resources.c: gnome-pomodoro.gresource.xml $(resource_files)
 
 resources.h: gnome-pomodoro.gresource.xml $(resource_files)
 	$(AM_V_GEN) glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-header --c-name pomodoro $<
-
-gnome_pomodoro_built_sources = \
-    resources.c \
-    resources.h
 
 gnome_pomodoro_SOURCES = \
     about-dialog.vala \
@@ -46,6 +46,10 @@ gnome_pomodoro_SOURCES = \
     utils.vala \
     widgets.vala
 
+gnome_pomodoro_DEPENDENCIES = \
+    $(top_srcdir)/vapi/gnome-desktop-3.0.vapi \
+    $(top_srcdir)/vapi/upower-glib.vapi
+
 gnome_pomodoro_VALAFLAGS = \
     --vapidir=$(top_srcdir)/vapi \
     --pkg config \
@@ -63,9 +67,6 @@ gnome_pomodoro_VALAFLAGS = \
 
 gnome_pomodoro_LDADD = \
     $(GNOME_POMODORO_LIBS)
-
-BUILT_SOURCES = \
-    $(gnome_pomodoro_built_sources)
 
 CLEANFILES = \
     $(BUILT_SOURCES) \
