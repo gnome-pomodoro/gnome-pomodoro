@@ -52,7 +52,7 @@ Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodor
 
    **On Ubuntu:**
 
-        sudo apt-get install gnome-common intltool valac libglib2.0-dev gobject-introspection libgirepository1.0-dev libgtk-3-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev libcanberra-dev libgdata-dev libgstreamer1.0-dev libupower-glib-dev fonts-droid
+        sudo apt-get install gnome-common intltool valac libglib2.0-dev gobject-introspection libgirepository1.0-dev libgtk-3-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev libcanberra-dev libgdata-dev libgstreamer1.0-dev libupower-glib-dev fonts-droid libgstreamer0.10-dev
 
    **On Fedora:**
 
@@ -122,7 +122,7 @@ Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodo
 
 * Support for GNOME Shell 3.10
 * New layout in preferences dialog
-* Migrate to gsteramer-1.0
+* Migrate to gstreamer-1.0
 * Updated translations
 
 **Version 0.9.1**
