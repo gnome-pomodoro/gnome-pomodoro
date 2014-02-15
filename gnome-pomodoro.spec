@@ -1,4 +1,3 @@
-%define gstreamer_version	1.0.0
 %define gnome_version	3.9.12
 
 Summary:   Time management utility for GNOME
@@ -25,9 +24,9 @@ BuildRequires: vala
 BuildRequires: vala-tools
 BuildRequires: glib2-devel
 BuildRequires: gobject-introspection-devel
-BuildRequires: gtk3-devel >= 3.9.12
+BuildRequires: gtk3-devel >= %{gnome_version}
 BuildRequires: clutter-gtk-devel
-BuildRequires: gnome-desktop3-devel
+BuildRequires: gnome-desktop3-devel >= %{gnome_version}
 BuildRequires: libnotify-devel
 BuildRequires: libcanberra-devel
 BuildRequires: libgdata-devel
@@ -51,22 +50,18 @@ The Pomodoro Technique is a time and focus management method which improves prod
 %setup -q -n %{_distdir}-%{version}
 
 %build
-./autogen.sh --prefix=%{_prefix}
-# %configure --disable-static
-
+%configure --disable-static
 make %{?_smp_mflags}
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
-#find $RPM_BUILD_ROOT -name '*.la' -delete
-#rm -fR $RPM_BUILD_ROOT/%{_bindir}
+find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 desktop-file-edit $RPM_BUILD_ROOT/%{_datadir}/applications/*.desktop \
     --set-key=X-AppInstall-Package --set-value=%{name}
 
 %find_lang %{name}
 
 %check
-#desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 desktop-file-validate $RPM_BUILD_ROOT/%{_datadir}/applications/*.desktop
 
 %post
@@ -95,4 +90,3 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/gnome-shell/extensions/pomodoro@arun.codito.in/*
 %{_datadir}/icons/hicolor/*/apps/*
 %{_datadir}/icons/hicolor/*/status/*
-
