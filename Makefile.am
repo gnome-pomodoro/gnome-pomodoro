@@ -7,14 +7,14 @@ SUBDIRS = \
     src \
     extension \
     data \
-    po
+    po \
+    packages
 
 EXTRA_DIST = \
     autogen.sh \
     COPYING \
     Makefile.include \
-    README.md \
-    gnome-pomodoro.spec
+    README.md
 
 distdir = $(PACKAGE_TARNAME)-$(VERSION)
 
@@ -30,7 +30,7 @@ rpmdefines = \
 
 rpm: dist
 	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \
-	rpmbuild $(rpmdefines) -ba $(top_srcdir)/gnome-pomodoro.spec
+	rpmbuild $(rpmdefines) -ba $(top_srcdir)/packages/rpm/gnome-pomodoro.spec
 
 clean-local:
 	rm -Rf $(builddir)/rpms

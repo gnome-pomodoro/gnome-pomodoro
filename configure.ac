@@ -161,6 +161,8 @@ AC_CONFIG_FILES([
   data/icons/Makefile
   data/sounds/Makefile
   po/Makefile.in
+  packages/Makefile
+  packages/rpm/Makefile
 ])
 
 AC_OUTPUT
