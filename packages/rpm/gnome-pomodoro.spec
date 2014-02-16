@@ -1,11 +1,11 @@
 %define gnome_version	3.9.12
 
-Summary:   Time management utility for GNOME
+Summary:   A time management utility for GNOME
 Name:      %{_name}
 Version:   %{_version}
 Release:   1%{?dist}
-License:   GPLv3
-Group:     Application/Productivity
+License:   GPLv3+
+Group:     Productivity/Office/Other
 URL:       https://github.com/codito/gnome-shell-pomodoro
 Source:    %{_distdir}-%{version}.tar.xz
 BuildArch: x86_64 i686
@@ -42,9 +42,9 @@ BuildRequires: pkgconfig(libcanberra)
 Obsoletes: gnome-shell-extension-pomodoro
 
 %description
-This GNOME utility intends to help manage time according to Pomodoro Technique.
-
-The Pomodoro Technique is a time and focus management method which improves productivity and quality of work. The name comes from a kitchen timer, which can be used to keep track of time. In short, you are supposed to focus on work for around 25 minutes and then have a well deserved break in which you should do nothing but relax. This cycle repeats once it reaches 4th break – then you should take a longer break (have a walk or something). It's that simple. It improves your focus, physical health and mental agility depending on how you spend your breaks and how strictly you follow the routine.
+This GNOME utility helps managing time using Pomodoro Technique. It intends
+to improve productivity and focus by taking short breaks after every 25 minutes
+of work.
 
 %prep
 %setup -q -n %{_distdir}-%{version}
