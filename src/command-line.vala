@@ -30,7 +30,7 @@ public class Pomodoro.CommandLine
 
     public bool parse_ref ([CCode (array_length_pos = 0.9)] ref unowned string[]? args)
     {
-        var option_context = new GLib.OptionContext ("- A simple pomodoro timer");
+        var option_context = new GLib.OptionContext ("- Time management utility for GNOME");
         option_context.set_help_enabled (true);
         option_context.add_group (Gtk.get_option_group (true));
         option_context.add_group (Gst.init_get_option_group ());
