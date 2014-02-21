@@ -83,7 +83,7 @@ namespace Pomodoro
             value.set_object (GLib.File.new_for_uri (uri));
         }
         else {
-            value.set_object (null);
+            value.set_pointer (null);
         }
 
         return true;
@@ -159,21 +159,6 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
     private void setup ()
     {
-        var css_provider = new Gtk.CssProvider ();
-        try {
-           var css_file = File.new_for_uri ("resource:///org/gnome/pomodoro/gtk-style.css");
-
-           css_provider.load_from_file (css_file);
-        }
-        catch (Error e) {
-            GLib.warning ("Error while loading css file: %s", e.message);
-        }
-
-        Gtk.StyleContext.add_provider_for_screen (
-                                     Gdk.Screen.get_default (),
-                                     css_provider,
-                                     Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-
         var context = this.get_style_context ();
         context.add_class ("preferences-dialog");
 

@@ -3,12 +3,12 @@
 _Name=Pomodoro
 _Comment=Manage your time and tasks
 _Keywords=time;timer;tasks;manage;organize;
-Exec=gnome-pomodoro --preferences
+Exec=gnome-pomodoro
 Icon=gnome-pomodoro
 StartupNotify=true
 Terminal=false
 Type=Application
 Categories=GNOME;GTK;Utility;
 OnlyShowIn=GNOME;
-NoDisplay=true
+NoDisplay=false
 X-GNOME-UsesNotifications=true

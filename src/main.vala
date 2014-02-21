@@ -52,12 +52,7 @@ public int main (string[] args)
         application.set_default ();
 
         try {
-            if (application.register ())
-            {
-                // if (!command_line.no_default_window) {
-                //     application.activate_action ("preferences", "");
-                // }
-
+            if (application.register ()) {
                 return application.run (args);
             }
         }

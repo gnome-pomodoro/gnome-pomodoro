@@ -35,7 +35,7 @@ public class Pomodoro.Application : Gtk.Application
     public GLib.Settings settings;
     public Pomodoro.Service service;
     public Pomodoro.Timer timer;
-    public Gtk.Window window;
+    public Gtk.Window main_window;
 
     private Gtk.Window preferences_dialog;
     private Gtk.Window about_dialog;
@@ -46,8 +46,7 @@ public class Pomodoro.Application : Gtk.Application
     {
         GLib.Object (
             application_id: "org.gnome.Pomodoro",
-            flags: GLib.ApplicationFlags.HANDLES_COMMAND_LINE |
-                   GLib.ApplicationFlags.IS_SERVICE
+            flags: GLib.ApplicationFlags.HANDLES_COMMAND_LINE
         );
 
         this.inactivity_timeout = 300000;
@@ -56,7 +55,7 @@ public class Pomodoro.Application : Gtk.Application
         this.settings = new GLib.Settings ("org.gnome.pomodoro");
         this.timer = null;
         this.service = null;
-        this.window = null;
+        this.main_window = null;
         this.hold_reasons = HoldReason.NONE;
     }
 
@@ -89,6 +88,42 @@ public class Pomodoro.Application : Gtk.Application
         return windows != null
                 ? windows.first ().data
                 : null;
+    }
+
+    private void setup_resources ()
+    {
+        var css_provider = new Gtk.CssProvider ();
+        try {
+           var css_file = File.new_for_uri ("resource:///org/gnome/pomodoro/gtk-style.css");
+
+           css_provider.load_from_file (css_file);
+        }
+        catch (Error e) {
+            GLib.warning ("Error while loading css file: %s", e.message);
+        }
+
+        Gtk.StyleContext.add_provider_for_screen (
+                                     Gdk.Screen.get_default (),
+                                     css_provider,
+                                     Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+    }
+
+    private void action_main_window (SimpleAction action,
+                                     Variant?     parameter)
+    {
+        if (this.main_window == null)
+        {
+            this.main_window = new Pomodoro.MainWindow ();
+            this.main_window.destroy.connect (() => {
+                this.main_window = null;
+            });
+
+            this.add_window (this.main_window);
+        }
+
+        if (this.main_window != null) {
+            this.main_window.present ();
+        }
     }
 
     private void action_preferences (SimpleAction action,
@@ -167,6 +202,9 @@ public class Pomodoro.Application : Gtk.Application
         var preferences_action = new GLib.SimpleAction ("preferences", VariantType.STRING);
         preferences_action.activate.connect (this.action_preferences);
 
+        var main_window_action = new GLib.SimpleAction ("main-window", null);
+        main_window_action.activate.connect (this.action_main_window);
+
         var about_action = new GLib.SimpleAction ("about", null);
         about_action.activate.connect (this.action_about);
 
@@ -176,6 +214,7 @@ public class Pomodoro.Application : Gtk.Application
         this.add_accelerator ("<Primary>q", "app.quit", null);
 
         this.add_action (preferences_action);
+        this.add_action (main_window_action);
         this.add_action (about_action);
         this.add_action (quit_action);
     }
@@ -203,6 +242,8 @@ public class Pomodoro.Application : Gtk.Application
         this.hold (HoldReason.SERVICE);
 
         base.startup ();
+
+        this.setup_resources ();
 
         this.modules = new List<Object> ();
         this.modules.prepend (new Pomodoro.Sounds (this.timer));
@@ -285,6 +326,7 @@ public class Pomodoro.Application : Gtk.Application
      */
     public override void activate ()
     {
+        this.activate_action ("main-window", null);
     }
 
     public override bool dbus_register (DBusConnection connection,

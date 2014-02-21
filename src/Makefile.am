@@ -35,6 +35,7 @@ gnome_pomodoro_SOURCES = \
     gnome-desktop.vala \
     keybindings.vala \
     main.vala \
+    main-window.vala \
     power.vala \
     preferences-dialog.vala \
     presence.vala \
