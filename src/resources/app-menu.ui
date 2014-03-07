@@ -15,6 +15,16 @@
       <item>
         <attribute name="label" translatable="yes">Quit</attribute>
         <attribute name="action">app.quit</attribute>
+        <attribute name="accel"><![CDATA[<Primary>Q]]></attribute>
+      </item>
+    </section>
+  </menu>
+  <menu id="window-menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Find</attribute>
+        <attribute name="action">win.find</attribute>
+        <attribute name="accel"><![CDATA[<Primary>F]]></attribute>
       </item>
     </section>
   </menu>

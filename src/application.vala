@@ -30,6 +30,13 @@ public enum Pomodoro.HoldReason {
 }
 
 
+namespace Pomodoro.Stock {
+    public const string NONE = null;
+    public const string BOOKMARK = "bookmark-symbolic";
+    public const string BOOKMARK_ADD = "bookmark-add-symbolic";
+}
+
+
 public class Pomodoro.Application : Gtk.Application
 {
     public GLib.Settings settings;
@@ -210,8 +217,6 @@ public class Pomodoro.Application : Gtk.Application
 
         var quit_action = new GLib.SimpleAction ("quit", null);
         quit_action.activate.connect (this.action_quit);
-
-        this.add_accelerator ("<Primary>q", "app.quit", null);
 
         this.add_action (preferences_action);
         this.add_action (main_window_action);

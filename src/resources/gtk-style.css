@@ -2,6 +2,15 @@
 .preferences-dialog {
 }
 
+.headerbar .titlebar .arrow-right {
+    font-size: 70%;
+}
+
+.headerbar .titlebar GtkLabel {
+    font-weight: bold;
+    padding: 0pt 2pt;
+}
+
 PomodoroSymbolicButton {
     icon-shadow: none;
 }
