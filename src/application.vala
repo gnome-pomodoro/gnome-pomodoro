@@ -228,10 +228,10 @@ public class Pomodoro.Application : Gtk.Application
     {
         var builder = new Gtk.Builder ();
         try {
-            builder.add_from_resource ("/org/gnome/pomodoro/app-menu.ui");
+            builder.add_from_resource ("/org/gnome/pomodoro/menu.ui");
         }
         catch (GLib.Error error) {
-            GLib.error ("Failed to load app-menu.ui from the resource file.");
+            GLib.error ("Failed to load menu.ui from the resource file.");
         }
 
         var menu = builder.get_object ("app-menu") as GLib.MenuModel;
