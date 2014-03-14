@@ -30,6 +30,12 @@ public enum Pomodoro.HoldReason {
 }
 
 
+public enum Pomodoro.ExitStatus {
+    SUCCESS = 0,
+    FAILURE = 1
+}
+
+
 namespace Pomodoro.Stock {
     public const string NONE = null;
     public const string BOOKMARK = "bookmark-symbolic";

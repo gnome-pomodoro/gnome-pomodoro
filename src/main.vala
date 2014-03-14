@@ -22,13 +22,6 @@
 using GLib;
 
 
-private enum ExitStatus
-{
-    SUCCESS = 0,
-    FAILURE = 1
-}
-
-
 public int main (string[] args)
 {
     GLib.Environment.set_application_name (Config.PACKAGE);
@@ -61,5 +54,5 @@ public int main (string[] args)
         }
     }
 
-    return ExitStatus.FAILURE;
+    return Pomodoro.ExitStatus.FAILURE;
 }

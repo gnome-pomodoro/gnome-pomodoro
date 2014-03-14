@@ -155,6 +155,7 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
 AC_CONFIG_FILES([
   Makefile
   vapi/Makefile
+  lib/Makefile
   src/Makefile
   extension/Makefile
   data/Makefile
