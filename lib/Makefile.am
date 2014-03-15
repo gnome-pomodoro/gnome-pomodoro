@@ -22,7 +22,7 @@ libgnome_pomodoro_la_SOURCES = \
     widgets.vala
 
 libgnome_pomodoro_la_VALAFLAGS = \
-    --vapidir=$(top_srcdir)/vapi \
+    --vapidir=$(top_srcdir) \
     --vapidir=$(top_builddir)/vapi \
     --pkg config \
     --pkg gobject-2.0 \

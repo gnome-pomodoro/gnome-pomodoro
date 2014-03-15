@@ -11,6 +11,7 @@ SUBDIRS = \
 
 EXTRA_DIST = \
     autogen.sh \
+    config.vapi \
     COPYING \
     README.md
 

@@ -6,7 +6,7 @@ gnome_pomodoro_SOURCES = \
     main.vala
 
 gnome_pomodoro_VALAFLAGS = \
-    --vapidir=$(top_srcdir)/vapi \
+    --vapidir=$(top_srcdir) \
     --vapidir=$(top_builddir)/vapi \
     --vapidir=$(top_builddir)/lib \
     --pkg gnome-pomodoro \
