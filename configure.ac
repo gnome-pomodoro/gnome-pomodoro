@@ -130,11 +130,14 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
 
 # Some helpful constants that are available to the application
 
+AC_SUBST(EXTENSION_UUID, ["pomodoro@arun.codito.in"])
+
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
                    [The name of the gettext domain])
 
-AC_DEFINE([EXTENSION_UUID], ["pomodoro@arun.codito.in"],
-          [UUID of the pomodoro extensoin])
+AC_DEFINE_UNQUOTED([EXTENSION_UUID], ["$EXTENSION_UUID"],
+                   [UUID of the pomodoro extensoin])
+
 
 
 AC_CONFIG_FILES([
