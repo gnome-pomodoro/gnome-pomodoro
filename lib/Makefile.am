@@ -1,17 +1,3 @@
-include $(top_srcdir)/Makefile.include
-
-AM_CFLAGS = \
-    -I$(top_srcdir) \
-    -I$(top_builddir) \
-    $(WARNING_CFLAGS) \
-    -DGETTEXT_PACKAGE="\"$(GETTEXT_PACKAGE)\"" \
-    -DPACKAGE_LOCALE_DIR="\"$(localedir)\"" \
-    -DPACKAGE_SRC_DIR="\"$(srcdir)\"" \
-    -DPACKAGE_DATA_DIR="\"$(pkgdatadir)\"" \
-    -DGNOME_DESKTOP_USE_UNSTABLE_API \
-    -Wall \
-    -Wno-unused
-
 
 noinst_LTLIBRARIES = \
     libgnome-pomodoro.la
@@ -55,7 +41,15 @@ libgnome_pomodoro_la_VALAFLAGS = \
     -H gnome-pomodoro.h
 
 libgnome_pomodoro_la_CPPFLAGS = \
-    $(GNOME_POMODORO_CFLAGS)
+    $(GNOME_POMODORO_CFLAGS) \
+    $(WARNING_CFLAGS) \
+    -I$(top_srcdir) \
+    -I$(top_builddir) \
+    -I$(top_builddir)/lib \
+    -DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
+    -DPACKAGE_LOCALE_DIR=\"$(localedir)\" \
+    -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
+    -DGNOME_DESKTOP_USE_UNSTABLE_API
 
 libgnome_pomodoro_la_LIBADD = \
     $(GNOME_POMODORO_LIBS)

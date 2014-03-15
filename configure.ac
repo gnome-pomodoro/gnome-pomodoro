@@ -1,45 +1,38 @@
-AC_PREREQ(2.63)
-
-AC_INIT([Pomodoro],
+AC_INIT([gnome-pomodoro],
         [0.10.0],
         [https://github.com/codito/gnome-shell-pomodoro/issues],
         [gnome-pomodoro],
         [https://github.com/codito/gnome-shell-pomodoro])
-
-AC_CONFIG_SRCDIR([src])
-AM_CONFIG_HEADER([config/config.h])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_AUX_DIR([config])
+AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz foreign])
+LT_INIT
+AM_MAINTAINER_MODE
+AC_CONFIG_HEADERS([config.h])
 
-AM_INIT_AUTOMAKE([1.13 dist-xz no-dist-gzip tar-ustar foreign])
-AM_SILENT_RULES([yes])
-AM_MAINTAINER_MODE([enable])
-GNOME_MAINTAINER_MODE_DEFINES
+AC_PATH_PROG(VALAC, valac, valac)
+AC_SUBST(VALAC)
 
-AC_PROG_CC
-AC_PROG_INSTALL
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-AM_PROG_VALAC([0.20.0])
+AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 
-AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+IT_PROG_INTLTOOL([0.40.1])
 
-# Initialize libtool
-LT_PREREQ([2.2])
-LT_INIT([disable-static])
-
-
-GETTEXT_PACKAGE=gnome-pomodoro
+GETTEXT_PACKAGE=AC_PACKAGE_NAME
 AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
-                   [The name of the gettext domain])
-
-AM_GLIB_GNU_GETTEXT
-GLIB_DEFINE_LOCALEDIR(GNOMELOCALEDIR)
 
 GLIB_GSETTINGS
 
-IT_PROG_INTLTOOL([0.40.1])
+AC_SUBST(CFLAGS)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
+
+AC_CHECK_LIB(m, floor)
+AC_CHECK_HEADERS(malloc.h)
+AC_CHECK_FUNCS(mallopt)
+
+PKG_PROG_PKG_CONFIG([0.22])
+GOBJECT_INTROSPECTION_REQUIRE([1.36.0])
+
+VAPIGEN_CHECK
 
 
 # Enable Debug
@@ -74,7 +67,7 @@ fi
 WARNING_CFLAGS=""
 
 AC_ARG_ENABLE(more-warnings,
-AS_HELP_STRING([--enable-more-warnings],[Maximum compiler warnings]),
+AS_HELP_STRING([--enable-more-warnings], [Maximum compiler warnings]),
 set_more_warnings="$enableval",[
 if test -d $srcdir/.git; then
     is_cvs_version=true
@@ -115,55 +108,47 @@ fi
 AC_SUBST(WARNING_CFLAGS)
 
 
-# don't rerun to this point if we abort
-AC_CACHE_SAVE
-
-m4_define(glib_minver,                 2.36.1)
-m4_define(gnome_desktop_minver,        3.10.0)
-m4_define(pango_minver,                1.32.0)
-m4_define(gtk_minver,                  3.10.0)
-m4_define(schemas_minver,              3.10.0)
-m4_define(upower_minver,               0.9.20)
-m4_define(canberra_minver,             0.30)
-m4_define(gstreamer_minver,            1.2.0)
-
-AC_CHECK_LIB(m, floor)
-AC_CHECK_HEADERS(malloc.h)
-AC_CHECK_FUNCS(mallopt)
-
-PKG_PROG_PKG_CONFIG([0.22])
-GOBJECT_INTROSPECTION_REQUIRE([1.36.0])
-
-VAPIGEN_CHECK
+GLIB_REQUIRED=2.36.0
+GTK_REQUIRED=3.8.0
+GNOME_REQUIRED=3.8.0
 
 PKG_CHECK_MODULES(GNOME_POMODORO, [
-    glib-2.0 >= glib_minver
-    gtk+-3.0 >= gtk_minver
-    gio-2.0 >= glib_minver
-    gio-unix-2.0 >= glib_minver
+    glib-2.0 >= $GLIB_REQUIRED
+    gio-2.0 >= $GLIB_REQUIRED
+    gio-unix-2.0 >= $GLIB_REQUIRED
+    gthread-2.0 >= $GLIB_REQUIRED
+    gmodule-no-export-2.0 >= $GLIB_REQUIRED
+    gtk+-3.0 >= $GTK_REQUIRED
+    gsettings-desktop-schemas >= $GTK_REQUIRED
+    gnome-desktop-3.0 >= $GNOME_REQUIRED
     dbus-glib-1
-    gnome-desktop-3.0 >= gnome_desktop_minver
-    gthread-2.0 >= glib_minver
-    gmodule-no-export-2.0 >= glib_minver
-    gsettings-desktop-schemas >= schemas_minver
-    upower-glib >= upower_minver
-    libcanberra >= canberra_minver
-    gstreamer-1.0 >= gstreamer_minver
+    upower-glib >= 0.9.20
+    libcanberra >= 0.30
+    gstreamer-1.0 >= 1.2.0
 ])
 
 
+# Some helpful constants that are available to the application
+
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
+                   [The name of the gettext domain])
+
+AC_DEFINE([EXTENSION_UUID], ["pomodoro@arun.codito.in"],
+          [UUID of the pomodoro extensoin])
+
+
 AC_CONFIG_FILES([
-  Makefile
-  vapi/Makefile
-  lib/Makefile
-  src/Makefile
-  extension/Makefile
-  data/Makefile
-  data/icons/Makefile
-  data/sounds/Makefile
-  po/Makefile.in
-  packages/Makefile
-  packages/rpm/Makefile
+    Makefile
+    vapi/Makefile
+    lib/Makefile
+    src/Makefile
+    extension/Makefile
+    data/Makefile
+    data/icons/Makefile
+    data/sounds/Makefile
+    po/Makefile.in
+    packages/Makefile
+    packages/rpm/Makefile
 ])
 
 AC_OUTPUT

@@ -1,5 +1,3 @@
-include $(top_srcdir)/Makefile.include
-
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 SUBDIRS = \
@@ -14,7 +12,6 @@ SUBDIRS = \
 EXTRA_DIST = \
     autogen.sh \
     COPYING \
-    Makefile.include \
     README.md
 
 distdir = $(PACKAGE_TARNAME)-$(VERSION)

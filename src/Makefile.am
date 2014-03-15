@@ -1,20 +1,6 @@
-include $(top_srcdir)/Makefile.include
 
-AM_CFLAGS = \
-    -I$(top_srcdir) \
-    -I$(top_builddir) \
-    -I$(top_builddir)/lib \
-    $(WARNING_CFLAGS) \
-    -DGETTEXT_PACKAGE="\"$(GETTEXT_PACKAGE)\"" \
-    -DPACKAGE_LOCALE_DIR="\"$(localedir)\"" \
-    -DPACKAGE_SRC_DIR="\"$(srcdir)\"" \
-    -DPACKAGE_DATA_DIR="\"$(pkgdatadir)\"" \
-    -DGNOME_DESKTOP_USE_UNSTABLE_API \
-    -Wall \
-    -Wno-unused
-
-
-bin_PROGRAMS = gnome-pomodoro
+bin_PROGRAMS = \
+    gnome-pomodoro
 
 gnome_pomodoro_SOURCES = \
     main.vala
@@ -24,10 +10,22 @@ gnome_pomodoro_VALAFLAGS = \
     --vapidir=$(top_builddir)/vapi \
     --vapidir=$(top_builddir)/lib \
     --pkg gnome-pomodoro \
-    --pkg config
+    --pkg config \
+    --pkg gobject-2.0 \
+    --pkg gio-2.0 \
+    --pkg gdk-3.0 \
+    --pkg gtk+-3.0
 
 gnome_pomodoro_CPPFLAGS = \
-    $(GNOME_POMODORO_CFLAGS)
+    $(GNOME_POMODORO_CFLAGS) \
+    $(WARNING_CFLAGS) \
+    -I$(top_srcdir) \
+    -I$(top_builddir) \
+    -I$(top_builddir)/lib \
+    -DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
+    -DPACKAGE_LOCALE_DIR=\"$(localedir)\" \
+    -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
+    -DGNOME_DESKTOP_USE_UNSTABLE_API
 
 gnome_pomodoro_LDADD = \
     $(GNOME_POMODORO_LIBS) \
