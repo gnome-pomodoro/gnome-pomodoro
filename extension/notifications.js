@@ -41,8 +41,9 @@ const Tweener = imports.ui.tweener;
 const Util = imports.misc.util;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const Config = Extension.imports.config;
 
-const Gettext = imports.gettext.domain('gnome-pomodoro');
+const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
 const ngettext = Gettext.ngettext;
 

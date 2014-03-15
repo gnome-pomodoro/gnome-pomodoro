@@ -24,24 +24,25 @@
 const Gettext = imports.gettext;
 
 const Main = imports.ui.main;
-const Config = imports.misc.config;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Indicator = Extension.imports.indicator;
+const Config = Extension.imports.config;
 
 
 let indicator = null;
 
 
 function init(metadata) {
-    Gettext.bindtextdomain('gnome-pomodoro', Config.LOCALEDIR);
+    Gettext.bindtextdomain(Config.GETTEXT_PACKAGE,
+                           Config.LOCALE_DIR);
 }
 
 
 function enable() {
     if (!indicator) {
         indicator = new Indicator.Indicator();
-        Main.panel.addToStatusArea('pomodoro', indicator);
+        Main.panel.addToStatusArea(Config.PACKAGE_NAME, indicator);
     }
 }
 

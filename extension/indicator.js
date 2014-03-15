@@ -40,8 +40,9 @@ const Tweener = imports.ui.tweener;
 const DBus = Extension.imports.dbus;
 const Notifications = Extension.imports.notifications;
 const Tasklist = Extension.imports.tasklist;
+const Config = Extension.imports.config;
 
-const Gettext = imports.gettext.domain('gnome-pomodoro');
+const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
 
 
