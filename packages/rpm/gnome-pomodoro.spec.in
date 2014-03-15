@@ -1,43 +1,42 @@
-%define gnome_version	3.9.12
-
 Summary:   A time management utility for GNOME
-Name:      %{_name}
-Version:   %{_version}
+Name:      @PACKAGE_NAME@
+Version:   @PACKAGE_VERSION@
 Release:   1%{?dist}
 License:   GPLv3+
 Group:     Productivity/Office/Other
-URL:       https://github.com/codito/gnome-shell-pomodoro
-Source:    %{_distdir}-%{version}.tar.xz
+URL:       @PACKAGE_URL@
+Source:    @distdir@-@PACKAGE_VERSION@.tar.xz
 BuildArch: x86_64 i686
-BuildRoot: %{_tmppath}/%{name}-%{version}-build
+BuildRoot: @PACKAGE_NAME@-@PACKAGE_VERSION@-build
 
-Requires:  gnome-shell >= %{gnome_version}
-Requires:  gstreamer1
-Requires:  google-droid-sans-fonts
-Requires:  hicolor-icon-theme
+Requires: gnome-shell >= @GNOME_REQUIRED@
+Requires: hicolor-icon-theme
+Requires: google-droid-sans-fonts
 
+%if %{defined fedora}
+Requires: gtk3 >= @GTK_REQUIRED@
+Requires: gstreamer1
+%endif
+
+BuildRequires: gnome-shell
 BuildRequires: gnome-common
 BuildRequires: gettext
 BuildRequires: intltool
 BuildRequires: desktop-file-utils
 BuildRequires: vala
-BuildRequires: vala-tools
-BuildRequires: glib2-devel
-BuildRequires: gobject-introspection-devel
-BuildRequires: gtk3-devel >= %{gnome_version}
-BuildRequires: clutter-gtk-devel
-BuildRequires: gnome-desktop3-devel >= %{gnome_version}
-BuildRequires: libnotify-devel
-BuildRequires: libcanberra-devel
-BuildRequires: libgdata-devel
-BuildRequires: gstreamer1-devel
-BuildRequires: upower-devel
+BuildRequires: pkgconfig(glib-2.0) >= @GLIB_REQUIRED@
+BuildRequires: pkgconfig(gtk+-3.0) >= @GTK_REQUIRED@
 BuildRequires: pkgconfig(gobject-introspection-1.0)
-BuildRequires: pkgconfig(gnome-desktop-3.0)
+BuildRequires: pkgconfig(dbus-glib-1)
+BuildRequires: pkgconfig(libnotify)
+BuildRequires: pkgconfig(libcanberra)
+BuildRequires: pkgconfig(gnome-desktop-3.0) >= @GNOME_REQUIRED@
 BuildRequires: pkgconfig(gstreamer-1.0)
 BuildRequires: pkgconfig(upower-glib)
-BuildRequires: pkgconfig(dbus-glib-1)
-BuildRequires: pkgconfig(libcanberra)
+
+%if %{defined fedora}
+BuildRequires: vala-tools
+%endif
 
 Obsoletes: gnome-shell-extension-pomodoro
 
@@ -47,7 +46,7 @@ to improve productivity and focus by taking short breaks after every 25 minutes
 of work.
 
 %prep
-%setup -q -n %{_distdir}-%{version}
+%setup -q -n @distdir@-%{version}
 
 %build
 %configure --disable-static
@@ -84,9 +83,7 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/applications/*.desktop
 %{_datadir}/dbus-1/services/org.gnome.Pomodoro.service
 %{_datadir}/glib-2.0/schemas/org.gnome.pomodoro.gschema.xml
-%dir %{_datadir}/gnome-pomodoro
-%{_datadir}/gnome-pomodoro/sounds/*
-%dir %{_datadir}/gnome-shell/extensions/pomodoro@arun.codito.in
-%{_datadir}/gnome-shell/extensions/pomodoro@arun.codito.in/*
+%{_datadir}/gnome-pomodoro
+%{_datadir}/gnome-shell/extensions/@UUID@
 %{_datadir}/icons/hicolor/*/apps/*
 %{_datadir}/icons/hicolor/*/status/*

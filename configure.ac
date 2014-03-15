@@ -109,8 +109,8 @@ AC_SUBST(WARNING_CFLAGS)
 
 
 GLIB_REQUIRED=2.36.0
-GTK_REQUIRED=3.8.0
-GNOME_REQUIRED=3.8.0
+GTK_REQUIRED=3.10.0
+GNOME_REQUIRED=3.10.0
 
 PKG_CHECK_MODULES(GNOME_POMODORO, [
     glib-2.0 >= $GLIB_REQUIRED
@@ -124,13 +124,17 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
     dbus-glib-1
     upower-glib >= 0.9.20
     libcanberra >= 0.30
-    gstreamer-1.0 >= 1.2.0
+    gstreamer-1.0 >= 1.0.10
 ])
 
 
 # Some helpful constants that are available to the application
 
 AC_SUBST(EXTENSION_UUID, ["pomodoro@arun.codito.in"])
+
+AC_SUBST(GLIB_REQUIRED)
+AC_SUBST(GTK_REQUIRED)
+AC_SUBST(GNOME_REQUIRED)
 
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
                    [The name of the gettext domain])

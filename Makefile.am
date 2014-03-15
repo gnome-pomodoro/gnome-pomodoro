@@ -21,13 +21,10 @@ uninstall-hook:
 	rm -Rf $(pkgdatadir)
 
 rpmdefines = \
-	--define "_name $(PACKAGE_TARNAME)" \
-	--define "_version $(PACKAGE_VERSION)" \
-	--define "_distdir $(PACKAGE_TARNAME)" \
 	--define "_sourcedir $(abs_builddir)" \
 	--define "_specdir $(abs_srcdir)"
 
-rpm: dist
+rpm: dist $(top_srcdir)/packages/rpm/gnome-pomodoro.spec
 	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \
 	rpmbuild $(rpmdefines) -ba $(top_srcdir)/packages/rpm/gnome-pomodoro.spec
 
