@@ -44,8 +44,6 @@ libgnome_pomodoro_la_CPPFLAGS = \
     $(GNOME_POMODORO_CFLAGS) \
     $(WARNING_CFLAGS) \
     -I$(top_srcdir) \
-    -I$(top_builddir) \
-    -I$(top_builddir)/lib \
     -DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
     -DPACKAGE_LOCALE_DIR=\"$(localedir)\" \
     -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
@@ -55,10 +53,6 @@ libgnome_pomodoro_la_LIBADD = \
     $(GNOME_POMODORO_LIBS)
 
 libgnome_pomodoro_la_DEPENDENCIES = \
-    $(top_builddir)/vapi/gnome-desktop-3.0.vapi \
-    $(top_builddir)/vapi/upower-glib.vapi
-
-libgnome_pomodoro_la_vala.stamp: \
     $(top_builddir)/vapi/gnome-desktop-3.0.vapi \
     $(top_builddir)/vapi/upower-glib.vapi
 
@@ -77,8 +71,7 @@ BUILT_SOURCES = \
     resources.h
 
 CLEANFILES = \
-    $(BUILT_SOURCES) \
-    libgnome_pomodoro_la_vala.stamp
+    $(BUILT_SOURCES)
 
 EXTRA_DIST = \
     $(resource_files) \

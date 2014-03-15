@@ -20,8 +20,7 @@ gnome_pomodoro_CPPFLAGS = \
     $(GNOME_POMODORO_CFLAGS) \
     $(WARNING_CFLAGS) \
     -I$(top_srcdir) \
-    -I$(top_builddir) \
-    -I$(top_builddir)/lib \
+    -I$(top_srcdir)/lib \
     -DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
     -DPACKAGE_LOCALE_DIR=\"$(localedir)\" \
     -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
@@ -31,12 +30,9 @@ gnome_pomodoro_LDADD = \
     $(GNOME_POMODORO_LIBS) \
     $(top_builddir)/lib/libgnome-pomodoro.la
 
-gnome_pomodoro_vala.stamp: $(top_builddir)/lib/libgnome-pomodoro.la
-
 
 CLEANFILES = \
-    gnome-pomodoro \
-    gnome_pomodoro_vala.stamp
+    gnome-pomodoro
 
 dist-hook:
 	cd $(distdir); rm -f $(CLEANFILES)

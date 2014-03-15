@@ -1,3 +1,4 @@
-src/about-dialog.c
-src/preferences-dialog.c
-src/widgets.c
+lib/about-dialog.c
+lib/main-window.c
+lib/preferences-dialog.c
+lib/widgets.c
