@@ -112,7 +112,7 @@ public class Pomodoro.Application : Gtk.Application
            css_provider.load_from_file (css_file);
         }
         catch (Error e) {
-            GLib.warning ("Error while loading css file: %s", e.message);
+            GLib.warning (e.message);
         }
 
         Gtk.StyleContext.add_provider_for_screen (
@@ -235,13 +235,13 @@ public class Pomodoro.Application : Gtk.Application
         var builder = new Gtk.Builder ();
         try {
             builder.add_from_resource ("/org/gnome/pomodoro/menu.ui");
+
+            var menu = builder.get_object ("app-menu") as GLib.MenuModel;
+            this.set_app_menu (menu);
         }
         catch (GLib.Error error) {
-            GLib.error ("Failed to load menu.ui from the resource file.");
+            GLib.warning (error.message);
         }
-
-        var menu = builder.get_object ("app-menu") as GLib.MenuModel;
-        this.set_app_menu (menu);
     }
 
     private List<Object> modules;

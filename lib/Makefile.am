@@ -13,7 +13,6 @@ libgnome_pomodoro_la_SOURCES = \
     power.vala \
     preferences-dialog.vala \
     presence.vala \
-    resources.c \
     screensaver.vala \
     service.vala \
     sounds.vala \
@@ -22,6 +21,9 @@ libgnome_pomodoro_la_SOURCES = \
     widgets.vala
 
 libgnome_pomodoro_la_VALAFLAGS = \
+    --library=gnome-pomodoro \
+    --header=gnome-pomodoro.h \
+    --vapi=gnome-pomodoro.vapi \
     --vapidir=$(top_srcdir) \
     --vapidir=$(top_builddir)/vapi \
     --pkg config \
@@ -35,10 +37,7 @@ libgnome_pomodoro_la_VALAFLAGS = \
     --pkg gnome-desktop-3.0 \
     --pkg upower-glib \
     --pkg libcanberra \
-    --pkg gstreamer-1.0 \
-    --library gnome-pomodoro \
-    --vapi gnome-pomodoro.vapi \
-    -H gnome-pomodoro.h
+    --pkg gstreamer-1.0
 
 libgnome_pomodoro_la_CPPFLAGS = \
     $(GNOME_POMODORO_CFLAGS) \
@@ -49,35 +48,9 @@ libgnome_pomodoro_la_CPPFLAGS = \
     -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
     -DGNOME_DESKTOP_USE_UNSTABLE_API
 
-libgnome_pomodoro_la_LIBADD = \
-    $(GNOME_POMODORO_LIBS)
-
 libgnome_pomodoro_la_DEPENDENCIES = \
     $(top_builddir)/vapi/gnome-desktop-3.0.vapi \
     $(top_builddir)/vapi/upower-glib.vapi
 
-
-resource_files = $(shell glib-compile-resources --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gnome-pomodoro.gresource.xml)
-
-resources.c: gnome-pomodoro.gresource.xml $(resource_files)
-	$(AM_V_GEN) glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-source --c-name pomodoro $<
-
-resources.h: gnome-pomodoro.gresource.xml $(resource_files)
-	$(AM_V_GEN) glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-header --c-name pomodoro $<
-
-
-BUILT_SOURCES = \
-    resources.c \
-    resources.h
-
-CLEANFILES = \
-    $(BUILT_SOURCES)
-
-EXTRA_DIST = \
-    $(resource_files) \
-    gnome-pomodoro.gresource.xml
-
-dist-hook:
-	cd $(distdir); rm -f $(CLEANFILES)
 
 -include $(top_srcdir)/git.mk
