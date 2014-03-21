@@ -9,12 +9,6 @@ SUBDIRS = \
     po \
     packages
 
-EXTRA_DIST = \
-    autogen.sh \
-    config.vapi \
-    COPYING \
-    README.md
-
 distdir = $(PACKAGE_TARNAME)-$(VERSION)
 
 uninstall-hook:
@@ -27,6 +21,18 @@ rpmdefines = \
 rpm: dist $(top_srcdir)/packages/rpm/gnome-pomodoro.spec
 	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \
 	rpmbuild $(rpmdefines) -ba $(top_srcdir)/packages/rpm/gnome-pomodoro.spec
+
+EXTRA_DIST = \
+    autogen.sh \
+    config.vapi \
+    COPYING \
+    README.md
+
+DISTCLEANFILES = \
+	intltool-extract \
+	intltool-merge \
+	intltool-update \
+	po/.intltool-merge-cache
 
 clean-local:
 	rm -Rf $(builddir)/rpms

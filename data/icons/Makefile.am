@@ -10,10 +10,6 @@ public_icons = \
 noinst_DATA = \
     gnome-pomodoro.svg
 
-EXTRA_DIST = \
-    $(public_icons) \
-    $(noinst_DATA)
-
 gtk_update_icon_cache = gtk-update-icon-cache -f -t
 
 update-icon-cache:
@@ -51,5 +47,9 @@ uninstall-icons:
 install-data-local: install-icons update-icon-cache
 
 uninstall-local: uninstall-icons update-icon-cache
+
+EXTRA_DIST = \
+    $(public_icons) \
+    $(noinst_DATA)
 
 -include $(top_srcdir)/git.mk

@@ -6,9 +6,6 @@ public_sounds = \
     loud-bell.ogg \
     timer.ogg
 
-EXTRA_DIST = \
-    $(public_sounds)
-
 install-sounds:
 	for sound in $(public_sounds); do \
 		mkdir -p $(DESTDIR)$(pkgdatadir)/sounds; \
@@ -23,5 +20,8 @@ uninstall-sounds:
 install-data-local: install-sounds
 
 uninstall-local: uninstall-sounds
+
+EXTRA_DIST = \
+    $(public_sounds)
 
 -include $(top_srcdir)/git.mk

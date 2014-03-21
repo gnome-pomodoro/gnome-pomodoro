@@ -51,7 +51,9 @@ BUILT_SOURCES = \
 
 CLEANFILES = \
     $(BUILT_SOURCES) \
-    gnome-pomodoro
+    $(gnome_pomodoro_SOURCES:.vala=.c) \
+    gnome-pomodoro \
+    gnome_pomodoro_vala.stamp
 
 EXTRA_DIST = \
     $(resource_files) \

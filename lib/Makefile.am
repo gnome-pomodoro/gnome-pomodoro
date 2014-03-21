@@ -53,4 +53,14 @@ libgnome_pomodoro_la_DEPENDENCIES = \
     $(top_builddir)/vapi/upower-glib.vapi
 
 
+CLEANFILES = \
+    $(libgnome_pomodoro_la_SOURCES:.vala=.c) \
+    gnome-pomodoro.h \
+    gnome-pomodoro.vapi \
+    libgnome-pomodoro.la \
+    libgnome_pomodoro_la_vala.stamp
+
+dist-hook:
+	cd $(distdir); rm -f $(CLEANFILES)
+
 -include $(top_srcdir)/git.mk

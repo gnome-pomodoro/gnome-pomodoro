@@ -18,6 +18,10 @@ service_in_files = \
     org.gnome.Pomodoro.service.in
 service_DATA = $(service_in_files:.service.in=.service)
 
+$(service_DATA): $(service_in_files) Makefile
+	$(AM_V_GEN) sed -e "s|@bindir[@]|$(bindir)|g" \
+	                $< > $@
+
 EXTRA_DIST = \
     $(desktop_in_files) \
     $(gsettings_in_files) \
@@ -28,10 +32,7 @@ CLEANFILES = \
     $(gsettings_SCHEMAS) \
     $(service_DATA)
 
-$(service_DATA): $(service_in_files) Makefile
-	$(AM_V_GEN) sed -e "s|@bindir[@]|$(bindir)|g" \
-	                $< > $@
-
-$(service_DATA): $(service_in_files)
+dist-hook:
+	cd $(distdir); rm -f $(CLEANFILES)
 
 -include $(top_srcdir)/git.mk
