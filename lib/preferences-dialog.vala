@@ -516,7 +516,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                        pomodoro_end_sound);
 
         var pomodoro_start_sound = new Pomodoro.SoundChooserButton ();
-        pomodoro_start_sound.title = _("Select sound for pomodoro start");
+        pomodoro_start_sound.title = _("Select sound for end of break");
 
         for (var i = 0; i < sounds.length; i += 2)
         {
@@ -525,7 +525,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         }
 
         var pomodoro_start_sound_field = this.create_field (
-                                       _("Pomodoro start sound"),
+                                       _("End of break sound"),
                                        pomodoro_start_sound);
 
         this.settings.bind_with_mapping ("pomodoro-end-sound",
