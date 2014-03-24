@@ -1,5 +1,5 @@
 AC_INIT([gnome-pomodoro],
-        [0.10.0],
+        [0.11.0],
         [https://github.com/codito/gnome-shell-pomodoro/issues],
         [gnome-pomodoro],
         [https://github.com/codito/gnome-shell-pomodoro])
