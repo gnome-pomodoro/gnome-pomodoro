@@ -7,13 +7,14 @@ gnome_pomodoro_SOURCES = \
     resources.c
 
 gnome_pomodoro_DEPENDENCIES = \
-    $(top_srcdir)/lib/libgnome-pomodoro.la \
+    ../lib/libgnome-pomodoro.la \
     resources.c
 
 gnome_pomodoro_VALAFLAGS = \
-    --vapidir=$(top_srcdir) \
-    --vapidir=$(top_builddir)/vapi \
-    --vapidir=$(top_builddir)/lib \
+    --vapidir=$(abs_top_srcdir) \
+    --vapidir=$(abs_top_srcdir)/lib \
+    --vapidir=$(abs_top_srcdir)/vapi \
+    --vapidir=$(abs_top_builddir)/vapi \
     --pkg gnome-pomodoro \
     --pkg config \
     --pkg gobject-2.0 \
@@ -24,8 +25,8 @@ gnome_pomodoro_VALAFLAGS = \
 gnome_pomodoro_CPPFLAGS = \
     $(GNOME_POMODORO_CFLAGS) \
     $(WARNING_CFLAGS) \
-    -I$(top_srcdir) \
-    -I$(top_srcdir)/lib \
+    -I$(abs_top_srcdir) \
+    -I$(abs_top_srcdir)/lib \
     -DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
     -DPACKAGE_LOCALE_DIR=\"$(localedir)\" \
     -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \

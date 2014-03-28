@@ -18,9 +18,9 @@ rpmdefines = \
 	--define "_sourcedir $(abs_builddir)" \
 	--define "_specdir $(abs_srcdir)"
 
-rpm: dist $(top_srcdir)/packages/rpm/gnome-pomodoro.spec
+rpm: dist packages/rpm/gnome-pomodoro.spec
 	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \
-	rpmbuild $(rpmdefines) -ba $(top_srcdir)/packages/rpm/gnome-pomodoro.spec
+	rpmbuild $(rpmdefines) -ba $(abs_top_builddir)/packages/rpm/gnome-pomodoro.spec
 
 EXTRA_DIST = \
     autogen.sh \

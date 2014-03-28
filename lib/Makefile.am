@@ -24,8 +24,9 @@ libgnome_pomodoro_la_VALAFLAGS = \
     --library=gnome-pomodoro \
     --header=gnome-pomodoro.h \
     --vapi=gnome-pomodoro.vapi \
-    --vapidir=$(top_srcdir) \
-    --vapidir=$(top_builddir)/vapi \
+    --vapidir=$(abs_top_srcdir) \
+    --vapidir=$(abs_top_srcdir)/vapi \
+    --vapidir=$(abs_top_builddir)/vapi \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
@@ -42,7 +43,7 @@ libgnome_pomodoro_la_VALAFLAGS = \
 libgnome_pomodoro_la_CPPFLAGS = \
     $(GNOME_POMODORO_CFLAGS) \
     $(WARNING_CFLAGS) \
-    -I$(top_srcdir) \
+    -I$(abs_top_builddir) \
     -DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
     -DPACKAGE_LOCALE_DIR=\"$(localedir)\" \
     -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
