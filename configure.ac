@@ -156,6 +156,7 @@ AC_CONFIG_FILES([
     po/Makefile.in
     packages/Makefile
     packages/rpm/Makefile
+    tests/Makefile
 ])
 
 AC_OUTPUT

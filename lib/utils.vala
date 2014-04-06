@@ -105,7 +105,7 @@ namespace Pomodoro
         return str;
     }
 
-    private double get_real_time ()
+    public double get_real_time ()
     {
         return (double) GLib.get_real_time () / 1000000.0;
     }

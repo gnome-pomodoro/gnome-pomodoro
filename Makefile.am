@@ -7,7 +7,8 @@ SUBDIRS = \
     extension \
     data \
     po \
-    packages
+    packages \
+    tests
 
 distdir = $(PACKAGE_TARNAME)-$(VERSION)
 
@@ -21,6 +22,11 @@ rpmdefines = \
 rpm: dist packages/rpm/gnome-pomodoro.spec
 	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \
 	rpmbuild $(rpmdefines) -ba $(abs_top_builddir)/packages/rpm/gnome-pomodoro.spec
+
+test:
+	( cd ./tests && $(MAKE) $(AM_MAKEFLAGS) $@ ) || exit $$?
+
+.PHONY: test
 
 EXTRA_DIST = \
     autogen.sh \
