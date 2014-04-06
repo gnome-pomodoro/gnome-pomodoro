@@ -409,8 +409,7 @@ public enum Pomodoro.SoundBackend {
 
 private string get_default_current_folder_uri ()
 {
-    var application = GLib.Application.get_default () as Pomodoro.Application;
-    var settings = application.settings.get_child ("state");
+    var settings = Pomodoro.get_settings ().get_child ("state");
 
     return settings.get_string ("open-uri");
 }
@@ -418,8 +417,7 @@ private string get_default_current_folder_uri ()
 
 private void set_default_current_folder_uri (string current_folder)
 {
-    var application = GLib.Application.get_default () as Pomodoro.Application;
-    var settings = application.settings.get_child ("state");
+    var settings = Pomodoro.get_settings ().get_child ("state");
 
     settings.set_string ("open-uri", current_folder);
 }

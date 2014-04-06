@@ -145,9 +145,7 @@ public class Pomodoro.Timer : Object
         this.idle_monitor = new Gnome.IdleMonitor ();
         this.became_active_id = 0;
 
-        var application = GLib.Application.get_default () as Pomodoro.Application;
-
-        var settings = application.settings as GLib.Settings;
+        var settings = Pomodoro.get_settings ();
 
         this.settings = settings.get_child ("preferences");
         this.settings.changed.connect (this.on_settings_changed);

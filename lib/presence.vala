@@ -96,10 +96,7 @@ class Pomodoro.Presence : Object
     {
         this.timer = timer;
 
-        var application = GLib.Application.get_default () as Pomodoro.Application;
-
-        this.settings = application.settings as GLib.Settings;
-        this.settings = this.settings.get_child ("preferences");
+        this.settings = Pomodoro.get_settings ().get_child ("preferences");
         this.settings.changed.connect (this.on_settings_changed);
 
         this.ignore_next_status = false;

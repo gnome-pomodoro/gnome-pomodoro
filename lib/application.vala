@@ -45,7 +45,6 @@ namespace Pomodoro.Stock {
 
 public class Pomodoro.Application : Gtk.Application
 {
-    public GLib.Settings settings;
     public Pomodoro.Service service;
     public Pomodoro.Timer timer;
     public Gtk.Window main_window;
@@ -65,7 +64,6 @@ public class Pomodoro.Application : Gtk.Application
         this.inactivity_timeout = 300000;
         this.register_session = false;
 
-        this.settings = new GLib.Settings ("org.gnome.pomodoro");
         this.timer = null;
         this.service = null;
         this.main_window = null;

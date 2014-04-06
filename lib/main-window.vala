@@ -52,8 +52,7 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
 
         this.set_type_hint (Gdk.WindowTypeHint.NORMAL);
 
-        var application = GLib.Application.get_default () as Pomodoro.Application;
-        this.settings = application.settings.get_child ("preferences");
+        this.settings = Pomodoro.get_settings ().get_child ("preferences");
 
         this.setup ();
     }

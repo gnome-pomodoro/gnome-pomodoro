@@ -15,6 +15,7 @@ libgnome_pomodoro_la_SOURCES = \
     presence.vala \
     screensaver.vala \
     service.vala \
+    settings.vala \
     sounds.vala \
     timer.vala \
     utils.vala \
