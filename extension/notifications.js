@@ -537,11 +537,15 @@ const Notification = new Lang.Class({
     },
 
     show: function() {
-        if (!Main.messageTray.contains(this.source)) {
-            Main.messageTray.add(this.source);
-        }
+        this.emit('show');
 
-        this.source.notify(this);
+        if (!this._destroying) {
+            if (!Main.messageTray.contains(this.source)) {
+                Main.messageTray.add(this.source);
+            }
+
+            this.source.notify(this);
+        }
     },
 
     hide: function(close_tray) {
@@ -563,6 +567,11 @@ const Notification = new Lang.Class({
 
         this.emit('done-displaying');
         this.destroy();
+    },
+
+    destroy: function(reason) {
+        this._destroying = true;
+        this.parent(reason);
     }
 });
 
@@ -754,9 +763,9 @@ const PomodoroEndReminder = new Lang.Class({
         this._timeout = 0;
     },
 
-    destroy: function() {
+    destroy: function(reason) {
         this.unschedule();
-        this.parent();
+        this.parent(reason);
     }
 });
 
