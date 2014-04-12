@@ -40,6 +40,8 @@ Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodor
 
 1. Download the right version
 
+   **For GNOME 3.12** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-3.12).
+
    **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-3.10).
 
    **For GNOME 3.8** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-3.8).
