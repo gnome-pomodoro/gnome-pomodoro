@@ -35,6 +35,13 @@ namespace Pomodoro
      * to be too short
      */
     private const uint PLAYER_FADE_INTERVAL = 100;
+
+    private const double MIN_PLAYED_VOLUME = 0.01;
+
+
+    private double amplitude_to_decibels (double amplitude) {
+        return 20.0 * Math.log10 (amplitude);
+    }
 }
 
 
@@ -512,15 +519,21 @@ public class Pomodoro.Sounds : Object
         if (this.context != null)
         {
             var file_path = this.get_file_path ("pomodoro-start-sound");
-            if (file_path == "") {
+            var volume = this.settings.get_double ("pomodoro-start-sound-volume");
+
+            if (file_path == "" || volume < MIN_PLAYED_VOLUME) {
                 return;
             }
 
-            var status = this.context.play (EventType.POMODORO_START,
+            volume = amplitude_to_decibels (volume);
+
+            var status = this.context.play (
+                    EventType.POMODORO_START,
                     Canberra.PROP_EVENT_ID, "pomodoro-start",
                     Canberra.PROP_EVENT_DESCRIPTION, "Pomodoro started",
                     Canberra.PROP_MEDIA_FILENAME, file_path,
                     Canberra.PROP_MEDIA_ROLE, "event",
+                    Canberra.PROP_CANBERRA_VOLUME, volume.to_string (),
                     Canberra.PROP_CANBERRA_CACHE_CONTROL, "permanent");
 
             if (status != Canberra.SUCCESS) {
@@ -538,15 +551,21 @@ public class Pomodoro.Sounds : Object
         if (this.context != null && is_completed)
         {
             var file_path = this.get_file_path ("pomodoro-end-sound");
-            if (file_path == "") {
+            var volume = this.settings.get_double ("pomodoro-end-sound-volume");
+
+            if (file_path == "" || volume < MIN_PLAYED_VOLUME) {
                 return;
             }
 
-            var status = this.context.play (EventType.POMODORO_END,
+            volume = amplitude_to_decibels (volume);
+
+            var status = this.context.play (
+                    EventType.POMODORO_END,
                     Canberra.PROP_EVENT_ID, "pomodoro-end",
                     Canberra.PROP_EVENT_DESCRIPTION, "Pomodoro ended",
                     Canberra.PROP_MEDIA_FILENAME, file_path,
                     Canberra.PROP_MEDIA_ROLE, "event",
+                    Canberra.PROP_CANBERRA_VOLUME, volume.to_string (),
                     Canberra.PROP_CANBERRA_CACHE_CONTROL, "permanent");
 
             if (status != Canberra.SUCCESS) {
