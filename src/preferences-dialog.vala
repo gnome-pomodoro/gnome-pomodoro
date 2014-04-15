@@ -561,6 +561,16 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                          null,
                                          null);
 
+        this.settings.bind ("pomodoro-end-sound-volume",
+                            pomodoro_end_sound,
+                            "volume",
+                            SETTINGS_BIND_FLAGS);
+
+        this.settings.bind ("pomodoro-start-sound-volume",
+                            pomodoro_start_sound,
+                            "volume",
+                            SETTINGS_BIND_FLAGS);
+
         list_box.insert (pomodoro_end_sound_field, -1);
         list_box.insert (pomodoro_start_sound_field, -1);
 
