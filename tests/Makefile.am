@@ -43,9 +43,9 @@ tests_LDADD = \
 test: tests
 	$(builddir)/$<
 
-.PHONY: test
-
 # run make test as part of make check
 check-local: test
+
+.PHONY: test
 
 -include $(top_srcdir)/git.mk

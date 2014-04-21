@@ -1,4 +1,3 @@
-
 bin_PROGRAMS = \
     gnome-pomodoro
 
@@ -61,6 +60,6 @@ EXTRA_DIST = \
     gnome-pomodoro.gresource.xml
 
 dist-hook:
-	cd $(distdir); rm -f $(CLEANFILES)
+	cd $(distdir) && rm -f $(CLEANFILES)
 
 -include $(top_srcdir)/git.mk

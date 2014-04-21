@@ -1,4 +1,3 @@
-
 SUBDIRS = \
     rpm
 

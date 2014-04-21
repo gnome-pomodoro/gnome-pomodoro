@@ -3,7 +3,7 @@ gnome_pomodoro_specdir =
 dist_gnome_pomodoro_spec_DATA = \
     gnome-pomodoro.spec
 
-gnome-pomodoro.spec: gnome-pomodoro.spec.in Makefile
+gnome-pomodoro.spec: gnome-pomodoro.spec.in
 	$(AM_V_GEN) sed -e "s|@GETTEXT_PACKAGE[@]|$(GETTEXT_PACKAGE)|g" \
 	                -e "s|@PACKAGE_BUGREPORT[@]|$(PACKAGE_BUGREPORT)|g" \
 	                -e "s|@PACKAGE_NAME[@]|$(PACKAGE_NAME)|g" \

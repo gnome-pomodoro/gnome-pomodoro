@@ -12,21 +12,16 @@ SUBDIRS = \
 
 distdir = $(PACKAGE_TARNAME)-$(VERSION)
 
-uninstall-hook:
-	rm -Rf $(pkgdatadir)
-
 rpmdefines = \
 	--define "_sourcedir $(abs_builddir)" \
 	--define "_specdir $(abs_srcdir)"
 
-rpm: dist packages/rpm/gnome-pomodoro.spec
+rpm: packages/rpm/gnome-pomodoro.spec dist
 	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \
 	rpmbuild $(rpmdefines) -ba $(abs_top_builddir)/packages/rpm/gnome-pomodoro.spec
 
 test:
-	( cd ./tests && $(MAKE) $(AM_MAKEFLAGS) $@ ) || exit $$?
-
-.PHONY: test
+	cd tests && $(MAKE) $@
 
 EXTRA_DIST = \
     autogen.sh \
@@ -40,7 +35,12 @@ DISTCLEANFILES = \
 	intltool-update \
 	po/.intltool-merge-cache
 
+.PHONY: test rpm
+
 clean-local:
-	rm -Rf $(builddir)/rpms
+	rm -rf $(builddir)/rpms
+
+uninstall-hook:
+	-rm -rf $(pkgdatadir)
 
 -include $(top_srcdir)/git.mk

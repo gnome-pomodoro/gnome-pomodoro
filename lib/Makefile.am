@@ -1,4 +1,3 @@
-
 noinst_LTLIBRARIES = \
     libgnome-pomodoro.la
 
@@ -63,6 +62,6 @@ CLEANFILES = \
     libgnome_pomodoro_la_vala.stamp
 
 dist-hook:
-	cd $(distdir); rm -f $(CLEANFILES)
+	cd $(distdir) && rm -f $(CLEANFILES)
 
 -include $(top_srcdir)/git.mk
