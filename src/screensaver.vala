@@ -39,6 +39,8 @@ namespace Gnome
         public abstract uint get_active_time () throws IOError;
 
         public signal void active_changed (bool active);
+
+        public signal void wake_up_screen ();
     }
 }
 
