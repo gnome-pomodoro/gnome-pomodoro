@@ -151,6 +151,9 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
          */
         this.set_type_hint (Gdk.WindowTypeHint.DIALOG);
 
+        /* Used to transfer focus from gnome-shell */
+        this.set_startup_id ("gnome-pomodoro-properties");
+
         var application = GLib.Application.get_default () as Pomodoro.Application;
         this.settings = application.settings.get_child ("preferences");
 
