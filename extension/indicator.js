@@ -126,63 +126,15 @@ const Indicator = new Lang.Class({
         this.refresh();
     },
 
-    _focusWindow: function(meta_window) {
-        Main.activateWindow(meta_window, global.get_current_time());
-    },
-
-    _focusWindowById: function(startup_id) {
-        let windows = global.get_window_actors();
-        for (let i in windows) {
-            let meta_window = windows[i].get_meta_window();
-            if (meta_window.get_startup_id() == startup_id) {
-                this._focusWindow(meta_window);
-
-                return true;
-            }
-        }
-
-        return false;
-    },
-
-    _unscheduleFocusWindow: function() {
-        if (this._windowCreatedId) {
-            global.display.disconnect(this._windowCreatedId);
-            this._windowCreatedId = 0;
-        }
-
-        if (this._focusWindowSource) {
-            GLib.source_remove(this._focusWindowSource);
-            this._focusWindowSource = 0;
-        }
-    },
-
-    _scheduleFocusWindowById: function(startup_id) {
-        this._unscheduleFocusWindow();
-
-        if (this._focusWindowById(startup_id)) {
-            return;
-        }
-
-        this._windowCreatedId = global.display.connect('window-created', Lang.bind(this,
-            function(display, meta_window) {
-                if (meta_window.get_startup_id() == startup_id) {
-                    this._focusWindow(meta_window);
-                    this._unscheduleFocusWindow();
-                }
-            }));
-
-        this._focusWindowSource = Mainloop.timeout_add_seconds(FOCUS_WINDOW_TIMEOUT, Lang.bind(this,
-            function() {
-                this._unscheduleFocusWindow();
-                return false;
-            }));
-    },
-
     _showPreferences: function() {
         this._ensureActionsProxy(Lang.bind(this,
             function() {
-                this._scheduleFocusWindowById('gnome-pomodoro-properties');
-                this._actionsProxy.ActivateRemote('preferences', [GLib.Variant.new_string('timer')], null);
+                let mode = 'timer';
+                let timestamp = global.get_current_time();
+
+                this._actionsProxy.ActivateRemote('preferences', [
+                        GLib.Variant.new('(su)', [mode, timestamp])
+                    ], null);
             }));
     },
 
@@ -676,8 +628,6 @@ const Indicator = new Lang.Class({
         if (this._notification) {
             this._notification.destroy();
         }
-
-        this._unscheduleFocusWindow();
 
         this.parent();
     }
