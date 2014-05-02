@@ -120,6 +120,14 @@ Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodo
 
 ## Changelog
 
+**Version 0.10.1**
+
+* Support for GNOME Shell 3.10 and 3.12
+* Louder sounds
+* Fixed brining preferences dialog to focus
+* Fixed change of notications volume
+* Fixed reminders being showed up during pomodoro
+
 **Version 0.10.0**
 
 * Support for GNOME Shell 3.10
