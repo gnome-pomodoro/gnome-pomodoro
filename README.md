@@ -40,23 +40,25 @@ Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodor
 
 1. Download the right version
 
-   **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-3.10).
+   **For GNOME 3.12** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.12).
 
-   **For GNOME 3.8** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-3.8).
+   **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.10).
 
-   **For GNOME 3.6** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-extension-3.6) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-shell-extension-3.6#direct-from-source).
+   **For GNOME 3.8** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.8).
 
-   **For GNOME 3.4** download from [here](https://github.com/codito/gnome-shell-pomodoro/zipball/gnome-shell-extension-3.4) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-shell-extension-3.4#direct-from-source).
+   **For GNOME 3.6** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-shell-extension-3.6) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-shell-extension-3.6#direct-from-source).
+
+   **For GNOME 3.4** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-shell-extension-3.4) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-shell-extension-3.4#direct-from-source).
 
 2. You may need to install tools and dependencies before building it
 
    **On Ubuntu:**
 
-        sudo apt-get install gnome-common intltool valac libglib2.0-dev gobject-introspection libgirepository1.0-dev libgtk-3-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev libcanberra-dev libgdata-dev libgstreamer1.0-dev libupower-glib-dev fonts-droid
+        sudo apt-get install gnome-common intltool valac libglib2.0-dev gobject-introspection libgirepository1.0-dev libgtk-3-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev libcanberra-dev libgdata-dev libdbus-glib-1-dev libgstreamer1.0-dev libupower-glib-dev fonts-droid
 
    **On Fedora:**
 
-        sudo yum install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel clutter-gtk-devel gnome-desktop3-devel libcanberra-devel libgdata-devel gstreamer1-devel upower-devel google-droid-sans-fonts
+        sudo yum install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel clutter-gtk-devel gnome-desktop3-devel libcanberra-devel libgdata-devel dbus-glib-devel gstreamer1-devel upower-devel google-droid-sans-fonts
 
 3. Build it and install:
 

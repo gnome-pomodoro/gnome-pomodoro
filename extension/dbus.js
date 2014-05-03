@@ -24,35 +24,38 @@ const Gio = imports.gi.Gio;
 
 const SERVICE_NAME = 'org.gnome.Pomodoro';
 
-const PomodoroInterface = <interface name="org.gnome.Pomodoro">
-    <property name="Elapsed" type="d" access="read"/>
-    <property name="Session" type="d" access="read"/>
-    <property name="SessionLimit" type="d" access="read"/>
-    <property name="State" type="s" access="read"/>
-    <property name="StateDuration" type="d" access="read"/>
-    <method name="SetState">
-        <arg type="s" name="state" direction="in" />
-        <arg type="d" name="duration" direction="in" />
-    </method>
-    <method name="Start"/>
-    <method name="Stop"/>
-    <method name="Reset"/>
-    <signal name="NotifyPomodoroStart">
-        <arg type="b" name="is_requested"/>
-    </signal>
-    <signal name="NotifyPomodoroEnd">
-        <arg type="b" name="is_completed"/>
-    </signal>
-</interface>;
+const PomodoroInterface = '<node> \
+<interface name="org.gnome.Pomodoro"> \
+    <property name="Elapsed" type="d" access="read"/> \
+    <property name="Session" type="d" access="read"/> \
+    <property name="SessionLimit" type="d" access="read"/> \
+    <property name="State" type="s" access="read"/> \
+    <property name="StateDuration" type="d" access="read"/> \
+    <method name="SetState"> \
+        <arg type="s" name="state" direction="in" /> \
+        <arg type="d" name="duration" direction="in" /> \
+    </method> \
+    <method name="Start"/> \
+    <method name="Stop"/> \
+    <method name="Reset"/> \
+    <signal name="NotifyPomodoroStart"> \
+        <arg type="b" name="is_requested"/> \
+    </signal> \
+    <signal name="NotifyPomodoroEnd"> \
+        <arg type="b" name="is_completed"/> \
+    </signal> \
+</interface> \
+</node>';
 
-const GtkActionsInterface = <interface name="org.gtk.Actions">
-    <method name="Activate">
-        <arg type="s" name="action_name" direction="in"/>
-        <arg type="av" name="parameter" direction="in"/>
-        <arg type="a{sv}" name="platform_data" direction="in"/>
-    </method>
-</interface>;
-
+const GtkActionsInterface = '<node> \
+<interface name="org.gtk.Actions"> \
+    <method name="Activate"> \
+        <arg type="s" name="action_name" direction="in"/> \
+        <arg type="av" name="parameter" direction="in"/> \
+        <arg type="a{sv}" name="platform_data" direction="in"/> \
+    </method> \
+</interface> \
+</node>';
 
 var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
 function Pomodoro(init_callback, cancellable) {

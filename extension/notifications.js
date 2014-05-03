@@ -39,6 +39,7 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const Tweener = imports.ui.tweener;
 const Util = imports.misc.util;
+const ShellConfig = imports.misc.config;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
@@ -75,6 +76,8 @@ const REMINDER_INTERVALS = [75000];
  */
 const REMINDER_ACCEPTANCE = 0.66;
 
+const GNOME_SHELL_VERSION = ShellConfig.PACKAGE_VERSION;
+
 const State = {
     OPENED: 0,
     CLOSED: 1,
@@ -103,6 +106,23 @@ function get_default_source() {
         });
     }
     return source;
+}
+
+
+function check_version(required, current) {
+    let current_array = current.split('.');
+    let major = current_array[0];
+    let minor = current_array[1];
+    let point = current_array[2];
+    for (let i = 0; i < required.length; i++) {
+        let required_array = required[i].split('.');
+        if (required_array[0] == major &&
+            required_array[1] == minor &&
+            (required_array[2] == point ||
+             (required_array[2] == undefined && parseInt(minor) % 2 == 0)))
+            return true;
+    }
+    return false;
 }
 
 
@@ -616,18 +636,48 @@ const PomodoroEnd = new Lang.Class({
         this.setResident(true);
         this.setUrgency(MessageTray.Urgency.HIGH);
 
-        this.addButton(Action.SWITCH_TO_PAUSE, "");
-        this.addButton(Action.SWITCH_TO_POMODORO, _("Start pomodoro"));
+        if (check_version(['3.10'], GNOME_SHELL_VERSION)) {
+            this.addButton(Action.SWITCH_TO_PAUSE, "");
+            this.addButton(Action.SWITCH_TO_POMODORO, _("Start pomodoro"));
+
+            this._pause_switch_button = this.getButton(Action.SWITCH_TO_PAUSE);
+        }
+        else {
+            this._pause_switch_button = this._makeButton("");
+            this._pomodoro_switch_button = this._makeButton(_("Start pomodoro"));
+
+            this.addButton(this._pause_switch_button, Lang.bind(this,
+                function() {
+                    this.emit('action-invoked', Action.SWITCH_TO_PAUSE);
+                }));
+            this.addButton(this._pomodoro_switch_button, Lang.bind(this,
+                function() {
+                    this.emit('action-invoked', Action.SWITCH_TO_POMODORO);
+                }));
+        }
+
+        if (this._pause_switch_button) {
+            this._pause_switch_button.hide();
+        }
 
         if (!this._bodyLabel) {
             this._bodyLabel = this.addBody("", null, null);
         }
 
-        this._pause_switch_button = this.getButton(Action.SWITCH_TO_PAUSE);
-        this._pause_switch_button.hide();
-
         this._short_break_duration = this._settings.get_double('short-break-duration');
         this._long_break_duration = this._settings.get_double('long-break-duration');
+    },
+
+    _makeButton: function(label, iconName, useActionIcons) {
+        let button = new St.Button({ can_focus: true });
+        if (useActionIcons && Gtk.IconTheme.get_default().has_icon(iconName)) {
+            button.add_style_class_name('notification-icon-button');
+            button.child = new St.Icon({ icon_name: iconName });
+        } else {
+            button.add_style_class_name('notification-button');
+            button.label = label;
+        }
+        return button;
     },
 
     _onSettingsChanged: function() {
@@ -635,6 +685,7 @@ const PomodoroEnd = new Lang.Class({
         this._long_break_duration = this._settings.get_double('long-break-duration');
     },
 
+    /* deprecated since 3.12 */
     getButton: function(id) {
         let button = this._buttonBox.get_children().filter(function(b) {
             return b._actionId == id;

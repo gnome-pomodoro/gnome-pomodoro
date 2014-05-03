@@ -52,6 +52,8 @@ const FADE_IN_OPACITY = 1.0;
 const FADE_OUT_TIME = 250;
 const FADE_OUT_OPACITY = 0.47;
 
+const FOCUS_WINDOW_TIMEOUT = 3;
+
 const State = {
     NULL: 'null',
     POMODORO: 'pomodoro',
@@ -150,18 +152,14 @@ const Indicator = new Lang.Class({
     },
 
     _showPreferences: function() {
-        Main.overview.hide();
-
         this._ensureActionsProxy(Lang.bind(this,
             function() {
-                //let app = Shell.AppSystem.get_default().lookup_app('gnome-pomodoro.desktop');
-                //
-                //if (app)
-                //    app.activate();
-                //else
-                //   log('Pomodoro: App could not be found.');
+                let mode = 'timer';
+                let timestamp = global.get_current_time();
 
-                this._actionsProxy.ActivateRemote('preferences', [GLib.Variant.new_string('timer')], null);
+                this._actionsProxy.ActivateRemote('preferences', [
+                        GLib.Variant.new('(su)', [mode, timestamp])
+                    ], null);
             }));
     },
 

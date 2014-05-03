@@ -153,6 +153,9 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         this.settings = Pomodoro.get_settings ().get_child ("preferences");
 
+        /* Used to transfer focus from gnome-shell */
+        this.set_startup_id ("gnome-pomodoro-properties");
+
         this.setup ();
     }
 
