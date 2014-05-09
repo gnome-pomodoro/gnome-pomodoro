@@ -9,7 +9,7 @@ tests_SOURCES = \
     tests.vala \
     test-timer.vala
 
-gnome_pomodoro_DEPENDENCIES = \
+tests_DEPENDENCIES = \
     ../lib/libgnome-pomodoro.la
 
 tests_VALAFLAGS = \

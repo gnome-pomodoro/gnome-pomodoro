@@ -11,7 +11,7 @@ gnome-pomodoro.spec: gnome-pomodoro.spec.in
 	                -e "s|@PACKAGE_TARNAME[@]|$(PACKAGE_TARNAME)|g" \
 	                -e "s|@PACKAGE_URL[@]|$(PACKAGE_URL)|g" \
 	                -e "s|@PACKAGE_VERSION[@]|$(PACKAGE_VERSION)|g" \
-	                -e "s|@UUID[@]|$(EXTENSION_UUID)|g" \
+	                -e "s|@EXTENSION_UUID[@]|$(EXTENSION_UUID)|g" \
 	                -e "s|@GLIB_REQUIRED[@]|$(GLIB_REQUIRED)|g" \
 	                -e "s|@GTK_REQUIRED[@]|$(GTK_REQUIRED)|g" \
 	                -e "s|@GNOME_REQUIRED[@]|$(GNOME_REQUIRED)|g" \

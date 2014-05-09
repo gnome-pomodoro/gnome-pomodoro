@@ -1,4 +1,3 @@
-
 public_sounds = \
     bell.ogg \
     birds.ogg \
@@ -8,7 +7,7 @@ public_sounds = \
 
 install-sounds:
 	for sound in $(public_sounds); do \
-		mkdir -p $(DESTDIR)$(pkgdatadir)/sounds; \
+		$(MKDIR_P) $(DESTDIR)$(pkgdatadir)/sounds; \
 		$(INSTALL_DATA) $(srcdir)/$$sound $(DESTDIR)$(pkgdatadir)/sounds/$$sound; \
 	done
 

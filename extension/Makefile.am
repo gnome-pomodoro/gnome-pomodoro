@@ -30,7 +30,7 @@ config.js: config.js.in Makefile
 	                -e "s|@PACKAGE_URL[@]|$(PACKAGE_URL)|g" \
 	                -e "s|@PACKAGE_VERSION[@]|$(PACKAGE_VERSION)|g" \
 	                -e "s|@PACKAGE_DATA_DIR[@]|$(pkgdatadir)|g" \
-	                -e "s|@UUID[@]|$(EXTENSION_UUID)|g" \
+	                -e "s|@EXTENSION_UUID[@]|$(EXTENSION_UUID)|g" \
 	                -e "s|@LOCALE_DIR[@]|$(localedir)|g" \
 	                -e "s|@BIN_DIR[@]|$(bindir)|g" \
 	                -e "s|@DATA_DIR[@]|$(datadir)|g" \
@@ -45,7 +45,7 @@ metadata.json: metadata.json.in Makefile
 	                -e "s|@PACKAGE_URL[@]|$(PACKAGE_URL)|g" \
 	                -e "s|@PACKAGE_VERSION[@]|$(PACKAGE_VERSION)|g" \
 	                -e "s|@PACKAGE[@]|$(PACKAGE)|g" \
-	                -e "s|@UUID[@]|$(EXTENSION_UUID)|g" \
+	                -e "s|@EXTENSION_UUID[@]|$(EXTENSION_UUID)|g" \
 	                $< > $@
 
 uninstall-hook:

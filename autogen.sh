@@ -1,6 +1,8 @@
 #!/bin/sh
 # Run this to generate all the initial makefiles, etc.
 
+PKG_NAME=gnome-pomodoro
+
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 

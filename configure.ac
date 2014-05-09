@@ -1,113 +1,41 @@
+AC_PREREQ([2.69])
 AC_INIT([gnome-pomodoro],
         [0.11.0],
         [https://github.com/codito/gnome-shell-pomodoro/issues],
         [gnome-pomodoro],
         [https://github.com/codito/gnome-shell-pomodoro])
-AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz foreign])
-LT_INIT
-AM_MAINTAINER_MODE
+AC_CONFIG_SRCDIR([gnome-pomodoro.doap])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
-AC_PATH_PROG(VALAC, valac, valac)
-AC_SUBST(VALAC)
+AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz foreign])
+AM_MAINTAINER_MODE
 
-AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
+LT_INIT
 
 IT_PROG_INTLTOOL([0.40.1])
-
-GETTEXT_PACKAGE=AC_PACKAGE_NAME
-AC_SUBST(GETTEXT_PACKAGE)
-
-GLIB_GSETTINGS
-
-AC_SUBST(CFLAGS)
-AC_SUBST(CPPFLAGS)
-AC_SUBST(LDFLAGS)
-
-AC_CHECK_LIB(m, floor)
-AC_CHECK_HEADERS(malloc.h)
-AC_CHECK_FUNCS(mallopt)
-
 PKG_PROG_PKG_CONFIG([0.22])
 GOBJECT_INTROSPECTION_REQUIRE([1.36.0])
 
-VAPIGEN_CHECK
+GETTEXT_PACKAGE=AC_PACKAGE_NAME
+WARNING_CFLAGS=
 
 
-# Enable Debug
+# Extra configuration arguments.
 AC_ARG_ENABLE(debug,
-  AS_HELP_STRING([--disable-debug],[Disable debugging code]),
-  [
-    case "${enableval}" in
-      yes|no) enable_debug="${enableval}" ;;
-      *)   AC_MSG_ERROR(bad value ${enableval} for --enable-debug) ;;
-    esac
-  ],
-  [enable_debug=yes])
+    AS_HELP_STRING([--enable-debug], [Turn on debugging]),,
+    [enable_debug=no])
 
-if test "$enable_debug" = yes; then
-  AC_DEFINE(ENABLE_DEBUG, [], [Enable debug code])
-else
-  enable_debug=no
-fi
-
-# Enable Profiling
 AC_ARG_ENABLE(profiling,
-        [AS_HELP_STRING([--enable-profiling],
-                        [turn on profiling])],
-        , enable_profiling=yes)
+    AS_HELP_STRING([--enable-profiling], [Turn on profiling]),,
+    [enable_profiling=no])
 
-if test "x$enable_profiling" = "xyes"; then
-    AC_DEFINE(ENABLE_PROFILING,1,[enable profiling])
-fi
-
-
-# Turn on the additional warnings last, so -Werror doesn't affect other tests.
-WARNING_CFLAGS=""
-
-AC_ARG_ENABLE(more-warnings,
-AS_HELP_STRING([--enable-more-warnings], [Maximum compiler warnings]),
-set_more_warnings="$enableval",[
-if test -d $srcdir/.git; then
-    is_cvs_version=true
-    set_more_warnings=yes
-else
-    set_more_warnings=no
-fi
-])
-AC_MSG_CHECKING(for more warnings, including -Werror)
-if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
-    AC_MSG_RESULT(yes)
-    WARNING_CFLAGS="\
-    -Wall \
-    -Wmissing-declarations -Wmissing-prototypes \
-    -Wnested-externs -Wpointer-arith \
-    -Wcast-align "
-
-    for option in -Wstrict-aliasing=0 -Wno-pointer-sign; do
-        SAVE_CFLAGS="$CFLAGS"
-        CFLAGS="$CFLAGS $option"
-        AC_MSG_CHECKING([whether gcc understands $option])
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],
-                          [has_option=yes],
-                          [has_option=no])
-        if test $has_option = yes; then
-               WARNING_CFLAGS="$WARNING_CFLAGS $option"
-        fi
-        AC_MSG_RESULT($has_option)
-        CFLAGS="$SAVE_CFLAGS"
-        unset has_option
-        unset SAVE_CFLAGS
-    done
-    unset option
-else
-    AC_MSG_RESULT(no)
-fi
-
-AC_SUBST(WARNING_CFLAGS)
+AC_ARG_ENABLE([more-warnings],
+    AS_HELP_STRING([--enable-more-warnings], [Maximum compiler warnings]),,
+    [enable_more_warnings=no])
 
 
+# Checks for pkg-config packages.
 GLIB_REQUIRED=2.36.0
 GTK_REQUIRED=3.10.0
 GNOME_REQUIRED=3.10.0
@@ -128,20 +56,97 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
 ])
 
 
-# Some helpful constants that are available to the application
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_INSTALL
+AC_PROG_AWK
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_MKDIR_P
 
-AC_SUBST(EXTENSION_UUID, ["pomodoro@arun.codito.in"])
+AC_PATH_PROG(VALAC, valac)
+AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
+
+GLIB_GSETTINGS
+VAPIGEN_CHECK
+
+
+# Checks for libraries.
+AC_CHECK_LIB(m, floor)
+
+
+# Checks for header files.
+AC_CHECK_HEADERS([malloc.h float.h stdlib.h string.h])
+
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_SIZE_T
+
+
+# Checks for library functions.
+AC_CHECK_FUNCS([atexit floor memchr memset mallopt])
+
+
+# Checks for --enable-more-warnings.
+AC_MSG_CHECKING([for more warnings, including -Werror])
+if test "$GCC" = yes -a "$enable_more_warnings" = yes; then
+    AC_MSG_RESULT(yes)
+    WARNING_CFLAGS="\
+-Wall \
+-Wmissing-declarations -Wmissing-prototypes \
+-Wnested-externs -Wpointer-arith \
+-Wcast-align "
+
+    for option in -Wstrict-aliasing=0 -Wno-pointer-sign; do
+        SAVE_CFLAGS="$CFLAGS"
+        CFLAGS="$CFLAGS $option"
+        AC_MSG_CHECKING([whether gcc understands $option])
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],
+                          [has_option=yes],
+                          [has_option=no])
+        if test "$has_option" = yes; then
+            WARNING_CFLAGS="$WARNING_CFLAGS $option"
+        fi
+        AC_MSG_RESULT($has_option)
+        CFLAGS="$SAVE_CFLAGS"
+        unset has_option
+        unset SAVE_CFLAGS
+    done
+    unset option
+else
+    AC_MSG_RESULT(no)
+fi
+
+
+# Some variables to pass to Makefiles
+AC_SUBST(EXTENSION_UUID, [pomodoro@arun.codito.in])
+AC_SUBST(GETTEXT_PACKAGE)
+AC_SUBST(WARNING_CFLAGS)
 
 AC_SUBST(GLIB_REQUIRED)
 AC_SUBST(GTK_REQUIRED)
 AC_SUBST(GNOME_REQUIRED)
 
+
+# Some constants to pass to config.h
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
                    [The name of the gettext domain])
 
 AC_DEFINE_UNQUOTED([EXTENSION_UUID], ["$EXTENSION_UUID"],
                    [UUID of the pomodoro extensoin])
 
+if test "$enable_debug" = yes; then
+	AC_DEFINE([ENABLE_DEBUG], [1], [Debug code])
+else
+	AC_DEFINE([ENABLE_DEBUG], [0], [Debug code])
+fi
+
+if test "$enable_profiling" = yes; then
+	AC_DEFINE([ENABLE_PROFILING], [1], [Debug code])
+else
+	AC_DEFINE([ENABLE_PROFILING], [0], [Debug code])
+fi
 
 
 AC_CONFIG_FILES([
@@ -167,6 +172,6 @@ gnome-pomodoro ${VERSION}:
     prefix:                 ${prefix}
     source code location:   ${srcdir}
     compiler:               ${CC}
-    debugging support:      ${enable_debug}
-    profiling support:      ${enable_profiling}
+    debugging enabled:      ${enable_debug}
+    profiling enabled:      ${enable_profiling}
 "
