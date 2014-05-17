@@ -370,6 +370,7 @@ public class Pomodoro.Timer : Object
     {
         var state = string_to_state (this.settings_state.get_string ("state"));
         var state_duration = this.settings_state.get_double ("state-duration");
+        var state_date = this.settings_state.get_string ("state-date");
         var session = this.settings_state.get_double ("session");
 
         var current_timestamp = get_real_time ();
@@ -377,10 +378,10 @@ public class Pomodoro.Timer : Object
         var pomodoro_end_timestamp = 0.0;
 
         try {
-            var state_date = datetime_from_string (
-                    this.settings_state.get_string ("state-date"));
-
-            state_timestamp = (double) state_date.to_unix ();
+            if (state_date != "") {
+                var state_datetime = datetime_from_string (state_date);
+                state_timestamp = (double) state_datetime.to_unix ();
+            }
         }
         catch (DateTimeError error) {
             /* In case there is no valid state-date, elapsed time
@@ -392,10 +393,10 @@ public class Pomodoro.Timer : Object
         }
 
         try {
-            var pomodoro_end_date = datetime_from_string (
+            var pomodoro_end_datetime = datetime_from_string (
                     this.settings_state.get_string ("pomodoro-end-date"));
 
-            pomodoro_end_timestamp = (double) pomodoro_end_date.to_unix ();
+            pomodoro_end_timestamp = (double) pomodoro_end_datetime.to_unix ();
         }
         catch (DateTimeError error) {
             /* Ignore error */
