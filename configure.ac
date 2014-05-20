@@ -119,7 +119,7 @@ AC_SUBST(WARNING_CFLAGS)
 AC_CACHE_SAVE
 
 m4_define(glib_minver,                 2.36.1)
-m4_define(gnome_desktop_minver,        3.10.0)
+m4_define(gnome_desktop_minver,        3.8.0)
 m4_define(pango_minver,                1.32.0)
 m4_define(gtk_minver,                  3.10.0)
 m4_define(schemas_minver,              3.10.0)
