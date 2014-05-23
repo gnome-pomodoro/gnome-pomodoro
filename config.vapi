@@ -28,4 +28,8 @@ namespace Config
 
     /* Version number of package */
     public const string VERSION;
+
+    public const string EXTENSION_UUID;
+
+    public const string DATA_DIR;
 }

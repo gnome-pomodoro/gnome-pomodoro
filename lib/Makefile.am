@@ -47,7 +47,8 @@ libgnome_pomodoro_la_CPPFLAGS = \
     -DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
     -DPACKAGE_LOCALE_DIR=\"$(localedir)\" \
     -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
-    -DGNOME_DESKTOP_USE_UNSTABLE_API
+    -DGNOME_DESKTOP_USE_UNSTABLE_API \
+    -DDATA_DIR=\""$(datadir)"\"
 
 libgnome_pomodoro_la_DEPENDENCIES = \
     $(top_builddir)/vapi/gnome-desktop-3.0.vapi \

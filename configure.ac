@@ -130,10 +130,10 @@ AC_SUBST(GNOME_REQUIRED)
 
 
 # Some constants to pass to config.h
-AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], "$GETTEXT_PACKAGE",
                    [The name of the gettext domain])
 
-AC_DEFINE_UNQUOTED([EXTENSION_UUID], ["$EXTENSION_UUID"],
+AC_DEFINE_UNQUOTED([EXTENSION_UUID], "$EXTENSION_UUID",
                    [UUID of the pomodoro extensoin])
 
 if test "$enable_debug" = yes; then
@@ -170,8 +170,9 @@ echo "
 gnome-pomodoro ${VERSION}:
 
     prefix:                 ${prefix}
-    source code location:   ${srcdir}
+    datadir:                ${datadir}
+    srcdir:                 ${srcdir}
     compiler:               ${CC}
-    debugging enabled:      ${enable_debug}
-    profiling enabled:      ${enable_profiling}
+    cflags:                 ${CFLAGS}
+    cppflags:               ${CPPFLAGS}
 "
