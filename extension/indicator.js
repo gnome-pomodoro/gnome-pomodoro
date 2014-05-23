@@ -41,6 +41,7 @@ const DBus = Extension.imports.dbus;
 const Notifications = Extension.imports.notifications;
 const Tasklist = Extension.imports.tasklist;
 const Config = Extension.imports.config;
+const Settings = Extension.imports.settings;
 
 const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
@@ -116,11 +117,11 @@ const Indicator = new Lang.Class({
                           Lang.bind(this, this._onMenuOpenStateChanged));
 
         try {
-            this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
+            this._settings = Settings.getSettings('org.gnome.pomodoro.preferences');
             this._settingsChangedId = this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         }
-        catch (e) {
-            log('Pomodoro: ' + e);
+        catch (error) {
+            log('Pomodoro: ' + error);
         }
 
         /* Register keybindings to toggle the timer */
@@ -147,8 +148,18 @@ const Indicator = new Lang.Class({
     },
 
     _isRunning: function() {
-        let settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.state' });
-        return settings.get_string('state') != State.NULL;
+        let settings;
+        let state;
+
+        try {
+            settings = Settings.getSettings('org.gnome.pomodoro.state');
+            state = settings.get_string('state');
+        }
+        catch (error) {
+            log('Pomodoro: ' + error);
+        }
+
+        return state && state != State.NULL;
     },
 
     _showPreferences: function() {

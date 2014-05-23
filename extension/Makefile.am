@@ -6,6 +6,7 @@ dist_extension_DATA = \
     indicator.js \
     metadata.json \
     notifications.js \
+    settings.js \
     stylesheet.css \
     tasklist.js
 
@@ -34,6 +35,7 @@ config.js: config.js.in Makefile
 	                -e "s|@LOCALE_DIR[@]|$(localedir)|g" \
 	                -e "s|@BIN_DIR[@]|$(bindir)|g" \
 	                -e "s|@DATA_DIR[@]|$(datadir)|g" \
+	                -e "s|@GSETTINGS_SCHEMA_DIR[@]|$(gsettingsschemadir)|g" \
 	                $< > $@
 
 metadata.json: metadata.json.in Makefile

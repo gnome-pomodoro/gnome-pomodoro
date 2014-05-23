@@ -43,6 +43,7 @@ const ShellConfig = imports.misc.config;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
+const Settings = Extension.imports.settings;
 
 const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
@@ -619,11 +620,11 @@ const PomodoroEnd = new Lang.Class({
         this._settingsChangedId = 0;
 
         try {
-            this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
+            this._settings = Settings.getSettings('org.gnome.pomodoro.preferences');
             this._settingsChangedId = this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         }
-        catch (e) {
-            log('Pomodoro: ' + e);
+        catch (error) {
+            log('Pomodoro: ' + error);
         }
 
         this.connect('destroy', Lang.bind(this,
