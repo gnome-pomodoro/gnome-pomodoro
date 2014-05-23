@@ -639,7 +639,7 @@ const Indicator = new Lang.Class({
             return;
         }
 
-        this._notification = new Notifications.Issue();
+        this._notification = new Notifications.Issue(_("Looks like gnome-pomodoro is not installed"));
         this._notification.connect('destroy', Lang.bind(this,
             function(notification) {
                 if (this._notification === notification)

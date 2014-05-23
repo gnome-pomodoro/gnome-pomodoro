@@ -825,28 +825,17 @@ const Issue = new Lang.Class({
     Name: 'PomodoroIssueNotification',
     Extends: Notification,
 
-    _init: function() {
-        let service   = Extension.metadata['service'];
-        let url       = Extension.metadata['url'];
-        let installed = Gio.file_new_for_path(service).query_exists(null);
+    _init: function(message) {
+        let url = Config.PACKAGE_BUGREPORT;
+        let title = _("Problem with pomodoro");
 
-        let title = _("Could not run pomodoro");
-        let description = installed
-                    ? _("Something went badly wrong...")
-                    : _("Looks like gnome-pomodoro is not installed");
-
-        this.parent(title, description, {});
+        this.parent(title, message, {});
         this.setUrgency(MessageTray.Urgency.HIGH);
         this.setTransient(true);
 
-        /* TODO: Check which distro running, install via package manager */
+        /* TODO: Check which distro running, check for updates via package manager */
 
-        if (installed) {
-            this.addButton(Action.REPORT_BUG, _("Report issue"));
-        }
-        else {
-            this.addButton(Action.VISIT_WEBSITE, _("Install"));
-        }
+        this.addButton(Action.REPORT_BUG, _("Report"));
 
         this.connect('action-invoked', Lang.bind(this,
             function(notification, action) {
