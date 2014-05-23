@@ -39,6 +39,8 @@ const Tweener = imports.ui.tweener;
 
 const DBus = Extension.imports.dbus;
 const Notifications = Extension.imports.notifications;
+const Config = Extension.imports.config;
+const Settings = Extension.imports.settings;
 
 const Gettext = imports.gettext.domain('gnome-pomodoro');
 const _ = Gettext.gettext;
@@ -98,11 +100,11 @@ const Indicator = new Lang.Class({
         this.menu.actor.connect('notify::visible', Lang.bind(this, this.refresh));
 
         try {
-            this._settings = new Gio.Settings({ schema: 'org.gnome.pomodoro.preferences' });
+            this._settings = Settings.getSettings('org.gnome.pomodoro.preferences');
             this._settingsChangedId = this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         }
-        catch (e) {
-            log('Pomodoro: ' + e);
+        catch (error) {
+            log('Pomodoro: ' + error);
         }
 
         /* Register keybindings to toggle the timer */
