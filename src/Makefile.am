@@ -12,6 +12,7 @@ AM_CFLAGS = \
     -DPACKAGE_SRC_DIR="\"$(srcdir)\"" \
     -DPACKAGE_DATA_DIR="\"$(pkgdatadir)\"" \
     -DGNOME_DESKTOP_USE_UNSTABLE_API \
+    -DDATA_DIR="\"$(datadir)\"" \
     -Wall \
     -Wno-unused
 

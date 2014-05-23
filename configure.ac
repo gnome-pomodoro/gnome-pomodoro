@@ -131,6 +131,13 @@ AC_CHECK_LIB(m, floor)
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_FUNCS(mallopt)
 
+# Some variables to pass to Makefiles
+AC_SUBST(EXTENSION_UUID, [pomodoro@arun.codito.in])
+
+# Some constants to pass to config.h
+AC_DEFINE_UNQUOTED([EXTENSION_UUID], "$EXTENSION_UUID",
+                   [UUID of the pomodoro extensoin])
+
 PKG_PROG_PKG_CONFIG([0.22])
 GOBJECT_INTROSPECTION_REQUIRE([1.36.0])
 
@@ -167,8 +174,9 @@ echo "
 gnome-pomodoro ${VERSION}:
 
     prefix:                 ${prefix}
-    source code location:   ${srcdir}
+    datadir:                ${datadir}
+    srcdir:                 ${srcdir}
     compiler:               ${CC}
-    debugging support:      ${enable_debug}
-    profiling support:      ${enable_profiling}
+    cflags:                 ${CFLAGS}
+    cppflags:               ${CPPFLAGS}
 "
