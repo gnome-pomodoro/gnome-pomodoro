@@ -51,6 +51,10 @@ public class Pomodoro.Service : Object
         owned get { return state_to_string (this.timer.state); }
     }
 
+    public string version {
+        get { return Config.PACKAGE_VERSION; }
+    }
+
     public Service (DBusConnection connection, Pomodoro.Timer timer)
     {
         this.connection = connection;

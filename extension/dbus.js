@@ -31,6 +31,7 @@ const PomodoroInterface = '<node> \
     <property name="SessionLimit" type="d" access="read"/> \
     <property name="State" type="s" access="read"/> \
     <property name="StateDuration" type="d" access="read"/> \
+    <property name="Version" type="s" access="read"/> \
     <method name="SetState"> \
         <arg type="s" name="state" direction="in" /> \
         <arg type="d" name="duration" direction="in" /> \

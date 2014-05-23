@@ -3,5 +3,6 @@
   "name": "Pomodoro",
   "description": "A simple pomodoro timer",
   "shell-version": ["3.12", "3.10", "3.9.92", "3.9.91", "3.9.90"],
-  "url": "@PACKAGE_URL@"
+  "url": "@PACKAGE_URL@",
+  "version": "@PACKAGE_VERSION@"
 }
