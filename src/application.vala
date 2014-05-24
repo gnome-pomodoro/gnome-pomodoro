@@ -240,7 +240,8 @@ public class Pomodoro.Application : Gtk.Application
         if (arguments.parse (command_line.get_arguments ()))
         {
             if (arguments.preferences) {
-                this.activate_action ("preferences", "");
+                this.activate_action ("preferences",
+                                      new GLib.Variant ("(su)", "", 0));
             }
 
             if (arguments.no_default_window) {
