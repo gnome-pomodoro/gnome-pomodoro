@@ -4,7 +4,7 @@ public_icon_themes = \
 public_icons = \
     hicolor_apps_48x48_gnome-pomodoro.png \
     hicolor_apps_256x256_gnome-pomodoro.png \
-    hicolor_status_scalable_timer-symbolic.svg
+    hicolor_apps_scalable_gnome-pomodoro-symbolic.svg
 
 noinst_DATA = \
     gnome-pomodoro.svg

@@ -131,7 +131,7 @@ const Source = new Lang.Class({
     Name: 'PomodoroNotificationSource',
     Extends: MessageTray.Source,
 
-    ICON_NAME: 'timer-symbolic',
+    ICON_NAME: 'gnome-pomodoro-symbolic',
 
     _init: function() {
         this.parent(_("Pomodoro"), this.ICON_NAME);
