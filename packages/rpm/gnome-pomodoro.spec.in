@@ -11,7 +11,12 @@ BuildRoot: @PACKAGE_NAME@-@PACKAGE_VERSION@-build
 
 Requires: gnome-shell >= @GNOME_REQUIRED@
 Requires: hicolor-icon-theme
+
+%if %{defined fedora}
 Requires: google-droid-sans-fonts
+%else
+Requires: google-droid-fonts
+%endif
 
 %if %{defined fedora}
 Requires: gtk3 >= @GTK_REQUIRED@
