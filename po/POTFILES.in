@@ -1,5 +1,5 @@
-data/gnome-pomodoro.desktop.in
 data/org.gnome.pomodoro.gschema.xml.in
+data/org.gnome.Pomodoro.desktop.in
 data/org.gnome.Pomodoro.service.in
 extension/dbus.js
 extension/extension.js

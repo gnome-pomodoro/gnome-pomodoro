@@ -1,4 +1,3 @@
-
 [Desktop Entry]
 _Name=Pomodoro
 _Comment=Manage your time and tasks
@@ -10,5 +9,5 @@ Terminal=false
 Type=Application
 Categories=GNOME;GTK;Utility;
 OnlyShowIn=GNOME;
-NoDisplay=false
 X-GNOME-UsesNotifications=true
+DBusActivatable=true
