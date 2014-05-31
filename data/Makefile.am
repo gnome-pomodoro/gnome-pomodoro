@@ -22,17 +22,28 @@ $(service_DATA): $(service_in_files)
 	$(AM_V_GEN) sed -e "s|@bindir[@]|$(bindir)|g" \
 	                $< > $@
 
+appdatadir = $(datadir)/appdata
+appdata_in_files = \
+    org.gnome.Pomodoro.appdata.xml.in
+appdata_DATA = org.gnome.Pomodoro.appdata.xml
+
 EXTRA_DIST = \
+    $(appdata_in_files) \
     $(desktop_in_files) \
     $(gsettings_in_files) \
     $(service_in_files)
 
 CLEANFILES = \
+    $(appdata_DATA) \
     $(desktop_DATA) \
     $(gsettings_SCHEMAS) \
     $(service_DATA)
 
 dist-hook:
 	cd $(distdir) && rm -f $(CLEANFILES)
+
+# For uninstalled use
+all-local:
+	$(GLIB_COMPILE_SCHEMAS) $(builddir)
 
 -include $(top_srcdir)/git.mk

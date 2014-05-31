@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014 Kamil Prusko <kamilprusko@gmail.com> -->
+<application>
+  <id type="desktop">org.gnome.Pomodoro.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <description>
+    <_p>
+    A GNOME utility that helps managing time using Pomodoro Technique.
+    It intends to improve productivity and focus by taking short breaks after
+    every 25 minutes of work.
+    </_p>
+  </description>
+  <screenshots>
+    <screenshot type="default" width="624" height="351">http://kamilprusko.org/files/gnome-pomodoro/0.11/indicator.png</screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/codito/gnome-shell-pomodoro</url>
+  <updatecontact>kamilprusko@gmail.com</updatecontact>
+</application>
