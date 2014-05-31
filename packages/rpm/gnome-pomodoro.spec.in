@@ -91,4 +91,3 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/gnome-pomodoro
 %{_datadir}/gnome-shell/extensions/@EXTENSION_UUID@
 %{_datadir}/icons/hicolor/*/apps/*
-%{_datadir}/icons/hicolor/*/status/*

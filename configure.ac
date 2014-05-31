@@ -4,7 +4,7 @@ AC_INIT([gnome-pomodoro],
         [https://github.com/codito/gnome-shell-pomodoro/issues],
         [gnome-pomodoro],
         [https://github.com/codito/gnome-shell-pomodoro])
-AC_CONFIG_SRCDIR([gnome-pomodoro.doap])
+AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
