@@ -62,7 +62,7 @@ Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodor
 
 3. Build it and install:
 
-        ./autogen.sh --prefix=/usr
+        ./autogen.sh --prefix=/usr --datadir=/usr/share
         make
         sudo make install
 
