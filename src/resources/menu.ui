@@ -3,17 +3,17 @@
   <menu id="app-menu">
     <section>
       <item>
-        <attribute name="label" translatable="yes">Preferences</attribute>
+        <attribute name="label" translatable="yes">_Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
       </item>
     </section>
     <section>
       <item>
-        <attribute name="label" translatable="yes">About</attribute>
+        <attribute name="label" translatable="yes">_About</attribute>
         <attribute name="action">app.about</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">Quit</attribute>
+        <attribute name="label" translatable="yes">_Quit</attribute>
         <attribute name="action">app.quit</attribute>
         <attribute name="accel"><![CDATA[<Primary>Q]]></attribute>
       </item>
@@ -22,7 +22,7 @@
   <menu id="window-menu">
     <section>
       <item>
-        <attribute name="label" translatable="yes">Find</attribute>
+        <attribute name="label" translatable="yes">_Find</attribute>
         <attribute name="action">win.find</attribute>
         <attribute name="accel"><![CDATA[<Primary>F]]></attribute>
       </item>
