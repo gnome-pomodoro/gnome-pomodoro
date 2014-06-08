@@ -163,14 +163,12 @@ const Indicator = new Lang.Class({
     },
 
     _showPreferences: function() {
-        this._ensureActionsProxy(Lang.bind(this,
+        this._ensureProxy(Lang.bind(this,
             function() {
-                let mode = 'timer';
+                let view = 'timer';
                 let timestamp = global.get_current_time();
 
-                this._actionsProxy.ActivateRemote('preferences', [
-                        GLib.Variant.new('(su)', [mode, timestamp])
-                    ], null);
+                this._proxy.ShowPreferencesRemote(view, timestamp);
             }));
     },
 
@@ -396,36 +394,6 @@ const Indicator = new Lang.Class({
              */
 //            this._proxy.destroy();
             this._proxy = null;
-        }
-
-        if (this._actionsProxy) {
-            this._actionsProxy = null;
-        }
-    },
-
-    _ensureActionsProxy: function(callback) {
-        if (this._actionsProxy) {
-            if (callback) {
-                callback.call(this);
-            }
-            return;
-        }
-        else {
-            this._actionsProxy = new DBus.GtkActions(Lang.bind(this,
-                function(proxy, error)
-                {
-                    if (!error) {
-                        if (callback) {
-                            callback.call(this);
-                        }
-                    }
-                    else {
-                        global.log('Pomodoro: ' + error.message);
-
-                        this._actionsProxy = null;
-                        this._notifyIssue();
-                    }
-                }));
         }
     },
 

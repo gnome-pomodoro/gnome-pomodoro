@@ -36,6 +36,10 @@ const PomodoroInterface = '<node> \
         <arg type="s" name="state" direction="in" /> \
         <arg type="d" name="duration" direction="in" /> \
     </method> \
+    <method name="ShowPreferences"> \
+        <arg type="s" name="view" direction="in" /> \
+        <arg type="u" name="timestamp" direction="in" /> \
+    </method> \
     <method name="Start"/> \
     <method name="Stop"/> \
     <method name="Reset"/> \
@@ -48,23 +52,7 @@ const PomodoroInterface = '<node> \
 </interface> \
 </node>';
 
-const GtkActionsInterface = '<node> \
-<interface name="org.gtk.Actions"> \
-    <method name="Activate"> \
-        <arg type="s" name="action_name" direction="in"/> \
-        <arg type="av" name="parameter" direction="in"/> \
-        <arg type="a{sv}" name="platform_data" direction="in"/> \
-    </method> \
-</interface> \
-</node>';
-
 var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
 function Pomodoro(init_callback, cancellable) {
     return new PomodoroProxy(Gio.DBus.session, SERVICE_NAME, '/org/gnome/Pomodoro', init_callback, cancellable);
-}
-
-
-var GtkActionsProxy = Gio.DBusProxy.makeProxyWrapper(GtkActionsInterface);
-function GtkActions(init_callback, cancellable) {
-    return new GtkActionsProxy(Gio.DBus.session, SERVICE_NAME, '/org/gnome/Pomodoro', init_callback, cancellable);
 }

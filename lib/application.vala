@@ -137,16 +137,9 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
-    private void action_preferences (SimpleAction action,
-                                     Variant?     parameter)
+    public void show_preferences_full (string? view,
+                                       uint32  timestamp)
     {
-        string mode = "";
-        uint32 timestamp = 0;
-
-        if (parameter != null) {
-            parameter.@get ("(su)", out mode, out timestamp);
-        }
-
         if (this.preferences_dialog == null) {
             this.preferences_dialog = new Pomodoro.PreferencesDialog ();
             this.preferences_dialog.destroy.connect (() => {
@@ -164,6 +157,17 @@ public class Pomodoro.Application : Gtk.Application
                 this.preferences_dialog.present ();
             }
         }
+    }
+
+    public void show_preferences ()
+    {
+        this.show_preferences_full (null, 0);
+    }
+
+    private void action_preferences (SimpleAction action,
+                                     Variant?     parameter)
+    {
+        this.show_preferences ();
     }
 
     private void action_about (SimpleAction action, Variant? parameter)
@@ -204,8 +208,7 @@ public class Pomodoro.Application : Gtk.Application
 
     private void setup_actions ()
     {
-        var preferences_action = new GLib.SimpleAction ("preferences",
-                                       new GLib.VariantType ("(su)"));
+        var preferences_action = new GLib.SimpleAction ("preferences", null);
         preferences_action.activate.connect (this.action_preferences);
 
         var main_window_action = new GLib.SimpleAction ("main-window", null);
@@ -290,8 +293,7 @@ public class Pomodoro.Application : Gtk.Application
         if (arguments.parse (command_line.get_arguments ()))
         {
             if (arguments.preferences) {
-                this.activate_action ("preferences",
-                                      new GLib.Variant ("(su)", "", 0));
+                this.activate_action ("preferences", null);
             }
 
             if (arguments.no_default_window) {
