@@ -2,6 +2,10 @@
 .preferences-dialog {
 }
 
+.preferences-dialog GtkViewport {
+    background: @theme_bg_color;
+}
+
 .headerbar .titlebar .arrow-right {
     font-size: 70%;
 }

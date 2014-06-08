@@ -31,7 +31,7 @@ namespace Pomodoro
     const double LONG_BREAK_INTERVAL_LOWER = 1.0;
     const double LONG_BREAK_INTERVAL_UPPER = 10.0;
 
-    const GLib.SettingsBindFlags BINDING_FLAGS =
+    private const GLib.SettingsBindFlags SETTINGS_BIND_FLAGS =
                                        GLib.SettingsBindFlags.DEFAULT |
                                        GLib.SettingsBindFlags.GET |
                                        GLib.SettingsBindFlags.SET;
@@ -104,114 +104,28 @@ namespace Pomodoro
 }
 
 
-public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
+private abstract class Pomodoro.PreferencesTab : Gtk.Box
 {
-    private GLib.Settings settings;
+    public Gtk.Label? label;
 
-    private Gtk.SizeGroup combo_box_size_group;
-    private Gtk.Box vbox;
-    private Gtk.Stack stack;
-    private Gtk.Box preferences_vbox;
-    private Gtk.HeaderBar header_bar;
-    private Gtk.Box info_box;
-
-    private const GLib.SettingsBindFlags SETTINGS_BIND_FLAGS =
-                                       GLib.SettingsBindFlags.DEFAULT |
-                                       GLib.SettingsBindFlags.GET |
-                                       GLib.SettingsBindFlags.SET;
+    protected Gtk.Box info_box;
 
     private enum MessageType {
         PRESENCE_STATUS,
     }
 
-    public PreferencesDialog ()
-    {
-        this.title = _("Preferences");
-
-        var geometry = Gdk.Geometry ();
-        geometry.min_width = 500;
-        geometry.max_width = 500;
-        geometry.min_height = 200;
-        geometry.max_height = 1000;
-
-        var geometry_hints = Gdk.WindowHints.MAX_SIZE |
-                             Gdk.WindowHints.MIN_SIZE;
-
-        this.set_geometry_hints (this,
-                                 geometry,
-                                 geometry_hints);
-
-        this.set_default_size (-1, 706);
-
-        this.set_destroy_with_parent (true);
-
-        /* It's not precisely a dialog window, but we want to disable maximize
-         * button. We could use set_resizable(false), but then user looses
-         * ability to resize it if needed.
-         */
-        this.set_type_hint (Gdk.WindowTypeHint.DIALOG);
-
-        this.settings = Pomodoro.get_settings ().get_child ("preferences");
-
-        /* Used to transfer focus from gnome-shell */
-        this.set_startup_id ("gnome-pomodoro-properties");
-
-        this.setup ();
-    }
-
-    private void setup ()
-    {
-        var context = this.get_style_context ();
-        context.add_class ("preferences-dialog");
-
-        this.combo_box_size_group = new Gtk.SizeGroup (Gtk.SizeGroupMode.BOTH);
-
-        this.header_bar = new Gtk.HeaderBar ();
-        this.header_bar.show_close_button = true;
-        this.header_bar.title = _("Preferences");
-        this.header_bar.show_all ();
-        this.set_titlebar (this.header_bar);
+    construct {
+        this.orientation = Gtk.Orientation.VERTICAL;
 
         this.info_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
         this.info_box.show ();
 
-        this.stack = new Gtk.Stack ();
-        this.stack.homogeneous = true;
-        this.stack.transition_duration = 150;
-        this.stack.transition_type = Gtk.StackTransitionType.CROSSFADE;
-        this.stack.show ();
-
-        this.preferences_vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 3);
-        this.preferences_vbox.show ();
-
-        var alignment = new Gtk.Alignment (0.5f, 0.0f, 1.0f, 0.0f);
-        alignment.set_padding (20, 16, 40, 40);
-        alignment.add (this.preferences_vbox);
-        alignment.show ();
-
-        var scrolled_window = new Gtk.ScrolledWindow (null, null);
-        scrolled_window.set_policy (Gtk.PolicyType.NEVER,
-                                    Gtk.PolicyType.AUTOMATIC);
-        scrolled_window.set_size_request (500, 300);
-        scrolled_window.add (alignment);
-        scrolled_window.show ();
-        this.stack.add_named (scrolled_window, "preferences");
-
-        this.vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-        this.vbox.pack_start (this.info_box, false, true);
-        this.vbox.pack_end (this.stack, true, true);
-        this.vbox.show ();
-
-        this.add_timer_section ();
-        this.add_notifications_section ();
-        this.add_presence_section ();
-        this.add_sounds_section ();
-
-        this.add (this.vbox);
+        this.pack_start (this.info_box, false, true);
     }
 
-    private void contents_separator_func (Gtk.ListBoxRow row,
-                                          Gtk.ListBoxRow? before)
+    /* TODO: Move to Utils? */
+    protected void contents_separator_func (Gtk.ListBoxRow  row,
+                                            Gtk.ListBoxRow? before)
     {
         if (before != null)
         {
@@ -226,37 +140,9 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         }
     }
 
-    private void create_section (string          title,
-                                 out Gtk.Box     vbox,
-                                 out Gtk.ListBox list_box)
-    {
-        var label = new Gtk.Label ("<b>%s</b>".printf (title));
-        label.set_use_markup (true);
-        label.set_alignment (0.0f, 0.5f);
-        label.set_padding (6, 0);
-        label.set_margin_bottom (6);
-        label.show ();
-
-        list_box = new Gtk.ListBox ();
-        list_box.set_selection_mode (Gtk.SelectionMode.NONE);
-        list_box.set_activate_on_single_click (false);
-        list_box.set_header_func (contents_separator_func);
-        list_box.can_focus = false;
-        list_box.show ();
-
-        var frame = new Gtk.Frame (null);
-        frame.set_shadow_type (Gtk.ShadowType.IN);
-        frame.set_margin_bottom (24);
-        frame.add (list_box);
-        frame.show ();
-
-        vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-        vbox.pack_start (label, false, false, 0);
-        vbox.pack_start (frame, true, true, 0);
-        vbox.show ();
-    }
-
-    private Gtk.ListBoxRow create_field (string text, Gtk.Widget widget, Gtk.Widget? bottom_widget=null)
+    protected Gtk.ListBoxRow create_field (string      text,
+                                           Gtk.Widget  widget,
+                                           Gtk.Widget? bottom_widget=null)
     {
         var row = new Gtk.ListBoxRow ();
 
@@ -290,8 +176,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         return row;
     }
 
-    private Gtk.Widget create_scale_field (string text,
-                                           Gtk.Adjustment adjustment)
+    protected Gtk.Widget create_scale_field (string         text,
+                                             Gtk.Adjustment adjustment)
     {
         var value_label = new Gtk.Label (null);
         value_label.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
@@ -306,6 +192,98 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         adjustment.value_changed ();
 
         return widget;
+    }
+
+    protected unowned Gtk.InfoBar get_info_bar (string message_id)
+    {
+        unowned Gtk.InfoBar info_bar = null;
+
+        foreach (unowned Gtk.Widget child in this.info_box.get_children ())
+        {
+            var message_type = child.get_data<string> ("message-id");
+
+            if (message_type == message_id)
+            {
+                info_bar = child as Gtk.InfoBar;
+
+                break;
+            }
+        }
+
+        return info_bar;
+    }
+}
+
+
+private class Pomodoro.TimerPreferencesTab : PreferencesTab
+{
+    private Gtk.SizeGroup combo_box_size_group;
+
+    private GLib.Settings settings;
+
+    private Gtk.Box preferences_vbox;
+
+    construct {
+        this.label = new Gtk.Label (_("Timer"));
+
+        this.settings = Pomodoro.get_settings ().get_child ("preferences");
+
+        this.preferences_vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 3);
+        this.preferences_vbox.show ();
+
+        this.combo_box_size_group = new Gtk.SizeGroup (Gtk.SizeGroupMode.BOTH);
+
+        var alignment = new Gtk.Alignment (0.5f, 0.0f, 1.0f, 0.0f);
+        alignment.set_padding (20, 16, 40, 40);
+        alignment.add (this.preferences_vbox);
+        alignment.show ();
+
+        var scrolled_window = new Gtk.ScrolledWindow (null, null);
+        scrolled_window.set_policy (Gtk.PolicyType.NEVER,
+                                    Gtk.PolicyType.AUTOMATIC);
+        scrolled_window.set_size_request (500, 300);
+        scrolled_window.add (alignment);
+        scrolled_window.show ();
+
+        var context = scrolled_window.get_style_context ();
+        context.add_class ("timer-page");
+
+        this.add_timer_section ();
+        this.add_notifications_section ();
+        this.add_presence_section ();
+        this.add_sounds_section ();
+
+        this.pack_end (scrolled_window, true, true);
+    }
+
+    private void create_section (string          title,
+                                 out Gtk.Box     vbox,
+                                 out Gtk.ListBox list_box)
+    {
+        var label = new Gtk.Label ("<b>%s</b>".printf (title));
+        label.set_use_markup (true);
+        label.set_alignment (0.0f, 0.5f);
+        label.set_padding (6, 0);
+        label.set_margin_bottom (6);
+        label.show ();
+
+        list_box = new Gtk.ListBox ();
+        list_box.set_selection_mode (Gtk.SelectionMode.NONE);
+        list_box.set_activate_on_single_click (false);
+        list_box.set_header_func (contents_separator_func);
+        list_box.can_focus = false;
+        list_box.show ();
+
+        var frame = new Gtk.Frame (null);
+        frame.set_shadow_type (Gtk.ShadowType.IN);
+        frame.set_margin_bottom (24);
+        frame.add (list_box);
+        frame.show ();
+
+        vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+        vbox.pack_start (label, false, false, 0);
+        vbox.pack_start (frame, true, true, 0);
+        vbox.show ();
     }
 
     private void add_timer_section ()
@@ -642,25 +620,6 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         break_presence.changed.connect (this.update_presence_notice);
     }
 
-    private unowned Gtk.InfoBar get_info_bar (MessageType message_id)
-    {
-        unowned Gtk.InfoBar info_bar = null;
-
-        foreach (unowned Gtk.Widget child in this.info_box.get_children ())
-        {
-            var message_type = child.get_data<uint> ("message-id");
-
-            if (message_type == message_id)
-            {
-                info_bar = child as Gtk.InfoBar;
-
-                break;
-            }
-        }
-
-        return info_bar;
-    }
-
     private void update_presence_notice ()
     {
         var presence_during_pomodoro = string_to_presence_status (
@@ -691,7 +650,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
             text = _("System notifications including chat messages won't show\xC2\xA0up.");
         }
 
-        Gtk.InfoBar info_bar = this.get_info_bar (MessageType.PRESENCE_STATUS);
+        Gtk.InfoBar info_bar = this.get_info_bar ("presence-status");
 
         if (text != "")
         {
@@ -699,8 +658,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
             {
                 info_bar = new Gtk.InfoBar ();
                 info_bar.set_message_type (Gtk.MessageType.INFO);
-                info_bar.set_data<uint> ("message-id",
-                                         MessageType.PRESENCE_STATUS);
+                info_bar.set_data<string> ("message-id", "presence-status");
                 info_bar.add_button (_("OK"), Gtk.ResponseType.CLOSE);
                 info_bar.response.connect ((info_bar, response_id) => {
                         if (response_id == Gtk.ResponseType.CLOSE) {
@@ -736,5 +694,96 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                 info_bar.hide ();
             }
         }
+    }
+}
+
+
+private class Pomodoro.TaskListPreferencesTab : PreferencesTab
+{
+    construct {
+        this.orientation = Gtk.Orientation.VERTICAL;
+        this.spacing = 3;
+
+        this.label = new Gtk.Label (_("Task List"));
+    }
+}
+
+
+private class Pomodoro.PluginsPreferencesTab : PreferencesTab
+{
+    construct {
+        this.orientation = Gtk.Orientation.VERTICAL;
+        this.spacing = 3;
+
+        this.label = new Gtk.Label (_("Plugins"));
+    }
+}
+
+
+public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
+{
+    private Gtk.Notebook notebook;
+    private Gtk.HeaderBar header_bar;
+
+    public PreferencesDialog ()
+    {
+        this.title = _("Pomodoro Preferences");
+
+        var geometry = Gdk.Geometry ();
+        geometry.min_width = 500;
+        geometry.max_width = 500;
+        geometry.min_height = 200;
+        geometry.max_height = 1000;
+
+        var geometry_hints = Gdk.WindowHints.MAX_SIZE |
+                             Gdk.WindowHints.MIN_SIZE;
+
+        this.set_geometry_hints (this,
+                                 geometry,
+                                 geometry_hints);
+
+        this.set_default_size (-1, 760);
+
+        this.set_destroy_with_parent (true);
+
+        /* It's not precisely a dialog window, but we want to disable maximize
+         * button. We could use set_resizable(false), but then user looses
+         * ability to resize it if needed.
+         */
+        this.set_type_hint (Gdk.WindowTypeHint.DIALOG);
+
+        /* Used to transfer focus from gnome-shell */
+        this.set_startup_id ("gnome-pomodoro-properties");
+
+        this.setup ();
+    }
+
+    private void setup ()
+    {
+        var context = this.get_style_context ();
+        context.add_class ("preferences-dialog");
+
+        this.header_bar = new Gtk.HeaderBar ();
+        this.header_bar.show_close_button = true;
+        this.header_bar.title = this.title;
+        this.header_bar.show_all ();
+        this.set_titlebar (this.header_bar);
+
+        this.notebook = new Gtk.Notebook ();
+        this.notebook.scrollable = false;
+        this.notebook.show_border = false;
+
+        var timer_page = new TimerPreferencesTab ();
+        this.notebook.append_page (timer_page, timer_page.label);
+
+        var task_list_page = new TaskListPreferencesTab ();
+        this.notebook.append_page (task_list_page, task_list_page.label);
+
+        var plugins_page = new PluginsPreferencesTab ();
+        this.notebook.append_page (plugins_page, plugins_page.label);
+
+        this.notebook.show_all ();
+
+        this.add (this.notebook);
     }
 }
