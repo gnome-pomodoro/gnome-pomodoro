@@ -75,6 +75,12 @@ public class Pomodoro.Service : Object
         });
     }
 
+    public void show_main_window (uint32 timestamp)
+    {
+        var application = GLib.Application.get_default () as Pomodoro.Application;
+        application.show_main_window_full (timestamp);
+    }
+
     public void show_preferences (string view,
                                   uint32 timestamp)
     {

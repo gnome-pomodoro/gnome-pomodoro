@@ -119,8 +119,7 @@ public class Pomodoro.Application : Gtk.Application
                                      Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
 
-    private void action_main_window (SimpleAction action,
-                                     Variant?     parameter)
+    public void show_main_window_full (uint32 timestamp)
     {
         if (this.main_window == null)
         {
@@ -133,8 +132,18 @@ public class Pomodoro.Application : Gtk.Application
         }
 
         if (this.main_window != null) {
-            this.main_window.present ();
+            if (timestamp > 0) {
+                this.main_window.present_with_time (timestamp);
+            }
+            else {
+                this.main_window.present ();
+            }
         }
+    }
+
+    public void show_main_window ()
+    {
+        this.show_main_window_full (0);
     }
 
     public void show_preferences_full (string? view,
@@ -162,6 +171,12 @@ public class Pomodoro.Application : Gtk.Application
     public void show_preferences ()
     {
         this.show_preferences_full (null, 0);
+    }
+
+    private void action_main_window (SimpleAction action,
+                                     Variant?     parameter)
+    {
+        this.show_main_window ();
     }
 
     private void action_preferences (SimpleAction action,

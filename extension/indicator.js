@@ -107,7 +107,7 @@ const Indicator = new Lang.Class({
         this.tasklist.connect('task-selected', Lang.bind(this, this._onTaskSelected));
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addAction(_("Manage Tasks"), Lang.bind(this, function() {}));
+        this.menu.addAction(_("Manage Tasks"), Lang.bind(this, this._showMainWindow));
         this.menu.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.menu.addMenuItem(this.tasklist);
@@ -160,6 +160,15 @@ const Indicator = new Lang.Class({
         }
 
         return state && state != State.NULL;
+    },
+
+    _showMainWindow: function() {
+        this._ensureProxy(Lang.bind(this,
+            function() {
+                let timestamp = global.get_current_time();
+
+                this._proxy.ShowMainWindowRemote(timestamp);
+            }));
     },
 
     _showPreferences: function() {
