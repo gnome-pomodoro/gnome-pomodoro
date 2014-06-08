@@ -98,7 +98,7 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
         context.add_class ("headerbar");
 
         var bookmark_icon = GLib.Icon.new_for_string (
-                "resource:///org/gnome/pomodoro/" + Stock.BOOKMARK + ".svg");
+                "resource:///org/gnome/pomodoro/" + Resources.BOOKMARK + ".svg");
         var urgency_status = new Gtk.Image.from_gicon (bookmark_icon,
                                                        Gtk.IconSize.MENU);
 

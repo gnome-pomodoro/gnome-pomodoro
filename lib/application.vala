@@ -36,7 +36,7 @@ public enum Pomodoro.ExitStatus {
 }
 
 
-namespace Pomodoro.Stock {
+namespace Pomodoro.Resources {
     public const string NONE = null;
     public const string BOOKMARK = "bookmark-symbolic";
     public const string BOOKMARK_ADD = "bookmark-add-symbolic";
