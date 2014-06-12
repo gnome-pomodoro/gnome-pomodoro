@@ -125,7 +125,7 @@ m4_define(gtk_minver,                  3.10.0)
 m4_define(schemas_minver,              3.10.0)
 m4_define(upower_minver,               0.9.20)
 m4_define(canberra_minver,             0.30)
-m4_define(gstreamer_minver,            1.2.0)
+m4_define(gstreamer_minver,            1.0.0)
 
 AC_CHECK_LIB(m, floor)
 AC_CHECK_HEADERS(malloc.h)

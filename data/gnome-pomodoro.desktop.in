@@ -8,6 +8,5 @@ Icon=gnome-pomodoro
 StartupNotify=true
 Terminal=false
 Type=Application
-Categories=GNOME;GTK;Accessories
+Categories=GNOME;GTK;Utility;
 OnlyShowIn=GNOME;
-NoDisplay=true
