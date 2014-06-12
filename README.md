@@ -120,6 +120,10 @@ Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodo
 
 ## Changelog
 
+**Version 0.10.2**
+
+* No need to restart gnome-shell to enable extension
+
 **Version 0.10.1**
 
 * Support for GNOME Shell 3.10 and 3.12
