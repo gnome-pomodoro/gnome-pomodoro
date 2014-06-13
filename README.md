@@ -1,8 +1,6 @@
-# Pomodoro for GNOME
+# A time management utility for GNOME
 
-This [GNOME](http://www.gnome.org/gnome-3/) utility intends to help manage time according to [Pomodoro Technique](http://en.wikipedia.org/wiki/Pomodoro_technique).
-
-*Notice: Until recently it was just an [GNOME Shell](http://www.gnome.org/gnome-3/) extension, with latest release it became an app. It was necessary change to make ground for coming features, a todo list for instance. However, it no longer will be possible to distribute it via [extensions.gnome.org](https://extensions.gnome.org/extension/53/pomodoro/), we need to figure out packaging and it will take a few months...*
+This [GNOME](http://www.gnome.org/gnome-3/) utility helps to manage time according to [Pomodoro Technique](http://en.wikipedia.org/wiki/Pomodoro_technique). It intends to improve productivity and focus by taking short breaks.
 
 
 ### Features
@@ -19,6 +17,7 @@ This [GNOME](http://www.gnome.org/gnome-3/) utility intends to help manage time 
 
 ![Screenshot](http://kamilprusko.org/files/gnome-pomodoro-0.10.0.png)
 
+
 ### What is the pomodoro technique?
 
 The [Pomodoro Technique](http://en.wikipedia.org/wiki/Pomodoro_technique) is a time and focus management method which improves productivity and quality of work. The name comes from a kitchen timer, which can be used to keep track of time. In short, you are supposed to focus on work for around 25 minutes and then have a well deserved break in which you should do nothing but relax. This cycle repeats once it reaches 4th break – then you should take a longer break (have a walk or something). It's that simple. It improves your focus, physical health and mental agility depending on how you spend your breaks and how strictly you follow the routine.
@@ -33,7 +32,26 @@ You can read more on pomodoro technique [here](http://www.pomodorotechnique.com/
 
 ### From repositories
 
-Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodoro*.
+Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodoro*. Those packages are made and maintained by volunteers.
+
+1. Install package
+
+2. Close gnome-pomodoro
+
+   If you're updating, you need to close running background service by opening Preferences and clicking Quit it the AppMenu or by ```killall gnome-pomodoro``` in terminal.
+
+3. Launch it
+
+        gnome-pomodoro
+
+   It will enable GNOME Shell extension. A new indicator should show up in the top panel. If it doesn't, restart GNOME Shell by hitting *Alt + F2* and typing *r* in command.
+
+
+### From package
+
+For Fedora and openSUSE you can download package from [here](http://software.opensuse.org/download.html?project=home%3Akamilprusko&package=gnome-pomodoro). A package for Ubuntu should be available soon.
+
+Then follow instructions from above, as if installing package from repos.
 
 
 ### From source
@@ -60,13 +78,17 @@ Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodor
 
         sudo yum install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel gnome-desktop3-devel libcanberra-devel dbus-glib-devel gstreamer1-devel upower-devel google-droid-sans-fonts
 
-3. Build it and install:
+3. Build it and install
 
         ./autogen.sh --prefix=/usr --datadir=/usr/share
         make
         sudo make install
 
-4. Launch it:
+4. Close gnome-pomodoro
+
+   If you're updating, you need to close running background service by opening Preferences and clicking Quit it the AppMenu or by ```killall gnome-pomodoro``` in terminal.
+
+5. Launch it
 
         gnome-pomodoro
 
@@ -75,12 +97,12 @@ Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodor
 
 ### From extensions.gnome.org
 
-You can install older version via [extensions.gnome.org](https://extensions.gnome.org/extension/53/pomodoro/). We will maintain it until more packages are available.
+You can install older version via [extensions.gnome.org](https://extensions.gnome.org/extension/53/pomodoro/).
 
 
 ## Advanced settings
 
-If you still want to tinker with settings, you can use *dconf-editor* or *gsettings* from commandline. Settings for Pomodoro are in */org/gnome/pomodoro* tree.
+If you want to tinker with more settings, you can use *dconf-editor* or *gsettings*. Lookup */org/gnome/pomodoro* tree.
 
 
 **Change keyboard shortcut**
@@ -101,11 +123,11 @@ For more options see *gsettings --help*
 
 ## Debugging
 
-If you experience the extension causing problems, please run *gnome-shell* with an incantation:
+If you experience extension causing problems, run *gnome-shell* like this:
 
     DISPLAY=:0 gnome-shell --replace > gnome-shell.log 2>&1
 
-and send us *gnome-shell.log* file. To comfort you, you can recover from most *gnome-shell* crashes using the same command. 
+and send us *gnome-shell.log* file. A a side note, you can recover from most *gnome-shell* crashes using that command. 
 
 
 ## License
@@ -115,7 +137,7 @@ GPL3. See [COPYING](https://raw.github.com/codito/gnome-shell-pomodoro/master/CO
 
 ## Thanks
 
-Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodoro/contributors).
+Thanks to our [contributors](https://github.com/codito/gnome-shell-pomodoro/contributors) and to package maintainers.
 
 
 ## Changelog
