@@ -46,9 +46,9 @@ BuildRequires: vala-tools
 Obsoletes: gnome-shell-extension-pomodoro
 
 %description
-This GNOME utility helps managing time using Pomodoro Technique. It intends
-to improve productivity and focus by taking short breaks after every 25 minutes
-of work.
+A GNOME utility that helps managing time according to Pomodoro Technique. It
+intends to improve productivity and focus by taking short breaks after every
+25 minutes of work.
 
 %prep
 %setup -q -n @distdir@-%{version}

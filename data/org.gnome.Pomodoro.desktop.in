@@ -1,6 +1,6 @@
 [Desktop Entry]
 _Name=Pomodoro
-_Comment=Manage your time and tasks
+_Comment=A simple time management utility
 _Keywords=time;timer;tasks;manage;organize;
 Exec=gnome-pomodoro
 Icon=gnome-pomodoro
