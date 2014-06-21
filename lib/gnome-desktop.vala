@@ -167,7 +167,8 @@ public class Pomodoro.GnomeDesktop : Object
         return desktop_session == "gnome";
     }
 
-    private ExtensionState get_extension_state (string extension_uuid,
+    private ExtensionState get_extension_state (string  extension_uuid,
+                                                string? extension_path,
                                                 string? extension_version)
     {
         HashTable<string,Variant> info;
@@ -175,6 +176,7 @@ public class Pomodoro.GnomeDesktop : Object
         var uuid = "";
         var version = "";
         var state = ExtensionState.ERROR;
+        var path = "";
 
         try {
             this.shell_extensions_proxy.get_extension_info (extension_uuid,
@@ -183,6 +185,7 @@ public class Pomodoro.GnomeDesktop : Object
             var tmp_uuid = info.lookup ("uuid");
             var tmp_version = info.lookup ("version");
             var tmp_state = info.lookup ("state");
+            var tmp_path = info.lookup ("path");
 
             if (tmp_uuid != null) {
                 uuid = tmp_uuid.get_string();
@@ -195,12 +198,20 @@ public class Pomodoro.GnomeDesktop : Object
             if (tmp_state != null) {
                 state = (ExtensionState) tmp_state.get_double();
             }
+
+            if (tmp_path != null) {
+                path = tmp_path.get_string();
+            }
         }
         catch (IOError error) {
             return ExtensionState.ERROR;
         }
 
         if (uuid != extension_uuid) {
+            return ExtensionState.UNINSTALLED;
+        }
+
+        if (extension_path != "" && path != extension_path) {
             return ExtensionState.UNINSTALLED;
         }
 
@@ -236,7 +247,12 @@ public class Pomodoro.GnomeDesktop : Object
 
         try
         {
+            var extension_path = GLib.Path.build_filename (Config.DATA_DIR,
+                                                           "gnome-shell",
+                                                           "extensions",
+                                                           extension_uuid);
             var extension_state = this.get_extension_state (extension_uuid,
+                                                            extension_path,
                                                             extension_version);
 
             switch (extension_state)
@@ -254,17 +270,11 @@ public class Pomodoro.GnomeDesktop : Object
                     /* try to enable extension by force, in case gnome-shell
                      * isn't aware it's installed
                      */
-                    var extension_dir = GLib.Path.build_filename (
-                                       Config.DATA_DIR,
-                                       "gnome-shell",
-                                       "extensions",
-                                       extension_uuid);
-
                     var script = """
 (function () {
     let uuid = '""" + extension_uuid +"""';
     let perUserDir = Gio.File.new_for_path(global.userdatadir);
-    let extensionDir = Gio.File.new_for_path('""" + extension_dir + """');
+    let extensionDir = Gio.File.new_for_path('""" + extension_path + """');
     let type = extensionDir.has_prefix(perUserDir) ? ExtensionUtils.ExtensionType.PER_USER
                                                    : ExtensionUtils.ExtensionType.SYSTEM;
 
@@ -279,8 +289,8 @@ public class Pomodoro.GnomeDesktop : Object
 """;
                     GLib.debug (
                             "Attempting to enable extension \"%s\" in \"%s\"",
-                            GLib.Path.get_basename (extension_dir),
-                            GLib.Path.get_dirname (extension_dir));
+                            GLib.Path.get_basename (extension_path),
+                            GLib.Path.get_dirname (extension_path));
 
                     this.shell_proxy.eval (script);
                     break;
