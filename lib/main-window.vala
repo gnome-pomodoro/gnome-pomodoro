@@ -112,7 +112,7 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
         this.title = _("Tasks");
 
         var geometry = Gdk.Geometry ();
-        geometry.min_width = 500;
+        geometry.min_width = 300;
         geometry.min_height = 300;
 
         var geometry_hints = Gdk.WindowHints.MIN_SIZE;
@@ -121,7 +121,7 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
                                  geometry,
                                  geometry_hints);
 
-        this.set_default_size (-1, 706);
+        this.set_default_size (450, 600);
 
         this.set_destroy_with_parent (false);
 
@@ -268,7 +268,6 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
         var scrolled_window = new Gtk.ScrolledWindow (null, null);
         scrolled_window.set_policy (Gtk.PolicyType.NEVER,
                                     Gtk.PolicyType.AUTOMATIC);
-        scrolled_window.set_size_request (400, 200);
         scrolled_window.add (this.task_list_box);
         scrolled_window.show ();
 
