@@ -22,6 +22,125 @@
 using GLib;
 
 
+public enum Pomodoro.TaskStatus
+{
+    DEFAULT = 0,
+    DONE = 1,
+    DISMISSED = 2,
+    BLOCKED = 3
+}
+
+
+public enum Pomodoro.Urgency
+{
+    LOW = 0,
+    NORMAL = 1,
+    HIGH = 2,
+    VERY_HIGH = 3
+}
+
+
+public enum Pomodoro.Importance
+{
+    LOW = 0,
+    NORMAL = 1,
+    HIGH = 2,
+    VERY_HIGH = 3
+}
+
+
+public class Pomodoro.Task : Object
+{
+    public string summary { get; set; }
+    public string description { get; set; }
+
+//    public uint16 status { get; set; }
+    public Importance importance { get; set; default = Importance.NORMAL; }
+    public Urgency urgency { get; set; default = Urgency.NORMAL; }
+
+    public uint64 time_spent { get; set; }
+
+    public bool is_done { get; set; }
+
+    public Task? parent { get; set; }
+
+//    public List<GLib.File> attachments;
+
+//    public uint64 start_date { get; set; }
+//    public uint64 end_date { get; set; }
+
+//    public List<Task> get_children () {
+//    }
+
+//    public List<Task> get_tasks_blocked () {  // get_preceding_tasks ()
+//    }
+
+//    public List<Task> get_tasks_blocking () {  // get_following_tasks ()
+//    }
+
+}
+
+
+private class Pomodoro.TaskListRow : Gtk.ListBoxRow
+{
+    public Gtk.Label label;
+    public Task task;
+
+    public TaskListRow (Task task)
+    {
+        this.height_request = 50;
+
+        var row_context = this.get_style_context ();
+        row_context.add_class ("task");
+
+        this.task = task;
+
+        this.label = new Gtk.Label (task.summary);
+        this.label.set_ellipsize (Pango.EllipsizeMode.END);
+        this.label.set_alignment (0.0f, 0.5f);
+        this.label.wrap = true;
+        this.label.wrap_mode = Pango.WrapMode.WORD;
+
+        var label_context = this.label.get_style_context ();
+        label_context.add_class ("summary");
+
+        var check_button = new Gtk.CheckButton ();
+        check_button.set_margin_left (15); /* TODO: Use css */
+        check_button.set_margin_right (3); /* TODO: Use css */
+
+        task.bind_property ("is-done",
+                            check_button,
+                            "active",
+                            GLib.BindingFlags.BIDIRECTIONAL | GLib.BindingFlags.SYNC_CREATE);
+
+        task.notify.connect(() => {
+            this.on_task_changed ();
+        });
+
+        var hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 2);
+        hbox.set_halign (Gtk.Align.START);
+        hbox.pack_start (check_button, false, true);
+        hbox.pack_start (label, true, false);
+
+        hbox.show_all ();
+
+        this.add (hbox);
+
+        this.on_task_changed ();
+    }
+
+    private void on_task_changed ()
+    {
+        var attribs = new Pango.AttrList ();
+
+        if (this.task.is_done) {
+            var strikethrough = Pango.attr_strikethrough_new (true);
+            attribs.insert ((owned) strikethrough);
+        }
+
+        label.set_attributes (attribs);
+    }
+}
 
 private class Pomodoro.TaskListBox : Gtk.Box
 {
@@ -67,27 +186,11 @@ private class Pomodoro.TaskListBox : Gtk.Box
 
     protected Gtk.ListBoxRow create_row_for_task (string text)
     {
-        var row = new Gtk.ListBoxRow ();
-        row.height_request = 50;
+        var task = new Task ();
+        task.summary = text;
 
-        var label = new Gtk.Label (text);
-        label.set_ellipsize (Pango.EllipsizeMode.END);
-        label.set_alignment (0.0f, 0.5f);
-        label.wrap = true;
-        label.wrap_mode = Pango.WrapMode.WORD;
-
-        var widget = new Gtk.CheckButton ();
-        widget.set_margin_left (15); /* TODO: Use css */
-        widget.set_margin_right (3); /* TODO: Use css */
-
-        var hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 2);
-        hbox.set_halign (Gtk.Align.START);
-        hbox.pack_start (widget, false, true);
-        hbox.pack_start (label, true, false);
-
-        row.add (hbox);
-
-        row.show_all ();
+        var row = new TaskListRow (task);
+        row.show ();
 
         return row;
     }
