@@ -180,7 +180,16 @@ private class Pomodoro.TaskListBox : Gtk.Box
         this.list_box.insert (this.create_row_for_task ("Buy milk"), -1);
         this.list_box.insert (this.create_row_for_task ("Walk the dog"), -1);
 
+        this.list_box.row_activated.connect (this.on_row_activated);
+
         this.pack_start (this.list_box);
+    }
+
+    private void on_row_activated (Gtk.ListBoxRow row)
+    {
+        var tmp_row = row as TaskListRow;
+
+        GLib.message ("\"%s\" activated", tmp_row.task.summary);
     }
 
     protected Gtk.ListBoxRow create_row_for_task (string text)
