@@ -278,44 +278,44 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
         var context = this.header_bar.get_style_context ();
         context.add_class ("headerbar");
 
-        var bookmark_icon = GLib.Icon.new_for_string (
-                "resource:///org/gnome/pomodoro/" + Resources.BOOKMARK + ".svg");
-        var urgency_status = new Gtk.Image.from_gicon (bookmark_icon,
-                                                       Gtk.IconSize.MENU);
+//        var bookmark_icon = GLib.Icon.new_for_string (
+//                "resource:///org/gnome/pomodoro/" + Resources.BOOKMARK + ".svg");
+//        var urgency_status = new Gtk.Image.from_gicon (bookmark_icon,
+//                                                       Gtk.IconSize.MENU);
 
-        var filter_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 3);
-        filter_box.pack_start (urgency_status, false, false);
+//        var filter_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 3);
+//        filter_box.pack_start (urgency_status, false, false);
 
-        var filter_label = new Gtk.Label (_("Today"));
-        filter_box.pack_start (filter_label, true, false);
+//        var filter_label = new Gtk.Label (_("Today"));
+//        filter_box.pack_start (filter_label, true, false);
 
-        var filter_button = new Gtk.Button ();
-        filter_button.set_relief (Gtk.ReliefStyle.NONE);
-        filter_button.add (filter_box);
+//        var filter_button = new Gtk.Button ();
+//        filter_button.set_relief (Gtk.ReliefStyle.NONE);
+//        filter_button.add (filter_box);
 
-        var urgency_filter_menu = new GLib.Menu ();
-        urgency_filter_menu.append (_("Urgent"), "action-name");
-        urgency_filter_menu.append (_("Important"), "action-name");
+//        var urgency_filter_menu = new GLib.Menu ();
+//        urgency_filter_menu.append (_("Urgent"), "action-name");
+//        urgency_filter_menu.append (_("Important"), "action-name");
 
-        var time_filter_menu = new GLib.Menu ();
-        time_filter_menu.append (_("All"), "action-name");
-        time_filter_menu.append (_("Today"), "action-name");
+//        var time_filter_menu = new GLib.Menu ();
+//        time_filter_menu.append (_("All"), "action-name");
+//        time_filter_menu.append (_("Today"), "action-name");
 
-        var filter_menu = new GLib.Menu ();
-        filter_menu.append_section (null, urgency_filter_menu);
-        filter_menu.append_section (null, time_filter_menu );
+//        var filter_menu = new GLib.Menu ();
+//        filter_menu.append_section (null, urgency_filter_menu);
+//        filter_menu.append_section (null, time_filter_menu );
 
-        var urgency_popover = new Gtk.Popover.from_model (filter_button,
-                                                          filter_menu);
-        urgency_popover.set_modal (true);
-        urgency_popover.set_position (Gtk.PositionType.TOP);
+//        var urgency_popover = new Gtk.Popover.from_model (filter_button,
+//                                                          filter_menu);
+//        urgency_popover.set_modal (true);
+//        urgency_popover.set_position (Gtk.PositionType.TOP);
 
-        filter_button.clicked.connect(() => {
-            urgency_popover.show();
-        });
+//        filter_button.clicked.connect(() => {
+//            urgency_popover.show();
+//        });
 
-        filter_button.show_all();
-        this.header_bar.pack_start (filter_button);
+//        filter_button.show_all();
+//        this.header_bar.pack_start (filter_button);
 
         //
 
