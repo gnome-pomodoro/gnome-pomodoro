@@ -18,6 +18,4 @@ which gnome-autogen.sh || {
     exit 1
 }
 
-git submodule update --init --recursive
-
 REQUIRED_AUTOMAKE_VERSION=1.9 . gnome-autogen.sh
