@@ -669,8 +669,6 @@ public class Pomodoro.SoundChooserButton : Gtk.Box
         }
 
         assert_not_reached ();
-
-        return -1;
     }
 
     private static int model_sort_func (Gtk.TreeModel model, Gtk.TreeIter a, Gtk.TreeIter b)
