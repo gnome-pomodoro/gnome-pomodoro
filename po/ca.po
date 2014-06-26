@@ -1,15 +1,15 @@
 # Catalan translation for gnome-pomodoro
 # Copyright (c) 2012 gnome-pomodoro contributors
 # This file is distributed under the same license as the gnome-pomodoro package.
-# juanmah <juanmah@gmail.com>, 2012.
+# Ecron <ecron_89@hotmail.com>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:23+0100\n"
-"PO-Revision-Date: 2012-03-19 10:56+0100\n"
-"Last-Translator: juanmah <juanmah@gmail.com>\n"
+"PO-Revision-Date: 2014-06-26 12:56+0100\n"
+"Last-Translator: Ecron <ecron_89@hotmail.com>\n"
 "Language-Team:  <>\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -35,16 +35,16 @@ msgstr "Pomodoro"
 
 #: ../extension/notifications.js:389
 msgid "It's time to take a break"
-msgstr ""
+msgstr "És hora de fer un descans"
 
 #: ../extension/notifications.js:574
 #, fuzzy
 msgid "A new pomodoro is starting"
-msgstr "La pausa ha finalitzat, un nou pomodoro està començant!"
+msgstr "La pausa ha finalitzat, comença un nou pomodoro"
 
 #: ../extension/notifications.js:587
 msgid "Take a break!"
-msgstr "Dejte si pauzu!"
+msgstr "Feu un descans!"
 
 #: ../extension/notifications.js:610
 #, fuzzy
@@ -53,11 +53,11 @@ msgstr "Comença un pomodoro"
 
 #: ../extension/notifications.js:652
 msgid "Shorten the break"
-msgstr ""
+msgstr "Escurça el descans"
 
 #: ../extension/notifications.js:658
 msgid "Lengthen the break"
-msgstr ""
+msgstr "Allarga el descans"
 
 #: ../extension/notifications.js:672
 #, fuzzy, javascript-format
@@ -75,23 +75,23 @@ msgstr[1] "Prengui's un descans, té %d minuts\n"
 
 #: ../extension/notifications.js:693
 msgid "Hey, you're missing out on a break"
-msgstr ""
+msgstr "No esteu aprofitant el descans"
 
 #: ../extension/notifications.js:772
 msgid "Could not run pomodoro"
-msgstr ""
+msgstr "Pomodoro no s'ha pogut executar"
 
 #: ../extension/notifications.js:774
 msgid "Something went badly wrong..."
-msgstr ""
+msgstr "Alguna cosa ha anat malament..."
 
 #: ../extension/notifications.js:775
 msgid "Looks like gnome-pomodoro is not installed"
-msgstr ""
+msgstr "Sembla que gnome-pomodoro no hi es instalat"
 
 #: ../extension/notifications.js:784
 msgid "Report issue"
-msgstr ""
+msgstr "Notifica un problema"
 
 #: ../extension/notifications.js:787
 msgid "Install"
@@ -99,7 +99,7 @@ msgstr "Instal·la"
 
 #: ../src/about-dialog.vala:29
 msgid "About Pomodoro"
-msgstr "Sobre Pomodoro"
+msgstr "Quant a Pomodoro"
 
 #: ../src/about-dialog.vala:31
 msgid "A simple time management utility"
@@ -107,7 +107,7 @@ msgstr "Una senzilla utilitat de gestió del temps"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
-msgstr ""
+msgstr "translator-credits"
 
 #: ../src/about-dialog.vala:45
 msgid ""
@@ -116,10 +116,14 @@ msgid ""
 "Software Foundation; either version 3 of the License, or (at your option) "
 "any later version."
 msgstr ""
+"Aquest programa és programari lliure: pot modificar-lo o redistribuir-lo "
+"atenent als termes de la GNU General Public License tal com va ser publicada "
+"per la Free Software Foundation; sigui tant la versió 3 de la Llicència com "
+"(a la vostra opció) qualsevol versió posterior."
 
 #: ../src/preferences-dialog.vala:329
 msgid "Timer"
-msgstr "Hora"
+msgstr "Temporitzador"
 
 #: ../src/preferences-dialog.vala:396
 msgid "Pomodoro duration"
@@ -138,7 +142,7 @@ msgstr "Durada de la pausa llarga"
 #. @translators: You can refer it to number of pomodoros in a cycle
 #: ../src/preferences-dialog.vala:411
 msgid "Pomodoros to a long break"
-msgstr ""
+msgstr "Pomodoros fins una pausa llarga"
 
 #: ../src/preferences-dialog.vala:418
 #, fuzzy
@@ -153,61 +157,61 @@ msgstr "Notificacions"
 #: ../src/preferences-dialog.vala:432
 #, fuzzy
 msgid "Screen notifications"
-msgstr "Notificacions de la pantalla"
+msgstr "Notificacions a la pantalla"
 
 #: ../src/preferences-dialog.vala:437
 msgid "Remind to take a break"
-msgstr ""
+msgstr "Recorda'm fer una pausa"
 
 #: ../src/preferences-dialog.vala:459
 msgid "Sounds"
-msgstr ""
+msgstr "Sons"
 
 #: ../src/preferences-dialog.vala:464
 msgid "Clock Ticking"
-msgstr ""
+msgstr "Tic-tac de rellotge"
 
 #: ../src/preferences-dialog.vala:468
 msgid "Timer Ticking"
-msgstr ""
+msgstr "Tic-tac de temporitzador"
 
 #: ../src/preferences-dialog.vala:472
 msgid "Woodland Birds"
-msgstr ""
+msgstr "Ocells al camp"
 
 #: ../src/preferences-dialog.vala:479
 #, fuzzy
 msgid "Select ticking sound"
-msgstr "Empra so de notificació"
+msgstr "Trieu so de notificació"
 
 #: ../src/preferences-dialog.vala:490
 msgid "Ticking sound"
-msgstr ""
+msgstr "So de tic-tac"
 
 #: ../src/preferences-dialog.vala:510
 msgid "Loud bell"
-msgstr ""
+msgstr "Campaneta sorollosa"
 
 #: ../src/preferences-dialog.vala:514
 msgid "Bell"
-msgstr ""
+msgstr "Campaneta"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Select sound for start of break"
-msgstr ""
+msgstr "Trieu un so per iniciar un descans"
 
 #: ../src/preferences-dialog.vala:530
 msgid "Start of break sound"
-msgstr ""
+msgstr "So d'inici d'un descans"
 
 #: ../src/preferences-dialog.vala:534
 #, fuzzy
 msgid "Select sound for pomodoro start"
-msgstr "Arxiu de so per reproduir en iniciar o finalitzar un pomodoro."
+msgstr "Trieu un so per iniciar un pomodoro"
 
 #: ../src/preferences-dialog.vala:543
 msgid "Pomodoro start sound"
-msgstr ""
+msgstr "So d'inici d'un pomodoro"
 
 #: ../src/preferences-dialog.vala:575
 msgid "Available"
@@ -228,49 +232,46 @@ msgstr "Presència"
 
 #: ../src/preferences-dialog.vala:603
 msgid "Postpone pomodoro when idle"
-msgstr ""
+msgstr "Posposa el pomodoro en estar inactiu"
 
 #: ../src/preferences-dialog.vala:608
 msgid "Status during pomodoro"
-msgstr ""
+msgstr "Estat durant el pomodoro"
 
 #: ../src/preferences-dialog.vala:613
 msgid "Status during break"
-msgstr ""
+msgstr "Estat durant el descans"
 
 #: ../src/preferences-dialog.vala:686
 #, fuzzy
 msgid ""
 "System notifications including chat messages won't show up during pomodoro."
 msgstr ""
-"Canvia l'estat en linia i inhabilita notificacions inclouent missatges del "
-"chat"
+"Durant el pomodoro no es mostraràn les notificacions del sistema, inclosos els missatges de xat."
 
 #: ../src/preferences-dialog.vala:690
 #, fuzzy
 msgid ""
 "System notifications including chat messages won't show up during break."
 msgstr ""
-"Canvia l'estat en linia i inhabilita notificacions inclouent missatges del "
-"chat"
+"Durant el descans no es mostraràn les notificacions del sistema, inclosos els missatges de xat."
 
 #: ../src/preferences-dialog.vala:694
 #, fuzzy
 msgid "System notifications including chat messages won't show up."
 msgstr ""
-"Canvia l'estat en linia i inhabilita notificacions inclouent missatges del "
-"chat"
+"No es mostraràn les notificacions del sistema, inclosos els missatges de xat."
 
 #: ../src/preferences-dialog.vala:707
 msgid "OK"
-msgstr ""
+msgstr "D'acord"
 
 #: ../src/utils.vala:92
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d hora"
+msgstr[1] "%d hores"
 
 #: ../src/utils.vala:101
 #, c-format
@@ -281,7 +282,7 @@ msgstr[1] "%d minuts"
 
 #: ../src/widgets.vala:327
 msgid "Disabled"
-msgstr ""
+msgstr "Deshabilitat"
 
 #: ../src/widgets.vala:384
 #, c-format
@@ -290,10 +291,13 @@ msgid ""
 "using this key.\n"
 "Please try with a key such as Control, Alt or Shift at the same time."
 msgstr ""
+"No es pot usar la drecera \"%s\" perquè seria impossible escriure "
+"al fer servir aquesta tecla.\n"
+"Utilitzeu a més una tecla com Control, Alt o Majús."
 
 #: ../src/widgets.vala:512
 msgid "_No sound"
-msgstr ""
+msgstr "_Sense so"
 
 #: ../src/widgets.vala:514
 msgid "_Cancel"
@@ -321,15 +325,15 @@ msgstr "Cap"
 
 #: ../src/widgets.vala:1061 ../src/widgets.vala:1070
 msgid "Supported audio files"
-msgstr ""
+msgstr "Fitxers d'àudio compatibles"
 
 #: ../data/gnome-pomodoro.desktop.in.h:2
 msgid "Manage your time and tasks"
-msgstr ""
+msgstr "Gestioneu el vostre temps i tasques"
 
 #: ../data/gnome-pomodoro.desktop.in.h:3
 msgid "time;timer;tasks;manage;organize;"
-msgstr ""
+msgstr "time;timer;tasks;manage;organize;"
 
 #~ msgid "Options"
 #~ msgstr "Opcions"
@@ -338,10 +342,10 @@ msgstr ""
 #~ msgstr "Reinicia el comptador i el temporitzador"
 
 #~ msgid "Click to reset session counts to zero"
-#~ msgstr "Premi per reiniciar el comptador de la sessió a zero"
+#~ msgstr "Premeu per reiniciar el comptador de la sessió a zero"
 
 #~ msgid "Away From Desk"
-#~ msgstr "Absència de l'escriptori"
+#~ msgstr "Absent a l'escriptori"
 
 #~ msgid "Set optimal settings for doing paperwork"
 #~ msgstr "Paràmetres òptims per fer paperassa"
@@ -412,7 +416,7 @@ msgstr ""
 #~ msgstr "Si es reprodueix un so per notificar els esdeveniments."
 
 #~ msgid "Notification sound file"
-#~ msgstr "Arxiu de so de la notificació"
+#~ msgstr "Fitxer de so de la notificació"
 
 #~ msgid "Restore timer state"
 #~ msgstr "Restaura l'estat del temporitzador"
