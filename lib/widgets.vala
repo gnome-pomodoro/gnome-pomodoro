@@ -101,6 +101,8 @@ public class Pomodoro.ModeButton : Gtk.Box
 
     public new void add (Gtk.Widget child)
     {
+        assert (child is Gtk.ToggleButton);
+
         var style_context = child.get_style_context ();
         style_context.add_class (Gtk.STYLE_CLASS_RAISED);
 
@@ -119,12 +121,10 @@ public class Pomodoro.ModeButton : Gtk.Box
         }
     }
 
-    private void on_child_toggled (Gtk.Widget child)
+    private void on_child_toggled (Gtk.ToggleButton button)
     {
-        var button = child as Gtk.ToggleButton;
-
         if (button.active) {
-            this.selected = this.get_children ().index (child);
+            this.selected = this.get_children ().index (button);
         }
     }
 
@@ -212,8 +212,10 @@ public class Pomodoro.ModeButton : Gtk.Box
 
                 if (this.layout_bold == null)
                 {
-                    var font = child.get_style_context ()
-                                    .get_font (Gtk.StateFlags.NORMAL);
+                    Pango.FontDescription font;
+                    child.get_style_context ().@get (Gtk.StateFlags.NORMAL,
+                                                     "font",
+                                                     out font);
                     font.set_weight (Pango.Weight.BOLD);
 
                     this.layout_bold = layout.copy ();

@@ -39,9 +39,9 @@ namespace Pomodoro
     /**
      * Mapping from settings to keybinding
      */
-    public bool get_keybinding_mapping (GLib.Value   value,
-                                        GLib.Variant variant,
-                                        void*        user_data)
+    private bool get_keybinding_mapping (GLib.Value   value,
+                                         GLib.Variant variant,
+                                         void*        user_data)
     {
         var accelerators = variant.get_strv ();
 
@@ -60,9 +60,10 @@ namespace Pomodoro
     /**
      * Mapping from keybinding to settings
      */
-    public Variant set_keybinding_mapping (GLib.Value       value,
-                                           GLib.VariantType expected_type,
-                                           void*            user_data)
+    [CCode (has_target = false)]
+    private Variant set_keybinding_mapping (GLib.Value       value,
+                                            GLib.VariantType expected_type,
+                                            void*            user_data)
     {
         var accelerator = value.get_string ();
         string[] strv = { accelerator };
@@ -73,9 +74,9 @@ namespace Pomodoro
     /**
      * Mapping from settings to file chooser
      */
-    public bool get_file_mapping (GLib.Value   value,
-                                  GLib.Variant variant,
-                                  void*        user_data)
+    private bool get_file_mapping (GLib.Value   value,
+                                   GLib.Variant variant,
+                                   void*        user_data)
     {
         var uri = variant.get_string ();
 
@@ -83,7 +84,7 @@ namespace Pomodoro
             value.set_object (GLib.File.new_for_uri (uri));
         }
         else {
-            value.set_pointer (null);
+            value.unset ();
         }
 
         return true;
@@ -92,9 +93,10 @@ namespace Pomodoro
     /**
      * Mapping from file chooser to settings
      */
-    public Variant set_file_mapping (GLib.Value       value,
-                                     GLib.VariantType expected_type,
-                                     void*            user_data)
+    [CCode (has_target = false)]
+    private Variant set_file_mapping (GLib.Value       value,
+                                      GLib.VariantType expected_type,
+                                      void*            user_data)
     {
         var file = value.get_object () as GLib.File;
 
@@ -353,8 +355,8 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
                                          keybinding,
                                          "accelerator",
                                          SETTINGS_BIND_FLAGS,
-                                         get_keybinding_mapping,
-                                         set_keybinding_mapping,
+                                         (SettingsBindGetMappingShared) get_keybinding_mapping,
+                                         (SettingsBindSetMappingShared) set_keybinding_mapping,
                                          null,
                                          null);
 
@@ -458,8 +460,8 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
                                          ticking_sound,
                                          "file",
                                          SETTINGS_BIND_FLAGS,
-                                         Sounds.get_file_mapping,
-                                         Sounds.set_file_mapping,
+                                         (SettingsBindGetMappingShared) Sounds.get_file_mapping,
+                                         (SettingsBindSetMappingShared) Sounds.set_file_mapping,
                                          null,
                                          null);
 
@@ -512,8 +514,8 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
                                          pomodoro_end_sound,
                                          "file",
                                          SETTINGS_BIND_FLAGS,
-                                         Sounds.get_file_mapping,
-                                         Sounds.set_file_mapping,
+                                         (SettingsBindGetMappingShared) Sounds.get_file_mapping,
+                                         (SettingsBindSetMappingShared) Sounds.set_file_mapping,
                                          null,
                                          null);
 
@@ -521,8 +523,8 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
                                          pomodoro_start_sound,
                                          "file",
                                          SETTINGS_BIND_FLAGS,
-                                         Sounds.get_file_mapping,
-                                         Sounds.set_file_mapping,
+                                         (SettingsBindGetMappingShared) Sounds.get_file_mapping,
+                                         (SettingsBindSetMappingShared) Sounds.set_file_mapping,
                                          null,
                                          null);
 
@@ -601,8 +603,8 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
                                          pomodoro_presence,
                                          "value",
                                          SETTINGS_BIND_FLAGS,
-                                         Presence.get_status_mapping,
-                                         Presence.set_status_mapping,
+                                         (SettingsBindGetMappingShared) Presence.get_status_mapping,
+                                         (SettingsBindSetMappingShared)Presence.set_status_mapping,
                                          null,
                                          null);
 
@@ -611,8 +613,8 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
                                          break_presence,
                                          "value",
                                          SETTINGS_BIND_FLAGS,
-                                         Presence.get_status_mapping,
-                                         Presence.set_status_mapping,
+                                         (SettingsBindGetMappingShared) Presence.get_status_mapping,
+                                         (SettingsBindSetMappingShared) Presence.set_status_mapping,
                                          null,
                                          null);
 
