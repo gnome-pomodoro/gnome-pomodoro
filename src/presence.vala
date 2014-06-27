@@ -206,13 +206,12 @@ class Pomodoro.Presence : Object
     }
 
     /* mapping from presence combobox to settings */
+    [CCode (has_target = false)]
     public static Variant set_status_mapping (GLib.Value       value,
                                               GLib.VariantType expected_type,
                                               void*            user_data)
     {
-        var status = PresenceStatus.DEFAULT;
-
-        status = (PresenceStatus) value.get_int ();
+        var status = (PresenceStatus) value.get_int ();
 
         return new Variant.string (presence_status_to_string (status));
     }
