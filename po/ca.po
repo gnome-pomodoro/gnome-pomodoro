@@ -29,7 +29,6 @@ msgstr "Preferències"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
-#, fuzzy
 msgid "Pomodoro"
 msgstr "Pomodoro"
 
@@ -38,7 +37,6 @@ msgid "It's time to take a break"
 msgstr "És hora de fer un descans"
 
 #: ../extension/notifications.js:574
-#, fuzzy
 msgid "A new pomodoro is starting"
 msgstr "La pausa ha finalitzat, comença un nou pomodoro"
 
@@ -47,7 +45,6 @@ msgid "Take a break!"
 msgstr "Feu un descans!"
 
 #: ../extension/notifications.js:610
-#, fuzzy
 msgid "Start pomodoro"
 msgstr "Comença un pomodoro"
 
@@ -60,18 +57,18 @@ msgid "Lengthen the break"
 msgstr "Allarga el descans"
 
 #: ../extension/notifications.js:672
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "You have %d second left"
 msgid_plural "You have %d seconds left"
-msgstr[0] "Prengui's un descans, té %d segon\n"
-msgstr[1] "Prengui's un descans, té %d segons\n"
+msgstr[0] "Prengui's un descans, té %d segon"
+msgstr[1] "Prengui's un descans, té %d segons"
 
 #: ../extension/notifications.js:674
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "You have %d minute left"
 msgid_plural "You have %d minutes left"
-msgstr[0] "Prengui's un descans, té %d minut\n"
-msgstr[1] "Prengui's un descans, té %d minuts\n"
+msgstr[0] "Prengui's un descans, té %d minut"
+msgstr[1] "Prengui's un descans, té %d minuts"
 
 #: ../extension/notifications.js:693
 msgid "Hey, you're missing out on a break"
@@ -87,7 +84,7 @@ msgstr "Alguna cosa ha anat malament..."
 
 #: ../extension/notifications.js:775
 msgid "Looks like gnome-pomodoro is not installed"
-msgstr "Sembla que gnome-pomodoro no hi es instalat"
+msgstr "Sembla que gnome-pomodoro no hi és instaŀlat"
 
 #: ../extension/notifications.js:784
 msgid "Report issue"
@@ -95,7 +92,7 @@ msgstr "Notifica un problema"
 
 #: ../extension/notifications.js:787
 msgid "Install"
-msgstr "Instal·la"
+msgstr "Instaŀla"
 
 #: ../src/about-dialog.vala:29
 msgid "About Pomodoro"
@@ -107,7 +104,7 @@ msgstr "Una senzilla utilitat de gestió del temps"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
-msgstr "translator-credits"
+msgstr "Ecron"
 
 #: ../src/about-dialog.vala:45
 msgid ""
@@ -119,7 +116,7 @@ msgstr ""
 "Aquest programa és programari lliure: pot modificar-lo o redistribuir-lo "
 "atenent als termes de la GNU General Public License tal com va ser publicada "
 "per la Free Software Foundation; sigui tant la versió 3 de la Llicència com "
-"(a la vostra opció) qualsevol versió posterior."
+"(a la vostra elecció) qualsevol versió posterior."
 
 #: ../src/preferences-dialog.vala:329
 msgid "Timer"
@@ -130,12 +127,10 @@ msgid "Pomodoro duration"
 msgstr "Durada del pomodoro"
 
 #: ../src/preferences-dialog.vala:399
-#, fuzzy
 msgid "Short break duration"
 msgstr "Durada de la pausa curta"
 
 #: ../src/preferences-dialog.vala:402
-#, fuzzy
 msgid "Long break duration"
 msgstr "Durada de la pausa llarga"
 
@@ -145,17 +140,14 @@ msgid "Pomodoros to a long break"
 msgstr "Pomodoros fins una pausa llarga"
 
 #: ../src/preferences-dialog.vala:418
-#, fuzzy
 msgid "Shortcut to toggle the timer"
-msgstr "Tecla per commutar el temporitzador."
+msgstr "Drecera per commutar el temporitzador."
 
 #: ../src/preferences-dialog.vala:426
-#, fuzzy
 msgid "Notifications"
 msgstr "Notificacions"
 
 #: ../src/preferences-dialog.vala:432
-#, fuzzy
 msgid "Screen notifications"
 msgstr "Notificacions a la pantalla"
 
@@ -180,9 +172,8 @@ msgid "Woodland Birds"
 msgstr "Ocells al camp"
 
 #: ../src/preferences-dialog.vala:479
-#, fuzzy
 msgid "Select ticking sound"
-msgstr "Trieu so de notificació"
+msgstr "Trieu un so de notificació"
 
 #: ../src/preferences-dialog.vala:490
 msgid "Ticking sound"
@@ -205,7 +196,6 @@ msgid "Start of break sound"
 msgstr "So d'inici d'un descans"
 
 #: ../src/preferences-dialog.vala:534
-#, fuzzy
 msgid "Select sound for pomodoro start"
 msgstr "Trieu un so per iniciar un pomodoro"
 
@@ -243,24 +233,21 @@ msgid "Status during break"
 msgstr "Estat durant el descans"
 
 #: ../src/preferences-dialog.vala:686
-#, fuzzy
 msgid ""
 "System notifications including chat messages won't show up during pomodoro."
 msgstr ""
-"Durant el pomodoro no es mostraràn les notificacions del sistema, inclosos els missatges de xat."
+"Durant el pomodoro no es mostraran les notificacions del sistema, inclosos els missatges de xat."
 
 #: ../src/preferences-dialog.vala:690
-#, fuzzy
 msgid ""
 "System notifications including chat messages won't show up during break."
 msgstr ""
-"Durant el descans no es mostraràn les notificacions del sistema, inclosos els missatges de xat."
+"Durant el descans no es mostraran les notificacions del sistema, inclosos els missatges de xat."
 
 #: ../src/preferences-dialog.vala:694
-#, fuzzy
 msgid "System notifications including chat messages won't show up."
 msgstr ""
-"No es mostraràn les notificacions del sistema, inclosos els missatges de xat."
+"No es mostraran les notificacions del sistema, inclosos els missatges de xat."
 
 #: ../src/preferences-dialog.vala:707
 msgid "OK"
@@ -301,7 +288,7 @@ msgstr "_Sense so"
 
 #: ../src/widgets.vala:514
 msgid "_Cancel"
-msgstr "_Cancel·la"
+msgstr "_Canceŀla"
 
 #: ../src/widgets.vala:516
 msgid "_Open"
@@ -401,7 +388,7 @@ msgstr "time;timer;tasks;manage;organize;"
 #~ msgstr "Si es mostra un diàleg de notificació quan s'inicia una pausa."
 
 #~ msgid "Disable flexible breaks"
-#~ msgstr "Inhabilita pauses flexibles"
+#~ msgstr "Inhabilita les pauses flexibles"
 
 #~ msgid "Whether you are not using a computer to work."
 #~ msgstr "Si no s'està fent servir un ordinador per treballar."
