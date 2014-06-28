@@ -84,7 +84,7 @@ msgstr "Alguna cosa ha anat malament..."
 
 #: ../extension/notifications.js:775
 msgid "Looks like gnome-pomodoro is not installed"
-msgstr "Sembla que gnome-pomodoro no hi es instalat"
+msgstr "Sembla que gnome-pomodoro no hi és instaŀlat"
 
 #: ../extension/notifications.js:784
 msgid "Report issue"
@@ -92,7 +92,7 @@ msgstr "Notifica un problema"
 
 #: ../extension/notifications.js:787
 msgid "Install"
-msgstr "Instal·la"
+msgstr "Instaŀla"
 
 #: ../src/about-dialog.vala:29
 msgid "About Pomodoro"
@@ -116,7 +116,7 @@ msgstr ""
 "Aquest programa és programari lliure: pot modificar-lo o redistribuir-lo "
 "atenent als termes de la GNU General Public License tal com va ser publicada "
 "per la Free Software Foundation; sigui tant la versió 3 de la Llicència com "
-"(a la vostra opció) qualsevol versió posterior."
+"(a la vostra elecció) qualsevol versió posterior."
 
 #: ../src/preferences-dialog.vala:329
 msgid "Timer"
@@ -141,7 +141,7 @@ msgstr "Pomodoros fins una pausa llarga"
 
 #: ../src/preferences-dialog.vala:418
 msgid "Shortcut to toggle the timer"
-msgstr "Tecla per commutar el temporitzador"
+msgstr "Drecera per commutar el temporitzador"
 
 #: ../src/preferences-dialog.vala:426
 msgid "Notifications"
@@ -173,7 +173,7 @@ msgstr "Ocells al camp"
 
 #: ../src/preferences-dialog.vala:479
 msgid "Select ticking sound"
-msgstr "Trieu so de notificació"
+msgstr "Trieu un so de notificació"
 
 #: ../src/preferences-dialog.vala:490
 msgid "Ticking sound"
@@ -234,20 +234,20 @@ msgstr "Estat durant el descans"
 
 #: ../src/preferences-dialog.vala:686
 msgid ""
-"System notifications including chat messages won't show up during pomodoro."
+"System notifications including chat messages won't show up during pomodoro."
 msgstr ""
-"Durant el pomodoro no es mostraràn les notificacions del sistema, inclosos els missatges de xat."
+"Durant el pomodoro no es mostraran les notificacions del sistema, inclosos els missatges de xat."
 
 #: ../src/preferences-dialog.vala:690
 msgid ""
-"System notifications including chat messages won't show up during break."
+"System notifications including chat messages won't show up during break."
 msgstr ""
-"Durant el descans no es mostraràn les notificacions del sistema, inclosos els missatges de xat."
+"Durant el descans no es mostraran les notificacions del sistema, inclosos els missatges de xat."
 
 #: ../src/preferences-dialog.vala:694
-msgid "System notifications including chat messages won't show up."
+msgid "System notifications including chat messages won't show up."
 msgstr ""
-"No es mostraràn les notificacions del sistema, inclosos els missatges de xat."
+"No es mostraran les notificacions del sistema, inclosos els missatges de xat."
 
 #: ../src/preferences-dialog.vala:707
 msgid "OK"
@@ -288,7 +288,7 @@ msgstr "_Sense so"
 
 #: ../src/widgets.vala:514
 msgid "_Cancel"
-msgstr "_Cancel·la"
+msgstr "_Canceŀla"
 
 #: ../src/widgets.vala:516
 msgid "_Open"
@@ -388,7 +388,7 @@ msgstr "time;timer;tasks;manage;organize;"
 #~ msgstr "Si es mostra un diàleg de notificació quan s'inicia una pausa."
 
 #~ msgid "Disable flexible breaks"
-#~ msgstr "Inhabilita pauses flexibles"
+#~ msgstr "Inhabilita les pauses flexibles"
 
 #~ msgid "Whether you are not using a computer to work."
 #~ msgstr "Si no s'està fent servir un ordinador per treballar."
