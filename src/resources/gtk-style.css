@@ -1,18 +1,14 @@
 
+GtkMenuButton .title {
+    margin-right: 0px;
+    padding-right: 0px;
+}
+
 .preferences-dialog {
 }
 
 .preferences-dialog GtkViewport {
     background: @theme_bg_color;
-}
-
-.headerbar .titlebar .arrow-right {
-    font-size: 70%;
-}
-
-.headerbar .titlebar GtkLabel {
-    font-weight: bold;
-    padding: 0pt 2pt;
 }
 
 PomodoroSymbolicButton {

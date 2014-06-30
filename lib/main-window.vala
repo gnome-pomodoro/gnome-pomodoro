@@ -141,9 +141,15 @@ private class Pomodoro.TaskListRow : Gtk.ListBoxRow
     }
 }
 
-private class Pomodoro.TaskListBox : Gtk.Box
+
+private class Pomodoro.TaskListPane : Gtk.Box
 {
-    Gtk.ListBox list_box;
+    public Gtk.SearchBar search_bar;
+
+    private Gtk.ListBox list_box;
+    private unowned GLib.ActionGroup? action_group;
+
+//    private GLib.List<Task> selection;
 
     /* TODO: Move to Utils? */
     private void list_box_separator_func (Gtk.ListBoxRow  row,
@@ -162,13 +168,15 @@ private class Pomodoro.TaskListBox : Gtk.Box
         }
     }
 
-    public TaskListBox () {
+    public TaskListPane () {
         this.orientation = Gtk.Orientation.VERTICAL;
         this.spacing = 0;
     }
 
     construct
     {
+        this.setup_search_bar ();
+
         this.list_box = new Gtk.ListBox ();
         this.list_box.set_selection_mode (Gtk.SelectionMode.NONE);
         this.list_box.set_activate_on_single_click (true);
@@ -180,9 +188,138 @@ private class Pomodoro.TaskListBox : Gtk.Box
         this.list_box.insert (this.create_row_for_task ("Buy milk"), -1);
         this.list_box.insert (this.create_row_for_task ("Walk the dog"), -1);
 
+        this.list_box.insert (this.create_row_for_task ("Save the world"), -1);
+        this.list_box.insert (this.create_row_for_task ("Buy milk"), -1);
+        this.list_box.insert (this.create_row_for_task ("Walk the dog"), -1);
+
+        this.list_box.insert (this.create_row_for_task ("Save the world"), -1);
+        this.list_box.insert (this.create_row_for_task ("Buy milk"), -1);
+        this.list_box.insert (this.create_row_for_task ("Walk the dog"), -1);
+
+        this.list_box.insert (this.create_row_for_task ("Save the world"), -1);
+        this.list_box.insert (this.create_row_for_task ("Buy milk"), -1);
+        this.list_box.insert (this.create_row_for_task ("Walk the dog"), -1);
+
         this.list_box.row_activated.connect (this.on_row_activated);
 
-        this.pack_start (this.list_box);
+		this.list_box.selected_rows_changed.connect
+		                               (this.on_selected_rows_changed);
+
+        var scrolled_window = new Gtk.ScrolledWindow (null, null);
+        scrolled_window.set_policy (Gtk.PolicyType.NEVER,
+                                    Gtk.PolicyType.AUTOMATIC);
+        scrolled_window.add (this.list_box);
+        scrolled_window.show ();
+
+        this.pack_start (this.search_bar, false, true);
+        this.pack_start (scrolled_window, true, true);
+
+        this.setup_actions ();
+    }
+
+    public GLib.List<unowned Task> get_selection ()
+    {
+        var selection = new GLib.List<unowned Task> ();
+
+		foreach (var row in this.list_box.get_selected_rows ()) {
+		    selection.prepend ((row as TaskListRow).task);
+		}
+
+        return selection;
+    }
+
+    public void select_all ()
+    {
+        this.list_box.select_all ();
+    }
+
+    public void unselect_all ()
+    {
+        this.list_box.unselect_all ();
+    }
+
+
+    private void action_select_all (SimpleAction action,
+                                    Variant?     parameter)
+    {
+        this.select_all ();
+    }
+
+    private void action_select_none (SimpleAction action,
+                                     Variant?     parameter)
+    {
+        this.unselect_all ();
+    }
+
+    private void action_find (SimpleAction action,
+                              Variant?     parameter)
+    {
+        var is_enabled = this.search_bar.search_mode_enabled;
+
+        this.search_bar.search_mode_enabled = !is_enabled;
+    }
+
+    private void setup_search_bar ()
+    {
+        var entry = new Gtk.SearchEntry ();
+        entry.set_placeholder_text (_("Type to search..."));
+        entry.set_width_chars (30);
+        entry.valign = Gtk.Align.FILL;
+        entry.shadow_type = Gtk.ShadowType.NONE;
+
+        // var prev_button = new Gtk.Button.from_icon_name ("go-up-symbolic",
+        //                                                  Gtk.IconSize.MENU);
+        // var next_button = new Gtk.Button.from_icon_name ("go-down-symbolic",
+        //                                                  Gtk.IconSize.MENU);
+        // var options_button = new Gtk.Button.from_icon_name ("go-down-symbolic",
+        //                                                     Gtk.IconSize.MENU);
+
+        var hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        // hbox.get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
+        hbox.pack_start (entry, true, false);
+        // hbox.pack_start (prev_button, false, false);
+        // hbox.pack_start (next_button, false, false);
+        // hbox.pack_start (options_button, false, false);
+
+        var size_group = new Gtk.SizeGroup (Gtk.SizeGroupMode.VERTICAL);
+        size_group.add_widget (entry);
+        // size_group.add_widget (prev_button);
+        // size_group.add_widget (next_button);
+        // size_group.add_widget (options_button);
+
+        this.search_bar = new Gtk.SearchBar ();
+        this.search_bar.get_style_context ().add_class (Gtk.STYLE_CLASS_PRIMARY_TOOLBAR);
+        this.search_bar.get_style_context ().add_class (Gtk.STYLE_CLASS_TOOLBAR);
+        this.search_bar.add (hbox);
+        this.search_bar.connect_entry (entry);
+        this.search_bar.show_all ();
+    }
+
+    private void setup_actions ()
+    {
+        this.realize.connect (() => {
+            var window = this.get_toplevel ();
+
+            return_if_fail (window != null);
+
+            var action_group = window as ActionMap;
+            // var action_group = new GLib.SimpleActionGroup ();
+
+            var select_all_action = new GLib.SimpleAction ("select-all", null);
+            select_all_action.activate.connect (this.action_select_all);
+
+            var select_none_action = new GLib.SimpleAction ("select-none", null);
+            select_none_action.activate.connect (this.action_select_none);
+
+            var find_action = new GLib.SimpleAction ("find", null);
+            find_action.activate.connect (this.action_find);
+
+            action_group.add_action (select_all_action);
+            action_group.add_action (select_none_action);
+            action_group.add_action (find_action);
+
+            this.action_group = action_group as GLib.ActionGroup;
+        });
     }
 
     private void on_row_activated (Gtk.ListBoxRow row)
@@ -190,6 +327,17 @@ private class Pomodoro.TaskListBox : Gtk.Box
         var tmp_row = row as TaskListRow;
 
         GLib.message ("\"%s\" activated", tmp_row.task.summary);
+
+        if (this.list_box.selection_mode != Gtk.SelectionMode.MULTIPLE)
+        {
+            this.list_box.set_selection_mode (Gtk.SelectionMode.MULTIPLE);
+            this.list_box.select_row (row);
+        }
+    }
+
+    private void on_selected_rows_changed ()
+    {
+	    this.selection_changed ();
     }
 
     protected Gtk.ListBoxRow create_row_for_task (string text)
@@ -202,6 +350,8 @@ private class Pomodoro.TaskListBox : Gtk.Box
 
         return row;
     }
+
+    public signal void selection_changed ();
 }
 
 
@@ -210,12 +360,10 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
     private GLib.Settings settings;
 
     private Gtk.Box vbox;
-    private Gtk.SearchBar search_bar;
-    private Gtk.Widget search_bar_container;
-    private Gtk.HeaderBar header_bar;
+    private Gtk.Stack header_bar_stack;
     private Gtk.Stack stack;
 
-    private TaskListBox task_list_box;
+    private TaskListPane task_list_pane;
 
 
     public MainWindow ()
@@ -248,99 +396,43 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
         var context = this.get_style_context ();
         context.add_class ("main-window");
 
-        this.setup_header_bar ();
-        this.setup_search_bar ();
-
         this.stack = new Gtk.Stack ();
         this.stack.homogeneous = true;
         this.stack.transition_duration = 150;
         this.stack.transition_type = Gtk.StackTransitionType.CROSSFADE;
         this.stack.show ();
 
-        this.vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
-        this.vbox.pack_start (this.search_bar_container, false, true);
-        this.vbox.pack_end (this.stack, true, true);
-        this.vbox.show ();
+        this.add (this.stack);
 
         this.setup_task_list ();
-
-        this.add (this.vbox);
+        this.setup_header_bar ();
 
         this.key_press_event.connect (this.on_key_press_event);
     }
 
-    private void setup_header_bar ()
+    private Gtk.HeaderBar create_task_list_header_bar ()
     {
-        this.header_bar = new Gtk.HeaderBar ();
-        this.header_bar.show_close_button = true;
-        this.header_bar.show_all ();
+        var header_bar = new Gtk.HeaderBar ();
+        header_bar.show_close_button = true;
 
-        var context = this.header_bar.get_style_context ();
-        context.add_class ("headerbar");
+        var menubutton = new Gtk.MenuButton ();
+        menubutton.relief = Gtk.ReliefStyle.NONE;
+        menubutton.valign = Gtk.Align.CENTER;
+        // menubutton.menu_model = selection_menu;
+        // menubutton.get_style_context ().add_class ("project-menu");
 
-//        var bookmark_icon = GLib.Icon.new_for_string (
-//                "resource:///org/gnome/pomodoro/" + Resources.BOOKMARK + ".svg");
-//        var urgency_status = new Gtk.Image.from_gicon (bookmark_icon,
-//                                                       Gtk.IconSize.MENU);
+        var menubutton_label = new Gtk.Label (_("All Tasks"));
+        menubutton_label.get_style_context ().add_class ("title");
 
-//        var filter_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 3);
-//        filter_box.pack_start (urgency_status, false, false);
+        var menubutton_arrow = new Gtk.Arrow (Gtk.ArrowType.DOWN,
+                                              Gtk.ShadowType.NONE);
 
-//        var filter_label = new Gtk.Label (_("Today"));
-//        filter_box.pack_start (filter_label, true, false);
+        var menubutton_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+        menubutton_box.pack_start (menubutton_label, true, false);
+        menubutton_box.pack_start (menubutton_arrow, false, false);
+        menubutton.add (menubutton_box);
 
-//        var filter_button = new Gtk.Button ();
-//        filter_button.set_relief (Gtk.ReliefStyle.NONE);
-//        filter_button.add (filter_box);
-
-//        var urgency_filter_menu = new GLib.Menu ();
-//        urgency_filter_menu.append (_("Urgent"), "action-name");
-//        urgency_filter_menu.append (_("Important"), "action-name");
-
-//        var time_filter_menu = new GLib.Menu ();
-//        time_filter_menu.append (_("All"), "action-name");
-//        time_filter_menu.append (_("Today"), "action-name");
-
-//        var filter_menu = new GLib.Menu ();
-//        filter_menu.append_section (null, urgency_filter_menu);
-//        filter_menu.append_section (null, time_filter_menu );
-
-//        var urgency_popover = new Gtk.Popover.from_model (filter_button,
-//                                                          filter_menu);
-//        urgency_popover.set_modal (true);
-//        urgency_popover.set_position (Gtk.PositionType.TOP);
-
-//        filter_button.clicked.connect(() => {
-//            urgency_popover.show();
-//        });
-
-//        filter_button.show_all();
-//        this.header_bar.pack_start (filter_button);
-
-        //
-
-        var hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-        hbox.get_style_context ().add_class ("titlebar");
-
-        Gtk.Label label;
-
-        label = new Gtk.Label ("Projects");
-        label.valign = Gtk.Align.BASELINE;
-        hbox.pack_start (label, false, false);
-
-        label = new Gtk.Label ("❯");
-        label.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
-        label.get_style_context ().add_class ("arrow-right");
-        hbox.pack_start (label, false, false);
-
-        label = new Gtk.Label ("Personal");
-        hbox.pack_start (label, false, false);
-
-        hbox.show_all ();
-
-
-        this.header_bar.set_custom_title (hbox);
-
+        menubutton.show_all();
 
         // var search_button = new Gtk.ToggleButton ();
         // search_button.set_image (new Gtk.Image.from_icon_name ("edit-find-symbolic", Gtk.IconSize.MENU));
@@ -348,45 +440,174 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
         // this.header_bar.pack_end (search_button);
         // search_button.bind_property ("active", this.search_bar, "search-mode-enabled", GLib.BindingFlags.BIDIRECTIONAL);
 
-        this.set_titlebar (this.header_bar);
+
+        //var bookmark_icon = GLib.Icon.new_for_string (
+        //        "resource:///org/gnome/pomodoro/" + Resources.BOOKMARK + ".svg");
+        //var urgency_status = new Gtk.Image.from_gicon (bookmark_icon,
+        //                                               Gtk.IconSize.MENU);
+
+        //var filter_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 3);
+        //filter_box.pack_start (urgency_status, false, false);
+
+        //var filter_label = new Gtk.Label (_("Today"));
+        //filter_box.pack_start (filter_label, true, false);
+
+        //var filter_button = new Gtk.Button ();
+        //filter_button.set_relief (Gtk.ReliefStyle.NONE);
+        //filter_button.add (filter_box);
+
+        //var urgency_filter_menu = new GLib.Menu ();
+        //urgency_filter_menu.append (_("Urgent"), "action-name");
+        //urgency_filter_menu.append (_("Important"), "action-name");
+
+        //var time_filter_menu = new GLib.Menu ();
+        //time_filter_menu.append (_("All"), "action-name");
+        //time_filter_menu.append (_("Today"), "action-name");
+
+        //var filter_menu = new GLib.Menu ();
+        //filter_menu.append_section (null, urgency_filter_menu);
+        //filter_menu.append_section (null, time_filter_menu );
+
+        //var urgency_popover = new Gtk.Popover.from_model (filter_button,
+        //                                                  filter_menu);
+        //urgency_popover.set_modal (true);
+        //urgency_popover.set_position (Gtk.PositionType.TOP);
+
+        //filter_button.clicked.connect(() => {
+        //    urgency_popover.show();
+        //});
+
+        //filter_button.show_all();
+        //this.header_bar.pack_start (filter_button);
+
+
+        header_bar.set_custom_title (menubutton);
+
+        header_bar.show_all ();
+        return header_bar;
     }
 
-    private void setup_search_bar ()
+    private Gtk.Label selection_menubutton_label;
+
+    private Gtk.HeaderBar create_task_list_selection_header_bar ()
     {
-        var entry = new Gtk.SearchEntry ();
-        entry.set_width_chars (30);
+        var header_bar = new Gtk.HeaderBar ();
+        header_bar.show_close_button = false;
+        header_bar.get_style_context ().add_class ("selection-mode");
 
-        this.search_bar = new Gtk.SearchBar ();
-        this.search_bar.add (entry);
+        var menubutton = new Gtk.MenuButton ();
+        menubutton.valign = Gtk.Align.CENTER;
+        menubutton.get_style_context ().add_class ("selection-menu");
 
-        var revealer = new Gtk.Revealer ();
-        revealer.transition_type = Gtk.RevealerTransitionType.SLIDE_DOWN;
-        revealer.bind_property ("reveal-child",
-                                this.search_bar,
-                                "search-mode-enabled",
-                                GLib.BindingFlags.BIDIRECTIONAL);
-        revealer.add (this.search_bar);
-        revealer.show_all ();
+        try {
+            var builder = new Gtk.Builder ();
+            builder.add_from_resource ("/org/gnome/pomodoro/menu.ui");
 
-        this.search_bar_container = revealer as Gtk.Widget;
+            var selection_menu = builder.get_object ("selection-menu") as GLib.MenuModel;
+            menubutton.menu_model = selection_menu;
+        }
+        catch (GLib.Error error) {
+            GLib.warning (error.message);
+        }
+
+        var menubutton_label = new Gtk.Label (_("Click on items to select them"));
+
+        var menubutton_arrow = new Gtk.Arrow (Gtk.ArrowType.DOWN,
+                                              Gtk.ShadowType.NONE);
+        var menubutton_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+        menubutton_box.pack_start (menubutton_label, true, false);
+        menubutton_box.pack_start (menubutton_arrow, false, false);
+        menubutton.add (menubutton_box);
+
+        this.selection_menubutton_label = menubutton_label;
+
+        var search_button = new Gtk.ToggleButton ();
+        var search_image = new Gtk.Image.from_icon_name ("edit-find-symbolic",
+                                                         Gtk.IconSize.MENU);
+        search_button.set_image (search_image);
+        search_button.show_all();
+        search_button.bind_property ("active",
+                                     this.task_list_pane.search_bar,
+                                     "search-mode-enabled",
+                                     GLib.BindingFlags.BIDIRECTIONAL);
+
+        var cancel_button = new Gtk.Button.from_stock (Gtk.Stock.CANCEL);
+        cancel_button.clicked.connect (() => {
+            this.task_list_pane.unselect_all ();
+            this.header_bar_stack.set_visible_child_name ("task-list");
+        });
+
+        header_bar.set_custom_title (menubutton);
+        header_bar.pack_end (cancel_button);
+        header_bar.pack_end (search_button);
+
+        header_bar.show_all ();
+        return header_bar;
+    }
+
+    private Gtk.HeaderBar create_task_details_header_bar ()
+    {
+        var header_bar = new Gtk.HeaderBar ();
+        header_bar.show_close_button = true;
+
+        header_bar.title = "<Project name>";
+
+        header_bar.show_all ();
+        return header_bar;
+    }
+
+    private void setup_header_bar ()
+    {
+        this.header_bar_stack = new Gtk.Stack ();
+        this.header_bar_stack.add_named (
+                              this.create_task_list_header_bar (),
+                              "task-list");
+        this.header_bar_stack.add_named (
+                              this.create_task_list_selection_header_bar (),
+                              "task-list-selection");
+        this.header_bar_stack.add_named (
+                              this.create_task_details_header_bar (),
+                              "task-details");
+        this.header_bar_stack.show ();
+
+        this.header_bar_stack.set_visible_child_name ("task-list");
+
+        this.set_titlebar (this.header_bar_stack);
     }
 
     private void setup_task_list ()
     {
-        this.task_list_box = new TaskListBox ();
-        this.task_list_box.show ();
+        this.task_list_pane = new TaskListPane ();
+        this.task_list_pane.show ();
 
-        var scrolled_window = new Gtk.ScrolledWindow (null, null);
-        scrolled_window.set_policy (Gtk.PolicyType.NEVER,
-                                    Gtk.PolicyType.AUTOMATIC);
-        scrolled_window.add (this.task_list_box);
-        scrolled_window.show ();
+        this.task_list_pane.selection_changed.connect (() => {
+            var items = this.task_list_pane.get_selection ();
+            var n_items = items.length ();
 
-        this.stack.add_named (scrolled_window, "task-list");
+            if (n_items > 0) {
+                this.header_bar_stack.set_visible_child_name ("task-list-selection");
+            }
+            else {
+                this.header_bar_stack.set_visible_child_name ("task-list");
+            }
+
+            string label;
+            if (n_items == 0) {
+                label = _("Click on items to select them");
+            } else {
+                label = ngettext ("%d selected",
+                                  "%d selected",
+                                  n_items).printf (n_items);
+            }
+
+            this.selection_menubutton_label.label = label;
+        });
+
+        this.stack.add_named (this.task_list_pane, "task-list");
     }
 
     private bool on_key_press_event (Gdk.EventKey event)
     {
-        return this.search_bar.handle_event (Gtk.get_current_event ());
+        return this.task_list_pane.search_bar.handle_event (event); //Gtk.get_current_event ());
     }
 }

@@ -34,4 +34,17 @@
       </item>
     </section>
   </menu>
+  <menu id="selection-menu">
+    <section>
+      <item>
+        <attribute name="action">win.select-all</attribute>
+        <attribute name="label" translatable="yes">Select All</attribute>
+        <attribute name="accel"><![CDATA[<Primary>A]]></attribute>
+      </item>
+      <item>
+        <attribute name="action">win.select-none</attribute>
+        <attribute name="label" translatable="yes">Select None</attribute>
+      </item>
+    </section>
+  </menu>
 </interface>
