@@ -35,11 +35,12 @@ public class Pomodoro.CommandLine
         option_context.add_group (Gtk.get_option_group (true));
         option_context.add_group (Gst.init_get_option_group ());
 
-        var options = new GLib.OptionEntry[2];
+        var options = new GLib.OptionEntry[3];
         options[0] = { "preferences", 0, 0, GLib.OptionArg.NONE, ref this.preferences,
                        "Show preferences", null };
         options[1] = { "no-default-window", 0, 0, GLib.OptionArg.NONE, ref this.no_default_window,
                        "Run as background service", null };
+        options[2] = { null };
 
         option_context.add_main_entries (options, Config.GETTEXT_PACKAGE);
 
