@@ -329,15 +329,16 @@ public class Pomodoro.Timer : Object
             var is_completed = !is_requested;
 
             var pomodoro_end_date_string = this.pomodoro_end_timestamp > 0.0
-                    ? datetime_to_string (pomodoro_end_date)
+                    ? datetime_to_string (pomodoro_end_date.to_local ())
                     : "";
+            var state_date_string = datetime_to_string (state_date.to_local ());
 
             this.settings_state.set_double ("session",
                                             this.session);
             this.settings_state.set_string ("state",
                                             state_to_string (this.state));
             this.settings_state.set_string ("state-date",
-                                            datetime_to_string (state_date));
+                                            state_date_string);
             this.settings_state.set_double ("state-duration",
                                             this.state_duration);
             this.settings_state.set_string ("pomodoro-end-date",
