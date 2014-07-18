@@ -22,8 +22,6 @@ using GLib;
 
 namespace Pomodoro
 {
-    private const string DATETIME_FORMAT_ISO8601 = "%Y-%m-%dT%H:%M:%S%z";
-
     private errordomain DateTimeError {
         PARSE
     }
@@ -43,7 +41,17 @@ namespace Pomodoro
 
     private string datetime_to_string (DateTime datetime)
     {
-        return datetime.format (DATETIME_FORMAT_ISO8601);
+        var timeval = TimeVal();
+        string date_string;
+
+        if (datetime.to_utc().to_timeval (out timeval)) {
+            date_string = timeval.to_iso8601 ();
+        }
+        else {
+            date_string = null;
+        }
+
+        return date_string;
     }
 
     private string format_time (long seconds)
