@@ -48,6 +48,12 @@ public enum Pomodoro.Importance
 }
 
 
+public class Pomodoro.Project : Object
+{
+    public string name { get; set; }
+}
+
+
 public class Pomodoro.Task : Object
 {
     public string summary { get; set; }
@@ -62,6 +68,7 @@ public class Pomodoro.Task : Object
     public bool is_done { get; set; }
 
     public Task? parent { get; set; }
+    public Project? project { get; set; }
 
 //    public List<GLib.File> attachments;
 
@@ -77,6 +84,154 @@ public class Pomodoro.Task : Object
 //    public List<Task> get_tasks_blocking () {  // get_following_tasks ()
 //    }
 
+}
+
+
+// TODO: File/URL attachments
+private class Pomodoro.AddTaskDialog : Gtk.Dialog
+{
+    public Project? project;
+    public Task task;
+
+    private Gtk.Grid grid;
+    private int grid_rows = 0;
+
+    private enum Column {
+        LABEL = 0,
+        CONTENT = 1
+    }
+
+    construct {
+        this.task = new Task ();
+
+        this.destroy_with_parent = true;
+        this.modal = true;
+        this.use_header_bar = 1;
+
+        this.title = _("New Task");
+
+        var cancel_button = new Gtk.Button.with_mnemonic (_("_Cancel"));
+
+        var done_button = new Gtk.Button.with_mnemonic (_("_Done"));
+        done_button.get_style_context ().add_class ("suggested-action");
+
+        cancel_button.clicked.connect (() => {
+            this.response (Gtk.ResponseType.CANCEL);
+        });
+
+        done_button.clicked.connect (() => {
+            this.response (Gtk.ResponseType.OK);
+        });
+
+        this.response.connect ((response) => {
+            this.destroy ();
+        });
+
+        var header_bar = new Gtk.HeaderBar ();
+        header_bar.show_close_button = false;
+        header_bar.title = this.title;
+        header_bar.pack_start (cancel_button);
+        header_bar.pack_end (done_button);
+        header_bar.show_all ();
+        this.set_titlebar (header_bar);
+
+        var entry = new Gtk.Entry ();
+        entry.halign = Gtk.Align.FILL;
+        entry.hexpand = true;
+        entry.width_chars = 30;
+        entry.truncate_multiline = true;
+        entry.input_purpose = Gtk.InputPurpose.ALPHA;
+        entry.input_hints = Gtk.InputHints.SPELLCHECK |
+                            Gtk.InputHints.UPPERCASE_SENTENCES |
+                            Gtk.InputHints.WORD_COMPLETION;
+//        entry.has_default = true; // TODO
+
+        var notes_text_view = new Gtk.TextView ();
+        notes_text_view.border_width = 4;
+        entry.input_purpose = Gtk.InputPurpose.FREE_FORM;
+        entry.input_hints = Gtk.InputHints.SPELLCHECK |
+                            Gtk.InputHints.UPPERCASE_SENTENCES;
+        notes_text_view.wrap_mode = Gtk.WrapMode.WORD;
+
+
+        var notes_window = new Gtk.ScrolledWindow (null, null);
+        notes_window.halign = Gtk.Align.FILL;
+        notes_window.valign = Gtk.Align.FILL;
+        notes_window.hexpand = true;
+        notes_window.vexpand = true;
+        notes_window.shadow_type = Gtk.ShadowType.IN;
+        notes_window.min_content_height = 200;
+        notes_window.add (notes_text_view);
+
+        var project_select = new Gtk.ComboBoxText();
+        project_select.halign = Gtk.Align.START;
+        project_select.no_show_all = true;
+        project_select.append_text ("Household");
+        project_select.append_text ("Pomodoro");
+
+        var tag_flow_box = new Gtk.FlowBox ();
+        tag_flow_box.halign = Gtk.Align.FILL;
+        tag_flow_box.hexpand = false;
+        tag_flow_box.selection_mode = Gtk.SelectionMode.NONE;
+        tag_flow_box.column_spacing = 6;
+        tag_flow_box.row_spacing = 6;
+        tag_flow_box.homogeneous = false;
+
+        tag_flow_box.add (new Gtk.ToggleButton.with_label (_("Urgent")));
+        tag_flow_box.add (new Gtk.ToggleButton.with_label (_("Important")));
+
+        foreach (var child in tag_flow_box.get_children ()) {
+            child.hexpand = false;
+        }
+
+        var due_date_button = new CalendarButton ();
+        due_date_button.halign = Gtk.Align.START;
+
+        // var completed/done checkbox
+
+        // var time_spent
+
+        // var parent_task
+
+        // var blocked_by
+
+        // var blocks
+
+        // mark_as_done_button, dismiss_button, delete_button
+
+        this.grid = new Gtk.Grid ();
+        this.grid.row_spacing = 10;
+        this.grid.column_spacing = 10;
+        this.grid.insert_column (Column.LABEL);
+        this.grid.insert_column (Column.CONTENT);
+
+        this.grid.set_margin_start (24);
+        this.grid.set_margin_end (32);
+        this.grid.set_margin_top (24);
+        this.grid.set_margin_bottom (24);
+
+        // this.add_field (_("Project"), project_select); // TODO: Pass parent_task/project when creating a dialog
+        this.add_field (_("Summary"), entry);
+        this.add_field (_("Tags"), tag_flow_box);
+        this.add_field (_("Due Date"), due_date_button);
+        this.add_field (_("Notes"), notes_window);
+
+        this.grid.show_all ();
+
+        var content_area = this.get_content_area ();
+        content_area.pack_start (this.grid, true, true);
+    }
+
+    private void add_field (string title, Gtk.Widget widget)
+    {
+        var label = new Gtk.Label (title);
+        label.halign = Gtk.Align.END;
+        label.valign = Gtk.Align.CENTER;
+
+        this.grid.attach (label, Column.LABEL, this.grid_rows, 1, 1);
+        this.grid.attach (widget, Column.CONTENT, this.grid_rows, 1, 1);
+        this.grid_rows += 1;
+    }
 }
 
 
@@ -412,34 +567,44 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
 
     private Gtk.HeaderBar create_task_list_header_bar ()
     {
-        var header_bar = new Gtk.HeaderBar ();
-        header_bar.show_close_button = true;
+        var project_button = new Gtk.MenuButton ();
+        project_button.relief = Gtk.ReliefStyle.NONE;
+        project_button.valign = Gtk.Align.CENTER;
+        // project_button.menu_model = project_menu;
+        // project_button.get_style_context ().add_class ("project-menu");
 
-        var menubutton = new Gtk.MenuButton ();
-        menubutton.relief = Gtk.ReliefStyle.NONE;
-        menubutton.valign = Gtk.Align.CENTER;
-        // menubutton.menu_model = selection_menu;
-        // menubutton.get_style_context ().add_class ("project-menu");
+        var project_button_label = new Gtk.Label (_("All Tasks"));
+        project_button_label.get_style_context ().add_class ("title");
 
-        var menubutton_label = new Gtk.Label (_("All Tasks"));
-        menubutton_label.get_style_context ().add_class ("title");
-
-        var menubutton_arrow = new Gtk.Arrow (Gtk.ArrowType.DOWN,
+        var project_button_arrow = new Gtk.Arrow (Gtk.ArrowType.DOWN,
                                               Gtk.ShadowType.NONE);
 
-        var menubutton_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
-        menubutton_box.pack_start (menubutton_label, true, false);
-        menubutton_box.pack_start (menubutton_arrow, false, false);
-        menubutton.add (menubutton_box);
+        var project_button_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 6);
+        project_button_box.pack_start (project_button_label, true, false);
+        project_button_box.pack_start (project_button_arrow, false, false);
+        project_button.add (project_button_box);
 
-        menubutton.show_all();
+        var new_task_button = new Gtk.Button.with_mnemonic (_("_New"));
+        new_task_button.clicked.connect (() => {
+            var dialog = new AddTaskDialog ();  // TODO: Set current project
+            dialog.set_transient_for (this.get_toplevel () as Gtk.Window);
+            dialog.present ();
+        });
 
-        // var search_button = new Gtk.ToggleButton ();
-        // search_button.set_image (new Gtk.Image.from_icon_name ("edit-find-symbolic", Gtk.IconSize.MENU));
-        // search_button.show_all();
-        // this.header_bar.pack_end (search_button);
-        // search_button.bind_property ("active", this.search_bar, "search-mode-enabled", GLib.BindingFlags.BIDIRECTIONAL);
+        var find_image = new Gtk.Image.from_icon_name ("edit-find-symbolic",
+                                                       Gtk.IconSize.MENU);
+        var find_button = new Gtk.ToggleButton ();
+        find_button.set_image (find_image);
+        find_button.bind_property ("active",
+                                   this.task_list_pane.search_bar,
+                                   "search-mode-enabled",
+                                   GLib.BindingFlags.BIDIRECTIONAL);
 
+        var header_bar = new Gtk.HeaderBar ();
+        header_bar.show_close_button = true;
+        header_bar.set_custom_title (project_button);
+        header_bar.pack_start (new_task_button);
+        header_bar.pack_end (find_button);
 
         //var bookmark_icon = GLib.Icon.new_for_string (
         //        "resource:///org/gnome/pomodoro/" + Resources.BOOKMARK + ".svg");
@@ -479,9 +644,6 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
 
         //filter_button.show_all();
         //this.header_bar.pack_start (filter_button);
-
-
-        header_bar.set_custom_title (menubutton);
 
         header_bar.show_all ();
         return header_bar;
