@@ -27,7 +27,11 @@ appdata_in_files = \
     org.gnome.Pomodoro.appdata.xml.in
 appdata_DATA = org.gnome.Pomodoro.appdata.xml
 
+resource_files = $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gnome-pomodoro.gresource.xml)
+
 EXTRA_DIST = \
+	gnome-pomodoro.gresource.xml \
+	$(resource_files) \
     $(appdata_in_files) \
     $(desktop_in_files) \
     $(gsettings_in_files) \
