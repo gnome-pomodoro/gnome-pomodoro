@@ -53,6 +53,7 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
     gsettings-desktop-schemas >= $GTK_REQUIRED
     gnome-desktop-3.0 >= $GNOME_REQUIRED
     dbus-glib-1
+    gom-1.0 >= 0.2
     upower-glib >= 0.9.20
     libcanberra >= 0.30
     gstreamer-1.0 >= 1.0.10
