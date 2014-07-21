@@ -32,7 +32,7 @@ You can read more on pomodoro technique [here](http://www.pomodorotechnique.com/
 
 ### From repositories
 
-Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodoro*. Those packages are made and maintained by volunteers.
+For [Fedora](https://apps.fedoraproject.org/packages/gnome-shell-extension-pomodoro), [Debian](https://packages.debian.org/sid/gnome-shell-pomodoro) and [Arch](https://aur.archlinux.org/packages/gnome-shell-pomodoro/) packages are available through repos. Thanks to volunteers who maintain them.
 
 1. Install package
 
@@ -49,7 +49,7 @@ Look for packages named *gnome-shell-pomodoro* or *gnome-shell-extension-pomodor
 
 ### From package
 
-For Fedora and openSUSE you can download package from [here](http://software.opensuse.org/download.html?project=home%3Akamilprusko&package=gnome-pomodoro). A package for Ubuntu should be available soon.
+For Ubuntu, Fedora and openSUSE you can download packages from [here](http://software.opensuse.org/download.html?project=home%3Akamilprusko&package=gnome-pomodoro). These are updated more frequently.
 
 Then follow instructions from above, as if installing package from repos.
 
