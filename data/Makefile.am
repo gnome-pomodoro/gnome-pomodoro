@@ -29,16 +29,13 @@ appdata_DATA = org.gnome.Pomodoro.appdata.xml
 
 resource_files = $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gnome-pomodoro.gresource.xml)
 
-man_MANS=gnome-pomodoro.7
-
 EXTRA_DIST = \
 	gnome-pomodoro.gresource.xml \
 	$(resource_files) \
     $(appdata_in_files) \
     $(desktop_in_files) \
     $(gsettings_in_files) \
-    $(service_in_files) \
-    $(man_MANS)
+    $(service_in_files)
 
 CLEANFILES = \
     $(appdata_DATA) \

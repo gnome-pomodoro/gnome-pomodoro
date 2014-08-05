@@ -7,6 +7,7 @@ SUBDIRS = \
     extension \
     data \
     po \
+    man \
     packages \
     tests
 

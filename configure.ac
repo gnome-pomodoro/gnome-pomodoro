@@ -75,6 +75,13 @@ AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 GLIB_GSETTINGS
 VAPIGEN_CHECK
 
+# Is docbook2man available?
+AC_PATH_PROG(DOCBOOK2MAN, docbook2man, no)
+if test "$DOCBOOK2MAN" = "no" ; then
+	AC_MSG_WARN([docbook2man not found, will not be able to build man documentation])
+fi
+AM_CONDITIONAL(HAVE_DOCBOOK2MAN, [test "$DOCBOOK2MAN" != "no"])
+
 
 # Checks for libraries.
 AC_CHECK_LIB(m, floor)
@@ -163,6 +170,7 @@ AC_CONFIG_FILES([
     data/icons/Makefile
     data/sounds/Makefile
     po/Makefile.in
+    man/Makefile
     packages/Makefile
     packages/rpm/Makefile
     tests/Makefile
