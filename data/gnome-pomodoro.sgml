@@ -1,0 +1,267 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+
+<!-- Process this file with docbook-to-man to generate an nroff manual
+     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+     less'.  A typical entry in a Makefile or Makefile.am is:
+
+manpage.1: manpage.sgml
+	docbook-to-man $< > $@
+  -->
+
+<!-- This is based on an example constructed by Colin Watson
+     <email>cjwatson@debian.org</email>, based on a man page template
+     provided by Tom Christiansen <email>tchrist@jhereg.perl.com</email>
+     and a DocBook man page example by Craig Small
+     <email>csmall@debian.org</email>.
+  -->
+
+  <!-- Fill in the various UPPER CASE things here. -->
+  <!ENTITY manfirstname "<firstname>Joseph</firstname>">
+  <!ENTITY mansurname   "<surname>Herlant</surname>">
+  <!-- Please adjust the date whenever revising the manpage. -->
+  <!ENTITY mandate      "<date>2014-08-06</date>">
+  <!-- SECTION should be 1-8, maybe with subsection. Other parameters are
+       allowed: see man(7), man(1). -->
+  <!ENTITY mansection   "<manvolnum>1</manvolnum>">
+  <!ENTITY manemail     "<email>herlantj@gmail.com</email>">
+  <!ENTITY manusername  "Joseph Herlant">
+  <!ENTITY manucpackage "<refentrytitle>gnome-pomodoro</refentrytitle>">
+  <!ENTITY manpackage   "gnome-pomodoro">
+  <!ENTITY programauthors "Kamil Prusko <email>kamilprusko@gmail.com</email>">
+]>
+
+<refentry>
+  <refentryinfo>
+    <address>
+      &manemail;
+    </address>
+    <author>
+      &manfirstname;
+      &mansurname;
+    </author>
+    <copyright>
+      <year>2014</year>
+      <holder>&manusername;</holder>
+    </copyright>
+    &mandate;
+  </refentryinfo>
+  <refmeta>
+    &manucpackage;
+
+    &mansection;
+  </refmeta>
+  <refnamediv>
+    <refname>&manpackage;</refname>
+    <refpurpose>A time management utility for GNOME</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>&manpackage;</command>
+
+      <group choice="opt"><arg><replaceable>options</replaceable></arg></group>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para>
+The <command>&manpackage;</command> application is a GNOME utility that helps to manage time according to Pomodoro Technique.
+It intends to improve productivity and focus by taking short breaks.
+    </para>
+    <para>
+      Features:
+      <itemizedlist>
+       <listitem><para>Countdown timer in the GNOME Shell top panel</para></listitem>
+       <listitem><para>Screen notifications that can be easily dismissed</para></listitem>
+       <listitem><para>Hiding other notifications during pomodoro</para></listitem>
+       <listitem><para>Postponing pomodoro unless there is some activity</para></listitem>
+       <listitem><para>Option to quickly shorten/lenghten the break</para></listitem>
+       <listitem><para>Nagging to take a break</para></listitem>
+      </itemizedlist>
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>OPTIONS</title>
+
+    <refsect2>
+      <title>Help Options</title>
+      <variablelist>
+        <varlistentry>
+          <term><option>-h, --help</option></term>
+          <listitem><para>Show help options</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--help-all</option></term>
+          <listitem> <para>Show all help options</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--help-gtk</option></term>
+          <listitem> <para>Show GTK+ Options</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--help-gst</option></term>
+          <listitem> <para>Show GStreamer Options</para> </listitem>
+        </varlistentry>
+      </variablelist>
+    </refsect2>
+
+    <refsect2>
+      <title>GTK+ Options</title>
+      <variablelist>
+        <varlistentry>
+          <term><option>--class=CLASS</option></term>
+          <listitem><para>Program class as used by the window manager</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--name=NAME</option></term>
+          <listitem><para>Program name as used by the window manager</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gdk-debug=FLAGS</option></term>
+          <listitem><para>GDK debugging flags to set</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gdk-no-debug=FLAGS</option></term>
+          <listitem><para>GDK debugging flags to unset</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gtk-module=MODULES</option></term>
+          <listitem><para>Load additional GTK+ modules</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--g-fatal-warnings</option></term>
+          <listitem><para>Make all warnings fatal</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gtk-debug=FLAGS</option></term>
+          <listitem><para>GTK+ debugging flags to set</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gtk-no-debug=FLAGS</option></term>
+          <listitem><para>GTK+ debugging flags to unset</para> </listitem>
+        </varlistentry>
+      </variablelist>
+    </refsect2>
+
+    <refsect2>
+      <title>GStreamer Options</title>
+      <variablelist>
+        <varlistentry>
+          <term><option>--gst-version</option></term>
+          <listitem><para>Print the GStreamer version</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-fatal-warnings</option></term>
+          <listitem><para>Make all warnings fatal</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-debug-help</option></term>
+          <listitem><para>Print available debug categories and exit</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-debug-level=LEVEL</option></term>
+          <listitem><para>Default debug level from 1 (only error) to 9 (anything) or 0 for no output</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-debug=LIST</option></term>
+          <listitem><para>Comma-separated list of category_name:level pairs to set specific levels for the individual categories. Example: GST_AUTOPLUG:5,GST_ELEMENT_*:3</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-debug-no-color</option></term>
+          <listitem><para>Disable colored debugging output</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-debug-color-mode</option></term>
+          <listitem><para>Changes coloring mode of the debug log. Possible modes: off, on, disable, auto, unix</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-debug-disable</option></term>
+          <listitem><para>Disable debugging</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-plugin-spew</option></term>
+          <listitem><para>Enable verbose plugin loading diagnostics</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-plugin-path=PATHS</option></term>
+          <listitem><para>Colon-separated paths containing plugins</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-plugin-load=PLUGINS</option></term>
+          <listitem><para>Comma-separated list of plugins to preload in addition to the list stored in environment variable GST_PLUGIN_PATH</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-disable-segtrap</option></term>
+          <listitem><para>Disable trapping of segmentation faults during plugin loading</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-disable-registry-update</option></term>
+          <listitem><para>Disable updating the registry</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--gst-disable-registry-fork</option></term>
+          <listitem><para>Disable spawning a helper process while scanning the registry</para> </listitem>
+        </varlistentry>
+      </variablelist>
+    </refsect2>
+
+    <refsect2>
+      <title>Application Options</title>
+      <variablelist>
+        <varlistentry>
+          <term><option>--preferences</option></term>
+          <listitem><para>Show preferences</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--no-default-window</option></term>
+          <listitem><para>Run as background service</para></listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--display=DISPLAY</option></term>
+          <listitem><para>X display to use</para> </listitem>
+        </varlistentry>
+      </variablelist>
+    </refsect2>
+
+  </refsect1>
+
+  <refsect1>
+    <title>NOTE</title>
+    <para>
+      More information about GNOME Pomodoro can be found at
+      https://github.com/codito/gnome-shell-pomodoro
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>AUTHOR</title>
+    <para>
+<command>&manpackage;</command> has been written by &programauthors; with the help of community contributions.
+    </para>
+    <para>
+This manual page was written initially by &manusername; &manemail;
+for the Debian system (but may be used by others).
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU General Public License, Version 3 any
+later version published by the Free Software Foundation.
+    </para>
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
