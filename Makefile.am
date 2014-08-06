@@ -28,6 +28,7 @@ EXTRA_DIST = \
     autogen.sh \
     config.vapi \
     COPYING \
+    ChangeLog \
     README.md
 
 DISTCLEANFILES = \
