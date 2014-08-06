@@ -83,7 +83,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &> /dev/null || :
 glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 
 %files -f %{name}.lang
-%doc README.md COPYING
+%doc README.md COPYING NEWS
 %{_bindir}/gnome-pomodoro
 %{_datadir}/appdata/*.appdata.xml
 %{_datadir}/applications/*.desktop
