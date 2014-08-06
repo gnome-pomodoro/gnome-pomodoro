@@ -27,13 +27,12 @@
   </refmeta>
   <refnamediv>
     <refname>&package;</refname>
-    <refpurpose>A time management utility for GNOME</refpurpose>
+    <refpurpose>A simple time management utility</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <cmdsynopsis>
       <command>&package;</command>
-      <arg><option>--preferences</option></arg>
-      <arg><option>--no-default-window</option></arg>
+      <arg><replaceable>OPTION</replaceable></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1>
@@ -43,7 +42,7 @@
     </para>
     <para>
       <command>&package;</command> is a GNOME utility that helps to manage time
-      according to Pomodoro Technique. It intends to improve productivity and
+      according to the Pomodoro Technique. It intends to improve productivity and
       focus by taking short breaks.
     </para>
   </refsect1>
@@ -55,14 +54,6 @@
       A summary of options is included below.
     </para>
     <variablelist>
-      <varlistentry>
-        <term>
-          <option>--help</option>
-        </term>
-        <listitem>
-          <para>Show summary of options.</para>
-        </listitem>
-      </varlistentry>
       <varlistentry>
         <term>
           <option>--preferences</option>
@@ -79,11 +70,32 @@
           <para>Run as background service.</para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--help</option>
+        </term>
+        <listitem>
+          <para>Show a summary of options.</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
+    <para>
+      Other standard GNOME options not listed here are also supported.
+    </para>
   </refsect1>
   <refsect1>
-    <title>AUTHOR</title>
-    <para>This manual page was written by Kamil Prusko <email>kamilprusko@gmail.com</email>.
+    <title>SEE ALSO</title>
+    <para>
+      More information about <command>&package;</command> can be found at https://github.com/codito/gnome-shell-pomodoro.
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>AUTHORS</title>
+    <para>
+      <command>&package;</command> has been written by Kamil Prusko <email>kamilprusko@gmail.com</email>; with the help of community contributions.
+    </para>
+    <para>
+      This manual page was written initially by Joseph Herlant <email>herlantj@gmail.com</email> for the Debian system (but may be used by others).
     </para>
   </refsect1>
 </refentry>
