@@ -5,7 +5,6 @@ BUILT_SOURCES = \
     gom-1.0.vapi
 
 EXTRA_DIST = \
-    libcanberra.vapi \
     upower-glib.vapi \
     gnome-desktop-3.0.vapi \
     gom-1.0.vapi \
