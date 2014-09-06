@@ -58,6 +58,8 @@ Then follow instructions from above, as if installing package from repos.
 
 1. Download the right version
 
+   **For GNOME 3.14** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.14).
+
    **For GNOME 3.12** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.12).
 
    **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.10).
