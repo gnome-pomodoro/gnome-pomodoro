@@ -693,7 +693,7 @@ public class Pomodoro.MainWindow : Gtk.ApplicationWindow
                                      "search-mode-enabled",
                                      GLib.BindingFlags.BIDIRECTIONAL);
 
-        var cancel_button = new Gtk.Button.from_stock (Gtk.Stock.CANCEL);
+        var cancel_button = new Gtk.Button.with_mnemonic (_("_Cancel"));
         cancel_button.clicked.connect (() => {
             this.task_list_pane.unselect_all ();
             this.header_bar_stack.set_visible_child_name ("task-list");
