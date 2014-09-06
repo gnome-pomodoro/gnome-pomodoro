@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
 <interface>
   <menu id="app-menu">
+    <!--
     <section>
       <item>
         <attribute name="label" translatable="yes">_Manage Tasks</attribute>
         <attribute name="action">app.main-window</attribute>
       </item>
     </section>
+    -->
     <section>
       <item>
         <attribute name="label" translatable="yes">_Preferences</attribute>

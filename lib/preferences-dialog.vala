@@ -774,6 +774,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.notebook.scrollable = false;
         this.notebook.show_border = false;
 
+        this.notebook.show_tabs = false; // TODO: finish task-list and plugins tab
+
         var timer_page = new TimerPreferencesTab ();
         this.notebook.append_page (timer_page, timer_page.label);
 

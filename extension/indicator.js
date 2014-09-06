@@ -106,11 +106,11 @@ const Indicator = new Lang.Class({
         this.tasklist.connect('task-selected', Lang.bind(this, this._onTaskSelected));
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addAction(_("Manage Tasks"), Lang.bind(this, this._showMainWindow));
+        // this.menu.addAction(_("Manage Tasks"), Lang.bind(this, this._showMainWindow));
         this.menu.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addMenuItem(this.tasklist);
-        this.menu.addMenuItem(this.entry);
+        // this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        // this.menu.addMenuItem(this.tasklist);
+        // this.menu.addMenuItem(this.entry);
 
         this.menu.connect('open-state-changed',
                           Lang.bind(this, this._onMenuOpenStateChanged));

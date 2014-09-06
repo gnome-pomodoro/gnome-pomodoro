@@ -347,7 +347,6 @@ public class Pomodoro.Application : Gtk.Application
      */
     public override void activate ()
     {
-        this.activate_action ("main-window", null);
     }
 
     public override bool dbus_register (DBusConnection connection,
