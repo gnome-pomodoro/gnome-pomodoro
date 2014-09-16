@@ -480,36 +480,39 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                                            "birds.ogg"),
         };
 
-        var ticking_sound = new Pomodoro.SoundChooserButton ();
-        ticking_sound.title = _("Select ticking sound");
-        ticking_sound.backend = SoundBackend.GSTREAMER;
-        ticking_sound.has_volume_button = true;
+        if (Player.is_supported ())
+        {  // TODO: Check sounds modules capabilities
+            var ticking_sound = new Pomodoro.SoundChooserButton ();
+            ticking_sound.title = _("Select ticking sound");
+            ticking_sound.backend = SoundBackend.GSTREAMER;
+            ticking_sound.has_volume_button = true;
 
-        for (var i = 0; i < ticking_sounds.length; i += 2)
-        {
-            ticking_sound.add_bookmark (ticking_sounds[i],
-                                        File.new_for_uri (ticking_sounds[i+1]));
+            for (var i = 0; i < ticking_sounds.length; i += 2)
+            {
+                ticking_sound.add_bookmark (ticking_sounds[i],
+                                            File.new_for_uri (ticking_sounds[i+1]));
+            }
+
+            var ticking_sound_field = this.create_field (_("Ticking sound"),
+                                                         ticking_sound);
+            list_box.insert (ticking_sound_field, -1);
+
+            this.settings.bind_with_mapping ("ticking-sound",
+                                             ticking_sound,
+                                             "file",
+                                             SETTINGS_BIND_FLAGS,
+                                             (SettingsBindGetMappingShared) Sounds.get_file_mapping,
+                                             (SettingsBindSetMappingShared) Sounds.set_file_mapping,
+                                             null,
+                                             null);
+
+            this.settings.bind ("ticking-sound-volume",
+                                ticking_sound,
+                                "volume",
+                                SETTINGS_BIND_FLAGS);
+
+            this.combo_box_size_group.add_widget (ticking_sound.combo_box);
         }
-
-        list_box.insert (
-            this.create_field (_("Ticking sound"), ticking_sound), -1);
-
-        this.settings.bind_with_mapping ("ticking-sound",
-                                         ticking_sound,
-                                         "file",
-                                         SETTINGS_BIND_FLAGS,
-                                         (SettingsBindGetMappingShared) Sounds.get_file_mapping,
-                                         (SettingsBindSetMappingShared) Sounds.set_file_mapping,
-                                         null,
-                                         null);
-
-        this.settings.bind ("ticking-sound-volume",
-                            ticking_sound,
-                            "volume",
-                            SETTINGS_BIND_FLAGS);
-
-        this.combo_box_size_group.add_widget (ticking_sound.combo_box);
-
 
         string[] sounds = {
             _("Loud bell"), GLib.Path.build_filename ("file://",

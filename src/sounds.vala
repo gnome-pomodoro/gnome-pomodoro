@@ -106,7 +106,8 @@ public class Pomodoro.Player : Object
 
     construct
     {
-        dynamic Gst.Element pipeline = Gst.ElementFactory.make ("playbin", "player");
+        dynamic Gst.Element pipeline = Gst.ElementFactory.make ("playbin",
+                                                                null);
 
         assert (pipeline != null);
 
@@ -128,6 +129,14 @@ public class Pomodoro.Player : Object
         this.pipeline = null;
         this.bus = null;
         this.fade_animation = null;
+    }
+
+    public static bool is_supported ()
+    {
+        /* Check whether playbin exists */
+        var element_factory = Gst.ElementFactory.find("playbin");
+
+        return element_factory != null;
     }
 
     public void play ()
@@ -273,23 +282,28 @@ public class Pomodoro.Sounds : Object
 
         this.ensure_context ();
 
+        if (Player.is_supported ())
+        {
+            this.player = new Player ();
+            this.player.repeat = true;
 
-        this.player = new Player ();
-        this.player.repeat = true;
+            this.settings.bind ("ticking-sound-volume",
+                                this.player,
+                                "volume",
+                                binding_flags);
 
-        this.settings.bind ("ticking-sound-volume",
-                            this.player,
-                            "volume",
-                            binding_flags);
-
-        this.settings.bind_with_mapping ("ticking-sound",
-                                         this.player,
-                                         "file",
-                                         binding_flags,
-                                         Sounds.get_file_mapping,
-                                         Sounds.set_file_mapping,
-                                         (void *) this,
-                                         null);
+            this.settings.bind_with_mapping ("ticking-sound",
+                                             this.player,
+                                             "file",
+                                             binding_flags,
+                                             Sounds.get_file_mapping,
+                                             Sounds.set_file_mapping,
+                                             (void *) this,
+                                             null);
+        }
+        else {
+            GLib.warning ("Couldn't create gstramer player");
+        }
 
         this.timer.notify["state-duration"].connect (this.on_state_duration_changed);
 
@@ -388,7 +402,9 @@ public class Pomodoro.Sounds : Object
 
             case "ticking-sound":
                 var file_path = this.get_file_path (key);
-                this.player.file = GLib.File.new_for_path (file_path);
+                if (this.player != null) {
+                    this.player.file = GLib.File.new_for_path (file_path);
+                }
 
                 break;
         }
@@ -581,7 +597,7 @@ public class Pomodoro.Sounds : Object
 
     private void on_state_changed ()
     {
-        if (this.timer.state != State.POMODORO) {
+        if (this.timer.state != State.POMODORO && this.player != null) {
             this.player.stop ();
         }
     }
@@ -597,15 +613,23 @@ public class Pomodoro.Sounds : Object
 
     private void on_pomodoro_start (bool is_requested)
     {
-        this.player.play ();
-        this.player.fade (1.0, AnimationMode.EASE_OUT, PLAYER_FADE_IN_TIME);
+        if (this.player != null) {
+            this.player.play ();
+            this.player.fade (1.0,
+                              AnimationMode.EASE_OUT,
+                              PLAYER_FADE_IN_TIME);
+        }
 
         this.schedule_fade_out ();
     }
 
     private bool on_fade_out_timeout ()
     {
-        this.player.fade (0.0, AnimationMode.EASE_IN_OUT, PLAYER_FADE_OUT_TIME);
+        if (this.player != null) {
+            this.player.fade (0.0,
+                              AnimationMode.EASE_IN_OUT,
+                              PLAYER_FADE_OUT_TIME);
+        }
 
         this.unschedule_fade_out ();
 
