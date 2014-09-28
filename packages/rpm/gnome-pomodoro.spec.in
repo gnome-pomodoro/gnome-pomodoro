@@ -10,17 +10,21 @@ BuildArch: x86_64 i686
 BuildRoot: @PACKAGE_NAME@-@PACKAGE_VERSION@-build
 
 Requires: gnome-shell >= @GNOME_REQUIRED@
+Requires: gtk3 >= @GTK_REQUIRED@
 Requires: hicolor-icon-theme
 
 %if %{defined fedora}
-Requires: google-droid-sans-fonts
+Requires: gstreamer1
 %else
-Requires: google-droid-fonts
+Requires: gstreamer
 %endif
 
 %if %{defined fedora}
-Requires: gtk3 >= @GTK_REQUIRED@
-Requires: gstreamer1
+Recommends: google-droid-sans-fonts
+Recommends: gstreamer1-plugins-base
+%else
+Recommends: google-droid-fonts
+Recommends: gstreamer-plugins-base
 %endif
 
 BuildRequires: gnome-shell
