@@ -42,6 +42,7 @@ AC_ARG_ENABLE([more-warnings],
 GLIB_REQUIRED=2.36.0
 GTK_REQUIRED=3.13.0
 GNOME_REQUIRED=3.13.0
+GOM_REQUIRED=0.2
 
 PKG_CHECK_MODULES(GNOME_POMODORO, [
     glib-2.0 >= $GLIB_REQUIRED
@@ -53,7 +54,8 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
     gsettings-desktop-schemas >= $GTK_REQUIRED
     gnome-desktop-3.0 >= $GNOME_REQUIRED
     dbus-glib-1
-    gom-1.0 >= 0.2
+    gom-1.0 >= $GOM_REQUIRED
+    sqlite3
     upower-glib >= 0.9.20
     libcanberra >= 0.30
     gstreamer-1.0 >= 1.0.10
@@ -138,6 +140,7 @@ AC_SUBST(WARNING_CFLAGS)
 AC_SUBST(GLIB_REQUIRED)
 AC_SUBST(GTK_REQUIRED)
 AC_SUBST(GNOME_REQUIRED)
+AC_SUBST(GOM_REQUIRED)
 
 
 # Some constants to pass to config.h
