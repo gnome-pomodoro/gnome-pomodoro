@@ -20,6 +20,7 @@
 
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
+const Cairo = imports.cairo;
 
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
@@ -50,15 +51,23 @@ const FADE_IN_TIME = 250;
 const FADE_IN_OPACITY = 1.0;
 
 const FADE_OUT_TIME = 250;
-const FADE_OUT_OPACITY = 0.47;
+const FADE_OUT_OPACITY = 0.38;
 
 const FOCUS_WINDOW_TIMEOUT = 3;
+
+const ICON_SIZE = 0.8;
+const ICON_STEPS = 720;
 
 const State = {
     NULL: 'null',
     POMODORO: 'pomodoro',
     PAUSE: 'pause',
     IDLE: 'idle'
+};
+
+const IndicatorType = {
+    TEXT: 'text',
+    ICON: 'icon'
 };
 
 
@@ -80,12 +89,22 @@ const Indicator = new Lang.Class({
         this._state = State.NULL;
         this._proxy = null;
 
-        this.label = new St.Label({ opacity: FADE_OUT_OPACITY * 255,
-                                    style_class: 'extension-pomodoro-label',
+        this.box = new St.Bin({ style_class: 'extension-pomodoro-indicator-box',
+                                x_align: St.Align.START,
+                                y_align: St.Align.START,
+                                x_fill: true,
+                                y_fill: true,
+                                opacity: FADE_OUT_OPACITY * 255 });  /* FIXME: Icon is faded-in during "null" state */
+        this.actor.add_actor(this.box);
+
+        this.icon = new St.DrawingArea({ style_class: 'extension-pomodoro-icon' });
+        this.icon.connect('repaint', Lang.bind(this, this._iconRepaint));
+        this._iconProgress = -1.0;
+
+        this.label = new St.Label({ style_class: 'extension-pomodoro-label',
                                     y_align: Clutter.ActorAlign.CENTER });
         this.label.clutter_text.set_line_wrap(false);
         this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
-        this.actor.add_actor(this.label);
 
         this.menu.actor.add_style_class_name('extension-pomodoro-indicator');
 
@@ -189,24 +208,54 @@ const Indicator = new Lang.Class({
         if (this._notificationDialog && !this._settings.get_boolean('show-screen-notifications')) {
             this._notificationDialog.close();
         }
+
+        let indicatorType = this._settings.get_string('indicator-type');
+        if (this._type != indicatorType) {
+            this._type = indicatorType;
+
+            for (let child = this.box.get_first_child();
+                 child;
+                 child = child.get_next_sibling()) {
+                 child.unparent();
+            }
+
+            if (this._type == IndicatorType.ICON) {
+                this.box.add_actor(this.icon);
+            }
+            else {
+                this.box.add_actor(this.label);
+            }
+
+            this.refresh();
+        }
     },
 
     _getPreferredWidth: function(actor, forHeight, alloc) {
+        let min_width, natural_width;
+
         let theme_node = actor.get_theme_node();
         let min_hpadding = theme_node.get_length('-minimum-hpadding');
         let natural_hpadding = theme_node.get_length('-natural-hpadding');
 
-        let context     = actor.get_pango_context();
-        let font        = theme_node.get_font();
-        let metrics     = context.get_metrics(font, context.get_language());
-        let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
-        let char_width  = metrics.get_approximate_char_width() / Pango.SCALE;
+        if (this._type == IndicatorType.ICON) {
+            min_width = forHeight - 2 * theme_node.get_length('-minimum-vpadding');
+            natural_width = forHeight - 2 * theme_node.get_length('-natural-vpadding');
+        }
+        else {
+            let context     = actor.get_pango_context();
+            let font        = theme_node.get_font();
+            let metrics     = context.get_metrics(font, context.get_language());
+            let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
+            let char_width  = metrics.get_approximate_char_width() / Pango.SCALE;
 
-        let predicted_width        = Math.floor(digit_width * 4 + 0.5 * char_width);
-        let predicted_min_size     = predicted_width + 2 * min_hpadding;
-        let predicted_natural_size = predicted_width + 2 * natural_hpadding;
+            min_width = Math.floor(digit_width * 4 + 0.5 * char_width);
+            natural_width = min_width;
+        }
 
-        PanelMenu.Button.prototype._getPreferredWidth.call(this, actor, forHeight, alloc); // output stored in alloc
+        let predicted_min_size     = min_width + 2 * min_hpadding;
+        let predicted_natural_size = natural_width + 2 * natural_hpadding;
+
+        this.parent(actor, forHeight, alloc);  /* output stored in alloc */
 
         if (alloc.min_size < predicted_min_size) {
             alloc.min_size = predicted_min_size;
@@ -223,8 +272,81 @@ const Indicator = new Lang.Class({
         }
     },
 
+    _iconRepaint: function(area) {
+        let cr = area.get_context();
+        let themeNode = area.get_theme_node();
+        let [width, height] = area.get_surface_size();
+
+        let radius = Math.min(width, height) * 0.85 * ICON_SIZE / 2;
+        let progress = Math.max(this._iconProgress, 0.001);
+
+        let color = themeNode.get_foreground_color();
+        let supplementColor = new Clutter.Color({
+            red: color.red,
+            green: color.green,
+            blue: color.blue,
+            alpha: color.alpha * FADE_OUT_OPACITY
+        });
+
+        cr.translate(width / 2,
+                     height / 2);
+
+        cr.setOperator(Cairo.Operator.SOURCE);
+        cr.setLineCap(Cairo.LineCap.ROUND);
+
+        if (this._state && this._state != State.NULL)
+        {
+            let angle1 = - 0.5 * Math.PI;
+            let angle2 = 2.0 * Math.PI * progress - 0.5 * Math.PI;
+            let negative = (this._state == State.PAUSE);
+
+            /* background pie */
+            if (!negative)
+            {
+                Clutter.cairo_set_source_color(cr, supplementColor);
+                cr.setLineWidth(2.1);
+
+                cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
+                cr.stroke();
+            }
+
+            /* foreground pie */
+            Clutter.cairo_set_source_color(cr, color);
+            if (!negative) {
+                cr.arc(0, 0, radius, angle1, angle2);
+            }
+            else {
+                cr.arcNegative(0, 0, radius, angle1, angle2);
+            }
+
+            cr.setOperator(Cairo.Operator.CLEAR);
+            cr.setLineWidth(3.5);
+            cr.strokePreserve();
+
+            cr.setOperator(Cairo.Operator.SOURCE);
+            cr.setLineWidth(2.2);
+            cr.stroke();
+        }
+        else {
+            Clutter.cairo_set_source_color(cr, supplementColor);
+            cr.setLineWidth(2.1);
+            cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
+            cr.stroke();
+        }
+
+        cr.$dispose();
+    },
+
+    _getProgress: function() {
+        if (this._proxy && this._proxy.StateDuration > 0) {
+            return this._proxy.Elapsed / this._proxy.StateDuration;
+        }
+
+        return 0.0;
+    },
+
     refresh: function() {
-        let remaining, minutes, seconds;
+        let remaining, minutes, seconds, label_text;
 
         let state = this._proxy ? this._proxy.State : null;
         let toggled = state !== null && state !== State.NULL;
@@ -233,14 +355,14 @@ const Indicator = new Lang.Class({
         {
             this._state = state;
 
-            if (state == State.POMODORO || state == State.IDLE) {
-                Tweener.addTween(this.label,
+            if (state == State.POMODORO || state == State.IDLE || (state != State.PAUSE && this._type == IndicatorType.ICON)) {
+                Tweener.addTween(this.box,
                                  { opacity: FADE_IN_OPACITY * 255,
                                    time: FADE_IN_TIME / 1000,
                                    transition: 'easeOutQuad' });
             }
             else {
-                Tweener.addTween(this.label,
+                Tweener.addTween(this.box,
                                  { opacity: FADE_OUT_OPACITY * 255,
                                    time: FADE_OUT_TIME / 1000,
                                    transition: 'easeOutQuad' });
@@ -253,6 +375,8 @@ const Indicator = new Lang.Class({
             if (this._timerToggle.toggled !== toggled) {
                 this._timerToggle.setToggleState(toggled);
             }
+
+            this._iconProgress = -1.0;  /* force refresh */
         }
 
         if (toggled) {
@@ -284,7 +408,28 @@ const Indicator = new Lang.Class({
             }
         }
 
-        this.label.set_text('%02d:%02d'.format(minutes, seconds));
+        if (this._type == IndicatorType.ICON) {
+            let progress = (state != State.IDLE)
+                    ? Math.floor(this._getProgress() * ICON_STEPS) / ICON_STEPS
+                    : 0.0;
+
+            if (progress != this._iconProgress) {
+                this._iconProgress = progress;
+                this.icon.queue_repaint();
+            }
+        }
+        else {
+            if (this._type == 'short') {
+                label_text = minutes > 0
+                        ? '%2dm'.format(minutes)
+                        : '%2ds'.format(seconds);
+            }
+            else {
+                label_text = '%02d:%02d'.format(minutes, seconds);
+            }
+
+            this.label.set_text(label_text);
+        }
     },
 
     start: function() {
@@ -657,6 +802,14 @@ const Indicator = new Lang.Class({
         if (this._notification) {
             this._notification.destroy();
         }
+
+
+        if (this._notificationDialog) {
+            this._notificationDialog.destroy();
+        }
+
+        this.label.destroy();
+        this.icon.destroy();
 
         this.parent();
     }

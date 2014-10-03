@@ -35,6 +35,66 @@ namespace Pomodoro
                                        GLib.SettingsBindFlags.GET |
                                        GLib.SettingsBindFlags.SET;
 
+    public enum IndicatorType {
+        TEXT = 0,
+        ICON = 2
+    }
+
+    public string indicator_type_to_string (IndicatorType indicator_type)
+    {
+        switch (indicator_type)
+        {
+            case IndicatorType.TEXT:
+                return "text";
+
+            case IndicatorType.ICON:
+                return "icon";
+        }
+
+        return "";
+    }
+
+    public IndicatorType string_to_indicator_type (string indicator_type)
+    {
+        switch (indicator_type)
+        {
+            case "text":
+                return IndicatorType.TEXT;
+
+            case "icon":
+                return IndicatorType.ICON;
+        }
+
+        return IndicatorType.TEXT;
+    }
+
+    /**
+     * Mapping from settings to presence combobox
+     */
+    public bool get_indicator_type_mapping (GLib.Value   value,
+                                            GLib.Variant variant,
+                                            void*        user_data)
+    {
+        var status = string_to_indicator_type (variant.get_string ());
+
+        value.set_int ((int) status);
+
+        return true;
+    }
+
+    /**
+     * Mapping from presence combobox to settings
+     */
+    [CCode (has_target = false)]
+    public Variant set_indicator_type_mapping (GLib.Value       value,
+                                               GLib.VariantType expected_type,
+                                               void*            user_data)
+    {
+        var indicator_type = (IndicatorType) value.get_int ();
+
+        return new Variant.string (indicator_type_to_string (indicator_type));
+    }
+
     /**
      * Mapping from settings to keybinding
      */
@@ -250,6 +310,7 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
         context.add_class ("timer-page");
 
         this.add_timer_section ();
+        this.add_indicator_section ();
         this.add_notifications_section ();
         this.add_presence_section ();
         this.add_sounds_section ();
@@ -382,6 +443,29 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
 
         list_box.insert (
             this.create_field (_("Shortcut to toggle the timer"), toggle_key_button), -1);
+    }
+
+    private void add_indicator_section ()
+    {
+        Gtk.Box vbox;
+        Gtk.ListBox list_box;
+
+        create_section (_("Indicator"), out vbox, out list_box);
+
+        this.preferences_vbox.pack_start (vbox);
+
+        var indicator_type_combo_box = this.create_indicator_type_combo_box ();
+        list_box.insert (
+            this.create_field (_("Indicator type"), indicator_type_combo_box), -1);
+
+        this.settings.bind_with_mapping ("indicator-type",
+                                         indicator_type_combo_box,
+                                         "value",
+                                         SETTINGS_BIND_FLAGS,
+                                         (SettingsBindGetMappingShared) get_indicator_type_mapping,
+                                         (SettingsBindSetMappingShared) set_indicator_type_mapping,
+                                         null,
+                                         null);
     }
 
     private void add_notifications_section ()
@@ -542,6 +626,17 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
 
         this.combo_box_size_group.add_widget (pomodoro_end_sound.combo_box);
         this.combo_box_size_group.add_widget (pomodoro_start_sound.combo_box);
+    }
+
+    private Gtk.ComboBox create_indicator_type_combo_box ()
+    {
+        var combo_box = new Pomodoro.EnumComboBox ();
+        combo_box.add_option (IndicatorType.TEXT, _("Text"));
+        combo_box.add_option (IndicatorType.ICON, _("Icon"));
+
+        combo_box.show ();
+
+        return combo_box as Gtk.ComboBox;
     }
 
     private Gtk.ComboBox create_presence_status_combo_box ()
