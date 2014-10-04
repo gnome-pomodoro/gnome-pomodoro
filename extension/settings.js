@@ -40,10 +40,8 @@ function getSettings(schema) {
 
     let schemaObj = schemaSource.lookup(schema, true);
     if (!schemaObj) {
-        let extension = ExtensionUtils.getCurrentExtension();
-
         throw new Error('Schema ' + schema + ' could not be found for extension '
-                        + extension.metadata.uuid + '. Please check your installation.');
+                        + Extension.metadata.uuid + '. Please check your installation.');
     }
 
     return new Gio.Settings({ settings_schema: schemaObj });

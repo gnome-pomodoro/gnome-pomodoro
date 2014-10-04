@@ -8,7 +8,8 @@ dist_extension_DATA = \
     notifications.js \
     settings.js \
     stylesheet.css \
-    tasklist.js
+    tasklist.js \
+    timer.js
 
 nodist_extension_DATA = \
     config.js \

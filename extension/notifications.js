@@ -43,6 +43,7 @@ const ShellConfig = imports.misc.config;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
 const Settings = Extension.imports.settings;
+const Timer = Extension.imports.timer;
 
 const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
@@ -100,10 +101,13 @@ let source = null;
 
 function get_default_source() {
     if (!source) {
-        source = new Source();
-        source.connect('destroy', function(reason) {
-            source = null;
+        let new_source = new Source();
+        new_source.connect('destroy', function(reason) {
+            if (source === new_source) {
+                source = null;
+            }
         });
+        source = new_source;
     }
     return source;
 }
@@ -404,9 +408,10 @@ const PomodoroEndDialog = new Lang.Class({
     Name: 'PomodoroEndDialog',
     Extends: ModalDialog,
 
-    _init: function() {
+    _init: function(timer) {
         this.parent();
 
+        this.timer = timer;
         this.description = _("It's time to take a break");
 
         this._openIdleWatchId = 0;
@@ -439,7 +444,18 @@ const PomodoroEndDialog = new Lang.Class({
                        { x_fill: true,
                          y_fill: true });
 
-        this.setElapsedTime(0, 0);
+        this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+        this._onTimerUpdate();
+    },
+
+    _onTimerUpdate: function() {
+        if (this.timer.getState() == Timer.State.PAUSE) {
+            let remaining = this.timer.getRemaining();
+            let minutes = Math.floor(remaining / 60);
+            let seconds = Math.floor(remaining % 60);
+
+            this._timerLabel.set_text('%02d:%02d'.format(minutes, seconds));
+        }
     },
 
     /**
@@ -517,14 +533,6 @@ const PomodoroEndDialog = new Lang.Class({
                 }
             ));
         }
-    },
-
-    setElapsedTime: function(elapsed, state_duration) {
-        let remaining = Math.ceil(state_duration - elapsed);
-        let minutes = Math.floor(remaining / 60);
-        let seconds = Math.floor(remaining % 60);
-
-        this._timerLabel.set_text('%02d:%02d'.format(minutes, seconds));
     },
 
     setDescription: function(text) {
@@ -613,23 +621,24 @@ const PomodoroEnd = new Lang.Class({
     Name: 'PomodoroEndNotification',
     Extends: Notification,
 
-    _init: function() {
+    _init: function(timer) {
         this.parent(_("Take a break!"), null, null);
+
+        this.timer = timer;
 
         this._settingsChangedId = 0;
 
         try {
-            this._settings = Settings.getSettings('org.gnome.pomodoro.preferences');
-            this._settingsChangedId = this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+            this._settingsChangedId = Extension.extension.settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         }
         catch (error) {
-            log('Pomodoro: ' + error);
+            Extension.extension.logError(error);
         }
 
         this.connect('destroy', Lang.bind(this,
             function(notification) {
                 if (this._settingsChangedId) {
-                    this._settings.disconnect(this._settingsChangedId);
+                    Extension.extension.settings.disconnect(this._settingsChangedId);
                 }
             }));
 
@@ -664,8 +673,40 @@ const PomodoroEnd = new Lang.Class({
             this._bodyLabel = this.addBody("", null, null);
         }
 
-        this._short_break_duration = this._settings.get_double('short-break-duration');
-        this._long_break_duration = this._settings.get_double('long-break-duration');
+        this._short_break_duration = Extension.extension.settings.get_double('short-break-duration');
+        this._long_break_duration = Extension.extension.settings.get_double('long-break-duration');
+
+        this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+        this._onTimerUpdate();
+    },
+
+    _onTimerUpdate: function() {
+        if (this.timer.getState() == Timer.State.PAUSE) {
+            let elapsed = this.timer.proxy.Elapsed;
+            let state_duration = this.timer.proxy.StateDuration;
+            let remaining = this.timer.getRemaining();
+            let minutes = Math.floor(remaining / 60);
+            let seconds = Math.floor(remaining % 60);
+
+            let message = (minutes < 1)
+                    ? ngettext("You have %d second left",
+                               "You have %d seconds left", seconds).format(seconds)
+                    : ngettext("You have %d minute left",
+                               "You have %d minutes left", minutes).format(minutes);
+
+            let is_long_pause = state_duration > this._short_break_duration;
+            let can_switch_pause = elapsed < this._short_break_duration;
+
+            this._bannerLabel.set_text(message);
+            this._bodyLabel.set_text(message);
+
+            this.updateButtons(is_long_pause, can_switch_pause);
+        }
+    },
+
+    _onSettingsChanged: function() {
+        this._short_break_duration = Extension.extension.settings.get_double('short-break-duration');
+        this._long_break_duration = Extension.extension.settings.get_double('long-break-duration');
     },
 
     _makeButton: function(label, iconName, useActionIcons) {
@@ -678,11 +719,6 @@ const PomodoroEnd = new Lang.Class({
             button.label = label;
         }
         return button;
-    },
-
-    _onSettingsChanged: function() {
-        this._short_break_duration = this._settings.get_double('short-break-duration');
-        this._long_break_duration = this._settings.get_double('long-break-duration');
     },
 
     /* deprecated since 3.12 */
@@ -723,25 +759,6 @@ const PomodoroEnd = new Lang.Class({
         if (changed) {
             this._pause_switch_button.show();
         }
-    },
-
-    setElapsedTime: function(elapsed, state_duration) {
-        let remaining = Math.ceil(state_duration - elapsed);
-        let minutes = Math.round(remaining / 60);
-        let seconds = Math.floor(remaining % 60);
-        let message = (remaining <= 45)
-                ? ngettext("You have %d second left",
-                           "You have %d seconds left", seconds).format(seconds)
-                : ngettext("You have %d minute left",
-                           "You have %d minutes left", minutes).format(minutes);
-
-        let is_long_pause = state_duration > this._short_break_duration;
-        let can_switch_pause = elapsed < this._short_break_duration;
-
-        this._bannerLabel.set_text(message);
-        this._bodyLabel.set_text(message);
-
-        this.updateButtons(is_long_pause, can_switch_pause);
     }
 });
 
