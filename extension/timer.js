@@ -161,10 +161,17 @@ const Timer = new Lang.Class({
     },
 
     getRemaining: function() {
+        let state = this.getState();
+
+        if (state == State.IDLE) {  /* TODO: should be done earlier */
+            return Extension.extension.settings.get_double('pomodoro-duration');
+        }
+
+        if (state == State.NULL) {
+            return 0.0;
+        }
+
         return Math.ceil(this.proxy.StateDuration - this.proxy.Elapsed);
-//        return (this.getState() != State.IDLE)
-//                ? Math.ceil(this.proxy.StateDuration - this.proxy.Elapsed)
-//                : Extension.extension.settings.get_double('pomodoro-duration');
     },
 
     getProgress: function() {

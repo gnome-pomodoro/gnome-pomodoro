@@ -37,6 +37,7 @@ namespace Pomodoro
 
     public enum IndicatorType {
         TEXT = 0,
+        TEXT_SMALL = 1,
         ICON = 2
     }
 
@@ -46,6 +47,9 @@ namespace Pomodoro
         {
             case IndicatorType.TEXT:
                 return "text";
+
+            case IndicatorType.TEXT_SMALL:
+                return "text-small";
 
             case IndicatorType.ICON:
                 return "icon";
@@ -632,6 +636,7 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
     {
         var combo_box = new Pomodoro.EnumComboBox ();
         combo_box.add_option (IndicatorType.TEXT, _("Text"));
+        combo_box.add_option (IndicatorType.TEXT_SMALL, _("Short Text"));
         combo_box.add_option (IndicatorType.ICON, _("Icon"));
 
         combo_box.show ();

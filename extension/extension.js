@@ -119,7 +119,7 @@ const PomodoroExtension = new Lang.Class({
         }
 
         if (!this.dialog && enableNotifications) {
-            this.enableNotifications()
+            this.enableNotifications();
         }
     },
 
@@ -131,6 +131,7 @@ const PomodoroExtension = new Lang.Class({
 
     enableIndicator: function() {
         this.indicator = new Indicator.Indicator(this.timer);
+
         Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
     },
 

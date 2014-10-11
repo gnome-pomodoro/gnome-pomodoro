@@ -26,6 +26,7 @@ const Signals = imports.signals;
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
 const Shell = imports.gi.Shell;
@@ -39,7 +40,6 @@ const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 
 const DBus = Extension.imports.dbus;
-//const Notifications = Extension.imports.notifications;
 const Config = Extension.imports.config;
 const Settings = Extension.imports.settings;
 const Tasklist = Extension.imports.tasklist;
@@ -55,13 +55,12 @@ const FADE_IN_OPACITY = 1.0;
 const FADE_OUT_TIME = 250;
 const FADE_OUT_OPACITY = 0.38;
 
-const FOCUS_WINDOW_TIMEOUT = 3;
-
 const ICON_SIZE = 0.8;
 const ICON_STEPS = 360;
 
 const IndicatorType = {
     TEXT: 'text',
+    TEXT_SMALL: 'text-small',
     ICON: 'icon'
 };
 
@@ -139,215 +138,351 @@ const IndicatorMenu = new Lang.Class({
 });
 
 
-const Indicator = new Lang.Class({
-    Name: 'PomodoroIndicator',
-    Extends: PanelMenu.Button,
+const TextIndicator = new Lang.Class({
+    Name: 'PomodoroTextIndicator',
 
-    _init: function(timer) {
-        this.parent(St.Align.START, _("Pomodoro Indicator"), true);
+    _init : function(timer) {
+        this._initialized = false;
+        this._state       = Timer.State.NULL;
+        this._minHPadding = 0;
+        this._natHPadding = 0;
+        this._digitWidth  = 0;
+        this._charWidth   = 0;
 
         this.timer = timer;
 
-        this._initialized = false;
-        this._settingsChangedId = 0;
-        this._state = Timer.State.NULL;
-        this._iconProgress = -1.0;
-
-        this.box = new St.Bin({ style_class: 'extension-pomodoro-indicator-box',
-                                x_align: St.Align.START,
-                                y_align: St.Align.START,
-                                x_fill: true,
-                                y_fill: true,
-                                opacity: FADE_OUT_OPACITY * 255 });  /* FIXME: Icon is faded-in during "null" state */
-        this.actor.add_actor(this.box);
-
-        this.icon = new St.DrawingArea({ style_class: 'extension-pomodoro-icon' });
-        this.icon.connect('repaint', Lang.bind(this, this._iconRepaint));
+        this.actor = new Shell.GenericContainer({ reactive: true });
+        this.actor._delegate = this;
 
         this.label = new St.Label({ style_class: 'extension-pomodoro-label',
+                                    x_align: Clutter.ActorAlign.CENTER,
                                     y_align: Clutter.ActorAlign.CENTER });
-        this.label.clutter_text.set_line_wrap(false);
-        this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
+        this.label.clutter_text.line_wrap = false;
+        this.label.clutter_text.ellipsize = false;
+        this.actor.add_child(this.label);
 
-        let menu = new IndicatorMenu(this);
-        this.setMenu(menu);
+        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
+        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
+        this.actor.connect('allocate', Lang.bind(this, this._allocate));
+        this.actor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
 
-        this.menu.connect('open-state-changed',
-                          Lang.bind(this, this._onMenuOpenStateChanged));
+        this._onTimerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
 
-        try {
-            this._settingsChangedId = Extension.extension.settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
-        }
-        catch (error) {
-            Extension.extension.logError(error);
-        }
+        this._onTimerUpdate();
 
-        this._onSettingsChanged();
-
+        this._state = this.timer.getState();
         this._initialized = true;
 
-        this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
-        this._onTimerUpdate();
-    },
-
-    _onSettingsChanged: function() {
-        let indicatorType = Extension.extension.settings.get_string('indicator-type');
-        if (this._type != indicatorType) {
-            this._type = indicatorType;
-
-            for (let child = this.box.get_first_child();
-                 child;
-                 child = child.get_next_sibling()) {
-                 child.unparent();
-            }
-
-            if (this._type == IndicatorType.ICON) {
-                this.box.add_actor(this.icon);
-            }
-            else {
-                this.box.add_actor(this.label);
-            }
-
-            this._onTimerUpdate();
+        if (this._state == Timer.State.POMODORO ||
+            this._state == Timer.State.IDLE) {
+            this.actor.set_opacity(FADE_IN_OPACITY * 255);
+        }
+        else {
+            this.actor.set_opacity(FADE_OUT_OPACITY * 255);
         }
     },
 
-//    _onPropertiesChanged: function(proxy, properties) {
-//        /* TODO: DBus implementation in gjs enforces properties to be cached,
-//         *       but does not update them properly...
-//         *       This walkaround may not bee needed in the future
-//         */
-//        properties = properties.deep_unpack();
-//
-//        for (var name in properties) {
-//            proxy.set_cached_property(name, properties[name]);
-//        }
-//
-//        this.refresh();
-//    },
+    _onStyleChanged: function(actor) {
+        let themeNode = actor.get_theme_node();
+        let font      = themeNode.get_font();
+        let context   = actor.get_pango_context();
+        let metrics   = context.get_metrics(font, context.get_language());
 
-    _onMenuOpenStateChanged: function(menu, open) {
-        if (open) {
-            this._onTimerUpdate();
+        this._minHPadding = themeNode.get_length('-minimum-hpadding');
+        this._natHPadding = themeNode.get_length('-natural-hpadding');
+        this._digitWidth  = metrics.get_approximate_digit_width() / Pango.SCALE;
+        this._charWidth   = metrics.get_approximate_char_width() / Pango.SCALE;
+    },
+
+    _getWidth: function() {
+        return Math.ceil(4 * this._digitWidth + 0.5 * this._charWidth);
+    },
+
+    _getPreferredWidth: function(actor, forHeight, alloc) {
+        let child        = actor.get_first_child();
+        let minWidth     = this._getWidth();
+        let naturalWidth = minWidth;
+
+        minWidth     += 2 * this._minHPadding;
+        naturalWidth += 2 * this._natHPadding;
+
+        if (child) {
+            [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
+        } else {
+            alloc.min_size = alloc.natural_size = 0;
         }
+
+        if (alloc.min_size < minWidth) {
+            alloc.min_size = minWidth;
+        }
+
+        if (alloc.natural_size < naturalWidth) {
+            alloc.natural_size = naturalWidth;
+        }
+    },
+
+    _getPreferredHeight: function(actor, forWidth, alloc) {
+        let child = actor.get_first_child();
+
+        if (child) {
+            [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
+        } else {
+            alloc.min_size = alloc.natural_size = 0;
+        }
+    },
+
+    _getText: function(state, remaining) {
+        let minutes = Math.floor(remaining / 60);
+        let seconds = Math.floor(remaining % 60);
+
+        return '%02d:%02d'.format(minutes, seconds);
     },
 
     _onTimerUpdate: function() {
-        let remaining, minutes, seconds, progress, label_text;
-
         let state = this.timer.getState();
-        let toggled = state != Timer.State.NULL;
 
         if (this._state != state && this._initialized)
         {
             this._state = state;
 
-            if (state == Timer.State.POMODORO || state == Timer.State.IDLE || (state != Timer.State.PAUSE && this._type == IndicatorType.ICON)) {
-                Tweener.addTween(this.box,
+            if (state == Timer.State.POMODORO || state == Timer.State.IDLE) {
+                Tweener.addTween(this.actor,
                                  { opacity: FADE_IN_OPACITY * 255,
                                    time: FADE_IN_TIME / 1000,
                                    transition: 'easeOutQuad' });
             }
             else {
-                Tweener.addTween(this.box,
+                Tweener.addTween(this.actor,
                                  { opacity: FADE_OUT_OPACITY * 255,
                                    time: FADE_OUT_TIME / 1000,
                                    transition: 'easeOutQuad' });
             }
-
-            this._iconProgress = -1.0;  /* force refresh */
         }
 
-        if (toggled) {
-            remaining = this.timer.getRemaining();
+        let remaining = this.timer.getRemaining();
 
-            minutes = Math.floor(remaining / 60);
-            seconds = Math.floor(remaining % 60);
-        }
-        else {
-            minutes = 0;
-            seconds = 0;
-        }
-
-        if (this._type == IndicatorType.ICON) {
-            progress = (state != Timer.State.IDLE)
-                    ? Math.floor(this.timer.getProgress() * ICON_STEPS) / ICON_STEPS
-                    : 0.0;
-
-            if (progress != this._iconProgress) {
-                this._iconProgress = progress;
-                this.icon.queue_repaint();
-            }
-        }
-        else {
-            if (this._type == 'short') {
-                label_text = minutes > 0
-                        ? '%2dm'.format(minutes)
-                        : '%2ds'.format(seconds);
-            }
-            else {
-                label_text = '%02d:%02d'.format(minutes, seconds);
-            }
-
-            this.label.set_text(label_text);
-        }
+        this.label.set_text(this._getText(state, remaining));
     },
 
-    _getPreferredWidth: function(actor, forHeight, alloc) {
-        let min_width, natural_width;
+    _allocate: function(actor, box, flags) {
+        let child = actor.get_first_child();
+        if (!child)
+            return;
 
-        let theme_node = actor.get_theme_node();
-        let min_hpadding = theme_node.get_length('-minimum-hpadding');
-        let natural_hpadding = theme_node.get_length('-natural-hpadding');
+        let [minWidth, natWidth] = child.get_preferred_width(-1);
 
-        if (this._type == IndicatorType.ICON) {
-            min_width = forHeight - 2 * theme_node.get_length('-minimum-vpadding');
-            natural_width = forHeight - 2 * theme_node.get_length('-natural-vpadding');
-        }
-        else {
-            let context     = actor.get_pango_context();
-            let font        = theme_node.get_font();
-            let metrics     = context.get_metrics(font, context.get_language());
-            let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
-            let char_width  = metrics.get_approximate_char_width() / Pango.SCALE;
+        let availWidth = box.x2 - box.x1;
+        let availHeight = box.y2 - box.y1;
 
-            min_width = Math.floor(digit_width * 4 + 0.5 * char_width);
-            natural_width = min_width;
+        let childBox = new Clutter.ActorBox();
+        if (natWidth + 2 * this._natHPadding <= availWidth) {
+            childBox.x1 = this._natHPadding;
+            childBox.x2 = availWidth - this._natHPadding;
+        } else {
+            childBox.x1 = this._minHPadding;
+            childBox.x2 = availWidth - this._minHPadding;
         }
 
-        let predicted_min_size     = min_width + 2 * min_hpadding;
-        let predicted_natural_size = natural_width + 2 * natural_hpadding;
+        childBox.y1 = 0;
+        childBox.y2 = availHeight;
 
-        this.parent(actor, forHeight, alloc);  /* output stored in alloc */
-
-        if (alloc.min_size < predicted_min_size) {
-            alloc.min_size = predicted_min_size;
-        }
-
-        if (alloc.natural_size < predicted_natural_size) {
-            alloc.natural_size = predicted_natural_size;
-        }
+        child.allocate(childBox, flags);
     },
 
-    _iconRepaint: function(area) {
-        let cr = area.get_context();
-        let themeNode = area.get_theme_node();
-        let [width, height] = area.get_surface_size();
+    destroy: function() {
+        this.timer.disconnect(this._onTimerUpdateId);
+        this.actor.destroy();
+    }
+});
 
-        let radius = Math.min(width, height) * 0.85 * ICON_SIZE / 2;
-        let progress = Math.max(this._iconProgress, 0.001);
 
-        let color = themeNode.get_foreground_color();
-        let supplementColor = new Clutter.Color({
+const ShortTextIndicator = new Lang.Class({
+    Name: 'PomodoroShortTextIndicator',
+    Extends: TextIndicator,
+
+    _init: function(timer) {
+        this.parent(timer);
+
+        this.label.set_x_align(Clutter.ActorAlign.END);
+    },
+
+    _getWidth: function() {
+        return Math.ceil(2 * this._digitWidth + 1 * this._charWidth);
+    },
+
+    _getText: function(state, remaining) {
+        let minutes = Math.round(remaining / 60);
+        let seconds = Math.round(remaining % 60);
+
+        if (remaining > 15) {
+            seconds = Math.ceil(seconds / 15) * 15;
+        }
+
+        return remaining > 45
+                ? '%dm'.format(minutes, remaining)
+                : '%ds'.format(seconds, remaining);
+    }
+});
+
+
+const IconIndicator = new Lang.Class({
+    Name: 'PomodoroIconIndicator',
+
+    _init : function(timer) {
+        this._initialized    = false;
+        this._state          = Timer.State.NULL;
+        this._progress       = -1.0;
+        this._minHPadding    = 0;
+        this._natHPadding    = 0;
+        this._minVPadding    = 0;
+        this._natVPadding    = 0;
+        this._primaryColor   = null;
+        this._secondaryColor = null;
+
+        this.timer = timer;
+
+        this.actor = new Shell.GenericContainer({ reactive: true });
+        this.actor._delegate = this;
+
+        this.icon = new St.DrawingArea({ style_class: 'system-status-icon' });
+        this.icon.connect('repaint', Lang.bind(this, this._repaint));
+        this.actor.add_child(this.icon);
+
+        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
+        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
+        this.actor.connect('allocate', Lang.bind(this, this._allocate));
+        this.actor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
+
+        this._onTimerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+
+        this._onTimerUpdate();
+
+        this._state = this.timer.getState();
+        this._initialized = true;
+
+        // if (this._state == Timer.State.POMODORO ||
+        //     this._state == Timer.State.IDLE) {
+        //     this.actor.set_opacity(FADE_IN_OPACITY * 255);
+        // }
+        // else {
+        //     this.actor.set_opacity(FADE_OUT_OPACITY * 255);
+        // }
+    },
+
+    _onStyleChanged: function(actor) {
+        let themeNode = actor.get_theme_node();
+
+        this._minHPadding = themeNode.get_length('-minimum-hpadding');
+        this._natHPadding = themeNode.get_length('-natural-hpadding');
+        this._minVPadding = themeNode.get_length('-minimum-vpadding');
+        this._natVPadding = themeNode.get_length('-natural-vpadding');
+
+        let color = themeNode.get_foreground_color()
+        this._primaryColor = color;
+        this._secondaryColor = new Clutter.Color({
             red: color.red,
             green: color.green,
             blue: color.blue,
             alpha: color.alpha * FADE_OUT_OPACITY
         });
+    },
 
-        cr.translate(width / 2,
-                     height / 2);
+    _getPreferredWidth: function(actor, forHeight, alloc) {
+        let minWidth     = forHeight - 2 * this._minVPadding;
+        let naturalWidth = forHeight - 2 * this._natVPadding;
+        let child        = actor.get_first_child();
 
+        minWidth     += 2 * this._minHPadding;
+        naturalWidth += 2 * this._natHPadding;
+
+        if (child) {
+            [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
+        } else {
+            alloc.min_size = alloc.natural_size = 0;
+        }
+
+        if (alloc.min_size < minWidth) {
+            alloc.min_size = minWidth;
+        }
+
+        if (alloc.natural_size < naturalWidth) {
+            alloc.natural_size = naturalWidth;
+        }
+    },
+
+    _getPreferredHeight: function(actor, forWidth, alloc) {
+        let child = actor.get_first_child();
+
+        if (child) {
+            [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
+        } else {
+            alloc.min_size = alloc.natural_size = 0;
+        }
+    },
+
+    _onTimerUpdate: function() {
+        let state = this.timer.getState();
+        let progress = this.timer.getProgress();
+
+        if (this._state != state && this._initialized)
+        {
+            this._state = state;
+
+            // if (state != Timer.State.PAUSE) {
+            //     Tweener.addTween(this.actor,
+            //                      { opacity: FADE_IN_OPACITY * 255,
+            //                        time: FADE_IN_TIME / 1000,
+            //                        transition: 'easeOutQuad' });
+            // }
+            // else {
+            //     Tweener.addTween(this.actor,
+            //                      { opacity: FADE_OUT_OPACITY * 255,
+            //                        time: FADE_OUT_TIME / 1000,
+            //                        transition: 'easeOutQuad' });
+            // }
+
+            this._progress = -1.0;  /* force refresh */
+        }
+
+        if (this._progress != progress) {
+            this._progress = progress;
+            this.icon.queue_repaint();
+        }
+    },
+
+    _allocate: function(actor, box, flags) {
+        let child = actor.get_first_child();
+        if (!child)
+            return;
+
+        let [minWidth, natWidth] = child.get_preferred_width(-1);
+
+        let availWidth = box.x2 - box.x1;
+        let availHeight = box.y2 - box.y1;
+
+        let childBox = new Clutter.ActorBox();
+        if (natWidth + 2 * this._natHPadding <= availWidth) {
+            childBox.x1 = this._natHPadding;
+            childBox.x2 = availWidth - this._natHPadding;
+        } else {
+            childBox.x1 = this._minHPadding;
+            childBox.x2 = availWidth - this._minHPadding;
+        }
+
+        childBox.y1 = 0;
+        childBox.y2 = availHeight;
+
+        child.allocate(childBox, flags);
+    },
+
+    _repaint: function(area) {
+        let cr = area.get_context();
+        let [width, height] = area.get_surface_size();
+
+        let radius = Math.min(width, height) * 0.85 * ICON_SIZE / 2;
+        let progress = Math.max(this._progress, 0.001);
+
+        cr.translate(0.5 * width, 0.5 * height);
         cr.setOperator(Cairo.Operator.SOURCE);
         cr.setLineCap(Cairo.LineCap.ROUND);
 
@@ -360,7 +495,7 @@ const Indicator = new Lang.Class({
             /* background pie */
             if (!negative)
             {
-                Clutter.cairo_set_source_color(cr, supplementColor);
+                Clutter.cairo_set_source_color(cr, this._secondaryColor);
                 cr.setLineWidth(2.1);
 
                 cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
@@ -368,7 +503,7 @@ const Indicator = new Lang.Class({
             }
 
             /* foreground pie */
-            Clutter.cairo_set_source_color(cr, color);
+            Clutter.cairo_set_source_color(cr, this._primaryColor);
             if (!negative) {
                 cr.arc(0, 0, radius, angle1, angle2);
             }
@@ -385,7 +520,7 @@ const Indicator = new Lang.Class({
             cr.stroke();
         }
         else {
-            Clutter.cairo_set_source_color(cr, supplementColor);
+            Clutter.cairo_set_source_color(cr, this._secondaryColor);
             cr.setLineWidth(2.1);
             cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
             cr.stroke();
@@ -395,13 +530,65 @@ const Indicator = new Lang.Class({
     },
 
     destroy: function() {
-        if (this._settingsChangedId) {
-            Extension.extension.settings.disconnect(this._settingsChangedId);
+        this.timer.disconnect(this._onTimerUpdateId);
+        this.actor.destroy();
+    }
+});
+
+
+const Indicator = new Lang.Class({
+    Name: 'PomodoroIndicator',
+    Extends: PanelMenu.Button,
+
+    _init: function(timer) {
+        this.parent(St.Align.START, _("Pomodoro"), true);
+
+        this.timer = timer;
+        this.widget = null;
+
+        this._arrow = PopupMenu.arrowIcon
+                ? PopupMenu.arrowIcon(St.Side.BOTTOM)
+                : PopupMenu.unicodeArrow(St.Side.BOTTOM);  /* XXX: deprecated */
+
+        this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
+        this._hbox.pack_start = true;
+        this._hbox.add_child(this._arrow, { expand: false,
+                                            x_fill: false,
+                                            x_align: St.Align.END });
+
+        this.actor.add_child(this._hbox);
+
+        this.setMenu(new IndicatorMenu(this));
+
+        this._settingsChangedId = Extension.extension.settings.connect('changed::indicator-type', Lang.bind(this, this._onSettingsChanged));
+
+        this._onSettingsChanged();
+    },
+
+    _onSettingsChanged: function() {
+        let indicatorType = Extension.extension.settings.get_string('indicator-type');
+
+        if (this.widget) {
+            this.widget.destroy();
         }
 
-        this.label.destroy();
-        this.icon.destroy();
+        if (indicatorType == IndicatorType.ICON) {
+            this.widget = new IconIndicator(this.timer);
+        }
+        else if (indicatorType == IndicatorType.TEXT_SMALL) {
+            this.widget = new ShortTextIndicator(this.timer);
+        }
+        else {
+            this.widget = new TextIndicator(this.timer);
+        }
 
-        this.parent();
+        this.widget.actor.bind_property('opacity',
+                                        this._arrow,
+                                        'opacity',
+                                        GObject.BindingFlags.SYNC_CREATE);
+
+        this._hbox.add_child(this.widget.actor, { expand: false,
+                                                  x_fill: false,
+                                                  x_align: St.Align.START });
     }
 });

@@ -35,6 +35,7 @@
     <key name="indicator-type" type="s">
       <choices>
         <choice value="text"/>
+        <choice value="text-small"/>
         <choice value="icon"/>
       </choices>
       <default>"text"</default>
