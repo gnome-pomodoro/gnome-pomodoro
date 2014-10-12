@@ -86,22 +86,22 @@ const IndicatorMenu = new Lang.Class({
         this.addMenuItem(this._timerToggle);
 
         /* Task list */
-        this.entry = new Tasklist.TaskEntry();
-        this.entry.connect('task-entered', Lang.bind(this, this._onTaskEntered));
+        // this.entry = new Tasklist.TaskEntry();
+        // this.entry.connect('task-entered', Lang.bind(this, this._onTaskEntered));
 
         /* TODO: Lock focus on the entry once active */
         /* TODO: Add history manager, just as in runDialog */
         /* TODO: More items could be added to context menu */
 
-        this.tasklist = new Tasklist.TaskList();
-        this.tasklist.connect('task-selected', Lang.bind(this, this._onTaskSelected));
+        // this.tasklist = new Tasklist.TaskList();
+        // this.tasklist.connect('task-selected', Lang.bind(this, this._onTaskSelected));
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.addAction(_("Manage Tasks"), Lang.bind(this, this._showMainWindow));
         this.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
-        this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.addMenuItem(this.tasklist);
-        this.addMenuItem(this.entry);
+        // this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        // this.addMenuItem(this.tasklist);
+        // this.addMenuItem(this.entry);
     },
 
     _onTimerStateChanged: function() {
