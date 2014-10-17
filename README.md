@@ -120,6 +120,13 @@ Thanks to our [GitHub contributors](https://github.com/codito/gnome-shell-pomodo
 
 ## Changelog
 
+**Version 0.10.3**
+
+* Support for GNOME Shell 3.10, 3.12 and 3.14
+* Updated Catalan translation (thanks @Ecron)
+* Code cleanups (thanks @aerostitch)
+* Bug fixes
+
 **Version 0.10.2**
 
 * No need to restart gnome-shell to enable extension

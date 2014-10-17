@@ -1,7 +1,7 @@
 AC_PREREQ(2.63)
 
 AC_INIT([Pomodoro],
-        [0.10.2],
+        [0.10.3],
         [https://github.com/codito/gnome-shell-pomodoro/issues],
         [gnome-pomodoro],
         [https://github.com/codito/gnome-shell-pomodoro])
