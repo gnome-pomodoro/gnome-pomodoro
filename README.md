@@ -78,7 +78,7 @@ Then follow instructions from above, as if installing package from repos.
 
    **On Fedora:**
 
-        sudo yum install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel gnome-desktop3-devel libcanberra-devel dbus-glib-devel gstreamer1-devel upower-devel google-droid-sans-fonts
+        sudo dnf install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel gnome-desktop3-devel libcanberra-devel dbus-glib-devel gstreamer1-devel upower-devel google-droid-sans-fonts
 
 3. Build it and install
 
