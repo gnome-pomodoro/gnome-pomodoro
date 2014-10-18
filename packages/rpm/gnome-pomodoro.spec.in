@@ -3,11 +3,34 @@ Name:      @PACKAGE_NAME@
 Version:   @PACKAGE_VERSION@
 Release:   1%{?dist}
 License:   GPLv3+
-Group:     Productivity/Office/Other
 URL:       @PACKAGE_URL@
 Source:    @distdir@-@PACKAGE_VERSION@.tar.xz
-BuildArch: x86_64 i686
-BuildRoot: @PACKAGE_NAME@-@PACKAGE_VERSION@-build
+
+%if %{undefined fedora}
+Group: Productivity/Office/Other
+%endif
+
+BuildRequires: gettext
+BuildRequires: intltool
+BuildRequires: vala
+BuildRequires: gnome-common
+BuildRequires: gnome-shell
+BuildRequires: desktop-file-utils
+BuildRequires: pkgconfig(dbus-1)
+BuildRequires: pkgconfig(dbus-glib-1)
+BuildRequires: pkgconfig(glib-2.0) >= @GLIB_REQUIRED@
+BuildRequires: pkgconfig(gnome-desktop-3.0) >= @GNOME_REQUIRED@
+BuildRequires: pkgconfig(gobject-introspection-1.0)
+BuildRequires: pkgconfig(gom-1.0)
+BuildRequires: pkgconfig(gstreamer-1.0)
+BuildRequires: pkgconfig(gtk+-3.0) >= @GTK_REQUIRED@
+BuildRequires: pkgconfig(libcanberra)
+BuildRequires: pkgconfig(sqlite3)
+BuildRequires: pkgconfig(upower-glib)
+
+%if %{defined fedora}
+BuildRequires: vala-tools
+%endif
 
 Requires: gnome-shell >= @GNOME_REQUIRED@
 Requires: gtk3 >= @GTK_REQUIRED@
@@ -27,27 +50,9 @@ Recommends: google-droid-fonts
 Recommends: gstreamer-plugins-base
 %endif
 
-BuildRequires: gnome-shell
-BuildRequires: gnome-common
-BuildRequires: gettext
-BuildRequires: intltool
-BuildRequires: desktop-file-utils
-BuildRequires: vala
-BuildRequires: pkgconfig(glib-2.0) >= @GLIB_REQUIRED@
-BuildRequires: pkgconfig(gtk+-3.0) >= @GTK_REQUIRED@
-BuildRequires: pkgconfig(gobject-introspection-1.0)
-BuildRequires: pkgconfig(dbus-glib-1)
-BuildRequires: pkgconfig(libnotify)
-BuildRequires: pkgconfig(libcanberra)
-BuildRequires: pkgconfig(gnome-desktop-3.0) >= @GNOME_REQUIRED@
-BuildRequires: pkgconfig(gstreamer-1.0)
-BuildRequires: pkgconfig(upower-glib)
-
 %if %{defined fedora}
-BuildRequires: vala-tools
-%endif
-
 Obsoletes: gnome-shell-extension-pomodoro
+%endif
 
 %description
 A GNOME utility that helps managing time according to Pomodoro Technique. It
@@ -70,7 +75,7 @@ desktop-file-edit $RPM_BUILD_ROOT/%{_datadir}/applications/*.desktop \
 %find_lang %{name}
 
 %check
-desktop-file-validate $RPM_BUILD_ROOT/%{_datadir}/applications/*.desktop
+desktop-file-validate $RPM_BUILD_ROOT/%{_datadir}/applications/org.gnome.Pomodoro.desktop
 
 %post
 touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
@@ -89,8 +94,8 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %files -f %{name}.lang
 %doc README.md COPYING NEWS
 %{_bindir}/gnome-pomodoro
-%{_datadir}/appdata/*.appdata.xml
-%{_datadir}/applications/*.desktop
+%{_datadir}/appdata/org.gnome.Pomodoro.appdata.xml
+%{_datadir}/applications/org.gnome.Pomodoro.desktop
 %{_datadir}/dbus-1/services/org.gnome.Pomodoro.service
 %{_datadir}/glib-2.0/schemas/org.gnome.pomodoro.gschema.xml
 %{_datadir}/gnome-pomodoro
