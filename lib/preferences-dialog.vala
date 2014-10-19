@@ -460,7 +460,7 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
 
         var indicator_type_combo_box = this.create_indicator_type_combo_box ();
         list_box.insert (
-            this.create_field (_("Indicator type"), indicator_type_combo_box), -1);
+            this.create_field (_("Indicator appearance"), indicator_type_combo_box), -1);
 
         this.settings.bind_with_mapping ("indicator-type",
                                          indicator_type_combo_box,
