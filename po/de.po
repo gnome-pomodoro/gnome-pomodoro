@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:23+0100\n"
-"PO-Revision-Date: 2013-11-23 05:57+0100\n"
-"Last-Translator: Johannes Hermann <linuxrider@web.de>\n"
-"Language-Team: de\n"
+"PO-Revision-Date: 2014-10-20 18:52+0100\n"
+"Last-Translator: Jonatan Zeidler <jonatan_zeidler@gmx.de>\n"
+"Language-Team: de <jonatan_zeidler@gmx.de>\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -106,7 +106,7 @@ msgstr "Ein einfaches Werkzeug für Zeitmanagement"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
-msgstr ""
+msgstr "Übersetzer-Danksagung"
 
 #: ../src/about-dialog.vala:45
 msgid ""
@@ -138,13 +138,12 @@ msgstr "Dauer einer langen Pause"
 
 #. @translators: You can refer it to number of pomodoros in a cycle
 #: ../src/preferences-dialog.vala:411
-#, fuzzy
 msgid "Pomodoros to a long break"
-msgstr "Dauer einer Pomodoro"
+msgstr "Pomodoros bis zu einer langen Pause"
 
 #: ../src/preferences-dialog.vala:418
 msgid "Shortcut to toggle the timer"
-msgstr "Shortcut zum Ein- und Ausschalten des Timers"
+msgstr "Kürzel zum Ein- und Ausschalten des Timers"
 
 #: ../src/preferences-dialog.vala:426
 msgid "Notifications"
@@ -236,25 +235,24 @@ msgid "Status during break"
 msgstr "Status während der Pause"
 
 #: ../src/preferences-dialog.vala:686
-#, fuzzy
 msgid ""
 "System notifications including chat messages won't show up during pomodoro."
 msgstr ""
-"Systembenachrichtigungen inklusive Chat-Nachrichten werden während der "
-"Pomodoro abgeschaltet."
+"Systembenachrichtigungen einschließlich Chat-Nachrichten werden während der "
+"Pomodoro nicht angezeigt."
 
 #: ../src/preferences-dialog.vala:690
-#, fuzzy
 msgid ""
 "System notifications including chat messages won't show up during break."
 msgstr ""
-"Systembenachrichtigungen inklusive Chat-Nachrichten werden während der Pause "
-"abgeschaltet."
+"Systembenachrichtigungen einschließlich Chat-Nachrichten werden während der "
+"Pause nicht angezeigt."
 
 #: ../src/preferences-dialog.vala:694
-#, fuzzy
 msgid "System notifications including chat messages won't show up."
-msgstr "Systembenachrichtigungen "
+msgstr ""
+"Systembenachrichtigungen einschließlich Chat-Nachrichten werden nicht "
+"angezeigt."
 
 #: ../src/preferences-dialog.vala:707
 msgid "OK"
@@ -285,7 +283,7 @@ msgid ""
 "using this key.\n"
 "Please try with a key such as Control, Alt or Shift at the same time."
 msgstr ""
-"Das Shortcut \"%s\" kann nicht verwendet werden, da hierdurch das Schreiben "
+"Das Kürzel \"%s\" kann nicht verwendet werden, da hierdurch das Schreiben "
 "mit dieser Taste unmöglich wird.\n"
 " Bitte versuche mit gleichzeitig gedrücktem Strg, Alt oder Umschalt."
 
@@ -310,14 +308,12 @@ msgid "All files"
 msgstr "Alle Dateien"
 
 #: ../src/widgets.vala:711
-#, fuzzy
 msgid "Other…"
-msgstr "Andere…"
+msgstr "Andere …"
 
 #: ../src/widgets.vala:722
-#, fuzzy
 msgid "None"
-msgstr "Keiner"
+msgstr "Kein"
 
 #: ../src/widgets.vala:1061 ../src/widgets.vala:1070
 msgid "Supported audio files"
@@ -328,6 +324,5 @@ msgid "Manage your time and tasks"
 msgstr "Habe deine Zeit und Aufgabe im Griff"
 
 #: ../data/gnome-pomodoro.desktop.in.h:3
-#, fuzzy
 msgid "time;timer;tasks;manage;organize;"
-msgstr "Zeit;Timer;Aufgaben;Verwalte;Plane;"
+msgstr "Zeit;Timer;Aufgaben;Verwalten;Planen;"
