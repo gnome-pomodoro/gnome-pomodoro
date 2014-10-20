@@ -98,7 +98,7 @@ msgstr "Un outils simple de gestion du temps"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
-msgstr "crédits traducteurs"
+msgstr "neitsab <neitsab@ovh.fr>"
 
 #: ../src/about-dialog.vala:45
 msgid ""
