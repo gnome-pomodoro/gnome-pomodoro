@@ -106,7 +106,8 @@ msgstr "Ein einfaches Werkzeug für Zeitmanagement"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
-msgstr "Übersetzer-Danksagung"
+msgstr "Jonatan Zeidler <jonatan_zeidler@gmx.de>"
+"Johannes Hermann <linuxrider@web.de>"
 
 #: ../src/about-dialog.vala:45
 msgid ""
