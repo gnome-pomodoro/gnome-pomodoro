@@ -50,6 +50,9 @@ libgnome_pomodoro_la_CPPFLAGS = \
     -DGNOME_DESKTOP_USE_UNSTABLE_API \
     -DDATA_DIR=\""$(datadir)"\"
 
+libgnome_pomodoro_la_LIBADD = \
+    $(GNOME_POMODORO_LIBS)
+
 libgnome_pomodoro_la_DEPENDENCIES = \
     $(top_builddir)/vapi/gnome-desktop-3.0.vapi \
     $(top_builddir)/vapi/upower-glib.vapi

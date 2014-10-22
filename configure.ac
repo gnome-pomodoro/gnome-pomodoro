@@ -190,4 +190,5 @@ gnome-pomodoro ${VERSION}:
     compiler:               ${CC}
     cflags:                 ${CFLAGS}
     cppflags:               ${CPPFLAGS}
+    ldflags:                ${LDFLAGS}
 "
