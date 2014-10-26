@@ -26,7 +26,7 @@ const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
 
 
-function getSettings(schema) {
+function getSettings(schemaId) {
     let schemaDir = Gio.File.new_for_path(Config.GSETTINGS_SCHEMA_DIR);
     let schemaSource;
     if (schemaDir.query_exists(null)) {
@@ -38,11 +38,11 @@ function getSettings(schema) {
         schemaSource = Gio.SettingsSchemaSource.get_default();
     }
 
-    let schemaObj = schemaSource.lookup(schema, true);
-    if (!schemaObj) {
-        throw new Error('Schema ' + schema + ' could not be found for extension '
+    let schema = schemaSource.lookup(schemaId, true);
+    if (!schema) {
+        throw new Error('Schema ' + schemaId + ' could not be found for extension '
                         + Extension.metadata.uuid + '. Please check your installation.');
     }
 
-    return new Gio.Settings({ settings_schema: schemaObj });
+    return new Gio.Settings({ settings_schema: schema });
 }
