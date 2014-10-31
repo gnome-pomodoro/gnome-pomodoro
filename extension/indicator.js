@@ -241,6 +241,10 @@ const TextIndicator = new Lang.Class({
     _onTimerUpdate: function() {
         let state = this.timer.getState();
 
+        if (!this.label) {
+            return;
+        }
+
         if (this._state != state && this._initialized)
         {
             this._state = state;
