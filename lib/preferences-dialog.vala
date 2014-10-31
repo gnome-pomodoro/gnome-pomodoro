@@ -679,7 +679,7 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
 
         var pause_when_idle_toggle = new Gtk.Switch ();
         var pause_when_idle_field = this.create_field (
-                                       _("Postpone pomodoro when idle"),
+                                       _("Wait for activity after a break"),
                                        pause_when_idle_toggle);
 
         var pomodoro_presence = this.create_presence_status_combo_box ();
@@ -831,7 +831,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
     public PreferencesDialog ()
     {
-        this.title = _("Pomodoro Preferences");
+        this.title = _("Preferences");
 
         var geometry = Gdk.Geometry ();
         geometry.min_width = 500;
