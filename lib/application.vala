@@ -266,6 +266,10 @@ public class Pomodoro.Application : Gtk.Application
 
         this.setup_resources ();
 
+        this.timer.state_changed.connect (this.on_timer_state_changed);
+        this.timer.destroy.connect (this.on_timer_destroy);
+        this.timer.restore ();
+
         this.modules = new List<Object> ();
         this.modules.prepend (new Pomodoro.Sounds (this.timer));
         this.modules.prepend (new Pomodoro.Presence (this.timer));
@@ -273,13 +277,8 @@ public class Pomodoro.Application : Gtk.Application
         this.modules.prepend (new Pomodoro.ScreenSaver (this.timer));
         this.modules.prepend (new Pomodoro.GnomeDesktop (this.timer));
 
-        this.timer.state_changed.connect (this.on_timer_state_changed);
-        this.timer.destroy.connect (this.on_timer_destroy);
-
         this.setup_actions ();
         this.setup_menu ();
-
-        this.timer.restore ();
     }
 
     private void on_timer_state_changed (Timer timer)
