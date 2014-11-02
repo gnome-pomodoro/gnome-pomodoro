@@ -1,7 +1,7 @@
 /*
  * A simple pomodoro timer for GNOME Shell
  *
- * Copyright (c) 2011-2013 gnome-pomodoro contributors
+ * Copyright (c) 2011-2014 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,13 +51,11 @@ const PomodoroExtension = new Lang.Class({
         this.settings = null;
         this.timer = null;
         this.indicator = null;
+        this.notification = null;
         this.dialog = null;
-
-        this._settingsChangedId = 0;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
-            this._settingsChangedId = this.settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         }
         catch (error) {
             this.logError(error);
@@ -68,6 +66,7 @@ const PomodoroExtension = new Lang.Class({
         this.enableKeybinding();
         this.enableIndicator();
         this.enableNotifications();
+        this.enableScreenNotifications();
 
         this.timer.connect('service-connected', Lang.bind(this, this._onServiceConnected));
         this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
@@ -92,6 +91,11 @@ const PomodoroExtension = new Lang.Class({
         if (this.dialog) {
             this.dialog.close();
         }
+
+        if (this.notification) {
+            this.notification.destroy();
+            this.notification = null;
+        }
     },
 
     _onTimerStateChanged: function() {
@@ -100,26 +104,57 @@ const PomodoroExtension = new Lang.Class({
         if (this.dialog && state != Timer.State.PAUSE) {
             this.dialog.close();
         }
+
+        if (this.notification && state == Timer.State.NULL) {
+            this.notification.destroy();
+            this.notification = null;
+        }
     },
 
     _onNotifyPomodoroStart: function() {
+        if (this.notification) {
+            this.notification.destroy();
+        }
+
+        this.notification = new Notifications.PomodoroStart(this.timer);
+        this.notification.connect('destroy', Lang.bind(this,
+            function(notification){
+                if (this.notification === notification) {
+                    this.notification = null;
+                }
+            }));
+        this.notification.show();
     },
 
     _onNotifyPomodoroEnd: function() {
-        if (this.dialog) {
+        let showScreenNotifications = this.settings.get_boolean('show-screen-notifications');
+
+        if (this.notification) {
+            this.notification.destroy();
+        }
+
+        this.notification = new Notifications.PomodoroEnd(this.timer);
+        this.notification.connect('clicked', Lang.bind(this,
+            function(notification){
+                if (this.dialog) {
+                    this.dialog.open();
+                    this.dialog.pushModal();
+
+                    notification.hide();
+                }
+            }));
+        this.notification.connect('destroy', Lang.bind(this,
+            function(notification){
+                if (this.notification === notification) {
+                    this.notification = null;
+                }
+            }));
+
+        if (this.dialog && showScreenNotifications) {
             this.dialog.open();
         }
-    },
-
-    _onSettingsChanged: function() {
-        let enableNotifications = this.settings.get_boolean('show-screen-notifications');
-
-        if (this.dialog && !enableNotifications) {
-            this.disableNotifications();
-        }
-
-        if (!this.dialog && enableNotifications) {
-            this.enableNotifications();
+        else {
+            this.notification.show();
         }
     },
 
@@ -156,20 +191,42 @@ const PomodoroExtension = new Lang.Class({
     },
 
     enableNotifications: function() {
-        this.dialog = new Notifications.PomodoroEndDialog(this.timer);
-        this.dialog.connect('closing', Lang.bind(this,
-            function() {
-                if (this.timer.getState() == Timer.State.PAUSE) {
-                    this.dialog.openWhenIdle();
-                }
-            }));
-        this.dialog.connect('destroy', Lang.bind(this,
-            function() {
-                this.dialog = null;
-            }));
     },
 
     disableNotifications: function() {
+        if (this.notification) {
+            this.notification.destroy();
+            this.notification = null;
+        }
+
+        if (Notifications.source) {
+            Notifications.source.destroy();
+        }
+    },
+
+    enableScreenNotifications: function() {
+        if (!this.dialog) {
+            this.dialog = new Notifications.PomodoroEndDialog(this.timer);
+            this.dialog.connect('closing', Lang.bind(this,
+                function() {
+                    if (this.timer.getState() == Timer.State.PAUSE)
+                    {
+                        if (this.notification instanceof Notifications.PomodoroEnd) {
+                            this.notification.show();
+                        }
+
+                        // TODO: check if using fullscreen/redirect mode, like when playing a video
+                        this.dialog.openWhenIdle();
+                    }
+                }));
+            this.dialog.connect('destroy', Lang.bind(this,
+                function() {
+                    this.dialog = null;
+                }));
+        }
+    },
+
+    disableScreenNotifications: function() {
         if (this.dialog) {
             this.dialog.destroy();
             this.dialog = null;
@@ -186,20 +243,14 @@ const PomodoroExtension = new Lang.Class({
     },
 
     destroy: function() {
-        if (this._settingsChangedId) {
-            this.settings.disconnect(this._settingsChangedId);
-            this._settingsChangedId = 0;
-        }
-
-        if (Notifications.source) {
-            Notifications.source.destroy();
-        }
-
         this.disableKeybinding();
         this.disableIndicator();
         this.disableNotifications();
+        this.disableScreenNotifications();
 
         this.timer.destroy();
+
+        this.settings.run_dispose();
 
         this.emit('destroy');
     }

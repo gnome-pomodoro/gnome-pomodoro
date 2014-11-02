@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013 gnome-pomodoro contributors
+ * Copyright (c) 2011-2014 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -322,9 +322,9 @@ const ShortTextIndicator = new Lang.Class({
             seconds = Math.ceil(seconds / 15) * 15;
         }
 
-        return remaining > 45
-                ? '%dm'.format(minutes, remaining)
-                : '%ds'.format(seconds, remaining);
+        return (remaining <= 45)
+                ? '%ds'.format(seconds, remaining)
+                : '%dm'.format(minutes, remaining);
     }
 });
 

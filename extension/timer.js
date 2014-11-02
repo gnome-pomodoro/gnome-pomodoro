@@ -160,6 +160,15 @@ const Timer = new Lang.Class({
         return this.proxy ? this.proxy.State : State.NULL;
     },
 
+    setState: function(state, duration) {
+        this._ensureProxy(Lang.bind(this,
+            function() {
+                this.proxy.SetStateRemote(state,
+                                          duration || 0,
+                                          Lang.bind(this, this._onCallback));
+            }));
+    },
+
     getRemaining: function() {
         let state = this.getState();
 

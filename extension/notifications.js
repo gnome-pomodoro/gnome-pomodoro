@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013 gnome-pomodoro contributors
+ * Copyright (c) 2011-2014 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const Tweener = imports.ui.tweener;
 const Util = imports.misc.util;
-const ShellConfig = imports.misc.config;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
@@ -77,22 +76,11 @@ const REMINDER_INTERVALS = [75000];
  */
 const REMINDER_ACCEPTANCE = 0.66;
 
-const GNOME_SHELL_VERSION = ShellConfig.PACKAGE_VERSION;
-
 const State = {
     OPENED: 0,
     CLOSED: 1,
     OPENING: 2,
     CLOSING: 3
-};
-
-const Action = {
-    SWITCH_TO_POMODORO: 'switch-to-pomodoro',
-    SWITCH_TO_PAUSE: 'switch-to-pause',
-    SWITCH_TO_SHORT_PAUSE: 'switch-to-short-pause',
-    SWITCH_TO_LONG_PAUSE: 'switch-to-long-pause',
-    REPORT_BUG: 'report-bug',
-    VISIT_WEBSITE: 'visit-website'
 };
 
 
@@ -113,34 +101,33 @@ function get_default_source() {
 }
 
 
-function check_version(required, current) {
-    let current_array = current.split('.');
-    let major = current_array[0];
-    let minor = current_array[1];
-    let point = current_array[2];
-    for (let i = 0; i < required.length; i++) {
-        let required_array = required[i].split('.');
-        if (required_array[0] == major &&
-            required_array[1] == minor &&
-            (required_array[2] == point ||
-             (required_array[2] == undefined && parseInt(minor) % 2 == 0)))
-            return true;
+const NotificationPolicy = new Lang.Class({
+    Name: 'PomodoroNotificationPolicy',
+    Extends: MessageTray.NotificationGenericPolicy,
+
+    /* override parent method */
+    get detailsInLockScreen() {
+        return true;
     }
-    return false;
-}
+});
 
 
 const Source = new Lang.Class({
     Name: 'PomodoroNotificationSource',
     Extends: MessageTray.Source,
 
-    ICON_NAME: 'gnome-pomodoro-symbolic',
+    ICON_NAME: 'gnome-pomodoro',
 
     _init: function() {
         this.parent(_("Pomodoro"), this.ICON_NAME);
 
         this.connect('notification-added',
                      Lang.bind(this, this._onNotificationAdded));
+    },
+
+    /* override parent method */
+    _createPolicy: function() {
+        return new NotificationPolicy();
     },
 
     _onNotificationAdded: function(source, notification) {
@@ -209,7 +196,7 @@ const ModalDialog = new Lang.Class({
         this._lightbox.actor.style_class = 'extension-pomodoro-lightbox';
         this._lightbox.show();
 
-        this._backgroundBin.child = this._dialogLayout;
+        this._backgroundBin.set_child(this._dialogLayout);
 
         this.contentLayout = new St.BoxLayout({ vertical: true });
         this._dialogLayout.add(this.contentLayout,
@@ -417,6 +404,8 @@ const PomodoroEndDialog = new Lang.Class({
         this._openIdleWatchId = 0;
         this._openWhenIdleWatchId = 0;
         this._closeWhenActiveWatchId = 0;
+        this._actorMappedId = 0;
+        this._timerUpdateId = 0;
 
         let mainLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-main-layout',
                                             vertical: false });
@@ -444,8 +433,19 @@ const PomodoroEndDialog = new Lang.Class({
                        { x_fill: true,
                          y_fill: true });
 
-        this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
-        this._onTimerUpdate();
+        this._actorMappedId = this._group.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+    },
+
+    _onActorMappedChanged: function(actor) {
+        if (actor.mapped && !this._timerUpdateId) {
+            this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+            this._onTimerUpdate();
+        }
+
+        if (!actor.mapped && this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
     },
 
     _onTimerUpdate: function() {
@@ -548,6 +548,12 @@ const PomodoroEndDialog = new Lang.Class({
             this._idleMonitor.remove_watch(this._openIdleWatchId);
             this._openIdleWatchId = 0;
         }
+        if (this._actorMappedId) {
+            this._group.disconnect(this._actorMappedId);
+        }
+        if (this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+        }
 
         this.parent();
     }
@@ -561,12 +567,17 @@ const Notification = new Lang.Class({
     _init: function(title, description, params) {
         this.parent(get_default_source(), title, description, params);
 
-        this._titleFitsInBannerMode = true;
+        /* We want notifications to be shown right after the action,
+         * therefore urgency bump.
+         */
+        this.setUrgency(MessageTray.Urgency.HIGH);
+
+        this.actor.child.add_style_class_name('extension-pomodoro-notification');
+
+        this._bodyLabel = this.addBody(description);
     },
 
     show: function() {
-        this.emit('show');
-
         if (!this._destroying) {
             if (!Main.messageTray.contains(this.source)) {
                 Main.messageTray.add(this.source);
@@ -586,6 +597,16 @@ const Notification = new Lang.Class({
         if (!this.resident) {
             this.destroy();
         }
+    },
+
+    _updateBody: function(text) {
+        this._bodyLabel.clutter_text.set_markup(text);
+        this._bodyLabel.queue_relayout();
+    },
+
+    _updateBanner: function(text) {
+        this._bannerLabel.clutter_text.set_markup(text);
+        this._bannerLabel.queue_relayout();
     },
 
     close: function(close_tray) {
@@ -608,11 +629,70 @@ const PomodoroStart = new Lang.Class({
     Name: 'PomodoroStartNotification',
     Extends: Notification,
 
-    _init: function() {
-        this.parent(_("A new pomodoro is starting"), null, null);
+    _init: function(timer) {
+        this.parent(_("Pomodoro"), null, null);
 
-        this.setTransient(true);
-        this.setUrgency(MessageTray.Urgency.HIGH);
+        this.setResident(true);
+
+        this.timer = timer;
+
+        this._actorMappedId = 0;
+        this._timerUpdateId = 0;
+
+        this.addAction(_("Take a break now"), Lang.bind(this,
+            function() {
+                this.timer.setState(Timer.State.PAUSE);
+                this.close(false);
+            }));
+
+        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+
+        this._updateBanner(_("Focus on your task"));
+    },
+
+    _onActorMappedChanged: function(actor) {
+        if (actor.mapped && !this._timerUpdateId) {
+            this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+            this._onTimerUpdate();
+        }
+
+        if (!actor.mapped && this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+    },
+
+    _onTimerUpdate: function() {
+        if (this.timer.getState() == Timer.State.POMODORO) {
+            let elapsed = this.timer.proxy.Elapsed;
+            let stateDuration = this.timer.proxy.StateDuration;
+            let remaining = this.timer.getRemaining();
+            let minutes = Math.round(remaining / 60);
+            let seconds = Math.round(remaining % 60);
+
+            if (remaining > 15) {
+                seconds = Math.ceil(seconds / 15) * 15;
+            }
+
+            let longMessage = (remaining <= 45)
+                    ? ngettext("Focus on your task for %d more second.",
+                               "Focus on your task for %d more seconds.", seconds).format(seconds)
+                    : ngettext("Focus on your task for %d more minute.",
+                               "Focus on your task for %d more minutes.", minutes).format(minutes);
+
+            this._updateBody(longMessage);
+        }
+    },
+
+    destroy: function(reason) {
+        if (this._actorMappedId) {
+            this.actor.disconnect(this._actorMappedId);
+        }
+        if (this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+        }
+
+        this.parent(reason);
     }
 });
 
@@ -624,141 +704,129 @@ const PomodoroEnd = new Lang.Class({
     _init: function(timer) {
         this.parent(_("Take a break!"), null, null);
 
+        this.setResident(true);
+
         this.timer = timer;
 
+        this._actorMappedId = 0;
+        this._timerUpdateId = 0;
         this._settingsChangedId = 0;
+        this._shortBreakDuration = 0;
+        this._longBreakDuration = 0;
+        this._isLongPause = null;
 
+        let settings = Extension.extension.settings;
         try {
-            this._settingsChangedId = Extension.extension.settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+            this._settingsChangedId = settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+            this._shortBreakDuration = settings.get_double('short-break-duration');
+            this._longBreakDuration = settings.get_double('long-break-duration');
         }
         catch (error) {
             Extension.extension.logError(error);
         }
 
-        this.connect('destroy', Lang.bind(this,
-            function(notification) {
-                if (this._settingsChangedId) {
-                    Extension.extension.settings.disconnect(this._settingsChangedId);
-                }
+        this._switchToPauseButton = this.addAction(null, Lang.bind(this,
+            function() {
+                let duration = this._isLongPause
+                        ? this._shortBreakDuration
+                        : this._longBreakDuration;
+
+                this.timer.setState(Timer.State.PAUSE, duration);
             }));
 
-        this.setResident(true);
-        this.setUrgency(MessageTray.Urgency.HIGH);
+        this.addAction(_("Start pomodoro"), Lang.bind(this,
+            function() {
+                this.timer.setState(Timer.State.POMODORO);
+                this.close(true);
+            }));
 
-        if (check_version(['3.10'], GNOME_SHELL_VERSION)) {
-            this.addButton(Action.SWITCH_TO_PAUSE, "");
-            this.addButton(Action.SWITCH_TO_POMODORO, _("Start pomodoro"));
+        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+    },
 
-            this._pause_switch_button = this.getButton(Action.SWITCH_TO_PAUSE);
+    _onSettingsChanged: function(settings, key) {
+        switch (key) {
+            case 'short-break-duration':
+                this._shortBreakDuration = settings.get_double('short-break-duration');
+                break;
+
+            case 'long-break-duration':
+                this._longBreakDuration = settings.get_double('long-break-duration');
+                break;
         }
-        else {
-            this._pause_switch_button = this._makeButton("");
-            this._pomodoro_switch_button = this._makeButton(_("Start pomodoro"));
+    },
 
-            this.addButton(this._pause_switch_button, Lang.bind(this,
-                function() {
-                    this.emit('action-invoked', Action.SWITCH_TO_PAUSE);
-                }));
-            this.addButton(this._pomodoro_switch_button, Lang.bind(this,
-                function() {
-                    this.emit('action-invoked', Action.SWITCH_TO_POMODORO);
-                }));
-        }
-
-        if (this._pause_switch_button) {
-            this._pause_switch_button.hide();
-        }
-
-        if (!this._bodyLabel) {
-            this._bodyLabel = this.addBody("", null, null);
+    _onActorMappedChanged: function(actor) {
+        if (actor.mapped && !this._timerUpdateId) {
+            this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+            this._onTimerUpdate();
         }
 
-        this._short_break_duration = Extension.extension.settings.get_double('short-break-duration');
-        this._long_break_duration = Extension.extension.settings.get_double('long-break-duration');
-
-        this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
-        this._onTimerUpdate();
+        if (!actor.mapped && this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
     },
 
     _onTimerUpdate: function() {
         if (this.timer.getState() == Timer.State.PAUSE) {
             let elapsed = this.timer.proxy.Elapsed;
-            let state_duration = this.timer.proxy.StateDuration;
+            let stateDuration = this.timer.proxy.StateDuration;
             let remaining = this.timer.getRemaining();
-            let minutes = Math.floor(remaining / 60);
-            let seconds = Math.floor(remaining % 60);
+            let minutes = Math.round(remaining / 60);
+            let seconds = Math.round(remaining % 60);
 
-            let message = (minutes < 1)
-                    ? ngettext("You have %d second left",
-                               "You have %d seconds left", seconds).format(seconds)
-                    : ngettext("You have %d minute left",
-                               "You have %d minutes left", minutes).format(minutes);
+            if (remaining > 15) {
+                seconds = Math.ceil(seconds / 15) * 15;
+            }
 
-            let is_long_pause = state_duration > this._short_break_duration;
-            let can_switch_pause = elapsed < this._short_break_duration;
+            let shortMessage = (remaining <= 45)
+                    ? ngettext("You have %d second",
+                               "You have %d seconds", seconds).format(seconds)
+                    : ngettext("You have %d minute",
+                               "You have %d minutes", minutes).format(minutes);
 
-            this._bannerLabel.set_text(message);
-            this._bodyLabel.set_text(message);
+            let longMessage = (remaining <= 45)
+                    ? ngettext("You have %d second until next pomodoro.",
+                               "You have %d seconds until next pomodoro.", seconds).format(seconds)
+                    : ngettext("You have %d minute until next pomodoro.",
+                               "You have %d minutes until next pomodoro.", minutes).format(minutes);
 
-            this.updateButtons(is_long_pause, can_switch_pause);
+            let isLongPause = stateDuration > this._shortBreakDuration;
+            let canSwitchPause =
+                    (elapsed < this._shortBreakDuration) &&
+                    (this._shortBreakDuration < this._longBreakDuration);
+
+            this._updateBanner(shortMessage);
+            this._updateBody(longMessage);
+            this._updateButtons(isLongPause, canSwitchPause);
         }
     },
 
-    _onSettingsChanged: function() {
-        this._short_break_duration = Extension.extension.settings.get_double('short-break-duration');
-        this._long_break_duration = Extension.extension.settings.get_double('long-break-duration');
+    _updateButtons: function(isLongPause, canSwitchPause) {
+        if (this._switchToPauseButton.reactive != canSwitchPause) {
+            this._switchToPauseButton.reactive = canSwitchPause;
+            this._switchToPauseButton.can_focus = canSwitchPause;
+        }
+
+        if (this._isLongPause !== isLongPause) {
+            this._isLongPause = isLongPause;
+            this._switchToPauseButton.set_label(
+                isLongPause ? _("Shorten it") : _("Lengthen it"));
+        }
     },
 
-    _makeButton: function(label, iconName, useActionIcons) {
-        let button = new St.Button({ can_focus: true });
-        if (useActionIcons && Gtk.IconTheme.get_default().has_icon(iconName)) {
-            button.add_style_class_name('notification-icon-button');
-            button.child = new St.Icon({ icon_name: iconName });
-        } else {
-            button.add_style_class_name('notification-button');
-            button.label = label;
+    destroy: function(reason) {
+        if (this._settingsChangedId) {
+            Extension.extension.settings.disconnect(this._settingsChangedId);
         }
-        return button;
-    },
-
-    /* deprecated since 3.12 */
-    getButton: function(id) {
-        let button = this._buttonBox.get_children().filter(function(b) {
-            return b._actionId == id;
-        })[0];
-
-        return button;
-    },
-
-    updateButtons: function(is_long_pause, can_switch_pause) {
-        let changed = false;
-        let action_id = this._pause_switch_button._actionId;
-
-        if (this._short_break_duration >= this._long_break_duration) {
-            this._pause_switch_button.hide();
-            return;
+        if (this._actorMappedId) {
+            this.actor.disconnect(this._actorMappedId);
+        }
+        if (this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
         }
 
-        if (this._pause_switch_button.reactive != can_switch_pause) {
-            this._pause_switch_button.reactive = can_switch_pause;
-            this._pause_switch_button.can_focus = can_switch_pause;
-        }
-
-        if (is_long_pause && action_id != Action.SWITCH_TO_SHORT_PAUSE) {
-            this._pause_switch_button._actionId = Action.SWITCH_TO_SHORT_PAUSE;
-            this._pause_switch_button.set_label(_("Shorten the break"));
-            changed = true;
-        }
-
-        if (!is_long_pause && action_id != Action.SWITCH_TO_LONG_PAUSE) {
-            this._pause_switch_button._actionId = Action.SWITCH_TO_LONG_PAUSE;
-            this._pause_switch_button.set_label(_("Lengthen the break"));
-            changed = true;
-        }
-
-        if (changed) {
-            this._pause_switch_button.show();
-        }
+        this.parent(reason);
     }
 });
 
@@ -843,22 +911,19 @@ const Issue = new Lang.Class({
     Extends: Notification,
 
     _init: function(message) {
-        let url = Config.PACKAGE_BUGREPORT;
         let title = _("Problem with pomodoro");
+        let url = Config.PACKAGE_BUGREPORT;
 
         this.parent(title, message, {});
-        this.setUrgency(MessageTray.Urgency.HIGH);
+
         this.setTransient(true);
 
         /* TODO: Check which distro running, check for updates via package manager */
 
-        this.addButton(Action.REPORT_BUG, _("Report"));
-
-        this.connect('action-invoked', Lang.bind(this,
-            function(notification, action) {
-                notification.hide();
-                if (action == Action.REPORT_BUG)
-                    Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
+        this.addAction(_("Report issue"), Lang.bind(this,
+            function() {
+                Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
+                this.hide();
             }));
     }
 });
