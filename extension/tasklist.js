@@ -61,10 +61,11 @@ const TaskEntry = new Lang.Class({
     _init: function() {
         this.parent();
 
-        this.actor.add_style_class_name('extension-pomodoro-task-entry');
+        this.actor.add_style_class_name('extension-pomodoro-task-entry-menu-item');
         this.actor._delegate = this;
 
         this.entry = new St.Entry({
+                style_class: 'extension-pomodoro-task-entry',
                 can_focus: true,
                 hint_text: _("Enter new task")
             });
@@ -154,7 +155,7 @@ const TaskListItem = new Lang.Class({
     _init: function (task, params) {
         this.parent(params);
 
-        this.actor.add_style_class_name('task-list-item');
+        this.actor.add_style_class_name('extension-pomodoro-task-list-item');
 
         this.task = task;
         this.selected = false;
@@ -164,7 +165,7 @@ const TaskListItem = new Lang.Class({
 //        }
 
         this.label = new St.Label({ text: task.name });
-        this.label.add_style_class_name('name-label');
+        this.label.add_style_class_name('extension-pomodoro-task-list-item-name');
 
         this.actor.add_actor(this.label, { expand: true });
 
@@ -349,10 +350,10 @@ const TaskList = new Lang.Class({
         // TODO: only reveal top or bottom item
         let value = (box.y1 + adjustment.step_increment / 2.0) - (adjustment.page_size / 2.0);
         Tweener.removeTweens(adjustment);
-        Tweener.addTween (adjustment,
-                          { value: value,
-                            time: SCROLL_ANIMATION_TIME,
-                            transition: 'easeOutQuad' });
+        Tweener.addTween(adjustment,
+                         { value: value,
+                           time: SCROLL_ANIMATION_TIME,
+                           transition: 'easeOutQuad' });
     },
 
     getItemFromTaskId: function(task_id) {

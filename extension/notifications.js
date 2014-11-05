@@ -87,15 +87,15 @@ const State = {
 let source = null;
 
 
-function get_default_source() {
+function getDefaultSource() {
     if (!source) {
-        let new_source = new Source();
-        new_source.connect('destroy', function(reason) {
-            if (source === new_source) {
+        let newSource = new Source();
+        newSource.connect('destroy', function(reason) {
+            if (source === newSource) {
                 source = null;
             }
         });
-        source = new_source;
+        source = newSource;
     }
     return source;
 }
@@ -145,9 +145,9 @@ const Source = new Lang.Class({
         ));
     },
 
-    close: function(close_tray) {
+    close: function() {
         this.destroy();
-        this.emit('done-displaying-content', close_tray == true);
+        this.emit('done-displaying-content', false);
     }
 });
 
@@ -163,52 +163,45 @@ const ModalDialog = new Lang.Class({
     _init: function() {
         this.state = State.CLOSED;
 
-        this._idleMonitor = Meta.IdleMonitor.get_core();
+        this._idleMonitor          = Meta.IdleMonitor.get_core();
         this._pushModalDelaySource = 0;
-        this._pushModalWatchId = 0;
-        this._pushModalSource = 0;
-        this._pushModalTries = 0;
+        this._pushModalWatchId     = 0;
+        this._pushModalSource      = 0;
+        this._pushModalTries       = 0;
 
-        this._group = new St.Widget({ visible: false,
-                                      x: 0,
-                                      y: 0,
-                                      accessible_role: Atk.Role.DIALOG });
-        Main.uiGroup.add_actor(this._group);
-
-        let constraint = new Clutter.BindConstraint({ source: global.stage,
-                                                      coordinate: Clutter.BindCoordinate.ALL });
-        this._group.add_constraint(constraint);
-        this._group.opacity = 0.0;
-        this._group.connect('destroy', Lang.bind(this, this._onGroupDestroy));
-
-        this._backgroundBin = new St.Bin();
         this._monitorConstraint = new Layout.MonitorConstraint();
-        this._backgroundBin.add_constraint(this._monitorConstraint);
-        this._group.add_actor(this._backgroundBin);
+        this._stageConstraint   = new Clutter.BindConstraint({
+                                       source: global.stage,
+                                       coordinate: Clutter.BindCoordinate.ALL });
 
-        this._dialogLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-layout',
-                                                vertical: true });
+        this._layout = new St.BoxLayout({ vertical: true });
 
-        this._lightbox = new Lightbox.Lightbox(this._group,
+        let background = new St.Bin();
+        background.add_constraint(this._monitorConstraint);
+        background.set_child(this._layout);
+
+        this.actor = new St.Widget({ accessible_role: Atk.Role.DIALOG,
+                                     visible: false,
+                                     opacity: 0.0,
+                                     x: 0,
+                                     y: 0 });
+        this.actor.add_constraint(this._stageConstraint);
+        this.actor.add_style_class_name('extension-pomodoro-dialog');
+        this.actor.add_child(background);
+        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
+        Main.uiGroup.add_actor(this.actor);
+
+        this._lightbox = new Lightbox.Lightbox(this.actor,
                                                { fadeFactor: FADE_IN_OPACITY,
                                                  inhibitEvents: false });
-        this._lightbox.highlight(this._backgroundBin);
-        this._lightbox.actor.style_class = 'extension-pomodoro-lightbox';
+        this._lightbox.highlight(background);
+        this._lightbox.actor.add_style_class_name('extension-pomodoro-lightbox');
         this._lightbox.show();
 
-        this._backgroundBin.set_child(this._dialogLayout);
-
-        this.contentLayout = new St.BoxLayout({ vertical: true });
-        this._dialogLayout.add(this.contentLayout,
-                               { x_fill:  true,
-                                 y_fill:  true,
-                                 x_align: St.Align.MIDDLE,
-                                 y_align: St.Align.START });
-
-        this._grabHelper = new GrabHelper.GrabHelper(this._group);
+        this._grabHelper = new GrabHelper.GrabHelper(this.actor);
         this._grabHelper.addActor(this._lightbox.actor);
 
-        global.focus_manager.add_group(this._group);
+        global.focus_manager.add_group(this.actor);
     },
 
     open: function(timestamp) {
@@ -225,9 +218,9 @@ const ModalDialog = new Lang.Class({
         }
 
         this._monitorConstraint.index = global.screen.get_current_monitor();
-        this._group.show();
+        this.actor.show();
 
-        Tweener.addTween(this._group,
+        Tweener.addTween(this.actor,
                          { opacity: 255,
                            time: FADE_IN_TIME / 1000,
                            transition: 'easeOutQuad',
@@ -252,7 +245,7 @@ const ModalDialog = new Lang.Class({
         this.popModal(timestamp);
         this.state = State.CLOSING;
 
-        Tweener.addTween(this._group,
+        Tweener.addTween(this.actor,
                          { opacity: 0,
                            time: FADE_OUT_TIME / 1000,
                            transition: 'easeOutQuad',
@@ -260,7 +253,7 @@ const ModalDialog = new Lang.Class({
                                function() {
                                     if (this.state == State.CLOSING) {
                                         this.state = State.CLOSED;
-                                        this._group.hide();
+                                        this.actor.hide();
                                         this.emit('closed');
                                     }
                                })
@@ -375,7 +368,7 @@ const ModalDialog = new Lang.Class({
         }
     },
 
-    _onGroupDestroy: function() {
+    _onActorDestroy: function() {
         this.close();
         this.emit('destroy');
     },
@@ -385,7 +378,7 @@ const ModalDialog = new Lang.Class({
     },
 
     destroy: function() {
-        this._group.destroy();
+        this.actor.destroy();
     }
 });
 Signals.addSignalMethods(ModalDialog.prototype);
@@ -401,39 +394,33 @@ const PomodoroEndDialog = new Lang.Class({
         this.timer = timer;
         this.description = _("It's time to take a break");
 
-        this._openIdleWatchId = 0;
-        this._openWhenIdleWatchId = 0;
+        this._openIdleWatchId        = 0;
+        this._openWhenIdleWatchId    = 0;
         this._closeWhenActiveWatchId = 0;
-        this._actorMappedId = 0;
-        this._timerUpdateId = 0;
-
-        let mainLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-main-layout',
-                                            vertical: false });
-
-        let messageBox = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-message-layout',
-                                            vertical: true });
+        this._actorMappedId          = 0;
+        this._timerUpdateId          = 0;
 
         this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-timer' });
 
-        this._descriptionLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-message',
-                                                text: this.description });
+        this._descriptionLabel = new St.Label({
+                                       style_class: 'extension-pomodoro-dialog-description',
+                                       text: this.description });
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
 
-        messageBox.add(this._timerLabel,
-                       { y_fill:  false,
-                         y_align: St.Align.START });
-        messageBox.add(this._descriptionLabel,
-                       { y_fill:  true,
-                         y_align: St.Align.START });
-        mainLayout.add(messageBox,
-                       { x_fill: true,
-                         y_align: St.Align.START });
-        this.contentLayout.add(mainLayout,
-                       { x_fill: true,
-                         y_fill: true });
+        let box = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-box',
+                                     vertical: true });
+        box.add(this._timerLabel,
+                { y_fill: false,
+                  y_align: St.Align.START });
+        box.add(this._descriptionLabel,
+                { y_fill: true,
+                  y_align: St.Align.START });
+        this._layout.add(box,
+                         { x_fill: true,
+                           y_fill: true });
 
-        this._actorMappedId = this._group.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
     },
 
     _onActorMappedChanged: function(actor) {
@@ -451,8 +438,8 @@ const PomodoroEndDialog = new Lang.Class({
     _onTimerUpdate: function() {
         if (this.timer.getState() == Timer.State.PAUSE) {
             let remaining = this.timer.getRemaining();
-            let minutes = Math.floor(remaining / 60);
-            let seconds = Math.floor(remaining % 60);
+            let minutes   = Math.floor(remaining / 60);
+            let seconds   = Math.floor(remaining % 60);
 
             this._timerLabel.set_text('%02d:%02d'.format(minutes, seconds));
         }
@@ -536,8 +523,7 @@ const PomodoroEndDialog = new Lang.Class({
     },
 
     setDescription: function(text) {
-        this.description = text;
-        this._descriptionLabel.text = text;
+        this._descriptionLabel.text = this.description = text;
     },
 
     destroy: function() {
@@ -549,7 +535,7 @@ const PomodoroEndDialog = new Lang.Class({
             this._openIdleWatchId = 0;
         }
         if (this._actorMappedId) {
-            this._group.disconnect(this._actorMappedId);
+            this.actor.disconnect(this._actorMappedId);
         }
         if (this._timerUpdateId) {
             this.timer.disconnect(this._timerUpdateId);
@@ -565,7 +551,7 @@ const Notification = new Lang.Class({
     Extends: MessageTray.Notification,
 
     _init: function(title, description, params) {
-        this.parent(get_default_source(), title, description, params);
+        this.parent(getDefaultSource(), title, description, params);
 
         /* We want notifications to be shown right after the action,
          * therefore urgency bump.
@@ -587,11 +573,7 @@ const Notification = new Lang.Class({
         }
     },
 
-    hide: function(close_tray) {
-        if (close_tray) {
-            Main.messageTray.close();
-        }
-
+    hide: function() {
         this.emit('done-displaying');
 
         if (!this.resident) {
@@ -609,11 +591,7 @@ const Notification = new Lang.Class({
         this._bannerLabel.queue_relayout();
     },
 
-    close: function(close_tray) {
-        if (close_tray) {
-            Main.messageTray.close();
-        }
-
+    close: function() {
         this.emit('done-displaying');
         this.destroy();
     },
@@ -642,7 +620,7 @@ const PomodoroStart = new Lang.Class({
         this.addAction(_("Take a break now"), Lang.bind(this,
             function() {
                 this.timer.setState(Timer.State.PAUSE);
-                this.close(false);
+                this.close();
             }));
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
@@ -664,11 +642,11 @@ const PomodoroStart = new Lang.Class({
 
     _onTimerUpdate: function() {
         if (this.timer.getState() == Timer.State.POMODORO) {
-            let elapsed = this.timer.proxy.Elapsed;
+            let elapsed       = this.timer.proxy.Elapsed;
             let stateDuration = this.timer.proxy.StateDuration;
-            let remaining = this.timer.getRemaining();
-            let minutes = Math.round(remaining / 60);
-            let seconds = Math.round(remaining % 60);
+            let remaining     = this.timer.getRemaining();
+            let minutes       = Math.round(remaining / 60);
+            let seconds       = Math.round(remaining % 60);
 
             if (remaining > 15) {
                 seconds = Math.ceil(seconds / 15) * 15;
@@ -708,18 +686,18 @@ const PomodoroEnd = new Lang.Class({
 
         this.timer = timer;
 
-        this._actorMappedId = 0;
-        this._timerUpdateId = 0;
-        this._settingsChangedId = 0;
+        this._actorMappedId      = 0;
+        this._timerUpdateId      = 0;
+        this._settingsChangedId  = 0;
         this._shortBreakDuration = 0;
-        this._longBreakDuration = 0;
-        this._isLongPause = null;
+        this._longBreakDuration  = 0;
+        this._isLongPause        = null;
 
         let settings = Extension.extension.settings;
         try {
-            this._settingsChangedId = settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+            this._settingsChangedId  = settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
             this._shortBreakDuration = settings.get_double('short-break-duration');
-            this._longBreakDuration = settings.get_double('long-break-duration');
+            this._longBreakDuration  = settings.get_double('long-break-duration');
         }
         catch (error) {
             Extension.extension.logError(error);
@@ -737,7 +715,8 @@ const PomodoroEnd = new Lang.Class({
         this.addAction(_("Start pomodoro"), Lang.bind(this,
             function() {
                 this.timer.setState(Timer.State.POMODORO);
-                this.close(true);
+                this.close();
+                Main.messageTray.close();
             }));
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
@@ -769,11 +748,11 @@ const PomodoroEnd = new Lang.Class({
 
     _onTimerUpdate: function() {
         if (this.timer.getState() == Timer.State.PAUSE) {
-            let elapsed = this.timer.proxy.Elapsed;
+            let elapsed       = this.timer.proxy.Elapsed;
             let stateDuration = this.timer.proxy.StateDuration;
-            let remaining = this.timer.getRemaining();
-            let minutes = Math.round(remaining / 60);
-            let seconds = Math.round(remaining % 60);
+            let remaining     = this.timer.getRemaining();
+            let minutes       = Math.round(remaining / 60);
+            let seconds       = Math.round(remaining % 60);
 
             if (remaining > 15) {
                 seconds = Math.ceil(seconds / 15) * 15;
@@ -804,7 +783,7 @@ const PomodoroEnd = new Lang.Class({
 
     _updateButtons: function(isLongPause, canSwitchPause) {
         if (this._switchToPauseButton.reactive != canSwitchPause) {
-            this._switchToPauseButton.reactive = canSwitchPause;
+            this._switchToPauseButton.reactive  = canSwitchPause;
             this._switchToPauseButton.can_focus = canSwitchPause;
         }
 
@@ -842,19 +821,19 @@ const PomodoroEndReminder = new Lang.Class({
         this.setUrgency(MessageTray.Urgency.LOW);
 
         this._timeoutSource = 0;
-        this._interval = 0;
-        this._timeout = 0;
+        this._interval      = 0;
+        this._timeout       = 0;
     },
 
     _onTimeout: function() {
-        let display = global.screen.get_display();
-        let idle_time = (display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000;
+        let display  = global.screen.get_display();
+        let idleTime = (display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000;
 
         /* No need to notify if user seems to be away. We only monitor idle
          * time based on X11, and not Clutter scene which should better reflect
          * to real work.
          */
-        if (idle_time < this._timeout * REMINDER_ACCEPTANCE) {
+        if (idleTime < this._timeout * REMINDER_ACCEPTANCE) {
             this.show();
         }
         else {
@@ -867,7 +846,7 @@ const PomodoroEndReminder = new Lang.Class({
     },
 
     schedule: function() {
-        let intervals = REMINDER_INTERVALS;
+        let intervals  = REMINDER_INTERVALS;
         let reschedule = this._timeoutSource != 0;
 
         if (this._timeoutSource) {
@@ -896,7 +875,7 @@ const PomodoroEndReminder = new Lang.Class({
         }
 
         this._interval = 0;
-        this._timeout = 0;
+        this._timeout  = 0;
     },
 
     destroy: function(reason) {
@@ -911,8 +890,8 @@ const Issue = new Lang.Class({
     Extends: Notification,
 
     _init: function(message) {
-        let title = _("Problem with pomodoro");
-        let url = Config.PACKAGE_BUGREPORT;
+        let title = _("Problem with gnome-pomodoro");
+        let url   = Config.PACKAGE_BUGREPORT;
 
         this.parent(title, message, {});
 

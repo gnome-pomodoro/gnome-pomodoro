@@ -142,12 +142,12 @@ const Timer = new Lang.Class({
         this.emit('update');
     },
 
-    _onNotifyPomodoroStart: function(proxy, senderName, [is_requested]) {
-        this.emit('notify-pomodoro-start', is_requested);
+    _onNotifyPomodoroStart: function(proxy, senderName, [isRequested]) {
+        this.emit('notify-pomodoro-start', isRequested);
     },
 
-    _onNotifyPomodoroEnd: function(proxy, senderName, [is_completed]) {
-        this.emit('notify-pomodoro-end', is_completed);
+    _onNotifyPomodoroEnd: function(proxy, senderName, [isCompleted]) {
+        this.emit('notify-pomodoro-end', isCompleted);
     },
 
     _onCallback: function(result, error) {

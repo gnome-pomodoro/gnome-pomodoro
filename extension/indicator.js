@@ -72,13 +72,13 @@ const IndicatorMenu = new Lang.Class({
     _init: function(indicator) {
         this.parent(indicator.actor, St.Align.START, St.Side.TOP);
 
-        this.actor.add_style_class_name('extension-pomodoro-indicator');
+        this.actor.add_style_class_name('extension-pomodoro-indicator-menu');
 
         this.indicator = indicator;
         this.indicator.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
 
         /* Toggle timer state button */
-        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'extension-pomodoro-toggle' });
+        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false);
         this._timerToggle.connect('toggled', Lang.bind(this,
             function() {
                 this.indicator.timer.toggle();
@@ -134,7 +134,6 @@ const IndicatorMenu = new Lang.Class({
     _onTaskSelected: function(tasklist, task) {
         global.log("Selected task: " + (task ? task.name : '-'));
     }
-
 });
 
 
@@ -154,7 +153,7 @@ const TextIndicator = new Lang.Class({
         this.actor = new Shell.GenericContainer({ reactive: true });
         this.actor._delegate = this;
 
-        this.label = new St.Label({ style_class: 'extension-pomodoro-label',
+        this.label = new St.Label({ style_class: 'system-status-label',
                                     x_align: Clutter.ActorAlign.CENTER,
                                     y_align: Clutter.ActorAlign.CENTER });
         this.label.clutter_text.line_wrap = false;
@@ -174,7 +173,8 @@ const TextIndicator = new Lang.Class({
         this._initialized = true;
 
         if (this._state == Timer.State.POMODORO ||
-            this._state == Timer.State.IDLE) {
+            this._state == Timer.State.IDLE)
+        {
             this.actor.set_opacity(FADE_IN_OPACITY * 255);
         }
         else {
@@ -275,10 +275,13 @@ const TextIndicator = new Lang.Class({
 
         let [minWidth, natWidth] = child.get_preferred_width(-1);
 
-        let availWidth = box.x2 - box.x1;
+        let availWidth  = box.x2 - box.x1;
         let availHeight = box.y2 - box.y1;
 
         let childBox = new Clutter.ActorBox();
+        childBox.y1 = 0;
+        childBox.y2 = availHeight;
+
         if (natWidth + 2 * this._natHPadding <= availWidth) {
             childBox.x1 = this._natHPadding;
             childBox.x2 = availWidth - this._natHPadding;
@@ -286,9 +289,6 @@ const TextIndicator = new Lang.Class({
             childBox.x1 = this._minHPadding;
             childBox.x2 = availWidth - this._minHPadding;
         }
-
-        childBox.y1 = 0;
-        childBox.y2 = availHeight;
 
         child.allocate(childBox, flags);
     },
@@ -311,7 +311,8 @@ const ShortTextIndicator = new Lang.Class({
     },
 
     _getWidth: function() {
-        return Math.ceil(2 * this._digitWidth + 1 * this._charWidth);
+        return Math.ceil(2 * this._digitWidth +
+                         1 * this._charWidth);
     },
 
     _getText: function(state, remaining) {
@@ -323,8 +324,8 @@ const ShortTextIndicator = new Lang.Class({
         }
 
         return (remaining <= 45)
-                ? '%ds'.format(seconds, remaining)
-                : '%dm'.format(minutes, remaining);
+                ? _("%ds").format(seconds, remaining)
+                : _("%dm").format(minutes, remaining);
     }
 });
 
@@ -363,14 +364,6 @@ const IconIndicator = new Lang.Class({
 
         this._state = this.timer.getState();
         this._initialized = true;
-
-        // if (this._state == Timer.State.POMODORO ||
-        //     this._state == Timer.State.IDLE) {
-        //     this.actor.set_opacity(FADE_IN_OPACITY * 255);
-        // }
-        // else {
-        //     this.actor.set_opacity(FADE_OUT_OPACITY * 255);
-        // }
     },
 
     _onStyleChanged: function(actor) {
@@ -431,24 +424,11 @@ const IconIndicator = new Lang.Class({
         if (this._state != state && this._initialized)
         {
             this._state = state;
-
-            // if (state != Timer.State.PAUSE) {
-            //     Tweener.addTween(this.actor,
-            //                      { opacity: FADE_IN_OPACITY * 255,
-            //                        time: FADE_IN_TIME / 1000,
-            //                        transition: 'easeOutQuad' });
-            // }
-            // else {
-            //     Tweener.addTween(this.actor,
-            //                      { opacity: FADE_OUT_OPACITY * 255,
-            //                        time: FADE_OUT_TIME / 1000,
-            //                        transition: 'easeOutQuad' });
-            // }
-
             this._progress = -1.0;  /* force refresh */
         }
 
-        if (this._progress != progress) {
+        if (this._progress != progress)
+        {
             this._progress = progress;
             this.icon.queue_repaint();
         }
@@ -461,10 +441,13 @@ const IconIndicator = new Lang.Class({
 
         let [minWidth, natWidth] = child.get_preferred_width(-1);
 
-        let availWidth = box.x2 - box.x1;
+        let availWidth  = box.x2 - box.x1;
         let availHeight = box.y2 - box.y1;
 
         let childBox = new Clutter.ActorBox();
+        childBox.y1 = 0;
+        childBox.y2 = availHeight;
+
         if (natWidth + 2 * this._natHPadding <= availWidth) {
             childBox.x1 = this._natHPadding;
             childBox.x2 = availWidth - this._natHPadding;
@@ -473,9 +456,6 @@ const IconIndicator = new Lang.Class({
             childBox.x2 = availWidth - this._minHPadding;
         }
 
-        childBox.y1 = 0;
-        childBox.y2 = availHeight;
-
         child.allocate(childBox, flags);
     },
 
@@ -483,7 +463,7 @@ const IconIndicator = new Lang.Class({
         let cr = area.get_context();
         let [width, height] = area.get_surface_size();
 
-        let radius = Math.min(width, height) * 0.85 * ICON_SIZE / 2;
+        let radius   = Math.min(width, height) * 0.85 * ICON_SIZE / 2;
         let progress = Math.max(this._progress, 0.001);
 
         cr.translate(0.5 * width, 0.5 * height);
@@ -492,8 +472,8 @@ const IconIndicator = new Lang.Class({
 
         if (this._state && this._state != Timer.State.NULL)
         {
-            let angle1 = - 0.5 * Math.PI;
-            let angle2 = 2.0 * Math.PI * progress - 0.5 * Math.PI;
+            let angle1   = - 0.5 * Math.PI;
+            let angle2   = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
             let negative = (this._state == Timer.State.PAUSE);
 
             /* background pie */
@@ -547,19 +527,18 @@ const Indicator = new Lang.Class({
     _init: function(timer) {
         this.parent(St.Align.START, _("Pomodoro"), true);
 
-        this.timer = timer;
+        this.timer  = timer;
         this.widget = null;
 
-        this._arrow = PopupMenu.arrowIcon
-                ? PopupMenu.arrowIcon(St.Side.BOTTOM)
-                : PopupMenu.unicodeArrow(St.Side.BOTTOM);  /* XXX: deprecated */
+        this.actor.add_style_class_name('extension-pomodoro-indicator');
+
+        this._arrow = PopupMenu.arrowIcon(St.Side.BOTTOM);
 
         this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
         this._hbox.pack_start = true;
         this._hbox.add_child(this._arrow, { expand: false,
                                             x_fill: false,
                                             x_align: St.Align.END });
-
         this.actor.add_child(this._hbox);
 
         this.setMenu(new IndicatorMenu(this));
@@ -576,14 +555,18 @@ const Indicator = new Lang.Class({
             this.widget.destroy();
         }
 
-        if (indicatorType == IndicatorType.ICON) {
-            this.widget = new IconIndicator(this.timer);
-        }
-        else if (indicatorType == IndicatorType.TEXT_SMALL) {
-            this.widget = new ShortTextIndicator(this.timer);
-        }
-        else {
-            this.widget = new TextIndicator(this.timer);
+        switch(indicatorType)
+        {
+            case IndicatorType.ICON:
+                this.widget = new IconIndicator(this.timer);
+                break;
+
+            case IndicatorType.TEXT_SMALL:
+                this.widget = new ShortTextIndicator(this.timer);
+                break;
+
+            default:
+                this.widget = new TextIndicator(this.timer);
         }
 
         this.widget.actor.bind_property('opacity',

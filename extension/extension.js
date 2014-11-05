@@ -48,17 +48,19 @@ const PomodoroExtension = new Lang.Class({
     _init: function() {
         Extension.extension = this;
 
-        this.settings = null;
-        this.timer = null;
-        this.indicator = null;
+        this.settings     = null;
+        this.timer        = null;
+        this.indicator    = null;
         this.notification = null;
-        this.dialog = null;
+        this.dialog       = null;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
         }
         catch (error) {
             this.logError(error);
+
+            // TODO: Notify issue
         }
 
         this.timer = new Timer.Timer();
