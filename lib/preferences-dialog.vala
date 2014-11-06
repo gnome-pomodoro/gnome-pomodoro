@@ -65,6 +65,9 @@ namespace Pomodoro
             case "text":
                 return IndicatorType.TEXT;
 
+            case "text-small":
+                return IndicatorType.TEXT_SMALL;
+
             case "icon":
                 return IndicatorType.ICON;
         }
