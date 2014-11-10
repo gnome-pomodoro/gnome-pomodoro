@@ -618,7 +618,7 @@ const PomodoroStart = new Lang.Class({
         this._actorMappedId = 0;
         this._timerUpdateId = 0;
 
-        this.addAction(_("Take a break now"), Lang.bind(this,
+        this.addAction(_("Take a break"), Lang.bind(this,
             function() {
                 this.timer.setState(Timer.State.PAUSE);
             }));
