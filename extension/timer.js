@@ -129,6 +129,7 @@ const Timer = new Lang.Class({
     },
 
     _onNameVanished: function() {
+        this.emit('service-disconnected');
     },
 
     _onPropertiesChanged: function(proxy, properties) {
