@@ -88,14 +88,12 @@ let source = null;
 
 
 function getDefaultSource() {
-    if (!source) {
-        let newSource = new Source();
-        newSource.connect('destroy', function(reason) {
-            if (source === newSource) {
+    if (!source || !source.policy) {
+        source = new Source();
+        source.connect('destroy', Lang.bind(this,
+            function() {
                 source = null;
-            }
-        });
-        source = newSource;
+            }));
     }
     return source;
 }
@@ -120,9 +118,6 @@ const Source = new Lang.Class({
 
     _init: function() {
         this.parent(_("Pomodoro"), this.ICON_NAME);
-
-        this.connect('notification-added',
-                     Lang.bind(this, this._onNotificationAdded));
     },
 
     /* override parent method */
@@ -130,19 +125,13 @@ const Source = new Lang.Class({
         return new NotificationPolicy();
     },
 
-    _onNotificationAdded: function(source, notification) {
-        notification.connect('destroy', Lang.bind(this,
-            function() {
-                let notifications = source.notifications;
+    clear: function() {
+        let notifications = this.notifications;
+        this.notifications = [];
 
-                if ((notifications.length == 0) ||
-                    (notifications.length == 1 && notifications.indexOf(notification) == 0))
-                {
-                    source.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-                    source.emit('done-displaying-content', false);
-                }
-            }
-        ));
+        for (let i = 0; i < notifications.length; i++) {
+            notifications[i].destroy();
+        }
     },
 
     close: function() {
@@ -268,14 +257,16 @@ const ModalDialog = new Lang.Class({
         if (this._pushModalWatchId == 0) {
             this._pushModalWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_PUSH_MODAL, Lang.bind(this,
                 function(monitor) {
-                    this._idleMonitor.remove_watch(this._pushModalWatchId);
-                    this._pushModalWatchId = 0;
-
+                    if (this._pushModalWatchId) {
+                        this._idleMonitor.remove_watch(this._pushModalWatchId);
+                        this._pushModalWatchId = 0;
+                    }
                     this.pushModal(global.get_current_time());
                 }
             ));
         }
 
+        this._pushModalDelaySource = 0;
         return false;
     },
 
@@ -296,17 +287,20 @@ const ModalDialog = new Lang.Class({
 
     _onPushModalTimeout: function() {
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
+            this._pushModalSource = 0;
             return false;
         }
 
         this._pushModalTries += 1;
 
         if (this._pushModal(global.get_current_time())) {
+            this._pushModalSource = 0;
             return false; /* dialog finally opened */
         }
 
         if (this._pushModalTries > PUSH_MODAL_TIME_LIMIT * PUSH_MODAL_RATE) {
             this.close();
+            this._pushModalSource = 0;
             return false; /* dialog can't become modal */
         }
 
@@ -354,15 +348,15 @@ const ModalDialog = new Lang.Class({
     },
 
     _disconnectInternals: function() {
-        if (this._pushModalDelaySource != 0) {
+        if (this._pushModalDelaySource) {
             GLib.source_remove(this._pushModalDelaySource);
             this._pushModalDelaySource = 0;
         }
-        if (this._pushModalSource != 0) {
+        if (this._pushModalSource) {
             GLib.source_remove(this._pushModalSource);
             this._pushModalSource = 0;
         }
-        if (this._pushModalWatchId != 0) {
+        if (this._pushModalWatchId) {
             this._idleMonitor.remove_watch(this._pushModalWatchId);
             this._pushModalWatchId = 0;
         }
@@ -451,10 +445,14 @@ const PomodoroEndDialog = new Lang.Class({
     open: function(timestamp) {
         this.parent(timestamp);
 
+        if (this._openTimeoutSource) {
+            return;
+        }
+
         /* Delay scheduling of closing the dialog by activity
          * until user has chance to see it.
          */
-        Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this,
+        this._openTimeoutSource = Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this,
             function() {
                 /* Wait until user becomes slightly idle */
                 if (this._idleMonitor.get_idletime() < IDLE_TIME_TO_CLOSE) {
@@ -468,9 +466,9 @@ const PomodoroEndDialog = new Lang.Class({
                     this.closeWhenActive();
                 }
 
+                this._openTimeoutSource = 0;
                 return false;
-            }
-        ));
+            }));
     },
 
     close: function(timestamp) {
@@ -481,7 +479,7 @@ const PomodoroEndDialog = new Lang.Class({
     },
 
     _cancelOpenWhenIdle: function() {
-        if (this._openWhenIdleWatchId != 0) {
+        if (this._openWhenIdleWatchId) {
             this._idleMonitor.remove_watch(this._openWhenIdleWatchId);
             this._openWhenIdleWatchId = 0;
         }
@@ -502,7 +500,7 @@ const PomodoroEndDialog = new Lang.Class({
     },
 
     _cancelCloseWhenActive: function() {
-        if (this._closeWhenActiveWatchId != 0) {
+        if (this._closeWhenActiveWatchId) {
             this._idleMonitor.remove_watch(this._closeWhenActiveWatchId);
             this._closeWhenActiveWatchId = 0;
         }
@@ -523,22 +521,25 @@ const PomodoroEndDialog = new Lang.Class({
     },
 
     setDescription: function(text) {
-        this._descriptionLabel.text = this.description = text;
+        this.description = text;
+        this._descriptionLabel.set_text(this.description);
     },
 
     destroy: function() {
         this._cancelOpenWhenIdle();
         this._cancelCloseWhenActive();
 
-        if (this._openIdleWatchId != 0) {
+        if (this._openIdleWatchId) {
             this._idleMonitor.remove_watch(this._openIdleWatchId);
             this._openIdleWatchId = 0;
         }
         if (this._actorMappedId) {
             this.actor.disconnect(this._actorMappedId);
+            this._actorMappedId = 0;
         }
         if (this._timerUpdateId) {
             this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
         }
 
         this.parent();
@@ -623,6 +624,18 @@ const PomodoroStart = new Lang.Class({
                 this.close();
             }));
 
+        this.connect('destroy', Lang.bind(this,
+            function() {
+                if (this._actorMappedId) {
+                    this.actor.disconnect(this._actorMappedId);
+                    this._actorMappedId = 0;
+                }
+                if (this._timerUpdateId) {
+                    this.timer.disconnect(this._timerUpdateId);
+                    this._timerUpdateId = 0;
+                }
+            }));
+
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
 
         this._updateBanner(_("Focus on your task"));
@@ -641,7 +654,9 @@ const PomodoroStart = new Lang.Class({
     },
 
     _onTimerUpdate: function() {
-        if (this.timer.getState() == Timer.State.POMODORO) {
+        let state = this.timer.getState();
+
+        if (state == Timer.State.POMODORO || state == Timer.State.IDLE) {
             let elapsed       = this.timer.proxy.Elapsed;
             let stateDuration = this.timer.proxy.StateDuration;
             let remaining     = this.timer.getRemaining();
@@ -660,17 +675,6 @@ const PomodoroStart = new Lang.Class({
 
             this._updateBody(longMessage);
         }
-    },
-
-    destroy: function(reason) {
-        if (this._actorMappedId) {
-            this.actor.disconnect(this._actorMappedId);
-        }
-        if (this._timerUpdateId) {
-            this.timer.disconnect(this._timerUpdateId);
-        }
-
-        this.parent(reason);
     }
 });
 
@@ -720,6 +724,22 @@ const PomodoroEnd = new Lang.Class({
             }));
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+
+        this.connect('destroy', Lang.bind(this,
+            function() {
+                if (this._settingsChangedId) {
+                    Extension.extension.settings.disconnect(this._settingsChangedId);
+                    this._settingsChangedId = 0;
+                }
+                if (this._actorMappedId) {
+                    this.actor.disconnect(this._actorMappedId);
+                    this._actorMappedId = 0;
+                }
+                if (this._timerUpdateId) {
+                    this.timer.disconnect(this._timerUpdateId);
+                    this._timerUpdateId = 0;
+                }
+            }));
     },
 
     _onSettingsChanged: function(settings, key) {
@@ -747,7 +767,9 @@ const PomodoroEnd = new Lang.Class({
     },
 
     _onTimerUpdate: function() {
-        if (this.timer.getState() == Timer.State.PAUSE) {
+        let state = this.timer.getState();
+
+        if (state == Timer.State.PAUSE) {
             let elapsed       = this.timer.proxy.Elapsed;
             let stateDuration = this.timer.proxy.StateDuration;
             let remaining     = this.timer.getRemaining();
@@ -792,20 +814,6 @@ const PomodoroEnd = new Lang.Class({
             this._switchToPauseButton.set_label(
                 isLongPause ? _("Shorten it") : _("Lengthen it"));
         }
-    },
-
-    destroy: function(reason) {
-        if (this._settingsChangedId) {
-            Extension.extension.settings.disconnect(this._settingsChangedId);
-        }
-        if (this._actorMappedId) {
-            this.actor.disconnect(this._actorMappedId);
-        }
-        if (this._timerUpdateId) {
-            this.timer.disconnect(this._timerUpdateId);
-        }
-
-        this.parent(reason);
     }
 });
 
@@ -823,6 +831,11 @@ const PomodoroEndReminder = new Lang.Class({
         this._timeoutSource = 0;
         this._interval      = 0;
         this._timeout       = 0;
+
+        this.connect('destroy', Lang.bind(this,
+            function() {
+                this.unschedule();
+            }));
     },
 
     _onTimeout: function() {
@@ -876,11 +889,6 @@ const PomodoroEndReminder = new Lang.Class({
 
         this._interval = 0;
         this._timeout  = 0;
-    },
-
-    destroy: function(reason) {
-        this.unschedule();
-        this.parent(reason);
     }
 });
 

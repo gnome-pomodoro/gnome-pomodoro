@@ -141,12 +141,14 @@ const TextIndicator = new Lang.Class({
     Name: 'PomodoroTextIndicator',
 
     _init : function(timer) {
-        this._initialized = false;
-        this._state       = Timer.State.NULL;
-        this._minHPadding = 0;
-        this._natHPadding = 0;
-        this._digitWidth  = 0;
-        this._charWidth   = 0;
+        this._initialized     = false;
+        this._actorDestroyed  = false;
+        this._state           = Timer.State.NULL;
+        this._minHPadding     = 0;
+        this._natHPadding     = 0;
+        this._digitWidth      = 0;
+        this._charWidth       = 0;
+        this._onTimerUpdateId = 0;
 
         this.timer = timer;
 
@@ -158,6 +160,10 @@ const TextIndicator = new Lang.Class({
                                     y_align: Clutter.ActorAlign.CENTER });
         this.label.clutter_text.line_wrap = false;
         this.label.clutter_text.ellipsize = false;
+        this.label.connect('destroy', Lang.bind(this, function() {
+            this.timer.disconnect(this._onTimerUpdateId);
+            this._actorDestroyed = true;
+        }));
         this.actor.add_child(this.label);
 
         this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
@@ -239,11 +245,11 @@ const TextIndicator = new Lang.Class({
     },
 
     _onTimerUpdate: function() {
-        let state = this.timer.getState();
-
-        if (!this.label) {
+        if (this._actorDestroyed) {
             return;
         }
+
+        let state = this.timer.getState();
 
         if (this._state != state && this._initialized)
         {
@@ -294,8 +300,9 @@ const TextIndicator = new Lang.Class({
     },
 
     destroy: function() {
-        this.timer.disconnect(this._onTimerUpdateId);
         this.actor.destroy();
+
+        this.emit('destroy');
     }
 });
 
@@ -334,15 +341,17 @@ const IconIndicator = new Lang.Class({
     Name: 'PomodoroIconIndicator',
 
     _init : function(timer) {
-        this._initialized    = false;
-        this._state          = Timer.State.NULL;
-        this._progress       = -1.0;
-        this._minHPadding    = 0;
-        this._natHPadding    = 0;
-        this._minVPadding    = 0;
-        this._natVPadding    = 0;
-        this._primaryColor   = null;
-        this._secondaryColor = null;
+        this._initialized     = false;
+        this._actorDestroyed  = false;
+        this._state           = Timer.State.NULL;
+        this._progress        = -1.0;
+        this._minHPadding     = 0;
+        this._natHPadding     = 0;
+        this._minVPadding     = 0;
+        this._natVPadding     = 0;
+        this._primaryColor    = null;
+        this._secondaryColor  = null;
+        this._onTimerUpdateId = 0;
 
         this.timer = timer;
 
@@ -351,6 +360,10 @@ const IconIndicator = new Lang.Class({
 
         this.icon = new St.DrawingArea({ style_class: 'system-status-icon' });
         this.icon.connect('repaint', Lang.bind(this, this._repaint));
+        this.icon.connect('destroy', Lang.bind(this, function() {
+            this.timer.disconnect(this._onTimerUpdateId);
+            this._actorDestroyed = true;
+        }));
         this.actor.add_child(this.icon);
 
         this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
@@ -418,6 +431,10 @@ const IconIndicator = new Lang.Class({
     },
 
     _onTimerUpdate: function() {
+        if (this._actorDestroyed) {
+            return;
+        }
+
         let state = this.timer.getState();
         let progress = this.timer.getProgress();
 
@@ -514,8 +531,9 @@ const IconIndicator = new Lang.Class({
     },
 
     destroy: function() {
-        this.timer.disconnect(this._onTimerUpdateId);
         this.actor.destroy();
+
+        this.emit('destroy');
     }
 });
 

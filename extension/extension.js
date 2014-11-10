@@ -77,6 +77,18 @@ const PomodoroExtension = new Lang.Class({
         this.timer.connect('notify-pomodoro-end', Lang.bind(this, this._onNotifyPomodoroEnd));
     },
 
+    _destroyNotifications: function() {
+        if (Notifications.source) {
+            Notifications.source.destroy();
+        }
+    },
+
+    _clearNotifications: function() {
+        if (Notifications.source) {
+            Notifications.source.clear();
+        }
+    },
+
     _onServiceConnected: function() {
         let state = this.timer.getState();
 
@@ -94,10 +106,7 @@ const PomodoroExtension = new Lang.Class({
             this.dialog.close();
         }
 
-        if (this.notification) {
-            this.notification.destroy();
-            this.notification = null;
-        }
+        this._destroyNotifications();
     },
 
     _onTimerStateChanged: function() {
@@ -107,33 +116,35 @@ const PomodoroExtension = new Lang.Class({
             this.dialog.close();
         }
 
-        if (this.notification && state == Timer.State.NULL) {
-            this.notification.destroy();
-            this.notification = null;
+        if (state == Timer.State.NULL) {
+            this._destroyNotifications();
+        }
+
+        if (!(this.notification instanceof Notifications.PomodoroEnd) &&
+            (state == Timer.State.POMODORO || state == Timer.State.IDLE))
+        {
+            this._onNotifyPomodoroStart();
         }
     },
 
     _onNotifyPomodoroStart: function() {
-        if (this.notification) {
-            this.notification.destroy();
-        }
+        this._clearNotifications();
 
         this.notification = new Notifications.PomodoroStart(this.timer);
-        this.notification.connect('destroy', Lang.bind(this,
-            function(notification){
-                if (this.notification === notification) {
-                    this.notification = null;
-                }
+        this.notification.connect('clicked', Lang.bind(this,
+            function(notification) {
+                Main.messageTray.close();
+
+                notification.hide();
             }));
+        this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
         this.notification.show();
     },
 
     _onNotifyPomodoroEnd: function() {
         let showScreenNotifications = this.settings.get_boolean('show-screen-notifications');
 
-        if (this.notification) {
-            this.notification.destroy();
-        }
+        this._clearNotifications();
 
         this.notification = new Notifications.PomodoroEnd(this.timer);
         this.notification.connect('clicked', Lang.bind(this,
@@ -145,12 +156,7 @@ const PomodoroExtension = new Lang.Class({
                     notification.hide();
                 }
             }));
-        this.notification.connect('destroy', Lang.bind(this,
-            function(notification){
-                if (this.notification === notification) {
-                    this.notification = null;
-                }
-            }));
+        this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
 
         if (this.dialog && showScreenNotifications) {
             this.dialog.open();
@@ -166,8 +172,18 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
+    _onNotificationDestroy: function(notification) {
+        if (this.notification === notification) {
+            this.notification = null;
+        }
+    },
+
     enableIndicator: function() {
         this.indicator = new Indicator.Indicator(this.timer);
+        this.indicator.connect('destroy', Lang.bind(this,
+            function() {
+                this.indicator = null;
+            }));
 
         Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
     },
@@ -196,10 +212,7 @@ const PomodoroExtension = new Lang.Class({
     },
 
     disableNotifications: function() {
-        if (this.notification) {
-            this.notification.destroy();
-            this.notification = null;
-        }
+        this.notification = null;
 
         if (Notifications.source) {
             Notifications.source.destroy();
