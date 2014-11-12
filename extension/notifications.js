@@ -141,6 +141,109 @@ const Source = new Lang.Class({
 });
 
 
+const MessagesIndicator = new Lang.Class({
+    Name: 'PomodoroMessagesIndicator',
+
+    _init: function() {
+        this._count = 0;
+        this._sources = [];
+
+        this._container = new St.BoxLayout({ style_class: 'messages-indicator-contents',
+                                             reactive: true,
+                                             track_hover: true,
+                                             x_expand: true,
+                                             y_expand: true,
+                                             x_align: Clutter.ActorAlign.CENTER });
+
+        this._icon = new St.Icon({ icon_name: 'user-idle-symbolic',
+                                   icon_size: 16 });
+        this._container.add_actor(this._icon);
+
+        this._label = new St.Label();
+        this._container.add_actor(this._label);
+
+        this._highlight = new St.Widget({ style_class: 'messages-indicator-highlight',
+                                          x_expand: true,
+                                          y_expand: true,
+                                          y_align: Clutter.ActorAlign.END,
+                                          visible: false });
+
+        this._container.connect('notify::hover', Lang.bind(this,
+            function() {
+                this._highlight.visible = this._container.hover;
+            }));
+
+        let clickAction = new Clutter.ClickAction();
+        this._container.add_action(clickAction);
+        clickAction.connect('clicked', Lang.bind(this,
+            function() {
+                Main.messageTray.openTray();
+            }));
+
+        Main.messageTray.connect('showing', Lang.bind(this,
+            function() {
+                this._highlight.visible = false;
+                this._container.hover = false;
+            }));
+
+        let layout = new Clutter.BinLayout();
+        this.actor = new St.Widget({ layout_manager: layout,
+                                     style_class: 'messages-indicator',
+                                     y_expand: true,
+                                     y_align: Clutter.ActorAlign.END,
+                                     visible: false });
+        this.actor.add_actor(this._container);
+        this.actor.add_actor(this._highlight);
+
+        Main.messageTray.connect('source-added', Lang.bind(this, this._onSourceAdded));
+        Main.messageTray.connect('source-removed', Lang.bind(this, this._onSourceRemoved));
+
+        let sources = Main.messageTray.getSources();
+        sources.forEach(Lang.bind(this, function(source) { this._onSourceAdded(null, source); }));
+
+        Main.overview.connect('showing', Lang.bind(this, this._updateVisibility));
+    },
+
+    _onSourceAdded: function(tray, source) {
+        if (source.trayIcon)
+            return;
+
+        source.connect('count-updated', Lang.bind(this, this._updateCount));
+        this._sources.push(source);
+        this._updateCount();
+    },
+
+    _onSourceRemoved: function(tray, source) {
+        this._sources.splice(this._sources.indexOf(source), 1);
+        this._updateCount();
+    },
+
+    _updateCount: function() {
+        let count = 0;
+        let hasChats = false;
+        this._sources.forEach(Lang.bind(this,
+            function(source) {
+                count += source.indicatorCount;
+                hasChats |= source.isChat;
+            }));
+
+        this._count = count;
+        this._label.text = ngettext("%d new message",
+                                    "%d new messages",
+                                   count).format(count);
+
+        this._icon.visible = hasChats;
+        this._updateVisibility();
+    },
+
+    _updateVisibility: function() {
+        let visible = (this._count > 0);
+
+        this.actor.visible = visible;
+    }
+});
+
+
 /**
  * ModalDialog class based on ModalDialog from GNOME Shell. We need our own
  * class to have more event signals, different fade in/out times, and different
@@ -165,9 +268,20 @@ const ModalDialog = new Lang.Class({
 
         this._layout = new St.BoxLayout({ vertical: true });
 
-        let background = new St.Bin();
-        background.add_constraint(this._monitorConstraint);
-        background.set_child(this._layout);
+        /* Modal dialogs are fixed width and grow vertically; set the request
+         * mode accordingly so wrapped labels are handled correctly during
+         * size requests.
+         */
+        this._layout.request_mode = Clutter.RequestMode.HEIGHT_FOR_WIDTH;
+
+        this._backgroundStack = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+        this._backgroundStack.add_actor(this._layout);
+
+
+        let backgroundBin = new St.Bin({ child: this._backgroundStack,
+                                         x_fill: true,
+                                         y_fill: true });
+        backgroundBin.add_constraint(this._monitorConstraint);
 
         this.actor = new St.Widget({ accessible_role: Atk.Role.DIALOG,
                                      visible: false,
@@ -176,14 +290,14 @@ const ModalDialog = new Lang.Class({
                                      y: 0 });
         this.actor.add_constraint(this._stageConstraint);
         this.actor.add_style_class_name('extension-pomodoro-dialog');
-        this.actor.add_child(background);
+        this.actor.add_actor(backgroundBin);
         this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
-        Main.uiGroup.add_actor(this.actor);
+        Main.layoutManager.modalDialogGroup.add_actor(this.actor);
 
         this._lightbox = new Lightbox.Lightbox(this.actor,
                                                { fadeFactor: FADE_IN_OPACITY,
                                                  inhibitEvents: false });
-        this._lightbox.highlight(background);
+        this._lightbox.highlight(backgroundBin);
         this._lightbox.actor.add_style_class_name('extension-pomodoro-lightbox');
         this._lightbox.show();
 
@@ -408,11 +522,17 @@ const PomodoroEndDialog = new Lang.Class({
                 { y_fill: false,
                   y_align: St.Align.START });
         box.add(this._descriptionLabel,
-                { y_fill: true,
+                { y_fill: false,
                   y_align: St.Align.START });
         this._layout.add(box,
-                         { x_fill: true,
-                           y_fill: true });
+                         { expand: true,
+                           x_fill: false,
+                           y_fill: false,
+                           x_align: St.Align.MIDDLE,
+                           y_align: St.Align.MIDDLE });
+
+        let messagesIndicator = new MessagesIndicator();
+        this._backgroundStack.add_actor(messagesIndicator.actor);
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
     },

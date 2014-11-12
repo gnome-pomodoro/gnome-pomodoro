@@ -97,3 +97,8 @@
 .summary-notification-stack .extension-pomodoro-notification {
     width: 30em;
 }
+
+.extension-pomodoro-dialog .messages-indicator {
+    text-shadow: 0.0px 1.0px 2.0px rgba(0, 0, 0, 0.35);
+    color: white;
+}
