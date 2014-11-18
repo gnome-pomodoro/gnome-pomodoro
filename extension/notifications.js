@@ -681,11 +681,29 @@ const Notification = new Lang.Class({
 
         this.actor.child.add_style_class_name('extension-pomodoro-notification');
 
-        this._bodyLabel = this.addBody(description);
+        this._overrideForFeedback = false;
+        this._showing             = false;
+        this._destroying          = false;
+        this._bodyLabel           = this.addBody(description);
+
+        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
     },
 
-    show: function() {
+    _onActorMappedChanged: function(actor) {
+        if (this._overrideForFeedback) {
+            this._overrideForFeedback = false;
+            this.setForFeedback(false);
+        }
+    },
+
+    show: function(force) {
         if (!this._destroying) {
+            /* Popup notification regardless of session busy status */
+            if (!this.forFeedback && force) {
+                this.setForFeedback(true);
+                this._overrideForFeedback = true;
+            }
+
             if (!Main.messageTray.contains(this.source)) {
                 Main.messageTray.add(this.source);
             }
@@ -719,6 +737,12 @@ const Notification = new Lang.Class({
 
     destroy: function(reason) {
         this._destroying = true;
+
+        if (this._actorMappedId) {
+            this.actor.disconnect(this._actorMappedId);
+            this._actorMappedId = 0;
+        }
+
         this.parent(reason);
     }
 });
@@ -732,11 +756,9 @@ const PomodoroStart = new Lang.Class({
         this.parent(_("Pomodoro"), null, null);
 
         this.setResident(true);
-        this.setForFeedback(true);
 
         this.timer = timer;
 
-        this._actorMappedId = 0;
         this._timerUpdateId = 0;
 
         this.addAction(_("Take a break"), Lang.bind(this,
@@ -746,23 +768,17 @@ const PomodoroStart = new Lang.Class({
 
         this.connect('destroy', Lang.bind(this,
             function() {
-                if (this._actorMappedId) {
-                    this.actor.disconnect(this._actorMappedId);
-                    this._actorMappedId = 0;
-                }
                 if (this._timerUpdateId) {
                     this.timer.disconnect(this._timerUpdateId);
                     this._timerUpdateId = 0;
                 }
             }));
 
-        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
-
         this._updateBanner(_("Focus on your task"));
     },
 
     _onActorMappedChanged: function(actor) {
-        this.setForFeedback(false);
+        this.parent(actor);
 
         if (actor.mapped && !this._timerUpdateId) {
             this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
@@ -797,6 +813,10 @@ const PomodoroStart = new Lang.Class({
 
             this._updateBody(longMessage);
         }
+    },
+
+    show: function() {
+        this.parent(true);
     }
 });
 
@@ -809,11 +829,9 @@ const PomodoroEnd = new Lang.Class({
         this.parent(_("Take a break!"), null, null);
 
         this.setResident(true);
-        this.setForFeedback(true);
 
         this.timer = timer;
 
-        this._actorMappedId      = 0;
         this._timerUpdateId      = 0;
         this._settingsChangedId  = 0;
         this._shortBreakDuration = 0;
@@ -846,17 +864,11 @@ const PomodoroEnd = new Lang.Class({
                 Main.messageTray.close();
             }));
 
-        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
-
         this.connect('destroy', Lang.bind(this,
             function() {
                 if (this._settingsChangedId) {
                     Extension.extension.settings.disconnect(this._settingsChangedId);
                     this._settingsChangedId = 0;
-                }
-                if (this._actorMappedId) {
-                    this.actor.disconnect(this._actorMappedId);
-                    this._actorMappedId = 0;
                 }
                 if (this._timerUpdateId) {
                     this.timer.disconnect(this._timerUpdateId);
@@ -878,7 +890,7 @@ const PomodoroEnd = new Lang.Class({
     },
 
     _onActorMappedChanged: function(actor) {
-        this.setForFeedback(false);
+        this.parent(actor);
 
         if (actor.mapped && !this._timerUpdateId) {
             this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
@@ -939,6 +951,10 @@ const PomodoroEnd = new Lang.Class({
             this._switchToPauseButton.set_label(
                 isLongPause ? _("Shorten it") : _("Lengthen it"));
         }
+    },
+
+    show: function() {
+        this.parent(true);
     }
 });
 
@@ -952,9 +968,7 @@ const PomodoroEndReminder = new Lang.Class({
 
         this.setTransient(true);
         this.setUrgency(MessageTray.Urgency.LOW);
-        this.setForFeedback(true);
 
-        this._actorMappedId = 0;
         this._timeoutSource = 0;
         this._interval      = 0;
         this._timeout       = 0;
@@ -962,18 +976,7 @@ const PomodoroEndReminder = new Lang.Class({
         this.connect('destroy', Lang.bind(this,
             function() {
                 this.unschedule();
-
-                if (this._actorMappedId) {
-                    this.actor.disconnect(this._actorMappedId);
-                    this._actorMappedId = 0;
-                }
             }));
-
-        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
-    },
-
-    _onActorMappedChanged: function(actor) {
-        this.setForFeedback(false);
     },
 
     _onTimeout: function() {
@@ -994,6 +997,10 @@ const PomodoroEndReminder = new Lang.Class({
         this.schedule();
 
         return false;
+    },
+
+    show: function() {
+        this.parent(true);
     },
 
     schedule: function() {
