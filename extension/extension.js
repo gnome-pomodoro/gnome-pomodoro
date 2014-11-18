@@ -128,35 +128,49 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _onNotifyPomodoroStart: function() {
-        this._clearNotifications();
+        if (this.notification &&
+            this.notification instanceof Notifications.PomodoroStart)
+        {
+            /* do not renotify */
+        }
+        else {
+            this._clearNotifications();
 
-        this.notification = new Notifications.PomodoroStart(this.timer);
-        this.notification.connect('clicked', Lang.bind(this,
-            function(notification) {
-                Main.messageTray.close();
+            this.notification = new Notifications.PomodoroStart(this.timer);
+            this.notification.connect('clicked', Lang.bind(this,
+                function(notification) {
+                    Main.messageTray.close();
 
-                notification.hide();
-            }));
-        this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
-        this.notification.show();
+                    notification.hide();
+                }));
+            this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
+            this.notification.show();
+        }
     },
 
     _onNotifyPomodoroEnd: function() {
         let showScreenNotifications = this.settings.get_boolean('show-screen-notifications');
 
-        this._clearNotifications();
+        if (this.notification &&
+            this.notification instanceof Notifications.PomodoroEnd)
+        {
+            /* do not renotify */
+        }
+        else {
+            this._clearNotifications();
 
-        this.notification = new Notifications.PomodoroEnd(this.timer);
-        this.notification.connect('clicked', Lang.bind(this,
-            function(notification){
-                if (this.dialog) {
-                    this.dialog.open();
-                    this.dialog.pushModal();
+            this.notification = new Notifications.PomodoroEnd(this.timer);
+            this.notification.connect('clicked', Lang.bind(this,
+                function(notification){
+                    if (this.dialog) {
+                        this.dialog.open();
+                        this.dialog.pushModal();
 
-                    notification.hide();
-                }
-            }));
-        this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
+                        notification.hide();
+                    }
+                }));
+            this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
+        }
 
         if (this.dialog && showScreenNotifications) {
             this.dialog.open();

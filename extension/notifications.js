@@ -732,6 +732,7 @@ const PomodoroStart = new Lang.Class({
         this.parent(_("Pomodoro"), null, null);
 
         this.setResident(true);
+        this.setForFeedback(true);
 
         this.timer = timer;
 
@@ -761,6 +762,8 @@ const PomodoroStart = new Lang.Class({
     },
 
     _onActorMappedChanged: function(actor) {
+        this.setForFeedback(false);
+
         if (actor.mapped && !this._timerUpdateId) {
             this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
             this._onTimerUpdate();
@@ -806,6 +809,7 @@ const PomodoroEnd = new Lang.Class({
         this.parent(_("Take a break!"), null, null);
 
         this.setResident(true);
+        this.setForFeedback(true);
 
         this.timer = timer;
 
@@ -874,6 +878,8 @@ const PomodoroEnd = new Lang.Class({
     },
 
     _onActorMappedChanged: function(actor) {
+        this.setForFeedback(false);
+
         if (actor.mapped && !this._timerUpdateId) {
             this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
             this._onTimerUpdate();
@@ -946,7 +952,9 @@ const PomodoroEndReminder = new Lang.Class({
 
         this.setTransient(true);
         this.setUrgency(MessageTray.Urgency.LOW);
+        this.setForFeedback(true);
 
+        this._actorMappedId = 0;
         this._timeoutSource = 0;
         this._interval      = 0;
         this._timeout       = 0;
@@ -954,7 +962,18 @@ const PomodoroEndReminder = new Lang.Class({
         this.connect('destroy', Lang.bind(this,
             function() {
                 this.unschedule();
+
+                if (this._actorMappedId) {
+                    this.actor.disconnect(this._actorMappedId);
+                    this._actorMappedId = 0;
+                }
             }));
+
+        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+    },
+
+    _onActorMappedChanged: function(actor) {
+        this.setForFeedback(false);
     },
 
     _onTimeout: function() {
