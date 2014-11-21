@@ -57,6 +57,10 @@ const PomodoroExtension = new Lang.Class({
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
+
+            this.settings.connect('changed::show-screen-notifications',
+                                  Lang.bind(this, this._onSettingsChanged));
+            this._onSettingsChanged(this.settings, 'show-screen-notifications');
         }
         catch (error) {
             this.logError(error);
@@ -87,6 +91,26 @@ const PomodoroExtension = new Lang.Class({
     _clearNotifications: function() {
         if (Notifications.source) {
             Notifications.source.clear();
+        }
+    },
+
+    _onSettingsChanged: function(settings, key) {
+        switch(key)
+        {
+            case 'show-screen-notifications':
+                this._showScreenNotifications = this.settings.get_boolean(key);
+
+                if (this.dialog && this.timer.getState() == Timer.State.PAUSE)
+                {
+                    if (this._showScreenNotifications) {
+                        this.dialog.openWhenIdle();
+                    }
+                    else {
+                        this.dialog.close();
+                    }
+                }
+
+                break;
         }
     },
 
@@ -150,8 +174,6 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _onNotifyPomodoroEnd: function() {
-        let showScreenNotifications = this.settings.get_boolean('show-screen-notifications');
-
         if (this.notification &&
             this.notification instanceof Notifications.PomodoroEndNotification)
         {
@@ -173,7 +195,7 @@ const PomodoroExtension = new Lang.Class({
             this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
         }
 
-        if (this.dialog && showScreenNotifications) {
+        if (this.dialog && this._showScreenNotifications) {
             this.dialog.open();
         }
         else {
@@ -246,7 +268,9 @@ const PomodoroExtension = new Lang.Class({
                         }
 
                         // TODO: check if using fullscreen/redirect mode, like when playing a video
-                        this.dialog.openWhenIdle();
+                        if (this._showScreenNotifications) {
+                            this.dialog.openWhenIdle();
+                        }
                     }
                 }));
             this.dialog.connect('destroy', Lang.bind(this,
