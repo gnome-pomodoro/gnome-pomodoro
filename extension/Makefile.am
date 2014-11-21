@@ -2,6 +2,7 @@ extensiondir = $(datadir)/gnome-shell/extensions/$(EXTENSION_UUID)
 
 dist_extension_DATA = \
     dbus.js \
+    dialogs.js \
     extension.js \
     indicator.js \
     metadata.json \

@@ -35,6 +35,7 @@ const Config = Extension.imports.config;
 const DBus = Extension.imports.dbus;
 const Indicator = Extension.imports.indicator;
 const Notifications = Extension.imports.notifications;
+const Dialogs = Extension.imports.dialogs;
 const Settings = Extension.imports.settings;
 const Timer = Extension.imports.timer;
 
@@ -120,7 +121,7 @@ const PomodoroExtension = new Lang.Class({
             this._destroyNotifications();
         }
 
-        if (!(this.notification instanceof Notifications.PomodoroEnd) &&
+        if (!(this.notification instanceof Notifications.PomodoroEndNotification) &&
             (state == Timer.State.POMODORO || state == Timer.State.IDLE))
         {
             this._onNotifyPomodoroStart();
@@ -129,14 +130,14 @@ const PomodoroExtension = new Lang.Class({
 
     _onNotifyPomodoroStart: function() {
         if (this.notification &&
-            this.notification instanceof Notifications.PomodoroStart)
+            this.notification instanceof Notifications.PomodoroStartNotification)
         {
             /* do not renotify */
         }
         else {
             this._clearNotifications();
 
-            this.notification = new Notifications.PomodoroStart(this.timer);
+            this.notification = new Notifications.PomodoroStartNotification(this.timer);
             this.notification.connect('clicked', Lang.bind(this,
                 function(notification) {
                     Main.messageTray.close();
@@ -152,14 +153,14 @@ const PomodoroExtension = new Lang.Class({
         let showScreenNotifications = this.settings.get_boolean('show-screen-notifications');
 
         if (this.notification &&
-            this.notification instanceof Notifications.PomodoroEnd)
+            this.notification instanceof Notifications.PomodoroEndNotification)
         {
             /* do not renotify */
         }
         else {
             this._clearNotifications();
 
-            this.notification = new Notifications.PomodoroEnd(this.timer);
+            this.notification = new Notifications.PomodoroEndNotification(this.timer);
             this.notification.connect('clicked', Lang.bind(this,
                 function(notification){
                     if (this.dialog) {
@@ -235,12 +236,12 @@ const PomodoroExtension = new Lang.Class({
 
     enableScreenNotifications: function() {
         if (!this.dialog) {
-            this.dialog = new Notifications.PomodoroEndDialog(this.timer);
+            this.dialog = new Dialogs.PomodoroEndDialog(this.timer);
             this.dialog.connect('closing', Lang.bind(this,
                 function() {
                     if (this.timer.getState() == Timer.State.PAUSE)
                     {
-                        if (this.notification instanceof Notifications.PomodoroEnd) {
+                        if (this.notification instanceof Notifications.PomodoroEndNotification) {
                             this.notification.show();
                         }
 
@@ -263,7 +264,7 @@ const PomodoroExtension = new Lang.Class({
     },
 
     notifyIssue: function(message) {
-        let notification = new Notifications.Issue(message);
+        let notification = new Notifications.IssueNotification(message);
         notification.show();
     },
 
