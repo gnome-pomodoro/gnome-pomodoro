@@ -54,6 +54,7 @@ const PomodoroExtension = new Lang.Class({
         this.indicator    = null;
         this.notification = null;
         this.dialog       = null;
+        this.keybinding   = false;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
@@ -70,10 +71,10 @@ const PomodoroExtension = new Lang.Class({
 
         this.timer = new Timer.Timer();
 
+        Main.sessionMode.connect('updated', Lang.bind(this, this._onSessionModeUpdated));
+        this._onSessionModeUpdated();
+
         this.enableKeybinding();
-        this.enableIndicator();
-        this.enableNotifications();
-        this.enableScreenNotifications();
 
         this.timer.connect('service-connected', Lang.bind(this, this._onServiceConnected));
         this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
@@ -114,16 +115,14 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
+    _onSessionModeUpdated: function() {
+        if (Main.sessionMode.isLocked !== this.inLockScreen) {
+            this.setInLockScreen(Main.sessionMode.isLocked);
+        }
+    },
+
     _onServiceConnected: function() {
-        let state = this.timer.getState();
-
-        if (state == Timer.State.POMODORO || state == Timer.State.IDLE) {
-            this._onNotifyPomodoroStart();
-        }
-
-        if (state == Timer.State.PAUSE) {
-            this._onNotifyPomodoroEnd();
-        }
+        this.enableNotifications();
     },
 
     _onServiceDisconnected: function() {
@@ -216,13 +215,15 @@ const PomodoroExtension = new Lang.Class({
     },
 
     enableIndicator: function() {
-        this.indicator = new Indicator.Indicator(this.timer);
-        this.indicator.connect('destroy', Lang.bind(this,
-            function() {
-                this.indicator = null;
-            }));
+        if (!this.indicator) {
+            this.indicator = new Indicator.Indicator(this.timer);
+            this.indicator.connect('destroy', Lang.bind(this,
+                function() {
+                    this.indicator = null;
+                }));
 
-        Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
+            Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
+        }
     },
 
     disableIndicator: function() {
@@ -233,19 +234,33 @@ const PomodoroExtension = new Lang.Class({
     },
 
     enableKeybinding: function() {
-        Main.wm.addKeybinding('toggle-timer-key',
-                              this.settings,
-                              Meta.KeyBindingFlags.NONE,
-                              Shell.KeyBindingMode.ALL,
-                              Lang.bind(this, this._onKeybindingPressed));
-
+        if (!this.keybinding) {
+            this.keybinding = true;
+            Main.wm.addKeybinding('toggle-timer-key',
+                                  this.settings,
+                                  Meta.KeyBindingFlags.NONE,
+                                  Shell.KeyBindingMode.ALL,
+                                  Lang.bind(this, this._onKeybindingPressed));
+        }
     },
 
     disableKeybinding: function() {
-        Main.wm.removeKeybinding('toggle-timer-key');
+        if (this.keybinding) {
+            this.keybinding = false;
+            Main.wm.removeKeybinding('toggle-timer-key');
+        }
     },
 
     enableNotifications: function() {
+        let state = this.timer.getState();
+
+        if (state == Timer.State.POMODORO || state == Timer.State.IDLE) {
+            this._onNotifyPomodoroStart();
+        }
+
+        if (state == Timer.State.PAUSE) {
+            this._onNotifyPomodoroEnd();
+        }
     },
 
     disableNotifications: function() {
@@ -284,6 +299,22 @@ const PomodoroExtension = new Lang.Class({
             this.dialog.destroy();
             this.dialog = null;
         }
+    },
+
+    setInLockScreen: function(inLockScreen) {
+        this.inLockScreen = inLockScreen;
+
+        if (inLockScreen) {
+            this.disableIndicator();
+            this.disableScreenNotifications();
+        }
+        else {
+            this.enableIndicator();
+            this.enableScreenNotifications();
+        }
+
+        this.enableIndicator();
+        this.enableNotifications();
     },
 
     notifyIssue: function(message) {
@@ -325,7 +356,7 @@ function enable() {
 
 
 function disable() {
-    if (extension) {
+    if (extension && !Main.sessionMode.isLocked) {
         extension.destroy();
         extension = null;
     }

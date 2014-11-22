@@ -60,17 +60,6 @@ function getDefaultSource() {
 }
 
 
-const NotificationPolicy = new Lang.Class({
-    Name: 'PomodoroNotificationPolicy',
-    Extends: MessageTray.NotificationGenericPolicy,
-
-    /* override parent method */
-    get detailsInLockScreen() {
-        return true;
-    }
-});
-
-
 const Source = new Lang.Class({
     Name: 'PomodoroNotificationSource',
     Extends: MessageTray.Source,
@@ -83,7 +72,8 @@ const Source = new Lang.Class({
 
     /* override parent method */
     _createPolicy: function() {
-        return new NotificationPolicy();
+        return new MessageTray.NotificationPolicy({ showInLockScreen: true,
+                                                    detailsInLockScreen: true });
     },
 
     clear: function() {
@@ -129,6 +119,10 @@ const Notification = new Lang.Class({
             this._overrideForFeedback = false;
             this.setForFeedback(false);
         }
+    },
+
+    setShowInLockScreen: function(enabled) {
+        this.isMusic = enabled;
     },
 
     show: function(force) {
@@ -191,6 +185,7 @@ const PomodoroStartNotification = new Lang.Class({
         this.parent(_("Pomodoro"), null, null);
 
         this.setResident(true);
+        this.setShowInLockScreen(true);
 
         this.timer = timer;
 
@@ -264,6 +259,7 @@ const PomodoroEndNotification = new Lang.Class({
         this.parent(_("Take a break!"), null, null);
 
         this.setResident(true);
+        this.setShowInLockScreen(true);
 
         this.timer = timer;
 
