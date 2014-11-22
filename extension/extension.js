@@ -267,7 +267,6 @@ const PomodoroExtension = new Lang.Class({
                             this.notification.show();
                         }
 
-                        // TODO: check if using fullscreen/redirect mode, like when playing a video
                         if (this._showScreenNotifications) {
                             this.dialog.openWhenIdle();
                         }

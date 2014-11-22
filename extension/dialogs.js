@@ -26,6 +26,7 @@ const Atk = imports.gi.Atk;
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Meta = imports.gi.Meta;
+const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Pango = imports.gi.Pango;
 
@@ -63,6 +64,12 @@ const FADE_IN_OPACITY = 0.55;
 
 const FADE_OUT_TIME = 180;
 
+const VIDEO_PLAYER_CATEGORIES = [
+    ['Player', 'Video'],
+    ['Player', 'AudioVideo'],
+    ['Game'],
+];
+
 
 const State = {
     OPENED: 0,
@@ -70,6 +77,27 @@ const State = {
     OPENING: 2,
     CLOSING: 3
 };
+
+
+function _getCategories(appInfo) {
+    let categoriesStr = appInfo.get_categories();
+    if (!categoriesStr) {
+        return [];
+    }
+
+    return categoriesStr.split(';');
+}
+
+
+function _arrayContains(array1, array2) {
+    for (let i = 0; i < array2.length; i++) {
+        if (array1.indexOf(array2[i]) < 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 
 const MessagesIndicator = new Lang.Class({
@@ -543,8 +571,34 @@ const PomodoroEndDialog = new Lang.Class({
 
         if (this._openWhenIdleWatchId == 0) {
             this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN, Lang.bind(this,
-                function(monitor) {
-                    this.open();
+                function() {
+                    /* check if playing a video before reopening */
+                    let isPlayerFocused = false;
+                    let isPlayerFullscreen = false;
+
+                    let focusedApp = Shell.WindowTracker.get_default().focus_app;
+                    let focusedWindow = global.display.focus_window;
+
+                    if (focusedApp) {
+                        let categories = _getCategories(focusedApp.get_app_info());
+
+                        for (let i = 0; i < VIDEO_PLAYER_CATEGORIES.length; i++) {
+                            if (_arrayContains(categories, VIDEO_PLAYER_CATEGORIES[i])) {
+                                isPlayerFocused = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (focusedWindow) {
+                        let monitor = Main.layoutManager.monitors[focusedWindow.get_monitor()];
+
+                        isPlayerFullscreen = monitor.inFullscreen;
+                    }
+
+                    if (!isPlayerFocused || !isPlayerFullscreen) {
+                        this.open();
+                    }
                 }
             ));
         }
