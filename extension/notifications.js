@@ -106,17 +106,17 @@ const Notification = new Lang.Class({
 
         this.actor.child.add_style_class_name('extension-pomodoro-notification');
 
-        this._overrideForFeedback = false;
-        this._showing             = false;
-        this._destroying          = false;
-        this._bodyLabel           = this.addBody(description);
+        this._restoreForFeedback = false;
+        this._showing            = false;
+        this._destroying         = false;
+        this._bodyLabel          = this.addBody(description);
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
     },
 
     _onActorMappedChanged: function(actor) {
-        if (this._overrideForFeedback) {
-            this._overrideForFeedback = false;
+        if (this._restoreForFeedback) {
+            this._restoreForFeedback = false;
             this.setForFeedback(false);
         }
     },
@@ -130,7 +130,7 @@ const Notification = new Lang.Class({
             /* Popup notification regardless of session busy status */
             if (!this.forFeedback && force) {
                 this.setForFeedback(true);
-                this._overrideForFeedback = true;
+                this._restoreForFeedback = true;
             }
 
             if (!Main.messageTray.contains(this.source)) {

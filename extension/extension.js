@@ -44,7 +44,7 @@ let extension = null;
 
 
 const PomodoroExtension = new Lang.Class({
-    Name: 'PomodoroExtensoin',
+    Name: 'PomodoroExtension',
 
     _init: function() {
         Extension.extension = this;
