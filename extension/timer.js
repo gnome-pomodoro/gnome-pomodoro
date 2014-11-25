@@ -24,6 +24,7 @@ const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const Config = Extension.imports.config;
 const DBus = Extension.imports.dbus;
 const Settings = Extension.imports.settings;
 
@@ -83,13 +84,13 @@ const Timer = new Lang.Class({
         }
 
         this.proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
-            if (error) {
-                Extension.extension.logError(error.message);
-                Extension.extension.notifyIssue(_("Looks like gnome-pomodoro is not installed"));
+            if (proxy !== this.proxy) {
                 return;
             }
 
-            if (proxy !== this.proxy) {
+            if (error) {
+                Extension.extension.logError(error.message);
+                this._notifyServiceNotInstalled();
                 return;
             }
 
@@ -155,12 +156,24 @@ const Timer = new Lang.Class({
 
     _onCallback: function(result, error) {
         if (error) {
-            Extension.extension.logError(error.message)
+            Extension.extension.logError(error.message);
+
+            /* timer toggle assumes success right away, so we need to
+               straighten it out */
+            this.emit('state-changed');
+
+            if (error.matches(Gio.DBusError, Gio.DBusError.SERVICE_UNKNOWN)) {
+                this._notifyServiceNotInstalled();
+            }
         }
     },
 
     getState: function() {
-        return this.proxy ? this.proxy.State : State.NULL;
+        if (!this.proxy || this.proxy.State == null) {
+            return State.NULL;
+        }
+
+        return this.proxy.State;
     },
 
     setState: function(state, duration) {
@@ -225,15 +238,19 @@ const Timer = new Lang.Class({
     showMainWindow: function(timestamp) {
         this._ensureProxy(Lang.bind(this,
             function() {
-                this.proxy.ShowMainWindowRemote(timestamp);
+                this.proxy.ShowMainWindowRemote(timestamp, Lang.bind(this, this._onCallback));
             }));
     },
 
     showPreferences: function(view, timestamp) {
         this._ensureProxy(Lang.bind(this,
             function() {
-                this.proxy.ShowPreferencesRemote(view, timestamp);
+                this.proxy.ShowPreferencesRemote(view, timestamp, Lang.bind(this, this._onCallback));
             }));
+    },
+
+    _notifyServiceNotInstalled: function() {
+        Extension.extension.notifyIssue(_("Failed to run <i>%s</i> service").format(Config.PACKAGE_NAME));
     },
 
     destroy: function() {

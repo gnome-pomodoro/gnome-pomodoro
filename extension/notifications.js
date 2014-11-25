@@ -471,22 +471,35 @@ const PomodoroEndReminderNotification = new Lang.Class({
 
 const IssueNotification = new Lang.Class({
     Name: 'PomodoroIssueNotification',
-    Extends: Notification,
+    Extends: MessageTray.Notification,
 
     _init: function(message) {
-        let title = _("Problem with gnome-pomodoro");
-        let url   = Config.PACKAGE_BUGREPORT;
+        let source = getDefaultSource();
+        let title  = _("Pomodoro");
+        let url    = Config.PACKAGE_BUGREPORT;
 
-        this.parent(title, message, {});
+        this.parent(source, title, message, { bannerMarkup: true });
 
         this.setTransient(true);
-
-        /* TODO: Check which distro running, check for updates via package manager */
+        this.setUrgency(MessageTray.Urgency.HIGH);
 
         this.addAction(_("Report issue"), Lang.bind(this,
             function() {
                 Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
-                this.hide();
+                Main.messageTray.close();
             }));
+    },
+
+    show: function() {
+        if (!Main.messageTray.contains(this.source)) {
+            Main.messageTray.add(this.source);
+        }
+
+        this.source.notify(this);
+    },
+
+    close: function() {
+        this.emit('done-displaying');
+        this.destroy();
     }
 });

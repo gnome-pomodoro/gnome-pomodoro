@@ -78,7 +78,8 @@ const IndicatorMenu = new Lang.Class({
         this.indicator.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
 
         /* Toggle timer state button */
-        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false);
+        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"),
+                                                              this._isTimerToggled());
         this._timerToggle.connect('toggled', Lang.bind(this,
             function() {
                 this.indicator.timer.toggle();
@@ -105,11 +106,11 @@ const IndicatorMenu = new Lang.Class({
     },
 
     _onTimerStateChanged: function() {
-        let toggled = this.indicator.timer.getState() != Timer.State.NULL;
+        this._timerToggle.setToggleState(this._isTimerToggled());
+    },
 
-        if (this._timerToggle.toggled !== toggled) {
-            this._timerToggle.setToggleState(toggled);
-        }
+    _isTimerToggled: function() {
+        return this.indicator.timer.getState() != Timer.State.NULL;
     },
 
     _showMainWindow: function() {
