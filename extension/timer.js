@@ -119,6 +119,7 @@ const Timer = new Lang.Class({
             }
 
             this.emit('service-connected');
+            this.emit('state-changed');
 
             this._onPropertiesChanged(this.proxy, null);
         }));
@@ -129,6 +130,7 @@ const Timer = new Lang.Class({
     },
 
     _onNameVanished: function() {
+        this.emit('state-changed');
         this.emit('service-disconnected');
     },
 
