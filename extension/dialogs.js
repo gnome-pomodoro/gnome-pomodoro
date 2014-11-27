@@ -57,7 +57,7 @@ const PUSH_MODAL_RATE = Clutter.get_default_frame_rate();
 
 const IDLE_TIME_TO_OPEN = 60000;
 const IDLE_TIME_TO_CLOSE = 600;
-const MIN_DISPLAY_TIME = 300;
+const MIN_DISPLAY_TIME = 500;
 
 const FADE_IN_TIME = 180;
 const FADE_IN_OPACITY = 0.55;
