@@ -596,5 +596,12 @@ const Indicator = new Lang.Class({
         this._hbox.add_child(this.widget.actor, { expand: false,
                                                   x_fill: false,
                                                   x_align: St.Align.START });
+    },
+
+    destroy: function() {
+        if (this._settingsChangedId) {
+            Extension.extension.settings.disconnect(this._settingsChangedId);
+            this._settingsChangedId = 0;
+        }
     }
 });
