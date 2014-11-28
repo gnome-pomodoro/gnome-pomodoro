@@ -222,7 +222,12 @@ const PomodoroExtension = new Lang.Class({
                     this.indicator = null;
                 }));
 
-            Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
+            try {
+                Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
+            }
+            catch (error) {
+                this.logError(error.message);
+            }
         }
     },
 
