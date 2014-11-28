@@ -7,6 +7,7 @@ dist_extension_DATA = \
     indicator.js \
     metadata.json \
     notifications.js \
+    presence.js \
     settings.js \
     stylesheet.css \
     tasklist.js \

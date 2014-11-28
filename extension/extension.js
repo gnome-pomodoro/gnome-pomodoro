@@ -36,6 +36,7 @@ const DBus = Extension.imports.dbus;
 const Indicator = Extension.imports.indicator;
 const Notifications = Extension.imports.notifications;
 const Dialogs = Extension.imports.dialogs;
+const Presence = Extension.imports.presence;
 const Settings = Extension.imports.settings;
 const Timer = Extension.imports.timer;
 
@@ -54,6 +55,7 @@ const PomodoroExtension = new Lang.Class({
         this.indicator    = null;
         this.notification = null;
         this.dialog       = null;
+        this.presence     = null;
         this.keybinding   = false;
 
         try {
@@ -73,8 +75,6 @@ const PomodoroExtension = new Lang.Class({
 
         Main.sessionMode.connect('updated', Lang.bind(this, this._onSessionModeUpdated));
         this._onSessionModeUpdated();
-
-        this.enableKeybinding();
 
         this.timer.connect('service-connected', Lang.bind(this, this._onServiceConnected));
         this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
@@ -251,6 +251,19 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
+    enablePresence: function() {
+        if (!this.presence) {
+            this.presence = new Presence.Presence();
+        }
+    },
+
+    disablePresence: function() {
+        if (this.presence) {
+            this.presence.destroy();
+            this.presence = null;
+        }
+    },
+
     enableNotifications: function() {
         let state = this.timer.getState();
 
@@ -313,8 +326,10 @@ const PomodoroExtension = new Lang.Class({
             this.enableScreenNotifications();
         }
 
+        this.enableKeybinding();
         this.enableIndicator();
         this.enableNotifications();
+        this.enablePresence();
     },
 
     notifyIssue: function(message) {
@@ -328,6 +343,7 @@ const PomodoroExtension = new Lang.Class({
 
     destroy: function() {
         this.disableKeybinding();
+        this.disablePresence();
         this.disableIndicator();
         this.disableNotifications();
         this.disableScreenNotifications();

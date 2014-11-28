@@ -161,18 +161,22 @@ class Pomodoro.Presence : Object
 
     private void on_timer_pomodoro_start (bool is_requested)
     {
-        var status = string_to_presence_status (
-                this.settings.get_string ("presence-during-pomodoro"));
+        this.set_status(PresenceStatus.BUSY);
 
-        this.set_status (status);
+//        var status = string_to_presence_status (
+//                this.settings.get_string ("presence-during-pomodoro"));
+//
+//        this.set_status (status);
     }
 
     private void on_timer_pomodoro_end (bool is_completed)
     {
-        var status = string_to_presence_status (
-                this.settings.get_string ("presence-during-break"));
+        this.set_status(PresenceStatus.AVAILABLE);
 
-        this.set_status (status);
+//        var status = string_to_presence_status (
+//                this.settings.get_string ("presence-during-break"));
+//
+//        this.set_status (status);
     }
 
     public void set_status (PresenceStatus status)

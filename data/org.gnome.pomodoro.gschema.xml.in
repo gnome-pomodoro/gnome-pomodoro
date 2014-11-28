@@ -52,6 +52,11 @@
       <summary>Reminders</summary>
       <description>Whether to remind about ongoing break.</description>
     </key>
+    <key name="hide-notifications-during-pomodoro" type="b">
+      <default>true</default>
+      <summary>Hide notifications during pomodoro</summary>
+      <description>Whether to hide other notifications during pomodoro.</description>
+    </key>
     <key name="pause-when-idle" type="b">
       <default>true</default>
       <summary>Wait after a break</summary>

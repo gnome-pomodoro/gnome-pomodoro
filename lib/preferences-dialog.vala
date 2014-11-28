@@ -484,10 +484,15 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
 
         this.preferences_vbox.pack_start (vbox);
 
-        var notifications_toggle = new Gtk.Switch ();
-        var notifications_field = this.create_field (
+        var screen_notifications_toggle = new Gtk.Switch ();
+        var screen_notifications_field = this.create_field (
                                        _("Screen notifications"),
-                                       notifications_toggle);
+                                       screen_notifications_toggle);
+
+        var hide_notifications_toggle = new Gtk.Switch ();
+        var hide_notifications_field = this.create_field (
+                                       _("Hide notifications during pomodoro"),
+                                       hide_notifications_toggle);
 
         var reminders_toggle = new Gtk.Switch ();
         var reminders_field = this.create_field (
@@ -495,7 +500,7 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
                                        reminders_toggle);
 
         this.settings.bind ("show-screen-notifications",
-                            notifications_toggle,
+                            screen_notifications_toggle,
                             "active",
                             SETTINGS_BIND_FLAGS);
 
@@ -504,8 +509,14 @@ private class Pomodoro.TimerPreferencesTab : PreferencesTab
                             "active",
                             SETTINGS_BIND_FLAGS);
 
-        list_box.insert (notifications_field, -1);
+        this.settings.bind ("hide-notifications-during-pomodoro",
+                            hide_notifications_toggle,
+                            "active",
+                            SETTINGS_BIND_FLAGS);
+
+        list_box.insert (screen_notifications_field, -1);
         list_box.insert (reminders_field, -1);
+        list_box.insert (hide_notifications_field, -1);
     }
 
     private void add_sounds_section ()
