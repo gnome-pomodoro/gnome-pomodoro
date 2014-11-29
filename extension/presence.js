@@ -179,45 +179,23 @@ const Presence = new Lang.Class({
 
             if (isRunning) {
                 this._patch.apply();
+
+                this._updateNotificationsMenuItem();
+
+                this.setNotifications(timerState == Timer.State.POMODORO
+                                           ? this._notificationsDuringPomodoro
+                                           : this._notificationsDuringBreak);
             }
             else {
+                this._updateNotificationsMenuItem();
+
+                this.setNotifications(timerState == Timer.State.POMODORO
+                                           ? this._notificationsDuringPomodoro
+                                           : this._notificationsDuringBreak);
+
                 this._patch.revert();
                 this._setNotificationDefaults();
             }
-
-            /* update notififications toggle */
-            try {
-                let menuItem = this._getNotificationsMenuItem();
-                let menuItemMarkup;
-                let menuItemHint;
-
-                if (!this._menuItemText) {
-                    this._menuItemText = menuItem.label.get_text();
-                }
-
-                if (isRunning) {
-                    // translators: Full text is actually "Notifications during...",
-                    //              the "Notifications" label is taken from gnome-shell
-                    menuItemHint = timerState == Timer.State.POMODORO
-                                       ? _("during pomodoro")
-                                       : _("during break");
-
-                    menuItemMarkup = '%s\n<small><i>%s</i></small>'.format(this._menuItemText,
-                                                                           menuItemHint);
-
-                    menuItem.label.clutter_text.set_markup(menuItemMarkup);
-                }
-                else {
-                    menuItem.label.clutter_text.set_markup(this._menuItemText);
-                }
-            }
-            catch (error) {
-                Extension.extension.logError(error.message);
-            }
-
-            this.setNotifications(timerState == Timer.State.POMODORO
-                                       ? this._notificationsDuringPomodoro
-                                       : this._notificationsDuringBreak);
         }
     },
 
@@ -226,6 +204,40 @@ const Presence = new Lang.Class({
 
         if (isRunning) {
             this.setNotifications(state);
+        }
+    },
+
+    _updateNotificationsMenuItem: function() {
+        let timerState = Extension.extension.timer.getState();
+        let isRunning = timerState != Timer.State.NULL;
+
+        try {
+            let menuItem = this._getNotificationsMenuItem();
+            let menuItemMarkup;
+            let menuItemHint;
+
+            if (!this._menuItemText) {
+                this._menuItemText = menuItem.label.get_text();
+            }
+
+            if (isRunning) {
+                // translators: Full text is actually "Notifications during...",
+                //              the "Notifications" label is taken from gnome-shell
+                menuItemHint = timerState == Timer.State.POMODORO
+                                   ? _("during pomodoro")
+                                   : _("during break");
+
+                menuItemMarkup = '%s\n<small><i>%s</i></small>'.format(this._menuItemText,
+                                                                       menuItemHint);
+
+                menuItem.label.clutter_text.set_markup(menuItemMarkup);
+            }
+            else {
+                menuItem.label.clutter_text.set_markup(this._menuItemText);
+            }
+        }
+        catch (error) {
+            Extension.extension.logError(error.message);
         }
     },
 
