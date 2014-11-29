@@ -76,6 +76,11 @@ const Source = new Lang.Class({
                                                     detailsInLockScreen: true });
     },
 
+    /* override parent method */
+    get isClearable() {
+        return false;
+    },
+
     clear: function() {
         let notifications = this.notifications;
         this.notifications = [];
