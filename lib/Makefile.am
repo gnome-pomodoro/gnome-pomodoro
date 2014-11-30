@@ -38,7 +38,8 @@ libgnome_pomodoro_la_VALAFLAGS = \
     --pkg gnome-desktop-3.0 \
     --pkg upower-glib \
     --pkg libcanberra \
-    --pkg gstreamer-1.0
+    --pkg gstreamer-1.0 \
+    --pkg telepathy-glib
 
 libgnome_pomodoro_la_CPPFLAGS = \
     $(GNOME_POMODORO_CFLAGS) \

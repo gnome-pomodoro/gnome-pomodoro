@@ -20,8 +20,7 @@
 using GLib;
 using Gnome.SessionManager;
 
-
-namespace Gnome.SessionManager
+namespace Pomodoro
 {
     public enum PresenceStatus {
         AVAILABLE = 0,
@@ -29,14 +28,6 @@ namespace Gnome.SessionManager
         BUSY = 2,
         IDLE = 3,
         DEFAULT = -1
-    }
-
-    [DBus (name = "org.gnome.SessionManager.Presence")]
-    interface Presence : Object
-    {
-        public abstract uint status { get; set; }
-
-        public signal void status_changed (uint status);
     }
 
     public string presence_status_to_string (PresenceStatus presence_status)
@@ -81,9 +72,72 @@ namespace Gnome.SessionManager
 }
 
 
+namespace Gnome.SessionManager
+{
+    public enum PresenceStatus {
+        AVAILABLE = 0,
+        INVISIBLE = 1,
+        BUSY = 2,
+        IDLE = 3,
+        DEFAULT = -1
+    }
+
+    [DBus (name = "org.gnome.SessionManager.Presence")]
+    interface Presence : Object
+    {
+        public abstract uint status { get; set; }
+
+        public signal void status_changed (uint status);
+    }
+}
+
+
+class Pomodoro.TelepathyPresence : Object
+{
+    protected TelepathyGLib.AccountManager account_manager;
+
+    public TelepathyPresence ()
+    {
+        this.account_manager = TelepathyGLib.AccountManager.dup ();
+    }
+
+    public void set_status (Pomodoro.PresenceStatus status)
+    {
+        string message;
+        string status_string;
+
+        var type = this.account_manager.get_most_available_presence (
+                                       out status_string,
+                                       out message);
+        var new_type = TelepathyGLib.ConnectionPresenceType.UNSET;
+        var new_status_string = "";
+
+        if (status == Pomodoro.PresenceStatus.BUSY &&
+            type == TelepathyGLib.ConnectionPresenceType.AVAILABLE)
+        {
+            new_type = TelepathyGLib.ConnectionPresenceType.BUSY;
+            new_status_string = "busy";
+        } else if (status == Pomodoro.PresenceStatus.AVAILABLE &&
+                   type == TelepathyGLib.ConnectionPresenceType.BUSY)
+        {
+            new_type = TelepathyGLib.ConnectionPresenceType.AVAILABLE;
+            new_status_string = "available";
+        }
+
+        if (new_type != TelepathyGLib.ConnectionPresenceType.UNSET) {
+            this.account_manager.set_all_requested_presences (new_type,
+                                                              new_status_string,
+                                                              message);
+        }
+    }
+}
+
+
 class Pomodoro.Presence : Object
 {
     private unowned Pomodoro.Timer timer;
+    private Pomodoro.TelepathyPresence telepathy_presence;
+
     private GLib.Settings settings;
     private Gnome.SessionManager.Presence proxy;
     private PresenceStatus previous_status;
@@ -115,6 +169,8 @@ class Pomodoro.Presence : Object
 
             return;
         }
+
+        this.telepathy_presence = new Pomodoro.TelepathyPresence ();
 
         this.timer.pomodoro_start.connect (this.on_timer_pomodoro_start);
         this.timer.pomodoro_end.connect (this.on_timer_pomodoro_end);
@@ -161,7 +217,7 @@ class Pomodoro.Presence : Object
 
     private void on_timer_pomodoro_start (bool is_requested)
     {
-        this.set_status(PresenceStatus.BUSY);
+        this.set_status (PresenceStatus.BUSY);
 
 //        var status = string_to_presence_status (
 //                this.settings.get_string ("presence-during-pomodoro"));
@@ -171,7 +227,7 @@ class Pomodoro.Presence : Object
 
     private void on_timer_pomodoro_end (bool is_completed)
     {
-        this.set_status(PresenceStatus.AVAILABLE);
+        this.set_status (PresenceStatus.AVAILABLE);
 
 //        var status = string_to_presence_status (
 //                this.settings.get_string ("presence-during-break"));
@@ -186,11 +242,13 @@ class Pomodoro.Presence : Object
         this.ignore_next_status = true;
 
         if (status == PresenceStatus.DEFAULT) {
-            this.proxy.status = this.previous_status;
+            this.proxy.status = (Gnome.SessionManager.PresenceStatus) this.previous_status;
         }
         else {
-            this.proxy.status = status;
+            this.proxy.status = (Gnome.SessionManager.PresenceStatus) status;
         }
+
+        this.telepathy_presence.set_status (status);
     }
 
     /* mapping from settings to presence combobox */
