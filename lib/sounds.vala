@@ -100,7 +100,6 @@ public class Pomodoro.Player : Object
     public bool repeat { get; set; default=false; }
 
     private Gst.Element pipeline;
-    private Gst.Bus bus;
     private Pomodoro.Animation fade_animation;
 
     construct
@@ -114,8 +113,8 @@ public class Pomodoro.Player : Object
 
         this.pipeline = pipeline;
 
-        this.bus = this.pipeline.get_bus ();
-        this.bus.add_watch (GLib.Priority.DEFAULT, this.bus_callback);
+        var bus = this.pipeline.get_bus ();
+        bus.add_watch (GLib.Priority.DEFAULT, this.bus_callback);
 
         this.fade_animation = null;
         this.fade_value = 0.0;
@@ -126,7 +125,6 @@ public class Pomodoro.Player : Object
         this.pipeline.set_state (Gst.State.NULL);
 
         this.pipeline = null;
-        this.bus = null;
         this.fade_animation = null;
     }
 
@@ -258,6 +256,7 @@ public class Pomodoro.Player : Object
 public class Pomodoro.Sounds : Object
 {
     public Player player;
+    public Player fallback_player;
 
     private Settings settings;
     private Canberra.Context context;
@@ -269,14 +268,36 @@ public class Pomodoro.Sounds : Object
     public Sounds (Pomodoro.Timer timer)
     {
         this.timer = timer;
-
-        var binding_flags = GLib.SettingsBindFlags.DEFAULT |
-                            GLib.SettingsBindFlags.GET;
+        this.timer.notify["state-duration"].connect (this.on_state_duration_changed);
 
         this.settings = Pomodoro.get_settings ().get_child ("preferences");
         this.settings.changed.connect (this.on_settings_changed);
 
+        this.enable ();
+    }
+
+    ~Sounds ()
+    {
+        this.disable ();
+    }
+
+    private void setup_libcanberra ()
+    {
         this.ensure_context ();
+
+        if (Player.is_supported ())
+        {
+            this.fallback_player = new Player ();
+        }
+        else {
+            GLib.warning ("Couldn't create gstramer player");
+        }
+    }
+
+    private void setup_gstreamer ()
+    {
+        var binding_flags = GLib.SettingsBindFlags.DEFAULT |
+                            GLib.SettingsBindFlags.GET;
 
         if (Player.is_supported ())
         {
@@ -300,15 +321,6 @@ public class Pomodoro.Sounds : Object
         else {
             GLib.warning ("Couldn't create gstramer player");
         }
-
-        this.timer.notify["state-duration"].connect (this.on_state_duration_changed);
-
-        this.enable ();
-    }
-
-    ~Sounds ()
-    {
-        this.disable ();
     }
 
     private void schedule_fade_out ()
@@ -338,6 +350,9 @@ public class Pomodoro.Sounds : Object
 
     public void enable ()
     {
+        this.setup_libcanberra ();
+        this.setup_gstreamer ();
+
         this.timer.state_changed.connect (this.on_state_changed);
         this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
         this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
@@ -555,6 +570,10 @@ public class Pomodoro.Sounds : Object
                 GLib.warning ("Couldn't play sound '%s' - %s",
                               file_path,
                               Canberra.strerror (status));
+
+                this.fallback_player.file = GLib.File.new_for_path (file_path);
+                this.fallback_player.volume = volume;
+                this.fallback_player.play ();
             }
         }
     }
@@ -587,6 +606,10 @@ public class Pomodoro.Sounds : Object
                 GLib.warning ("Couldn't play sound '%s' - %s",
                               file_path,
                               Canberra.strerror (status));
+
+                this.fallback_player.file = GLib.File.new_for_path (file_path);
+                this.fallback_player.volume = volume;
+                this.fallback_player.play ();
             }
         }
     }
