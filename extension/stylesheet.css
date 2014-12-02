@@ -100,5 +100,6 @@
 
 .extension-pomodoro-dialog .messages-indicator {
     text-shadow: 0.0px 1.0px 2.0px rgba(0, 0, 0, 0.35);
-    color: rgba(255, 255, 255, 0.65);
+    color: white;
+    padding-bottom: 25px;
 }
