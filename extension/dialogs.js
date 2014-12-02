@@ -132,13 +132,6 @@ const MessagesIndicator = new Lang.Class({
                 this._highlight.visible = this._container.hover;
             }));
 
-        let clickAction = new Clutter.ClickAction();
-        this._container.add_action(clickAction);
-        clickAction.connect('clicked', Lang.bind(this,
-            function() {
-                Main.messageTray.openTray();
-            }));
-
         Main.messageTray.connect('showing', Lang.bind(this,
             function() {
                 this._highlight.visible = false;
@@ -266,6 +259,10 @@ const ModalDialog = new Lang.Class({
         global.focus_manager.add_group(this.actor);
     },
 
+    get isOpened() {
+        return this.state == State.OPENED || this.state == State.OPENING;
+    },
+
     open: function(timestamp) {
         if (this.state == State.OPENED || this.state == State.OPENING) {
             return;
@@ -295,8 +292,6 @@ const ModalDialog = new Lang.Class({
                                 })
                          });
         this.emit('opening');
-
-        Main.messageTray.close();
     },
 
     close: function(timestamp) {

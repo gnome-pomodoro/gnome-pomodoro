@@ -292,6 +292,21 @@ const PomodoroExtension = new Lang.Class({
     enableScreenNotifications: function() {
         if (!this.dialog) {
             this.dialog = new Dialogs.PomodoroEndDialog(this.timer);
+            this.dialog.connect('opening', Lang.bind(this,
+                function() {
+                    try {
+                        Main.messageTray._hideNotification(true);
+                    }
+                    catch (error) {
+                        this.logError(error.message);        
+                    }
+
+                    Main.messageTray.close();
+
+                    if (this.presence) {
+                        this.presence.update();
+                    }
+                }));
             this.dialog.connect('closing', Lang.bind(this,
                 function() {
                     if (this.timer.getState() == Timer.State.PAUSE)
@@ -303,6 +318,10 @@ const PomodoroExtension = new Lang.Class({
                         if (this._showScreenNotifications) {
                             this.dialog.openWhenIdle();
                         }
+                    }
+
+                    if (this.presence) {
+                        this.presence.update();
                     }
                 }));
             this.dialog.connect('destroy', Lang.bind(this,

@@ -182,16 +182,12 @@ const Presence = new Lang.Class({
 
                 this._updateNotificationsMenuItem();
 
-                this.setNotifications(timerState == Timer.State.POMODORO
-                                           ? this._notificationsDuringPomodoro
-                                           : this._notificationsDuringBreak);
+                this.update();
             }
             else {
                 this._updateNotificationsMenuItem();
 
-                this.setNotifications(timerState == Timer.State.POMODORO
-                                           ? this._notificationsDuringPomodoro
-                                           : this._notificationsDuringBreak);
+                this.update();
 
                 this._patch.revert();
                 this._setNotificationDefaults();
@@ -202,8 +198,12 @@ const Presence = new Lang.Class({
     _onNotificationsMenuItemToggled: function(item, state) {
         let isRunning = (this._timerState != Timer.State.NULL);
 
-        if (isRunning) {
-            this.setNotifications(state);
+        if (isRunning && this._timerState == Timer.State.POMODORO) {
+            this.setNotificationsDuringPomodoro(state);
+        }
+
+        if (isRunning && this._timerState != Timer.State.POMODORO) {
+            this.setNotificationsDuringBreak(state);
         }
     },
 
@@ -258,27 +258,18 @@ const Presence = new Lang.Class({
         this._notificationsDuringBreak = NOTIFICATIONS_DURING_BREAK;
     },
 
-    setNotifications: function(enabled, state) {
-        if (state === undefined) {
-            state = this._timerState;
-        }
-
-        if (state == Timer.State.POMODORO) {
-            this._notificationsDuringPomodoro = enabled;
-        }
-        else {
-            this._notificationsDuringBreak = enabled;
-        }
-
+    update: function() {
         try {
             let messageTray = this._getMessageTray();
             let menuItem = this._getNotificationsMenuItem();
 
-            let notifications = this._timerState == Timer.State.POMODORO
-                                 ? this._notificationsDuringPomodoro
-                                 : this._notificationsDuringBreak;
+            let busy = this._timerState == Timer.State.POMODORO
+                                 ? !this._notificationsDuringPomodoro
+                                 : !this._notificationsDuringBreak;
 
-            messageTray._busy = !notifications;
+            let hasDialog = Extension.extension.dialog && Extension.extension.dialog.isOpened;
+
+            messageTray._busy = busy || hasDialog;
             messageTray._updateState();
 
             if (menuItem.state != notifications) {
@@ -291,11 +282,15 @@ const Presence = new Lang.Class({
     },
 
     setNotificationsDuringPomodoro: function(enabled) {
-        this.setNotifications(enabled, Timer.State.POMODORO);
+        this._notificationsDuringPomodoro = enabled;
+
+        this.update();
     },
 
     setNotificationsDuringBreak: function(enabled) {
-        this.setNotifications(enabled, Timer.State.BREAK);
+        this._notificationsDuringBreak = enabled;
+
+        this.update();
     },
 
     destroy: function() {
