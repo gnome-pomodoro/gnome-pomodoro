@@ -295,7 +295,9 @@ const PomodoroExtension = new Lang.Class({
             this.dialog.connect('opening', Lang.bind(this,
                 function() {
                     try {
-                        Main.messageTray._hideNotification(true);
+                        if (Main.messageTray._notification) {
+                            Main.messageTray._hideNotification(true);
+                        }
                     }
                     catch (error) {
                         this.logError(error.message);        

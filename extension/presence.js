@@ -127,9 +127,7 @@ const Presence = new Lang.Class({
                 function(accountManager, type) {
                 },
             _updatePresence:
-                function(item, state) {
-                    self.setNotifications(state);
-                }
+                Lang.bind(this, this._onNotificationsMenuItemToggled),
         });
 
         // We need to reconnect the 'toggled' signal to use method from
@@ -272,7 +270,7 @@ const Presence = new Lang.Class({
             messageTray._busy = busy || hasDialog;
             messageTray._updateState();
 
-            if (menuItem.state != notifications) {
+            if (menuItem.state == messageTray._busy) {
                 menuItem.toggle();
             }
         }
