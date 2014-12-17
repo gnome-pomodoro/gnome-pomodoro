@@ -1311,7 +1311,6 @@ public class Pomodoro.SymbolicButton : Gtk.Button
 {
     public SymbolicButton (string icon_name, Gtk.IconSize icon_size)
     {
-        this.set_alignment (0.5f, 0.5f);
         this.set_relief (Gtk.ReliefStyle.NORMAL);
 
         var icon = new Gtk.Image.from_icon_name (icon_name, icon_size);
