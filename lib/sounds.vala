@@ -225,7 +225,9 @@ public class Pomodoro.Player : Object
 
             case Gst.MessageType.ERROR:
                 message.parse_error (out error, null);
-                GLib.message ("Error: %s\n", error.message);
+                GLib.critical (error.message);
+
+                this.pipeline.set_state (Gst.State.NULL);
                 break;
 
             default:
@@ -264,6 +266,8 @@ public class Pomodoro.Sounds : Object
     private unowned Pomodoro.Timer timer;
     private uint fade_out_timeout_id;
 
+    private bool has_gstreamer;
+
 
     public Sounds (Pomodoro.Timer timer)
     {
@@ -272,6 +276,12 @@ public class Pomodoro.Sounds : Object
 
         this.settings = Pomodoro.get_settings ().get_child ("preferences");
         this.settings.changed.connect (this.on_settings_changed);
+
+        this.has_gstreamer = Player.is_supported ();
+
+        if (!this.has_gstreamer) {
+            GLib.debug ("Can not use Gstramer backend");
+        }
 
         this.enable ();
     }
@@ -284,14 +294,6 @@ public class Pomodoro.Sounds : Object
     private void setup_libcanberra ()
     {
         this.ensure_context ();
-
-        if (Player.is_supported ())
-        {
-            this.fallback_player = new Player ();
-        }
-        else {
-            GLib.warning ("Couldn't create gstramer player");
-        }
     }
 
     private void setup_gstreamer ()
@@ -299,7 +301,12 @@ public class Pomodoro.Sounds : Object
         var binding_flags = GLib.SettingsBindFlags.DEFAULT |
                             GLib.SettingsBindFlags.GET;
 
-        if (Player.is_supported ())
+        if (this.has_gstreamer)
+        {
+            this.fallback_player = new Player ();
+        }
+
+        if (this.has_gstreamer)
         {
             this.player = new Player ();
             this.player.repeat = true;
@@ -317,9 +324,6 @@ public class Pomodoro.Sounds : Object
                                              Sounds.set_file_mapping,
                                              (void *) this,
                                              null);
-        }
-        else {
-            GLib.warning ("Couldn't create gstramer player");
         }
     }
 
@@ -424,35 +428,41 @@ public class Pomodoro.Sounds : Object
     private void ensure_context ()
     {
         /* Create context */
-        var status = Canberra.Context.create (out this.context);
+        if (this.context == null)
+        {
+            Canberra.Context context = null;
+            var status = Canberra.Context.create (out context);
 
-        if (status != Canberra.SUCCESS) {
-            GLib.warning ("Couldn't create canberra context - %s",
-                          Canberra.strerror (status));
+            if (status != Canberra.SUCCESS) {
+                GLib.critical ("Could not create canberra context: %s",
+                               Canberra.strerror (status));
 
-            return;
-        }
+                return;
+            }
 
-        /* Set properties about application */
-        status = this.context.change_props (
-                Canberra.PROP_APPLICATION_NAME, Config.PACKAGE_NAME,
-                Canberra.PROP_APPLICATION_ID, "org.gnome.Pomodoro");
+            /* Set properties about application */
+            status = context.change_props (
+                    Canberra.PROP_APPLICATION_NAME, Config.PACKAGE_NAME,
+                    Canberra.PROP_APPLICATION_ID, "org.gnome.Pomodoro");
 
-        if (status != Canberra.SUCCESS) {
-            GLib.warning ("Couldn't setup canberra context - %s",
-                          Canberra.strerror (status));
+            if (status != Canberra.SUCCESS) {
+                GLib.critical ("Could not setup canberra context: %s",
+                               Canberra.strerror (status));
 
-            return;
-        }
+                return;
+            }
 
-        /* Connect to the sound system */
-        status = this.context.open ();
+            /* Connect to the sound system */
+            status = context.open ();
 
-        if (status != Canberra.SUCCESS) {
-            GLib.warning ("Couldn't open canberra context - %s",
-                          Canberra.strerror (status));
+            if (status != Canberra.SUCCESS) {
+                GLib.critical ("Could not open canberra context: %s",
+                               Canberra.strerror (status));
 
-            return;
+                return;
+            }
+
+            this.context = (owned) context;
         }
     }
 
@@ -567,7 +577,7 @@ public class Pomodoro.Sounds : Object
                     Canberra.PROP_CANBERRA_CACHE_CONTROL, "permanent");
 
             if (status != Canberra.SUCCESS) {
-                GLib.warning ("Couldn't play sound '%s' - %s",
+                GLib.critical ("Could not play sound \"%s\": %s",
                               file_path,
                               Canberra.strerror (status));
 
@@ -603,9 +613,9 @@ public class Pomodoro.Sounds : Object
                     Canberra.PROP_CANBERRA_CACHE_CONTROL, "permanent");
 
             if (status != Canberra.SUCCESS) {
-                GLib.warning ("Couldn't play sound '%s' - %s",
-                              file_path,
-                              Canberra.strerror (status));
+                GLib.critical ("Could not play sound \"%s\": %s",
+                               file_path,
+                               Canberra.strerror (status));
 
                 this.fallback_player.file = GLib.File.new_for_path (file_path);
                 this.fallback_player.volume = volume;
