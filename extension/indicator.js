@@ -55,7 +55,6 @@ const FADE_IN_OPACITY = 1.0;
 const FADE_OUT_TIME = 250;
 const FADE_OUT_OPACITY = 0.38;
 
-const ICON_SIZE = 0.8;
 const ICON_STEPS = 360;
 
 const IndicatorType = {
@@ -306,6 +305,7 @@ const TextIndicator = new Lang.Class({
         this.emit('destroy');
     }
 });
+Signals.addSignalMethods(TextIndicator.prototype);
 
 
 const ShortTextIndicator = new Lang.Class({
@@ -360,11 +360,9 @@ const IconIndicator = new Lang.Class({
         this.actor._delegate = this;
 
         this.icon = new St.DrawingArea({ style_class: 'system-status-icon' });
-        this.icon.connect('repaint', Lang.bind(this, this._repaint));
-        this.icon.connect('destroy', Lang.bind(this, function() {
-            this.timer.disconnect(this._onTimerUpdateId);
-            this._actorDestroyed = true;
-        }));
+        this.icon.connect('style-changed', Lang.bind(this, this._onIconStyleChanged));
+        this.icon.connect('repaint', Lang.bind(this, this._onIconRepaint));
+        this.icon.connect('destroy', Lang.bind(this, this._onIconDestroy));
         this.actor.add_child(this.icon);
 
         this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
@@ -380,108 +378,21 @@ const IconIndicator = new Lang.Class({
         this._initialized = true;
     },
 
-    _onStyleChanged: function(actor) {
+    _onIconStyleChanged: function(actor) {
         let themeNode = actor.get_theme_node();
+        let size = Math.ceil(themeNode.get_length('icon-size'));
 
-        this._minHPadding = themeNode.get_length('-minimum-hpadding');
-        this._natHPadding = themeNode.get_length('-natural-hpadding');
-        this._minVPadding = themeNode.get_length('-minimum-vpadding');
-        this._natVPadding = themeNode.get_length('-natural-vpadding');
+        [actor.min_width, actor.natural_width] = themeNode.adjust_preferred_width(size, size);
+        [actor.min_height, actor.natural_height] = themeNode.adjust_preferred_height(size, size);
 
-        let color = themeNode.get_foreground_color()
-        this._primaryColor = color;
-        this._secondaryColor = new Clutter.Color({
-            red: color.red,
-            green: color.green,
-            blue: color.blue,
-            alpha: color.alpha * FADE_OUT_OPACITY
-        });
+        this._iconSize = size;
     },
 
-    _getPreferredWidth: function(actor, forHeight, alloc) {
-        let minWidth     = forHeight - 2 * this._minVPadding;
-        let naturalWidth = forHeight - 2 * this._natVPadding;
-        let child        = actor.get_first_child();
-
-        minWidth     += 2 * this._minHPadding;
-        naturalWidth += 2 * this._natHPadding;
-
-        if (child) {
-            [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
-        } else {
-            alloc.min_size = alloc.natural_size = 0;
-        }
-
-        if (alloc.min_size < minWidth) {
-            alloc.min_size = minWidth;
-        }
-
-        if (alloc.natural_size < naturalWidth) {
-            alloc.natural_size = naturalWidth;
-        }
-    },
-
-    _getPreferredHeight: function(actor, forWidth, alloc) {
-        let child = actor.get_first_child();
-
-        if (child) {
-            [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
-        } else {
-            alloc.min_size = alloc.natural_size = 0;
-        }
-    },
-
-    _onTimerUpdate: function() {
-        if (this._actorDestroyed) {
-            return;
-        }
-
-        let state = this.timer.getState();
-        let progress = this.timer.getProgress();
-
-        if (this._state != state && this._initialized)
-        {
-            this._state = state;
-            this._progress = -1.0;  /* force refresh */
-        }
-
-        if (this._progress != progress)
-        {
-            this._progress = progress;
-            this.icon.queue_repaint();
-        }
-    },
-
-    _allocate: function(actor, box, flags) {
-        let child = actor.get_first_child();
-        if (!child)
-            return;
-
-        let [minWidth, natWidth] = child.get_preferred_width(-1);
-
-        let availWidth  = box.x2 - box.x1;
-        let availHeight = box.y2 - box.y1;
-
-        let childBox = new Clutter.ActorBox();
-        childBox.y1 = 0;
-        childBox.y2 = availHeight;
-
-        if (natWidth + 2 * this._natHPadding <= availWidth) {
-            childBox.x1 = this._natHPadding;
-            childBox.x2 = availWidth - this._natHPadding;
-        } else {
-            childBox.x1 = this._minHPadding;
-            childBox.x2 = availWidth - this._minHPadding;
-        }
-
-        child.allocate(childBox, flags);
-    },
-
-    _repaint: function(area) {
+    _onIconRepaint: function(area) {
         let cr = area.get_context();
         let [width, height] = area.get_surface_size();
 
-        let radius   = Math.min(width, height) * 0.85 * ICON_SIZE / 2;
+        let radius = 0.5 * this._iconSize - 2.0;
         let progress = Math.max(this._progress, 0.001);
 
         cr.translate(0.5 * width, 0.5 * height);
@@ -531,12 +442,110 @@ const IconIndicator = new Lang.Class({
         cr.$dispose();
     },
 
+    _onIconDestroy: function() {
+        this.timer.disconnect(this._onTimerUpdateId);
+        this._actorDestroyed = true;
+    },
+
+    _onStyleChanged: function(actor) {
+        let themeNode = actor.get_theme_node();
+
+        this._minHPadding = themeNode.get_length('-minimum-hpadding');
+        this._natHPadding = themeNode.get_length('-natural-hpadding');
+        this._minVPadding = themeNode.get_length('-minimum-vpadding');
+        this._natVPadding = themeNode.get_length('-natural-vpadding');
+
+        let color = themeNode.get_foreground_color()
+        this._primaryColor = color;
+        this._secondaryColor = new Clutter.Color({
+            red: color.red,
+            green: color.green,
+            blue: color.blue,
+            alpha: color.alpha * FADE_OUT_OPACITY
+        });
+    },
+
+    _getPreferredWidth: function(actor, forHeight, alloc) {
+        let child = actor.get_first_child();
+
+        if (child) {
+            [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
+
+        } else {
+            alloc.min_size = alloc.natural_size = 0;
+        }
+
+        alloc.min_size += 2 * this._minHPadding;
+        alloc.natural_size += 2 * this._natHPadding;
+    },
+
+    _getPreferredHeight: function(actor, forWidth, alloc) {
+        let child = actor.get_first_child();
+
+        if (child) {
+            [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
+        } else {
+            alloc.min_size = alloc.natural_size = 0;
+        }
+
+        alloc.min_size += 2 * this._minVPadding;
+        alloc.natural_size += 2 * this._natVPadding;
+    },
+
+    _onTimerUpdate: function() {
+        if (this._actorDestroyed) {
+            return;
+        }
+
+        let state = this.timer.getState();
+        let progress = this.timer.getProgress();
+
+        if (this._state != state && this._initialized)
+        {
+            this._state = state;
+            this._progress = -1.0;  /* force refresh */
+        }
+
+        if (this._progress != progress)
+        {
+            this._progress = progress;
+            this.icon.queue_repaint();
+        }
+    },
+
+    _allocate: function(actor, box, flags) {
+        let child = actor.get_first_child();
+        if (!child) {
+            return;
+        }
+
+        let availWidth  = box.x2 - box.x1;
+        let availHeight = box.y2 - box.y1;
+
+        let [minWidth, natWidth] = child.get_preferred_width(availHeight);
+
+        let childBox = new Clutter.ActorBox();
+        childBox.y1 = 0;
+        childBox.y2 = availHeight;
+
+        if (natWidth + 2 * this._natHPadding <= availWidth) {
+            childBox.x1 = this._natHPadding;
+            childBox.x2 = availWidth - this._natHPadding;
+        } else {
+            childBox.x1 = this._minHPadding;
+            childBox.x2 = availWidth - this._minHPadding;
+        }
+
+        child.allocate(childBox, flags);
+    },
+
     destroy: function() {
         this.actor.destroy();
 
         this.emit('destroy');
     }
 });
+Signals.addSignalMethods(IconIndicator.prototype);
 
 
 const Indicator = new Lang.Class({
@@ -572,9 +581,10 @@ const Indicator = new Lang.Class({
 
         if (this.widget) {
             this.widget.destroy();
+            this.widget = null;
         }
 
-        switch(indicatorType)
+        switch (indicatorType)
         {
             case IndicatorType.ICON:
                 this.widget = new IconIndicator(this.timer);
