@@ -230,8 +230,8 @@ const PomodoroStartNotification = new Lang.Class({
         let state = this.timer.getState();
 
         if (state == Timer.State.POMODORO || state == Timer.State.IDLE) {
-            let elapsed       = this.timer.proxy.Elapsed;
-            let stateDuration = this.timer.proxy.StateDuration;
+            let elapsed       = this.timer.getElapsed();
+            let stateDuration = this.timer.getStateDuration();
             let remaining     = this.timer.getRemaining();
             let minutes       = Math.round(remaining / 60);
             let seconds       = Math.round(remaining % 60);
@@ -343,8 +343,8 @@ const PomodoroEndNotification = new Lang.Class({
         let state = this.timer.getState();
 
         if (state == Timer.State.PAUSE) {
-            let elapsed       = this.timer.proxy.Elapsed;
-            let stateDuration = this.timer.proxy.StateDuration;
+            let elapsed       = this.timer.getElapsed();
+            let stateDuration = this.timer.getStateDuration();
             let remaining     = this.timer.getRemaining();
             let minutes       = Math.round(remaining / 60);
             let seconds       = Math.round(remaining % 60);

@@ -144,6 +144,7 @@ const PomodoroExtension = new Lang.Class({
             this._destroyNotifications();
         }
 
+        /* don't wait for pomodoro-start signal to reduce flicker */
         if (!(this.notification instanceof Notifications.PomodoroEndNotification) &&
             (state == Timer.State.POMODORO || state == Timer.State.IDLE))
         {

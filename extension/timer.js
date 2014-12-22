@@ -41,8 +41,7 @@ const Timer = new Lang.Class({
     Name: 'PomodoroTimer',
 
     _init: function() {
-        this.proxy = null;
-        this.state = State.NULL;
+        this._proxy = null;
 
         this._state = null;
         this._propertiesChangedId = 0;
@@ -76,15 +75,15 @@ const Timer = new Lang.Class({
     },
 
     _ensureProxy: function(callback) {
-        if (this.proxy) {
+        if (this._proxy) {
             if (callback) {
                 callback.call(this);
             }
             return;
         }
 
-        this.proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
-            if (proxy !== this.proxy) {
+        this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
+            if (proxy !== this._proxy) {
                 return;
             }
 
@@ -98,19 +97,19 @@ const Timer = new Lang.Class({
              * when gnome-pomodoro comes back and gets restored
              */
             if (this._propertiesChangedId == 0) {
-                this._propertiesChangedId = this.proxy.connect(
+                this._propertiesChangedId = this._proxy.connect(
                                            'g-properties-changed',
                                            Lang.bind(this, this._onPropertiesChanged));
             }
 
             if (this._notifyPomodoroStartId == 0) {
-                this._notifyPomodoroStartId = this.proxy.connectSignal(
+                this._notifyPomodoroStartId = this._proxy.connectSignal(
                                            'NotifyPomodoroStart',
                                            Lang.bind(this, this._onNotifyPomodoroStart));
             }
 
             if (this._notifyPomodoroEndId == 0) {
-                this._notifyPomodoroEndId = this.proxy.connectSignal(
+                this._notifyPomodoroEndId = this._proxy.connectSignal(
                                            'NotifyPomodoroEnd',
                                            Lang.bind(this, this._onNotifyPomodoroEnd));
             }
@@ -122,7 +121,7 @@ const Timer = new Lang.Class({
             this.emit('service-connected');
             this.emit('state-changed');
 
-            this._onPropertiesChanged(this.proxy, null);
+            this._onPropertiesChanged(this._proxy, null);
         }));
     },
 
@@ -131,6 +130,8 @@ const Timer = new Lang.Class({
     },
 
     _onNameVanished: function() {
+        this._proxy = null;
+
         this.emit('state-changed');
         this.emit('service-disconnected');
     },
@@ -169,20 +170,28 @@ const Timer = new Lang.Class({
     },
 
     getState: function() {
-        if (!this.proxy || this.proxy.State == null) {
+        if (!this._proxy || this._proxy.State == null) {
             return State.NULL;
         }
 
-        return this.proxy.State;
+        return this._proxy.State;
     },
 
     setState: function(state, duration) {
         this._ensureProxy(Lang.bind(this,
             function() {
-                this.proxy.SetStateRemote(state,
+                this._proxy.SetStateRemote(state,
                                           duration || 0,
                                           Lang.bind(this, this._onCallback));
             }));
+    },
+
+    getStateDuration: function() {
+        return this._proxy.StateDuration;
+    },
+
+    getElapsed: function() {
+        return this._proxy.Elapsed;
     },
 
     getRemaining: function() {
@@ -196,33 +205,33 @@ const Timer = new Lang.Class({
             return 0.0;
         }
 
-        return Math.ceil(this.proxy.StateDuration - this.proxy.Elapsed);
+        return Math.ceil(this._proxy.StateDuration - this._proxy.Elapsed);
     },
 
     getProgress: function() {
-        return (this.proxy && this.proxy.StateDuration > 0)
-                ? this.proxy.Elapsed / this.proxy.StateDuration
+        return (this._proxy && this._proxy.StateDuration > 0)
+                ? this._proxy.Elapsed / this._proxy.StateDuration
                 : 0.0;
     },
 
     start: function() {
         this._ensureProxy(Lang.bind(this,
             function() {
-                this.proxy.StartRemote(Lang.bind(this, this._onCallback));
+                this._proxy.StartRemote(Lang.bind(this, this._onCallback));
             }));
     },
 
     stop: function() {
         this._ensureProxy(Lang.bind(this,
             function() {
-                this.proxy.StopRemote(Lang.bind(this, this._onCallback));
+                this._proxy.StopRemote(Lang.bind(this, this._onCallback));
             }));
     },
 
     reset: function() {
         this._ensureProxy(Lang.bind(this,
             function() {
-                this.proxy.ResetRemote(Lang.bind(this, this._onCallback));
+                this._proxy.ResetRemote(Lang.bind(this, this._onCallback));
             }));
     },
 
@@ -238,14 +247,14 @@ const Timer = new Lang.Class({
     showMainWindow: function(timestamp) {
         this._ensureProxy(Lang.bind(this,
             function() {
-                this.proxy.ShowMainWindowRemote(timestamp, Lang.bind(this, this._onCallback));
+                this._proxy.ShowMainWindowRemote(timestamp, Lang.bind(this, this._onCallback));
             }));
     },
 
     showPreferences: function(view, timestamp) {
         this._ensureProxy(Lang.bind(this,
             function() {
-                this.proxy.ShowPreferencesRemote(view, timestamp, Lang.bind(this, this._onCallback));
+                this._proxy.ShowPreferencesRemote(view, timestamp, Lang.bind(this, this._onCallback));
             }));
     },
 
