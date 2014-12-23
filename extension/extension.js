@@ -116,9 +116,7 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _onSessionModeUpdated: function() {
-        if (Main.sessionMode.isLocked !== this.inLockScreen) {
-            this.setInLockScreen(Main.sessionMode.isLocked);
-        }
+        this.setInLockScreen(Main.sessionMode.isLocked);
     },
 
     _onServiceConnected: function() {
@@ -342,21 +340,22 @@ const PomodoroExtension = new Lang.Class({
     },
 
     setInLockScreen: function(inLockScreen) {
-        this.inLockScreen = inLockScreen;
+        if (this.inLockScreen !== inLockScreen) {
+            this.inLockScreen = inLockScreen;
 
-        if (inLockScreen) {
-            this.disableIndicator();
-            this.disableScreenNotifications();
-        }
-        else {
-            this.enableIndicator();
-            this.enableScreenNotifications();
-        }
+            if (inLockScreen) {
+                this.disableIndicator();
+                this.disableScreenNotifications();
+            }
+            else {
+                this.enableIndicator();
+                this.enableScreenNotifications();
+            }
 
-        this.enableKeybinding();
-        this.enableIndicator();
-        this.enableNotifications();
-        this.enablePresence();
+            this.enableKeybinding();
+            this.enableNotifications();
+            this.enablePresence();
+        }
     },
 
     notifyIssue: function(message) {

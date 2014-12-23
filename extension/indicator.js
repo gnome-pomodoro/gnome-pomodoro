@@ -613,5 +613,7 @@ const Indicator = new Lang.Class({
             Extension.extension.settings.disconnect(this._settingsChangedId);
             this._settingsChangedId = 0;
         }
+
+        this.parent();
     }
 });
