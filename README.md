@@ -58,13 +58,13 @@ Then follow instructions from above, as if installing package from repos.
 
 1. Download the right version
 
-   **For GNOME 3.14** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.14).
+   **For GNOME 3.14** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.14) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-3.14#from-source).
 
-   **For GNOME 3.12** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.12).
+   **For GNOME 3.12** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.12) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-3.12#from-source).
 
-   **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.10).
+   **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.10) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-3.10#from-source).
 
-   **For GNOME 3.8** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.8).
+   **For GNOME 3.8** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.8) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-3.8#from-source).
 
    **For GNOME 3.6** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-shell-extension-3.6) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-shell-extension-3.6#direct-from-source).
 
