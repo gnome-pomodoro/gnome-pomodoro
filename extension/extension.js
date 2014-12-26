@@ -89,9 +89,15 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
-    _clearNotifications: function() {
+    _destroyPreviousNotifications: function() {
         if (Notifications.source) {
-            Notifications.source.clear();
+            let notifications = Notifications.source.notifications;
+
+            for (let i = notifications.length - 1; i >= 0; i--) {
+                if (notifications[i] !== this.notification) {
+                    notifications[i].destroy();
+                }
+            }
         }
     },
 
@@ -157,8 +163,6 @@ const PomodoroExtension = new Lang.Class({
             /* do not renotify */
         }
         else {
-            this._clearNotifications();
-
             this.notification = new Notifications.PomodoroStartNotification(this.timer);
             this.notification.connect('clicked', Lang.bind(this,
                 function(notification) {
@@ -169,6 +173,8 @@ const PomodoroExtension = new Lang.Class({
             this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
             this.notification.show();
         }
+
+        this._destroyPreviousNotifications();
     },
 
     _onNotifyPomodoroEnd: function() {
@@ -178,8 +184,6 @@ const PomodoroExtension = new Lang.Class({
             /* do not renotify */
         }
         else {
-            this._clearNotifications();
-
             this.notification = new Notifications.PomodoroEndNotification(this.timer);
             this.notification.connect('clicked', Lang.bind(this,
                 function(notification){
@@ -199,6 +203,8 @@ const PomodoroExtension = new Lang.Class({
         else {
             this.notification.show();
         }
+
+        this._destroyPreviousNotifications();
     },
 
     _onKeybindingPressed: function() {
@@ -283,9 +289,7 @@ const PomodoroExtension = new Lang.Class({
     disableNotifications: function() {
         this.notification = null;
 
-        if (Notifications.source) {
-            Notifications.source.destroy();
-        }
+        this._destroyNotifications();
     },
 
     enableScreenNotifications: function() {

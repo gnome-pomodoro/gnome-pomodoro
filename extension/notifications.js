@@ -48,14 +48,23 @@ const REMINDER_ACCEPTANCE = 0.66;
 let source = null;
 
 
-function getDefaultSource() {
-    if (!source || !source.policy) {
+function getDefaultSource()
+{
+    /* a walkaround for ScreenShield requiring new source for each
+       music notification */
+    if (source && Main.sessionMode.isLocked) {
+        source.destroy();
+        source = null;
+    }
+
+    if (!source) {
         source = new Source();
         source.connect('destroy', Lang.bind(this,
             function() {
                 source = null;
             }));
     }
+
     return source;
 }
 
@@ -81,18 +90,16 @@ const Source = new Lang.Class({
         return false;
     },
 
-    clear: function() {
-        let notifications = this.notifications;
-        this.notifications = [];
-
-        for (let i = 0; i < notifications.length; i++) {
-            notifications[i].destroy();
+    destroyNotifications: function() {
+        for (let i = this.notifications.length - 1; i >= 0; i--) {
+            this.notifications[i].destroy();
         }
+
+        this.countUpdated();
     },
 
     close: function() {
         this.destroy();
-        this.emit('done-displaying-content', false);
     }
 });
 
@@ -130,13 +137,17 @@ const Notification = new Lang.Class({
         this.isMusic = enabled;
     },
 
-    show: function(force) {
+    show: function() {
         if (!this._destroying) {
             /* Popup notification regardless of session busy status */
-            if (!this.forFeedback && force) {
+            if (!this.forFeedback) {
                 this.setForFeedback(true);
                 this._restoreForFeedback = true;
             }
+
+            /* Add notification to source before "source-added"
+               signal gets emitted */
+            this.source.pushNotification(this);
 
             if (!Main.messageTray.contains(this.source)) {
                 Main.messageTray.add(this.source);
