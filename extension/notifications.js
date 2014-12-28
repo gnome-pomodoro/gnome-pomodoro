@@ -131,6 +131,13 @@ const Notification = new Lang.Class({
             this._restoreForFeedback = false;
             this.setForFeedback(false);
         }
+
+        if (actor.mapped) {
+            this.emit('mapped');
+        }
+        else {
+            this.emit('unmapped');
+        }
     },
 
     setShowInLockScreen: function(enabled) {
@@ -166,13 +173,17 @@ const Notification = new Lang.Class({
     },
 
     _updateBody: function(text) {
-        this._bodyLabel.clutter_text.set_markup(text);
-        this._bodyLabel.queue_relayout();
+        if (this._bodyLabel.clutter_text) {
+            this._bodyLabel.clutter_text.set_markup(text);
+            this._bodyLabel.queue_relayout();
+        }
     },
 
     _updateBanner: function(text) {
-        this._bannerLabel.clutter_text.set_markup(text);
-        this._bannerLabel.queue_relayout();
+        if (this._bannerLabel.clutter_text) {
+            this._bannerLabel.clutter_text.set_markup(text);
+            this._bannerLabel.queue_relayout();
+        }
     },
 
     close: function() {
@@ -182,6 +193,10 @@ const Notification = new Lang.Class({
 
     destroy: function(reason) {
         this._destroying = true;
+
+        if (this.actor && this.actor.mapped) {
+            this.emit('unmapped');
+        }
 
         if (this._actorMappedId) {
             this.actor.disconnect(this._actorMappedId);
@@ -212,26 +227,21 @@ const PomodoroStartNotification = new Lang.Class({
                 this.timer.setState(Timer.State.PAUSE);
             }));
 
-        this.connect('destroy', Lang.bind(this,
-            function() {
-                if (this._timerUpdateId) {
-                    this.timer.disconnect(this._timerUpdateId);
-                    this._timerUpdateId = 0;
-                }
-            }));
+        this.connect('mapped', Lang.bind(this, this._onActorMapped));
+        this.connect('unmapped', Lang.bind(this, this._onActorUnmapped));
 
         this._updateBanner(_("Focus on your task"));
     },
 
-    _onActorMappedChanged: function(actor) {
-        this.parent(actor);
-
-        if (actor.mapped && !this._timerUpdateId) {
+    _onActorMapped: function() {
+        if (!this._timerUpdateId) {
             this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
             this._onTimerUpdate();
         }
+    },
 
-        if (!actor.mapped && this._timerUpdateId) {
+    _onActorUnmapped: function() {
+        if (this._timerUpdateId) {
             this.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
         }
@@ -259,10 +269,6 @@ const PomodoroStartNotification = new Lang.Class({
 
             this._updateBody(longMessage);
         }
-    },
-
-    show: function() {
-        this.parent(true);
     }
 });
 
@@ -311,15 +317,14 @@ const PomodoroEndNotification = new Lang.Class({
                 Main.messageTray.close();
             }));
 
+        this.connect('mapped', Lang.bind(this, this._onActorMapped));
+        this.connect('unmapped', Lang.bind(this, this._onActorUnmapped));
+
         this.connect('destroy', Lang.bind(this,
             function() {
                 if (this._settingsChangedId) {
                     Extension.extension.settings.disconnect(this._settingsChangedId);
                     this._settingsChangedId = 0;
-                }
-                if (this._timerUpdateId) {
-                    this.timer.disconnect(this._timerUpdateId);
-                    this._timerUpdateId = 0;
                 }
             }));
     },
@@ -336,15 +341,15 @@ const PomodoroEndNotification = new Lang.Class({
         }
     },
 
-    _onActorMappedChanged: function(actor) {
-        this.parent(actor);
-
-        if (actor.mapped && !this._timerUpdateId) {
+    _onActorMapped: function() {
+        if (!this._timerUpdateId) {
             this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
             this._onTimerUpdate();
         }
+    },
 
-        if (!actor.mapped && this._timerUpdateId) {
+    _onActorUnmapped: function() {
+        if (this._timerUpdateId) {
             this.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
         }
@@ -398,10 +403,6 @@ const PomodoroEndNotification = new Lang.Class({
             this._switchToPauseButton.set_label(
                 isLongPause ? _("Shorten it") : _("Lengthen it"));
         }
-    },
-
-    show: function() {
-        this.parent(true);
     }
 });
 

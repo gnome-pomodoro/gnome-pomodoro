@@ -63,7 +63,8 @@ const PomodoroExtension = new Lang.Class({
 
             this.settings.connect('changed::show-screen-notifications',
                                   Lang.bind(this, this._onSettingsChanged));
-            this._onSettingsChanged(this.settings, 'show-screen-notifications');
+
+            this._showScreenNotifications = this.settings.get_boolean('show-screen-notifications');
         }
         catch (error) {
             this.logError(error);
@@ -105,7 +106,7 @@ const PomodoroExtension = new Lang.Class({
         switch(key)
         {
             case 'show-screen-notifications':
-                this._showScreenNotifications = this.settings.get_boolean(key);
+                this._showScreenNotifications = settings.get_boolean(key);
 
                 if (this.dialog && this.timer.getState() == Timer.State.PAUSE)
                 {
@@ -186,7 +187,7 @@ const PomodoroExtension = new Lang.Class({
         else {
             this.notification = new Notifications.PomodoroEndNotification(this.timer);
             this.notification.connect('clicked', Lang.bind(this,
-                function(notification){
+                function(notification) {
                     if (this.dialog) {
                         this.dialog.open();
                         this.dialog.pushModal();
@@ -286,8 +287,11 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
-    disableNotifications: function() {
-        this.notification = null;
+    disableNotifications: function() {        
+        if (this.notification) {
+            this.notification.destroy();
+            this.notification = null;
+        }
 
         this._destroyNotifications();
     },
