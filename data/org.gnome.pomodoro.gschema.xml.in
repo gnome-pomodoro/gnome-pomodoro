@@ -116,15 +116,10 @@
       <summary>Ticking sound volume</summary>
       <description>Volume of ticking sound.</description>
     </key>
-    <key name="pomodoro-start-deactivate-screensaver" type="b">
+    <key name="wake-up-screen" type="b">
       <default>true</default>
-      <summary>Deactivate screensaver on pomodoro start</summary>
-      <description>Notify about pomodoro by disabling screensaver.</description>
-    </key>
-    <key name="pomodoro-end-deactivate-screensaver" type="b">
-      <default>false</default>
-      <summary>Deactivate screensaver on pomodoro end</summary>
-      <description>Notify about break by disabling screensaver.</description>
+      <summary>Wake up screen</summary>
+      <description>Wake up screen to notify about pomodoro.</description>
     </key>
   </schema>
   <schema id="org.gnome.pomodoro.state" path="/org/gnome/pomodoro/state/">

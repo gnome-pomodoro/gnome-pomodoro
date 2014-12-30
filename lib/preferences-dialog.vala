@@ -646,6 +646,11 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                             "active",
                             SETTINGS_BIND_FLAGS);
 
+        this.settings.bind ("wake-up-screen",
+                            screen_wake_up_toggle,
+                            "active",
+                            SETTINGS_BIND_FLAGS);
+
         this.settings.bind_with_mapping ("pomodoro-end-sound",
                                          pomodoro_end_sound,
                                          "file",
