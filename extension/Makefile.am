@@ -11,7 +11,8 @@ dist_extension_DATA = \
     settings.js \
     stylesheet.css \
     tasklist.js \
-    timer.js
+    timer.js \
+    utils.js
 
 nodist_extension_DATA = \
     config.js \

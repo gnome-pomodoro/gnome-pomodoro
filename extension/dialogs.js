@@ -26,7 +26,6 @@ const Atk = imports.gi.Atk;
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Meta = imports.gi.Meta;
-const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 const Pango = imports.gi.Pango;
 
@@ -39,6 +38,7 @@ const Tweener = imports.ui.tweener;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
 const Timer = Extension.imports.timer;
+const Utils = Extension.imports.utils;
 
 const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
@@ -64,40 +64,12 @@ const FADE_IN_OPACITY = 0.55;
 
 const FADE_OUT_TIME = 180;
 
-const VIDEO_PLAYER_CATEGORIES = [
-    ['Player', 'Video'],
-    ['Player', 'AudioVideo'],
-    ['Game'],
-];
-
-
 const State = {
     OPENED: 0,
     CLOSED: 1,
     OPENING: 2,
     CLOSING: 3
 };
-
-
-function _getCategories(appInfo) {
-    let categoriesStr = appInfo.get_categories();
-    if (!categoriesStr) {
-        return [];
-    }
-
-    return categoriesStr.split(';');
-}
-
-
-function _arrayContains(array1, array2) {
-    for (let i = 0; i < array2.length; i++) {
-        if (array1.indexOf(array2[i]) < 0) {
-            return false;
-        }
-    }
-
-    return true;
-}
 
 
 const MessagesIndicator = new Lang.Class({
@@ -279,6 +251,7 @@ const ModalDialog = new Lang.Class({
         this._monitorConstraint.index = global.screen.get_current_monitor();
         this.actor.show();
 
+        Tweener.removeTweens(this.actor);
         Tweener.addTween(this.actor,
                          { opacity: 255,
                            time: FADE_IN_TIME / 1000,
@@ -299,9 +272,10 @@ const ModalDialog = new Lang.Class({
             return;
         }
 
-        this.popModal(timestamp);
         this.state = State.CLOSING;
+        this.popModal(timestamp);
 
+        Tweener.removeTweens(this.actor);
         Tweener.addTween(this.actor,
                          { opacity: 0,
                            time: FADE_OUT_TIME / 1000,
@@ -335,7 +309,7 @@ const ModalDialog = new Lang.Class({
         }
 
         this._pushModalDelaySource = 0;
-        return false;
+        return GLib.SOURCE_REMOVE;
     },
 
     _pushModal: function(timestamp) {
@@ -356,23 +330,23 @@ const ModalDialog = new Lang.Class({
     _onPushModalTimeout: function() {
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             this._pushModalSource = 0;
-            return false;
+            return GLib.SOURCE_REMOVE;
         }
 
         this._pushModalTries += 1;
 
         if (this._pushModal(global.get_current_time())) {
             this._pushModalSource = 0;
-            return false; /* dialog finally opened */
+            return GLib.SOURCE_REMOVE; /* dialog finally opened */
         }
 
         if (this._pushModalTries > PUSH_MODAL_TIME_LIMIT * PUSH_MODAL_RATE) {
             this.close();
             this._pushModalSource = 0;
-            return false; /* dialog can't become modal */
+            return GLib.SOURCE_REMOVE; /* dialog can't become modal */
         }
 
-        return true;
+        return GLib.SOURCE_CONTINUE;
     },
 
     pushModal: function(timestamp) {
@@ -395,7 +369,7 @@ const ModalDialog = new Lang.Class({
                                                                  Lang.bind(this, this._onPushModalTimeout));
                 }
 
-                return false;
+                return GLib.SOURCE_REMOVE;
             }
         ));
     },
@@ -417,11 +391,11 @@ const ModalDialog = new Lang.Class({
 
     _disconnectInternals: function() {
         if (this._pushModalDelaySource) {
-            GLib.source_remove(this._pushModalDelaySource);
+            Mainloop.source_remove(this._pushModalDelaySource);
             this._pushModalDelaySource = 0;
         }
         if (this._pushModalSource) {
-            GLib.source_remove(this._pushModalSource);
+            Mainloop.source_remove(this._pushModalSource);
             this._pushModalSource = 0;
         }
         if (this._pushModalWatchId) {
@@ -541,7 +515,7 @@ const PomodoroEndDialog = new Lang.Class({
                 }
 
                 this._openTimeoutSource = 0;
-                return false;
+                return GLib.SOURCE_REMOVE;
             }));
     },
 
@@ -567,31 +541,12 @@ const PomodoroEndDialog = new Lang.Class({
         if (this._openWhenIdleWatchId == 0) {
             this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN, Lang.bind(this,
                 function() {
-                    /* check if playing a video before reopening */
-                    let isPlayerFocused = false;
-                    let isPlayerFullscreen = false;
+                    let info = Utils.getFocusedWindowInfo();
 
-                    let focusedApp = Shell.WindowTracker.get_default().focus_app;
-                    let focusedWindow = global.display.focus_window;
-
-                    if (focusedApp) {
-                        let categories = _getCategories(focusedApp.get_app_info());
-
-                        for (let i = 0; i < VIDEO_PLAYER_CATEGORIES.length; i++) {
-                            if (_arrayContains(categories, VIDEO_PLAYER_CATEGORIES[i])) {
-                                isPlayerFocused = true;
-                                break;
-                            }
-                        }
+                    if (info.isPlayer && info.isFullscreen) {
+                        /* dont reopen if playing a video */
                     }
-
-                    if (focusedWindow) {
-                        let monitor = Main.layoutManager.monitors[focusedWindow.get_monitor()];
-
-                        isPlayerFullscreen = monitor.inFullscreen;
-                    }
-
-                    if (!isPlayerFocused || !isPlayerFullscreen) {
+                    else {
                         this.open();
                     }
                 }

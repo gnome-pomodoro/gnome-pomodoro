@@ -20,8 +20,10 @@
 
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
+const Signals = imports.signals;
 
 const GLib = imports.gi.GLib;
+const Meta = imports.gi.Meta;
 
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
@@ -30,19 +32,18 @@ const Util = imports.misc.util;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
 const Timer = Extension.imports.timer;
+const Utils = Extension.imports.utils;
 
 const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
 const ngettext = Gettext.ngettext;
 
 
-/* Remind about ongoing break in given delays */
-const REMINDER_INTERVALS = [75000];
+const IDLE_TIME_TO_ACKNOWLEDGE_REMINDER = 45;
 
-/* Ratio between user idle time and time between reminders to determine
- * whether user is away
- */
-const REMINDER_ACCEPTANCE = 0.66;
+const REMINDER_TIMEOUT = 75;
+
+const REMINDER_MIN_REMAINING_TIME = 60;
 
 
 let source = null;
@@ -59,9 +60,11 @@ function getDefaultSource()
 
     if (!source) {
         source = new Source();
-        source.connect('destroy', Lang.bind(this,
+        source.connect('destroy', Lang.bind(source,
             function() {
-                source = null;
+                if (source === this) {
+                    source = null;
+                }
             }));
     }
 
@@ -90,12 +93,16 @@ const Source = new Lang.Class({
         return false;
     },
 
-    destroyNotifications: function() {
-        for (let i = this.notifications.length - 1; i >= 0; i--) {
-            this.notifications[i].destroy();
+    destroyNotifications: function(notifications) {
+        for (let i = notifications.length - 1; i >= 0; i--) {
+            if (notifications[i]) {
+                notifications[i].destroy();
+            }
         }
+    },
 
-        this.countUpdated();
+    destroyAllNotifications: function() {
+        this.destroyNotifications(this.notifications);
     },
 
     close: function() {
@@ -193,10 +200,6 @@ const Notification = new Lang.Class({
 
     destroy: function(reason) {
         this._destroying = true;
-
-        if (this.actor && this.actor.mapped) {
-            this.emit('unmapped');
-        }
 
         if (this._actorMappedId) {
             this.actor.disconnect(this._actorMappedId);
@@ -407,81 +410,140 @@ const PomodoroEndNotification = new Lang.Class({
 });
 
 
+const ReminderManager = new Lang.Class({
+    Name: 'PomodoroReminderManager',
+
+    _init: function(timer) {
+        this.timer = timer;
+        this.acknowledged = false;
+
+        this._idleMonitor = Meta.IdleMonitor.get_core();
+        this._idleWatchId = 0;
+        this._timeoutSource = 0;
+        this._blockCount = 0;
+        this._isScheduled = false;
+    },
+
+    get isScheduled() {
+        return this._isScheduled;
+    },
+
+    get isBlocked() {
+        return this._blockCount != 0;
+    },
+
+    block: function() {
+        this._blockCount += 1;
+
+        if (this._timeoutSource) {
+            Mainloop.source_remove(this._timeoutSource);
+            this._timeoutSource = 0;
+        }
+    },
+
+    unblock: function() {
+        this._blockCount -= 1;
+
+        if (this._blockCount < 0) {
+            Extension.extension.logError('Spurious call for reminder unblock');
+        }
+
+        if (!this.isBlocked && this.isScheduled) {
+            this.schedule();
+        }
+    },
+
+    _onIdleTimeout: function(monitor) {
+        if (this._idleWatchId) {
+            this._idleMonitor.remove_watch(this._idleWatchId);
+            this._idleWatchId = 0;
+        }
+
+        this.acknowledged = true;
+    },
+
+    _onTimeout: function() {
+        this._isScheduled = false;
+        this._timeoutSource = 0;
+
+        if (this._idleWatchId) {
+            this._idleMonitor.remove_watch(this._idleWatchId);
+            this._idleWatchId = 0;
+        }
+
+        /* acknowledge break if playing a video or playing a game */
+        let info = Utils.getFocusedWindowInfo();
+
+        if (info.isPlayer && info.isFullscreen) {
+            this.acknowledged = true;
+        }
+
+        if (!this.acknowledged && this.timer.getRemaining() > REMINDER_MIN_REMAINING_TIME) {
+            this.emit('notify');
+        }
+
+        return GLib.SOURCE_REMOVE;
+    },
+
+    schedule: function() {
+        let seconds = REMINDER_TIMEOUT;
+
+        this._isScheduled = true;
+
+        if (this._timeoutSource) {
+            Mainloop.source_remove(this._timeoutSource);
+            this._timeoutSource = 0;
+        }
+
+        if (!this.isBlocked) {
+            this._timeoutSource = Mainloop.timeout_add_seconds(
+                                       seconds,
+                                       Lang.bind(this, this._onTimeout));
+        }
+
+        if (this._idleWatchId == 0) {
+            this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_ACKNOWLEDGE_REMINDER * 1000, Lang.bind(this, this._onIdleTimeout));
+        }
+    },
+
+    unschedule: function() {
+        this._isScheduled = false;
+
+        if (this._timeoutSource) {
+            Mainloop.source_remove(this._timeoutSource);
+            this._timeoutSource = 0;
+        }
+
+        if (this._idleWatchId) {
+            this._idleMonitor.remove_watch(this._idleWatchId);
+            this._idleWatchId = 0;
+        }
+    },
+
+    destroy: function() {
+        this.unschedule();
+
+        this.emit('destroy');
+    }
+});
+Signals.addSignalMethods(ReminderManager.prototype);
+
+
 const PomodoroEndReminderNotification = new Lang.Class({
     Name: 'PomodoroEndReminderNotification',
     Extends: Notification,
 
     _init: function() {
-        this.parent(_("Hey, you're missing out on a break"), null, null);
+        let title = _("Hey!");
+        let description = _("You're missing out on a break");
+
+        this.parent(title, null, null);
 
         this.setTransient(true);
         this.setUrgency(MessageTray.Urgency.LOW);
 
-        this._timeoutSource = 0;
-        this._interval      = 0;
-        this._timeout       = 0;
-
-        this.connect('destroy', Lang.bind(this,
-            function() {
-                this.unschedule();
-            }));
-    },
-
-    _onTimeout: function() {
-        let display  = global.screen.get_display();
-        let idleTime = (display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000;
-
-        /* No need to notify if user seems to be away. We only monitor idle
-         * time based on X11, and not Clutter scene which should better reflect
-         * to real work.
-         */
-        if (idleTime < this._timeout * REMINDER_ACCEPTANCE) {
-            this.show();
-        }
-        else {
-            this.unschedule();
-        }
-
-        this.schedule();
-
-        return false;
-    },
-
-    show: function() {
-        this.parent(true);
-    },
-
-    schedule: function() {
-        let intervals  = REMINDER_INTERVALS;
-        let reschedule = this._timeoutSource != 0;
-
-        if (this._timeoutSource) {
-            GLib.source_remove(this._timeoutSource);
-            this._timeoutSource = 0;
-        }
-
-        if (this._interval < intervals.length) {
-            let interval = Math.ceil(intervals[this._interval] / 1000);
-
-            this._timeout = interval;
-            this._timeoutSource = Mainloop.timeout_add_seconds(
-                                       interval,
-                                       Lang.bind(this, this._onTimeout));
-        }
-
-        if (!reschedule) {
-            this._interval += 1;
-        }
-    },
-
-    unschedule: function() {
-        if (this._timeoutSource) {
-            GLib.source_remove(this._timeoutSource);
-            this._timeoutSource = 0;
-        }
-
-        this._interval = 0;
-        this._timeout  = 0;
+        this._updateBanner(description);
+        this._updateBody(description);
     }
 });
 
