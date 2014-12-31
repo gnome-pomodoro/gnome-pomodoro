@@ -27,74 +27,10 @@ const PopupMenu = imports.ui.popupMenu;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
 const Timer = Extension.imports.timer;
+const Utils = Extension.imports.utils;
 
 
 const NOTIFICATIONS_DURING_BREAK = true;
-
-
-const Hook = new Lang.Class({
-    Name: 'PomodoroHook',
-
-    _init: function(object, property, func) {
-        this.object = object;
-        this.property = property;
-        this.func = func;
-
-        this.initial = object[property];
-
-        this.check();
-    },
-
-    check: function() {
-        if (this.initial === undefined) {
-            Extension.extension.logError('Hook "%s" for %s is not defined'.format(
-                                                    this.property, this.object));
-            return;
-        }
-        if (!(this.initial instanceof Function)) {
-            Extension.extension.logError('Hook "%s" for %s is not callable'.format(
-                                                    this.property, this.object));
-            return;
-        }        
-    },
-
-    override: function(func) {
-        this.object[this.property] = func ? func : this.func;
-    },
-
-    restore: function() {
-        this.object[this.property] = this.initial;
-    }
-});
-
-
-const Patch = new Lang.Class({
-    Name: 'PomodoroPatch',
-
-    _init: function() {
-        this._hooks = [];
-    },
-
-    addHooks: function(object, hooks) {
-        for (let name in hooks) {
-            this._hooks.push(new Hook(object, name, hooks[name]));
-        };
-    },
-
-    apply: function() {
-        this._hooks.forEach(Lang.bind(this,
-            function(hook) {
-                hook.override();
-            }));
-    },
-
-    revert: function() {
-        this._hooks.forEach(Lang.bind(this,
-            function(hook) {
-                hook.restore();
-            }));
-    }
-});
 
 
 const Presence = new Lang.Class({
@@ -111,7 +47,7 @@ const Presence = new Lang.Class({
         // When applied the main presence controller becomes gnome-pomodoro.
         let self = this;
 
-        this._patch = new Patch();
+        this._patch = new Utils.Patch();
         this._patch.addHooks(MessageTray.MessageTray.prototype, {
             _onStatusChanged:
                 function(status) {
