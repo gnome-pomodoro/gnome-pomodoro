@@ -540,7 +540,6 @@ const PomodoroEndReminderNotification = new Lang.Class({
         this.parent(title, null, null);
 
         this.setTransient(true);
-        this.setIconVisible(false);
         this.setUrgency(MessageTray.Urgency.LOW);
 
         this._updateBanner(description);
