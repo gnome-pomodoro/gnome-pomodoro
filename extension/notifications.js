@@ -58,11 +58,11 @@ function getDefaultSource()
         source = null;
     }
 
-    if (!source) {
+    if (!source || source._destroying) {
         source = new Source();
         source.connect('destroy', Lang.bind(source,
-            function() {
-                if (source === this) {
+            function(_source) {
+                if (source === _source) {
                     source = null;
                 }
             }));
@@ -80,6 +80,8 @@ const Source = new Lang.Class({
 
     _init: function() {
         this.parent(_("Pomodoro"), this.ICON_NAME);
+
+        this._destroying = false;
     },
 
     /* override parent method */
@@ -107,6 +109,14 @@ const Source = new Lang.Class({
 
     close: function() {
         this.destroy();
+    },
+
+    destroy: function(reason) {
+        if (!this._destroying) {
+            this._destroying = true;
+
+            this.parent(reason);
+        }
     }
 });
 
@@ -131,6 +141,11 @@ const Notification = new Lang.Class({
         this._bodyLabel          = this.addBody(description);
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+
+        this.source.connect('destroy', Lang.bind(this,
+            function() {
+                this.source = null;
+            }));
     },
 
     _onActorMappedChanged: function(actor) {
@@ -152,7 +167,15 @@ const Notification = new Lang.Class({
     },
 
     show: function() {
-        if (!this._destroying) {
+        if (!this.source) {
+            this.source = getDefaultSource();
+        }
+
+        if (this.source && this.source._destroying) {
+            Extension.extension.logError('Called Notification.show() after source.destroy()');
+        }
+
+        if (this.source && !this._destroying) {
             /* Popup notification regardless of session busy status */
             if (!this.forFeedback) {
                 this.setForFeedback(true);
@@ -168,6 +191,9 @@ const Notification = new Lang.Class({
             }
 
             this.source.notify(this);
+        }
+        else {
+            Extension.extension.logError('Called Notification.show() after destroy()');
         }
     },
 
