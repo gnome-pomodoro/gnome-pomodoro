@@ -114,13 +114,9 @@ const Presence = new Lang.Class({
             if (isRunning) {
                 this._patch.apply();
 
-                this._updateNotificationsMenuItem();
-
                 this.update();
             }
             else {
-                this._updateNotificationsMenuItem();
-
                 this.update();
 
                 this._patch.revert();
@@ -130,19 +126,21 @@ const Presence = new Lang.Class({
     },
 
     _onNotificationsMenuItemToggled: function(item, state) {
-        let isRunning = (this._timerState != Timer.State.NULL);
+        if (!this._notificationsMenuItemLock) {
+            let isRunning = (this._timerState != Timer.State.NULL);
 
-        if (isRunning && this._timerState == Timer.State.POMODORO) {
-            this.setNotificationsDuringPomodoro(state);
-        }
+            if (isRunning && this._timerState == Timer.State.POMODORO) {
+                this.setNotificationsDuringPomodoro(state);
+            }
 
-        if (isRunning && this._timerState != Timer.State.POMODORO) {
-            this.setNotificationsDuringBreak(state);
+            if (isRunning && this._timerState != Timer.State.POMODORO) {
+                this.setNotificationsDuringBreak(state);
+            }
         }
     },
 
     _updateNotificationsMenuItem: function() {
-        let timerState = Extension.extension.timer.getState();
+        let timerState = this._timerState;
         let isRunning = timerState != Timer.State.NULL;
 
         try {
@@ -201,30 +199,38 @@ const Presence = new Lang.Class({
                                  ? !this._notificationsDuringPomodoro
                                  : !this._notificationsDuringBreak;
 
-            let hasDialog = Extension.extension.dialog && Extension.extension.dialog.isOpened;
+            let isDialogOpened = Extension.extension.dialog && Extension.extension.dialog.isOpened;
 
-            messageTray._busy = busy || hasDialog;
+            messageTray._busy = busy || isDialogOpened;
             messageTray._updateState();
 
-            if (menuItem.state == messageTray._busy) {
+            if (menuItem.state != !messageTray._busy) {
+                this._notificationsMenuItemLock = true;
                 menuItem.toggle();
+                this._notificationsMenuItemLock = false;
             }
         }
         catch (error) {
             Extension.extension.logError(error.message);        
         }
+
+        this._updateNotificationsMenuItem();
     },
 
     setNotificationsDuringPomodoro: function(enabled) {
-        this._notificationsDuringPomodoro = enabled;
+        if (this._notificationsDuringPomodoro != enabled) {
+            this._notificationsDuringPomodoro = enabled;
 
-        this.update();
+            this.update();
+        }
     },
 
     setNotificationsDuringBreak: function(enabled) {
-        this._notificationsDuringBreak = enabled;
+        if (this._notificationsDuringBreak != enabled) {
+            this._notificationsDuringBreak = enabled;
 
-        this.update();
+            this.update();
+        }
     },
 
     destroy: function() {

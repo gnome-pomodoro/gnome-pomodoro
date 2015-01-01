@@ -152,40 +152,38 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _onTimerStateChanged: function() {
-        let state = this.timer.getState();
+        let timerState = this.timer.getState();
 
-        if (this._state === state) {
-            return;
-        }
+        if (this._timerState !== timerState) {
+            this._timerState = timerState;
 
-        this._state = state;
+            if (this.dialog && timerState != Timer.State.PAUSE) {
+                this.dialog.close();
+            }
 
-        if (this.dialog && state != Timer.State.PAUSE) {
-            this.dialog.close();
-        }
+            if (this.reminderManager) {
+                this.reminderManager.destroy();
+                this.reminderManager = null;
+            }
 
-        if (this.reminderManager) {
-            this.reminderManager.destroy();
-            this.reminderManager = null;
-        }
+            switch (timerState) {
+                case Timer.State.POMODORO:
+                case Timer.State.IDLE:
+                    this._notifyPomodoroStart();
+                    break;
 
-        switch (state) {
-            case Timer.State.POMODORO:
-            case Timer.State.IDLE:
-                this._onNotifyPomodoroStart();
-                break;
+                case Timer.State.PAUSE:
+                    this._notifyPomodoroEnd();
+                    break;
 
-            case Timer.State.PAUSE:
-                this._onNotifyPomodoroEnd();
-                break;
-
-            case Timer.State.NULL:
-                this._destroyNotifications();
-                break;
+                case Timer.State.NULL:
+                    this._destroyNotifications();
+                    break;
+            }
         }
     },
 
-    _onNotifyPomodoroStart: function() {
+    _notifyPomodoroStart: function() {
         if (this.notification &&
             this.notification instanceof Notifications.PomodoroStartNotification)
         {
@@ -206,7 +204,7 @@ const PomodoroExtension = new Lang.Class({
         this._destroyPreviousNotifications();
     },
 
-    _onNotifyPomodoroEnd: function() {
+    _notifyPomodoroEnd: function() {
         if (this.notification &&
             this.notification instanceof Notifications.PomodoroEndNotification)
         {
@@ -327,11 +325,11 @@ const PomodoroExtension = new Lang.Class({
         let state = this.timer.getState();
 
         if (state == Timer.State.POMODORO || state == Timer.State.IDLE) {
-            this._onNotifyPomodoroStart();
+            this._notifyPomodoroStart();
         }
 
         if (state == Timer.State.PAUSE) {
-            this._onNotifyPomodoroEnd();
+            this._notifyPomodoroEnd();
         }
     },
 
