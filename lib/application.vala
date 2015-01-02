@@ -273,7 +273,6 @@ public class Pomodoro.Application : Gtk.Application
         this.modules = new List<Object> ();
         this.modules.prepend (new Pomodoro.Sounds (this.timer));
         this.modules.prepend (new Pomodoro.Presence (this.timer));
-        this.modules.prepend (new Pomodoro.Power (this.timer));
         this.modules.prepend (new Pomodoro.ScreenSaver (this.timer));
         this.modules.prepend (new Pomodoro.GnomeDesktop (this.timer));
 

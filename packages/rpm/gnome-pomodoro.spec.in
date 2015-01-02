@@ -26,7 +26,6 @@ BuildRequires: pkgconfig(gstreamer-1.0)
 BuildRequires: pkgconfig(gtk+-3.0) >= @GTK_REQUIRED@
 BuildRequires: pkgconfig(libcanberra)
 BuildRequires: pkgconfig(sqlite3)
-BuildRequires: pkgconfig(upower-glib)
 BuildRequires: pkgconfig(telepathy-glib) >= @GTK_REQUIRED@
 
 

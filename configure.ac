@@ -57,7 +57,6 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
     dbus-glib-1
     gom-1.0 >= $GOM_REQUIRED
     sqlite3
-    upower-glib >= 0.9.20
     libcanberra >= 0.30
     gstreamer-1.0 >= 1.0.10
     telepathy-glib >= $TELEPATHY_GLIB_REQUIRED

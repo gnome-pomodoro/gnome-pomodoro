@@ -9,7 +9,6 @@ libgnome_pomodoro_la_SOURCES = \
     gnome-desktop.vala \
     keybindings.vala \
     main-window.vala \
-    power.vala \
     preferences-dialog.vala \
     presence.vala \
     screensaver.vala \
@@ -42,7 +41,6 @@ libgnome_pomodoro_la_VALAFLAGS = \
     --pkg pango \
     --pkg cairo \
     --pkg gnome-desktop-3.0 \
-    --pkg upower-glib \
     --pkg libcanberra \
     --pkg gstreamer-1.0 \
     --pkg telepathy-glib
@@ -61,9 +59,7 @@ libgnome_pomodoro_la_LIBADD = \
     $(GNOME_POMODORO_LIBS)
 
 libgnome_pomodoro_la_DEPENDENCIES = \
-    $(top_builddir)/vapi/gnome-desktop-3.0.vapi \
-    $(top_builddir)/vapi/upower-glib.vapi
-
+    $(top_builddir)/vapi/gnome-desktop-3.0.vapi
 
 CLEANFILES = \
     $(libgnome_pomodoro_la_SOURCES:.vala=.c) \
