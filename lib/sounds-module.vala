@@ -49,7 +49,7 @@ namespace Pomodoro
 }
 
 
-public class Pomodoro.Player : Object
+public class Pomodoro.Player : GLib.Object
 {
     private double _volume = 0.5;
     public double volume {
@@ -260,7 +260,7 @@ public class Pomodoro.Player : Object
 }
 
 
-public class Pomodoro.Sounds : Object
+public class Pomodoro.SoundsModule : Pomodoro.Module
 {
     public Player player;
     public Player fallback_player;
@@ -274,7 +274,7 @@ public class Pomodoro.Sounds : Object
     private bool has_gstreamer;
 
 
-    public Sounds (Pomodoro.Timer timer)
+    public SoundsModule (Pomodoro.Timer timer)
     {
         this.timer = timer;
         this.timer.notify["state-duration"].connect (this.on_state_duration_changed);
@@ -289,11 +289,6 @@ public class Pomodoro.Sounds : Object
         }
 
         this.enable ();
-    }
-
-    ~Sounds ()
-    {
-        this.disable ();
     }
 
     private void setup_libcanberra ()
@@ -325,8 +320,8 @@ public class Pomodoro.Sounds : Object
                                              this.player,
                                              "file",
                                              binding_flags,
-                                             Sounds.get_file_mapping,
-                                             Sounds.set_file_mapping,
+                                             SoundsModule.get_file_mapping,
+                                             SoundsModule.set_file_mapping,
                                              (void *) this,
                                              null);
         }
@@ -357,7 +352,7 @@ public class Pomodoro.Sounds : Object
         }
     }
 
-    public void enable ()
+    public new void enable ()
     {
         this.setup_libcanberra ();
         this.setup_gstreamer ();
@@ -368,7 +363,7 @@ public class Pomodoro.Sounds : Object
         this.timer.pomodoro_start.connect (this.on_pomodoro_start);
     }
 
-    public void disable ()
+    public new void disable ()
     {
         SignalHandler.disconnect_by_func (this.timer,
                   (void*) this.on_state_changed, (void*) this);

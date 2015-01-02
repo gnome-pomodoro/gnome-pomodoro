@@ -44,13 +44,13 @@ namespace Gnome
 }
 
 
-public class Pomodoro.ScreenSaver : Object
+public class Pomodoro.ScreenSaverModule : Pomodoro.Module
 {
     private unowned Pomodoro.Timer timer;
     private GLib.Settings settings;
     private Gnome.ScreenSaver proxy;
 
-    public ScreenSaver (Pomodoro.Timer timer)
+    public ScreenSaverModule (Pomodoro.Timer timer)
     {
         this.timer = timer;
 
@@ -70,18 +70,13 @@ public class Pomodoro.ScreenSaver : Object
         this.enable ();
     }
 
-    ~ScreenSaver ()
-    {
-        this.disable ();
-    }
-
-    public void enable ()
+    public new void enable ()
     {
         this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
         this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
     }
 
-    public void disable ()
+    public new void disable ()
     {
         SignalHandler.disconnect_by_func (this.timer,
                                           (void*) this.on_notify_pomodoro_start,

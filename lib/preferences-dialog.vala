@@ -564,8 +564,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                              ticking_sound_button,
                                              "file",
                                              SETTINGS_BIND_FLAGS,
-                                             (SettingsBindGetMappingShared) Sounds.get_file_mapping,
-                                             (SettingsBindSetMappingShared) Sounds.set_file_mapping,
+                                             (SettingsBindGetMappingShared) SoundsModule.get_file_mapping,
+                                             (SettingsBindSetMappingShared) SoundsModule.set_file_mapping,
                                              null,
                                              null);
 
@@ -655,8 +655,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                          pomodoro_end_sound,
                                          "file",
                                          SETTINGS_BIND_FLAGS,
-                                         (SettingsBindGetMappingShared) Sounds.get_file_mapping,
-                                         (SettingsBindSetMappingShared) Sounds.set_file_mapping,
+                                         (SettingsBindGetMappingShared) SoundsModule.get_file_mapping,
+                                         (SettingsBindSetMappingShared) SoundsModule.set_file_mapping,
                                          null,
                                          null);
 
@@ -664,8 +664,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                          pomodoro_start_sound,
                                          "file",
                                          SETTINGS_BIND_FLAGS,
-                                         (SettingsBindGetMappingShared) Sounds.get_file_mapping,
-                                         (SettingsBindSetMappingShared) Sounds.set_file_mapping,
+                                         (SettingsBindGetMappingShared) SoundsModule.get_file_mapping,
+                                         (SettingsBindSetMappingShared) SoundsModule.set_file_mapping,
                                          null,
                                          null);
 

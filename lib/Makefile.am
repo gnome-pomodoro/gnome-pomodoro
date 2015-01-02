@@ -6,15 +6,16 @@ libgnome_pomodoro_la_SOURCES = \
     animation.vala \
     application.vala \
     command-line.vala \
-    gnome-desktop.vala \
+    gnome-desktop-module.vala \
     keybindings.vala \
     main-window.vala \
+    module.vala \
     preferences-dialog.vala \
-    presence.vala \
-    screensaver.vala \
+    presence-module.vala \
+    screensaver-module.vala \
     service.vala \
     settings.vala \
-    sounds.vala \
+    sounds-module.vala \
     timer.vala \
     utils.vala \
     widgets/calendar-button.vala \

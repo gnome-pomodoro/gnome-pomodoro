@@ -133,7 +133,7 @@ class Pomodoro.TelepathyPresence : Object
 }
 
 
-class Pomodoro.Presence : Object
+public class Pomodoro.PresenceModule : Pomodoro.Module
 {
     private unowned Pomodoro.Timer timer;
     private Pomodoro.TelepathyPresence telepathy_presence;
@@ -145,7 +145,7 @@ class Pomodoro.Presence : Object
 
     private bool ignore_next_status;
 
-    public Presence (Pomodoro.Timer timer)
+    public PresenceModule (Pomodoro.Timer timer)
     {
         this.timer = timer;
 
@@ -174,11 +174,6 @@ class Pomodoro.Presence : Object
 
         this.timer.pomodoro_start.connect (this.on_timer_pomodoro_start);
         this.timer.pomodoro_end.connect (this.on_timer_pomodoro_end);
-    }
-
-    ~Presence ()
-    {
-        /* TODO: Restore user status on exit */
     }
 
     private void on_settings_changed (GLib.Settings settings,
@@ -233,6 +228,15 @@ class Pomodoro.Presence : Object
 //                this.settings.get_string ("presence-during-break"));
 //
 //        this.set_status (status);
+    }
+
+    public new void enable ()
+    {
+    }
+
+    public new void disable ()
+    {
+        /* TODO: Restore user status on exit */
     }
 
     public void set_status (PresenceStatus status)

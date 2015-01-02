@@ -98,14 +98,14 @@ namespace Gnome
 }
 
 
-public class Pomodoro.GnomeDesktop : Object
+public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
 {
     private unowned Pomodoro.Timer timer;
 
     private Gnome.Shell shell_proxy;
     private Gnome.ShellExtensions shell_extensions_proxy;
 
-    public GnomeDesktop (Pomodoro.Timer timer)
+    public GnomeDesktopModule (Pomodoro.Timer timer)
     {
         this.timer = timer;
 
@@ -123,7 +123,7 @@ public class Pomodoro.GnomeDesktop : Object
         }
     }
 
-    public void enable ()
+    public new void enable ()
     {
         try {
             if (this.shell_proxy == null) {
@@ -147,13 +147,13 @@ public class Pomodoro.GnomeDesktop : Object
             GLib.warning (error.message);
         }
 
-        if (GnomeDesktop.can_enable ()) {
+        if (GnomeDesktopModule.can_enable ()) {
             this.enable_extension (Config.EXTENSION_UUID,
                                    Config.PACKAGE_VERSION);
         }
     }
 
-    public void disable ()
+    public new void disable ()
     {
         this.shell_proxy = null;
         this.shell_extensions_proxy = null;
