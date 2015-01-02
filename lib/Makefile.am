@@ -24,8 +24,7 @@ libgnome_pomodoro_la_SOURCES = \
     widgets/log-scale.vala \
     widgets/mode-button.vala \
     widgets/sound-chooser-button.vala \
-    widgets/symbolic-button.vala \
-    widgets/toolbar.vala
+    widgets/symbolic-button.vala
 
 libgnome_pomodoro_la_VALAFLAGS = \
     --library=gnome-pomodoro \
