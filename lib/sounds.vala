@@ -27,6 +27,11 @@ namespace Pomodoro
         POMODORO_END = 2
     }
 
+    public enum SoundBackend {
+        CANBERRA,
+        GSTREAMER
+    }
+
     private const uint PLAYER_FADE_IN_TIME = 25000;
     private const uint PLAYER_FADE_OUT_TIME = 15000;
 

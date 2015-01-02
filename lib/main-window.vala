@@ -184,7 +184,7 @@ private class Pomodoro.AddTaskDialog : Gtk.Dialog
             child.hexpand = false;
         }
 
-        var due_date_button = new CalendarButton ();
+        var due_date_button = new Widgets.CalendarButton ();
         due_date_button.halign = Gtk.Align.START;
 
         // var completed/done checkbox

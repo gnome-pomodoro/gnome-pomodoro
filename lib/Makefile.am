@@ -18,7 +18,14 @@ libgnome_pomodoro_la_SOURCES = \
     sounds.vala \
     timer.vala \
     utils.vala \
-    widgets.vala
+    widgets/calendar-button.vala \
+    widgets/enum-combo-box.vala \
+    widgets/keybinding-chooser-button.vala \
+    widgets/log-scale.vala \
+    widgets/mode-button.vala \
+    widgets/sound-chooser-button.vala \
+    widgets/symbolic-button.vala \
+    widgets/toolbar.vala
 
 libgnome_pomodoro_la_VALAFLAGS = \
     --library=gnome-pomodoro \

@@ -234,7 +234,7 @@ namespace Pomodoro
         var value_label = new Gtk.Label (null);
         value_label.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
 
-        var scale = new LogScale (adjustment, 2.0);
+        var scale = new Widgets.LogScale (adjustment, 2.0);
         var widget = list_box_create_field (text, value_label, scale);
 
         adjustment.value_changed.connect (() => {
@@ -510,7 +510,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                          _("Pomodoros to a long break"),
                                          long_break_interval_entry);
 
-        var toggle_key_button = new Pomodoro.KeybindingButton (keybinding);
+        var toggle_key_button = new Pomodoro.Widgets.KeybindingChooserButton (keybinding);
         var toggle_key_field = list_box_create_field (
                                        _("Shortcut to toggle the timer"),
                                        toggle_key_button);
@@ -542,9 +542,9 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
         if (Pomodoro.Player.is_supported ())
         {
-            var ticking_sound_button = new Pomodoro.SoundChooserButton ();
+            var ticking_sound_button = new Widgets.SoundChooserButton ();
             ticking_sound_button.title = _("Select ticking sound");
-            ticking_sound_button.backend = Pomodoro.SoundBackend.GSTREAMER;
+            ticking_sound_button.backend = SoundBackend.GSTREAMER;
             ticking_sound_button.has_volume_button = true;
 
             foreach (var sound_info in this.timer_sounds)
@@ -607,7 +607,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                        _("Wake up screen"),
                                        screen_wake_up_toggle);
 
-        var pomodoro_end_sound = new Pomodoro.SoundChooserButton ();
+        var pomodoro_end_sound = new Widgets.SoundChooserButton ();
         pomodoro_end_sound.title = _("Select sound for start of break");
 
         foreach (var sound_info in this.notification_sounds)
@@ -621,7 +621,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                        _("Start of break sound"),
                                        pomodoro_end_sound);
 
-        var pomodoro_start_sound = new Pomodoro.SoundChooserButton ();
+        var pomodoro_start_sound = new Widgets.SoundChooserButton ();
         pomodoro_start_sound.title = _("Select sound for end of break");
 
         foreach (var sound_info in this.notification_sounds)
@@ -698,7 +698,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
     private Gtk.ComboBox create_indicator_type_combo_box ()
     {
-        var combo_box = new Pomodoro.EnumComboBox ();
+        var combo_box = new Widgets.EnumComboBox ();
         combo_box.add_option (IndicatorType.TEXT, _("Text"));
         combo_box.add_option (IndicatorType.TEXT_SMALL, _("Short Text"));
         combo_box.add_option (IndicatorType.ICON, _("Icon"));
@@ -710,7 +710,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
     private Gtk.ComboBox create_presence_status_combo_box ()
     {
-        var combo_box = new Pomodoro.EnumComboBox ();
+        var combo_box = new Widgets.EnumComboBox ();
         combo_box.add_option (PresenceStatus.DEFAULT, "");
         combo_box.add_option (PresenceStatus.AVAILABLE, _("Available"));
         combo_box.add_option (PresenceStatus.BUSY, _("Busy"));
