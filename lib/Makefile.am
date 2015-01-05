@@ -5,26 +5,26 @@ libgnome_pomodoro_la_SOURCES = \
     about-dialog.vala \
     animation.vala \
     application.vala \
+    calendar-button.vala \
     command-line.vala \
+    enum-combo-box.vala \
     gnome-desktop-module.vala \
+    keybinding-chooser-button.vala \
     keybindings.vala \
+    log-scale.vala \
     main-window.vala \
+    mode-button.vala \
     module.vala \
     preferences-dialog.vala \
     presence-module.vala \
     screensaver-module.vala \
     service.vala \
     settings.vala \
+    sound-chooser-button.vala \
     sounds-module.vala \
+    symbolic-button.vala \
     timer.vala \
-    utils.vala \
-    widgets/calendar-button.vala \
-    widgets/enum-combo-box.vala \
-    widgets/keybinding-chooser-button.vala \
-    widgets/log-scale.vala \
-    widgets/mode-button.vala \
-    widgets/sound-chooser-button.vala \
-    widgets/symbolic-button.vala
+    utils.vala
 
 libgnome_pomodoro_la_VALAFLAGS = \
     --library=gnome-pomodoro \
