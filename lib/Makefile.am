@@ -20,6 +20,7 @@ libgnome_pomodoro_la_SOURCES = \
     screensaver-module.vala \
     service.vala \
     settings.vala \
+    skype.vala \
     sound-chooser-button.vala \
     sounds-module.vala \
     symbolic-button.vala \
