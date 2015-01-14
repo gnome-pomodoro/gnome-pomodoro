@@ -74,7 +74,8 @@ const IndicatorMenu = new Lang.Class({
         this.actor.add_style_class_name('extension-pomodoro-indicator-menu');
 
         this.indicator = indicator;
-        this.indicator.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
+
+        this._onTimerStateChangedId = this.indicator.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
 
         /* Toggle timer state button */
         this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"),
@@ -133,6 +134,15 @@ const IndicatorMenu = new Lang.Class({
 
     _onTaskSelected: function(tasklist, task) {
         global.log("Selected task: " + (task ? task.name : '-'));
+    },
+
+    destroy: function() {
+        if (this._onTimerStateChangedId) {
+            this.indicator.timer.disconnect(this._onTimerStateChangedId);
+            this._onTimerStateChangedId = 0;
+        }
+
+        this.parent();
     }
 });
 
@@ -301,6 +311,11 @@ const TextIndicator = new Lang.Class({
 
     destroy: function() {
         this.actor.destroy();
+
+        if (this._onTimerUpdateId) {
+            this.timer.disconnect(this._onTimerUpdateId);
+            this._onTimerUpdateId = 0;
+        }
 
         this.emit('destroy');
     }
@@ -541,6 +556,11 @@ const IconIndicator = new Lang.Class({
 
     destroy: function() {
         this.actor.destroy();
+
+        if (this._onTimerUpdateId) {
+            this.timer.disconnect(this._onTimerUpdateId);
+            this._onTimerUpdateId = 0;
+        }
 
         this.emit('destroy');
     }

@@ -120,6 +120,7 @@ const Timer = new Lang.Class({
 
             this.emit('service-connected');
             this.emit('state-changed');
+            this.emit('update');
 
             this._onPropertiesChanged(this._proxy, null);
         }));
@@ -133,6 +134,7 @@ const Timer = new Lang.Class({
         this._proxy = null;
 
         this.emit('state-changed');
+        this.emit('update');
         this.emit('service-disconnected');
     },
 
