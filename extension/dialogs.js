@@ -64,6 +64,8 @@ const FADE_IN_OPACITY = 0.55;
 
 const FADE_OUT_TIME = 180;
 
+const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
+
 const State = {
     OPENED: 0,
     CLOSED: 1,
@@ -543,12 +545,19 @@ const PomodoroEndDialog = new Lang.Class({
                 function() {
                     let info = Utils.getFocusedWindowInfo();
 
-                    if (info.isPlayer && info.isFullscreen) {
+                    if (info.isPlayer && info.isFullscreen)
+                    {
                         /* dont reopen if playing a video */
+                        return;
                     }
-                    else {
-                        this.open();
+
+                    if (this.timer.getState() != Timer.State.PAUSE ||
+                        this.timer.getRemaining() < OPEN_WHEN_IDLE_MIN_REMAINING_TIME)
+                    {
+                        return;
                     }
+
+                    this.open();
                 }
             ));
         }
