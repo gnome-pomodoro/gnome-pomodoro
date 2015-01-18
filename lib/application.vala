@@ -208,16 +208,7 @@ public class Pomodoro.Application : Gtk.Application
 
     private void action_quit (SimpleAction action, Variant? parameter)
     {
-        // For now application gui and the service uses same process
-        // so if service is running we don't want to close both
-        if (this.timer.state != State.NULL) {
-            foreach (var window in this.get_windows ()) {
-                window.destroy ();
-            }
-        }
-        else {
-            this.quit ();
-        }
+        this.quit ();
     }
 
     private void setup_actions ()
