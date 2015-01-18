@@ -86,8 +86,6 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
 
         this.settings = Pomodoro.get_settings ().get_child ("preferences");
         this.settings.changed.connect (this.on_settings_changed);
-
-        this.enable ();
     }
 
     private void on_settings_changed (GLib.Settings settings,

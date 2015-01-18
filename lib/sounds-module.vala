@@ -287,8 +287,6 @@ public class Pomodoro.SoundsModule : Pomodoro.Module
         if (!this.has_gstreamer) {
             GLib.debug ("Can not use Gstramer backend");
         }
-
-        this.enable ();
     }
 
     private void setup_libcanberra ()
@@ -352,27 +350,37 @@ public class Pomodoro.SoundsModule : Pomodoro.Module
         }
     }
 
-    public new void enable ()
+    public override void enable ()
     {
-        this.setup_libcanberra ();
-        this.setup_gstreamer ();
+        if (!this.enabled)
+        {
+            this.setup_libcanberra ();
+            this.setup_gstreamer ();
 
-        this.timer.state_changed.connect (this.on_state_changed);
-        this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
-        this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
-        this.timer.pomodoro_start.connect (this.on_pomodoro_start);
+            this.timer.state_changed.connect (this.on_state_changed);
+            this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
+            this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
+            this.timer.pomodoro_start.connect (this.on_pomodoro_start);
+        }
+
+        base.enable ();
     }
 
     public new void disable ()
     {
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_state_changed, (void*) this);
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_notify_pomodoro_end, (void*) this);
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_notify_pomodoro_start, (void*) this);
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_pomodoro_start, (void*) this);
+        if (this.enabled)
+        {
+            SignalHandler.disconnect_by_func (this.timer,
+                      (void*) this.on_state_changed, (void*) this);
+            SignalHandler.disconnect_by_func (this.timer,
+                      (void*) this.on_notify_pomodoro_end, (void*) this);
+            SignalHandler.disconnect_by_func (this.timer,
+                      (void*) this.on_notify_pomodoro_start, (void*) this);
+            SignalHandler.disconnect_by_func (this.timer,
+                      (void*) this.on_pomodoro_start, (void*) this);
+        }
+
+        base.disable ();
     }
 
     private void on_settings_changed (GLib.Settings settings, string key)

@@ -18,7 +18,12 @@
  */
 
 using GLib;
-using Gnome;
+
+
+namespace Pomodoro
+{
+    private const string DESKTOP_SESSION_ENV_VARIABLE = "DESKTOP_SESSION";
+}
 
 
 namespace Gnome
@@ -26,9 +31,8 @@ namespace Gnome
     public const string SHELL_SCHEMA = "org.gnome.shell";
     public const string SHELL_ENABLED_EXTENSIONS_KEY = "enabled-extensions";
 
-    private const string DESKTOP_SESSION_ENV_VARIABLE = "DESKTOP_SESSION";
-
-    private enum ExtensionState {
+    public enum ExtensionState
+    {
         ENABLED = 1,
         DISABLED = 2,
         ERROR = 3,
@@ -41,7 +45,7 @@ namespace Gnome
     }
 
     [DBus (name = "org.gnome.Shell")]
-    interface Shell : Object
+    public interface Shell : Object
     {
         /* TODO: Add "result" attribute, seems to be a collision at C level */
         public abstract bool eval (string script)
@@ -75,7 +79,7 @@ namespace Gnome
     }
 
     [DBus (name = "org.gnome.Shell.Extensions")]
-    interface ShellExtensions : Object
+    public interface ShellExtensions : Object
     {
         public abstract void get_extension_info
                                        (string uuid,
@@ -108,8 +112,6 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
     public GnomeDesktopModule (Pomodoro.Timer timer)
     {
         this.timer = timer;
-
-        this.enable ();
     }
 
     private void on_extension_status_changed (string uuid,
@@ -123,40 +125,50 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
         }
     }
 
-    public new void enable ()
+    public override void enable ()
     {
-        try {
-            if (this.shell_proxy == null) {
-                this.shell_proxy =
-                        GLib.Bus.get_proxy_sync (GLib.BusType.SESSION,
-                                                 "org.gnome.Shell",
-                                                 "/org/gnome/Shell");
+        if (!this.enabled)
+        {
+            try {
+                if (this.shell_proxy == null) {
+                    this.shell_proxy =
+                            GLib.Bus.get_proxy_sync (GLib.BusType.SESSION,
+                                                     "org.gnome.Shell",
+                                                     "/org/gnome/Shell");
+                }
+
+                if (this.shell_extensions_proxy == null) {
+                    this.shell_extensions_proxy =
+                            GLib.Bus.get_proxy_sync (GLib.BusType.SESSION,
+                                                     "org.gnome.Shell",
+                                                     "/org/gnome/Shell");
+
+                    this.shell_extensions_proxy.extension_status_changed.connect (
+                            this.on_extension_status_changed);
+                }
+            }
+            catch (IOError error) {
+                GLib.warning (error.message);
             }
 
-            if (this.shell_extensions_proxy == null) {
-                this.shell_extensions_proxy =
-                        GLib.Bus.get_proxy_sync (GLib.BusType.SESSION,
-                                                 "org.gnome.Shell",
-                                                 "/org/gnome/Shell");
-
-                this.shell_extensions_proxy.extension_status_changed.connect (
-                        this.on_extension_status_changed);
+            if (GnomeDesktopModule.can_enable ()) {
+                this.enable_extension (Config.EXTENSION_UUID,
+                                       Config.PACKAGE_VERSION);
             }
         }
-        catch (IOError error) {
-            GLib.warning (error.message);
-        }
 
-        if (GnomeDesktopModule.can_enable ()) {
-            this.enable_extension (Config.EXTENSION_UUID,
-                                   Config.PACKAGE_VERSION);
-        }
+        base.enable ();
     }
 
-    public new void disable ()
+    public override void disable ()
     {
-        this.shell_proxy = null;
-        this.shell_extensions_proxy = null;
+        if (this.enabled)
+        {
+            this.shell_proxy = null;
+            this.shell_extensions_proxy = null;
+        }
+
+        base.disable ();
     }
 
     static bool can_enable () {
@@ -166,15 +178,15 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
         return desktop_session == "gnome";
     }
 
-    private ExtensionState get_extension_state (string  extension_uuid,
-                                                string? extension_path,
-                                                string? extension_version)
+    private Gnome.ExtensionState get_extension_state (string  extension_uuid,
+                                                      string? extension_path,
+                                                      string? extension_version)
     {
         HashTable<string,Variant> info;
 
         var uuid = "";
         var version = "";
-        var state = ExtensionState.ERROR;
+        var state = Gnome.ExtensionState.ERROR;
         var path = "";
 
         try {
@@ -195,7 +207,7 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
             }
 
             if (tmp_state != null) {
-                state = (ExtensionState) tmp_state.get_double();
+                state = (Gnome.ExtensionState) tmp_state.get_double();
             }
 
             if (tmp_path != null) {
@@ -203,19 +215,19 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
             }
         }
         catch (IOError error) {
-            return ExtensionState.ERROR;
+            return Gnome.ExtensionState.ERROR;
         }
 
         if (uuid != extension_uuid) {
-            return ExtensionState.UNINSTALLED;
+            return Gnome.ExtensionState.UNINSTALLED;
         }
 
         if (extension_path != "" && path != extension_path) {
-            return ExtensionState.UNINSTALLED;
+            return Gnome.ExtensionState.UNINSTALLED;
         }
 
         if (extension_version != "" && version != extension_version) {
-            return ExtensionState.OUT_OF_DATE;
+            return Gnome.ExtensionState.OUT_OF_DATE;
         }
 
         return state;
@@ -256,11 +268,11 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
 
             switch (extension_state)
             {
-                case ExtensionState.ENABLED:
-                case ExtensionState.ERROR:
+                case Gnome.ExtensionState.ENABLED:
+                case Gnome.ExtensionState.ERROR:
                     break;
 
-                case ExtensionState.OUT_OF_DATE:
+                case Gnome.ExtensionState.OUT_OF_DATE:
                     this.shell_extensions_proxy.reload_extension
                                        (extension_uuid);
                     break;

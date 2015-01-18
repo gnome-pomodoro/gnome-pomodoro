@@ -27,7 +27,7 @@ private const string SCREENSAVER_DEACTIVATE_COMMAND = "xdg-screensaver reset";
 namespace Gnome
 {
     [DBus (name = "org.gnome.ScreenSaver")]
-    interface ScreenSaver : Object
+    public interface ScreenSaver : Object
     {
         public abstract bool @lock () throws IOError;
 
@@ -66,24 +66,31 @@ public class Pomodoro.ScreenSaverModule : Pomodoro.Module
                           e.message);
             return;
         }
-
-        this.enable ();
     }
 
-    public new void enable ()
+    public override void enable ()
     {
-        this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
-        this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
+        if (!this.enabled) {
+            this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
+            this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
+        }
+
+        base.enable ();
     }
 
-    public new void disable ()
+    public override void disable ()
     {
-        SignalHandler.disconnect_by_func (this.timer,
-                                          (void*) this.on_notify_pomodoro_start,
-                                          (void*) this);
-        SignalHandler.disconnect_by_func (this.timer,
-                                          (void*) this.on_notify_pomodoro_end,
-                                          (void*) this);
+        if (this.enabled)
+        {
+            SignalHandler.disconnect_by_func (this.timer,
+                                              (void*) this.on_notify_pomodoro_start,
+                                              (void*) this);
+            SignalHandler.disconnect_by_func (this.timer,
+                                              (void*) this.on_notify_pomodoro_end,
+                                              (void*) this);
+        }
+
+        base.disable ();
     }
 
     private void deactivate_screensaver ()

@@ -51,6 +51,7 @@ public class Pomodoro.Application : Gtk.Application
     private Gtk.Window preferences_dialog;
     private Gtk.Window about_dialog;
 
+    private List<Pomodoro.Module> modules;
     private int hold_reasons;
 
     public Application ()
@@ -245,8 +246,6 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
-    private List<Object> modules;
-
     /* Emitted on the primary instance immediately after registration.
      */
     public override void startup ()
@@ -261,11 +260,16 @@ public class Pomodoro.Application : Gtk.Application
         this.timer.destroy.connect (this.on_timer_destroy);
         this.timer.restore ();
 
-        this.modules = new List<Object> ();
+        this.modules = new List<Pomodoro.Module> ();
         this.modules.prepend (new Pomodoro.SoundsModule (this.timer));
         this.modules.prepend (new Pomodoro.PresenceModule (this.timer));
         this.modules.prepend (new Pomodoro.ScreenSaverModule (this.timer));
         this.modules.prepend (new Pomodoro.GnomeDesktopModule (this.timer));
+
+        foreach (var module in this.modules)
+        {
+            module.enable ();
+        }
 
         this.setup_actions ();
         this.setup_menu ();
@@ -323,11 +327,14 @@ public class Pomodoro.Application : Gtk.Application
     }
 
     /* Save the state before exit.
-     * Emitted only on the registered primary instance instance immediately
-     * after the main loop terminates.
+     *
+     * Emitted only on the registered primary instance immediately after
+     * the main loop terminates.
      */
     public override void shutdown ()
     {
+        this.modules = null;
+
         base.shutdown ();
     }
 
