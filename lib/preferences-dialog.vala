@@ -169,6 +169,34 @@ namespace Pomodoro
         return new Variant.string (file != null
                                    ? file.get_uri () : "");
     }
+
+    /**
+     * Mapping from settings to presence combobox
+     */
+    public static bool get_presence_status_mapping (GLib.Value   value,
+                                                    GLib.Variant variant,
+                                                    void*        user_data)
+    {
+        var status = string_to_presence_status (variant.get_string ());
+
+        value.set_int ((int) status);
+
+        return true;
+    }
+
+    /**
+     * Mapping from presence combobox to settings
+     */
+    [CCode (has_target = false)]
+    public static Variant set_presence_status_mapping (
+                                       GLib.Value       value,
+                                       GLib.VariantType expected_type,
+                                       void*            user_data)
+    {
+        var status = (PresenceStatus) value.get_int ();
+
+        return new Variant.string (presence_status_to_string (status));
+    }
 }
 
 
@@ -790,8 +818,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                          pomodoro_presence,
                                          "value",
                                          SETTINGS_BIND_FLAGS,
-                                         (SettingsBindGetMappingShared) Presence.get_status_mapping,
-                                         (SettingsBindSetMappingShared)Presence.set_status_mapping,
+                                         (SettingsBindGetMappingShared) get_presence_status_mapping,
+                                         (SettingsBindSetMappingShared) set_presence_status_mapping,
                                          null,
                                          null);
 
@@ -800,8 +828,8 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                                          break_presence,
                                          "value",
                                          SETTINGS_BIND_FLAGS,
-                                         (SettingsBindGetMappingShared) Presence.get_status_mapping,
-                                         (SettingsBindSetMappingShared) Presence.set_status_mapping,
+                                         (SettingsBindGetMappingShared) get_presence_status_mapping,
+                                         (SettingsBindSetMappingShared) set_presence_status_mapping,
                                          null,
                                          null);
 

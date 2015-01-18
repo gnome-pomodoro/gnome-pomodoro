@@ -22,7 +22,8 @@ using GLib;
 
 namespace Pomodoro
 {
-    public enum PresenceStatus {
+    public enum PresenceStatus
+    {
         AVAILABLE = 0,
         INVISIBLE = 1,
         BUSY = 2,
@@ -72,162 +73,12 @@ namespace Pomodoro
 }
 
 
-namespace Gnome.SessionManager
-{
-    public enum PresenceStatus {
-        AVAILABLE = 0,
-        INVISIBLE = 1,
-        BUSY = 2,
-        IDLE = 3,
-        DEFAULT = -1
-    }
-
-    [DBus (name = "org.gnome.SessionManager.Presence")]
-    interface Presence : Object
-    {
-        public abstract uint status { get; set; }
-
-        public signal void status_changed (uint status);
-    }
-}
-
-
-class Pomodoro.TelepathyPresence : Object
-{
-    protected TelepathyGLib.AccountManager account_manager;
-
-    public TelepathyPresence ()
-    {
-        this.account_manager = TelepathyGLib.AccountManager.dup ();
-    }
-
-    public void set_status (Pomodoro.PresenceStatus status)
-    {
-        string message;
-        string status_string;
-
-        var type = this.account_manager.get_most_available_presence (
-                                       out status_string,
-                                       out message);
-        var new_type = TelepathyGLib.ConnectionPresenceType.UNSET;
-        var new_status_string = "";
-
-        if (status == Pomodoro.PresenceStatus.BUSY &&
-            type == TelepathyGLib.ConnectionPresenceType.AVAILABLE)
-        {
-            new_type = TelepathyGLib.ConnectionPresenceType.BUSY;
-            new_status_string = "busy";
-        } else if (status == Pomodoro.PresenceStatus.AVAILABLE &&
-                   type == TelepathyGLib.ConnectionPresenceType.BUSY)
-        {
-            new_type = TelepathyGLib.ConnectionPresenceType.AVAILABLE;
-            new_status_string = "available";
-        }
-
-        if (new_type != TelepathyGLib.ConnectionPresenceType.UNSET) {
-            this.account_manager.set_all_requested_presences (new_type,
-                                                              new_status_string,
-                                                              message);
-        }
-    }
-}
-
-
-private class Pomodoro.SkypePlugin : Object
-{
-    private Skype.Api skype_api;
-    private Pomodoro.PresenceStatus pending_status;
-
-    public SkypePlugin ()
-    {
-        this.pending_status = Pomodoro.PresenceStatus.DEFAULT;
-
-        this.skype_api = new Skype.Api (Config.PACKAGE_NAME);
-
-        this.skype_api.authenticated.connect (this.on_skype_authenticated);
-
-        this.skype_api.authenticate ();
-    }
-
-    private bool has_pending_status ()
-    {
-        return this.pending_status != Pomodoro.PresenceStatus.DEFAULT;
-    }
-
-    private void set_pending_status (Pomodoro.PresenceStatus status)
-    {
-        this.pending_status = status;
-
-        /* TODO: schedule changing status later */
-    }
-
-    private void unset_pending_status ()
-    {
-        this.pending_status = Pomodoro.PresenceStatus.DEFAULT;
-    }
-
-    private void on_skype_authenticated ()
-    {
-        if (this.has_pending_status ())
-        {
-            this.set_status (this.pending_status);
-            this.unset_pending_status ();
-        }
-    }
-
-    public void set_status (Pomodoro.PresenceStatus status)
-    {
-        var skype_status = this.convert_presence_status (status);
-
-        if (this.skype_api.is_authenticated)
-        {
-            try {
-                this.skype_api.set_status (skype_status);
-            }
-            catch (Skype.Error error) {
-                this.set_pending_status (status);
-            }
-        }
-        else {
-            this.set_pending_status (status);
-        }
-    }
-
-    private Skype.PresenceStatus convert_presence_status
-                                       (Pomodoro.PresenceStatus status)
-    {
-        switch (status)
-        {
-            case PresenceStatus.AVAILABLE:
-                return Skype.PresenceStatus.ONLINE;
-
-            case PresenceStatus.BUSY:
-                return Skype.PresenceStatus.DO_NOT_DISTURB;
-
-            case PresenceStatus.IDLE:
-                return Skype.PresenceStatus.AWAY;
-
-            case PresenceStatus.INVISIBLE:
-                return Skype.PresenceStatus.INVISIBLE;
-        }
-
-        return Skype.PresenceStatus.UNKNOWN;
-    }
-}
-
-
 public class Pomodoro.PresenceModule : Pomodoro.Module
 {
-    private unowned Pomodoro.Timer timer;
-    private Pomodoro.TelepathyPresence telepathy_presence;
-    private Pomodoro.SkypePlugin skype_plugin;
+    private unowned Pomodoro.Timer    timer;
+    private GLib.Settings             settings;
 
-    private GLib.Settings settings;
-    private Gnome.SessionManager.Presence proxy;
-    private PresenceStatus previous_status;
-    private PresenceStatus status;
-
-    private bool ignore_next_status;
+    private List<PresencePlugin> plugins;
 
     public PresenceModule (Pomodoro.Timer timer)
     {
@@ -235,24 +86,6 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
 
         this.settings = Pomodoro.get_settings ().get_child ("preferences");
         this.settings.changed.connect (this.on_settings_changed);
-
-        this.ignore_next_status = false;
-
-        try {
-            this.proxy = GLib.Bus.get_proxy_sync (GLib.BusType.SESSION,
-                                                  "org.gnome.SessionManager",
-                                                  "/org/gnome/SessionManager/Presence");
-
-            this.status = (PresenceStatus) this.proxy.status;
-            this.previous_status = this.status;
-
-            this.proxy.status_changed.connect (this.on_status_changed);
-        }
-        catch (Error e) {
-            stderr.printf ("%s\n", e.message);
-
-            return;
-        }
 
         this.enable ();
     }
@@ -265,7 +98,7 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
             case "presence-during-pomodoro":
                 var status = string_to_presence_status (
                                                 this.settings.get_string (key));
-                if (timer.state == State.POMODORO) {
+                if (this.timer.state == State.POMODORO) {
                     this.set_status (status);
                 }
                 break;
@@ -273,21 +106,10 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
             case "presence-during-break":
                 var status = string_to_presence_status (
                                                 this.settings.get_string (key));
-                if (timer.state != State.POMODORO) {
+                if (this.timer.state != State.POMODORO) {
                     this.set_status (status);
                 }
                 break;
-        }
-    }
-
-    private void on_status_changed (uint status)
-    {
-        if (!this.ignore_next_status)
-        {
-            this.previous_status = this.status;
-            this.status = (PresenceStatus) status;
-
-            this.ignore_next_status = false;
         }
     }
 
@@ -300,68 +122,51 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
 //                this.settings.get_string ("presence-during-break"));
 
         this.set_status (timer.state == Pomodoro.State.POMODORO
-                                       ? PresenceStatus.BUSY
-                                       : PresenceStatus.AVAILABLE);
+                                       ? Pomodoro.PresenceStatus.BUSY
+                                       : Pomodoro.PresenceStatus.AVAILABLE);
     }
 
-    public new void enable ()
+    public override void enable ()
     {
-        this.telepathy_presence = new Pomodoro.TelepathyPresence ();
-        this.skype_plugin = new Pomodoro.SkypePlugin ();
+        if (!this.enabled) {
+            this.plugins.append (new Pomodoro.GnomeSessionManagerPlugin ());
+            this.plugins.append (new Pomodoro.TelepathyPlugin ());
+            this.plugins.append (new Pomodoro.SkypePlugin ());
 
-        this.timer.state_changed.connect (this.on_timer_state_changed);
+            foreach (var plugin in this.plugins)
+            {
+                plugin.enable ();
+            }
 
-        this.on_timer_state_changed (this.timer);
+    //        this.session_magager_plugin = new Pomodoro.GnomeSessionManagerPlugin ();
+    //        this.session_magager_plugin.status_changed.connect (this.set_status);
+    //        this.session_magager_plugin.enable ();
+
+            this.timer.state_changed.connect (this.on_timer_state_changed);
+            this.on_timer_state_changed (this.timer);
+        }
+
+        base.enable ();
     }
 
-    public new void disable ()
+    public override void disable ()
     {
-        this.telepathy_presence = null;
-        this.skype_plugin = null;
+        if (this.enabled)
+        {
+            SignalHandler.disconnect_by_func (this.timer,
+                                              (void*) this.on_timer_state_changed, (void*) this);
 
-        SignalHandler.disconnect_by_func (this.timer,
-                                          (void*) this.on_timer_state_changed, (void*) this);
+            this.plugins = null;
+        }
 
-        /* TODO: Restore user status on exit */
+        base.disable ();
     }
 
     public void set_status (Pomodoro.PresenceStatus status)
     {
-        assert (this.proxy != null);
-
-        this.ignore_next_status = true;
-
-        if (status == Pomodoro.PresenceStatus.DEFAULT) {
-            this.proxy.status = (Gnome.SessionManager.PresenceStatus) this.previous_status;
+        foreach (var plugin in this.plugins)
+        {
+            plugin.set_status.begin (status);
         }
-        else {
-            this.proxy.status = (Gnome.SessionManager.PresenceStatus) status;
-        }
-
-        this.telepathy_presence.set_status (status);
-        this.skype_plugin.set_status (status);
-    }
-
-    /* mapping from settings to presence combobox */
-    public static bool get_status_mapping (GLib.Value   value,
-                                           GLib.Variant variant,
-                                           void*        user_data)
-    {
-        var status = string_to_presence_status (variant.get_string ());
-
-        value.set_int ((int) status);
-
-        return true;
-    }
-
-    /* mapping from presence combobox to settings */
-    [CCode (has_target = false)]
-    public static Variant set_status_mapping (GLib.Value       value,
-                                              GLib.VariantType expected_type,
-                                              void*            user_data)
-    {
-        var status = (PresenceStatus) value.get_int ();
-
-        return new Variant.string (presence_status_to_string (status));
     }
 }

@@ -20,24 +20,22 @@
 using GLib;
 
 
-public abstract class Pomodoro.Module : GLib.Object
+namespace Gnome.SessionManager
 {
-    public bool enabled { get; set; default = false; }
-
-    ~Module ()
+    public enum PresenceStatus
     {
-        if (this.enabled) {
-            this.disable ();
-        }
+        AVAILABLE = 0,
+        INVISIBLE = 1,
+        BUSY = 2,
+        IDLE = 3,
+        DEFAULT = -1
     }
 
-    public virtual void enable ()
+    [DBus (name = "org.gnome.SessionManager.Presence")]
+    public interface Presence : GLib.Object
     {
-        this.enabled = true;
-    }
+        public abstract uint status { get; set; }
 
-    public virtual void disable ()
-    {
-        this.enabled = false;
+        public signal void status_changed (uint status);
     }
 }

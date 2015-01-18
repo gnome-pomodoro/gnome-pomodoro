@@ -20,24 +20,7 @@
 using GLib;
 
 
-public abstract class Pomodoro.Module : GLib.Object
+public abstract class Pomodoro.PresencePlugin : Pomodoro.Plugin
 {
-    public bool enabled { get; set; default = false; }
-
-    ~Module ()
-    {
-        if (this.enabled) {
-            this.disable ();
-        }
-    }
-
-    public virtual void enable ()
-    {
-        this.enabled = true;
-    }
-
-    public virtual void disable ()
-    {
-        this.enabled = false;
-    }
+    public abstract async void set_status (Pomodoro.PresenceStatus status);
 }

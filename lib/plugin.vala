@@ -20,24 +20,6 @@
 using GLib;
 
 
-public abstract class Pomodoro.Module : GLib.Object
+public abstract class Pomodoro.Plugin : Pomodoro.Module
 {
-    public bool enabled { get; set; default = false; }
-
-    ~Module ()
-    {
-        if (this.enabled) {
-            this.disable ();
-        }
-    }
-
-    public virtual void enable ()
-    {
-        this.enabled = true;
-    }
-
-    public virtual void disable ()
-    {
-        this.enabled = false;
-    }
 }

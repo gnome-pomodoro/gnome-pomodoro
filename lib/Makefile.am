@@ -9,21 +9,27 @@ libgnome_pomodoro_la_SOURCES = \
     command-line.vala \
     enum-combo-box.vala \
     gnome-desktop-module.vala \
+    gnome-session-manager.vala \
+    gnome-session-manager-plugin.vala \
     keybinding-chooser-button.vala \
     keybindings.vala \
     log-scale.vala \
     main-window.vala \
     mode-button.vala \
     module.vala \
+    plugin.vala \
     preferences-dialog.vala \
     presence-module.vala \
+    presence-plugin.vala \
     screensaver-module.vala \
     service.vala \
     settings.vala \
     skype.vala \
+    skype-plugin.vala \
     sound-chooser-button.vala \
     sounds-module.vala \
     symbolic-button.vala \
+    telepathy-plugin.vala \
     timer.vala \
     utils.vala
 

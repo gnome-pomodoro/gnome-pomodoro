@@ -24,20 +24,29 @@ namespace Skype
 {
     public enum PresenceStatus
     {
-        UNKNOWN = 0,
-        ONLINE = 1,
-        OFFLINE = 2,
-        AWAY = 3,
-        NOT_AVAILABLE = 4,
-        DO_NOT_DISTURB = 5,
-        INVISIBLE = 6,
-        LOGGED_OUT = 7
+        UNKNOWN,
+        ONLINE,
+        OFFLINE,
+        AWAY,
+        NOT_AVAILABLE,
+        DO_NOT_DISTURB,
+        INVISIBLE,
+        LOGGED_OUT
+    }
+
+    public enum AuthenticationStatus
+    {
+        DISCONNECTED,
+        CONNECTING,
+        CONNECTED,
+        AUTHENTICATING,
+        AUTHENTICATED
     }
 
     public errordomain Error
     {
         CONNECTION,
-        NOT_AUTHENTICATED
+        AUTHENTICATION
     }
 
     public string presence_status_to_string (PresenceStatus presence_status)
@@ -99,60 +108,150 @@ namespace Skype
     }
 
     [DBus (name = "com.Skype.API")]
-    public interface ApiInterface : Object
+    public interface Api : GLib.Object
     {
         public abstract async string invoke (string request) throws IOError;
     }
 
-    public class Api : Object
+    public class Connection : GLib.Object
     {
-        public string application_name { get; construct set; }
-        public bool is_authenticated { get; set; default=false; }
+        public string application_name;
+
+        private Api proxy;
+        private AuthenticationStatus status;
+        private uint name_watcher_id = 0;
 
         private static uint PROTOCOL_VERSION = 5;
-        private ApiInterface proxy;
 
-        public Api (string application_name)
+        public Connection (string application_name)
         {
             this.application_name = application_name;
 
-            try {
-                this.proxy = Bus.get_proxy_sync (BusType.SESSION,
-                                                 "com.Skype.API",
-                                                 "/com/Skype");
+            this.proxy = null;
+            this.status = AuthenticationStatus.DISCONNECTED;
+
+            this.name_watcher_id = GLib.Bus.watch_name (
+                                       GLib.BusType.SESSION,
+                                       "com.Skype.API",
+                                       GLib.BusNameWatcherFlags.NONE,
+                                       () => { this.connect (); } ,
+                                       () => { this.disconnect (); });
+        }
+
+        ~Connection () {
+            if (this.name_watcher_id != 0) {
+                GLib.Bus.unwatch_name (this.name_watcher_id);
             }
-            catch (GLib.IOError error) {
-                GLib.warning ("%s", error.message);
+        }
+
+        /* hides GLib.Object.connect */
+        public new void connect ()
+        {
+            if (this.proxy == null &&
+                this.status != AuthenticationStatus.CONNECTING)
+            {
+                try {
+                    this.status = AuthenticationStatus.CONNECTING;
+                    this.proxy = GLib.Bus.get_proxy_sync (GLib.BusType.SESSION,
+                                                          "com.Skype.API",
+                                                          "/com/Skype");
+                    this.status = AuthenticationStatus.CONNECTED;
+
+                    this.connected ();
+                }
+                catch (GLib.IOError error) {
+                    GLib.warning ("%s", error.message);
+
+                    this.disconnect ();
+                }
             }
+        }
+
+        /* hides GLib.Object.disconnect */
+        public new void disconnect ()
+        {
+            var previous_status = this.status;
+
+            this.proxy = null;
+            this.status = AuthenticationStatus.DISCONNECTED;
+
+            if (previous_status != AuthenticationStatus.DISCONNECTED &&
+                previous_status != AuthenticationStatus.CONNECTING)
+            {
+                this.disconnected ();
+            }
+        }
+
+        public bool is_connected ()
+        {
+            return this.status == AuthenticationStatus.CONNECTED ||
+                   this.status == AuthenticationStatus.AUTHENTICATING ||
+                   this.status == AuthenticationStatus.AUTHENTICATED;
+        }
+
+        public bool is_authenticated ()
+        {
+            return this.status == AuthenticationStatus.AUTHENTICATED;
+        }
+
+        private bool on_authenticate_timeout ()
+        {
+            if (this.status == AuthenticationStatus.AUTHENTICATING)
+            {
+                try {
+                    this.status = AuthenticationStatus.CONNECTED;
+                    this.authenticate.begin ();
+                }
+                catch (GLib.IOError error) {
+                    GLib.warning ("%s", error.message);
+                }
+            }
+
+            return false;
         }
 
         public async void authenticate () throws Skype.Error
         {
-            string response;
+            if (this.status == AuthenticationStatus.AUTHENTICATED ||
+                this.status == AuthenticationStatus.AUTHENTICATING)
+            {
+                /* FIXME: should return only if authentication ended */
+                return;
+            }
+
+            if (this.status == AuthenticationStatus.DISCONNECTED)
+            {
+                this.connect ();
+            }
+
+            assert (this.status == AuthenticationStatus.CONNECTED);
 
             try {
-                response = yield this.proxy.invoke ("NAME " + this.application_name);
+                this.status = AuthenticationStatus.AUTHENTICATING;
 
-                switch (response)
+                var response = yield this.proxy.invoke ("NAME " + this.application_name);
+                var response_type = response.split (" ")[0];
+
+                switch (response_type)
                 {
                     case "OK":
-                        try {
-                            yield this.proxy.invoke ("PROTOCOL " +
-                                                     PROTOCOL_VERSION.to_string ());
+                        response = yield this.proxy.invoke ("PROTOCOL " +
+                                                 PROTOCOL_VERSION.to_string ());
 
-                            this.is_authenticated = true;
-
-                            this.authenticated ();
-                        }
-                        catch (GLib.IOError error) {
-                            GLib.warning ("Failed to initialize skype protocol: %s",
-                                          error.message);
-                        }
+                        this.status = AuthenticationStatus.AUTHENTICATED;
+                        this.authenticated ();
 
                         break;
 
-                    case "ERROR 68":
-                        /* user not gave permission */
+                    case "CONNSTATUS":
+                        GLib.Timeout.add_seconds (1, this.on_authenticate_timeout);
+
+                        break;
+
+                    default:
+                        /* Rejected authorization */
+                        this.status = AuthenticationStatus.CONNECTED;
+
                         break;
                 }
             }
@@ -163,18 +262,18 @@ namespace Skype
 
         private void assert_authenticated () throws Skype.Error
         {
-            if (!this.is_authenticated) {
-                throw new Skype.Error.NOT_AUTHENTICATED ("Skype is not authenticated");
+            if (this.status != AuthenticationStatus.AUTHENTICATED) {
+                throw new Skype.Error.AUTHENTICATION ("Skype is not authenticated");
             }
         }
 
         public async void set_status (PresenceStatus status) throws Skype.Error
         {
-            var status_string = presence_status_to_string (status);
-
             this.assert_authenticated ();
      
             try {
+                var status_string = presence_status_to_string (status);
+
                 yield this.proxy.invoke ("SET USERSTATUS " + status_string);
             }
             catch (GLib.IOError error) {
@@ -184,11 +283,11 @@ namespace Skype
 
         public async void set_auto_away (bool enabled) throws Skype.Error
         {
-            var enabled_string = enabled ? "ON" : "OFF";
-
             this.assert_authenticated ();
 
             try {
+                var enabled_string = enabled ? "ON" : "OFF";
+
                 yield this.proxy.invoke ("SET AUTOAWAY " + enabled_string);
             }
             catch (GLib.IOError error) {
@@ -208,6 +307,25 @@ namespace Skype
             }
         }
 
-        public signal void authenticated ();
+        public virtual signal void connected ()
+        {
+            if (this.status == AuthenticationStatus.CONNECTED)
+            {
+                try {
+                    this.authenticate.begin ();
+                }
+                catch (GLib.IOError error) {
+                    GLib.warning ("%s", error.message);
+                }
+            }
+        }
+
+        public virtual signal void disconnected ()
+        {
+        }
+
+        public virtual signal void authenticated ()
+        {
+        }
     }
 }
