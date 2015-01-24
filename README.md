@@ -79,6 +79,20 @@ Then follow instructions from above, as if installing package from repos.
    **On Fedora:**
 
         sudo dnf install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel gnome-desktop3-devel libcanberra-devel dbus-glib-devel gstreamer1-devel google-droid-sans-fonts sqlite-devel gom-devel
+   
+   **On Gentoo:**
+   
+        sudo emerge gnome-common intltool vala-common vala gobject-introspection-common gobject-introspection dev-libs/glib dbus-glib dev-libs/gom media-fonts/droid
+      
+      Then you need to link your vala executables and your pkgconfig:
+      
+        cd /usr/bin
+        sudo ln -s vala-0.26 vala
+        sudo ln -s valac-0.26 valac
+        sudo ln -s vapigen-0.26 vapigen
+        sudo ln -s vapicheck-0.26 vapicheck
+        sudo ln -s vala-gen-introspect-0.26 vala-gen-introspect
+        sudo ln -s /usr/share/pkgconfig/vapigen-0.26.pc /usr/share/pkgconfig/vapigen.pc
 
 3. Build it and install
 
