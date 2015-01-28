@@ -52,6 +52,7 @@ public class Pomodoro.Application : Gtk.Application
     private Gtk.Window about_dialog;
 
     private List<Pomodoro.Module> modules;
+    private Pomodoro.GnomeDesktopModule desktop_module;
     private int hold_reasons;
 
     public Application ()
@@ -92,7 +93,7 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
-    private unowned Gtk.Window get_last_focused_window ()
+    public unowned Gtk.Window get_last_focused_window ()
     {
         unowned List<weak Gtk.Window> windows = this.get_windows ();
 
@@ -185,6 +186,50 @@ public class Pomodoro.Application : Gtk.Application
         this.show_preferences ();
     }
 
+    private void action_visit_website (SimpleAction action,
+                                       Variant?     parameter)
+    {
+        try {
+            string[] spawn_args = { "xdg-open", Config.PACKAGE_URL };
+            string[] spawn_env = Environ.get ();
+
+            Process.spawn_async (null,
+                                 spawn_args,
+                                 spawn_env,
+                                 SpawnFlags.SEARCH_PATH,
+                                 null,
+                                 null);
+        }
+        catch (GLib.SpawnError error) {
+            GLib.warning ("Failed to spawn proccess: %s", error.message);
+        }
+    }
+
+    private void action_report_issue (SimpleAction action,
+                                      Variant?     parameter)
+    {
+        try {
+            string[] spawn_args = { "xdg-open", Config.PACKAGE_BUGREPORT };
+            string[] spawn_env = Environ.get ();
+
+            Process.spawn_async (null,
+                                 spawn_args,
+                                 spawn_env,
+                                 SpawnFlags.SEARCH_PATH,
+                                 null,
+                                 null);
+        }
+        catch (GLib.SpawnError error) {
+            GLib.warning ("Failed to spawn proccess: %s", error.message);
+        }
+    }
+
+    private void action_enable_extension (SimpleAction action,
+                                          Variant?     parameter)
+    {
+        this.desktop_module.enable_extension ();
+    }
+
     private void action_about (SimpleAction action, Variant? parameter)
     {
         if (this.about_dialog == null)
@@ -220,6 +265,15 @@ public class Pomodoro.Application : Gtk.Application
         var main_window_action = new GLib.SimpleAction ("main-window", null);
         main_window_action.activate.connect (this.action_main_window);
 
+        var visit_website_action = new GLib.SimpleAction ("visit-website", null);
+        visit_website_action.activate.connect (this.action_visit_website);
+
+        var report_issue_action = new GLib.SimpleAction ("report-issue", null);
+        report_issue_action.activate.connect (this.action_report_issue);
+
+        var enable_extension_action = new GLib.SimpleAction ("enable-extension", null);
+        enable_extension_action.activate.connect (this.action_enable_extension);
+
         var about_action = new GLib.SimpleAction ("about", null);
         about_action.activate.connect (this.action_about);
 
@@ -228,6 +282,9 @@ public class Pomodoro.Application : Gtk.Application
 
         this.add_action (preferences_action);
         this.add_action (main_window_action);
+        this.add_action (visit_website_action);
+        this.add_action (report_issue_action);
+        this.add_action (enable_extension_action);
         this.add_action (about_action);
         this.add_action (quit_action);
     }
@@ -260,11 +317,13 @@ public class Pomodoro.Application : Gtk.Application
         this.timer.destroy.connect (this.on_timer_destroy);
         this.timer.restore ();
 
+        this.desktop_module = new Pomodoro.GnomeDesktopModule (this.timer);
+
         this.modules = new List<Pomodoro.Module> ();
         this.modules.prepend (new Pomodoro.SoundsModule (this.timer));
         this.modules.prepend (new Pomodoro.PresenceModule (this.timer));
         this.modules.prepend (new Pomodoro.ScreenSaverModule (this.timer));
-        this.modules.prepend (new Pomodoro.GnomeDesktopModule (this.timer));
+        this.modules.prepend (this.desktop_module);
 
         foreach (var module in this.modules)
         {
@@ -333,6 +392,11 @@ public class Pomodoro.Application : Gtk.Application
      */
     public override void shutdown ()
     {
+        foreach (var module in this.modules)
+        {
+            module.disable ();
+        }
+
         this.modules = null;
 
         base.shutdown ();

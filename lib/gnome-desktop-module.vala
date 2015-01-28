@@ -33,10 +33,15 @@ namespace Gnome
 
     public enum ExtensionState
     {
+        /* Custom value suggesting there was DBus error */
+        UNKNOWN = 0,
+
         ENABLED = 1,
         DISABLED = 2,
         ERROR = 3,
         OUT_OF_DATE = 4,
+        DOWNLOADING = 5,
+        INITIALIZED = 6,
 
         /* Used as an error state for operations on unknown extensions,
          * should never be in a real extensionMeta object.
@@ -44,10 +49,17 @@ namespace Gnome
         UNINSTALLED = 99
     }
 
-    [DBus (name = "org.gnome.Shell")]
-    public interface Shell : Object
+    public struct ExtensionInfo
     {
-        /* TODO: Add "result" attribute, seems to be a collision at C level */
+        public string uuid;
+        public string path;
+        public string version;
+        public ExtensionState state;
+    }
+
+    [DBus (name = "org.gnome.Shell")]
+    public interface Shell : GLib.Object
+    {
         public abstract bool eval (string script)
                                    throws IOError;
 
@@ -79,7 +91,7 @@ namespace Gnome
     }
 
     [DBus (name = "org.gnome.Shell.Extensions")]
-    public interface ShellExtensions : Object
+    public interface ShellExtensions : GLib.Object
     {
         public abstract void get_extension_info
                                        (string uuid,
@@ -95,9 +107,10 @@ namespace Gnome
                                        (string uuid)
                                         throws IOError;
 
-        public signal void extension_status_changed (string uuid,
-                                                     int state,
-                                                     string error);
+        public signal void extension_status_changed
+                                       (string uuid,
+                                        int state,
+                                        string error);
     }
 }
 
@@ -108,53 +121,41 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
 
     private Gnome.Shell shell_proxy;
     private Gnome.ShellExtensions shell_extensions_proxy;
+    private uint name_watcher_id = 0;
+    private uint extension_name_watcher_id = 0;
+    private uint enable_extension_timeout_id = 0;
+    private bool extension_available = false;
+    private bool gnome_shell_restarted = false;
 
     public GnomeDesktopModule (Pomodoro.Timer timer)
     {
         this.timer = timer;
     }
 
-    private void on_extension_status_changed (string uuid,
-                                              int state,
-                                              string error)
-    {
-        if (uuid == Config.EXTENSION_UUID) {
-            GLib.debug ("Extension \"%s\" changed status to \"%d\"",
-                        uuid,
-                        state);
-        }
+    public static bool can_enable () {
+        var desktop_session = GLib.Environment.get_variable
+                                       (DESKTOP_SESSION_ENV_VARIABLE);
+
+        return desktop_session == "gnome";
     }
 
     public override void enable ()
     {
         if (!this.enabled)
         {
-            try {
-                if (this.shell_proxy == null) {
-                    this.shell_proxy =
-                            GLib.Bus.get_proxy_sync (GLib.BusType.SESSION,
-                                                     "org.gnome.Shell",
-                                                     "/org/gnome/Shell");
-                }
+            this.name_watcher_id = GLib.Bus.watch_name
+                                       (GLib.BusType.SESSION,
+                                        "org.gnome.Shell",
+                                        GLib.BusNameWatcherFlags.NONE,
+                                        () => { this.on_name_appeared (); } ,
+                                        () => { this.on_name_vanished (); });
 
-                if (this.shell_extensions_proxy == null) {
-                    this.shell_extensions_proxy =
-                            GLib.Bus.get_proxy_sync (GLib.BusType.SESSION,
-                                                     "org.gnome.Shell",
-                                                     "/org/gnome/Shell");
-
-                    this.shell_extensions_proxy.extension_status_changed.connect (
-                            this.on_extension_status_changed);
-                }
-            }
-            catch (IOError error) {
-                GLib.warning (error.message);
-            }
-
-            if (GnomeDesktopModule.can_enable ()) {
-                this.enable_extension (Config.EXTENSION_UUID,
-                                       Config.PACKAGE_VERSION);
-            }
+            this.extension_name_watcher_id = GLib.Bus.watch_name
+                                       (GLib.BusType.SESSION,
+                                        "org.gnome.Pomodoro.Extension",
+                                        GLib.BusNameWatcherFlags.NONE,
+                                        () => { this.on_extension_name_appeared (); } ,
+                                        () => { this.on_extension_name_vanished (); });
         }
 
         base.enable ();
@@ -164,126 +165,293 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
     {
         if (this.enabled)
         {
-            this.shell_proxy = null;
-            this.shell_extensions_proxy = null;
+            this.on_name_vanished ();
+
+            if (this.name_watcher_id != 0) {
+                GLib.Bus.unwatch_name (this.name_watcher_id);
+                name_watcher_id = 0;
+            }
+
+            var application = GLib.Application.get_default ()
+                                       as Pomodoro.Application;
+
+            application.withdraw_notification ("extension");
         }
 
         base.disable ();
     }
 
-    static bool can_enable () {
-        var desktop_session = GLib.Environment.get_variable
-                                       (DESKTOP_SESSION_ENV_VARIABLE);
-
-        return desktop_session == "gnome";
-    }
-
-    private Gnome.ExtensionState get_extension_state (string  extension_uuid,
-                                                      string? extension_path,
-                                                      string? extension_version)
+    private void on_name_appeared ()
     {
-        HashTable<string,Variant> info;
-
-        var uuid = "";
-        var version = "";
-        var state = Gnome.ExtensionState.ERROR;
-        var path = "";
+        this.gnome_shell_restarted = true;
 
         try {
-            this.shell_extensions_proxy.get_extension_info (extension_uuid,
-                                                            out info);
-
-            var tmp_uuid = info.lookup ("uuid");
-            var tmp_version = info.lookup ("version");
-            var tmp_state = info.lookup ("state");
-            var tmp_path = info.lookup ("path");
-
-            if (tmp_uuid != null) {
-                uuid = tmp_uuid.get_string();
+            if (this.shell_proxy == null) {
+                this.shell_proxy =
+                        GLib.Bus.get_proxy_sync (GLib.BusType.SESSION,
+                                                 "org.gnome.Shell",
+                                                 "/org/gnome/Shell");
             }
 
-            if (tmp_version != null) {
-                version = tmp_version.get_string();
-            }
+            if (this.shell_extensions_proxy == null) {
+                this.shell_extensions_proxy =
+                        GLib.Bus.get_proxy_sync<Gnome.ShellExtensions>
+                                   (GLib.BusType.SESSION,
+                                    "org.gnome.Shell",
+                                    "/org/gnome/Shell");
 
-            if (tmp_state != null) {
-                state = (Gnome.ExtensionState) tmp_state.get_double();
-            }
-
-            if (tmp_path != null) {
-                path = tmp_path.get_string();
+                this.shell_extensions_proxy.extension_status_changed.connect (
+                        this.on_extension_status_changed);
             }
         }
         catch (IOError error) {
-            return Gnome.ExtensionState.ERROR;
+            GLib.warning (error.message);
         }
 
-        if (uuid != extension_uuid) {
-            return Gnome.ExtensionState.UNINSTALLED;
-        }
-
-        if (extension_path != "" && path != extension_path) {
-            return Gnome.ExtensionState.UNINSTALLED;
-        }
-
-        if (extension_version != "" && version != extension_version) {
-            return Gnome.ExtensionState.OUT_OF_DATE;
-        }
-
-        return state;
+        this.enable_extension ();
     }
 
-    public void enable_extension (string extension_uuid,
-                                  string extension_version)
+    private void on_name_vanished ()
     {
-        var extension_is_enabled = false;
-
-        var gnome_shell_settings = new GLib.Settings (Gnome.SHELL_SCHEMA);
-        var enabled_extensions = gnome_shell_settings.get_strv
-                                       (Gnome.SHELL_ENABLED_EXTENSIONS_KEY);
-
-        foreach (var uuid in enabled_extensions)
-        {
-            if (uuid == extension_uuid) {
-                extension_is_enabled = true;
-            }
+        if (this.enable_extension_timeout_id != 0) {
+            GLib.Source.remove (this.enable_extension_timeout_id);
+            this.enable_extension_timeout_id = 0;
         }
 
-        if (!extension_is_enabled)
+        this.shell_proxy = null;
+        this.shell_extensions_proxy = null;
+    }
+
+    private void on_extension_name_appeared ()
+    {
+        this.extension_available = true;
+    }
+
+    private void on_extension_name_vanished ()
+    {
+        if (this.extension_available)
         {
-            enabled_extensions += extension_uuid;
-            gnome_shell_settings.set_strv ("enabled-extensions",
-                                           enabled_extensions);
+            this.extension_available = false;
+            this.notify_extension_disabled ();
         }
+    }
 
-        try
+    private void on_extension_status_changed (string uuid,
+                                              int state,
+                                              string error)
+    {
+        if (uuid == Config.EXTENSION_UUID)
         {
-            var extension_path = GLib.Path.build_filename (Config.DATA_DIR,
-                                                           "gnome-shell",
-                                                           "extensions",
-                                                           extension_uuid);
-            var extension_state = this.get_extension_state (extension_uuid,
-                                                            extension_path,
-                                                            extension_version);
+            GLib.debug ("Extension changed state to %d", state);
 
-            switch (extension_state)
+            switch (state)
             {
+                case Gnome.ExtensionState.INITIALIZED:
+                    break;
+
                 case Gnome.ExtensionState.ENABLED:
+                    this.extension_enabled ();
+                    break;
+
+                case Gnome.ExtensionState.DISABLED:
+                    this.extension_disabled ();
+                    break;
+
                 case Gnome.ExtensionState.ERROR:
+                    this.notify_extension_error ();
                     break;
 
                 case Gnome.ExtensionState.OUT_OF_DATE:
-                    this.shell_extensions_proxy.reload_extension
-                                       (extension_uuid);
+                    this.notify_extension_out_of_date ();
                     break;
 
                 default:
-                    /* try to enable extension by force, in case gnome-shell
-                     * isn't aware it's installed
-                     */
-                    var script = """
+                    break;
+            }
+        }
+    }
+
+    private Gnome.ExtensionInfo? get_extension_info ()
+    {
+        var extension_uuid = "";
+        var extension_path = "";
+        var extension_version = "";
+        var extension_state = Gnome.ExtensionState.UNKNOWN;
+
+        HashTable<string,Variant> extension_info;
+
+        try {
+            this.shell_extensions_proxy.get_extension_info
+                                       (Config.EXTENSION_UUID,
+                                        out extension_info);
+
+            var tmp_uuid = extension_info.lookup ("uuid");
+            var tmp_path = extension_info.lookup ("path");
+            var tmp_state = extension_info.lookup ("state");
+            var tmp_version = extension_info.lookup ("version");
+
+            if (tmp_uuid != null) {
+                extension_uuid = tmp_uuid.get_string ();
+            }
+
+            if (tmp_path != null) {
+                extension_path = tmp_path.get_string ();
+            }
+
+            if (tmp_state != null) {
+                extension_state = (Gnome.ExtensionState) tmp_state.get_double ();
+            }
+
+            if (tmp_version != null) {
+                extension_version = tmp_version.get_string ();
+            }
+        }
+        catch (GLib.IOError error) {
+            return null;
+        }
+        catch (GLib.DBusError error) {
+            return null;
+        }
+
+        /* We only care for boundled extension */
+        if (extension_uuid != Config.EXTENSION_UUID ||
+            extension_version != Config.PACKAGE_VERSION ||
+            extension_path != this.get_extension_path ())
+        {
+            extension_state = Gnome.ExtensionState.UNINSTALLED;
+        }
+
+        return Gnome.ExtensionInfo () {
+            uuid    = extension_uuid,
+            path    = extension_path,
+            state   = extension_state,
+            version = extension_version
+        };
+    }
+
+    private bool on_enable_extension_timeout ()
+    {
+        this.enable_extension_timeout_id = 0;
+
+        this.enable_extension ();
+
+        return false;
+    }
+
+    private string get_extension_path ()
+    {
+        return GLib.Path.build_filename (Config.DATA_DIR,
+                                         "gnome-shell",
+                                         "extensions",
+                                         Config.EXTENSION_UUID);
+    }
+
+    public void enable_extension ()
+    {
+        /* Enable extension in gnome-shell settings */
+        var gnome_shell_settings = new GLib.Settings (Gnome.SHELL_SCHEMA);
+        var enabled_extensions = gnome_shell_settings.get_strv
+                                       (Gnome.SHELL_ENABLED_EXTENSIONS_KEY);
+        var enabled_in_settings = false;
+
+        foreach (var uuid in enabled_extensions)
+        {
+            if (uuid == Config.EXTENSION_UUID)
+            {
+                enabled_in_settings = true;
+
+                break;
+            }
+        }
+      
+        if (!enabled_in_settings)
+        {
+            GLib.debug ("Enabling extension \"%s\" in settings",
+                        Config.EXTENSION_UUID);
+
+            enabled_extensions += Config.EXTENSION_UUID;
+            gnome_shell_settings.set_strv ("enabled-extensions",
+                                           enabled_extensions);
+            gnome_shell_settings.apply ();
+        }
+
+        /* Enable extension by Shell D-Bus */
+        var reloaded = false;
+
+        while (true)
+        {
+            var extension_info = this.get_extension_info ();
+
+            if (extension_info == null)
+            {
+                if (this.enable_extension_timeout_id == 0)
+                {
+                    this.enable_extension_timeout_id = GLib.Timeout.add
+                                           (1000,
+                                            this.on_enable_extension_timeout);
+                }
+            }
+            else
+            {
+                GLib.debug ("Extension state = %d", extension_info.state);
+
+                if (!reloaded &&
+                    extension_info.state == Gnome.ExtensionState.UNINSTALLED)
+                {
+                    this.reload_extension ();
+
+                    reloaded = true;
+
+                    continue;
+                }
+
+                switch (extension_info.state)
+                {
+                    case Gnome.ExtensionState.INITIALIZED:
+                        /* not likely, but should change */
+                        break;
+
+                    case Gnome.ExtensionState.ENABLED:
+                        break;
+
+                    case Gnome.ExtensionState.DISABLED:
+                        /* not likely */
+                        this.notify_extension_disabled ();
+                        break;
+
+                    case Gnome.ExtensionState.OUT_OF_DATE:
+                        this.notify_extension_out_of_date ();
+                        break;
+
+                    case Gnome.ExtensionState.ERROR:
+                        this.notify_extension_error ();
+                        break;
+
+                    default:
+                        this.enable_uninstalled_extension ();
+                        break;
+                }
+            }
+
+            break;
+        }
+    }
+
+    /**
+     * Enable extension in case gnome-shell isn't aware it's installed.
+     */
+    private void enable_uninstalled_extension ()
+    {
+        var extension_uuid = Config.EXTENSION_UUID;
+        var extension_path = this.get_extension_path ();
+
+        try
+        {
+            var script = """
 (function () {
-    let uuid = '""" + extension_uuid +"""';
+    const Gio = imports.gi.Gio;
+
+    let uuid = '""" + extension_uuid + """';
     let perUserDir = Gio.File.new_for_path(global.userdatadir);
     let extensionDir = Gio.File.new_for_path('""" + extension_path + """');
     let type = extensionDir.has_prefix(perUserDir) ? ExtensionUtils.ExtensionType.PER_USER
@@ -298,19 +466,177 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
     ExtensionSystem.loadExtension(newExtension);
 })();
 """;
-                    GLib.debug (
-                            "Attempting to enable extension \"%s\" in \"%s\"",
-                            GLib.Path.get_basename (extension_path),
-                            GLib.Path.get_dirname (extension_path));
+            GLib.debug ("Attempting to enable extension from \"%s\"",
+                        extension_path);
 
-                    this.shell_proxy.eval (script);
+            var success = this.shell_proxy.eval (script);
+            
+            GLib.message ("success = %s", (success ? "yes" : "no"));
+        }
+        catch (IOError error) {
+            GLib.warning ("Could not enable extension: %s",
+                          error.message);
+        }
+
+        var extension_info = this.get_extension_info ();
+
+        if (!gnome_shell_restarted &&
+            (extension_info == null || extension_info.uuid != Config.EXTENSION_UUID))
+        {
+            var dialog = new Gtk.MessageDialog (null,
+                                                Gtk.DialogFlags.MODAL,
+                                                Gtk.MessageType.QUESTION,
+                                                Gtk.ButtonsType.NONE,
+                                                _("Indicator for Pomodoro will show up after you restart your desktop."));
+            dialog.add_button (_("_Cancel"), Gtk.ResponseType.CANCEL);
+            dialog.add_button (_("_Restart"), Gtk.ResponseType.OK);
+            dialog.set_default_response (Gtk.ResponseType.OK);
+
+            dialog.response.connect (
+                (response_id) => {
+                    if (response_id == Gtk.ResponseType.OK) {
+                        this.gnome_shell_restarted = true;
+
+                        this.restart_gnome_shell ();
+                    }
+
+                    dialog.destroy ();
+                });
+
+            var application = GLib.Application.get_default () as Pomodoro.Application;        
+            var parent_window = application.get_last_focused_window ();
+
+            if (parent_window != null) {
+                dialog.set_transient_for (parent_window);
+            }
+
+            dialog.run ();
+        }
+        else {
+            var extension_state = (extension_info != null)
+                                       ? extension_info.state
+                                       : Gnome.ExtensionState.UNKNOWN;
+
+            GLib.debug ("Extension state = %d", extension_state);
+
+            switch (extension_state)
+            {
+                case Gnome.ExtensionState.INITIALIZED:
+                    /* state should change */
+                    break;
+
+                case Gnome.ExtensionState.ENABLED:
+                    break;
+
+                case Gnome.ExtensionState.DISABLED:
+                    /* not likely */
+                    this.notify_extension_disabled ();
+                    break;
+
+                case Gnome.ExtensionState.OUT_OF_DATE:
+                    this.notify_extension_out_of_date ();
+                    break;
+
+                default:
+                    this.notify_extension_error ();
                     break;
             }
         }
-        catch (IOError error) {
-            GLib.warning ("Could not enable extension \"%s\": %s",
-                          extension_uuid,
-                          error.message);
+    }
+
+    private void reload_extension ()
+    {
+        try {
+            this.shell_extensions_proxy.reload_extension (Config.EXTENSION_UUID);
+
+            GLib.debug ("Reloaded extension");
         }
+        catch (GLib.IOError error) {
+        }
+    }
+
+    private void restart_gnome_shell ()
+    {
+        try {
+            if (this.shell_proxy.eval ("""Meta.restart(_("Restarting…"));""")) {
+                GLib.debug ("Restarted gnome-shell");
+            }
+            else {
+                GLib.debug ("Failed to restart gnome-shell");
+            }
+        }
+        catch (GLib.IOError error) {
+        }
+    }
+
+    private void notify_extension_out_of_date ()
+    {
+        var notification = new GLib.Notification (
+                                       _("Extension does not support shell version"));
+
+        notification.set_body (_("You need to upgrade Pomodoro."));
+        notification.add_button (_("Upgrade"), "app.visit-website");
+
+        var application = GLib.Application.get_default () as Pomodoro.Application;
+        application.send_notification ("extension", notification);
+    }
+
+    private void notify_extension_error ()
+    {
+        string[] errors = null;
+
+        var extension_path = this.get_extension_path ();
+
+        if (GLib.FileUtils.test (extension_path, GLib.FileTest.IS_DIR))
+        {
+            try {
+                this.shell_extensions_proxy.get_extension_errors
+                                           (Config.EXTENSION_UUID, out errors);
+            }
+            catch (IOError error) {
+            }
+        }
+        else {
+            errors = {
+                _("Could not find extension \"%s\" in \"%s\"").printf (
+                                   GLib.Path.get_basename (extension_path),
+                                   GLib.Path.get_dirname (extension_path))
+            };
+        }
+
+        var notification = new GLib.Notification (_("Error loading extension"));
+        notification.add_button (_("Report issue"), "app.report-issue");
+
+        var errors_string = string.joinv ("\n", errors);
+        if (errors_string != null) {
+            notification.set_body (errors_string);
+        }
+
+        GLib.warning ("Error loading extension: %s", errors_string);
+
+        var application = GLib.Application.get_default () as Pomodoro.Application;
+        application.send_notification ("extension", notification);
+    }
+
+    private void notify_extension_disabled ()
+    {
+        var notification = new GLib.Notification (
+                                       _("Pomodoro extension is disabled"));
+        notification.set_body (_("Extension provides better desktop integration for the pomodoro app."));
+        notification.add_button (_("Enable"), "app.enable-extension");
+
+        var application = GLib.Application.get_default () as Pomodoro.Application;
+        application.send_notification ("extension", notification);
+    }
+
+    public virtual signal void extension_enabled ()
+    {
+        var application = GLib.Application.get_default () as Pomodoro.Application;
+
+        application.withdraw_notification ("extension");
+    }
+
+    public virtual signal void extension_disabled ()
+    {
     }
 }

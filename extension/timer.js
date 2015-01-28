@@ -49,7 +49,7 @@ const Timer = new Lang.Class({
         this._notifyPomodoroEndId = 0;
 
         this._nameWatcherId = Gio.DBus.session.watch_name(
-                                       DBus.SERVICE_NAME,
+                                       'org.gnome.Pomodoro',
                                        Gio.BusNameWatcherFlags.AUTO_START,
                                        Lang.bind(this, this._onNameAppeared),
                                        Lang.bind(this, this._onNameVanished));

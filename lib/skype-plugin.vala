@@ -52,7 +52,7 @@ public class Pomodoro.SkypePlugin : Pomodoro.PresencePlugin
 
             this.unset_pending_status ();
 
-            this.set_status (status);
+            this.set_status.begin (status);
         }
     }
 

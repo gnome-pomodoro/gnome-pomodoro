@@ -78,6 +78,8 @@ const PomodoroExtension = new Lang.Class({
 
         this.timer = new Timer.Timer();
 
+        this.dbus = new DBus.PomodoroExtension();
+
         Main.sessionMode.connect('updated', Lang.bind(this, this._onSessionModeUpdated));
         this._onSessionModeUpdated();
 
@@ -491,6 +493,7 @@ const PomodoroExtension = new Lang.Class({
         this.disableNotifications();
         this.disableScreenNotifications();
 
+        this.dbus.destroy();
         this.timer.destroy();
 
         this.settings.run_dispose();
