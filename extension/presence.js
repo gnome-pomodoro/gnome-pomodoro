@@ -234,6 +234,9 @@ const Presence = new Lang.Class({
     },
 
     destroy: function() {
+        log("Presence.destroy()");
+        let menuItem = this._getNotificationsMenuItem();
+
         if (this._settingsChangedId) {
             Extension.extension.settings.disconnect(this._settingsChangedId);
             this._settingsChangedId = 0;
@@ -242,6 +245,10 @@ const Presence = new Lang.Class({
         if (this._timerStateChangedId) {
             Extension.extension.timer.disconnect(this._timerStateChangedId);
             this._timerStateChangedId = 0;
+        }
+
+        if (this._menuItemText) {
+            menuItem.label.clutter_text.set_markup(this._menuItemText);
         }
 
         if (this._patch) {
