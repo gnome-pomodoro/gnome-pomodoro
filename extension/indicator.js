@@ -103,6 +103,14 @@ const IndicatorMenu = new Lang.Class({
         // this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         // this.addMenuItem(this.tasklist);
         // this.addMenuItem(this.entry);
+
+        this.connect('destroy', Lang.bind(this,
+            function() {
+                if (this._onTimerStateChangedId) {
+                    this.indicator.timer.disconnect(this._onTimerStateChangedId);
+                    this._onTimerStateChangedId = 0;
+                }
+            }));
     },
 
     _onTimerStateChanged: function() {
@@ -134,15 +142,6 @@ const IndicatorMenu = new Lang.Class({
 
     _onTaskSelected: function(tasklist, task) {
         global.log("Selected task: " + (task ? task.name : '-'));
-    },
-
-    destroy: function() {
-        if (this._onTimerStateChangedId) {
-            this.indicator.timer.disconnect(this._onTimerStateChangedId);
-            this._onTimerStateChangedId = 0;
-        }
-
-        this.parent();
     }
 });
 
@@ -152,7 +151,6 @@ const TextIndicator = new Lang.Class({
 
     _init : function(timer) {
         this._initialized     = false;
-        this._actorDestroyed  = false;
         this._state           = Timer.State.NULL;
         this._minHPadding     = 0;
         this._natHPadding     = 0;
@@ -170,16 +168,20 @@ const TextIndicator = new Lang.Class({
                                     y_align: Clutter.ActorAlign.CENTER });
         this.label.clutter_text.line_wrap = false;
         this.label.clutter_text.ellipsize = false;
-        this.label.connect('destroy', Lang.bind(this, function() {
-            this.timer.disconnect(this._onTimerUpdateId);
-            this._actorDestroyed = true;
-        }));
+        this.label.connect('destroy', Lang.bind(this,
+            function() {
+                if (this._onTimerUpdateId) {
+                    this.timer.disconnect(this._onTimerUpdateId);
+                    this._onTimerUpdateId = 0;
+                }
+            }));
         this.actor.add_child(this.label);
 
         this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
         this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
         this.actor.connect('allocate', Lang.bind(this, this._allocate));
         this.actor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
+        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
 
         this._onTimerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
 
@@ -255,10 +257,6 @@ const TextIndicator = new Lang.Class({
     },
 
     _onTimerUpdate: function() {
-        if (this._actorDestroyed) {
-            return;
-        }
-
         let state = this.timer.getState();
 
         if (this._state != state && this._initialized)
@@ -309,15 +307,19 @@ const TextIndicator = new Lang.Class({
         child.allocate(childBox, flags);
     },
 
-    destroy: function() {
-        this.actor.destroy();
-
+    _onActorDestroy: function() {
         if (this._onTimerUpdateId) {
             this.timer.disconnect(this._onTimerUpdateId);
             this._onTimerUpdateId = 0;
         }
 
+        this.actor._delegate = null;
+
         this.emit('destroy');
+    },
+
+    destroy: function() {
+        this.actor.destroy();
     }
 });
 Signals.addSignalMethods(TextIndicator.prototype);
@@ -358,7 +360,6 @@ const IconIndicator = new Lang.Class({
 
     _init : function(timer) {
         this._initialized     = false;
-        this._actorDestroyed  = false;
         this._state           = Timer.State.NULL;
         this._progress        = -1.0;
         this._minHPadding     = 0;
@@ -384,6 +385,7 @@ const IconIndicator = new Lang.Class({
         this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
         this.actor.connect('allocate', Lang.bind(this, this._allocate));
         this.actor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
+        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
 
         this._onTimerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
 
@@ -458,8 +460,10 @@ const IconIndicator = new Lang.Class({
     },
 
     _onIconDestroy: function() {
-        this.timer.disconnect(this._onTimerUpdateId);
-        this._actorDestroyed = true;
+        if (this._onTimerUpdateId) {
+            this.timer.disconnect(this._onTimerUpdateId);
+            this._onTimerUpdateId = 0;
+        }
     },
 
     _onStyleChanged: function(actor) {
@@ -508,10 +512,6 @@ const IconIndicator = new Lang.Class({
     },
 
     _onTimerUpdate: function() {
-        if (this._actorDestroyed) {
-            return;
-        }
-
         let state = this.timer.getState();
         let progress = this.timer.getProgress();
 
@@ -554,15 +554,19 @@ const IconIndicator = new Lang.Class({
         child.allocate(childBox, flags);
     },
 
-    destroy: function() {
-        this.actor.destroy();
-
+    _onActorDestroy: function() {
         if (this._onTimerUpdateId) {
             this.timer.disconnect(this._onTimerUpdateId);
             this._onTimerUpdateId = 0;
         }
 
+        this.actor._delegate = null;
+
         this.emit('destroy');
+    },
+
+    destroy: function() {
+        this.actor.destroy();
     }
 });
 Signals.addSignalMethods(IconIndicator.prototype);
@@ -594,6 +598,14 @@ const Indicator = new Lang.Class({
         this._settingsChangedId = Extension.extension.settings.connect('changed::indicator-type', Lang.bind(this, this._onSettingsChanged));
 
         this._onSettingsChanged();
+
+        this.connect('destroy', Lang.bind(this,
+            function() {
+                if (this._settingsChangedId) {
+                    Extension.extension.settings.disconnect(this._settingsChangedId);
+                    this._settingsChangedId = 0;
+                }
+            }));
     },
 
     _onSettingsChanged: function() {
@@ -626,14 +638,5 @@ const Indicator = new Lang.Class({
         this._hbox.add_child(this.widget.actor, { expand: false,
                                                   x_fill: false,
                                                   x_align: St.Align.START });
-    },
-
-    destroy: function() {
-        if (this._settingsChangedId) {
-            Extension.extension.settings.disconnect(this._settingsChangedId);
-            this._settingsChangedId = 0;
-        }
-
-        this.parent();
     }
 });

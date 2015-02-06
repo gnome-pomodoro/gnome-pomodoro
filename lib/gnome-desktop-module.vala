@@ -573,11 +573,11 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
     {
         var notification = new GLib.Notification (
                                        _("Extension does not support shell version"));
-
         notification.set_body (_("You need to upgrade Pomodoro."));
         notification.add_button (_("Upgrade"), "app.visit-website");
 
-        var application = GLib.Application.get_default () as Pomodoro.Application;
+        var application = GLib.Application.get_default ()
+                                       as Pomodoro.Application;
         application.send_notification ("extension", notification);
     }
 
@@ -604,35 +604,41 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
             };
         }
 
-        var notification = new GLib.Notification (_("Error loading extension"));
-        notification.add_button (_("Report issue"), "app.report-issue");
-
         var errors_string = string.joinv ("\n", errors);
-        if (errors_string != null) {
-            notification.set_body (errors_string);
-        }
 
         GLib.warning ("Error loading extension: %s", errors_string);
 
-        var application = GLib.Application.get_default () as Pomodoro.Application;
-        application.send_notification ("extension", notification);
+        /* popup notification only when failed to load extension */
+        if (this.shell_extensions_proxy == null)
+        {
+            var notification = new GLib.Notification (_("Error loading extension"));
+            notification.add_button (_("Report issue"), "app.report-issue");
+
+            if (errors_string != null) {
+                notification.set_body (errors_string);
+            }
+
+            var application = GLib.Application.get_default ()
+                                           as Pomodoro.Application;
+            application.send_notification ("extension", notification);
+        }
     }
 
     private void notify_extension_disabled ()
     {
-        var notification = new GLib.Notification (
-                                       _("Pomodoro extension is disabled"));
+        var notification = new GLib.Notification (_("Pomodoro extension is disabled"));
         notification.set_body (_("Extension provides better desktop integration for the pomodoro app."));
         notification.add_button (_("Enable"), "app.enable-extension");
 
-        var application = GLib.Application.get_default () as Pomodoro.Application;
+        var application = GLib.Application.get_default ()
+                                       as Pomodoro.Application;
         application.send_notification ("extension", notification);
     }
 
     public virtual signal void extension_enabled ()
     {
-        var application = GLib.Application.get_default () as Pomodoro.Application;
-
+        var application = GLib.Application.get_default ()
+                                       as Pomodoro.Application;
         application.withdraw_notification ("extension");
     }
 

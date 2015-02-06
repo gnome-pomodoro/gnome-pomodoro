@@ -80,12 +80,12 @@ const PomodoroExtension = new Lang.Class({
 
         this.dbus = new DBus.PomodoroExtension();
 
-        Main.sessionMode.connect('updated', Lang.bind(this, this._onSessionModeUpdated));
-        this._onSessionModeUpdated();
-
         this.timer.connect('service-connected', Lang.bind(this, this._onServiceConnected));
         this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
         this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
+
+        Main.sessionMode.connect('updated', Lang.bind(this, this._onSessionModeUpdated));
+        this._onSessionModeUpdated();
     },
 
     _destroyNotifications: function() {

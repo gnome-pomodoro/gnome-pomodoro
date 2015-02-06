@@ -95,23 +95,6 @@ const MessagesIndicator = new Lang.Class({
         this._label = new St.Label();
         this._container.add_actor(this._label);
 
-        this._highlight = new St.Widget({ style_class: 'messages-indicator-highlight',
-                                          x_expand: true,
-                                          y_expand: true,
-                                          y_align: Clutter.ActorAlign.END,
-                                          visible: false });
-
-        this._container.connect('notify::hover', Lang.bind(this,
-            function() {
-                this._highlight.visible = this._container.hover;
-            }));
-
-        Main.messageTray.connect('showing', Lang.bind(this,
-            function() {
-                this._highlight.visible = false;
-                this._container.hover = false;
-            }));
-
         let layout = new Clutter.BinLayout();
         this.actor = new St.Widget({ layout_manager: layout,
                                      style_class: 'messages-indicator',
@@ -119,7 +102,6 @@ const MessagesIndicator = new Lang.Class({
                                      y_align: Clutter.ActorAlign.END,
                                      visible: false });
         this.actor.add_actor(this._container);
-        this.actor.add_actor(this._highlight);
 
         Main.messageTray.connect('source-added', Lang.bind(this, this._onSourceAdded));
         Main.messageTray.connect('source-removed', Lang.bind(this, this._onSourceRemoved));
@@ -131,8 +113,9 @@ const MessagesIndicator = new Lang.Class({
     },
 
     _onSourceAdded: function(tray, source) {
-        if (source.trayIcon)
+        if (source.trayIcon) {
             return;
+        }
 
         source.connect('count-updated', Lang.bind(this, this._updateCount));
         this._sources.push(source);
@@ -154,9 +137,12 @@ const MessagesIndicator = new Lang.Class({
             }));
 
         this._count = count;
-        this._label.text = ngettext("%d new message",
-                                    "%d new messages",
-                                   count).format(count);
+
+        if (this._label.clutter_text) {
+            this._label.clutter_text.set_text(ngettext("%d new message",
+                                                       "%d new messages",
+                                                       count).format(count));
+        }
 
         this._icon.visible = hasChats;
         this._updateVisibility();
@@ -214,6 +200,7 @@ const ModalDialog = new Lang.Class({
                                      opacity: 0.0,
                                      x: 0,
                                      y: 0 });
+        this.actor._delegate = this;
         this.actor.add_constraint(this._stageConstraint);
         this.actor.add_style_class_name('extension-pomodoro-dialog');
         this.actor.add_actor(backgroundBin);
@@ -319,10 +306,6 @@ const ModalDialog = new Lang.Class({
             return false;
         }
 
-        this._lightbox.actor.reactive = true;
-
-        this._grabHelper.ignoreRelease();
-
         return this._grabHelper.grab({
             actor: this._lightbox.actor,
             onUngrab: Lang.bind(this, this._onUngrab)
@@ -356,7 +339,11 @@ const ModalDialog = new Lang.Class({
             return;
         }
 
-        this._disconnectInternals();
+        this._disconnectSignals();
+
+        this._lightbox.actor.reactive = true;
+
+        this._grabHelper.ignoreRelease();
 
         /* delay pushModal to ignore current events */
         Mainloop.idle_add(Lang.bind(this,
@@ -382,37 +369,54 @@ const ModalDialog = new Lang.Class({
      * by either a close() or a pushModal()
      */
     popModal: function(timestamp) {
-        this._disconnectInternals();
-
-        this._grabHelper.ungrab({
-            actor: this._lightbox.actor
-        });
+        try {
+            if (this._grabHelper.isActorGrabbed(this._lightbox.actor))
+            {
+                this._grabHelper.ungrab({
+                    actor: this._lightbox.actor
+                });
+            }
+        }
+        catch (error) {
+            Extension.extension.logError(error.message);
+        }
 
         this._lightbox.actor.reactive = false;
+
+        this._disconnectSignals();
     },
 
-    _disconnectInternals: function() {
+    _disconnectSignals: function() {
         if (this._pushModalDelaySource) {
             Mainloop.source_remove(this._pushModalDelaySource);
             this._pushModalDelaySource = 0;
         }
+
         if (this._pushModalSource) {
             Mainloop.source_remove(this._pushModalSource);
             this._pushModalSource = 0;
         }
+
         if (this._pushModalWatchId) {
             this._idleMonitor.remove_watch(this._pushModalWatchId);
             this._pushModalWatchId = 0;
         }
     },
 
-    _onActorDestroy: function() {
-        this.close();
-        this.emit('destroy');
-    },
-
     _onUngrab: function() {
         this.close();
+    },
+
+    _onActorDestroy: function() {
+        if (this._destroyed)
+            return;
+        this._destroyed = true;
+
+        this.popModal();
+
+        this.actor._delegate = null;
+
+        this.emit('destroy');
     },
 
     destroy: function() {
@@ -465,6 +469,19 @@ const PomodoroEndDialog = new Lang.Class({
         this._backgroundStack.add_actor(messagesIndicator.actor);
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+
+        this.connect('destroy', Lang.bind(this,
+            function() {
+                if (this._timerUpdateId) {
+                    this.timer.disconnect(this._timerUpdateId);
+                    this._timerUpdateId = 0;
+                }
+
+                if (this._actorMappedId) {
+                    this.actor.disconnect(this._actorMappedId);
+                    this._actorMappedId = 0;
+                }
+            }));
     },
 
     _onActorMappedChanged: function(actor) {
@@ -485,7 +502,10 @@ const PomodoroEndDialog = new Lang.Class({
             let minutes   = Math.floor(remaining / 60);
             let seconds   = Math.floor(remaining % 60);
 
-            this._timerLabel.set_text('%02d:%02d'.format(minutes, seconds));
+            /* method may be called while label actor got destroyed */
+            if (this._timerLabel.clutter_text) {
+                this._timerLabel.clutter_text.set_text('%02d:%02d'.format(minutes, seconds));
+            }
         }
     },
 
@@ -586,24 +606,19 @@ const PomodoroEndDialog = new Lang.Class({
 
     setDescription: function(text) {
         this.description = text;
-        this._descriptionLabel.set_text(this.description);
+
+        if (this._descriptionLabel.clutter_text) {
+            this._descriptionLabel.clutter_text.set_text(this.description);
+        }
     },
 
-    destroy: function() {
+    _disconnectSignals: function() {
         this._cancelOpenWhenIdle();
         this._cancelCloseWhenActive();
 
         if (this._openIdleWatchId) {
             this._idleMonitor.remove_watch(this._openIdleWatchId);
             this._openIdleWatchId = 0;
-        }
-        if (this._actorMappedId) {
-            this.actor.disconnect(this._actorMappedId);
-            this._actorMappedId = 0;
-        }
-        if (this._timerUpdateId) {
-            this.timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
         }
 
         this.parent();

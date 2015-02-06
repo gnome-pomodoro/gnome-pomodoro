@@ -24,6 +24,7 @@ const Signals = imports.signals;
 
 const GLib = imports.gi.GLib;
 const Meta = imports.gi.Meta;
+const St = imports.gi.St;
 
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
@@ -80,8 +81,6 @@ const Source = new Lang.Class({
 
     _init: function() {
         this.parent(_("Pomodoro"), this.ICON_NAME);
-
-        this._destroying = false;
     },
 
     /* override parent method */
@@ -109,14 +108,6 @@ const Source = new Lang.Class({
 
     close: function() {
         this.destroy();
-    },
-
-    destroy: function(reason) {
-        if (!this._destroying) {
-            this._destroying = true;
-
-            this.parent(reason);
-        }
     }
 });
 
@@ -137,10 +128,17 @@ const Notification = new Lang.Class({
 
         this._restoreForFeedback = false;
         this._showing            = false;
-        this._destroying         = false;
         this._bodyLabel          = this.addBody(description);
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+
+        this.connect('destroy', Lang.bind(this,
+            function() {
+                if (this._actorMappedId) {
+                    this.actor.disconnect(this._actorMappedId);
+                    this._actorMappedId = 0;
+                }
+            }));
 
         this.source.connect('destroy', Lang.bind(this,
             function() {
@@ -162,6 +160,14 @@ const Notification = new Lang.Class({
         }
     },
 
+    addBody: function(text, style) {
+        let actor = new St.Label({ text: text || '',
+                                   reactive: true });
+
+        this.addActor(actor, style);
+        return actor;
+    },
+
     setShowInLockScreen: function(enabled) {
         this.isMusic = enabled;
     },
@@ -171,11 +177,7 @@ const Notification = new Lang.Class({
             this.source = getDefaultSource();
         }
 
-        if (this.source && this.source._destroying) {
-            Extension.extension.logError('Called Notification.show() after source.destroy()');
-        }
-
-        if (this.source && !this._destroying) {
+        if (this.source) {
             /* Popup notification regardless of session busy status */
             if (!this.forFeedback) {
                 this.setForFeedback(true);
@@ -206,33 +208,32 @@ const Notification = new Lang.Class({
     },
 
     _updateBody: function(text) {
-        if (this._bodyLabel.clutter_text) {
-            this._bodyLabel.clutter_text.set_markup(text);
-            this._bodyLabel.queue_relayout();
+        try {
+            if (this._bodyLabel.clutter_text) {
+                this._bodyLabel.clutter_text.set_text(text || '');
+                this._bodyLabel.queue_relayout();
+            }
+        }
+        catch (error) {
+            Extension.extension.logError(error.message);
         }
     },
 
     _updateBanner: function(text) {
-        if (this._bannerLabel.clutter_text) {
-            this._bannerLabel.clutter_text.set_markup(text);
-            this._bannerLabel.queue_relayout();
+        try {
+            if (this._bannerLabel.clutter_text) {
+                this._bannerLabel.clutter_text.set_text(text || '');
+                this._bannerLabel.queue_relayout();
+            }
+        }
+        catch (error) {
+            Extension.extension.logError(error.message);
         }
     },
 
     close: function() {
         this.emit('done-displaying');
         this.destroy();
-    },
-
-    destroy: function(reason) {
-        this._destroying = true;
-
-        if (this._actorMappedId) {
-            this.actor.disconnect(this._actorMappedId);
-            this._actorMappedId = 0;
-        }
-
-        this.parent(reason);
     }
 });
 
@@ -258,6 +259,7 @@ const PomodoroStartNotification = new Lang.Class({
 
         this.connect('mapped', Lang.bind(this, this._onActorMapped));
         this.connect('unmapped', Lang.bind(this, this._onActorUnmapped));
+        this.connect('destroy', Lang.bind(this, this._onActorUnmapped)); // XXX
 
         this._updateBanner(_("Focus on your task"));
     },
@@ -348,9 +350,10 @@ const PomodoroEndNotification = new Lang.Class({
 
         this.connect('mapped', Lang.bind(this, this._onActorMapped));
         this.connect('unmapped', Lang.bind(this, this._onActorUnmapped));
-
         this.connect('destroy', Lang.bind(this,
             function() {
+                this._onActorUnmapped();
+
                 if (this._settingsChangedId) {
                     Extension.extension.settings.disconnect(this._settingsChangedId);
                     this._settingsChangedId = 0;

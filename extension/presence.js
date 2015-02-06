@@ -234,7 +234,6 @@ const Presence = new Lang.Class({
     },
 
     destroy: function() {
-        log("Presence.destroy()");
         let menuItem = this._getNotificationsMenuItem();
 
         if (this._settingsChangedId) {
