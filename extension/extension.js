@@ -111,15 +111,7 @@ const PomodoroExtension = new Lang.Class({
             case 'show-screen-notifications':
                 this._showScreenNotifications = settings.get_boolean(key);
 
-                if (this.dialog && this.timer.getState() == Timer.State.PAUSE)
-                {
-                    if (this._showScreenNotifications) {
-                        this.dialog.openWhenIdle();
-                    }
-                    else {
-                        this.dialog.close();
-                    }
-                }
+                this._updateScreenNotifications();
 
                 break;
 
@@ -146,10 +138,7 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _onServiceDisconnected: function() {
-        if (this.dialog) {
-            this.dialog.close();
-        }
-
+        this._updateScreenNotifications();
         this._destroyNotifications();
     },
 
@@ -160,7 +149,7 @@ const PomodoroExtension = new Lang.Class({
             this._timerState = timerState;
 
             if (this.dialog && timerState != Timer.State.PAUSE) {
-                this.dialog.close();
+                this.dialog.close(true);
             }
 
             if (this.reminderManager) {
@@ -229,7 +218,7 @@ const PomodoroExtension = new Lang.Class({
             this.notification.connect('clicked', Lang.bind(this,
                 function(notification) {
                     if (this.dialog) {
-                        this.dialog.open();
+                        this.dialog.open(true);
                         this.dialog.pushModal();
 
                         notification.hide();
@@ -246,7 +235,7 @@ const PomodoroExtension = new Lang.Class({
             }
 
             if (this.dialog && this._showScreenNotifications) {
-                this.dialog.open();
+                this.dialog.open(true);
             }
             else {
                 this.notification.show();
@@ -359,6 +348,19 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
+    _updateScreenNotifications: function() {
+        if (this.dialog && this.timer.getState() == Timer.State.PAUSE)
+        {
+            if (this._showScreenNotifications) {
+                this.dialog.open(false);
+                this.dialog.pushModal();
+            }
+            else {
+                this.dialog.close(false);
+            }
+        }
+    },
+
     enableScreenNotifications: function() {
         if (!this.dialog) {
             this.dialog = new Dialogs.PomodoroEndDialog(this.timer);
@@ -408,6 +410,8 @@ const PomodoroExtension = new Lang.Class({
                     this.dialog = null;
                 }));
         }
+
+        this._updateScreenNotifications();
     },
 
     disableScreenNotifications: function() {
@@ -428,7 +432,7 @@ const PomodoroExtension = new Lang.Class({
                             this.reminderManager.acknowledged = true;
 
                             if (this.dialog) {
-                                this.dialog.open();
+                                this.dialog.open(true);
                                 this.dialog.pushModal();
                             }
 

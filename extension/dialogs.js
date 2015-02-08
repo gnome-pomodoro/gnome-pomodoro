@@ -224,7 +224,7 @@ const ModalDialog = new Lang.Class({
         return this.state == State.OPENED || this.state == State.OPENING;
     },
 
-    open: function(timestamp) {
+    open: function(animate) {
         if (this.state == State.OPENED || this.state == State.OPENING) {
             return;
         }
@@ -241,44 +241,68 @@ const ModalDialog = new Lang.Class({
         this.actor.show();
 
         Tweener.removeTweens(this.actor);
-        Tweener.addTween(this.actor,
-                         { opacity: 255,
-                           time: FADE_IN_TIME / 1000,
-                           transition: 'easeOutQuad',
-                           onComplete: Lang.bind(this,
-                                function() {
-                                    if (this.state == State.OPENING) {
-                                        this.state = State.OPENED;
-                                        this.emit('opened');
-                                    }
-                                })
-                         });
-        this.emit('opening');
+
+        if (animate) {
+            Tweener.addTween(this.actor,
+                             { opacity: 255,
+                               time: FADE_IN_TIME / 1000,
+                               transition: 'easeOutQuad',
+                               onComplete: Lang.bind(this,
+                                    function() {
+                                        if (this.state == State.OPENING) {
+                                            this.state = State.OPENED;
+                                            this.emit('opened');
+                                        }
+                                    })
+                             });
+            this.emit('opening');
+        }
+        else {        
+            this.state = State.OPENED;
+
+            this.actor.opacity = 255;
+
+            this.emit('opening');
+            this.emit('opened');
+        }
     },
 
-    close: function(timestamp) {
+    close: function(animate) {
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             return;
         }
 
         this.state = State.CLOSING;
-        this.popModal(timestamp);
+        this.popModal();
 
         Tweener.removeTweens(this.actor);
-        Tweener.addTween(this.actor,
-                         { opacity: 0,
-                           time: FADE_OUT_TIME / 1000,
-                           transition: 'easeOutQuad',
-                           onComplete: Lang.bind(this,
-                               function() {
-                                    if (this.state == State.CLOSING) {
-                                        this.state = State.CLOSED;
-                                        this.actor.hide();
-                                        this.emit('closed');
-                                    }
-                               })
-                         });
-        this.emit('closing');
+
+        if (animate) {
+            Tweener.addTween(this.actor,
+                             { opacity: 0,
+                               time: FADE_OUT_TIME / 1000,
+                               transition: 'easeOutQuad',
+                               onComplete: Lang.bind(this,
+                                   function() {
+                                        if (this.state == State.CLOSING) {
+                                            this.state = State.CLOSED;
+                                            this.actor.hide();
+                                            this.emit('closed');
+                                        }
+                                   })
+                             });
+            this.emit('closing');
+        }
+        else {
+            this.state = State.CLOSED;
+
+            this.actor.opacity = 0;
+            this.actor.hide();
+
+            this.emit('closing');
+            this.emit('closed');
+        }
+        
     },
 
     _onPushModalDelayTimeout: function() {
@@ -301,7 +325,7 @@ const ModalDialog = new Lang.Class({
         return GLib.SOURCE_REMOVE;
     },
 
-    _pushModal: function(timestamp) {
+    _pushModal: function() {
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             return false;
         }
@@ -326,7 +350,7 @@ const ModalDialog = new Lang.Class({
         }
 
         if (this._pushModalTries > PUSH_MODAL_TIME_LIMIT * PUSH_MODAL_RATE) {
-            this.close();
+            this.close(true);
             this._pushModalSource = 0;
             return GLib.SOURCE_REMOVE; /* dialog can't become modal */
         }
@@ -334,7 +358,7 @@ const ModalDialog = new Lang.Class({
         return GLib.SOURCE_CONTINUE;
     },
 
-    pushModal: function(timestamp) {
+    pushModal: function() {
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             return;
         }
@@ -368,7 +392,7 @@ const ModalDialog = new Lang.Class({
      * dialog insensitive as well, so it needs to be followed shortly
      * by either a close() or a pushModal()
      */
-    popModal: function(timestamp) {
+    popModal: function() {
         try {
             if (this._grabHelper.isActorGrabbed(this._lightbox.actor))
             {
@@ -404,7 +428,7 @@ const ModalDialog = new Lang.Class({
     },
 
     _onUngrab: function() {
-        this.close();
+        this.close(true);
     },
 
     _onActorDestroy: function() {
@@ -412,7 +436,7 @@ const ModalDialog = new Lang.Class({
             return;
         this._destroyed = true;
 
-        this.popModal();
+        this.close(false);
 
         this.actor._delegate = null;
 
@@ -436,11 +460,12 @@ const PomodoroEndDialog = new Lang.Class({
         this.timer = timer;
         this.description = _("It's time to take a break");
 
-        this._openIdleWatchId        = 0;
-        this._openWhenIdleWatchId    = 0;
-        this._closeWhenActiveWatchId = 0;
-        this._actorMappedId          = 0;
-        this._timerUpdateId          = 0;
+        this._openWhenIdleWatchId        = 0;
+        this._closeWhenActiveDelaySource = 0;
+        this._closeWhenActiveIdleWatchId = 0;
+        this._closeWhenActiveWatchId     = 0;
+        this._actorMappedId              = 0;
+        this._timerUpdateId              = 0;
 
         this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-timer' });
 
@@ -470,29 +495,22 @@ const PomodoroEndDialog = new Lang.Class({
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
 
-        this.connect('destroy', Lang.bind(this,
-            function() {
-                if (this._timerUpdateId) {
-                    this.timer.disconnect(this._timerUpdateId);
-                    this._timerUpdateId = 0;
-                }
-
-                if (this._actorMappedId) {
-                    this.actor.disconnect(this._actorMappedId);
-                    this._actorMappedId = 0;
-                }
-            }));
+        this.connect('closing', Lang.bind(this, this._onClosing));
+        this.connect('destroy', Lang.bind(this, this._onDestroy));
     },
 
     _onActorMappedChanged: function(actor) {
-        if (actor.mapped && !this._timerUpdateId) {
-            this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
-            this._onTimerUpdate();
+        if (actor.mapped) {
+            if (!this._timerUpdateId) {
+                this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+                this._onTimerUpdate();
+            }
         }
-
-        if (!actor.mapped && this._timerUpdateId) {
-            this.timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
+        else {
+            if (this._timerUpdateId) {
+                this.timer.disconnect(this._timerUpdateId);
+                this._timerUpdateId = 0;
+            }
         }
     },
 
@@ -509,43 +527,57 @@ const PomodoroEndDialog = new Lang.Class({
         }
     },
 
-    /**
-     * Open the dialog and setup closing by user activity.
-     */
-    open: function(timestamp) {
-        this.parent(timestamp);
-
-        if (this._openTimeoutSource) {
-            return;
-        }
-
-        /* Delay scheduling of closing the dialog by activity
-         * until user has chance to see it.
-         */
-        this._openTimeoutSource = Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this,
-            function() {
-                /* Wait until user becomes slightly idle */
-                if (this._idleMonitor.get_idletime() < IDLE_TIME_TO_CLOSE) {
-                    this._openIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_CLOSE, Lang.bind(this,
-                        function(monitor) {
-                            this.closeWhenActive();
-                        }
-                    ));
-                }
-                else {
-                    this.closeWhenActive();
-                }
-
-                this._openTimeoutSource = 0;
-                return GLib.SOURCE_REMOVE;
-            }));
-    },
-
-    close: function(timestamp) {
+    _onClosing: function() {
         this._cancelCloseWhenActive();
         this._cancelOpenWhenIdle();
 
-        this.parent(timestamp);
+        if (this._closeWhenActiveDelaySource) {
+            Mainloop.source_remove(this._closeWhenActiveDelaySource);
+            this._closeWhenActiveDelaySource = 0;            
+        }
+
+        if (this._closeWhenActiveIdleWatchId) {
+            this._idleMonitor.remove_watch(this._closeWhenActiveIdleWatchId);
+            this._closeWhenActiveIdleWatchId = 0;
+        }
+
+        if (this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+    },
+
+    _onDestroy: function() {
+        this._onClosing();
+
+        if (this._actorMappedId) {
+            this.actor.disconnect(this._actorMappedId);
+            this._actorMappedId = 0;
+        }
+    },
+
+    /**
+     * Open the dialog and setup closing when user becomes active.
+     */
+    open: function(animate) {
+        this.parent(animate);
+
+        /* Wait until user has a chance of seeing the dialog */
+        if (this._closeWhenActiveDelaySource == 0) {
+            this._closeWhenActiveDelaySource = Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this,
+                function() {
+                    if (this._idleMonitor.get_idletime() < IDLE_TIME_TO_CLOSE) {
+                        /* Wait until user becomes slightly idle */
+                        this._closeWhenActiveIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_CLOSE, Lang.bind(this, this.closeWhenActive));
+                    }
+                    else {
+                        this.closeWhenActive();
+                    }
+
+                    this._closeWhenActiveDelaySource = 0;
+                    return GLib.SOURCE_REMOVE;
+                }));
+        }
     },
 
     _cancelOpenWhenIdle: function() {
@@ -577,7 +609,7 @@ const PomodoroEndDialog = new Lang.Class({
                         return;
                     }
 
-                    this.open();
+                    this.open(true);
                 }
             ));
         }
@@ -598,7 +630,7 @@ const PomodoroEndDialog = new Lang.Class({
         if (this._closeWhenActiveWatchId == 0) {
             this._closeWhenActiveWatchId = this._idleMonitor.add_user_active_watch(Lang.bind(this,
                 function(monitor) {
-                    this.close();
+                    this.close(true);
                 }
             ));
         }
@@ -610,17 +642,5 @@ const PomodoroEndDialog = new Lang.Class({
         if (this._descriptionLabel.clutter_text) {
             this._descriptionLabel.clutter_text.set_text(this.description);
         }
-    },
-
-    _disconnectSignals: function() {
-        this._cancelOpenWhenIdle();
-        this._cancelCloseWhenActive();
-
-        if (this._openIdleWatchId) {
-            this._idleMonitor.remove_watch(this._openIdleWatchId);
-            this._openIdleWatchId = 0;
-        }
-
-        this.parent();
     }
 });
