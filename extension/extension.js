@@ -50,14 +50,15 @@ const PomodoroExtension = new Lang.Class({
     _init: function() {
         Extension.extension = this;
 
-        this.settings        = null;
-        this.timer           = null;
-        this.indicator       = null;
-        this.notification    = null;
-        this.dialog          = null;
-        this.reminderManager = null;
-        this.presence        = null;
-        this.keybinding      = false;
+        this.settings           = null;
+        this.timer              = null;
+        this.indicator          = null;
+        this.notificationSource = null;
+        this.notification       = null;
+        this.dialog             = null;
+        this.reminderManager    = null;
+        this.presence           = null;
+        this.keybinding         = false;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
@@ -89,8 +90,8 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _destroyNotifications: function() {
-        if (Notifications.source) {
-            Notifications.source.destroyAllNotifications();
+        if (this.notificationSource) {
+            this.notificationSource.destroyAllNotifications();
         }
     },
 
@@ -324,7 +325,7 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
-    disableNotifications: function() {        
+    disableNotifications: function() {
         if (this.notification) {
             this.notification.destroy();
             this.notification = null;
@@ -490,12 +491,21 @@ const PomodoroExtension = new Lang.Class({
     },
 
     destroy: function() {
+        if (this._destroying) {
+            return;
+        }
+        this._destroying = true;
+
         this.disableKeybinding();
         this.disablePresence();
         this.disableIndicator();
         this.disableReminders();
         this.disableNotifications();
         this.disableScreenNotifications();
+
+        if (this.notificationSource) {
+            this.notificationSource.destroy();
+        }
 
         this.dbus.destroy();
         this.timer.destroy();
@@ -516,7 +526,17 @@ function init(metadata) {
 
 function enable() {
     if (!extension) {
+        if (Main.pomodoro && Main.pomodoro !== extension) {
+            Main.pomodoro.destroy();
+        }
+
         extension = new PomodoroExtension();
+        extension.connect('destroy', Lang.bind(this,
+            function() {
+                extension = null;
+            }));
+
+        Main.pomodoro = extension;
     }
 }
 

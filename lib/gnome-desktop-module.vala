@@ -444,6 +444,7 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
     {
         var extension_uuid = Config.EXTENSION_UUID;
         var extension_path = this.get_extension_path ();
+        var success = false;
 
         try
         {
@@ -469,9 +470,7 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
             GLib.debug ("Attempting to enable extension from \"%s\"",
                         extension_path);
 
-            var success = this.shell_proxy.eval (script);
-            
-            GLib.message ("success = %s", (success ? "yes" : "no"));
+            success = this.shell_proxy.eval (script);
         }
         catch (IOError error) {
             GLib.warning ("Could not enable extension: %s",

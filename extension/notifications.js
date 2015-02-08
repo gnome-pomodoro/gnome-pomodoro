@@ -47,11 +47,11 @@ const REMINDER_TIMEOUT = 75;
 const REMINDER_MIN_REMAINING_TIME = 60;
 
 
-let source = null;
-
-
 function getDefaultSource()
 {
+    let extension = Extension.extension;
+    let source = extension.notificationSource;
+
     /* a walkaround for ScreenShield requiring new source for each
        music notification */
     if (source && Main.sessionMode.isLocked) {
@@ -62,12 +62,14 @@ function getDefaultSource()
     if (!source || source._destroying) {
         source = new Source();
         source.connect('destroy', Lang.bind(source,
-            function(_source) {
-                if (source === _source) {
-                    source = null;
+            function(source) {
+                if (extension.notificationSource === source) {
+                    extension.notificationSource = null;
                 }
             }));
     }
+
+    extension.notificationSource = source;
 
     return source;
 }
