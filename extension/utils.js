@@ -112,6 +112,7 @@ function arrayContains(array1, array2) {
 
 function getFocusedWindowInfo() {
     let app = Shell.WindowTracker.get_default().focus_app;
+    let appInfo = app ? app.get_app_info() : null;
     let window = global.display.focus_window;
 
     let result = {
@@ -121,8 +122,8 @@ function getFocusedWindowInfo() {
         isFullscreen: false
     };
 
-    if (app) {
-        let categoriesStr = app.get_app_info().get_categories();
+    if (appInfo) {
+        let categoriesStr = appInfo.get_categories();
         let categories    = categoriesStr ? categoriesStr.split(';') : [];
 
         for (let i = 0; i < VIDEO_PLAYER_CATEGORIES.length; i++) {
