@@ -46,7 +46,6 @@ public class Pomodoro.Application : Gtk.Application
 {
     public Pomodoro.Service service;
     public Pomodoro.Timer timer;
-    public Gtk.Window main_window;
 
     private Gtk.Window preferences_dialog;
     private Gtk.Window about_dialog;
@@ -67,7 +66,6 @@ public class Pomodoro.Application : Gtk.Application
 
         this.timer = null;
         this.service = null;
-        this.main_window = null;
         this.hold_reasons = HoldReason.NONE;
     }
 
@@ -120,33 +118,6 @@ public class Pomodoro.Application : Gtk.Application
                                      Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
 
-    public void show_main_window_full (uint32 timestamp)
-    {
-        if (this.main_window == null)
-        {
-            this.main_window = new Pomodoro.MainWindow ();
-            this.main_window.destroy.connect (() => {
-                this.main_window = null;
-            });
-
-            this.add_window (this.main_window);
-        }
-
-        if (this.main_window != null) {
-            if (timestamp > 0) {
-                this.main_window.present_with_time (timestamp);
-            }
-            else {
-                this.main_window.present ();
-            }
-        }
-    }
-
-    public void show_main_window ()
-    {
-        this.show_main_window_full (0);
-    }
-
     public void show_preferences_full (string? view,
                                        uint32  timestamp)
     {
@@ -172,12 +143,6 @@ public class Pomodoro.Application : Gtk.Application
     public void show_preferences ()
     {
         this.show_preferences_full (null, 0);
-    }
-
-    private void action_main_window (SimpleAction action,
-                                     Variant?     parameter)
-    {
-        this.show_main_window ();
     }
 
     private void action_preferences (SimpleAction action,
@@ -262,9 +227,6 @@ public class Pomodoro.Application : Gtk.Application
         var preferences_action = new GLib.SimpleAction ("preferences", null);
         preferences_action.activate.connect (this.action_preferences);
 
-        var main_window_action = new GLib.SimpleAction ("main-window", null);
-        main_window_action.activate.connect (this.action_main_window);
-
         var visit_website_action = new GLib.SimpleAction ("visit-website", null);
         visit_website_action.activate.connect (this.action_visit_website);
 
@@ -281,7 +243,6 @@ public class Pomodoro.Application : Gtk.Application
         quit_action.activate.connect (this.action_quit);
 
         this.add_action (preferences_action);
-        this.add_action (main_window_action);
         this.add_action (visit_website_action);
         this.add_action (report_issue_action);
         this.add_action (enable_extension_action);
@@ -407,7 +368,7 @@ public class Pomodoro.Application : Gtk.Application
      */
     public override void activate ()
     {
-        this.activate_action ("main-window", null);
+        this.activate_action ("preferences", null);
     }
 
     public override bool dbus_register (DBusConnection connection,

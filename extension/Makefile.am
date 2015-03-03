@@ -10,7 +10,6 @@ dist_extension_DATA = \
     presence.js \
     settings.js \
     stylesheet.css \
-    tasklist.js \
     timer.js \
     utils.js
 

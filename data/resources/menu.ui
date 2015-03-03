@@ -3,12 +3,6 @@
   <menu id="app-menu">
     <section>
       <item>
-        <attribute name="label" translatable="yes">_Manage Tasks</attribute>
-        <attribute name="action">app.main-window</attribute>
-      </item>
-    </section>
-    <section>
-      <item>
         <attribute name="label" translatable="yes">_Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
       </item>
@@ -22,28 +16,6 @@
         <attribute name="label" translatable="yes">_Quit</attribute>
         <attribute name="action">app.quit</attribute>
         <attribute name="accel"><![CDATA[<Primary>Q]]></attribute>
-      </item>
-    </section>
-  </menu>
-  <menu id="window-menu">
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">_Find</attribute>
-        <attribute name="action">win.find</attribute>
-        <attribute name="accel"><![CDATA[<Primary>F]]></attribute>
-      </item>
-    </section>
-  </menu>
-  <menu id="selection-menu">
-    <section>
-      <item>
-        <attribute name="action">win.select-all</attribute>
-        <attribute name="label" translatable="yes">Select All</attribute>
-        <attribute name="accel"><![CDATA[<Primary>A]]></attribute>
-      </item>
-      <item>
-        <attribute name="action">win.select-none</attribute>
-        <attribute name="label" translatable="yes">Select None</attribute>
       </item>
     </section>
   </menu>

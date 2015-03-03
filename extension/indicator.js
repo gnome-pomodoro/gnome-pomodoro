@@ -42,7 +42,6 @@ const Tweener = imports.ui.tweener;
 const DBus = Extension.imports.dbus;
 const Config = Extension.imports.config;
 const Settings = Extension.imports.settings;
-const Tasklist = Extension.imports.tasklist;
 const Timer = Extension.imports.timer;
 
 const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
@@ -86,23 +85,8 @@ const IndicatorMenu = new Lang.Class({
             }));
         this.addMenuItem(this._timerToggle);
 
-        /* Task list */
-        // this.entry = new Tasklist.TaskEntry();
-        // this.entry.connect('task-entered', Lang.bind(this, this._onTaskEntered));
-
-        /* TODO: Lock focus on the entry once active */
-        /* TODO: Add history manager, just as in runDialog */
-        /* TODO: More items could be added to context menu */
-
-        // this.tasklist = new Tasklist.TaskList();
-        // this.tasklist.connect('task-selected', Lang.bind(this, this._onTaskSelected));
-
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.addAction(_("Manage Tasks"), Lang.bind(this, this._showMainWindow));
         this.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
-        // this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        // this.addMenuItem(this.tasklist);
-        // this.addMenuItem(this.entry);
 
         this.connect('destroy', Lang.bind(this,
             function() {
@@ -121,27 +105,11 @@ const IndicatorMenu = new Lang.Class({
         return this.indicator.timer.getState() != Timer.State.NULL;
     },
 
-    _showMainWindow: function() {
-        let timestamp = global.get_current_time();
-
-        this.indicator.timer.showMainWindow(timestamp);
-    },
-
     _showPreferences: function() {
         let view = 'timer';
         let timestamp = global.get_current_time();
 
         this.indicator.timer.showPreferences(view, timestamp);
-    },
-
-    _onTaskEntered: function(entry, text) {
-        this.tasklist.addTask(new Tasklist.Task(text), {
-            animate: true
-        });
-    },
-
-    _onTaskSelected: function(tasklist, task) {
-        global.log("Selected task: " + (task ? task.name : '-'));
     }
 });
 

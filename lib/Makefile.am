@@ -14,7 +14,6 @@ libgnome_pomodoro_la_SOURCES = \
     keybinding-chooser-button.vala \
     keybindings.vala \
     log-scale.vala \
-    main-window.vala \
     mode-button.vala \
     module.vala \
     plugin.vala \
