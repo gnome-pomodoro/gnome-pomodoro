@@ -205,7 +205,10 @@ const ModalDialog = new Lang.Class({
         this.actor.add_style_class_name('extension-pomodoro-dialog');
         this.actor.add_actor(backgroundBin);
         this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
-        Main.layoutManager.modalDialogGroup.add_actor(this.actor);
+
+        // TODO: Check it it's ok with multi-monitor setup
+        global.stage.add_actor(this.actor);
+        // Main.layoutManager.modalDialogGroup.add_actor(this.actor);
 
         this._lightbox = new Lightbox.Lightbox(this.actor,
                                                { fadeFactor: FADE_IN_OPACITY,
@@ -238,6 +241,8 @@ const ModalDialog = new Lang.Class({
         }
 
         this._monitorConstraint.index = global.screen.get_current_monitor();
+
+        this.actor.raise_top();
         this.actor.show();
 
         Tweener.removeTweens(this.actor);
