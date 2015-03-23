@@ -54,31 +54,37 @@ const Presence = new Lang.Class({
                     this._updateState();
                 }
         });
-        this._patch.addHooks(MessageTray.MessageTrayMenu.prototype, {
-            _onStatusChanged:
-                function(status) {
-                    this._sessionStatus = status;
-                },
-            _onIMPresenceChanged:
-                function(accountManager, type) {
-                },
-            _updatePresence:
-                Lang.bind(this, this._onNotificationsMenuItemToggled),
-        });
 
-        // We need to reconnect the 'toggled' signal to use method from
-        // the prototype.
-        try {
-            let menu = this._getMessageTrayMenu();
-            let menuItem = this._getNotificationsMenuItem();
-            menuItem.disconnectAll();
-            menuItem.connect('toggled', Lang.bind(menu,
-                function(item, state) {
-                    this._updatePresence(item, state);
-                }));
-        }
-        catch (error) {
-            Extension.extension.logError(error.message);
+        if (MessageTray.MessageTrayMenu) {  // deprecated in 3.16
+            this._patch.addHooks(MessageTray.MessageTrayMenu.prototype, {
+                _onStatusChanged:
+                    function(status) {
+                        this._sessionStatus = status;
+                    },
+                _onIMPresenceChanged:
+                    function(accountManager, type) {
+                    },
+                _updatePresence:
+                    Lang.bind(this, this._onNotificationsMenuItemToggled),
+            });
+
+            // We need to reconnect the 'toggled' signal to use method from
+            // the prototype.
+            try {
+                let menu = this._getMessageTrayMenu();
+                let menuItem = this._getNotificationsMenuItem();
+
+                if (menuItem && menu) {
+                    menuItem.disconnectAll();
+                    menuItem.connect('toggled', Lang.bind(menu,
+                        function(item, state) {
+                            this._updatePresence(item, state);
+                        }));
+                }
+            }
+            catch (error) {
+                Extension.extension.logError(error.message);
+            }
         }
 
         try {
@@ -148,24 +154,26 @@ const Presence = new Lang.Class({
             let menuItemMarkup;
             let menuItemHint;
 
-            if (!this._menuItemText) {
-                this._menuItemText = menuItem.label.get_text();
-            }
+            if (menuItem) {
+                if (!this._menuItemText) {
+                    this._menuItemText = menuItem.label.get_text();
+                }
 
-            if (isRunning) {
-                // translators: Full text is actually "Notifications during...",
-                //              the "Notifications" label is taken from gnome-shell
-                menuItemHint = timerState == Timer.State.POMODORO
-                                   ? _("during pomodoro")
-                                   : _("during break");
+                if (isRunning) {
+                    // translators: Full text is actually "Notifications during...",
+                    //              the "Notifications" label is taken from gnome-shell
+                    menuItemHint = timerState == Timer.State.POMODORO
+                                       ? _("during pomodoro")
+                                       : _("during break");
 
-                menuItemMarkup = '%s\n<small><i>%s</i></small>'.format(this._menuItemText,
-                                                                       menuItemHint);
+                    menuItemMarkup = '%s\n<small><i>%s</i></small>'.format(this._menuItemText,
+                                                                           menuItemHint);
 
-                menuItem.label.clutter_text.set_markup(menuItemMarkup);
-            }
-            else {
-                menuItem.label.clutter_text.set_markup(this._menuItemText);
+                    menuItem.label.clutter_text.set_markup(menuItemMarkup);
+                }
+                else {
+                    menuItem.label.clutter_text.set_markup(this._menuItemText);
+                }
             }
         }
         catch (error) {
@@ -178,11 +186,15 @@ const Presence = new Lang.Class({
     },
 
     _getMessageTrayMenu: function() {
-        return Main.messageTray._messageTrayMenuButton._menu;
+        return Main.messageTray._messageTrayMenuButton
+            ? Main.messageTray._messageTrayMenuButton._menu : undefined;
     },
 
     _getNotificationsMenuItem: function() {
-        return Main.messageTray._messageTrayMenuButton._menu._busyItem;
+        let menu = this._getMessageTrayMenu();
+
+        return menu && menu._busyItem
+            ? Main.messageTray._messageTrayMenuButton._menu._busyItem : undefined;
     },
 
     _setNotificationDefaults: function() {
@@ -204,7 +216,7 @@ const Presence = new Lang.Class({
             messageTray._busy = busy || isDialogOpened;
             messageTray._updateState();
 
-            if (menuItem.state != !messageTray._busy) {
+            if (menuItem && menuItem.state != !messageTray._busy) {
                 this._notificationsMenuItemLock = true;
                 menuItem.toggle();
                 this._notificationsMenuItemLock = false;
@@ -246,7 +258,7 @@ const Presence = new Lang.Class({
             this._timerStateChangedId = 0;
         }
 
-        if (this._menuItemText) {
+        if (menuItem && this._menuItemText) {
             menuItem.label.clutter_text.set_markup(this._menuItemText);
         }
 

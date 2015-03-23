@@ -47,12 +47,25 @@ const Timer = new Lang.Class({
         this._propertiesChangedId = 0;
         this._notifyPomodoroStartId = 0;
         this._notifyPomodoroEndId = 0;
+        this._settingsChangedId = 0;
+        this._shortBreakDuration = 0;
+        this._longBreakDuration = 0;
 
         this._nameWatcherId = Gio.DBus.session.watch_name(
                                        'org.gnome.Pomodoro',
                                        Gio.BusNameWatcherFlags.AUTO_START,
                                        Lang.bind(this, this._onNameAppeared),
                                        Lang.bind(this, this._onNameVanished));
+
+        let settings = Extension.extension.settings;
+        try {
+            this._settingsChangedId  = settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+            this._shortBreakDuration = settings.get_double('short-break-duration');
+            this._longBreakDuration  = settings.get_double('long-break-duration');
+        }
+        catch (error) {
+            Extension.extension.logError(error);
+        }
 
         if (this._isRunning()) {
             this._ensureProxy();
@@ -72,6 +85,18 @@ const Timer = new Lang.Class({
         }
 
         return state && state != State.NULL;
+    },
+
+    _onSettingsChanged: function(settings, key) {
+        switch (key) {
+            case 'short-break-duration':
+                this._shortBreakDuration = settings.get_double('short-break-duration');
+                break;
+
+            case 'long-break-duration':
+                this._longBreakDuration = settings.get_double('long-break-duration');
+                break;
+        }
     },
 
     _ensureProxy: function(callback) {
@@ -246,6 +271,23 @@ const Timer = new Lang.Class({
         }
     },
 
+    isLongPause: function() {
+        return (this.getState() == State.PAUSE) &&
+               (this.getStateDuration() > this._shortBreakDuration);
+    },
+
+    canSwitchPause: function() {
+        return (this.getElapsed() < this._shortBreakDuration) &&
+               (this._shortBreakDuration < this._longBreakDuration);
+    },
+
+    switchPause: function() {
+        let duration = this.isLongPause()
+                ? this._shortBreakDuration : this._longBreakDuration;
+
+        this.setState(State.PAUSE, duration);
+    },
+
     showMainWindow: function(timestamp) {
         this._ensureProxy(Lang.bind(this,
             function() {
@@ -268,6 +310,11 @@ const Timer = new Lang.Class({
         if (this._nameWatcherId) {
             Gio.DBus.session.unwatch_name(this._nameWatcherId);
             this._nameWatcherId = 0;
+        }
+
+        if (this._settingsChangedId) {
+            Extension.extension.settings.disconnect(this._settingsChangedId);
+            this._settingsChangedId = 0;
         }
     }
 });
