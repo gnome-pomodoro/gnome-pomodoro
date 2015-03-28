@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:23+0100\n"
-"PO-Revision-Date: 2015-03-28 03:11-0300\n"
+"PO-Revision-Date: 2015-03-28 03:21-0300\n"
 "Last-Translator: Alexandre Magno <alexandre.mbm@gmail.com>\n"
 "Language-Team: pt_BR <ale.alvesborba@gmail.com>\n"
 "Language: pt_BR\n"
@@ -61,15 +61,15 @@ msgstr "Alongar intervalo"
 #, javascript-format
 msgid "You have %d second left"
 msgid_plural "You have %d seconds left"
-msgstr[0] "Você tem %d segundo restante."
-msgstr[1] "Você tem %d segundos restantes."
+msgstr[0] "Você tem %d segundo restante"
+msgstr[1] "Você tem %d segundos restantes"
 
 #: ../extension/notifications.js:674
 #, javascript-format
 msgid "You have %d minute left"
 msgid_plural "You have %d minutes left"
-msgstr[0] "Você tem %d minuto restante."
-msgstr[1] "Você tem %d minutos restantes."
+msgstr[0] "Você tem %d minuto restante"
+msgstr[1] "Você tem %d minutos restantes"
 
 #: ../extension/notifications.js:693
 msgid "Hey, you're missing out on a break"
@@ -150,7 +150,7 @@ msgstr "Notificações"
 
 #: ../src/preferences-dialog.vala:432
 msgid "Screen notifications"
-msgstr "Mostrar na tela"
+msgstr "Mostrar em tela cheia"
 
 #: ../src/preferences-dialog.vala:437
 msgid "Remind to take a break"
