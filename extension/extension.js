@@ -91,18 +91,21 @@ const PomodoroExtension = new Lang.Class({
 
     _destroyNotifications: function() {
         if (this.notificationSource) {
-            this.notificationSource.destroyAllNotifications();
+            this.notificationSource.destroyNotifications();
         }
     },
 
     _destroyPreviousNotifications: function() {
-        if (Notifications.source) {
-            let notifications = Notifications.source.notifications.filter(Lang.bind(this,
-                function(notification) {
+        if (this.notificationSource) {
+            let notifications = this.notificationSource.notifications.filter(
+                Lang.bind(this, function(notification) {
                     return notification !== this.notification;
                 }));
 
-            Notifications.source.destroyNotifications(notifications);
+            notifications.forEach(
+                Lang.bind(this, function(notification) {
+                    return notification.destroy();
+                }));
         }
     },
 

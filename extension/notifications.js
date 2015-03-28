@@ -93,16 +93,10 @@ const Source = new Lang.Class({
                                                     detailsInLockScreen: true });
     },
 
-    destroyNotifications: function(notifications) {
-        for (let i = notifications.length - 1; i >= 0; i--) {
-            if (notifications[i]) {
-                notifications[i].destroy();
-            }
+    destroyNotifications: function() {
+        while (this.notifications && this.notifications.length) {
+            this.notifications.shift().destroy();
         }
-    },
-
-    destroyAllNotifications: function() {
-        this.destroyNotifications(this.notifications);
     },
 
     createBanner: function(notification) {
@@ -192,7 +186,7 @@ const Notification = new Lang.Class({
 
             /* Add notification to source before "source-added"
                signal gets emitted */
-            this.source.pushNotification(this);
+            // this.source.pushNotification(this);
 
             if (!Main.messageTray.contains(this.source)) {
                 Main.messageTray.add(this.source);
