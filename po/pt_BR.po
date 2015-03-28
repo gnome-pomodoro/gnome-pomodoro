@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:23+0100\n"
-"PO-Revision-Date: 2015-03-28 03:21-0300\n"
+"PO-Revision-Date: 2015-03-28 03:43-0300\n"
 "Last-Translator: Alexandre Magno <alexandre.mbm@gmail.com>\n"
 "Language-Team: pt_BR <ale.alvesborba@gmail.com>\n"
 "Language: pt_BR\n"
@@ -31,7 +31,7 @@ msgstr "Preferências"
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
 msgid "Pomodoro"
-msgstr "Temporizador"
+msgstr "Pomodoro"
 
 #: ../extension/notifications.js:389
 msgid "It's time to take a break"
@@ -39,7 +39,7 @@ msgstr "É hora de descansar!"
 
 #: ../extension/notifications.js:574
 msgid "A new pomodoro is starting"
-msgstr "Um novo pomodoro esta começando."
+msgstr "Um novo pomodoro está começando."
 
 #: ../extension/notifications.js:587
 msgid "Take a break!"
@@ -105,7 +105,7 @@ msgstr "Uma ferramenta simples para gerenciar o tempo"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
-msgstr "tradutor - créditos"
+msgstr "Alexandre Magno (alexandre-mbm)"
 
 #: ../src/about-dialog.vala:45
 msgid ""
