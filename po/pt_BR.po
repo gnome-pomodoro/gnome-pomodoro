@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:23+0100\n"
-"PO-Revision-Date: 2015-03-28 02:41-0300\n"
+"PO-Revision-Date: 2015-03-28 03:11-0300\n"
 "Last-Translator: Alexandre Magno <alexandre.mbm@gmail.com>\n"
 "Language-Team: pt_BR <ale.alvesborba@gmail.com>\n"
 "Language: pt_BR\n"
@@ -170,7 +170,7 @@ msgstr "Temporizador"
 
 #: ../src/preferences-dialog.vala:472
 msgid "Woodland Birds"
-msgstr "Pássaros do campo"
+msgstr "Pássaros"
 
 #: ../src/preferences-dialog.vala:479
 msgid "Select ticking sound"
