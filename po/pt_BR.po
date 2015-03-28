@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:23+0100\n"
-"PO-Revision-Date: 2015-03-28 03:43-0300\n"
+"PO-Revision-Date: 2015-03-28 03:50-0300\n"
 "Last-Translator: Alexandre Magno <alexandre.mbm@gmail.com>\n"
 "Language-Team: pt_BR <ale.alvesborba@gmail.com>\n"
 "Language: pt_BR\n"
@@ -26,7 +26,7 @@ msgstr "Temporizador Pomodoro"
 #: ../extension/indicator.js:94 ../src/preferences-dialog.vala:129
 #: ../src/preferences-dialog.vala:184
 msgid "Preferences"
-msgstr "Preferências"
+msgstr "Preferências do Pomodoro"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
