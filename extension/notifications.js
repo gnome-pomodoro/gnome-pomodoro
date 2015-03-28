@@ -211,8 +211,8 @@ const PomodoroStartNotification = new Lang.Class({
 
         this.parent(title, message, null);
 
-        this.setTransient(true);
-        this.setResident(false);
+        this.setTransient(false);
+        this.setResident(true);
 
         this.timer = timer;
 
