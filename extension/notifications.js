@@ -99,51 +99,6 @@ const Source = new Lang.Class({
         }
 
         this.countUpdated();
-    },
-
-    createBanner: function(notification) {
-        let banner = this.parent(notification);
-
-        if (notification && notification instanceof PomodoroEndNotification) {
-            // buttons
-            let switchPauseButton = banner.addAction("", Lang.bind(this,
-                function() {
-                    notification.timer.switchPause();
-                }));
-
-            let startPomodoroButton = banner.addAction(_("Start pomodoro"), Lang.bind(this,
-                function() {
-                    notification.timer.setState(Timer.State.POMODORO);
-                    notification.destroy();
-                }));
-
-            // signals
-            let notificationUpdatedId = notification.connect('timer-updated', Lang.bind(this,
-                function() {
-                    if (banner.bodyLabel && banner.bodyLabel.actor.clutter_text) {
-                        banner.setBody(notification.bannerBodyText);
-                        // banner.bodyLabel.actor.clutter_text.set_text(notification.bannerBodyText);
-                    }
-
-                    if (notification.timer.canSwitchPause()) {
-                        switchPauseButton.show();
-                    }
-                    else {
-                        switchPauseButton.hide();
-                    }
-
-                    switchPauseButton.set_label(
-                        notification.timer.isLongPause() ? _("Shorten it") : _("Lengthen it"));
-                }));
-
-            let notificationDestroyId = notification.connect('destroy', Lang.bind(this,
-                function() {
-                    notification.disconnect(notificationUpdatedId);
-                    notification.disconnect(notificationDestroyId);
-                }));
-        }
-
-        return banner;
     }
 });
 
@@ -269,6 +224,52 @@ const PomodoroEndNotification = new Lang.Class({
 
             this.emit('timer-updated');
         }
+    },
+
+    createBanner: function() {
+        let banner = this.parent();
+
+        let onTimerUpdated = Lang.bind(this,
+            function() {
+                if (banner.bodyLabel && banner.bodyLabel.actor.clutter_text) {
+                    banner.setBody(this.bannerBodyText);
+                    // banner.bodyLabel.actor.clutter_text.set_text(this.bannerBodyText);
+                }
+
+                if (this.timer.canSwitchPause()) {
+                    switchPauseButton.show();
+                }
+                else {
+                    switchPauseButton.hide();
+                }
+
+                switchPauseButton.set_label(
+                    this.timer.isLongPause() ? _("Shorten it") : _("Lengthen it"));
+            });
+
+        let onDestroy = Lang.bind(this,
+            function() {
+                this.disconnect(notificationUpdatedId);
+                this.disconnect(notificationDestroyId);
+            });
+
+        let switchPauseButton = banner.addAction("", Lang.bind(this,
+            function() {
+                this.timer.switchPause();
+            }));
+
+        let startPomodoroButton = banner.addAction(_("Start pomodoro"), Lang.bind(this,
+            function() {
+                this.timer.setState(Timer.State.POMODORO);
+                this.destroy();
+            }));
+
+        let notificationUpdatedId = this.connect('timer-updated', onTimerUpdated);
+        let notificationDestroyId = this.connect('destroy', onDestroy);
+
+        onTimerUpdated();
+
+        return banner;
     }
 });
 
