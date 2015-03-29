@@ -59,19 +59,19 @@ function getDefaultSource()
         source = null;
     }
 
-    if (!source || source._destroying) {
+    if (!source) {
         source = new Source();
         let destroyId = source.connect('destroy', Lang.bind(source,
             function(source) {
-                if (extension.notificationSource === source) {
-                    extension.notificationSource = null;
+                if (Extension.extension.notificationSource === source) {
+                    Extension.extension.notificationSource = null;
                 }
 
                 source.disconnect(destroyId);
             }));
-    }
 
-    extension.notificationSource = source;
+        extension.notificationSource = source;
+    }
 
     return source;
 }
@@ -97,6 +97,8 @@ const Source = new Lang.Class({
         while (this.notifications && this.notifications.length) {
             this.notifications.shift().destroy();
         }
+
+        this.countUpdated();
     },
 
     createBanner: function(notification) {
@@ -151,7 +153,7 @@ const Notification = new Lang.Class({
     Extends: MessageTray.Notification,
 
     _init: function(title, description, params) {
-        this.parent(getDefaultSource(), title, description, params);
+        this.parent(null, title, description, params);
 
         /* We want notifications to be shown right after the action,
          * therefore urgency bump.
@@ -159,10 +161,6 @@ const Notification = new Lang.Class({
         this.setUrgency(MessageTray.Urgency.HIGH);
 
         this._restoreForFeedback = false;
-    },
-
-    canClose: function() {
-        return this.notification.resident;
     },
 
     activate: function() {

@@ -103,9 +103,9 @@ const PomodoroExtension = new Lang.Class({
                 }));
 
             notifications.forEach(
-                Lang.bind(this, function(notification) {
-                    return notification.destroy();
-                }));
+                function(notification) {
+                    notification.destroy();
+                });
         }
     },
 
