@@ -222,6 +222,11 @@ const PomodoroEndNotification = new Lang.Class({
                     : ngettext("You have %d minute until next pomodoro.",
                                "You have %d minutes until next pomodoro.", minutes).format(minutes);
 
+            if (this._minutes && this._minutes !== minutes) {
+                this.emit('updated', false);
+            }
+            this._minutes = minutes;
+
             this.emit('timer-updated');
         }
     },
