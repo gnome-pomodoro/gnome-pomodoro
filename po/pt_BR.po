@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:23+0100\n"
-"PO-Revision-Date: 2015-03-28 03:59-0300\n"
+"PO-Revision-Date: 2015-03-29 04:57-0300\n"
 "Last-Translator: Alexandre Magno <alexandre.mbm@gmail.com>\n"
 "Language-Team: pt_BR <ale.alvesborba@gmail.com>\n"
 "Language: pt_BR\n"
@@ -154,7 +154,7 @@ msgstr "Mostrar em tela cheia"
 
 #: ../src/preferences-dialog.vala:437
 msgid "Remind to take a break"
-msgstr "Lembrete de intervalo"
+msgstr "Lembrete de intervalo em curso"
 
 #: ../src/preferences-dialog.vala:459
 msgid "Sounds"
