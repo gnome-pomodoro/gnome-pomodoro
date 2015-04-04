@@ -285,10 +285,11 @@ const PomodoroExtension = new Lang.Class({
     enableKeybinding: function() {
         if (!this.keybinding) {
             this.keybinding = true;
-            Main.wm.addKeybinding('toggle-timer-key',
+	var ModeType = Shell.hasOwnProperty('ActionMode') ? Shell.ActionMode : Shell.KeyBindingMode;            
+	Main.wm.addKeybinding('toggle-timer-key',
                                   this.settings,
                                   Meta.KeyBindingFlags.NONE,
-                                  Shell.KeyBindingMode.ALL,
+                                  ModeType.ALL,
                                   Lang.bind(this, this._onKeybindingPressed));
         }
     },
