@@ -83,6 +83,8 @@ public class Pomodoro.SkypePlugin : Pomodoro.PresencePlugin
 
     public override void disable ()
     {
+        this.unset_pending_status ();
+
         this.skype = null;
 
         base.disable ();

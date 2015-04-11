@@ -62,6 +62,11 @@
       <summary>Wait after a break</summary>
       <description>Postpone pomodoro until there is some activity.</description>
     </key>
+    <key name="change-presence-status" type="b">
+      <default>false</default>
+      <summary>Change presence status</summary>
+      <description>Whether to change IM presence status.</description>
+    </key>
     <key name="presence-during-pomodoro" type="s">
       <choices>
         <choice value=""/>

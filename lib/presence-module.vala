@@ -108,20 +108,60 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
                     this.set_status (status);
                 }
                 break;
+
+            case "change-presence-status":
+                this.enable_plugins ();
+                break;
         }
     }
 
     private void on_timer_state_changed (Pomodoro.Timer timer)
     {
-//        var status = string_to_presence_status (
-//                this.settings.get_string ("presence-during-pomodoro"));
+        var status_string = timer.state == Pomodoro.State.POMODORO
+                        ? this.settings.get_string ("presence-during-pomodoro")
+                        : this.settings.get_string ("presence-during-break");
 
-//        var status = string_to_presence_status (
-//                this.settings.get_string ("presence-during-break"));
+        this.set_status (string_to_presence_status (status_string));
+    }
 
-        this.set_status (timer.state == Pomodoro.State.POMODORO
-                                       ? Pomodoro.PresenceStatus.BUSY
-                                       : Pomodoro.PresenceStatus.AVAILABLE);
+
+    private void enable_plugin (PresencePlugin plugin)
+    {
+        if (!plugin.enabled) {
+            var status = string_to_presence_status (
+                        this.timer.state == Pomodoro.State.POMODORO
+                        ? this.settings.get_string ("presence-during-pomodoro")
+                        : this.settings.get_string ("presence-during-break"));
+
+            plugin.enable ();
+            plugin.set_status (status);
+        }
+    }
+
+    private void disable_plugin (PresencePlugin plugin)
+    {
+        if (plugin.enabled) {
+            var status = string_to_presence_status (
+                        this.settings.get_string ("presence-during-break"));
+
+            plugin.set_status (status);
+            plugin.disable ();
+        }
+    }
+
+    private void enable_plugins ()
+    {
+        foreach (var plugin in this.plugins)
+        {
+            if ((plugin is Pomodoro.GnomeSessionManagerPlugin) ||
+                (this.settings.get_boolean ("change-presence-status")))
+            {
+                this.enable_plugin (plugin);
+            }
+            else {
+                this.disable_plugin (plugin);
+            }
+        }
     }
 
     public override void enable ()
@@ -131,14 +171,7 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
             this.plugins.append (new Pomodoro.TelepathyPlugin ());
             this.plugins.append (new Pomodoro.SkypePlugin ());
 
-            foreach (var plugin in this.plugins)
-            {
-                plugin.enable ();
-            }
-
-    //        this.session_magager_plugin = new Pomodoro.GnomeSessionManagerPlugin ();
-    //        this.session_magager_plugin.status_changed.connect (this.set_status);
-    //        this.session_magager_plugin.enable ();
+            this.enable_plugins ();
 
             this.timer.state_changed.connect (this.on_timer_state_changed);
             this.on_timer_state_changed (this.timer);
@@ -154,6 +187,10 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
             SignalHandler.disconnect_by_func (this.timer,
                                               (void*) this.on_timer_state_changed, (void*) this);
 
+            foreach (var plugin in this.plugins) {
+                this.disable_plugin (plugin);
+            }
+
             this.plugins = null;
         }
 
@@ -164,7 +201,19 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
     {
         foreach (var plugin in this.plugins)
         {
-            plugin.set_status.begin (status);
+            if (!plugin.enabled) {
+                continue;
+            }
+
+            if (plugin is Pomodoro.GnomeSessionManagerPlugin) {
+                plugin.set_status.begin (
+                                   this.timer.state == Pomodoro.State.POMODORO
+                                   ? Pomodoro.PresenceStatus.BUSY
+                                   : Pomodoro.PresenceStatus.AVAILABLE);
+            }
+            else {
+                plugin.set_status.begin (status);
+            }
         }
     }
 }
