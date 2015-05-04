@@ -5,20 +5,32 @@ libgnome_pomodoro_la_SOURCES = \
     about-dialog.vala \
     animation.vala \
     application.vala \
+    calendar-button.vala \
     command-line.vala \
-    gnome-desktop.vala \
+    enum-combo-box.vala \
+    gnome-desktop-module.vala \
+    gnome-session-manager.vala \
+    gnome-session-manager-plugin.vala \
+    keybinding-chooser-button.vala \
     keybindings.vala \
-    main-window.vala \
-    power.vala \
+    log-scale.vala \
+    mode-button.vala \
+    module.vala \
+    plugin.vala \
     preferences-dialog.vala \
-    presence.vala \
-    screensaver.vala \
+    presence-module.vala \
+    presence-plugin.vala \
+    screensaver-module.vala \
     service.vala \
     settings.vala \
-    sounds.vala \
+    skype.vala \
+    skype-plugin.vala \
+    sound-chooser-button.vala \
+    sounds-module.vala \
+    symbolic-button.vala \
+    telepathy-plugin.vala \
     timer.vala \
-    utils.vala \
-    widgets.vala
+    utils.vala
 
 libgnome_pomodoro_la_VALAFLAGS = \
     --library=gnome-pomodoro \
@@ -36,9 +48,9 @@ libgnome_pomodoro_la_VALAFLAGS = \
     --pkg pango \
     --pkg cairo \
     --pkg gnome-desktop-3.0 \
-    --pkg upower-glib \
     --pkg libcanberra \
-    --pkg gstreamer-1.0
+    --pkg gstreamer-1.0 \
+    --pkg telepathy-glib
 
 libgnome_pomodoro_la_CPPFLAGS = \
     $(GNOME_POMODORO_CFLAGS) \
@@ -54,9 +66,7 @@ libgnome_pomodoro_la_LIBADD = \
     $(GNOME_POMODORO_LIBS)
 
 libgnome_pomodoro_la_DEPENDENCIES = \
-    $(top_builddir)/vapi/gnome-desktop-3.0.vapi \
-    $(top_builddir)/vapi/upower-glib.vapi
-
+    $(top_builddir)/vapi/gnome-desktop-3.0.vapi
 
 CLEANFILES = \
     $(libgnome_pomodoro_la_SOURCES:.vala=.c) \

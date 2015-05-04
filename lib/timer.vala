@@ -158,7 +158,7 @@ public class Pomodoro.Timer : Object
                                     double duration = 0,
                                     double timestamp = 0)
     {
-        this.current_timestamp = get_real_time ();
+        this.current_timestamp = Pomodoro.get_real_time ();
 
         var elapsed = this.elapsed;
         var wrap_elapsed = false;
@@ -215,7 +215,7 @@ public class Pomodoro.Timer : Object
             if ((this.state == State.POMODORO) &&
                 (this.elapsed >= this.state_duration * POMODORO_ACCEPTANCE))
             {
-                this.session += this.elapsed / this.state_duration;
+                this.session += double.min (this.elapsed / this.state_duration, 1.0);
 
                 this.pomodoro_end_timestamp = timestamp;
             }
@@ -373,7 +373,7 @@ public class Pomodoro.Timer : Object
         var state_date = this.settings_state.get_string ("state-date");
         var session = this.settings_state.get_double ("session");
 
-        var current_timestamp = get_real_time ();
+        var current_timestamp = Pomodoro.get_real_time ();
         var state_timestamp = current_timestamp;
         var pomodoro_end_timestamp = 0.0;
 
@@ -449,7 +449,9 @@ public class Pomodoro.Timer : Object
 
     public void update ()
     {
-        this.current_timestamp = get_real_time ();
+        this.current_timestamp = Pomodoro.get_real_time ();
+
+        this.notify_property ("elapsed");
 
         switch (this.state)
         {
@@ -457,8 +459,6 @@ public class Pomodoro.Timer : Object
                 break;
 
             case State.PAUSE:
-                this.notify_property ("elapsed");
-
                 /* Pause is over */
                 if (this.elapsed >= this.state_duration) {
                     this.state = this.settings.get_boolean ("pause-when-idle")
@@ -468,8 +468,6 @@ public class Pomodoro.Timer : Object
                 break;
 
             case State.POMODORO:
-                this.notify_property ("elapsed");
-
                 /* Pomodoro is over, a pause is needed :) */
                 if (this.elapsed >= this.state_duration) {
                     this.state = State.PAUSE;
@@ -547,7 +545,7 @@ public class Pomodoro.Timer : Object
     {
         if (this.state == State.IDLE)
         {
-            this.current_timestamp = get_real_time ();
+            this.current_timestamp = Pomodoro.get_real_time ();
 
             /* Treat last second as if it were already pomodoro */
             var elapsed = this.current_timestamp - this.state_timestamp;

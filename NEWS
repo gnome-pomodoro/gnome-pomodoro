@@ -1,3 +1,11 @@
+2014-10-17  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.10.3:
+
+	* Support for GNOME Shell 3.10, 3.12 and 3.14
+	* Updated Catalan translation (thanks @Ecron)
+	* Code cleanups (thanks @aerostitch)
+	* Bug fixes
+
 2014-06-13  Kamil Prusko  <kamilprusko@gmail.com>
 
 	Release version 0.10.2: 

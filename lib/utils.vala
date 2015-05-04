@@ -77,8 +77,20 @@ namespace Pomodoro
         return str;
     }
 
+    private double global_timestamp = 0.0;
+
+    /*
+     * Used by unit tests.
+     */
+    public void set_real_time (double timestamp)
+    {
+        Pomodoro.global_timestamp = timestamp;
+    }
+
     public double get_real_time ()
     {
-        return (double) GLib.get_real_time () / 1000000.0;
+        return Pomodoro.global_timestamp > 0.0
+                ? Pomodoro.global_timestamp
+                : ((double) GLib.get_real_time () / 1000000.0);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013 gnome-pomodoro contributors
+ * Copyright (c) 2011-2014 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,107 +22,56 @@ const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 
-const Atk = imports.gi.Atk;
-const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
-const Gio = imports.gi.Gio;
 const Meta = imports.gi.Meta;
-const Shell = imports.gi.Shell;
 const St = imports.gi.St;
-const Pango = imports.gi.Pango;
 
-const GrabHelper = imports.ui.grabHelper;
-const Layout = imports.ui.layout;
-const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
-const Tweener = imports.ui.tweener;
 const Util = imports.misc.util;
-const ShellConfig = imports.misc.config;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
-const Settings = Extension.imports.settings;
+const Timer = Extension.imports.timer;
+const Utils = Extension.imports.utils;
 
 const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
 const ngettext = Gettext.ngettext;
 
 
-/* Time between user input events before making dialog modal.
- * Value is a little higher than:
- *   - slow typing speed of 23 words per minute which translates
- *     to 523 miliseconds between key presses
- *   - moderate typing speed of 35 words per minute, 343 miliseconds.
- */
-const IDLE_TIME_TO_PUSH_MODAL = 600;
-const PUSH_MODAL_TIME_LIMIT = 1000;
-const PUSH_MODAL_RATE = Clutter.get_default_frame_rate();
+const IDLE_TIME_TO_ACKNOWLEDGE_REMINDER = 45;
 
-const IDLE_TIME_TO_OPEN = 60000;
-const IDLE_TIME_TO_CLOSE = 600;
-const MIN_DISPLAY_TIME = 300;
+const REMINDER_TIMEOUT = 75;
 
-const FADE_IN_TIME = 180;
-const FADE_IN_OPACITY = 0.55;
-
-const FADE_OUT_TIME = 180;
-
-/* Remind about ongoing break in given delays */
-const REMINDER_INTERVALS = [75000];
-
-/* Ratio between user idle time and time between reminders to determine
- * whether user is away
- */
-const REMINDER_ACCEPTANCE = 0.66;
-
-const GNOME_SHELL_VERSION = ShellConfig.PACKAGE_VERSION;
-
-const State = {
-    OPENED: 0,
-    CLOSED: 1,
-    OPENING: 2,
-    CLOSING: 3
-};
-
-const Action = {
-    SWITCH_TO_POMODORO: 'switch-to-pomodoro',
-    SWITCH_TO_PAUSE: 'switch-to-pause',
-    SWITCH_TO_SHORT_PAUSE: 'switch-to-short-pause',
-    SWITCH_TO_LONG_PAUSE: 'switch-to-long-pause',
-    REPORT_BUG: 'report-bug',
-    VISIT_WEBSITE: 'visit-website'
-};
+const REMINDER_MIN_REMAINING_TIME = 60;
 
 
-let source = null;
+function getDefaultSource()
+{
+    let extension = Extension.extension;
+    let source = extension.notificationSource;
 
+    /* a walkaround for ScreenShield requiring new source for each
+       music notification */
+    if (source && Main.sessionMode.isLocked) {
+        source.destroy();
+        source = null;
+    }
 
-function get_default_source() {
-    if (!source) {
+    if (!source || source._destroying) {
         source = new Source();
-        source.connect('destroy', function(reason) {
-            source = null;
-        });
+        source.connect('destroy', Lang.bind(source,
+            function(source) {
+                if (extension.notificationSource === source) {
+                    extension.notificationSource = null;
+                }
+            }));
     }
+
+    extension.notificationSource = source;
+
     return source;
-}
-
-
-function check_version(required, current) {
-    let current_array = current.split('.');
-    let major = current_array[0];
-    let minor = current_array[1];
-    let point = current_array[2];
-    for (let i = 0; i < required.length; i++) {
-        let required_array = required[i].split('.');
-        if (required_array[0] == major &&
-            required_array[1] == minor &&
-            (required_array[2] == point ||
-             (required_array[2] == undefined && parseInt(minor) % 2 == 0)))
-            return true;
-    }
-    return false;
 }
 
 
@@ -130,418 +79,37 @@ const Source = new Lang.Class({
     Name: 'PomodoroNotificationSource',
     Extends: MessageTray.Source,
 
-    ICON_NAME: 'gnome-pomodoro-symbolic',
+    ICON_NAME: 'gnome-pomodoro',
 
     _init: function() {
         this.parent(_("Pomodoro"), this.ICON_NAME);
-
-        this.connect('notification-added',
-                     Lang.bind(this, this._onNotificationAdded));
     },
 
-    _onNotificationAdded: function(source, notification) {
-        notification.connect('destroy', Lang.bind(this,
-            function() {
-                let notifications = source.notifications;
-
-                if ((notifications.length == 0) ||
-                    (notifications.length == 1 && notifications.indexOf(notification) == 0))
-                {
-                    source.destroy(MessageTray.NotificationDestroyedReason.SOURCE_CLOSED);
-                    source.emit('done-displaying-content', false);
-                }
-            }
-        ));
+    /* override parent method */
+    _createPolicy: function() {
+        return new MessageTray.NotificationPolicy({ showInLockScreen: true,
+                                                    detailsInLockScreen: true });
     },
 
-    close: function(close_tray) {
-        this.destroy();
-        this.emit('done-displaying-content', close_tray == true);
-    }
-});
-
-
-/**
- * ModalDialog class based on ModalDialog from GNOME Shell. We need our own
- * class to have more event signals, different fade in/out times, and different
- * event blocking behavior.
- */
-const ModalDialog = new Lang.Class({
-    Name: 'PomodoroModalDialog',
-
-    _init: function() {
-        this.state = State.CLOSED;
-
-        this._idleMonitor = Meta.IdleMonitor.get_core();
-        this._pushModalDelaySource = 0;
-        this._pushModalWatchId = 0;
-        this._pushModalSource = 0;
-        this._pushModalTries = 0;
-
-        this._group = new St.Widget({ visible: false,
-                                      x: 0,
-                                      y: 0,
-                                      accessible_role: Atk.Role.DIALOG });
-        Main.uiGroup.add_actor(this._group);
-
-        let constraint = new Clutter.BindConstraint({ source: global.stage,
-                                                      coordinate: Clutter.BindCoordinate.ALL });
-        this._group.add_constraint(constraint);
-        this._group.opacity = 0.0;
-        this._group.connect('destroy', Lang.bind(this, this._onGroupDestroy));
-
-        this._backgroundBin = new St.Bin();
-        this._monitorConstraint = new Layout.MonitorConstraint();
-        this._backgroundBin.add_constraint(this._monitorConstraint);
-        this._group.add_actor(this._backgroundBin);
-
-        this._dialogLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-layout',
-                                                vertical: true });
-
-        this._lightbox = new Lightbox.Lightbox(this._group,
-                                               { fadeFactor: FADE_IN_OPACITY,
-                                                 inhibitEvents: false });
-        this._lightbox.highlight(this._backgroundBin);
-        this._lightbox.actor.style_class = 'extension-pomodoro-lightbox';
-        this._lightbox.show();
-
-        this._backgroundBin.child = this._dialogLayout;
-
-        this.contentLayout = new St.BoxLayout({ vertical: true });
-        this._dialogLayout.add(this.contentLayout,
-                               { x_fill:  true,
-                                 y_fill:  true,
-                                 x_align: St.Align.MIDDLE,
-                                 y_align: St.Align.START });
-
-        this._grabHelper = new GrabHelper.GrabHelper(this._group);
-        this._grabHelper.addActor(this._lightbox.actor);
-
-        global.focus_manager.add_group(this._group);
-    },
-
-    open: function(timestamp) {
-        if (this.state == State.OPENED || this.state == State.OPENING) {
-            return;
-        }
-
-        this.state = State.OPENING;
-
-        if (this._pushModalDelaySource == 0) {
-            this._pushModalDelaySource = Mainloop.timeout_add(
-                        Math.max(MIN_DISPLAY_TIME - IDLE_TIME_TO_PUSH_MODAL, 0),
-                        Lang.bind(this, this._onPushModalDelayTimeout));
-        }
-
-        this._monitorConstraint.index = global.screen.get_current_monitor();
-        this._group.show();
-
-        Tweener.addTween(this._group,
-                         { opacity: 255,
-                           time: FADE_IN_TIME / 1000,
-                           transition: 'easeOutQuad',
-                           onComplete: Lang.bind(this,
-                                function() {
-                                    if (this.state == State.OPENING) {
-                                        this.state = State.OPENED;
-                                        this.emit('opened');
-                                    }
-                                })
-                         });
-        this.emit('opening');
-
-        Main.messageTray.close();
-    },
-
-    close: function(timestamp) {
-        if (this.state == State.CLOSED || this.state == State.CLOSING) {
-            return;
-        }
-
-        this.popModal(timestamp);
-        this.state = State.CLOSING;
-
-        Tweener.addTween(this._group,
-                         { opacity: 0,
-                           time: FADE_OUT_TIME / 1000,
-                           transition: 'easeOutQuad',
-                           onComplete: Lang.bind(this,
-                               function() {
-                                    if (this.state == State.CLOSING) {
-                                        this.state = State.CLOSED;
-                                        this._group.hide();
-                                        this.emit('closed');
-                                    }
-                               })
-                         });
-        this.emit('closing');
-    },
-
-    _onPushModalDelayTimeout: function() {
-        /* Don't become modal and block events just yet,
-         * wait until user becomes idle.
-         */
-        if (this._pushModalWatchId == 0) {
-            this._pushModalWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_PUSH_MODAL, Lang.bind(this,
-                function(monitor) {
-                    this._idleMonitor.remove_watch(this._pushModalWatchId);
-                    this._pushModalWatchId = 0;
-
-                    this.pushModal(global.get_current_time());
-                }
-            ));
-        }
-
+    /* override parent method */
+    get isClearable() {
         return false;
     },
 
-    _pushModal: function(timestamp) {
-        if (this.state == State.CLOSED || this.state == State.CLOSING) {
-            return false;
-        }
-
-        this._lightbox.actor.reactive = true;
-
-        this._grabHelper.ignoreRelease();
-
-        return this._grabHelper.grab({
-            actor: this._lightbox.actor,
-            onUngrab: Lang.bind(this, this._onUngrab)
-        });
-    },
-
-    _onPushModalTimeout: function() {
-        if (this.state == State.CLOSED || this.state == State.CLOSING) {
-            return false;
-        }
-
-        this._pushModalTries += 1;
-
-        if (this._pushModal(global.get_current_time())) {
-            return false; /* dialog finally opened */
-        }
-
-        if (this._pushModalTries > PUSH_MODAL_TIME_LIMIT * PUSH_MODAL_RATE) {
-            this.close();
-            return false; /* dialog can't become modal */
-        }
-
-        return true;
-    },
-
-    pushModal: function(timestamp) {
-        if (this.state == State.CLOSED || this.state == State.CLOSING) {
-            return;
-        }
-
-        this._disconnectInternals();
-
-        /* delay pushModal to ignore current events */
-        Mainloop.idle_add(Lang.bind(this,
-            function() {
-                this._pushModalTries = 1;
-
-                if (this._pushModal(global.get_current_time())) {
-                    /* dialog became modal */
-                }
-                else {
-                    this._pushModalSource = Mainloop.timeout_add(Math.floor(1000 / PUSH_MODAL_RATE),
-                                                                 Lang.bind(this, this._onPushModalTimeout));
-                }
-
-                return false;
+    destroyNotifications: function(notifications) {
+        for (let i = notifications.length - 1; i >= 0; i--) {
+            if (notifications[i]) {
+                notifications[i].destroy();
             }
-        ));
-    },
-
-    /**
-     * Drop modal status without closing the dialog; this makes the
-     * dialog insensitive as well, so it needs to be followed shortly
-     * by either a close() or a pushModal()
-     */
-    popModal: function(timestamp) {
-        this._disconnectInternals();
-
-        this._grabHelper.ungrab({
-            actor: this._lightbox.actor
-        });
-
-        this._lightbox.actor.reactive = false;
-    },
-
-    _disconnectInternals: function() {
-        if (this._pushModalDelaySource != 0) {
-            GLib.source_remove(this._pushModalDelaySource);
-            this._pushModalDelaySource = 0;
-        }
-        if (this._pushModalSource != 0) {
-            GLib.source_remove(this._pushModalSource);
-            this._pushModalSource = 0;
-        }
-        if (this._pushModalWatchId != 0) {
-            this._idleMonitor.remove_watch(this._pushModalWatchId);
-            this._pushModalWatchId = 0;
         }
     },
 
-    _onGroupDestroy: function() {
-        this.close();
-        this.emit('destroy');
+    destroyAllNotifications: function() {
+        this.destroyNotifications(this.notifications);
     },
 
-    _onUngrab: function() {
-        this.close();
-    },
-
-    destroy: function() {
-        this._group.destroy();
-    }
-});
-Signals.addSignalMethods(ModalDialog.prototype);
-
-
-const PomodoroEndDialog = new Lang.Class({
-    Name: 'PomodoroEndDialog',
-    Extends: ModalDialog,
-
-    _init: function() {
-        this.parent();
-
-        this.description = _("It's time to take a break");
-
-        this._openIdleWatchId = 0;
-        this._openWhenIdleWatchId = 0;
-        this._closeWhenActiveWatchId = 0;
-
-        let mainLayout = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-main-layout',
-                                            vertical: false });
-
-        let messageBox = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-message-layout',
-                                            vertical: true });
-
-        this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-timer' });
-
-        this._descriptionLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-message',
-                                                text: this.description });
-        this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._descriptionLabel.clutter_text.line_wrap = true;
-
-        messageBox.add(this._timerLabel,
-                       { y_fill:  false,
-                         y_align: St.Align.START });
-        messageBox.add(this._descriptionLabel,
-                       { y_fill:  true,
-                         y_align: St.Align.START });
-        mainLayout.add(messageBox,
-                       { x_fill: true,
-                         y_align: St.Align.START });
-        this.contentLayout.add(mainLayout,
-                       { x_fill: true,
-                         y_fill: true });
-
-        this.setElapsedTime(0, 0);
-    },
-
-    /**
-     * Open the dialog and setup closing by user activity.
-     */
-    open: function(timestamp) {
-        this.parent(timestamp);
-
-        /* Delay scheduling of closing the dialog by activity
-         * until user has chance to see it.
-         */
-        Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this,
-            function() {
-                /* Wait until user becomes slightly idle */
-                if (this._idleMonitor.get_idletime() < IDLE_TIME_TO_CLOSE) {
-                    this._openIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_CLOSE, Lang.bind(this,
-                        function(monitor) {
-                            this.closeWhenActive();
-                        }
-                    ));
-                }
-                else {
-                    this.closeWhenActive();
-                }
-
-                return false;
-            }
-        ));
-    },
-
-    close: function(timestamp) {
-        this._cancelCloseWhenActive();
-        this._cancelOpenWhenIdle();
-
-        this.parent(timestamp);
-    },
-
-    _cancelOpenWhenIdle: function() {
-        if (this._openWhenIdleWatchId != 0) {
-            this._idleMonitor.remove_watch(this._openWhenIdleWatchId);
-            this._openWhenIdleWatchId = 0;
-        }
-    },
-
-    openWhenIdle: function() {
-        if (this.state == State.OPEN || this.state == State.OPENING) {
-            return;
-        }
-
-        if (this._openWhenIdleWatchId == 0) {
-            this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN, Lang.bind(this,
-                function(monitor) {
-                    this.open();
-                }
-            ));
-        }
-    },
-
-    _cancelCloseWhenActive: function() {
-        if (this._closeWhenActiveWatchId != 0) {
-            this._idleMonitor.remove_watch(this._closeWhenActiveWatchId);
-            this._closeWhenActiveWatchId = 0;
-        }
-    },
-
-    closeWhenActive: function() {
-        if (this.state == State.CLOSED || this.state == State.CLOSING) {
-            return;
-        }
-
-        if (this._closeWhenActiveWatchId == 0) {
-            this._closeWhenActiveWatchId = this._idleMonitor.add_user_active_watch(Lang.bind(this,
-                function(monitor) {
-                    this.close();
-                }
-            ));
-        }
-    },
-
-    setElapsedTime: function(elapsed, state_duration) {
-        let remaining = Math.ceil(state_duration - elapsed);
-        let minutes = Math.floor(remaining / 60);
-        let seconds = Math.floor(remaining % 60);
-
-        this._timerLabel.set_text('%02d:%02d'.format(minutes, seconds));
-    },
-
-    setDescription: function(text) {
-        this.description = text;
-        this._descriptionLabel.text = text;
-    },
-
-    destroy: function() {
-        this._cancelOpenWhenIdle();
-        this._cancelCloseWhenActive();
-
-        if (this._openIdleWatchId != 0) {
-            this._idleMonitor.remove_watch(this._openIdleWatchId);
-            this._openIdleWatchId = 0;
-        }
-
-        this.parent();
+    close: function() {
+        this.destroy();
     }
 });
 
@@ -551,28 +119,89 @@ const Notification = new Lang.Class({
     Extends: MessageTray.Notification,
 
     _init: function(title, description, params) {
-        this.parent(get_default_source(), title, description, params);
+        this.parent(getDefaultSource(), title, description, params);
 
-        this._titleFitsInBannerMode = true;
+        /* We want notifications to be shown right after the action,
+         * therefore urgency bump.
+         */
+        this.setUrgency(MessageTray.Urgency.HIGH);
+
+        this.actor.child.add_style_class_name('extension-pomodoro-notification');
+
+        this._restoreForFeedback = false;
+        this._showing            = false;
+        this._bodyLabel          = this.addBody(description);
+
+        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+
+        this.connect('destroy', Lang.bind(this,
+            function() {
+                if (this._actorMappedId) {
+                    this.actor.disconnect(this._actorMappedId);
+                    this._actorMappedId = 0;
+                }
+            }));
+
+        this.source.connect('destroy', Lang.bind(this,
+            function() {
+                this.source = null;
+            }));
+    },
+
+    _onActorMappedChanged: function(actor) {
+        if (this._restoreForFeedback) {
+            this._restoreForFeedback = false;
+            this.setForFeedback(false);
+        }
+
+        if (actor.mapped) {
+            this.emit('mapped');
+        }
+        else {
+            this.emit('unmapped');
+        }
+    },
+
+    addBody: function(text, style) {
+        let actor = new St.Label({ text: text || '',
+                                   reactive: true });
+
+        this.addActor(actor, style);
+        return actor;
+    },
+
+    setShowInLockScreen: function(enabled) {
+        this.isMusic = enabled;
     },
 
     show: function() {
-        this.emit('show');
+        if (!this.source) {
+            this.source = getDefaultSource();
+        }
 
-        if (!this._destroying) {
+        if (this.source) {
+            /* Popup notification regardless of session busy status */
+            if (!this.forFeedback) {
+                this.setForFeedback(true);
+                this._restoreForFeedback = true;
+            }
+
+            /* Add notification to source before "source-added"
+               signal gets emitted */
+            this.source.pushNotification(this);
+
             if (!Main.messageTray.contains(this.source)) {
                 Main.messageTray.add(this.source);
             }
 
             this.source.notify(this);
         }
+        else {
+            Extension.extension.logError('Called Notification.show() after destroy()');
+        }
     },
 
-    hide: function(close_tray) {
-        if (close_tray) {
-            Main.messageTray.close();
-        }
-
+    hide: function() {
         this.emit('done-displaying');
 
         if (!this.resident) {
@@ -580,268 +209,407 @@ const Notification = new Lang.Class({
         }
     },
 
-    close: function(close_tray) {
-        if (close_tray) {
-            Main.messageTray.close();
+    _updateBody: function(text) {
+        try {
+            if (this._bodyLabel.clutter_text) {
+                this._bodyLabel.clutter_text.set_text(text || '');
+                this._bodyLabel.queue_relayout();
+            }
         }
-
-        this.emit('done-displaying');
-        this.destroy();
+        catch (error) {
+            Extension.extension.logError(error.message);
+        }
     },
 
-    destroy: function(reason) {
-        this._destroying = true;
-        this.parent(reason);
+    _updateBanner: function(text) {
+        try {
+            if (this._bannerLabel.clutter_text) {
+                this._bannerLabel.clutter_text.set_text(text || '');
+                this._bannerLabel.queue_relayout();
+            }
+        }
+        catch (error) {
+            Extension.extension.logError(error.message);
+        }
+    },
+
+    close: function() {
+        this.emit('done-displaying');
+        this.destroy();
     }
 });
 
 
-const PomodoroStart = new Lang.Class({
+const PomodoroStartNotification = new Lang.Class({
     Name: 'PomodoroStartNotification',
     Extends: Notification,
 
-    _init: function() {
-        this.parent(_("A new pomodoro is starting"), null, null);
+    _init: function(timer) {
+        this.parent(_("Pomodoro"), null, null);
 
-        this.setTransient(true);
-        this.setUrgency(MessageTray.Urgency.HIGH);
+        this.setResident(true);
+        this.setShowInLockScreen(true);
+
+        this.timer = timer;
+
+        this._timerUpdateId = 0;
+
+        this.addAction(_("Take a break"), Lang.bind(this,
+            function() {
+                this.timer.setState(Timer.State.PAUSE);
+            }));
+
+        this.connect('mapped', Lang.bind(this, this._onActorMapped));
+        this.connect('unmapped', Lang.bind(this, this._onActorUnmapped));
+        this.connect('destroy', Lang.bind(this, this._onActorUnmapped)); // XXX
+
+        this._updateBanner(_("Focus on your task"));
+    },
+
+    _onActorMapped: function() {
+        if (!this._timerUpdateId) {
+            this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+            this._onTimerUpdate();
+        }
+    },
+
+    _onActorUnmapped: function() {
+        if (this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+    },
+
+    _onTimerUpdate: function() {
+        let state = this.timer.getState();
+
+        if (state == Timer.State.POMODORO || state == Timer.State.IDLE) {
+            let elapsed       = this.timer.getElapsed();
+            let stateDuration = this.timer.getStateDuration();
+            let remaining     = this.timer.getRemaining();
+            let minutes       = Math.round(remaining / 60);
+            let seconds       = Math.round(remaining % 60);
+
+            if (remaining > 15) {
+                seconds = Math.ceil(seconds / 15) * 15;
+            }
+
+            let longMessage = (remaining <= 45)
+                    ? ngettext("Focus on your task for %d more second.",
+                               "Focus on your task for %d more seconds.", seconds).format(seconds)
+                    : ngettext("Focus on your task for %d more minute.",
+                               "Focus on your task for %d more minutes.", minutes).format(minutes);
+
+            this._updateBody(longMessage);
+        }
     }
 });
 
 
-const PomodoroEnd = new Lang.Class({
+const PomodoroEndNotification = new Lang.Class({
     Name: 'PomodoroEndNotification',
     Extends: Notification,
 
-    _init: function() {
+    _init: function(timer) {
         this.parent(_("Take a break!"), null, null);
 
-        this._settingsChangedId = 0;
+        this.setResident(true);
+        this.setShowInLockScreen(true);
 
+        this.timer = timer;
+
+        this._timerUpdateId      = 0;
+        this._settingsChangedId  = 0;
+        this._shortBreakDuration = 0;
+        this._longBreakDuration  = 0;
+        this._isLongPause        = null;
+
+        let settings = Extension.extension.settings;
         try {
-            this._settings = Settings.getSettings('org.gnome.pomodoro.preferences');
-            this._settingsChangedId = this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+            this._settingsChangedId  = settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+            this._shortBreakDuration = settings.get_double('short-break-duration');
+            this._longBreakDuration  = settings.get_double('long-break-duration');
         }
         catch (error) {
-            log('Pomodoro: ' + error);
+            Extension.extension.logError(error);
         }
 
-        this.connect('destroy', Lang.bind(this,
-            function(notification) {
-                if (this._settingsChangedId) {
-                    this._settings.disconnect(this._settingsChangedId);
-                }
+        this._switchToPauseButton = this.addAction(null, Lang.bind(this,
+            function() {
+                let duration = this._isLongPause
+                        ? this._shortBreakDuration
+                        : this._longBreakDuration;
+
+                this.timer.setState(Timer.State.PAUSE, duration);
             }));
 
-        this.setResident(true);
-        this.setUrgency(MessageTray.Urgency.HIGH);
+        this.addAction(_("Start pomodoro"), Lang.bind(this,
+            function() {
+                this.timer.setState(Timer.State.POMODORO);
+                this.close();
+                Main.messageTray.close();
+            }));
 
-        if (check_version(['3.10'], GNOME_SHELL_VERSION)) {
-            this.addButton(Action.SWITCH_TO_PAUSE, "");
-            this.addButton(Action.SWITCH_TO_POMODORO, _("Start pomodoro"));
+        this.connect('mapped', Lang.bind(this, this._onActorMapped));
+        this.connect('unmapped', Lang.bind(this, this._onActorUnmapped));
+        this.connect('destroy', Lang.bind(this,
+            function() {
+                this._onActorUnmapped();
 
-            this._pause_switch_button = this.getButton(Action.SWITCH_TO_PAUSE);
-        }
-        else {
-            this._pause_switch_button = this._makeButton("");
-            this._pomodoro_switch_button = this._makeButton(_("Start pomodoro"));
-
-            this.addButton(this._pause_switch_button, Lang.bind(this,
-                function() {
-                    this.emit('action-invoked', Action.SWITCH_TO_PAUSE);
-                }));
-            this.addButton(this._pomodoro_switch_button, Lang.bind(this,
-                function() {
-                    this.emit('action-invoked', Action.SWITCH_TO_POMODORO);
-                }));
-        }
-
-        if (this._pause_switch_button) {
-            this._pause_switch_button.hide();
-        }
-
-        if (!this._bodyLabel) {
-            this._bodyLabel = this.addBody("", null, null);
-        }
-
-        this._short_break_duration = this._settings.get_double('short-break-duration');
-        this._long_break_duration = this._settings.get_double('long-break-duration');
+                if (this._settingsChangedId) {
+                    Extension.extension.settings.disconnect(this._settingsChangedId);
+                    this._settingsChangedId = 0;
+                }
+            }));
     },
 
-    _makeButton: function(label, iconName, useActionIcons) {
-        let button = new St.Button({ can_focus: true });
-        if (useActionIcons && Gtk.IconTheme.get_default().has_icon(iconName)) {
-            button.add_style_class_name('notification-icon-button');
-            button.child = new St.Icon({ icon_name: iconName });
-        } else {
-            button.add_style_class_name('notification-button');
-            button.label = label;
-        }
-        return button;
-    },
+    _onSettingsChanged: function(settings, key) {
+        switch (key) {
+            case 'short-break-duration':
+                this._shortBreakDuration = settings.get_double('short-break-duration');
+                break;
 
-    _onSettingsChanged: function() {
-        this._short_break_duration = this._settings.get_double('short-break-duration');
-        this._long_break_duration = this._settings.get_double('long-break-duration');
-    },
-
-    /* deprecated since 3.12 */
-    getButton: function(id) {
-        let button = this._buttonBox.get_children().filter(function(b) {
-            return b._actionId == id;
-        })[0];
-
-        return button;
-    },
-
-    updateButtons: function(is_long_pause, can_switch_pause) {
-        let changed = false;
-        let action_id = this._pause_switch_button._actionId;
-
-        if (this._short_break_duration >= this._long_break_duration) {
-            this._pause_switch_button.hide();
-            return;
-        }
-
-        if (this._pause_switch_button.reactive != can_switch_pause) {
-            this._pause_switch_button.reactive = can_switch_pause;
-            this._pause_switch_button.can_focus = can_switch_pause;
-        }
-
-        if (is_long_pause && action_id != Action.SWITCH_TO_SHORT_PAUSE) {
-            this._pause_switch_button._actionId = Action.SWITCH_TO_SHORT_PAUSE;
-            this._pause_switch_button.set_label(_("Shorten the break"));
-            changed = true;
-        }
-
-        if (!is_long_pause && action_id != Action.SWITCH_TO_LONG_PAUSE) {
-            this._pause_switch_button._actionId = Action.SWITCH_TO_LONG_PAUSE;
-            this._pause_switch_button.set_label(_("Lengthen the break"));
-            changed = true;
-        }
-
-        if (changed) {
-            this._pause_switch_button.show();
+            case 'long-break-duration':
+                this._longBreakDuration = settings.get_double('long-break-duration');
+                break;
         }
     },
 
-    setElapsedTime: function(elapsed, state_duration) {
-        let remaining = Math.ceil(state_duration - elapsed);
-        let minutes = Math.round(remaining / 60);
-        let seconds = Math.floor(remaining % 60);
-        let message = (remaining <= 45)
-                ? ngettext("You have %d second left",
-                           "You have %d seconds left", seconds).format(seconds)
-                : ngettext("You have %d minute left",
-                           "You have %d minutes left", minutes).format(minutes);
+    _onActorMapped: function() {
+        if (!this._timerUpdateId) {
+            this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+            this._onTimerUpdate();
+        }
+    },
 
-        let is_long_pause = state_duration > this._short_break_duration;
-        let can_switch_pause = elapsed < this._short_break_duration;
+    _onActorUnmapped: function() {
+        if (this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+    },
 
-        this._bannerLabel.set_text(message);
-        this._bodyLabel.set_text(message);
+    _onTimerUpdate: function() {
+        let state = this.timer.getState();
 
-        this.updateButtons(is_long_pause, can_switch_pause);
+        if (state == Timer.State.PAUSE) {
+            let elapsed       = this.timer.getElapsed();
+            let stateDuration = this.timer.getStateDuration();
+            let remaining     = this.timer.getRemaining();
+            let minutes       = Math.round(remaining / 60);
+            let seconds       = Math.round(remaining % 60);
+
+            if (remaining > 15) {
+                seconds = Math.ceil(seconds / 15) * 15;
+            }
+
+            let shortMessage = (remaining <= 45)
+                    ? ngettext("You have %d second",
+                               "You have %d seconds", seconds).format(seconds)
+                    : ngettext("You have %d minute",
+                               "You have %d minutes", minutes).format(minutes);
+
+            let longMessage = (remaining <= 45)
+                    ? ngettext("You have %d second until next pomodoro.",
+                               "You have %d seconds until next pomodoro.", seconds).format(seconds)
+                    : ngettext("You have %d minute until next pomodoro.",
+                               "You have %d minutes until next pomodoro.", minutes).format(minutes);
+
+            let isLongPause = stateDuration > this._shortBreakDuration;
+            let canSwitchPause =
+                    (elapsed < this._shortBreakDuration) &&
+                    (this._shortBreakDuration < this._longBreakDuration);
+
+            this._updateBanner(shortMessage);
+            this._updateBody(longMessage);
+            this._updateButtons(isLongPause, canSwitchPause);
+        }
+    },
+
+    _updateButtons: function(isLongPause, canSwitchPause) {
+        if (this._switchToPauseButton.reactive != canSwitchPause) {
+            this._switchToPauseButton.reactive  = canSwitchPause;
+            this._switchToPauseButton.can_focus = canSwitchPause;
+        }
+
+        if (this._isLongPause !== isLongPause) {
+            this._isLongPause = isLongPause;
+            this._switchToPauseButton.set_label(
+                isLongPause ? _("Shorten it") : _("Lengthen it"));
+        }
     }
 });
 
 
-const PomodoroEndReminder = new Lang.Class({
-    Name: 'PomodoroEndReminderNotification',
-    Extends: Notification,
+const ReminderManager = new Lang.Class({
+    Name: 'PomodoroReminderManager',
 
-    _init: function() {
-        this.parent(_("Hey, you're missing out on a break"), null, null);
+    _init: function(timer) {
+        this.timer = timer;
+        this.acknowledged = false;
 
-        this.setTransient(true);
-        this.setUrgency(MessageTray.Urgency.LOW);
-
+        this._idleMonitor = Meta.IdleMonitor.get_core();
+        this._idleWatchId = 0;
         this._timeoutSource = 0;
-        this._interval = 0;
-        this._timeout = 0;
+        this._blockCount = 0;
+        this._isScheduled = false;
+    },
+
+    get isScheduled() {
+        return this._isScheduled;
+    },
+
+    get isBlocked() {
+        return this._blockCount != 0;
+    },
+
+    block: function() {
+        this._blockCount += 1;
+
+        if (this._timeoutSource) {
+            Mainloop.source_remove(this._timeoutSource);
+            this._timeoutSource = 0;
+        }
+    },
+
+    unblock: function() {
+        this._blockCount -= 1;
+
+        if (this._blockCount < 0) {
+            Extension.extension.logError('Spurious call for reminder unblock');
+        }
+
+        if (!this.isBlocked && this.isScheduled) {
+            this.schedule();
+        }
+    },
+
+    _onIdleTimeout: function(monitor) {
+        if (this._idleWatchId) {
+            this._idleMonitor.remove_watch(this._idleWatchId);
+            this._idleWatchId = 0;
+        }
+
+        this.acknowledged = true;
     },
 
     _onTimeout: function() {
-        let display = global.screen.get_display();
-        let idle_time = (display.get_current_time_roundtrip() - display.get_last_user_time()) / 1000;
+        this._isScheduled = false;
+        this._timeoutSource = 0;
 
-        /* No need to notify if user seems to be away. We only monitor idle
-         * time based on X11, and not Clutter scene which should better reflect
-         * to real work.
-         */
-        if (idle_time < this._timeout * REMINDER_ACCEPTANCE) {
-            this.show();
-        }
-        else {
-            this.unschedule();
+        if (this._idleWatchId) {
+            this._idleMonitor.remove_watch(this._idleWatchId);
+            this._idleWatchId = 0;
         }
 
-        this.schedule();
+        /* acknowledge break if playing a video or playing a game */
+        let info = Utils.getFocusedWindowInfo();
 
-        return false;
+        if (info.isPlayer && info.isFullscreen) {
+            this.acknowledged = true;
+        }
+
+        if (!this.acknowledged && this.timer.getRemaining() > REMINDER_MIN_REMAINING_TIME) {
+            this.emit('notify');
+        }
+
+        return GLib.SOURCE_REMOVE;
     },
 
     schedule: function() {
-        let intervals = REMINDER_INTERVALS;
-        let reschedule = this._timeoutSource != 0;
+        let seconds = REMINDER_TIMEOUT;
+
+        this._isScheduled = true;
 
         if (this._timeoutSource) {
-            GLib.source_remove(this._timeoutSource);
+            Mainloop.source_remove(this._timeoutSource);
             this._timeoutSource = 0;
         }
 
-        if (this._interval < intervals.length) {
-            let interval = Math.ceil(intervals[this._interval] / 1000);
-
-            this._timeout = interval;
+        if (!this.isBlocked) {
             this._timeoutSource = Mainloop.timeout_add_seconds(
-                                       interval,
+                                       seconds,
                                        Lang.bind(this, this._onTimeout));
         }
 
-        if (!reschedule) {
-            this._interval += 1;
+        if (this._idleWatchId == 0) {
+            this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_ACKNOWLEDGE_REMINDER * 1000, Lang.bind(this, this._onIdleTimeout));
         }
     },
 
     unschedule: function() {
+        this._isScheduled = false;
+
         if (this._timeoutSource) {
-            GLib.source_remove(this._timeoutSource);
+            Mainloop.source_remove(this._timeoutSource);
             this._timeoutSource = 0;
         }
 
-        this._interval = 0;
-        this._timeout = 0;
+        if (this._idleWatchId) {
+            this._idleMonitor.remove_watch(this._idleWatchId);
+            this._idleWatchId = 0;
+        }
     },
 
-    destroy: function(reason) {
+    destroy: function() {
         this.unschedule();
-        this.parent(reason);
+
+        this.emit('destroy');
+    }
+});
+Signals.addSignalMethods(ReminderManager.prototype);
+
+
+const PomodoroEndReminderNotification = new Lang.Class({
+    Name: 'PomodoroEndReminderNotification',
+    Extends: Notification,
+
+    _init: function() {
+        let title = _("Hey!");
+        let description = _("You're missing out on a break");
+
+        this.parent(title, null, null);
+
+        this.setTransient(true);
+        this.setUrgency(MessageTray.Urgency.LOW);
+
+        this._updateBanner(description);
+        this._updateBody(description);
     }
 });
 
 
-const Issue = new Lang.Class({
+const IssueNotification = new Lang.Class({
     Name: 'PomodoroIssueNotification',
-    Extends: Notification,
+    Extends: MessageTray.Notification,
 
     _init: function(message) {
-        let url = Config.PACKAGE_BUGREPORT;
-        let title = _("Problem with pomodoro");
+        let source = getDefaultSource();
+        let title  = _("Pomodoro");
+        let url    = Config.PACKAGE_BUGREPORT;
 
-        this.parent(title, message, {});
-        this.setUrgency(MessageTray.Urgency.HIGH);
+        this.parent(source, title, message, { bannerMarkup: true });
+
         this.setTransient(true);
+        this.setUrgency(MessageTray.Urgency.HIGH);
 
-        /* TODO: Check which distro running, check for updates via package manager */
-
-        this.addButton(Action.REPORT_BUG, _("Report"));
-
-        this.connect('action-invoked', Lang.bind(this,
-            function(notification, action) {
-                notification.hide();
-                if (action == Action.REPORT_BUG)
-                    Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
+        this.addAction(_("Report issue"), Lang.bind(this,
+            function() {
+                Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
+                Main.messageTray.close();
             }));
+    },
+
+    show: function() {
+        if (!Main.messageTray.contains(this.source)) {
+            Main.messageTray.add(this.source);
+        }
+
+        this.source.notify(this);
+    },
+
+    close: function() {
+        this.emit('done-displaying');
+        this.destroy();
     }
 });

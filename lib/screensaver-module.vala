@@ -27,7 +27,7 @@ private const string SCREENSAVER_DEACTIVATE_COMMAND = "xdg-screensaver reset";
 namespace Gnome
 {
     [DBus (name = "org.gnome.ScreenSaver")]
-    interface ScreenSaver : Object
+    public interface ScreenSaver : Object
     {
         public abstract bool @lock () throws IOError;
 
@@ -44,18 +44,17 @@ namespace Gnome
 }
 
 
-public class Pomodoro.ScreenSaver : Object
+public class Pomodoro.ScreenSaverModule : Pomodoro.Module
 {
     private unowned Pomodoro.Timer timer;
     private GLib.Settings settings;
     private Gnome.ScreenSaver proxy;
 
-    public ScreenSaver (Pomodoro.Timer timer)
+    public ScreenSaverModule (Pomodoro.Timer timer)
     {
         this.timer = timer;
 
         this.settings = Pomodoro.get_settings ().get_child ("preferences");
-        this.settings.changed.connect (this.on_settings_changed);
 
         try {
             this.proxy = GLib.Bus.get_proxy_sync (GLib.BusType.SESSION,
@@ -63,78 +62,68 @@ public class Pomodoro.ScreenSaver : Object
                                                   "/org/gnome/ScreenSaver");
         }
         catch (Error e) {
-            stderr.printf ("%s\n", e.message);
-
+            GLib.warning ("Failed to connect to org.gnome.ScreenSaver: %s",
+                          e.message);
             return;
         }
-
-        this.enable ();
     }
 
-    ~ScreenSaver ()
+    public override void enable ()
     {
-        this.disable ();
+        if (!this.enabled) {
+            this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
+            this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
+        }
+
+        base.enable ();
     }
 
-    public void enable ()
+    public override void disable ()
     {
-        this.timer.notify_pomodoro_start.connect (
-                this.on_notify_pomodoro_start);
-        this.timer.notify_pomodoro_end.connect (
-                this.on_notify_pomodoro_end);
-    }
+        if (this.enabled)
+        {
+            SignalHandler.disconnect_by_func (this.timer,
+                                              (void*) this.on_notify_pomodoro_start,
+                                              (void*) this);
+            SignalHandler.disconnect_by_func (this.timer,
+                                              (void*) this.on_notify_pomodoro_end,
+                                              (void*) this);
+        }
 
-    public void disable ()
-    {
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_notify_pomodoro_start, (void*) this);
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_notify_pomodoro_end, (void*) this);
+        base.disable ();
     }
 
     private void deactivate_screensaver ()
     {
-        try {
-            GLib.Process.spawn_command_line_async (
-                    SCREENSAVER_DEACTIVATE_COMMAND);
+        if (this.proxy != null) {
+            try {
+                this.proxy.wake_up_screen ();
+            }
+            catch (IOError error) {
+                GLib.warning ("Failed to deactivate screensaver: %s", error.message);
+            }
         }
-        catch (GLib.SpawnError error) {
-            warning ("Failed to spawn process - %s", error.message);
-        }
-
-        /* TODO: In GNOME 3.8 set_active(false) does not wake up the screen...
-         */
-        // try {
-        //     this.proxy.set_active (false);
-        // }
-        // catch (IOError error) {
-        //     warning ("Failed to deactivate screensaver - %s", error.message);
-        // }
-    }
-
-    private void on_settings_changed (GLib.Settings settings,
-                                      string        key)
-    {
-        switch (key)
-        {
-            case "pomodoro-start-deactivate-screensaver":
-                break;
-
-            case "pomodoro-end-deactivate-screensaver":
-                break;
+        else {
+            try {
+                GLib.Process.spawn_command_line_async (
+                        SCREENSAVER_DEACTIVATE_COMMAND);
+            }
+            catch (GLib.SpawnError error) {
+                GLib.warning ("Failed to spawn process: %s", error.message);
+            }
         }
     }
 
     private void on_notify_pomodoro_start (bool is_requested)
     {
-        if (this.settings.get_boolean ("pomodoro-start-deactivate-screensaver")) {
+        if (this.settings.get_boolean ("wake-up-screen")) {
             this.deactivate_screensaver ();
         }
     }
 
     private void on_notify_pomodoro_end (bool is_completed)
     {
-        if (this.settings.get_boolean ("pomodoro-end-deactivate-screensaver")) {
+        if (this.settings.get_boolean ("wake-up-screen")) {
             this.deactivate_screensaver ();
         }
     }

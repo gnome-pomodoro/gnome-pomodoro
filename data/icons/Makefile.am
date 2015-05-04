@@ -2,6 +2,9 @@ public_icon_themes = \
     hicolor
 
 public_icons = \
+    hicolor_apps_16x16_gnome-pomodoro.png \
+    hicolor_apps_24x24_gnome-pomodoro.png \
+    hicolor_apps_32x32_gnome-pomodoro.png \
     hicolor_apps_48x48_gnome-pomodoro.png \
     hicolor_apps_256x256_gnome-pomodoro.png \
     hicolor_apps_scalable_gnome-pomodoro-symbolic.svg

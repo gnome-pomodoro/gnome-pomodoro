@@ -46,11 +46,12 @@ public class Pomodoro.Application : Gtk.Application
 {
     public Pomodoro.Service service;
     public Pomodoro.Timer timer;
-    public Gtk.Window main_window;
 
     private Gtk.Window preferences_dialog;
     private Gtk.Window about_dialog;
 
+    private List<Pomodoro.Module> modules;
+    private Pomodoro.GnomeDesktopModule desktop_module;
     private int hold_reasons;
 
     public Application ()
@@ -65,7 +66,6 @@ public class Pomodoro.Application : Gtk.Application
 
         this.timer = null;
         this.service = null;
-        this.main_window = null;
         this.hold_reasons = HoldReason.NONE;
     }
 
@@ -91,7 +91,7 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
-    private unowned Gtk.Window get_last_focused_window ()
+    public unowned Gtk.Window get_last_focused_window ()
     {
         unowned List<weak Gtk.Window> windows = this.get_windows ();
 
@@ -116,33 +116,6 @@ public class Pomodoro.Application : Gtk.Application
                                      Gdk.Screen.get_default (),
                                      css_provider,
                                      Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-    }
-
-    public void show_main_window_full (uint32 timestamp)
-    {
-        if (this.main_window == null)
-        {
-            this.main_window = new Pomodoro.MainWindow ();
-            this.main_window.destroy.connect (() => {
-                this.main_window = null;
-            });
-
-            this.add_window (this.main_window);
-        }
-
-        if (this.main_window != null) {
-            if (timestamp > 0) {
-                this.main_window.present_with_time (timestamp);
-            }
-            else {
-                this.main_window.present ();
-            }
-        }
-    }
-
-    public void show_main_window ()
-    {
-        this.show_main_window_full (0);
     }
 
     public void show_preferences_full (string? view,
@@ -172,16 +145,54 @@ public class Pomodoro.Application : Gtk.Application
         this.show_preferences_full (null, 0);
     }
 
-    private void action_main_window (SimpleAction action,
-                                     Variant?     parameter)
-    {
-        this.show_main_window ();
-    }
-
     private void action_preferences (SimpleAction action,
                                      Variant?     parameter)
     {
         this.show_preferences ();
+    }
+
+    private void action_visit_website (SimpleAction action,
+                                       Variant?     parameter)
+    {
+        try {
+            string[] spawn_args = { "xdg-open", Config.PACKAGE_URL };
+            string[] spawn_env = Environ.get ();
+
+            Process.spawn_async (null,
+                                 spawn_args,
+                                 spawn_env,
+                                 SpawnFlags.SEARCH_PATH,
+                                 null,
+                                 null);
+        }
+        catch (GLib.SpawnError error) {
+            GLib.warning ("Failed to spawn proccess: %s", error.message);
+        }
+    }
+
+    private void action_report_issue (SimpleAction action,
+                                      Variant?     parameter)
+    {
+        try {
+            string[] spawn_args = { "xdg-open", Config.PACKAGE_BUGREPORT };
+            string[] spawn_env = Environ.get ();
+
+            Process.spawn_async (null,
+                                 spawn_args,
+                                 spawn_env,
+                                 SpawnFlags.SEARCH_PATH,
+                                 null,
+                                 null);
+        }
+        catch (GLib.SpawnError error) {
+            GLib.warning ("Failed to spawn proccess: %s", error.message);
+        }
+    }
+
+    private void action_enable_extension (SimpleAction action,
+                                          Variant?     parameter)
+    {
+        this.desktop_module.enable_extension ();
     }
 
     private void action_about (SimpleAction action, Variant? parameter)
@@ -208,16 +219,7 @@ public class Pomodoro.Application : Gtk.Application
 
     private void action_quit (SimpleAction action, Variant? parameter)
     {
-        // For now application gui and the service uses same process
-        // so if service is running we don't want to close both
-        if (this.timer.state != State.NULL) {
-            foreach (var window in this.get_windows ()) {
-                window.destroy ();
-            }
-        }
-        else {
-            this.quit ();
-        }
+        this.quit ();
     }
 
     private void setup_actions ()
@@ -225,8 +227,14 @@ public class Pomodoro.Application : Gtk.Application
         var preferences_action = new GLib.SimpleAction ("preferences", null);
         preferences_action.activate.connect (this.action_preferences);
 
-        var main_window_action = new GLib.SimpleAction ("main-window", null);
-        main_window_action.activate.connect (this.action_main_window);
+        var visit_website_action = new GLib.SimpleAction ("visit-website", null);
+        visit_website_action.activate.connect (this.action_visit_website);
+
+        var report_issue_action = new GLib.SimpleAction ("report-issue", null);
+        report_issue_action.activate.connect (this.action_report_issue);
+
+        var enable_extension_action = new GLib.SimpleAction ("enable-extension", null);
+        enable_extension_action.activate.connect (this.action_enable_extension);
 
         var about_action = new GLib.SimpleAction ("about", null);
         about_action.activate.connect (this.action_about);
@@ -235,7 +243,9 @@ public class Pomodoro.Application : Gtk.Application
         quit_action.activate.connect (this.action_quit);
 
         this.add_action (preferences_action);
-        this.add_action (main_window_action);
+        this.add_action (visit_website_action);
+        this.add_action (report_issue_action);
+        this.add_action (enable_extension_action);
         this.add_action (about_action);
         this.add_action (quit_action);
     }
@@ -254,8 +264,6 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
-    private List<Object> modules;
-
     /* Emitted on the primary instance immediately after registration.
      */
     public override void startup ()
@@ -266,20 +274,25 @@ public class Pomodoro.Application : Gtk.Application
 
         this.setup_resources ();
 
-        this.modules = new List<Object> ();
-        this.modules.prepend (new Pomodoro.Sounds (this.timer));
-        this.modules.prepend (new Pomodoro.Presence (this.timer));
-        this.modules.prepend (new Pomodoro.Power (this.timer));
-        this.modules.prepend (new Pomodoro.ScreenSaver (this.timer));
-        this.modules.prepend (new Pomodoro.GnomeDesktop (this.timer));
-
         this.timer.state_changed.connect (this.on_timer_state_changed);
         this.timer.destroy.connect (this.on_timer_destroy);
+        this.timer.restore ();
+
+        this.desktop_module = new Pomodoro.GnomeDesktopModule (this.timer);
+
+        this.modules = new List<Pomodoro.Module> ();
+        this.modules.prepend (new Pomodoro.SoundsModule (this.timer));
+        this.modules.prepend (new Pomodoro.PresenceModule (this.timer));
+        this.modules.prepend (new Pomodoro.ScreenSaverModule (this.timer));
+        this.modules.prepend (this.desktop_module);
+
+        foreach (var module in this.modules)
+        {
+            module.enable ();
+        }
 
         this.setup_actions ();
         this.setup_menu ();
-
-        this.timer.restore ();
     }
 
     private void on_timer_state_changed (Timer timer)
@@ -334,11 +347,19 @@ public class Pomodoro.Application : Gtk.Application
     }
 
     /* Save the state before exit.
-     * Emitted only on the registered primary instance instance immediately
-     * after the main loop terminates.
+     *
+     * Emitted only on the registered primary instance immediately after
+     * the main loop terminates.
      */
     public override void shutdown ()
     {
+        foreach (var module in this.modules)
+        {
+            module.disable ();
+        }
+
+        this.modules = null;
+
         base.shutdown ();
     }
 
@@ -347,6 +368,7 @@ public class Pomodoro.Application : Gtk.Application
      */
     public override void activate ()
     {
+        this.activate_action ("preferences", null);
     }
 
     public override bool dbus_register (DBusConnection connection,

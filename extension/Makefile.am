@@ -2,13 +2,16 @@ extensiondir = $(datadir)/gnome-shell/extensions/$(EXTENSION_UUID)
 
 dist_extension_DATA = \
     dbus.js \
+    dialogs.js \
     extension.js \
     indicator.js \
     metadata.json \
     notifications.js \
+    presence.js \
     settings.js \
     stylesheet.css \
-    tasklist.js
+    timer.js \
+    utils.js
 
 nodist_extension_DATA = \
     config.js \

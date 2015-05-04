@@ -27,6 +27,11 @@ namespace Pomodoro
         POMODORO_END = 2
     }
 
+    public enum SoundBackend {
+        CANBERRA,
+        GSTREAMER
+    }
+
     private const uint PLAYER_FADE_IN_TIME = 25000;
     private const uint PLAYER_FADE_OUT_TIME = 15000;
 
@@ -44,7 +49,7 @@ namespace Pomodoro
 }
 
 
-public class Pomodoro.Player : Object
+public class Pomodoro.Player : GLib.Object
 {
     private double _volume = 0.5;
     public double volume {
@@ -100,12 +105,12 @@ public class Pomodoro.Player : Object
     public bool repeat { get; set; default=false; }
 
     private Gst.Element pipeline;
-    private Gst.Bus bus;
     private Pomodoro.Animation fade_animation;
 
     construct
     {
-        dynamic Gst.Element pipeline = Gst.ElementFactory.make ("playbin", "player");
+        dynamic Gst.Element pipeline = Gst.ElementFactory.make ("playbin",
+                                                                null);
 
         assert (pipeline != null);
 
@@ -113,8 +118,8 @@ public class Pomodoro.Player : Object
 
         this.pipeline = pipeline;
 
-        this.bus = this.pipeline.get_bus ();
-        this.bus.add_watch (GLib.Priority.DEFAULT, this.bus_callback);
+        var bus = this.pipeline.get_bus ();
+        bus.add_watch (GLib.Priority.DEFAULT, this.bus_callback);
 
         this.fade_animation = null;
         this.fade_value = 0.0;
@@ -125,8 +130,15 @@ public class Pomodoro.Player : Object
         this.pipeline.set_state (Gst.State.NULL);
 
         this.pipeline = null;
-        this.bus = null;
         this.fade_animation = null;
+    }
+
+    public static bool is_supported ()
+    {
+        /* Check whether playbin exists */
+        var element_factory = Gst.ElementFactory.find("playbin");
+
+        return element_factory != null;
     }
 
     public void play ()
@@ -218,7 +230,9 @@ public class Pomodoro.Player : Object
 
             case Gst.MessageType.ERROR:
                 message.parse_error (out error, null);
-                GLib.message ("Error: %s\n", error.message);
+                GLib.critical (error.message);
+
+                this.pipeline.set_state (Gst.State.NULL);
                 break;
 
             default:
@@ -246,9 +260,10 @@ public class Pomodoro.Player : Object
 }
 
 
-public class Pomodoro.Sounds : Object
+public class Pomodoro.SoundsModule : Pomodoro.Module
 {
     public Player player;
+    public Player fallback_player;
 
     private Settings settings;
     private Canberra.Context context;
@@ -256,45 +271,58 @@ public class Pomodoro.Sounds : Object
     private unowned Pomodoro.Timer timer;
     private uint fade_out_timeout_id;
 
+    private bool has_gstreamer;
 
-    public Sounds (Pomodoro.Timer timer)
+
+    public SoundsModule (Pomodoro.Timer timer)
     {
         this.timer = timer;
-
-        var binding_flags = GLib.SettingsBindFlags.DEFAULT |
-                            GLib.SettingsBindFlags.GET;
+        this.timer.notify["state-duration"].connect (this.on_state_duration_changed);
 
         this.settings = Pomodoro.get_settings ().get_child ("preferences");
         this.settings.changed.connect (this.on_settings_changed);
 
-        this.ensure_context ();
+        this.has_gstreamer = Player.is_supported ();
 
-
-        this.player = new Player ();
-        this.player.repeat = true;
-
-        this.settings.bind ("ticking-sound-volume",
-                            this.player,
-                            "volume",
-                            binding_flags);
-
-        this.settings.bind_with_mapping ("ticking-sound",
-                                         this.player,
-                                         "file",
-                                         binding_flags,
-                                         Sounds.get_file_mapping,
-                                         Sounds.set_file_mapping,
-                                         (void *) this,
-                                         null);
-
-        this.timer.notify["state-duration"].connect (this.on_state_duration_changed);
-
-        this.enable ();
+        if (!this.has_gstreamer) {
+            GLib.debug ("Can not use Gstramer backend");
+        }
     }
 
-    ~Sounds ()
+    private void setup_libcanberra ()
     {
-        this.disable ();
+        this.ensure_context ();
+    }
+
+    private void setup_gstreamer ()
+    {
+        var binding_flags = GLib.SettingsBindFlags.DEFAULT |
+                            GLib.SettingsBindFlags.GET;
+
+        if (this.has_gstreamer)
+        {
+            this.fallback_player = new Player ();
+        }
+
+        if (this.has_gstreamer)
+        {
+            this.player = new Player ();
+            this.player.repeat = true;
+
+            this.settings.bind ("ticking-sound-volume",
+                                this.player,
+                                "volume",
+                                binding_flags);
+
+            this.settings.bind_with_mapping ("ticking-sound",
+                                             this.player,
+                                             "file",
+                                             binding_flags,
+                                             SoundsModule.get_file_mapping,
+                                             SoundsModule.set_file_mapping,
+                                             (void *) this,
+                                             null);
+        }
     }
 
     private void schedule_fade_out ()
@@ -322,24 +350,37 @@ public class Pomodoro.Sounds : Object
         }
     }
 
-    public void enable ()
+    public override void enable ()
     {
-        this.timer.state_changed.connect (this.on_state_changed);
-        this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
-        this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
-        this.timer.pomodoro_start.connect (this.on_pomodoro_start);
+        if (!this.enabled)
+        {
+            this.setup_libcanberra ();
+            this.setup_gstreamer ();
+
+            this.timer.state_changed.connect (this.on_state_changed);
+            this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
+            this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
+            this.timer.pomodoro_start.connect (this.on_pomodoro_start);
+        }
+
+        base.enable ();
     }
 
-    public void disable ()
+    public new void disable ()
     {
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_state_changed, (void*) this);
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_notify_pomodoro_end, (void*) this);
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_notify_pomodoro_start, (void*) this);
-        SignalHandler.disconnect_by_func (this.timer,
-                  (void*) this.on_pomodoro_start, (void*) this);
+        if (this.enabled)
+        {
+            SignalHandler.disconnect_by_func (this.timer,
+                      (void*) this.on_state_changed, (void*) this);
+            SignalHandler.disconnect_by_func (this.timer,
+                      (void*) this.on_notify_pomodoro_end, (void*) this);
+            SignalHandler.disconnect_by_func (this.timer,
+                      (void*) this.on_notify_pomodoro_start, (void*) this);
+            SignalHandler.disconnect_by_func (this.timer,
+                      (void*) this.on_pomodoro_start, (void*) this);
+        }
+
+        base.disable ();
     }
 
     private void on_settings_changed (GLib.Settings settings, string key)
@@ -384,7 +425,9 @@ public class Pomodoro.Sounds : Object
 
             case "ticking-sound":
                 var file_path = this.get_file_path (key);
-                this.player.file = GLib.File.new_for_path (file_path);
+                if (this.player != null) {
+                    this.player.file = GLib.File.new_for_path (file_path);
+                }
 
                 break;
         }
@@ -393,35 +436,41 @@ public class Pomodoro.Sounds : Object
     private void ensure_context ()
     {
         /* Create context */
-        var status = Canberra.Context.create (out this.context);
+        if (this.context == null)
+        {
+            Canberra.Context context = null;
+            var status = Canberra.Context.create (out context);
 
-        if (status != Canberra.SUCCESS) {
-            GLib.warning ("Couldn't create canberra context - %s",
-                          Canberra.strerror (status));
+            if (status != Canberra.SUCCESS) {
+                GLib.critical ("Could not create canberra context: %s",
+                               Canberra.strerror (status));
 
-            return;
-        }
+                return;
+            }
 
-        /* Set properties about application */
-        status = this.context.change_props (
-                Canberra.PROP_APPLICATION_NAME, Config.PACKAGE_NAME,
-                Canberra.PROP_APPLICATION_ID, "org.gnome.Pomodoro");
+            /* Set properties about application */
+            status = context.change_props (
+                    Canberra.PROP_APPLICATION_NAME, Config.PACKAGE_NAME,
+                    Canberra.PROP_APPLICATION_ID, "org.gnome.Pomodoro");
 
-        if (status != Canberra.SUCCESS) {
-            GLib.warning ("Couldn't setup canberra context - %s",
-                          Canberra.strerror (status));
+            if (status != Canberra.SUCCESS) {
+                GLib.critical ("Could not setup canberra context: %s",
+                               Canberra.strerror (status));
 
-            return;
-        }
+                return;
+            }
 
-        /* Connect to the sound system */
-        status = this.context.open ();
+            /* Connect to the sound system */
+            status = context.open ();
 
-        if (status != Canberra.SUCCESS) {
-            GLib.warning ("Couldn't open canberra context - %s",
-                          Canberra.strerror (status));
+            if (status != Canberra.SUCCESS) {
+                GLib.critical ("Could not open canberra context: %s",
+                               Canberra.strerror (status));
 
-            return;
+                return;
+            }
+
+            this.context = (owned) context;
         }
     }
 
@@ -536,9 +585,13 @@ public class Pomodoro.Sounds : Object
                     Canberra.PROP_CANBERRA_CACHE_CONTROL, "permanent");
 
             if (status != Canberra.SUCCESS) {
-                GLib.warning ("Couldn't play sound '%s' - %s",
+                GLib.critical ("Could not play sound \"%s\": %s",
                               file_path,
                               Canberra.strerror (status));
+
+                this.fallback_player.file = GLib.File.new_for_path (file_path);
+                this.fallback_player.volume = volume;
+                this.fallback_player.play ();
             }
         }
     }
@@ -568,16 +621,20 @@ public class Pomodoro.Sounds : Object
                     Canberra.PROP_CANBERRA_CACHE_CONTROL, "permanent");
 
             if (status != Canberra.SUCCESS) {
-                GLib.warning ("Couldn't play sound '%s' - %s",
-                              file_path,
-                              Canberra.strerror (status));
+                GLib.critical ("Could not play sound \"%s\": %s",
+                               file_path,
+                               Canberra.strerror (status));
+
+                this.fallback_player.file = GLib.File.new_for_path (file_path);
+                this.fallback_player.volume = volume;
+                this.fallback_player.play ();
             }
         }
     }
 
     private void on_state_changed ()
     {
-        if (this.timer.state != State.POMODORO) {
+        if (this.timer.state != State.POMODORO && this.player != null) {
             this.player.stop ();
         }
     }
@@ -593,15 +650,23 @@ public class Pomodoro.Sounds : Object
 
     private void on_pomodoro_start (bool is_requested)
     {
-        this.player.play ();
-        this.player.fade (1.0, AnimationMode.EASE_OUT, PLAYER_FADE_IN_TIME);
+        if (this.player != null) {
+            this.player.play ();
+            this.player.fade (1.0,
+                              AnimationMode.EASE_OUT,
+                              PLAYER_FADE_IN_TIME);
+        }
 
         this.schedule_fade_out ();
     }
 
     private bool on_fade_out_timeout ()
     {
-        this.player.fade (0.0, AnimationMode.EASE_IN_OUT, PLAYER_FADE_OUT_TIME);
+        if (this.player != null) {
+            this.player.fade (0.0,
+                              AnimationMode.EASE_IN_OUT,
+                              PLAYER_FADE_OUT_TIME);
+        }
 
         this.unschedule_fade_out ();
 

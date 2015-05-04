@@ -15,22 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ *
  */
 
 using GLib;
 
 
-class Pomodoro.Power : Object
+public class Pomodoro.Widgets.SymbolicButton : Gtk.Button
 {
-    private unowned Pomodoro.Timer timer;
-
-    public Up.Client client;
-
-    public Power (Pomodoro.Timer timer)
+    public SymbolicButton (string icon_name, Gtk.IconSize icon_size)
     {
-        this.timer = timer;
+        this.set_relief (Gtk.ReliefStyle.NORMAL);
 
-        this.client = new Up.Client ();
-//        this.client.notify_resume.connect (this.timer.restore);
+        var icon = new Gtk.Image.from_icon_name (icon_name, icon_size);
+        icon.show ();
+
+        this.image = icon;
     }
 }

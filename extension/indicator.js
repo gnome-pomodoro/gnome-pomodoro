@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013 gnome-pomodoro contributors
+ * Copyright (c) 2011-2014 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,13 @@
 
 const Lang = imports.lang;
 const Mainloop = imports.mainloop;
+const Cairo = imports.cairo;
+const Signals = imports.signals;
 
 const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
 const Shell = imports.gi.Shell;
@@ -37,10 +40,9 @@ const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 
 const DBus = Extension.imports.dbus;
-const Notifications = Extension.imports.notifications;
-const Tasklist = Extension.imports.tasklist;
 const Config = Extension.imports.config;
 const Settings = Extension.imports.settings;
+const Timer = Extension.imports.timer;
 
 const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
@@ -50,614 +52,559 @@ const FADE_IN_TIME = 250;
 const FADE_IN_OPACITY = 1.0;
 
 const FADE_OUT_TIME = 250;
-const FADE_OUT_OPACITY = 0.47;
+const FADE_OUT_OPACITY = 0.38;
 
-const FOCUS_WINDOW_TIMEOUT = 3;
+const ICON_STEPS = 360;
 
-const State = {
-    NULL: 'null',
-    POMODORO: 'pomodoro',
-    PAUSE: 'pause',
-    IDLE: 'idle'
+const IndicatorType = {
+    TEXT: 'text',
+    TEXT_SMALL: 'text-small',
+    ICON: 'icon'
 };
+
+
+const IndicatorMenu = new Lang.Class({
+    Name: 'PomodoroIndicatorMenu',
+    Extends: PopupMenu.PopupMenu,
+
+    _init: function(indicator) {
+        this.parent(indicator.actor, St.Align.START, St.Side.TOP);
+
+        this.actor.add_style_class_name('extension-pomodoro-indicator-menu');
+
+        this.indicator = indicator;
+
+        this._onTimerStateChangedId = this.indicator.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
+
+        /* Toggle timer state button */
+        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"),
+                                                              this._isTimerToggled());
+        this._timerToggle.connect('toggled', Lang.bind(this,
+            function() {
+                this.indicator.timer.toggle();
+            }));
+        this.addMenuItem(this._timerToggle);
+
+        this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        this.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
+
+        this.connect('destroy', Lang.bind(this,
+            function() {
+                if (this._onTimerStateChangedId) {
+                    this.indicator.timer.disconnect(this._onTimerStateChangedId);
+                    this._onTimerStateChangedId = 0;
+                }
+            }));
+    },
+
+    _onTimerStateChanged: function() {
+        this._timerToggle.setToggleState(this._isTimerToggled());
+    },
+
+    _isTimerToggled: function() {
+        return this.indicator.timer.getState() != Timer.State.NULL;
+    },
+
+    _showPreferences: function() {
+        let view = 'timer';
+        let timestamp = global.get_current_time();
+
+        this.indicator.timer.showPreferences(view, timestamp);
+    }
+});
+
+
+const TextIndicator = new Lang.Class({
+    Name: 'PomodoroTextIndicator',
+
+    _init : function(timer) {
+        this._initialized     = false;
+        this._state           = Timer.State.NULL;
+        this._minHPadding     = 0;
+        this._natHPadding     = 0;
+        this._digitWidth      = 0;
+        this._charWidth       = 0;
+        this._onTimerUpdateId = 0;
+
+        this.timer = timer;
+
+        this.actor = new Shell.GenericContainer({ reactive: true });
+        this.actor._delegate = this;
+
+        this.label = new St.Label({ style_class: 'system-status-label',
+                                    x_align: Clutter.ActorAlign.CENTER,
+                                    y_align: Clutter.ActorAlign.CENTER });
+        this.label.clutter_text.line_wrap = false;
+        this.label.clutter_text.ellipsize = false;
+        this.label.connect('destroy', Lang.bind(this,
+            function() {
+                if (this._onTimerUpdateId) {
+                    this.timer.disconnect(this._onTimerUpdateId);
+                    this._onTimerUpdateId = 0;
+                }
+            }));
+        this.actor.add_child(this.label);
+
+        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
+        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
+        this.actor.connect('allocate', Lang.bind(this, this._allocate));
+        this.actor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
+        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
+
+        this._onTimerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+
+        this._onTimerUpdate();
+
+        this._state = this.timer.getState();
+        this._initialized = true;
+
+        if (this._state == Timer.State.POMODORO ||
+            this._state == Timer.State.IDLE)
+        {
+            this.actor.set_opacity(FADE_IN_OPACITY * 255);
+        }
+        else {
+            this.actor.set_opacity(FADE_OUT_OPACITY * 255);
+        }
+    },
+
+    _onStyleChanged: function(actor) {
+        let themeNode = actor.get_theme_node();
+        let font      = themeNode.get_font();
+        let context   = actor.get_pango_context();
+        let metrics   = context.get_metrics(font, context.get_language());
+
+        this._minHPadding = themeNode.get_length('-minimum-hpadding');
+        this._natHPadding = themeNode.get_length('-natural-hpadding');
+        this._digitWidth  = metrics.get_approximate_digit_width() / Pango.SCALE;
+        this._charWidth   = metrics.get_approximate_char_width() / Pango.SCALE;
+    },
+
+    _getWidth: function() {
+        return Math.ceil(4 * this._digitWidth + 0.5 * this._charWidth);
+    },
+
+    _getPreferredWidth: function(actor, forHeight, alloc) {
+        let child        = actor.get_first_child();
+        let minWidth     = this._getWidth();
+        let naturalWidth = minWidth;
+
+        minWidth     += 2 * this._minHPadding;
+        naturalWidth += 2 * this._natHPadding;
+
+        if (child) {
+            [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
+        } else {
+            alloc.min_size = alloc.natural_size = 0;
+        }
+
+        if (alloc.min_size < minWidth) {
+            alloc.min_size = minWidth;
+        }
+
+        if (alloc.natural_size < naturalWidth) {
+            alloc.natural_size = naturalWidth;
+        }
+    },
+
+    _getPreferredHeight: function(actor, forWidth, alloc) {
+        let child = actor.get_first_child();
+
+        if (child) {
+            [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
+        } else {
+            alloc.min_size = alloc.natural_size = 0;
+        }
+    },
+
+    _getText: function(state, remaining) {
+        let minutes = Math.floor(remaining / 60);
+        let seconds = Math.floor(remaining % 60);
+
+        return '%02d:%02d'.format(minutes, seconds);
+    },
+
+    _onTimerUpdate: function() {
+        let state = this.timer.getState();
+
+        if (this._state != state && this._initialized)
+        {
+            this._state = state;
+
+            if (state == Timer.State.POMODORO || state == Timer.State.IDLE) {
+                Tweener.addTween(this.actor,
+                                 { opacity: FADE_IN_OPACITY * 255,
+                                   time: FADE_IN_TIME / 1000,
+                                   transition: 'easeOutQuad' });
+            }
+            else {
+                Tweener.addTween(this.actor,
+                                 { opacity: FADE_OUT_OPACITY * 255,
+                                   time: FADE_OUT_TIME / 1000,
+                                   transition: 'easeOutQuad' });
+            }
+        }
+
+        let remaining = this.timer.getRemaining();
+
+        this.label.set_text(this._getText(state, remaining));
+    },
+
+    _allocate: function(actor, box, flags) {
+        let child = actor.get_first_child();
+        if (!child)
+            return;
+
+        let [minWidth, natWidth] = child.get_preferred_width(-1);
+
+        let availWidth  = box.x2 - box.x1;
+        let availHeight = box.y2 - box.y1;
+
+        let childBox = new Clutter.ActorBox();
+        childBox.y1 = 0;
+        childBox.y2 = availHeight;
+
+        if (natWidth + 2 * this._natHPadding <= availWidth) {
+            childBox.x1 = this._natHPadding;
+            childBox.x2 = availWidth - this._natHPadding;
+        } else {
+            childBox.x1 = this._minHPadding;
+            childBox.x2 = availWidth - this._minHPadding;
+        }
+
+        child.allocate(childBox, flags);
+    },
+
+    _onActorDestroy: function() {
+        if (this._onTimerUpdateId) {
+            this.timer.disconnect(this._onTimerUpdateId);
+            this._onTimerUpdateId = 0;
+        }
+
+        this.actor._delegate = null;
+
+        this.emit('destroy');
+    },
+
+    destroy: function() {
+        this.actor.destroy();
+    }
+});
+Signals.addSignalMethods(TextIndicator.prototype);
+
+
+const ShortTextIndicator = new Lang.Class({
+    Name: 'PomodoroShortTextIndicator',
+    Extends: TextIndicator,
+
+    _init: function(timer) {
+        this.parent(timer);
+
+        this.label.set_x_align(Clutter.ActorAlign.END);
+    },
+
+    _getWidth: function() {
+        return Math.ceil(2 * this._digitWidth +
+                         1 * this._charWidth);
+    },
+
+    _getText: function(state, remaining) {
+        let minutes = Math.round(remaining / 60);
+        let seconds = Math.round(remaining % 60);
+
+        if (remaining > 15) {
+            seconds = Math.ceil(seconds / 15) * 15;
+        }
+
+        return (remaining <= 45)
+                ? _("%ds").format(seconds, remaining)
+                : _("%dm").format(minutes, remaining);
+    }
+});
+
+
+const IconIndicator = new Lang.Class({
+    Name: 'PomodoroIconIndicator',
+
+    _init : function(timer) {
+        this._initialized     = false;
+        this._state           = Timer.State.NULL;
+        this._progress        = -1.0;
+        this._minHPadding     = 0;
+        this._natHPadding     = 0;
+        this._minVPadding     = 0;
+        this._natVPadding     = 0;
+        this._primaryColor    = null;
+        this._secondaryColor  = null;
+        this._onTimerUpdateId = 0;
+
+        this.timer = timer;
+
+        this.actor = new Shell.GenericContainer({ reactive: true });
+        this.actor._delegate = this;
+
+        this.icon = new St.DrawingArea({ style_class: 'system-status-icon' });
+        this.icon.connect('style-changed', Lang.bind(this, this._onIconStyleChanged));
+        this.icon.connect('repaint', Lang.bind(this, this._onIconRepaint));
+        this.icon.connect('destroy', Lang.bind(this, this._onIconDestroy));
+        this.actor.add_child(this.icon);
+
+        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
+        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
+        this.actor.connect('allocate', Lang.bind(this, this._allocate));
+        this.actor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
+        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
+
+        this._onTimerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+
+        this._onTimerUpdate();
+
+        this._state = this.timer.getState();
+        this._initialized = true;
+    },
+
+    _onIconStyleChanged: function(actor) {
+        let themeNode = actor.get_theme_node();
+        let size = Math.ceil(themeNode.get_length('icon-size'));
+
+        [actor.min_width, actor.natural_width] = themeNode.adjust_preferred_width(size, size);
+        [actor.min_height, actor.natural_height] = themeNode.adjust_preferred_height(size, size);
+
+        this._iconSize = size;
+    },
+
+    _onIconRepaint: function(area) {
+        let cr = area.get_context();
+        let [width, height] = area.get_surface_size();
+
+        let radius = 0.5 * this._iconSize - 2.0;
+        let progress = Math.max(this._progress, 0.001);
+
+        cr.translate(0.5 * width, 0.5 * height);
+        cr.setOperator(Cairo.Operator.SOURCE);
+        cr.setLineCap(Cairo.LineCap.ROUND);
+
+        if (this._state && this._state != Timer.State.NULL)
+        {
+            let angle1   = - 0.5 * Math.PI;
+            let angle2   = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
+            let negative = (this._state == Timer.State.PAUSE);
+
+            /* background pie */
+            if (!negative)
+            {
+                Clutter.cairo_set_source_color(cr, this._secondaryColor);
+                cr.setLineWidth(2.1);
+
+                cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
+                cr.stroke();
+            }
+
+            /* foreground pie */
+            Clutter.cairo_set_source_color(cr, this._primaryColor);
+            if (!negative) {
+                cr.arc(0, 0, radius, angle1, angle2);
+            }
+            else {
+                cr.arcNegative(0, 0, radius, angle1, angle2);
+            }
+
+            cr.setOperator(Cairo.Operator.CLEAR);
+            cr.setLineWidth(3.5);
+            cr.strokePreserve();
+
+            cr.setOperator(Cairo.Operator.SOURCE);
+            cr.setLineWidth(2.2);
+            cr.stroke();
+        }
+        else {
+            Clutter.cairo_set_source_color(cr, this._secondaryColor);
+            cr.setLineWidth(2.1);
+            cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
+            cr.stroke();
+        }
+
+        cr.$dispose();
+    },
+
+    _onIconDestroy: function() {
+        if (this._onTimerUpdateId) {
+            this.timer.disconnect(this._onTimerUpdateId);
+            this._onTimerUpdateId = 0;
+        }
+    },
+
+    _onStyleChanged: function(actor) {
+        let themeNode = actor.get_theme_node();
+
+        this._minHPadding = themeNode.get_length('-minimum-hpadding');
+        this._natHPadding = themeNode.get_length('-natural-hpadding');
+        this._minVPadding = themeNode.get_length('-minimum-vpadding');
+        this._natVPadding = themeNode.get_length('-natural-vpadding');
+
+        let color = themeNode.get_foreground_color()
+        this._primaryColor = color;
+        this._secondaryColor = new Clutter.Color({
+            red: color.red,
+            green: color.green,
+            blue: color.blue,
+            alpha: color.alpha * FADE_OUT_OPACITY
+        });
+    },
+
+    _getPreferredWidth: function(actor, forHeight, alloc) {
+        let child = actor.get_first_child();
+
+        if (child) {
+            [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
+
+        } else {
+            alloc.min_size = alloc.natural_size = 0;
+        }
+
+        alloc.min_size += 2 * this._minHPadding;
+        alloc.natural_size += 2 * this._natHPadding;
+    },
+
+    _getPreferredHeight: function(actor, forWidth, alloc) {
+        let child = actor.get_first_child();
+
+        if (child) {
+            [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
+        } else {
+            alloc.min_size = alloc.natural_size = 0;
+        }
+
+        alloc.min_size += 2 * this._minVPadding;
+        alloc.natural_size += 2 * this._natVPadding;
+    },
+
+    _onTimerUpdate: function() {
+        let state = this.timer.getState();
+        let progress = this.timer.getProgress();
+
+        if (this._state != state && this._initialized)
+        {
+            this._state = state;
+            this._progress = -1.0;  /* force refresh */
+        }
+
+        if (this._progress != progress)
+        {
+            this._progress = progress;
+            this.icon.queue_repaint();
+        }
+    },
+
+    _allocate: function(actor, box, flags) {
+        let child = actor.get_first_child();
+        if (!child) {
+            return;
+        }
+
+        let availWidth  = box.x2 - box.x1;
+        let availHeight = box.y2 - box.y1;
+
+        let [minWidth, natWidth] = child.get_preferred_width(availHeight);
+
+        let childBox = new Clutter.ActorBox();
+        childBox.y1 = 0;
+        childBox.y2 = availHeight;
+
+        if (natWidth + 2 * this._natHPadding <= availWidth) {
+            childBox.x1 = this._natHPadding;
+            childBox.x2 = availWidth - this._natHPadding;
+        } else {
+            childBox.x1 = this._minHPadding;
+            childBox.x2 = availWidth - this._minHPadding;
+        }
+
+        child.allocate(childBox, flags);
+    },
+
+    _onActorDestroy: function() {
+        if (this._onTimerUpdateId) {
+            this.timer.disconnect(this._onTimerUpdateId);
+            this._onTimerUpdateId = 0;
+        }
+
+        this.actor._delegate = null;
+
+        this.emit('destroy');
+    },
+
+    destroy: function() {
+        this.actor.destroy();
+    }
+});
+Signals.addSignalMethods(IconIndicator.prototype);
 
 
 const Indicator = new Lang.Class({
     Name: 'PomodoroIndicator',
     Extends: PanelMenu.Button,
 
-    _init: function() {
-        this.parent(St.Align.START);
+    _init: function(timer) {
+        this.parent(St.Align.START, _("Pomodoro"), true);
 
-        this._initialized = false;
-        this._propertiesChangedId = 0;
-        this._notifyPomodoroStartId = 0;
-        this._notifyPomodoroEndId = 0;
-        this._notificationDialog = null;
-        this._notification = null;
-        this._settings = null;
-        this._settingsChangedId = 0;
-        this._state = State.NULL;
-        this._proxy = null;
+        this.timer  = timer;
+        this.widget = null;
 
-        this.label = new St.Label({ opacity: FADE_OUT_OPACITY * 255,
-                                    style_class: 'extension-pomodoro-label',
-                                    y_align: Clutter.ActorAlign.CENTER });
-        this.label.clutter_text.set_line_wrap(false);
-        this.label.clutter_text.set_ellipsize(Pango.EllipsizeMode.NONE);
-        this.actor.add_actor(this.label);
+        this.actor.add_style_class_name('extension-pomodoro-indicator');
 
-        this.menu.actor.add_style_class_name('extension-pomodoro-indicator');
+        this._arrow = PopupMenu.arrowIcon(St.Side.BOTTOM);
 
-        /* Toggle timer state button */
-        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"), false, { style_class: 'extension-pomodoro-toggle' });
-        this._timerToggle.connect('toggled', Lang.bind(this, this.toggle));
-        this.menu.addMenuItem(this._timerToggle);
+        this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
+        this._hbox.pack_start = true;
+        this._hbox.add_child(this._arrow, { expand: false,
+                                            x_fill: false,
+                                            x_align: St.Align.END });
+        this.actor.add_child(this._hbox);
 
-        /* Task list */
-        this.entry = new Tasklist.TaskEntry();
-        this.entry.connect('task-entered', Lang.bind(this, this._onTaskEntered));
+        this.setMenu(new IndicatorMenu(this));
 
-        /* TODO: Lock focus on the entry once active */
-        /* TODO: Add history manager, just as in runDialog */
-        /* TODO: More items could be added to context menu */
-
-        this.tasklist = new Tasklist.TaskList();
-        this.tasklist.connect('task-selected', Lang.bind(this, this._onTaskSelected));
-
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        // this.menu.addAction(_("Manage Tasks"), Lang.bind(this, this._showMainWindow));
-        this.menu.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
-        // this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        // this.menu.addMenuItem(this.tasklist);
-        // this.menu.addMenuItem(this.entry);
-
-        this.menu.connect('open-state-changed',
-                          Lang.bind(this, this._onMenuOpenStateChanged));
-
-        try {
-            this._settings = Settings.getSettings('org.gnome.pomodoro.preferences');
-            this._settingsChangedId = this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
-        }
-        catch (error) {
-            log('Pomodoro: ' + error);
-        }
-
-        /* Register keybindings to toggle the timer */
-        Main.wm.addKeybinding('toggle-timer-key',
-                              this._settings,
-                              Meta.KeyBindingFlags.NONE,
-                              Shell.KeyBindingMode.ALL,
-                              Lang.bind(this, this.toggle));
-
-        this._nameWatcherId = Gio.DBus.session.watch_name(
-                                       DBus.SERVICE_NAME,
-                                       Gio.BusNameWatcherFlags.AUTO_START,
-                                       Lang.bind(this, this._onNameAppeared),
-                                       Lang.bind(this, this._onNameVanished));
+        this._settingsChangedId = Extension.extension.settings.connect('changed::indicator-type', Lang.bind(this, this._onSettingsChanged));
 
         this._onSettingsChanged();
 
-        if (this._isRunning()) {
-            this._ensureProxy();
-        }
-        else {
-            this.refresh();
-        }
-    },
-
-    _isRunning: function() {
-        let settings;
-        let state;
-
-        try {
-            settings = Settings.getSettings('org.gnome.pomodoro.state');
-            state = settings.get_string('state');
-        }
-        catch (error) {
-            log('Pomodoro: ' + error);
-        }
-
-        return state && state != State.NULL;
-    },
-
-    _showMainWindow: function() {
-        this._ensureProxy(Lang.bind(this,
+        this.connect('destroy', Lang.bind(this,
             function() {
-                let timestamp = global.get_current_time();
-
-                this._proxy.ShowMainWindowRemote(timestamp);
-            }));
-    },
-
-    _showPreferences: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                let view = 'timer';
-                let timestamp = global.get_current_time();
-
-                this._proxy.ShowPreferencesRemote(view, timestamp);
+                if (this._settingsChangedId) {
+                    Extension.extension.settings.disconnect(this._settingsChangedId);
+                    this._settingsChangedId = 0;
+                }
             }));
     },
 
     _onSettingsChanged: function() {
-        if (this._reminder && !this._settings.get_boolean('show-reminders')) {
-            this._reminder.close();
-            this._reminder = null;
+        let indicatorType = Extension.extension.settings.get_string('indicator-type');
+
+        if (this.widget) {
+            this.widget.destroy();
+            this.widget = null;
         }
 
-        if (this._notificationDialog && !this._settings.get_boolean('show-screen-notifications')) {
-            this._notificationDialog.close();
-        }
-    },
-
-    _getPreferredWidth: function(actor, forHeight, alloc) {
-        let theme_node = actor.get_theme_node();
-        let min_hpadding = theme_node.get_length('-minimum-hpadding');
-        let natural_hpadding = theme_node.get_length('-natural-hpadding');
-
-        let context     = actor.get_pango_context();
-        let font        = theme_node.get_font();
-        let metrics     = context.get_metrics(font, context.get_language());
-        let digit_width = metrics.get_approximate_digit_width() / Pango.SCALE;
-        let char_width  = metrics.get_approximate_char_width() / Pango.SCALE;
-
-        let predicted_width        = Math.floor(digit_width * 4 + 0.5 * char_width);
-        let predicted_min_size     = predicted_width + 2 * min_hpadding;
-        let predicted_natural_size = predicted_width + 2 * natural_hpadding;
-
-        PanelMenu.Button.prototype._getPreferredWidth.call(this, actor, forHeight, alloc); // output stored in alloc
-
-        if (alloc.min_size < predicted_min_size) {
-            alloc.min_size = predicted_min_size;
-        }
-
-        if (alloc.natural_size < predicted_natural_size) {
-            alloc.natural_size = predicted_natural_size;
-        }
-    },
-
-    _onMenuOpenStateChanged: function(menu, open) {
-        if (open) {
-            this.refresh();
-        }
-    },
-
-    refresh: function() {
-        let remaining, minutes, seconds;
-
-        let state = this._proxy ? this._proxy.State : null;
-        let toggled = state !== null && state !== State.NULL;
-
-        if (this._state !== state && this._initialized)
+        switch (indicatorType)
         {
-            this._state = state;
+            case IndicatorType.ICON:
+                this.widget = new IconIndicator(this.timer);
+                break;
 
-            if (state == State.POMODORO || state == State.IDLE) {
-                Tweener.addTween(this.label,
-                                 { opacity: FADE_IN_OPACITY * 255,
-                                   time: FADE_IN_TIME / 1000,
-                                   transition: 'easeOutQuad' });
-            }
-            else {
-                Tweener.addTween(this.label,
-                                 { opacity: FADE_OUT_OPACITY * 255,
-                                   time: FADE_OUT_TIME / 1000,
-                                   transition: 'easeOutQuad' });
-            }
+            case IndicatorType.TEXT_SMALL:
+                this.widget = new ShortTextIndicator(this.timer);
+                break;
 
-            if (state != State.PAUSE && this._notificationDialog) {
-                this._notificationDialog.close();
-            }
-
-            if (this._timerToggle.toggled !== toggled) {
-                this._timerToggle.setToggleState(toggled);
-            }
+            default:
+                this.widget = new TextIndicator(this.timer);
         }
 
-        if (toggled) {
-            remaining = Math.max(state != State.IDLE
-                    ? Math.ceil(this._proxy.StateDuration - this._proxy.Elapsed)
-                    : this._settings.get_double('pomodoro-duration'), 0);
-
-            minutes = Math.floor(remaining / 60);
-            seconds = Math.floor(remaining % 60);
-
-            if (this._notification instanceof Notifications.PomodoroEnd) {
-                this._notification.setElapsedTime(this._proxy.Elapsed, this._proxy.StateDuration);
-                this._notificationDialog.setElapsedTime(this._proxy.Elapsed, this._proxy.StateDuration);
-            }
-        }
-        else {
-            minutes = 0;
-            seconds = 0;
-
-            if (this._notification instanceof Notifications.PomodoroStart ||
-                this._notification instanceof Notifications.PomodoroEnd)
-            {
-                this._notification.close();
-                this._notification = null;
-            }
-
-            if (this._notificationDialog) {
-                this._notificationDialog.close();
-            }
-        }
-
-        this.label.set_text('%02d:%02d'.format(minutes, seconds));
-    },
-
-    start: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.StartRemote(Lang.bind(this, this._onDBusCallback));
-            }));
-    },
-
-    stop: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.StopRemote(Lang.bind(this, this._onDBusCallback));
-            }));
-    },
-
-    reset: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.ResetRemote(Lang.bind(this, this._onDBusCallback));
-            }));
-    },
-
-    toggle: function() {
-        if (this._state === null || this._state === State.NULL) {
-            this.start();
-        }
-        else {
-            this.stop();
-        }
-    },
-
-    _ensureProxy: function(callback) {
-        if (this._proxy) {
-            if (callback) {
-                callback.call(this);
-
-                this.refresh();
-            }
-            return;
-        }
-
-        this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
-            if (error) {
-                global.log('Pomodoro: ' + error.message);
-
-                this._destroyProxy();
-                this._notifyIssue();
-                return;
-            }
-
-            if (proxy !== this._proxy) {
-                return;
-            }
-
-            /* Keep in mind that signals won't be called right after initialization
-             * when gnome-pomodoro comes back and gets restored
-             */
-            if (this._propertiesChangedId == 0) {
-                this._propertiesChangedId = this._proxy.connect(
-                                           'g-properties-changed',
-                                           Lang.bind(this, this._onPropertiesChanged));
-            }
-
-            if (this._notifyPomodoroStartId == 0) {
-                this._notifyPomodoroStartId = this._proxy.connectSignal(
-                                           'NotifyPomodoroStart',
-                                           Lang.bind(this, this._onNotifyPomodoroStart));
-            }
-
-            if (this._notifyPomodoroEndId == 0) {
-                this._notifyPomodoroEndId = this._proxy.connectSignal(
-                                           'NotifyPomodoroEnd',
-                                           Lang.bind(this, this._onNotifyPomodoroEnd));
-            }
-
-            if (callback) {
-                callback.call(this);
-            }
-
-            if (this._proxy.State == State.POMODORO ||
-                this._proxy.State == State.IDLE)
-            {
-                this._onNotifyPomodoroStart(this._proxy, null, [false]);
-            }
-
-            if (this._proxy.State == State.PAUSE) {
-                this._onNotifyPomodoroEnd(this._proxy, null, [true]);
-            }
-
-            this._initialized = true;
-            this.refresh();
-        }));
-    },
-
-    _destroyProxy: function() {
-        if (this._proxy) {
-            if (this._propertiesChangedId) {
-                this._proxy.disconnect(this._propertiesChangedId);
-                this._propertiesChangedId = 0;
-            }
-
-            if (this._notifyPomodoroStartId) {
-                this._proxy.disconnectSignal(this._notifyPomodoroStartId);
-                this._notifyPomodoroStartId = 0;
-            }
-
-            if (this._notifyPomodoroEndId) {
-                this._proxy.disconnectSignal(this._notifyPomodoroEndId);
-                this._notifyPomodoroEndId = 0;
-            }
-
-            /* TODO: not sure whether proxy gets destroyed by garbage collector
-             *       there is no destroy method
-             */
-//            this._proxy.destroy();
-            this._proxy = null;
-        }
-    },
-
-    _onNameAppeared: function() {
-        this._ensureProxy();
-    },
-
-    _onNameVanished: function() {
-        this._destroyProxy();
-        this.refresh();
-    },
-
-    _onDBusCallback: function(result, error) {
-        if (error) {
-            global.log('Pomodoro: ' + error.message)
-        }
-    },
-
-    _onPropertiesChanged: function(proxy, properties) {
-        /* TODO: DBus implementation in gjs enforces properties to be cached,
-         *       but does not update them properly...
-         *       This walkaround may not bee needed in the future
-         */
-        properties = properties.deep_unpack();
-
-        for (var name in properties) {
-            proxy.set_cached_property(name, properties[name]);
-        }
-
-        this.refresh();
-    },
-
-    _onTaskEntered: function(entry, text) {
-        this.tasklist.addTask(new Tasklist.Task(text), {
-            animate: true
-        });
-    },
-
-    _onTaskSelected: function(tasklist, task) {
-        global.log("Selected task: " + (task ? task.name : '-'));
-    },
-
-    _onNotifyPomodoroStart: function(proxy, senderName, [is_requested]) {
-
-        if (this._notification instanceof Notifications.PomodoroStart) {
-            this._notification.show();
-            return;
-        }
-
-        if (this._notification)
-        {
-            if (Main.messageTray._trayState == MessageTray.State.SHOWN) {
-                this._notification.close();
-            }
-            else {
-                this._notification.destroy();
-            }
-        }
-
-        this._notification = new Notifications.PomodoroStart();
-        this._notification.connect('destroy', Lang.bind(this,
-            function(notification) {
-                if (this._notification === notification) {
-                    this._notification = null;
-                }
-            }));
-
-        this._notification.show();
-    },
-
-    _onNotifyPomodoroEnd: function(proxy, senderName, [is_completed]) {
-
-        if (this._notification instanceof Notifications.PomodoroEnd) {
-            this._notification.show();
-            return;
-        }
-
-        if (this._notification) {
-            if (Main.messageTray._trayState == MessageTray.State.SHOWN) {
-                this._notification.close();
-            }
-            else {
-                this._notification.destroy();
-            }
-        }
-
-        let screenNotifications = this._settings.get_boolean('show-screen-notifications');
-
-        this._notification = new Notifications.PomodoroEnd();
-        this._notification.connect('action-invoked', Lang.bind(this,
-            function(notification, action)
-            {
-                /* Get current action of a pause switch button */
-                if (action == Notifications.Action.SWITCH_TO_PAUSE) {
-                    action = notification._pause_switch_button._actionId;
-                }
-
-                switch (action)
-                {
-                    case Notifications.Action.SWITCH_TO_POMODORO:
-                        this._proxy.SetStateRemote (State.POMODORO, 0);
-                        break;
-
-                    case Notifications.Action.SWITCH_TO_PAUSE:
-                        this._proxy.SetStateRemote (State.PAUSE, 0);
-                        break;
-
-                    case Notifications.Action.SWITCH_TO_SHORT_PAUSE:
-                        this._proxy.SetStateRemote (State.PAUSE, this._settings.get_double('short-break-duration'));
-                        break;
-
-                    case Notifications.Action.SWITCH_TO_LONG_PAUSE:
-                        this._proxy.SetStateRemote (State.PAUSE, this._settings.get_double('long-break-duration'));
-                        break;
-
-                    default:
-                        notification.destroy();
-                        break;
-                }
-            }));
-        this._notification.connect('clicked', Lang.bind(this,
-            function(notification) {
-                if (this._notificationDialog) {
-                    this._notificationDialog.open();
-                    this._notificationDialog.pushModal();
-                }
-                notification.hide(true);
-            }));
-        this._notification.connect('destroy', Lang.bind(this,
-            function(notification) {
-                if (this._notification === notification) {
-                    this._notification = null;
-                }
-
-                if (this._notificationDialog) {
-                    this._notificationDialog.close();
-                }
-
-                if (this._reminder) {
-                    this._reminder.close();
-                    this._reminder = null;
-                }
-            }));
-
-        if (!this._notificationDialog) {
-            this._notificationDialog = new Notifications.PomodoroEndDialog();
-            this._notificationDialog.connect('opening', Lang.bind(this,
-                function() {
-                    if (this._reminder) {
-                        this._reminder.close();
-                        this._reminder = null;
-                    }
-                }));
-            this._notificationDialog.connect('closing', Lang.bind(this,
-                function() {
-                    if (this._notification) {
-                        this._notification.show();
-                    }
-                    this._notificationDialog.openWhenIdle();
-                }));
-            this._notificationDialog.connect('closed', Lang.bind(this,
-                function() {
-                    this._schedulePomodoroEndReminder();
-                }));
-            this._notificationDialog.connect('destroy', Lang.bind(this,
-                function() {
-                    this._notificationDialog = null;
-                }));
-        }
-
-        if (screenNotifications) {
-            this._notificationDialog.open();
-        }
-        else {
-            this._notification.show();
-            this._schedulePomodoroEndReminder();
-        }
-    },
-
-    _schedulePomodoroEndReminder: function() {
-        if (!this._settings.get_boolean('show-reminders')) {
-            return;
-        }
-
-        if (this._reminder) {
-            return;
-        }
-
-        this._reminder = new Notifications.PomodoroEndReminder();
-        this._reminder.connect('show', Lang.bind(this,
-            function(notification) {
-                if (!this._proxy || this._proxy.State != State.PAUSE) {
-                    notification.close();
-                }
-                else {
-                    /* Don't show reminder if only 90 seconds remain to
-                     * next pomodoro
-                     */
-                    if (this._proxy.StateDuration - this._proxy.Elapsed < 90)
-                        notification.close();
-                }
-            }));
-        this._reminder.connect('clicked', Lang.bind(this,
-            function() {
-                if (this._notificationDialog) {
-                    this._notificationDialog.open();
-                    this._notificationDialog.pushModal();
-                }
-            }));
-        this._reminder.connect('destroy', Lang.bind(this,
-            function(notification) {
-                if (this._reminder === notification) {
-                    this._reminder = null;
-                }
-            }));
-
-        this._reminder.schedule();
-    },
-
-    _notifyIssue: function() {
-        if (this._notification instanceof Notifications.Issue) {
-            return;
-        }
-
-        this._notification = new Notifications.Issue(_("Looks like gnome-pomodoro is not installed"));
-        this._notification.connect('destroy', Lang.bind(this,
-            function(notification) {
-                if (this._notification === notification)
-                    this._notification = null;
-            }));
-        this._notification.show();
-    },
-
-    destroy: function() {
-        Main.wm.removeKeybinding('toggle-timer-key');
-
-        if (this._settingsChangedId) {
-            this._settings.disconnect(this._settingsChangedId);
-        }
-
-        if (this._nameWatcherId) {
-            Gio.DBus.session.unwatch_name(this._nameWatcherId);
-        }
-
-        if (this._proxy) {
-            this._destroyProxy();
-        }
-
-        if (this._notificationDialog) {
-            this._notificationDialog.destroy();
-        }
-
-        if (this._notification) {
-            this._notification.destroy();
-        }
-
-        this.parent();
+        this.widget.actor.bind_property('opacity',
+                                        this._arrow,
+                                        'opacity',
+                                        GObject.BindingFlags.SYNC_CREATE);
+
+        this._hbox.add_child(this.widget.actor, { expand: false,
+                                                  x_fill: false,
+                                                  x_align: St.Align.START });
     }
 });

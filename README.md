@@ -58,13 +58,13 @@ Then follow instructions from above, as if installing package from repos.
 
 1. Download the right version
 
-   **For GNOME 3.14** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.14).
+   **For GNOME 3.14** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.14) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-3.14#from-source).
 
-   **For GNOME 3.12** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.12).
+   **For GNOME 3.12** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.12) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-3.12#from-source).
 
-   **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.10).
+   **For GNOME 3.10** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.10) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-3.10#from-source).
 
-   **For GNOME 3.8** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.8).
+   **For GNOME 3.8** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-3.8) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-3.8#from-source).
 
    **For GNOME 3.6** download from [here](https://github.com/codito/gnome-shell-pomodoro/tarball/gnome-shell-extension-3.6) and follow instructions from [here](https://github.com/codito/gnome-shell-pomodoro/tree/gnome-shell-extension-3.6#direct-from-source).
 
@@ -74,11 +74,11 @@ Then follow instructions from above, as if installing package from repos.
 
    **On Ubuntu:**
 
-        sudo apt-get install gnome-common intltool valac libglib2.0-dev gobject-introspection libgirepository1.0-dev libgtk-3-dev libgnome-desktop-3-dev libcanberra-dev libdbus-glib-1-dev libgstreamer1.0-dev libupower-glib-dev fonts-droid
+        sudo apt-get install gnome-common intltool valac libglib2.0-dev gobject-introspection libgirepository1.0-dev libgtk-3-dev libgnome-desktop-3-dev libcanberra-dev libdbus-glib-1-dev libgstreamer1.0-dev fonts-droid
 
    **On Fedora:**
 
-        sudo yum install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel gnome-desktop3-devel libcanberra-devel dbus-glib-devel gstreamer1-devel upower-devel google-droid-sans-fonts
+        sudo dnf install gnome-common intltool vala vala-tools glib2-devel gobject-introspection-devel gtk3-devel gnome-desktop3-devel libcanberra-devel dbus-glib-devel gstreamer1-devel google-droid-sans-fonts
 
 3. Build it and install
 
