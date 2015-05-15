@@ -24,9 +24,20 @@ public class Pomodoro.TelepathyPlugin : Pomodoro.PresencePlugin
 {
     private TelepathyGLib.AccountManager account_manager;
 
-//    public TelepathyPlugin ()
-//    {
-//    }
+    public TelepathyPlugin ()
+    {
+        GLib.Object (label: "Empathy",
+                     name: "telepathy",
+                     icon_name: "empathy");
+    }
+
+    public override bool can_enable ()
+    {
+        /* check if installed */
+        var path = GLib.Environment.find_program_in_path ("empathy");
+
+        return (path != null);
+    }
 
     public override void enable ()
     {

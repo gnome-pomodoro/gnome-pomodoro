@@ -13,21 +13,16 @@ SUBDIRS = \
 
 distdir = $(PACKAGE_TARNAME)-$(VERSION)
 
-rpmdefines = \
-	--define "_sourcedir $(abs_builddir)" \
-	--define "_specdir $(abs_srcdir)"
+rpm-src:
+	cd packages/rpm && $(MAKE) rpm-src
 
-rpm: packages/rpm/gnome-pomodoro.spec dist-gzip
-	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \
-	rpmbuild $(rpmdefines) -ba $(abs_top_builddir)/packages/rpm/gnome-pomodoro.spec
+rpm:
+	cd packages/rpm && $(MAKE) rpm
 
-rpm-package:
-	cd packages/rpm && $(MAKE) gnome-pomodoro.spec
-
-debian-package:
+deb-src:
 	cd packages/debian && $(MAKE) deb-src
 
-packages: rpm-package debian-package
+packages: rpm-src deb-src
 
 test:
 	cd tests && $(MAKE) $@

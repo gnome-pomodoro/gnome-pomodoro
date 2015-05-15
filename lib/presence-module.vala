@@ -51,7 +51,7 @@ namespace Pomodoro
         return "";
     }
 
-    public PresenceStatus string_to_presence_status (string presence_status)
+    public PresenceStatus string_to_presence_status (string? presence_status)
     {
         switch (presence_status)
         {
@@ -78,10 +78,10 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
     private unowned Pomodoro.Timer    timer;
     private GLib.Settings             settings;
 
-    private List<PresencePlugin> plugins;
-
     public PresenceModule (Pomodoro.Timer timer)
     {
+        GLib.Object (name: "presence");
+
         this.timer = timer;
 
         this.settings = Pomodoro.get_settings ().get_child ("preferences");
@@ -125,7 +125,7 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
     }
 
 
-    private void enable_plugin (PresencePlugin plugin)
+    private void enable_plugin (Pomodoro.Plugin plugin)
     {
         if (!plugin.enabled) {
             var status = string_to_presence_status (
@@ -134,17 +134,19 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
                         : this.settings.get_string ("presence-during-break"));
 
             plugin.enable ();
-            plugin.set_status (status);
+
+            (plugin as Pomodoro.PresencePlugin).set_status (status);
         }
     }
 
-    private void disable_plugin (PresencePlugin plugin)
+    private void disable_plugin (Pomodoro.Plugin plugin)
     {
         if (plugin.enabled) {
             var status = string_to_presence_status (
                         this.settings.get_string ("presence-during-break"));
 
-            plugin.set_status (status);
+            (plugin as Pomodoro.PresencePlugin).set_status (status);
+
             plugin.disable ();
         }
     }
@@ -199,8 +201,10 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
 
     public void set_status (Pomodoro.PresenceStatus status)
     {
-        foreach (var plugin in this.plugins)
+        foreach (var item in this.plugins)
         {
+            var plugin = item as Pomodoro.PresencePlugin;
+
             if (!plugin.enabled) {
                 continue;
             }

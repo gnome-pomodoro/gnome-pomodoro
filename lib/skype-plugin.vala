@@ -27,6 +27,9 @@ public class Pomodoro.SkypePlugin : Pomodoro.PresencePlugin
 
     public SkypePlugin ()
     {
+        GLib.Object (label: "Skype",
+                     name: "skype",
+                     icon_name: "skype");
     }
 
     private bool has_pending_status ()
@@ -68,6 +71,14 @@ public class Pomodoro.SkypePlugin : Pomodoro.PresencePlugin
         catch (Skype.Error error) {
             this.set_pending_status (status);
         }
+    }
+
+    public override bool can_enable ()
+    {
+        /* check if installed */
+        var path = GLib.Environment.find_program_in_path ("skype");
+
+        return (path != null);
     }
 
     public override void enable ()

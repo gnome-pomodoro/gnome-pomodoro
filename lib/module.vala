@@ -22,13 +22,21 @@ using GLib;
 
 public abstract class Pomodoro.Module : GLib.Object
 {
+    public string? name { get; construct; }
     public bool enabled { get; set; default = false; }
+
+    protected List<Pomodoro.Plugin> plugins;
 
     ~Module ()
     {
         if (this.enabled) {
             this.disable ();
         }
+    }
+
+    public unowned List<Pomodoro.Plugin> get_plugins ()
+    {
+        return this.plugins;
     }
 
     public virtual void enable ()
