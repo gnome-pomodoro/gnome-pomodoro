@@ -17,9 +17,17 @@ rpmdefines = \
 	--define "_sourcedir $(abs_builddir)" \
 	--define "_specdir $(abs_srcdir)"
 
-rpm: packages/rpm/gnome-pomodoro.spec dist
+rpm: packages/rpm/gnome-pomodoro.spec dist-gzip
 	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \
 	rpmbuild $(rpmdefines) -ba $(abs_top_builddir)/packages/rpm/gnome-pomodoro.spec
+
+rpm-package:
+	cd packages/rpm && $(MAKE) gnome-pomodoro.spec
+
+debian-package:
+	cd packages/debian && $(MAKE) deb-src
+
+packages: rpm-package debian-package
 
 test:
 	cd tests && $(MAKE) $@
