@@ -23,9 +23,9 @@ using GLib;
 public abstract class Pomodoro.PresencePlugin : Pomodoro.Plugin
 {
     protected GLib.Settings global_settings;
-    protected GLib.Settings settings;
 
-//    public PresencePlugin ()
+    public GLib.Settings settings;
+
     construct
     {
         this.global_settings = Pomodoro.get_settings ()
@@ -35,6 +35,31 @@ public abstract class Pomodoro.PresencePlugin : Pomodoro.Plugin
             this.settings = new GLib.Settings.with_path (
                             "org.gnome.pomodoro.plugins." + this.name,
                             "/org/gnome/pomodoro/plugins/" + this.name + "/");
+
+            this.settings.changed.connect (this.on_settings_changed);
+        }
+
+        this.notify["enabled"].connect (this.on_enabled_changed);
+    }
+
+    private void on_settings_changed (GLib.Settings settings,
+                                      string        key)
+    {
+        this.update_status ();
+    }
+
+    private void on_enabled_changed ()
+    {
+        this.update_status ();
+    }
+
+    private void update_status ()
+    {
+        var application = GLib.Application.get_default () as Pomodoro.Application;
+        var timer_state = application.timer.state;
+
+        if (timer_state != Pomodoro.State.NULL) {
+            this.set_status.begin (this.get_default_status (timer_state));
         }
     }
 

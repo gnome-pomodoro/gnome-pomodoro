@@ -23,8 +23,21 @@ using GLib;
 public abstract class Pomodoro.Module : GLib.Object
 {
     public string? name { get; construct; }
-    public bool enabled { get; set; default = false; }
 
+    public bool enabled {
+        get {
+            return this._enabled;
+        }
+        set {
+            if (value)
+                this.enable ();
+            else
+                this.disable ();
+        }
+        default = false;
+    }
+
+    private bool _enabled;
     protected List<Pomodoro.Plugin> plugins;
 
     ~Module ()
@@ -39,13 +52,29 @@ public abstract class Pomodoro.Module : GLib.Object
         return this.plugins;
     }
 
+    public Pomodoro.Plugin? get_plugin_by_name (string name)
+    {
+        foreach (var plugin in this.plugins)
+        {
+            if (plugin.name == name) {
+                return plugin;
+            }
+        }
+
+        return null;
+    }
+
     public virtual void enable ()
     {
-        this.enabled = true;
+        this._enabled = true;
+
+        this.notify_property ("enabled");
     }
 
     public virtual void disable ()
     {
-        this.enabled = false;
+        this._enabled = false;
+
+        this.notify_property ("enabled");
     }
 }

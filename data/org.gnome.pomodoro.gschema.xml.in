@@ -127,11 +127,6 @@
       <summary>Wake up screen</summary>
       <description>Wake up screen to notify about pomodoro.</description>
     </key>
-    <key name="enabled-plugins" type="as">
-      <default>[]</default>
-      <summary>Enable plugins</summary>
-      <description>List of enabled plugins.</description>
-    </key>
   </schema>
 
   <schema id="org.gnome.pomodoro.state" path="/org/gnome/pomodoro/state/">
@@ -177,6 +172,11 @@
   </schema>
 
   <schema id="org.gnome.pomodoro.plugins.telepathy" path="/org/gnome/pomodoro/plugins/telepathy/">
+    <key name="enabled" type="b">
+      <default>false</default>
+      <summary>Enabled</summary>
+      <description>Whether plugin is enabled.</description>
+    </key>
     <key name="set-custom-status" type="b">
       <default>false</default>
       <summary>Set custom status</summary>
@@ -209,6 +209,11 @@
   </schema>
 
   <schema id="org.gnome.pomodoro.plugins.skype" path="/org/gnome/pomodoro/plugins/skype/">
+    <key name="enabled" type="b">
+      <default>false</default>
+      <summary>Enabled</summary>
+      <description>Whether plugin is enabled.</description>
+    </key>
     <key name="set-custom-status" type="b">
       <default>false</default>
       <summary>Set custom status</summary>

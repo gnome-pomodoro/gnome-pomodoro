@@ -93,59 +93,52 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
     {
         switch (key)
         {
-            case "presence-during-pomodoro":
-                var status = string_to_presence_status (
-                                                this.settings.get_string (key));
-                if (this.timer.state == State.POMODORO) {
-                    this.set_status (status);
-                }
-                break;
-
-            case "presence-during-break":
-                var status = string_to_presence_status (
-                                                this.settings.get_string (key));
-                if (this.timer.state != State.POMODORO) {
-                    this.set_status (status);
-                }
-                break;
-
             case "change-presence-status":
-                this.enable_plugins ();
+                if (settings.get_boolean (key)) {
+                    this.enable_plugins ();
+                }
+                else {
+                    this.disable_plugins ();
+                }
+
                 break;
         }
     }
 
     private void on_timer_state_changed (Pomodoro.Timer timer)
     {
-        var status_string = timer.state == Pomodoro.State.POMODORO
-                        ? this.settings.get_string ("presence-during-pomodoro")
-                        : this.settings.get_string ("presence-during-break");
-
-        this.set_status (string_to_presence_status (status_string));
+        this.set_status_for_state (timer.state);
     }
-
 
     private void enable_plugin (Pomodoro.Plugin plugin)
     {
-        if (!plugin.enabled) {
-            var status = string_to_presence_status (
-                        this.timer.state == Pomodoro.State.POMODORO
-                        ? this.settings.get_string ("presence-during-pomodoro")
-                        : this.settings.get_string ("presence-during-break"));
+        var presence_plugin = plugin as Pomodoro.PresencePlugin;
 
+        if (!plugin.enabled)
+        {
             plugin.enable ();
 
-            (plugin as Pomodoro.PresencePlugin).set_status (status);
+            if (this.timer.state != Pomodoro.State.NULL)
+            {
+                var status = presence_plugin.get_default_status (this.timer.state);
+
+                presence_plugin.set_status.begin (status);
+            }
         }
     }
 
     private void disable_plugin (Pomodoro.Plugin plugin)
     {
-        if (plugin.enabled) {
-            var status = string_to_presence_status (
-                        this.settings.get_string ("presence-during-break"));
+        var presence_plugin = (plugin as Pomodoro.PresencePlugin);
 
-            (plugin as Pomodoro.PresencePlugin).set_status (status);
+        if (plugin.enabled)
+        {
+            if (this.timer.state != Pomodoro.State.NULL)
+            {
+                var status = presence_plugin.get_default_status (Pomodoro.State.NULL);
+
+                presence_plugin.set_status (status);
+            }
 
             plugin.disable ();
         }
@@ -155,31 +148,53 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
     {
         foreach (var plugin in this.plugins)
         {
-            if ((plugin is Pomodoro.GnomeSessionManagerPlugin) ||
-                (this.settings.get_boolean ("change-presence-status")))
-            {
-                this.enable_plugin (plugin);
-            }
-            else {
-                this.disable_plugin (plugin);
-            }
+            this.enable_plugin (plugin);
+        }
+    }
+
+    private void disable_plugins ()
+    {
+        foreach (var plugin in this.plugins)
+        {
+            this.disable_plugin (plugin);
         }
     }
 
     public override void enable ()
     {
-        if (!this.enabled) {
-            this.plugins.append (new Pomodoro.GnomeSessionManagerPlugin ());
-            this.plugins.append (new Pomodoro.TelepathyPlugin ());
-            this.plugins.append (new Pomodoro.SkypePlugin ());
-
-            this.enable_plugins ();
-
-            this.timer.state_changed.connect (this.on_timer_state_changed);
-            this.on_timer_state_changed (this.timer);
-        }
+        var enabled = this.enabled;
 
         base.enable ();
+
+        if (!enabled) {
+            this.plugins.append (new Pomodoro.GnomeSessionManagerPlugin ());
+
+            var telepathy_plugin = new Pomodoro.TelepathyPlugin ();
+            telepathy_plugin.settings.bind ("enabled",
+                                            telepathy_plugin,
+                                            "enabled",
+                                            GLib.SettingsBindFlags.GET | 
+                                            GLib.SettingsBindFlags.DEFAULT |
+                                            GLib.SettingsBindFlags.NO_SENSITIVITY);
+            this.plugins.append (telepathy_plugin);
+
+            var skype_plugin = new Pomodoro.SkypePlugin ();
+            skype_plugin.settings.bind ("enabled",
+                                        skype_plugin,
+                                        "enabled",
+                                        GLib.SettingsBindFlags.GET | 
+                                        GLib.SettingsBindFlags.DEFAULT |
+                                        GLib.SettingsBindFlags.NO_SENSITIVITY);
+            this.plugins.append (skype_plugin);
+
+            // this.enable_plugins ();
+
+            this.timer.state_changed.connect (this.on_timer_state_changed);
+
+            if (this.timer.state != Pomodoro.State.NULL) {
+                this.on_timer_state_changed (this.timer);
+            }
+        }
     }
 
     public override void disable ()
@@ -189,9 +204,7 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
             SignalHandler.disconnect_by_func (this.timer,
                                               (void*) this.on_timer_state_changed, (void*) this);
 
-            foreach (var plugin in this.plugins) {
-                this.disable_plugin (plugin);
-            }
+            this.disable_plugins ();
 
             this.plugins = null;
         }
@@ -199,23 +212,36 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
         base.disable ();
     }
 
-    public void set_status (Pomodoro.PresenceStatus status)
+//    public void set_status (Pomodoro.PresenceStatus status)
+//    {
+//        foreach (var item in this.plugins)
+//        {
+//            var plugin = item as Pomodoro.PresencePlugin;
+//
+//            if (!plugin.enabled) {
+//                continue;
+//            }
+//
+//            if (plugin is Pomodoro.GnomeSessionManagerPlugin) {
+//                plugin.set_status.begin (
+//                                   this.timer.state == Pomodoro.State.POMODORO
+//                                   ? Pomodoro.PresenceStatus.BUSY
+//                                   : Pomodoro.PresenceStatus.AVAILABLE);
+//            }
+//            else {
+//                plugin.set_status.begin (status);
+//            }
+//        }
+//    }
+
+    public void set_status_for_state (Pomodoro.State timer_state)
     {
         foreach (var item in this.plugins)
         {
             var plugin = item as Pomodoro.PresencePlugin;
 
-            if (!plugin.enabled) {
-                continue;
-            }
-
-            if (plugin is Pomodoro.GnomeSessionManagerPlugin) {
-                plugin.set_status.begin (
-                                   this.timer.state == Pomodoro.State.POMODORO
-                                   ? Pomodoro.PresenceStatus.BUSY
-                                   : Pomodoro.PresenceStatus.AVAILABLE);
-            }
-            else {
+            if (plugin.enabled) {
+                var status = plugin.get_default_status (timer_state);
                 plugin.set_status.begin (status);
             }
         }

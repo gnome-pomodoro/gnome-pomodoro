@@ -68,16 +68,6 @@ public class Pomodoro.GnomeSessionManagerPlugin : Pomodoro.PresencePlugin
         base.disable ();
     }
 
-    public Pomodoro.PresenceStatus get_default_status (Pomodoro.State timer_state)
-    {
-        var settings = this.global_settings;
-        var settings_key = timer_state == State.POMODORO
-                                       ? "presence-during-pomodoro"
-                                       : "presence-during-break";
-
-        return string_to_presence_status (settings.get_string (settings_key));
-    }    
-
     public Pomodoro.PresenceStatus get_status ()
     {
         var status = (Gnome.SessionManager.PresenceStatus) this.proxy.status;

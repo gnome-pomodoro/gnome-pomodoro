@@ -61,14 +61,20 @@ public class Pomodoro.SkypePlugin : Pomodoro.PresencePlugin
 
     public override async void set_status (Pomodoro.PresenceStatus status)
     {
-        assert (this.enabled);
+        // assert (this.enabled);
 
-        try {
-            var skype_status = this.convert_from_pomodoro_presence_status (status);
+        if (this.enabled && this.skype != null)
+        {
+            try {
+                var skype_status = this.convert_from_pomodoro_presence_status (status);
 
-            yield this.skype.set_status (skype_status);
+                yield this.skype.set_status (skype_status);
+            }
+            catch (Skype.Error error) {
+                this.set_pending_status (status);
+            }
         }
-        catch (Skype.Error error) {
+        else {
             this.set_pending_status (status);
         }
     }
@@ -94,11 +100,23 @@ public class Pomodoro.SkypePlugin : Pomodoro.PresencePlugin
 
     public override void disable ()
     {
+        base.disable ();
+
         this.unset_pending_status ();
 
         this.skype = null;
+    }
 
-        base.disable ();
+    public void authenticate ()
+    {
+        try {
+            if (this.skype != null) {
+                this.skype.authenticate.begin ();
+            }
+        }
+        catch (GLib.IOError error) {
+            GLib.warning ("%s", error.message);
+        }
     }
 
     private Skype.PresenceStatus convert_from_pomodoro_presence_status
