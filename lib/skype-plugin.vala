@@ -57,6 +57,9 @@ public class Pomodoro.SkypePlugin : Pomodoro.PresencePlugin
 
             this.set_status.begin (status);
         }
+        else {
+            this.update_status ();
+        }
     }
 
     public override async void set_status (Pomodoro.PresenceStatus status)
@@ -91,6 +94,8 @@ public class Pomodoro.SkypePlugin : Pomodoro.PresencePlugin
     {
         if (this.skype == null)
         {
+            this.unset_pending_status ();
+
             this.skype = new Skype.Connection (Config.PACKAGE_NAME);
             this.skype.authenticated.connect (this.on_skype_authenticated);
 
@@ -101,8 +106,6 @@ public class Pomodoro.SkypePlugin : Pomodoro.PresencePlugin
     public override void disable ()
     {
         base.disable ();
-
-        this.unset_pending_status ();
 
         this.skype = null;
     }

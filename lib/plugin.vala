@@ -24,16 +24,4 @@ public abstract class Pomodoro.Plugin : Pomodoro.Module
 {
     public string? label { get; construct; }
     public string? icon_name { get; construct; }
-
-    public virtual bool can_enable ()
-    {
-        return true;
-    }
-
-    public override void enable ()
-    {
-        if (this.can_enable ()) {
-            this.enabled = true;
-        }
-    }
 }

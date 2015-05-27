@@ -377,7 +377,6 @@ private class Pomodoro.PresenceStatusDialog : Gtk.Dialog
     private unowned Pomodoro.PresencePlugin get_current_plugin ()
     {
         var plugin_name = this.stack.visible_child_name;
-
         var plugin = this.presence_module.get_plugin_by_name (plugin_name);
 
         return plugin as Pomodoro.PresencePlugin;
@@ -665,6 +664,10 @@ private class Pomodoro.PresenceStatusDialog : Gtk.Dialog
         authenticate_button.halign = Gtk.Align.START;
         authenticate_button.hexpand = false;
 
+        authenticate_button.clicked.connect (() => {
+            plugin.authenticate ();
+        });
+
         box.pack_start (custom_status_checkbutton, false, false, 0);
 
         grid.attach (pomodoro_presence_label, 0, grid_row, 1, 1);
@@ -682,10 +685,6 @@ private class Pomodoro.PresenceStatusDialog : Gtk.Dialog
         box.show_all ();
 
         this.stack.add_named (box, "skype");
-
-        authenticate_button.clicked.connect (() => {
-            plugin.authenticate ();
-        });
 
         plugin.settings.bind_with_mapping ("presence-during-pomodoro",
                                            pomodoro_presence,

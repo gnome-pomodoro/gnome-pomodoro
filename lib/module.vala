@@ -52,7 +52,7 @@ public abstract class Pomodoro.Module : GLib.Object
         return this.plugins;
     }
 
-    public Pomodoro.Plugin? get_plugin_by_name (string name)
+    public Pomodoro.Plugin? get_plugin_by_name (string? name)
     {
         foreach (var plugin in this.plugins)
         {
@@ -64,11 +64,19 @@ public abstract class Pomodoro.Module : GLib.Object
         return null;
     }
 
+    public virtual bool can_enable ()
+    {
+        return true;
+    }
+
     public virtual void enable ()
     {
-        this._enabled = true;
+        if (this.can_enable ())
+        {
+            this._enabled = true;
 
-        this.notify_property ("enabled");
+            this.notify_property ("enabled");
+        }
     }
 
     public virtual void disable ()

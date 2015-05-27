@@ -53,7 +53,7 @@ public abstract class Pomodoro.PresencePlugin : Pomodoro.Plugin
         this.update_status ();
     }
 
-    private void update_status ()
+    protected void update_status ()
     {
         var application = GLib.Application.get_default () as Pomodoro.Application;
         var timer_state = application.timer.state;

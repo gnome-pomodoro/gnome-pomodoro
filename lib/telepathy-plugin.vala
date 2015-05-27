@@ -65,29 +65,8 @@ public class Pomodoro.TelepathyPlugin : Pomodoro.PresencePlugin
             var current_status = this.account_manager.get_most_available_presence (
                                            out current_status_string,
                                            out message);
-            var new_status = TelepathyGLib.ConnectionPresenceType.UNSET;
-            var new_status_string = "";
-
-            switch (status)
-            {
-                case Pomodoro.PresenceStatus.BUSY:
-                    if (current_status == TelepathyGLib.ConnectionPresenceType.AVAILABLE)
-                    {
-                        new_status = TelepathyGLib.ConnectionPresenceType.BUSY;
-                        new_status_string = "busy";
-                    }
-
-                    break;
-
-                case Pomodoro.PresenceStatus.AVAILABLE:
-                    if (current_status == TelepathyGLib.ConnectionPresenceType.BUSY)
-                    {
-                        new_status = TelepathyGLib.ConnectionPresenceType.AVAILABLE;
-                        new_status_string = "available";
-                    }
-
-                    break;
-            }
+            var new_status = this.convert_from_pomodoro_presence_status (status);
+            var new_status_string = this.presence_status_to_string (status);
 
             if (new_status != TelepathyGLib.ConnectionPresenceType.UNSET) {
                 this.account_manager.set_all_requested_presences (new_status,
@@ -115,6 +94,26 @@ public class Pomodoro.TelepathyPlugin : Pomodoro.PresencePlugin
                 return TelepathyGLib.ConnectionPresenceType.HIDDEN;
         }
 
-        return TelepathyGLib.ConnectionPresenceType.UNKNOWN;
+        return TelepathyGLib.ConnectionPresenceType.UNSET;
+    }
+
+    private string presence_status_to_string (Pomodoro.PresenceStatus status)
+    {
+        switch (status)
+        {
+            case Pomodoro.PresenceStatus.AVAILABLE:
+                return "available";
+
+            case Pomodoro.PresenceStatus.BUSY:
+                return "dnd";
+
+            case Pomodoro.PresenceStatus.IDLE:
+                return "away";
+
+            case Pomodoro.PresenceStatus.INVISIBLE:
+                return "hidden";
+        }
+
+        return "";
     }
 }
