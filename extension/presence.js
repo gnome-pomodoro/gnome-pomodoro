@@ -55,7 +55,7 @@ const Presence = new Lang.Class({
                 }
         });
 
-        if (MessageTray.MessageTrayMenu) {  // deprecated in 3.16
+        if (!Utils.versionCheck('3.16')) {
             this._patch.addHooks(MessageTray.MessageTrayMenu.prototype, {
                 _onStatusChanged:
                     function(status) {
@@ -186,11 +186,17 @@ const Presence = new Lang.Class({
     },
 
     _getMessageTrayMenu: function() {
+        if (Utils.versionCheck('3.16'))
+            return undefined;
+
         return Main.messageTray._messageTrayMenuButton
             ? Main.messageTray._messageTrayMenuButton._menu : undefined;
     },
 
     _getNotificationsMenuItem: function() {
+        if (Utils.versionCheck('3.16'))
+            return undefined;
+
         let menu = this._getMessageTrayMenu();
 
         return menu && menu._busyItem

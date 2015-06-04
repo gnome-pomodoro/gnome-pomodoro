@@ -95,8 +95,8 @@ msgid "%dm"
 msgstr "%dm"
 
 #: ../extension/notifications.js:163
-msgid "Focus on your task"
-msgstr "Concentrez-vous sur votre tâche"
+msgid "Focus on your task."
+msgstr "Concentrez-vous sur votre tâche."
 
 #: ../extension/notifications.js:172
 msgid "Take a break"

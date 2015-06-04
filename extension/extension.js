@@ -39,6 +39,7 @@ const Dialogs = Extension.imports.dialogs;
 const Presence = Extension.imports.presence;
 const Settings = Extension.imports.settings;
 const Timer = Extension.imports.timer;
+const Utils = Extension.imports.utils;
 
 
 let extension = null;
@@ -270,20 +271,11 @@ const PomodoroExtension = new Lang.Class({
     enableKeybinding: function() {
         if (!this.keybinding) {
             this.keybinding = true;
-            if (Shell.ActionMode) {
-                Main.wm.addKeybinding('toggle-timer-key',  // 3.16+
-                                      this.settings,
-                                      Meta.KeyBindingFlags.NONE,
-                                      Shell.ActionMode.ALL,
-                                      Lang.bind(this, this._onKeybindingPressed));
-            }
-            else {
-                Main.wm.addKeybinding('toggle-timer-key',  // deprecated
-                                      this.settings,
-                                      Meta.KeyBindingFlags.NONE,
-                                      Shell.KeyBindingMode.ALL,
-                                      Lang.bind(this, this._onKeybindingPressed));
-            }
+            Main.wm.addKeybinding('toggle-timer-key',
+                                  this.settings,
+                                  Meta.KeyBindingFlags.NONE,
+                                  Utils.versionCheck('3.16') ? Shell.ActionMode.ALL : Shell.KeyBindingMode.ALL,
+                                  Lang.bind(this, this._onKeybindingPressed));
         }
     },
 

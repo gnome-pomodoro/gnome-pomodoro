@@ -142,3 +142,19 @@ function getFocusedWindowInfo() {
 
     return result;
 }
+
+
+function versionCheck(required) {
+    let current = imports.misc.config.PACKAGE_VERSION;
+    let currentArray = current.split('.');
+    let requiredArray = required.split('.');
+
+    if (requiredArray[0] <= currentArray[0] &&
+        requiredArray[1] <= currentArray[1] &&
+        (requiredArray[2] <= currentArray[2] ||
+         requiredArray[2] == undefined)) {
+        return true;
+    }
+
+    return false;
+}

@@ -47,8 +47,7 @@ const REMINDER_TIMEOUT = 75;
 const REMINDER_MIN_REMAINING_TIME = 60;
 
 
-function getDefaultSource()
-{
+function getDefaultSource() {
     let extension = Extension.extension;
     let source = extension.notificationSource;
 
@@ -63,8 +62,8 @@ function getDefaultSource()
         source = new Source();
         let destroyId = source.connect('destroy', Lang.bind(source,
             function(source) {
-                if (Extension.extension.notificationSource === source) {
-                    Extension.extension.notificationSource = null;
+                if (extension.notificationSource === source) {
+                    extension.notificationSource = null;
                 }
 
                 source.disconnect(destroyId);
@@ -85,6 +84,8 @@ const Source = new Lang.Class({
 
     _init: function() {
         this.parent(_("Pomodoro"), this.ICON_NAME);
+
+        this._idleId = 0;
     },
 
     /* override parent method */
@@ -93,12 +94,78 @@ const Source = new Lang.Class({
                                                     detailsInLockScreen: true });
     },
 
-    destroyNotifications: function() {
-        while (this.notifications && this.notifications.length) {
-            this.notifications.shift().destroy();
+    /* deprecated in 3.16, override parent method */
+    get isClearable() {
+        return false;
+    },
+
+    _lastNotificationRemoved: function() {
+        this._idleId = Mainloop.idle_add(Lang.bind(this,
+                                         function() {
+                                             if (!this.count) {
+                                                 this.destroy();
+                                             }
+
+                                             return GLib.SOURCE_REMOVE;
+                                         }));
+        GLib.Source.set_name_by_id(this._idleId,
+                                   '[gnome-pomodoro] this._lastNotificationRemoved');
+    },
+
+    /* override parent method */
+    _onNotificationDestroy: function(notification) {
+        let index = this.notifications.indexOf(notification);
+        if (index < 0) {
+            return;
+        }
+
+        this.notifications.splice(index, 1);
+        if (this.notifications.length == 0) {
+            this._lastNotificationRemoved();
         }
 
         this.countUpdated();
+    },
+
+    destroyNotifications: function() {
+        let notifications = this.notifications.slice();
+
+        notifications.forEach(
+            function(notification) {
+                notification.destroy();
+            });
+    },
+
+    destroy: function() {
+        this.parent();
+
+        if (this._idleId) {
+            Mainloop.source_remove(this._idleId);
+            this._idleId = 0;
+        }
+    }
+});
+
+
+const NotificationBannerBridge = new Lang.Class({
+    Name: 'NotificationBannerBridge',
+
+    _init: function(notification) {
+        this._useBodyMarkup = false;
+
+        this.bodyLabel = new MessageTray.URLHighlighter('', true, this._useBodyMarkup);
+
+        this.notification = notification;
+        this.notification.addActor(this.bodyLabel.actor);
+    },
+
+    setBody: function(text) {
+        this.bodyLabel.setMarkup(text, this._useBodyMarkup);
+        this.notification._bannerUrlHighlighter.setMarkup(text, this._useBodyMarkup);
+    },
+
+    addAction: function(label, callback) {
+        return this.notification.addAction(label, callback);
     }
 });
 
@@ -108,22 +175,70 @@ const Notification = new Lang.Class({
     Extends: MessageTray.Notification,
 
     _init: function(title, description, params) {
-        this.parent(null, title, description, params);
+        if (Utils.versionCheck('3.16')) {
+            this.parent(null, title, description, params);
+        }
+        else {
+            /* We need source to be reused or created in show() method, but
+               3.14 needs it in notification constructor. */
+            let source = new Source();
+            source.isPlaceholder = true;
+
+            this.parent(source, title, null, params);
+
+            this.actor.child.add_style_class_name('extension-pomodoro-notification');
+
+            this._banner = this.createBanner();
+            this._banner.setBody(description);
+
+            let clickedId = this.connect('clicked', Lang.bind(this,
+                function() {
+                    this.activate();
+                }));
+
+            let destroyId = this.connect('destroy', Lang.bind(this,
+                function() {
+                    this._banner = null;
+
+                    this.disconnect(clickedId);
+                    this.disconnect(destroyId);
+                }));
+        }
+
+        this._restoreForFeedback = false;
 
         /* We want notifications to be shown right after the action,
          * therefore urgency bump.
          */
         this.setUrgency(MessageTray.Urgency.HIGH);
-
-        this._restoreForFeedback = false;
     },
 
     activate: function() {
-        this.parent();
-        Main.panel.closeCalendar();
+        if (Utils.versionCheck('3.16')) {
+            this.parent();
+            Main.panel.closeCalendar();
+        }
+        else {
+            this.emit('activated');
+            if (!this.resident) {
+                this.destroy();
+            }
+            Main.messageTray.close();
+        }
+    },
+
+    createBanner: function() {
+        return Utils.versionCheck('3.16')
+                ? this.parent()
+                : new NotificationBannerBridge(this);
     },
 
     show: function() {
+        if (this.source && this.source.isPlaceholder) {
+            this.source.destroy();
+            this.source = null;
+        }
+
         if (!this.source) {
             this.source = getDefaultSource();
         }
@@ -136,10 +251,6 @@ const Notification = new Lang.Class({
             }
 
             this.acknowledged = false;
-
-            /* Add notification to source before "source-added"
-               signal gets emitted */
-            // this.source.pushNotification(this);
 
             if (!Main.messageTray.contains(this.source)) {
                 Main.messageTray.add(this.source);
@@ -160,7 +271,7 @@ const PomodoroStartNotification = new Lang.Class({
 
     _init: function(timer) {
         let title = _("Pomodoro");
-        let message = _("Focus on your task");
+        let message = _("Focus on your task.");
 
         this.parent(title, message, null);
 
@@ -226,9 +337,9 @@ const PomodoroEndNotification = new Lang.Class({
                 this.emit('updated', false);
             }
             this._minutes = minutes;
-
-            this.emit('timer-updated');
         }
+
+        this.emit('timer-updated');
     },
 
     createBanner: function() {
@@ -271,8 +382,6 @@ const PomodoroEndNotification = new Lang.Class({
 
         let notificationUpdatedId = this.connect('timer-updated', onTimerUpdated);
         let notificationDestroyId = this.connect('destroy', onDestroy);
-
-        onTimerUpdated();
 
         return banner;
     }
@@ -441,10 +550,5 @@ const IssueNotification = new Lang.Class({
         }
 
         this.source.notify(this);
-    },
-
-    close: function() {
-        this.emit('done-displaying');
-        this.destroy();
     }
 });
