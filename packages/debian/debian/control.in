@@ -1,0 +1,35 @@
+Source: @PACKAGE_NAME@
+Maintainer: Kamil Prusko <kamilprusko@gmail.com>
+Section: gnome
+Priority: optional
+Build-Depends: debhelper (>= 8.0.0),
+               dh-autoreconf,
+               gettext,
+               intltool,
+               valac
+               pkg-config,
+               gnome-common,
+               desktop-file-utils,
+               libdbus-glib-1-dev,
+               libglib2.0-dev (>= @GLIB_REQUIRED@),
+               libgnome-desktop-3-dev (>= @GNOME_REQUIRED@),
+               gsettings-desktop-schemas (>= @GNOME_REQUIRED@),
+               gobject-introspection,
+               libgirepository1.0-dev,
+               libgstreamer1.0-dev (>= 1.2.0),
+               libgtk-3-dev (>= @GTK_REQUIRED@),
+               libcanberra-dev (>= 0.30),
+               libtelepathy-glib-dev (>= @TELEPATHY_GLIB_REQUIRED@)
+Homepage: @PACKAGE_URL@
+
+Package: @PACKAGE_NAME@
+Architecture: any
+Depends: gnome-shell (<< 3.17.0),
+         gnome-shell (>= @GNOME_REQUIRED@),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Recommends: fonts-droid
+Description: A time management utility for GNOME
+ A GNOME utility that helps managing time according to Pomodoro Technique. It
+ intends to improve productivity and focus by taking short breaks after every
+ 25 minutes of work.

@@ -3,6 +3,7 @@
     <child name="preferences" schema="org.gnome.pomodoro.preferences"/>
     <child name="state" schema="org.gnome.pomodoro.state"/>
   </schema>
+
   <schema id="org.gnome.pomodoro.preferences" path="/org/gnome/pomodoro/preferences/">
     <key name="pomodoro-duration" type="d">
       <default>1500</default>
@@ -61,6 +62,11 @@
       <default>true</default>
       <summary>Wait after a break</summary>
       <description>Postpone pomodoro until there is some activity.</description>
+    </key>
+    <key name="change-presence-status" type="b">
+      <default>false</default>
+      <summary>Change presence status</summary>
+      <description>Whether to change IM presence status.</description>
     </key>
     <key name="presence-during-pomodoro" type="s">
       <choices>
@@ -122,6 +128,7 @@
       <description>Wake up screen to notify about pomodoro.</description>
     </key>
   </schema>
+
   <schema id="org.gnome.pomodoro.state" path="/org/gnome/pomodoro/state/">
     <key name="session" type="d">
       <default>0</default>
@@ -158,6 +165,83 @@
       <default>""</default>
       <summary>Default location for the "Open…" dialogues</summary>
       <description>Default location for the "Open…" dialogues.</description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.pomodoro.plugins" path="/org/gnome/pomodoro/plugins/">
+  </schema>
+
+  <schema id="org.gnome.pomodoro.plugins.telepathy" path="/org/gnome/pomodoro/plugins/telepathy/">
+    <key name="enabled" type="b">
+      <default>false</default>
+      <summary>Enabled</summary>
+      <description>Whether plugin is enabled.</description>
+    </key>
+    <key name="set-custom-status" type="b">
+      <default>false</default>
+      <summary>Set custom status</summary>
+      <description>Whether plugin should set custom presence status.</description>
+    </key>
+    <key name="presence-during-pomodoro" type="s">
+      <choices>
+        <choice value=""/>
+        <choice value="available"/>
+        <choice value="invisible"/>
+        <choice value="busy"/>
+        <choice value="idle"/>
+      </choices>
+      <default>"busy"</default>
+      <summary>Presence during pomodoro</summary>
+      <description>Presence during pomodoro.</description>
+    </key>
+    <key name="presence-during-break" type="s">
+      <choices>
+        <choice value=""/>
+        <choice value="available"/>
+        <choice value="invisible"/>
+        <choice value="busy"/>
+        <choice value="idle"/>
+      </choices>
+      <default>"available"</default>
+      <summary>Presence during break</summary>
+      <description>Presence during break.</description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.pomodoro.plugins.skype" path="/org/gnome/pomodoro/plugins/skype/">
+    <key name="enabled" type="b">
+      <default>false</default>
+      <summary>Enabled</summary>
+      <description>Whether plugin is enabled.</description>
+    </key>
+    <key name="set-custom-status" type="b">
+      <default>false</default>
+      <summary>Set custom status</summary>
+      <description>Whether plugin should set custom presence status.</description>
+    </key>
+    <key name="presence-during-pomodoro" type="s">
+      <choices>
+        <choice value=""/>
+        <choice value="available"/>
+        <choice value="invisible"/>
+        <choice value="busy"/>
+        <choice value="idle"/>
+      </choices>
+      <default>"busy"</default>
+      <summary>Presence during pomodoro</summary>
+      <description>Presence during pomodoro.</description>
+    </key>
+    <key name="presence-during-break" type="s">
+      <choices>
+        <choice value=""/>
+        <choice value="available"/>
+        <choice value="invisible"/>
+        <choice value="busy"/>
+        <choice value="idle"/>
+      </choices>
+      <default>"available"</default>
+      <summary>Presence during break</summary>
+      <description>Presence during break.</description>
     </key>
   </schema>
 </schemalist>

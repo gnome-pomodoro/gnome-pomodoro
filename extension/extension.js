@@ -39,6 +39,7 @@ const Dialogs = Extension.imports.dialogs;
 const Presence = Extension.imports.presence;
 const Settings = Extension.imports.settings;
 const Timer = Extension.imports.timer;
+const Utils = Extension.imports.utils;
 
 
 let extension = null;
@@ -91,18 +92,21 @@ const PomodoroExtension = new Lang.Class({
 
     _destroyNotifications: function() {
         if (this.notificationSource) {
-            this.notificationSource.destroyAllNotifications();
+            this.notificationSource.destroyNotifications();
         }
     },
 
     _destroyPreviousNotifications: function() {
-        if (Notifications.source) {
-            let notifications = Notifications.source.notifications.filter(Lang.bind(this,
-                function(notification) {
+        if (this.notificationSource) {
+            let notifications = this.notificationSource.notifications.filter(
+                Lang.bind(this, function(notification) {
                     return notification !== this.notification;
                 }));
 
-            Notifications.source.destroyNotifications(notifications);
+            notifications.forEach(
+                function(notification) {
+                    notification.destroy();
+                });
         }
     },
 
@@ -183,12 +187,6 @@ const PomodoroExtension = new Lang.Class({
         }
         else {
             this.notification = new Notifications.PomodoroStartNotification(this.timer);
-            this.notification.connect('clicked', Lang.bind(this,
-                function(notification) {
-                    Main.messageTray.close();
-
-                    notification.hide();
-                }));
             this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
             this.notification.show();
         }
@@ -204,25 +202,13 @@ const PomodoroExtension = new Lang.Class({
         }
         else {
             this.notification = new Notifications.PomodoroEndNotification(this.timer);
-            this.notification.connect('mapped', Lang.bind(this,
+            this.notification.connect('activated', Lang.bind(this,
                 function(notification) {
-                    if (this.reminderManager) {
-                        this.reminderManager.block();
-                    }
-                }));
-            this.notification.connect('unmapped', Lang.bind(this,
-                function(notification) {
-                    if (this.reminderManager) {
-                        this.reminderManager.unblock();
-                    }
-                }));
-            this.notification.connect('clicked', Lang.bind(this,
-                function(notification) {
-                    if (this.dialog) {
+                    let timerState = this.timer.getState();
+
+                    if (this.dialog && timerState == Timer.State.PAUSE) {
                         this.dialog.open(true);
                         this.dialog.pushModal();
-
-                        notification.hide();
                     }
 
                     if (this.reminderManager) {
@@ -288,7 +274,7 @@ const PomodoroExtension = new Lang.Class({
             Main.wm.addKeybinding('toggle-timer-key',
                                   this.settings,
                                   Meta.KeyBindingFlags.NONE,
-                                  Shell.KeyBindingMode.ALL,
+                                  Utils.versionCheck('3.16') ? Shell.ActionMode.ALL : Shell.KeyBindingMode.ALL,
                                   Lang.bind(this, this._onKeybindingPressed));
         }
     },
@@ -376,8 +362,6 @@ const PomodoroExtension = new Lang.Class({
                         this.logError(error.message);        
                     }
 
-                    Main.messageTray.close();
-
                     if (this.presence) {
                         this.presence.update();
                     }
@@ -428,7 +412,7 @@ const PomodoroExtension = new Lang.Class({
             this.reminderManager.connect('notify', Lang.bind(this,
                 function() {
                     let notification = new Notifications.PomodoroEndReminderNotification();
-                    notification.connect('clicked', Lang.bind(this,
+                    notification.connect('activated', Lang.bind(this,
                         function(notification) {
                             this.reminderManager.acknowledged = true;
 
@@ -439,13 +423,13 @@ const PomodoroExtension = new Lang.Class({
 
                             notification.destroy();
                         }));
-                    notification.connect('destroy', Lang.bind(this,
-                        function(notification) {
-                            // if (!this.reminderManager.acknowledged) {
-                            //     this.reminderManager.schedule();
-                            // }
-                        }));
-                    notification.show();
+                    // notification.connect('destroy', Lang.bind(this,
+                    //     function(notification) {
+                    //         if (!this.reminderManager.acknowledged) {
+                    //             this.reminderManager.schedule();
+                    //         }
+                    //     }));
+                    // notification.show();
                 }));
             this.reminderManager.connect('destroy', Lang.bind(this,
                 function() {

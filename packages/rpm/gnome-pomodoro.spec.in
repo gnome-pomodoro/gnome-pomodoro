@@ -4,7 +4,7 @@ Version:   @PACKAGE_VERSION@
 Release:   1%{?dist}
 License:   GPLv3+
 URL:       @PACKAGE_URL@
-Source:    @distdir@-@PACKAGE_VERSION@.tar.xz
+Source:    @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.xz
 
 %if %{undefined fedora}
 Group: Productivity/Office/Other
@@ -14,19 +14,17 @@ BuildRequires: gettext
 BuildRequires: intltool
 BuildRequires: vala
 BuildRequires: gnome-common
-BuildRequires: gnome-shell
+BuildRequires: gnome-shell >= @GNOME_REQUIRED@
 BuildRequires: desktop-file-utils
 BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(dbus-glib-1)
 BuildRequires: pkgconfig(glib-2.0) >= @GLIB_REQUIRED@
 BuildRequires: pkgconfig(gnome-desktop-3.0) >= @GNOME_REQUIRED@
 BuildRequires: pkgconfig(gobject-introspection-1.0)
-BuildRequires: pkgconfig(gom-1.0)
 BuildRequires: pkgconfig(gstreamer-1.0)
 BuildRequires: pkgconfig(gtk+-3.0) >= @GTK_REQUIRED@
 BuildRequires: pkgconfig(libcanberra)
-BuildRequires: pkgconfig(sqlite3)
-BuildRequires: pkgconfig(telepathy-glib) >= @GTK_REQUIRED@
+BuildRequires: pkgconfig(telepathy-glib) >= @TELEPATHY_GLIB_REQUIRED@
 
 
 %if %{defined fedora}
@@ -61,7 +59,7 @@ intends to improve productivity and focus by taking short breaks after every
 25 minutes of work.
 
 %prep
-%setup -q -n @distdir@-%{version}
+%setup -q -n @PACKAGE_TARNAME@-%{version}
 
 %build
 %configure --disable-static
@@ -102,4 +100,4 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/gnome-pomodoro
 %{_datadir}/gnome-shell/extensions/@EXTENSION_UUID@
 %{_datadir}/icons/hicolor/*/apps/*
-%{_mandir}/man1/gnome-pomodoro.1
+%{_mandir}/man1/gnome-pomodoro.1*

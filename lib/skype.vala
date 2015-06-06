@@ -270,7 +270,7 @@ namespace Skype
         public async void set_status (PresenceStatus status) throws Skype.Error
         {
             this.assert_authenticated ();
-     
+
             try {
                 var status_string = presence_status_to_string (status);
 
