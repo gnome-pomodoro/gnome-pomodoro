@@ -1,0 +1,5 @@
+@PACKAGE_NAME@ (@PACKAGE_VERSION@-1) stable; urgency=low
+
+  * Initial Release
+
+ -- Kamil Prusko <kamilprusko@gmail.com>  Sun, 15 Jun 2014 19:15:30 +0200

@@ -22,4 +22,6 @@ using GLib;
 
 public abstract class Pomodoro.Plugin : Pomodoro.Module
 {
+    public string? label { get; construct; }
+    public string? icon_name { get; construct; }
 }

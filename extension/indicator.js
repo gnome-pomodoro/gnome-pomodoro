@@ -70,11 +70,13 @@ const IndicatorMenu = new Lang.Class({
     _init: function(indicator) {
         this.parent(indicator.actor, St.Align.START, St.Side.TOP);
 
+        this._timerUpdateId = 0;
+
         this.actor.add_style_class_name('extension-pomodoro-indicator-menu');
 
-        this.indicator = indicator;
+        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMapped));
 
-        this._onTimerStateChangedId = this.indicator.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
+        this.indicator = indicator;
 
         /* Toggle timer state button */
         this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"),
@@ -85,20 +87,77 @@ const IndicatorMenu = new Lang.Class({
             }));
         this.addMenuItem(this._timerToggle);
 
+        this._actionsSeparator = new PopupMenu.PopupSeparatorMenuItem();
+        this.addMenuItem(this._actionsSeparator);
+
+        this._startPomodoroItem = this.addAction(_("Start Pomodoro"), Lang.bind(this, this._startPomodoro));
+        this._startPauseItem = this.addAction(_("Take Break"), Lang.bind(this, this._startPause));
+        this._switchPauseItem = this.addAction("", Lang.bind(this, this._switchPause));
+
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
 
         this.connect('destroy', Lang.bind(this,
             function() {
-                if (this._onTimerStateChangedId) {
-                    this.indicator.timer.disconnect(this._onTimerStateChangedId);
-                    this._onTimerStateChangedId = 0;
+                if (this._timerUpdateId) {
+                    this.indicator.timer.disconnect(this._timerUpdateId);
+                    this._timerUpdateId = 0;
+                }
+
+                if (this._actorMappedId) {
+                    this.actor.disconnect(this._actorMappedId);
+                    this._actorMappedId = 0;
                 }
             }));
     },
 
-    _onTimerStateChanged: function() {
-        this._timerToggle.setToggleState(this._isTimerToggled());
+    _onActorMapped: function(actor) {
+        if (actor.mapped && this._timerUpdateId == 0) {
+            this._timerUpdateId = this.indicator.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+            this._onTimerUpdate();
+        }
+
+        if (!actor.mapped && this._timerUpdateId != 0) {
+            this.indicator.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+    },
+
+    _onTimerUpdate: function() {
+        if (this.isOpen) {
+            let timerState = this.indicator.timer.getState();
+            let hasActions = false;
+
+            this._timerToggle.setToggleState(this._isTimerToggled());
+
+            if (timerState == Timer.State.POMODORO || timerState == Timer.State.IDLE) {
+                this._startPauseItem.actor.show();
+                hasActions = true;
+            }
+            else {
+                this._startPauseItem.actor.hide();
+            }
+
+            if (timerState == Timer.State.PAUSE) {
+                this._startPomodoroItem.actor.show();
+                this._switchPauseItem.actor.show();
+
+                this._updateSwitchPauseItem();
+
+                hasActions = true;
+            }
+            else {
+                this._startPomodoroItem.actor.hide();
+                this._switchPauseItem.actor.hide();
+            }
+
+            if (hasActions) {
+                this._actionsSeparator.actor.show();
+            }
+            else {
+                this._actionsSeparator.actor.hide();
+            }
+        }
     },
 
     _isTimerToggled: function() {
@@ -110,6 +169,27 @@ const IndicatorMenu = new Lang.Class({
         let timestamp = global.get_current_time();
 
         this.indicator.timer.showPreferences(view, timestamp);
+    },
+
+    _startPomodoro: function() {
+        this.indicator.timer.setState(Timer.State.POMODORO);
+    },
+
+    _startPause: function() {
+        this.indicator.timer.setState(Timer.State.PAUSE);
+    },
+
+    _updateSwitchPauseItem: function() {
+        let timer = this.indicator.timer;
+
+        this._switchPauseItem.label.set_text(timer.isLongPause()
+                    ? _("Take Shorter Break") : _("Take Longer Break"));
+
+        this._switchPauseItem.setSensitive(timer.canSwitchPause());
+    },
+
+    _switchPause: function() {
+        this.indicator.timer.switchPause();
     }
 });
 

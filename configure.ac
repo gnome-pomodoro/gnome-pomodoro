@@ -1,9 +1,9 @@
 AC_PREREQ([2.69])
 AC_INIT([gnome-pomodoro],
         [0.11.0],
-        [https://github.com/codito/gnome-shell-pomodoro/issues],
+        [https://github.com/codito/gnome-pomodoro/issues],
         [gnome-pomodoro],
-        [https://github.com/codito/gnome-shell-pomodoro])
+        [http://gnomepomodoro.org])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -173,6 +173,7 @@ AC_CONFIG_FILES([
     po/Makefile.in
     man/Makefile
     packages/Makefile
+    packages/debian/Makefile
     packages/rpm/Makefile
     tests/Makefile
 ])

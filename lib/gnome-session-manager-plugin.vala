@@ -26,9 +26,10 @@ public class Pomodoro.GnomeSessionManagerPlugin : Pomodoro.PresencePlugin
 
     private bool ignore_next_status = false;
 
-    public GnomeSessionManagerPlugin ()
-    {
-    }
+//    public GnomeSessionManagerPlugin ()
+//    {
+//        base ();
+//    }
 
     private void on_status_changed (uint status)
     {

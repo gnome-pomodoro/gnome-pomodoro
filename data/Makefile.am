@@ -2,6 +2,9 @@ SUBDIRS = \
     icons \
     sounds
 
+#BUILT_SOURCES = \
+#	gschemas.compiled
+
 @INTLTOOL_DESKTOP_RULE@
 desktopdir = $(datadir)/applications
 desktop_in_files = org.gnome.Pomodoro.desktop.in
@@ -29,6 +32,13 @@ appdata_DATA = org.gnome.Pomodoro.appdata.xml
 
 resource_files = $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gnome-pomodoro.gresource.xml)
 
+# We need to compile schemas at make time
+# to run from source tree
+#gschemas.compiled: $(gsettings_SCHEMAS)
+#	$(AM_V_GEN) $(GLIB_COMPILE_SCHEMAS) \
+#		$(addprefix --schema-file=,$(GTK_GSETTINGS_SCHEMAS)) \
+#		--targetdir=$(builddir)
+
 EXTRA_DIST = \
 	gnome-pomodoro.gresource.xml \
 	$(resource_files) \
@@ -42,12 +52,11 @@ CLEANFILES = \
     $(desktop_DATA) \
     $(gsettings_SCHEMAS) \
     $(service_DATA)
+#    gschemas.compiled
 
 dist-hook:
 	cd $(distdir) && rm -f $(CLEANFILES)
 
-# For uninstalled use
-all-local:
-	$(GLIB_COMPILE_SCHEMAS) $(builddir)
+# all-local: gschemas.compiled
 
 -include $(top_srcdir)/git.mk

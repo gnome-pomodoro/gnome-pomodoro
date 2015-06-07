@@ -295,6 +295,34 @@ public class Pomodoro.Application : Gtk.Application
         this.setup_menu ();
     }
 
+    public Pomodoro.Module? get_module_by_name (string name)
+    {
+        foreach (var module in this.modules)
+        {
+            if (module != null && module.name == name) {
+//                module.plugin_enabled.connect ((plugin) => {
+//                    message ("Plugin enabled");
+//                });
+
+//                module.plugin_disabled.connect ((plugin) => {
+//                    message ("Plugin disabled");
+//                });
+
+                return module;
+            }
+        }
+
+        return null;
+    }
+
+//    public void enable_plugin (Pomodoro.Plugin plugin)
+//    {
+//    }
+
+//    public void disable_plugin (Pomodoro.Plugin plugin)
+//    {
+//    }
+
     private void on_timer_state_changed (Timer timer)
     {
         var is_running = timer.state != State.NULL;

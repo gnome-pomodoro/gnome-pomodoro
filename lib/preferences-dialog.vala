@@ -19,7 +19,6 @@
  */
 
 using GLib;
-using Gnome.SessionManager;
 
 
 namespace Pomodoro
@@ -197,6 +196,38 @@ namespace Pomodoro
 
         return new Variant.string (presence_status_to_string (status));
     }
+
+    private bool on_off_mapping (GLib.Value   value,
+                                 GLib.Variant variant,
+                                 void*        user_data)
+    {
+        value.set_string (variant.get_boolean () ? _("On") : _("Off"));
+
+        return true;
+    }
+
+    private string? get_presence_status_label (Pomodoro.PresenceStatus status)
+    {
+        switch (status)
+        {
+            case PresenceStatus.AVAILABLE:
+                return _("Available");
+
+            case PresenceStatus.BUSY:
+                return _("Busy");
+
+            case PresenceStatus.INVISIBLE:
+                return _("Invisible");
+
+            // case PresenceStatus.AWAY:
+            //     return _("Away");
+
+            case PresenceStatus.IDLE:
+                return _("Idle");
+        }
+
+        return null;
+    }
 }
 
 
@@ -223,6 +254,7 @@ namespace Pomodoro
                                                   Gtk.Widget? bottom_widget=null)
     {
         var row = new Gtk.ListBoxRow ();
+        row.activatable = false;
 
         var bin = new Gtk.Alignment (0.0f, 0.0f, 1.0f, 1.0f);
         bin.set_padding (10, 10, 20, 20);
@@ -287,6 +319,485 @@ public struct Pomodoro.SoundInfo
                                          Config.PACKAGE_DATA_DIR,
                                          "sounds",
                                          this.uri);
+    }
+}
+
+
+private class Pomodoro.PresenceStatusDialog : Gtk.Dialog
+{
+    private GLib.Settings settings;
+    private Gtk.SizeGroup combo_box_size_group;
+    private Gtk.Button back_button;
+    private Gtk.Switch toggle;
+    private Gtk.Stack stack;
+    private Pomodoro.Module presence_module;
+
+    public PresenceStatusDialog () {
+        GLib.Object (
+            use_header_bar: 1
+        );
+
+        this.modal = true;
+        this.resizable = false;
+        this.destroy_with_parent = true;
+        this.border_width = 5;
+
+        var geometry = Gdk.Geometry ();
+        geometry.min_width = 500;
+        geometry.min_height = 100;
+
+        var geometry_hints = Gdk.WindowHints.MIN_SIZE;
+
+        this.set_geometry_hints (this,
+                                 geometry,
+                                 geometry_hints);
+
+        this.settings = Pomodoro.get_settings ().get_child ("preferences");
+
+        var application = GLib.Application.get_default () as Pomodoro.Application;
+        this.presence_module = application.get_module_by_name ("presence");
+
+        this.combo_box_size_group = new Gtk.SizeGroup (Gtk.SizeGroupMode.BOTH);
+
+        this.stack = new Gtk.Stack ();
+        this.stack.transition_type = Gtk.StackTransitionType.CROSSFADE;
+        this.stack.show ();
+
+        var content_area = this.get_content_area () as Gtk.Box;
+        content_area.pack_start (this.stack, false, true, 0);
+
+        this.setup_header_bar ();
+        this.setup_default_view ();
+        this.setup_skype_view ();
+        this.setup_telepathy_view ();
+
+        this.stack.set_visible_child_name ("default");
+    }
+
+    private unowned Pomodoro.PresencePlugin get_current_plugin ()
+    {
+        var plugin_name = this.stack.visible_child_name;
+        var plugin = this.presence_module.get_plugin_by_name (plugin_name);
+
+        return plugin as Pomodoro.PresencePlugin;
+    }
+
+    private void update_header_bar ()
+    {
+        var plugin = this.get_current_plugin ();
+
+        GLib.Settings.unbind (this.toggle, "active");
+
+        if (plugin == null)
+        {
+            this.title = _("Change Presence Status");
+            this.back_button.hide ();
+
+            this.settings.bind ("change-presence-status",
+                                this.toggle,
+                                "active",
+                                SETTINGS_BIND_FLAGS);
+        }
+        else {
+            this.title = plugin.label;
+            this.back_button.show ();
+
+            plugin.settings.bind ("enabled",
+                                  this.toggle,
+                                  "active",
+                                  SETTINGS_BIND_FLAGS);
+        }
+    }
+
+    private Gtk.ComboBox create_presence_status_combo_box ()
+    {
+        PresenceStatus[] status_list = {
+            PresenceStatus.AVAILABLE,
+            PresenceStatus.BUSY,
+            PresenceStatus.INVISIBLE,
+            // PresenceStatus.AWAY,
+            // PresenceStatus.IDLE,
+            // PresenceStatus.DEFAULT,
+        };
+
+        var combo_box = new Widgets.EnumComboBox ();
+        combo_box.show ();
+        
+        foreach (var status in status_list) {
+            combo_box.add_option (status,
+                                  get_presence_status_label (status));
+        }
+
+        this.combo_box_size_group.add_widget (combo_box);
+
+        return combo_box as Gtk.ComboBox;
+    }
+
+    private void setup_header_bar ()
+    {
+        var header_bar = this.get_header_bar () as Gtk.HeaderBar;
+
+        var back_button_image = new Gtk.Image.from_icon_name (
+                                       "go-previous-symbolic",
+                                       Gtk.IconSize.BUTTON);
+
+        var back_button = new Gtk.Button ();
+        back_button.set_image (back_button_image);
+        back_button.show_all ();
+        header_bar.pack_start (back_button);
+
+        back_button.clicked.connect (() => {
+            this.stack.set_visible_child_name ("default");
+        });
+
+        var change_status_switch = new Gtk.Switch ();
+        change_status_switch.valign = Gtk.Align.CENTER;
+        change_status_switch.show ();
+        header_bar.pack_end (change_status_switch);
+
+        this.stack.notify["visible-child"].connect (() => {
+            this.update_header_bar ();
+        });
+
+        change_status_switch.bind_property ("active",
+                                            this.get_content_area (),
+                                            "sensitive",
+                                            GLib.BindingFlags.SYNC_CREATE);
+
+        this.back_button = back_button;
+        this.toggle = change_status_switch;
+    }
+
+    private void setup_default_view ()
+    {
+        var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
+        box.set_margin_left (20);
+        box.set_margin_right (20);
+        box.set_margin_top (12);
+        box.set_margin_bottom (12);
+
+        this.stack.add_named (box, "default");
+
+        var grid = new Gtk.Grid ();
+        grid.set_margin_top (6);
+        grid.set_margin_bottom (6);
+        grid.set_column_spacing (6);
+        grid.set_row_spacing (12);
+
+        var grid_row = 0;
+
+        var pomodoro_presence_label = new Gtk.Label (_("Status during pomodoro"));
+        pomodoro_presence_label.halign = Gtk.Align.START;
+        pomodoro_presence_label.hexpand = true;
+
+        var pomodoro_presence = this.create_presence_status_combo_box ();
+
+        var break_presence = this.create_presence_status_combo_box ();
+
+        var break_presence_label = new Gtk.Label (_("Status during break"));
+        break_presence_label.halign = Gtk.Align.START;
+        break_presence_label.hexpand = true;
+
+
+        grid.attach (pomodoro_presence_label, 0, grid_row, 1, 1);
+        grid.attach (pomodoro_presence, 1, grid_row, 1, 1);
+        grid_row += 1;
+
+        grid.attach (break_presence_label, 0, grid_row, 1, 1);
+        grid.attach (break_presence, 1, grid_row, 1, 1);
+        grid_row += 1;
+
+        box.pack_start (grid, false, true, 0);
+
+
+        /* plugins */
+
+//        var app_info[] = DesktopAppInfo.search (string search_string);
+//        string get_string (string key)
+
+        var list_box = new Gtk.ListBox ();
+        list_box.set_selection_mode (Gtk.SelectionMode.NONE);
+        list_box.set_activate_on_single_click (true);
+        list_box.set_header_func (list_box_separator_func);
+        list_box.can_focus = false;
+        list_box.show ();
+
+        foreach (var plugin_base in this.presence_module.get_plugins ())
+        {
+            var plugin = plugin_base as Pomodoro.PresencePlugin;
+
+            var app_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+
+            if (plugin.icon_name != null) {
+                var app_icon = new Gtk.Image.from_icon_name (plugin.icon_name, Gtk.IconSize.DND);
+                app_icon.halign = Gtk.Align.FILL;
+                app_icon.set_margin_left (20);
+                app_box.pack_start (app_icon, false, true, 0);
+            }
+
+            if (plugin.name != null) {
+                var app_label = new Gtk.Label (plugin.label);
+                app_label.halign = Gtk.Align.START;
+                app_label.set_margin_top (15);
+                app_label.set_margin_bottom (15);
+                app_label.set_margin_left (2);
+                app_box.pack_start (app_label, false, true, 0);
+
+                var app_status = new Gtk.Label (null);
+                app_status.halign = Gtk.Align.END;
+                app_status.set_margin_right (20);
+                app_box.pack_end (app_status, false, false, 0);
+
+                plugin.settings.changed.connect(() => {
+                    this.update_plugin_status_label (plugin, app_status);
+                });
+
+                this.update_plugin_status_label (plugin, app_status);
+
+                var app_row = new Gtk.ListBoxRow ();
+                app_row.activatable = true;
+                app_row.add (app_box);
+                app_row.set_data_full ("plugin", plugin_base, null);
+                app_row.show_all ();
+
+                list_box.insert (app_row, 0);
+            }
+        }
+
+        list_box.row_activated.connect((row) => {
+            var plugin = row.get_data<Pomodoro.Plugin> ("plugin");
+
+            this.stack.set_visible_child_name (plugin.name);
+        });
+
+        var frame = new Gtk.Frame (null);
+        frame.set_shadow_type (Gtk.ShadowType.IN);
+        frame.set_margin_top (12);
+        frame.add (list_box);
+        frame.show ();
+
+        box.pack_start (frame, false, true, 0);
+
+        box.show_all ();
+
+
+        this.settings.bind_with_mapping ("presence-during-pomodoro",
+                                         pomodoro_presence,
+                                         "value",
+                                         SETTINGS_BIND_FLAGS,
+                                         (SettingsBindGetMappingShared) get_presence_status_mapping,
+                                         (SettingsBindSetMappingShared) set_presence_status_mapping,
+                                         null,
+                                         null);
+
+        this.settings.bind_with_mapping ("presence-during-break",
+                                         break_presence,
+                                         "value",
+                                         SETTINGS_BIND_FLAGS,
+                                         (SettingsBindGetMappingShared) get_presence_status_mapping,
+                                         (SettingsBindSetMappingShared) set_presence_status_mapping,
+                                         null,
+                                         null);
+    }
+
+    private void update_plugin_status_label (PresencePlugin plugin,
+                                             Gtk.Label      plugin_status_label)
+    {
+        if (plugin.enabled) {
+            if (plugin.has_custom_status ()) {
+                plugin_status_label.label = "%s / %s".printf (
+                        get_presence_status_label (plugin.get_default_status (State.POMODORO)),
+                        get_presence_status_label (plugin.get_default_status (State.PAUSE)));
+            }
+            else {
+                plugin_status_label.label = _("On");
+            }
+        }
+        else {
+            plugin_status_label.label = _("Off");
+        }
+    }
+
+    private void setup_skype_view ()
+    {
+        var plugin = this.presence_module.get_plugin_by_name ("skype")
+                                       as Pomodoro.SkypePlugin;
+
+        var list_box = new Gtk.ListBox ();
+        list_box.set_selection_mode (Gtk.SelectionMode.NONE);
+        list_box.set_activate_on_single_click (true);
+        list_box.set_header_func (list_box_separator_func);
+        list_box.can_focus = false;
+        list_box.show ();
+
+        var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
+        box.set_margin_left (20);
+        box.set_margin_right (20);
+        box.set_margin_top (12);
+        box.set_margin_bottom (12);
+
+        var grid = new Gtk.Grid ();
+        grid.set_margin_left (24);
+        grid.set_margin_top (6);
+        grid.set_margin_bottom (12);
+        grid.set_column_spacing (6);
+        grid.set_row_spacing (12);
+
+        var grid_row = 0;
+
+        var custom_status_checkbutton = new Gtk.CheckButton.with_label (_("Set custom status"));
+        custom_status_checkbutton.halign = Gtk.Align.START;
+
+        var pomodoro_presence_label = new Gtk.Label (_("Status during pomodoro"));
+        pomodoro_presence_label.halign = Gtk.Align.START;
+        pomodoro_presence_label.hexpand = true;
+
+        var pomodoro_presence = this.create_presence_status_combo_box ();
+
+        var break_presence_label = new Gtk.Label (_("Status during break"));
+        break_presence_label.halign = Gtk.Align.START;
+        break_presence_label.hexpand = true;
+
+        var break_presence = this.create_presence_status_combo_box ();
+
+        var authenticate_button = new Gtk.Button.with_label (_("Authenticate"));
+        authenticate_button.halign = Gtk.Align.START;
+        authenticate_button.hexpand = false;
+
+        authenticate_button.clicked.connect (() => {
+            plugin.authenticate ();
+        });
+
+        box.pack_start (custom_status_checkbutton, false, false, 0);
+
+        grid.attach (pomodoro_presence_label, 0, grid_row, 1, 1);
+        grid.attach (pomodoro_presence, 1, grid_row, 1, 1);
+        grid_row += 1;
+
+        grid.attach (break_presence_label, 0, grid_row, 1, 1);
+        grid.attach (break_presence, 1, grid_row, 1, 1);
+        grid_row += 1;
+
+        box.pack_start (grid, false, true, 0);
+
+        // box.pack_start (authenticate_button, false, false, 0);
+
+        box.show_all ();
+
+        this.stack.add_named (box, "skype");
+
+        plugin.settings.bind_with_mapping ("presence-during-pomodoro",
+                                           pomodoro_presence,
+                                           "value",
+                                           SETTINGS_BIND_FLAGS,
+                                           (SettingsBindGetMappingShared) get_presence_status_mapping,
+                                           (SettingsBindSetMappingShared) set_presence_status_mapping,
+                                           null,
+                                           null);
+
+        plugin.settings.bind_with_mapping ("presence-during-break",
+                                           break_presence,
+                                           "value",
+                                           SETTINGS_BIND_FLAGS,
+                                           (SettingsBindGetMappingShared) get_presence_status_mapping,
+                                           (SettingsBindSetMappingShared) set_presence_status_mapping,
+                                           null,
+                                           null);
+        plugin.settings.bind ("set-custom-status",
+                              custom_status_checkbutton,
+                              "active",
+                              SETTINGS_BIND_FLAGS);
+
+        plugin.settings.bind ("set-custom-status",
+                              grid,
+                              "sensitive",
+                              GLib.SettingsBindFlags.GET);
+    }
+
+    private void setup_telepathy_view ()
+    {
+        var plugin = this.presence_module.get_plugin_by_name ("telepathy")
+                                       as Pomodoro.TelepathyPlugin;
+
+        var list_box = new Gtk.ListBox ();
+        list_box.set_selection_mode (Gtk.SelectionMode.NONE);
+        list_box.set_activate_on_single_click (true);
+        list_box.set_header_func (list_box_separator_func);
+        list_box.can_focus = false;
+        list_box.show ();
+
+        var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
+        box.set_margin_left (20);
+        box.set_margin_right (20);
+        box.set_margin_top (12);
+        box.set_margin_bottom (12);
+
+        var grid = new Gtk.Grid ();
+        grid.set_margin_left (24);
+        grid.set_margin_top (6);
+        grid.set_margin_bottom (12);
+        grid.set_column_spacing (6);
+        grid.set_row_spacing (12);
+
+        var grid_row = 0;
+
+        var custom_status_checkbutton = new Gtk.CheckButton.with_label (_("Set custom status"));
+        custom_status_checkbutton.halign = Gtk.Align.START;
+
+        var pomodoro_presence_label = new Gtk.Label (_("Status during pomodoro"));
+        pomodoro_presence_label.halign = Gtk.Align.START;
+        pomodoro_presence_label.hexpand = true;
+
+        var pomodoro_presence = this.create_presence_status_combo_box ();
+
+        var break_presence_label = new Gtk.Label (_("Status during break"));
+        break_presence_label.halign = Gtk.Align.START;
+        break_presence_label.hexpand = true;
+
+        var break_presence = this.create_presence_status_combo_box ();
+
+        box.pack_start (custom_status_checkbutton, false, false, 0);
+
+        grid.attach (pomodoro_presence_label, 0, grid_row, 1, 1);
+        grid.attach (pomodoro_presence, 1, grid_row, 1, 1);
+        grid_row += 1;
+
+        grid.attach (break_presence_label, 0, grid_row, 1, 1);
+        grid.attach (break_presence, 1, grid_row, 1, 1);
+        grid_row += 1;
+
+        box.pack_start (grid, false, true, 0);
+
+        box.show_all ();
+
+        this.stack.add_named (box, "telepathy");
+
+        plugin.settings.bind_with_mapping ("presence-during-pomodoro",
+                                           pomodoro_presence,
+                                           "value",
+                                           SETTINGS_BIND_FLAGS,
+                                           (SettingsBindGetMappingShared) get_presence_status_mapping,
+                                           (SettingsBindSetMappingShared) set_presence_status_mapping,
+                                           null,
+                                           null);
+
+        plugin.settings.bind_with_mapping ("presence-during-break",
+                                           break_presence,
+                                           "value",
+                                           SETTINGS_BIND_FLAGS,
+                                           (SettingsBindGetMappingShared) get_presence_status_mapping,
+                                           (SettingsBindSetMappingShared) set_presence_status_mapping,
+                                           null,
+                                           null);
+        plugin.settings.bind ("set-custom-status",
+                              custom_status_checkbutton,
+                              "active",
+                              SETTINGS_BIND_FLAGS);
+
+        plugin.settings.bind ("set-custom-status",
+                              grid,
+                              "sensitive",
+                              GLib.SettingsBindFlags.GET);
     }
 }
 
@@ -736,32 +1247,23 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         return combo_box as Gtk.ComboBox;
     }
 
-    private Gtk.ComboBox create_presence_status_combo_box ()
-    {
-        var combo_box = new Widgets.EnumComboBox ();
-        combo_box.add_option (PresenceStatus.DEFAULT, "");
-        combo_box.add_option (PresenceStatus.AVAILABLE, _("Available"));
-        combo_box.add_option (PresenceStatus.BUSY, _("Busy"));
-        // combo_box.add_option (PresenceStatus.AWAY, _("Away"));
-        combo_box.add_option (PresenceStatus.INVISIBLE, _("Invisible"));
-
-        /* Idle status is used by gnome-shell/screensaver,
-         * it's not ment to be set by user
-         */
-        // combo_box.add_option (PresenceStatus.IDLE,
-        //                       _("Idle"));
-
-        combo_box.show ();
-
-        return combo_box as Gtk.ComboBox;
-    }
-
     private void add_presence_section ()
     {
         Gtk.Box vbox;
         Gtk.ListBox list_box;
 
         create_section (_("Presence"), out vbox, out list_box);
+
+        list_box.activate_on_single_click = true;
+
+        list_box.row_activated.connect((row) => {
+            var dialog = new PresenceStatusDialog ();
+            dialog.set_transient_for (this);
+
+            dialog.run ();
+
+            dialog.destroy();
+        });
 
         this.box.pack_start (vbox);
 
@@ -789,52 +1291,26 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                             SETTINGS_BIND_FLAGS);
 
 
-        var change_im_status_label = new Gtk.Label (_("On"));
+        var change_im_status_label = new Gtk.Label (null);
         var change_im_status_field = list_box_create_field (
-                                       _("Change IM status"),
+                                       _("Change presence status"),
                                        change_im_status_label);
+        change_im_status_field.activatable = true;
+
         list_box.insert (change_im_status_field, -1);
 
+        this.settings.bind_with_mapping ("change-presence-status",
+                                         change_im_status_label,
+                                         "label",
+                                         GLib.SettingsBindFlags.DEFAULT |
+                                         GLib.SettingsBindFlags.GET,
+                                         (SettingsBindGetMappingShared) on_off_mapping,
+                                         null,
+                                         null,
+                                         null);
 
         this.field_size_group.add_widget (pause_when_idle_field);
         this.field_size_group.add_widget (hide_notifications_field);
         this.field_size_group.add_widget (change_im_status_field);
-
-/* TODO
-        var pomodoro_presence = this.create_presence_status_combo_box ();
-        var pomodoro_presence_field = list_box_create_field (
-                                       _("Status during pomodoro"),
-                                       pomodoro_presence);
-
-        var break_presence = this.create_presence_status_combo_box ();
-        var break_presence_field = list_box_create_field (
-                                       _("Status during break"),
-                                       break_presence);
-
-        list_box.insert (pomodoro_presence_field, -1);
-        list_box.insert (break_presence_field, -1);
-
-        this.settings.bind_with_mapping ("presence-during-pomodoro",
-                                         pomodoro_presence,
-                                         "value",
-                                         SETTINGS_BIND_FLAGS,
-                                         (SettingsBindGetMappingShared) get_presence_status_mapping,
-                                         (SettingsBindSetMappingShared) set_presence_status_mapping,
-                                         null,
-                                         null);
-
-
-        this.settings.bind_with_mapping ("presence-during-break",
-                                         break_presence,
-                                         "value",
-                                         SETTINGS_BIND_FLAGS,
-                                         (SettingsBindGetMappingShared) get_presence_status_mapping,
-                                         (SettingsBindSetMappingShared) set_presence_status_mapping,
-                                         null,
-                                         null);
-
-        pomodoro_presence.changed.connect (this.update_presence_notice);
-        break_presence.changed.connect (this.update_presence_notice);
-*/
     }
 }

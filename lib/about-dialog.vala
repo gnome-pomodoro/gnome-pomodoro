@@ -30,6 +30,7 @@ public class Pomodoro.AboutDialog : Gtk.AboutDialog
         this.comments = _("A simple time management utility");
         this.logo_icon_name = Config.PACKAGE;
         this.version = Config.PACKAGE_VERSION;
+        this.website = Config.PACKAGE_URL;
 
         this.authors = {
             "Arun Mahapatra <pratikarun@gmail.com>",

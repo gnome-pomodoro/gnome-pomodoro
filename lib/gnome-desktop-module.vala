@@ -486,6 +486,7 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
                                                 Gtk.DialogFlags.MODAL,
                                                 Gtk.MessageType.QUESTION,
                                                 Gtk.ButtonsType.NONE,
+                                                "%s",
                                                 _("Indicator for Pomodoro will show up after you restart your desktop."));
             dialog.add_button (_("_Cancel"), Gtk.ResponseType.CANCEL);
             dialog.add_button (_("_Restart"), Gtk.ResponseType.OK);

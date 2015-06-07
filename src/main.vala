@@ -23,7 +23,7 @@ using GLib;
 
 public int main (string[] args)
 {
-    GLib.Environment.set_application_name (Config.PACKAGE);
+    GLib.Environment.set_application_name (_("Pomodoro"));
 
     #if ENABLE_NLS
         Intl.bindtextdomain (Config.GETTEXT_PACKAGE,
