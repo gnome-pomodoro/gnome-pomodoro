@@ -124,6 +124,7 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
     private uint name_watcher_id = 0;
     private uint extension_name_watcher_id = 0;
     private uint enable_extension_timeout_id = 0;
+    private uint notify_extension_disabled_timeout_id = 0;
     private bool extension_available = false;
     private bool gnome_shell_restarted = false;
 
@@ -169,7 +170,12 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
 
             if (this.name_watcher_id != 0) {
                 GLib.Bus.unwatch_name (this.name_watcher_id);
-                name_watcher_id = 0;
+                this.name_watcher_id = 0;
+            }
+
+            if (this.notify_extension_disabled_timeout_id != 0) {
+                GLib.Source.remove (this.notify_extension_disabled_timeout_id);
+                this.notify_extension_disabled_timeout_id = 0;
             }
 
             var application = GLib.Application.get_default ()
@@ -225,6 +231,8 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
     private void on_extension_name_appeared ()
     {
         this.extension_available = true;
+
+        this.extension_enabled ();
     }
 
     private void on_extension_name_vanished ()
@@ -232,7 +240,8 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
         if (this.extension_available)
         {
             this.extension_available = false;
-            this.notify_extension_disabled ();
+
+            this.extension_disabled ();
         }
     }
 
@@ -250,11 +259,9 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
                     break;
 
                 case Gnome.ExtensionState.ENABLED:
-                    this.extension_enabled ();
                     break;
 
                 case Gnome.ExtensionState.DISABLED:
-                    this.extension_disabled ();
                     break;
 
                 case Gnome.ExtensionState.ERROR:
@@ -363,7 +370,7 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
                 break;
             }
         }
-      
+
         if (!enabled_in_settings)
         {
             GLib.debug ("Enabling extension \"%s\" in settings",
@@ -416,7 +423,6 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
 
                     case Gnome.ExtensionState.DISABLED:
                         /* not likely */
-                        this.notify_extension_disabled ();
                         break;
 
                     case Gnome.ExtensionState.OUT_OF_DATE:
@@ -530,7 +536,6 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
 
                 case Gnome.ExtensionState.DISABLED:
                     /* not likely */
-                    this.notify_extension_disabled ();
                     break;
 
                 case Gnome.ExtensionState.OUT_OF_DATE:
@@ -630,6 +635,12 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
         notification.set_body (_("Extension provides better desktop integration for the pomodoro app."));
         notification.add_button (_("Enable"), "app.enable-extension");
 
+        try {
+            notification.set_icon (GLib.Icon.new_for_string (Config.PACKAGE));
+        }
+        catch (Error error) {
+        }
+
         var application = GLib.Application.get_default ()
                                        as Pomodoro.Application;
         application.send_notification ("extension", notification);
@@ -637,6 +648,11 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
 
     public virtual signal void extension_enabled ()
     {
+        if (this.notify_extension_disabled_timeout_id != 0) {
+            GLib.Source.remove (this.notify_extension_disabled_timeout_id);
+            this.notify_extension_disabled_timeout_id = 0;
+        }
+
         var application = GLib.Application.get_default ()
                                        as Pomodoro.Application;
         application.withdraw_notification ("extension");
@@ -644,5 +660,12 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
 
     public virtual signal void extension_disabled ()
     {
+        this.notify_extension_disabled_timeout_id = Timeout.add (500, () => {
+            this.notify_extension_disabled_timeout_id = 0;
+
+            this.notify_extension_disabled ();
+
+            return false;
+        });
     }
 }
