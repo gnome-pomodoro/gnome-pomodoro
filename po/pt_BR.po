@@ -317,7 +317,7 @@ msgstr "Gerencie seu tempo e suas tarefas"
 
 #: ../data/gnome-pomodoro.desktop.in.h:3
 msgid "time;timer;tasks;manage;organize;"
-msgstr ""
+msgstr "tempo;temporizador;tarefas;gerenciar;organizar;"
 
 #~ msgid "Could not run pomodoro"
 #~ msgstr "Não foi possível executar pomodoro"
