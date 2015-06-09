@@ -62,7 +62,7 @@ intends to improve productivity and focus by taking short breaks after every
 %setup -q -n @PACKAGE_TARNAME@-%{version}
 
 %build
-%configure --disable-static
+LDFLAGS="-Wl,--as-needed" %configure --disable-static
 make %{?_smp_mflags}
 
 %install
