@@ -91,7 +91,7 @@ const IndicatorMenu = new Lang.Class({
         this.addMenuItem(this._actionsSeparator);
 
         this._startPomodoroItem = this.addAction(_("Start Pomodoro"), Lang.bind(this, this._startPomodoro));
-        this._startPauseItem = this.addAction(_("Take Break"), Lang.bind(this, this._startPause));
+        this._startPauseItem = this.addAction(_("Take a Break"), Lang.bind(this, this._startPause));
         this._switchPauseItem = this.addAction("", Lang.bind(this, this._switchPause));
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
