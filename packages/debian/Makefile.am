@@ -55,8 +55,7 @@ $(gnome_pomodoro_debian_tar_gz_DATA): $(gnome_pomodoro_debian_DATA)
 
 $(gnome_pomodoro_dsc_DATA): $(gnome_pomodoro_dsc_deps) $(gnome_pomodoro_dsc_in_files)
 	$(AM_V_GEN) $(SUBST) $(gnome_pomodoro_dsc_in_files) > $@;
-	echo "" >> $@; \
-	echo "Files: " >> $@; \
+	echo "Files:" >> $@; \
 	for file in $(gnome_pomodoro_dsc_deps); do \
 		file_md5=`md5sum $$file | cut -d " " -f 1`; \
 		file_size=`stat -c%s $$file`; \
@@ -75,5 +74,7 @@ CLEANFILES = \
     $(gnome_pomodoro_debian_tar_gz_DATA) \
     $(gnome_pomodoro_debian_DATA) \
     $(gnome_pomodoro_dsc_DATA)
+
+.PHONY: all deb-src
 
 -include $(top_srcdir)/git.mk

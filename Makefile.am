@@ -8,7 +8,6 @@ SUBDIRS = \
     data \
     po \
     man \
-    packages \
     tests
 
 distdir = $(PACKAGE_TARNAME)-$(VERSION)
@@ -40,7 +39,7 @@ DISTCLEANFILES = \
 	intltool-update \
 	po/.intltool-merge-cache
 
-.PHONY: test rpm
+.PHONY: test packages rpm rpm-src deb-src
 
 clean-local:
 	rm -rf $(builddir)/rpms
