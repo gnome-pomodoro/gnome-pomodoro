@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 8.0.0),
                dh-autoreconf,
                gettext,
                intltool,
-               valac
+               valac,
                pkg-config,
                gnome-common,
                desktop-file-utils,

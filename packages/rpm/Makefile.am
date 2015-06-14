@@ -52,4 +52,6 @@ CLEANFILES = \
     $(gnome_pomodoro_tar_gz_DATA) \
     $(gnome_pomodoro_spec_DATA)
 
+.PHONY: all rpm rpm-src
+
 -include $(top_srcdir)/git.mk

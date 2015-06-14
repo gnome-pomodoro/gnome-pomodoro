@@ -17,7 +17,7 @@
    height="300"
    id="svg11300"
    sodipodi:version="0.32"
-   inkscape:version="0.48.5 r10040"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="gnome-pomodoro.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
@@ -32,15 +32,15 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="2"
-     inkscape:cx="276.86511"
-     inkscape:cy="178.11719"
-     inkscape:current-layer="g4336"
+     inkscape:cx="275.671"
+     inkscape:cy="142.10622"
+     inkscape:current-layer="layer3"
      showgrid="false"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
      inkscape:showpageshadow="false"
-     inkscape:window-width="1440"
-     inkscape:window-height="834"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
      inkscape:window-x="0"
      inkscape:window-y="27"
      width="400px"
@@ -2436,6 +2436,26 @@
        x2="196.61385"
        y2="227.0488"
        gradientUnits="userSpaceOnUse" />
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath4595">
+      <path
+         sodipodi:nodetypes="cssscsssc"
+         inkscape:connector-curvature="0"
+         id="path4597"
+         d="m -14.282595,8.1440635 0,1.4185643 c 0,0.9634652 2.014718,1.7441142 4.4999998,1.7441142 2.4852812,0 4.5000002,-0.780649 4.5000002,-1.7441142 l 0,-1.4185643 c 0,0.5866082 -0.753237,1.1023152 -1.898438,1.4185643 -0.7357131,0.2031681 -1.6294525,0.3255484 -2.6015622,0.3255484 -0.9721098,0 -1.8678018,-0.1223803 -2.6035158,-0.3255484 -1.1452,-0.3162491 -1.896484,-0.8319561 -1.896484,-1.4185643 z"
+         style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath4595-4">
+      <path
+         sodipodi:nodetypes="cssscsssc"
+         inkscape:connector-curvature="0"
+         id="path4597-2"
+         d="m -14.282595,8.1440635 0,1.4185643 c 0,0.9634652 2.014718,1.7441142 4.4999998,1.7441142 2.4852812,0 4.5000002,-0.780649 4.5000002,-1.7441142 l 0,-1.4185643 c 0,0.5866082 -0.753237,1.1023152 -1.898438,1.4185643 -0.7357131,0.2031681 -1.6294525,0.3255484 -2.6015622,0.3255484 -0.9721098,0 -1.8678018,-0.1223803 -2.6035158,-0.3255484 -1.1452,-0.3162491 -1.896484,-0.8319561 -1.896484,-1.4185643 z"
+         style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </clipPath>
   </defs>
   <metadata
      id="metadata4">
@@ -2502,12 +2522,12 @@
        height="256"
        width="256"
        id="rect6282"
-       style="fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="display:inline;overflow:visible;visibility:visible;fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;enable-background:accumulate"
        inkscape:export-filename="/home/build/jhbuild/checkout/gnome-pomodoro/data/icons/g4215.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="display:inline;overflow:visible;visibility:visible;fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;enable-background:accumulate"
        id="rect6284"
        width="48"
        height="48"
@@ -2523,11 +2543,11 @@
        height="32"
        width="32"
        id="rect6592"
-       style="fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="display:inline;overflow:visible;visibility:visible;fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;enable-background:accumulate"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       style="fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="display:inline;overflow:visible;visibility:visible;fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;enable-background:accumulate"
        id="rect6749"
        width="22"
        height="22"
@@ -2541,7 +2561,7 @@
        height="16"
        width="16"
        id="rect6833"
-       style="fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="display:inline;overflow:visible;visibility:visible;fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;enable-background:accumulate"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        inkscape:export-filename="/home/build/jhbuild/checkout/gnome-pomodoro/data/icons/hicolor_apps_16x16_gnome-pomodoro.png" />
@@ -2552,12 +2572,12 @@
        height="24"
        width="24"
        id="rect5028"
-       style="fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="display:inline;overflow:visible;visibility:visible;fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;enable-background:accumulate"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;enable-background:new;font-family:Trebuchet MS;-inkscape-font-specification:Trebuchet MS"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:125%;font-family:'Trebuchet MS';-inkscape-font-specification:'Trebuchet MS';text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;enable-background:new"
        x="21"
        y="-18.999996"
        id="context"
@@ -2569,7 +2589,7 @@
          y="-18.999996">apps</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;display:inline;enable-background:new;font-family:Trebuchet MS;-inkscape-font-specification:Trebuchet MS"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:125%;font-family:'Trebuchet MS';-inkscape-font-specification:'Trebuchet MS';text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#000000;fill-opacity:1;stroke:none;enable-background:new"
        x="159"
        y="-18.999996"
        id="icon-name"
@@ -2579,6 +2599,17 @@
          id="tspan16847"
          x="159"
          y="-18.999996">gnome-pomodoro</tspan></text>
+    <rect
+       inkscape:export-filename="/home/build/jhbuild/checkout/gnome-pomodoro/data/icons/hicolor_apps_16x16_gnome-pomodoro.png"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       style="display:inline;overflow:visible;visibility:visible;fill:#d3d7cf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;enable-background:accumulate"
+       id="rect3932"
+       width="16"
+       height="16"
+       x="303"
+       y="249"
+       inkscape:label="16x16" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -2600,11 +2631,11 @@
            sodipodi:cy="233"
            sodipodi:rx="22"
            sodipodi:ry="11"
-           d="m 232,233 c 0,6.07513 -9.84974,11 -22,11 -12.15026,0 -22,-4.92487 -22,-11 0,-6.07513 9.84974,-11 22,-11 12.15026,0 22,4.92487 22,11 z"
+           d="m 232,233 a 22,11 0 0 1 -22,11 22,11 0 0 1 -22,-11 22,11 0 0 1 22,-11 22,11 0 0 1 22,11 z"
            transform="matrix(3.6884922,0,0,1.8365503,-629.08334,-192.85557)" />
         <path
            transform="matrix(1.9571594,0,0,1.5916772,-265.50346,-137.14688)"
-           d="m 232,233 c 0,6.07513 -9.84974,11 -22,11 -12.15026,0 -22,-4.92487 -22,-11 0,-6.07513 9.84974,-11 22,-11 12.15026,0 22,4.92487 22,11 z"
+           d="m 232,233 a 22,11 0 0 1 -22,11 22,11 0 0 1 -22,-11 22,11 0 0 1 22,-11 22,11 0 0 1 22,11 z"
            sodipodi:ry="11"
            sodipodi:rx="22"
            sodipodi:cy="233"
@@ -2762,7 +2793,7 @@
          id="g4257">
         <path
            transform="matrix(0.95424501,0,0,0.50581001,121.45718,-22.85373)"
-           d="m 232,233 c 0,6.07513 -9.84974,11 -22,11 -12.15026,0 -22,-4.92487 -22,-11 0,-6.07513 9.84974,-11 22,-11 12.15026,0 22,4.92487 22,11 z"
+           d="m 232,233 a 22,11 0 0 1 -22,11 22,11 0 0 1 -22,-11 22,11 0 0 1 22,-11 22,11 0 0 1 22,11 z"
            sodipodi:ry="11"
            sodipodi:rx="22"
            sodipodi:cy="233"
@@ -2778,7 +2809,7 @@
            sodipodi:cy="233"
            sodipodi:rx="22"
            sodipodi:ry="11"
-           d="m 232,233 c 0,6.07513 -9.84974,11 -22,11 -12.15026,0 -22,-4.92487 -22,-11 0,-6.07513 9.84974,-11 22,-11 12.15026,0 22,4.92487 22,11 z"
+           d="m 232,233 a 22,11 0 0 1 -22,11 22,11 0 0 1 -22,-11 22,11 0 0 1 22,-11 22,11 0 0 1 22,11 z"
            transform="matrix(0.50633416,0,0,0.43836877,215.51846,-7.5108273)" />
       </g>
       <g
@@ -3010,7 +3041,7 @@
          style="opacity:0.5">
         <path
            transform="matrix(0.95424501,0,0,0.63445896,121.45718,-51.413797)"
-           d="m 232,233 c 0,6.07513 -9.84974,11 -22,11 -12.15026,0 -22,-4.92487 -22,-11 0,-6.07513 9.84974,-11 22,-11 12.15026,0 22,4.92487 22,11 z"
+           d="m 232,233 a 22,11 0 0 1 -22,11 22,11 0 0 1 -22,-11 22,11 0 0 1 22,-11 22,11 0 0 1 22,11 z"
            sodipodi:ry="11"
            sodipodi:rx="22"
            sodipodi:cy="233"
@@ -3026,7 +3057,7 @@
            sodipodi:cy="233"
            sodipodi:rx="22"
            sodipodi:ry="11"
-           d="m 232,233 c 0,6.07513 -9.84974,11 -22,11 -12.15026,0 -22,-4.92487 -22,-11 0,-6.07513 9.84974,-11 22,-11 12.15026,0 22,4.92487 22,11 z"
+           d="m 232,233 a 22,11 0 0 1 -22,11 22,11 0 0 1 -22,-11 22,11 0 0 1 22,-11 22,11 0 0 1 22,11 z"
            transform="matrix(0.50633416,0,0,0.43836877,215.51846,-7.5108273)" />
       </g>
       <g
@@ -3123,11 +3154,11 @@
            sodipodi:cy="233"
            sodipodi:rx="22"
            sodipodi:ry="11"
-           d="m 232,233 c 0,6.07513 -9.84974,11 -22,11 -12.15026,0 -22,-4.92487 -22,-11 0,-6.07513 9.84974,-11 22,-11 12.15026,0 22,4.92487 22,11 z"
+           d="m 232,233 a 22,11 0 0 1 -22,11 22,11 0 0 1 -22,-11 22,11 0 0 1 22,-11 22,11 0 0 1 22,11 z"
            transform="matrix(0.95424501,0,0,0.50581001,121.45718,-22.85373)" />
         <path
            transform="matrix(0.50633416,0,0,0.43836877,215.51846,-7.5108273)"
-           d="m 232,233 c 0,6.07513 -9.84974,11 -22,11 -12.15026,0 -22,-4.92487 -22,-11 0,-6.07513 9.84974,-11 22,-11 12.15026,0 22,4.92487 22,11 z"
+           d="m 232,233 a 22,11 0 0 1 -22,11 22,11 0 0 1 -22,-11 22,11 0 0 1 22,-11 22,11 0 0 1 22,11 z"
            sodipodi:ry="11"
            sodipodi:rx="22"
            sodipodi:cy="233"
@@ -3272,6 +3303,50 @@
            d="m 146.4375,39.375 c -26.15983,1.08432 -47.493384,20.737337 -59.90625,42.4375 -19.670274,34.6606 -24.657682,80.02783 -4.40625,115.625 17.273233,31.90597 58.71334,45.81169 92.31412,33.56267 29.89965,-10.3827 49.83234,-40.56355 52.08114,-71.4624 C 230.87655,119.30546 215.58419,75.914567 182.96875,51.15625 172.30258,43.56977 159.63656,38.855885 146.4375,39.375 z"
            id="path4446"
            inkscape:connector-curvature="0" />
+      </g>
+    </g>
+    <g
+       id="g3970"
+       transform="translate(-33.891329,11.624)">
+      <path
+         sodipodi:nodetypes="zszsz"
+         inkscape:connector-curvature="0"
+         id="path4366"
+         d="m 344.89133,238.37468 c -2.55828,-0.001 -5.43512,4.00132 -5.51495,7.64008 -0.0957,4.36097 2.48668,6.36256 5.51495,6.36256 3.02827,0 5.61063,-2.00159 5.51495,-6.36256 -0.0798,-3.63876 -2.95667,-7.63876 -5.51495,-7.64008 z"
+         style="display:inline;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#bebebe;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;enable-background:new" />
+      <path
+         sodipodi:nodetypes="csc"
+         inkscape:connector-curvature="0"
+         id="path4393"
+         d="m 349.92299,245.31077 c 0,1.35837 -2.25243,2.45954 -5.03095,2.45954 -2.77852,0 -5.03095,-1.10117 -5.03095,-2.45954"
+         style="display:inline;fill:none;fill-opacity:1;stroke:#bebebe;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;enable-background:new" />
+      <g
+         clip-path="url(#clipPath4595-4)"
+         id="g4580"
+         transform="translate(354.60752,236.39177)"
+         style="display:inline;enable-background:new">
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:#bebebe;stroke-width:0.99999988px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m -10.247375,8.7835817 0,2.6944073"
+           id="path4389"
+           inkscape:connector-curvature="0"
+           clip-path="none"
+           transform="translate(0,-0.19204541)" />
+        <path
+           inkscape:connector-curvature="0"
+           id="path4391"
+           d="m -12.182477,8.4761639 0,2.6944071"
+           style="fill:none;fill-rule:evenodd;stroke:#bebebe;stroke-width:0.99999988px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           clip-path="none"
+           transform="translate(0,-0.19204541)" />
+        <path
+           transform="translate(0,-0.19204541)"
+           clip-path="none"
+           style="fill:none;fill-rule:evenodd;stroke:#bebebe;stroke-width:0.99999988px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m -14.05492,8.1880958 0,2.6944072"
+           id="path4574"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc" />
       </g>
     </g>
   </g>
