@@ -69,7 +69,7 @@ msgid "Start Pomodoro"
 msgstr "Zacznij pomodoro"
 
 #: ../extension/indicator.js:94
-msgid "Take Break"
+msgid "Take a Break"
 msgstr "Zrób przerwę"
 
 #: ../extension/indicator.js:98 ../lib/preferences-dialog.vala:841

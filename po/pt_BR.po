@@ -69,7 +69,7 @@ msgstr "Começar um novo pomodoro"
 
 #: ../extension/indicator.js:94
 #, fuzzy
-msgid "Take Break"
+msgid "Take a Break"
 msgstr "Descanse!"
 
 #: ../extension/indicator.js:98 ../lib/preferences-dialog.vala:841
