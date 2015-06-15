@@ -1,5 +1,4 @@
 
-RPM_BASENAME = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
 RPM_DEFINES = \
     --define "_sourcedir $(abs_builddir)" \
     --define "_specdir $(abs_srcdir)"
@@ -22,35 +21,32 @@ SUBST=sed \
     -e "s|@pkgdatadir[@]|$(pkgdatadir)|g"
 
 
-gnome_pomodoro_specdir =
 gnome_pomodoro_spec_in_files = \
-    gnome-pomodoro.spec.in
-gnome_pomodoro_spec_DATA = \
-    $(RPM_BASENAME).spec
+    $(PACKAGE_NAME).spec.in
 
-gnome_pomodoro_tar_gzdir =
-gnome_pomodoro_tar_gz_DATA = $(RPM_BASENAME).tar.xz
+gnome_pomodoro_spec = \
+    $(PACKAGE_NAME)-$(PACKAGE_VERSION).spec
 
-$(gnome_pomodoro_tar_gz_DATA):
+gnome_pomodoro_tar_gz = \
+    $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.xz
+
+
+rpm-src:
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) dist-xz;
-	$(AM_V_GEN) cp $(top_builddir)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.xz $@;
-
-$(gnome_pomodoro_spec_DATA): $(gnome_pomodoro_spec_in_files) $(gnome_pomodoro_tar_gz_DATA)
-	$(AM_V_GEN) $(SUBST) $(gnome_pomodoro_spec_in_files) > $@
-
-
-rpm-src: $(gnome_pomodoro_spec_DATA)
+	$(AM_V_GEN) cp $(top_builddir)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.xz $(gnome_pomodoro_tar_gz);
+	\
+	$(AM_V_GEN) $(SUBST) $(gnome_pomodoro_spec_in_files) > $(gnome_pomodoro_spec)
 
 rpm: rpm-src
 	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \
-	rpmbuild $(RPM_DEFINES) -ba $(gnome_pomodoro_spec_DATA)
+	rpmbuild $(RPM_DEFINES) -ba $(gnome_pomodoro_spec)
 
 EXTRA_DIST = \
     $(gnome_pomodoro_spec_in_files)
 
 CLEANFILES = \
-    $(gnome_pomodoro_tar_gz_DATA) \
-    $(gnome_pomodoro_spec_DATA)
+    $(gnome_pomodoro_tar_gz) \
+    $(gnome_pomodoro_spec)
 
 .PHONY: all rpm rpm-src
 
