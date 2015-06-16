@@ -12,6 +12,7 @@ Group: Productivity/Office/Other
 
 BuildRequires: gettext
 BuildRequires: intltool
+BuildRequires: docbook-utils
 BuildRequires: vala
 BuildRequires: gnome-common
 BuildRequires: gnome-shell >= @GNOME_REQUIRED@

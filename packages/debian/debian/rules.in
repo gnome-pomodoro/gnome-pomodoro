@@ -7,7 +7,7 @@
 	dh $@ --with autoreconf
 
 override_dh_autoreconf:
-	dh_autoreconf ./autogen.sh --prefix=@prefix@ --datadir=@datadir@
+	dh_autoreconf ./autogen.sh -- --prefix=@prefix@ --datadir=@datadir@
 
 override_dh_auto_test:
 

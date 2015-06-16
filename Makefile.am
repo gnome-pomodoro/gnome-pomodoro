@@ -8,7 +8,8 @@ SUBDIRS = \
     data \
     po \
     man \
-    tests
+    tests \
+    packages
 
 distdir = $(PACKAGE_TARNAME)-$(VERSION)
 
