@@ -422,7 +422,7 @@ private class Pomodoro.PresenceStatusDialog : Gtk.Dialog
 
         var combo_box = new Widgets.EnumComboBox ();
         combo_box.show ();
-        
+
         foreach (var status in status_list) {
             combo_box.add_option (status,
                                   get_presence_status_label (status));

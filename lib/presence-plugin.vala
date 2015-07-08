@@ -80,7 +80,7 @@ public abstract class Pomodoro.PresencePlugin : Pomodoro.Plugin
                                        : "presence-during-break";
 
         return string_to_presence_status (settings.get_string (settings_key));
-    }    
+    }
 
     public abstract async void set_status (Pomodoro.PresenceStatus status);
 }

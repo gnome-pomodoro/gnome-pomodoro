@@ -262,7 +262,7 @@ const ModalDialog = new Lang.Class({
                              });
             this.emit('opening');
         }
-        else {        
+        else {
             this.state = State.OPENED;
 
             this.actor.opacity = 255;
@@ -307,7 +307,7 @@ const ModalDialog = new Lang.Class({
             this.emit('closing');
             this.emit('closed');
         }
-        
+
     },
 
     _onPushModalDelayTimeout: function() {
@@ -538,7 +538,7 @@ const PomodoroEndDialog = new Lang.Class({
 
         if (this._closeWhenActiveDelaySource) {
             Mainloop.source_remove(this._closeWhenActiveDelaySource);
-            this._closeWhenActiveDelaySource = 0;            
+            this._closeWhenActiveDelaySource = 0;
         }
 
         if (this._closeWhenActiveIdleWatchId) {
@@ -573,7 +573,9 @@ const PomodoroEndDialog = new Lang.Class({
                 function() {
                     if (this._idleMonitor.get_idletime() < IDLE_TIME_TO_CLOSE) {
                         /* Wait until user becomes slightly idle */
-                        this._closeWhenActiveIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_CLOSE, Lang.bind(this, this.closeWhenActive));
+                        this._closeWhenActiveIdleWatchId =
+                                this._idleMonitor.add_idle_watch(IDLE_TIME_TO_CLOSE,
+                                                                 Lang.bind(this, this.closeWhenActive));
                     }
                     else {
                         this.closeWhenActive();

@@ -488,12 +488,13 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
         if (!gnome_shell_restarted &&
             (extension_info == null || extension_info.uuid != Config.EXTENSION_UUID))
         {
+            var message = _("Indicator for Pomodoro will show up after you restart your desktop.");
             var dialog = new Gtk.MessageDialog (null,
                                                 Gtk.DialogFlags.MODAL,
                                                 Gtk.MessageType.QUESTION,
                                                 Gtk.ButtonsType.NONE,
                                                 "%s",
-                                                _("Indicator for Pomodoro will show up after you restart your desktop."));
+                                                message);
             dialog.add_button (_("_Cancel"), Gtk.ResponseType.CANCEL);
             dialog.add_button (_("_Restart"), Gtk.ResponseType.OK);
             dialog.set_default_response (Gtk.ResponseType.OK);
@@ -509,7 +510,7 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
                     dialog.destroy ();
                 });
 
-            var application = GLib.Application.get_default () as Pomodoro.Application;        
+            var application = GLib.Application.get_default () as Pomodoro.Application;
             var parent_window = application.get_last_focused_window ();
 
             if (parent_window != null) {

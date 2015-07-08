@@ -173,7 +173,7 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
             telepathy_plugin.settings.bind ("enabled",
                                             telepathy_plugin,
                                             "enabled",
-                                            GLib.SettingsBindFlags.GET | 
+                                            GLib.SettingsBindFlags.GET |
                                             GLib.SettingsBindFlags.DEFAULT |
                                             GLib.SettingsBindFlags.NO_SENSITIVITY);
             this.plugins.append (telepathy_plugin);
@@ -182,7 +182,7 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
             skype_plugin.settings.bind ("enabled",
                                         skype_plugin,
                                         "enabled",
-                                        GLib.SettingsBindFlags.GET | 
+                                        GLib.SettingsBindFlags.GET |
                                         GLib.SettingsBindFlags.DEFAULT |
                                         GLib.SettingsBindFlags.NO_SENSITIVITY);
             this.plugins.append (skype_plugin);

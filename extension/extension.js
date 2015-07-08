@@ -359,7 +359,7 @@ const PomodoroExtension = new Lang.Class({
                         }
                     }
                     catch (error) {
-                        this.logError(error.message);        
+                        this.logError(error.message);
                     }
 
                     if (this.presence) {

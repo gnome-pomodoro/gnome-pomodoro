@@ -643,7 +643,8 @@ const Indicator = new Lang.Class({
 
         this.setMenu(new IndicatorMenu(this));
 
-        this._settingsChangedId = Extension.extension.settings.connect('changed::indicator-type', Lang.bind(this, this._onSettingsChanged));
+        this._settingsChangedId = Extension.extension.settings.connect('changed::indicator-type',
+                                                                       Lang.bind(this, this._onSettingsChanged));
 
         this._onSettingsChanged();
 

@@ -480,7 +480,8 @@ const ReminderManager = new Lang.Class({
         }
 
         if (this._idleWatchId == 0) {
-            this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_ACKNOWLEDGE_REMINDER * 1000, Lang.bind(this, this._onIdleTimeout));
+            this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_ACKNOWLEDGE_REMINDER * 1000,
+                                                                 Lang.bind(this, this._onIdleTimeout));
         }
     },
 

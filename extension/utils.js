@@ -57,7 +57,7 @@ const Hook = new Lang.Class({
             Extension.extension.logError('Hook "%s" for %s is not callable'.format(
                                                     this.property, this.object));
             return;
-        }        
+        }
     },
 
     override: function(func) {

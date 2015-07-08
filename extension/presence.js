@@ -96,7 +96,8 @@ const Presence = new Lang.Class({
             Extension.extension.logError(error.message);
         }
 
-        this._timerStateChangedId = Extension.extension.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
+        this._timerStateChangedId = Extension.extension.timer.connect('state-changed',
+                                                                      Lang.bind(this, this._onTimerStateChanged));
 
         this._setNotificationDefaults();
         this._onTimerStateChanged();
@@ -204,8 +205,8 @@ const Presence = new Lang.Class({
     },
 
     _setNotificationDefaults: function() {
-        this._notificationsDuringPomodoro = !Extension.extension.settings.get_boolean('hide-notifications-during-pomodoro');
-        this._notificationsDuringBreak = NOTIFICATIONS_DURING_BREAK;
+        this._notificationsDuringPomodoro =
+                !Extension.extension.settings.get_boolean('hide-notifications-during-pomodoro');
     },
 
     update: function() {
@@ -229,7 +230,7 @@ const Presence = new Lang.Class({
             }
         }
         catch (error) {
-            Extension.extension.logError(error.message);        
+            Extension.extension.logError(error.message);
         }
 
         this._updateNotificationsMenuItem();
@@ -272,5 +273,5 @@ const Presence = new Lang.Class({
             this._patch.revert();
             this._patch = null;
         }
-    }   
+    }
 });
