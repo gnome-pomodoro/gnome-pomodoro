@@ -7,17 +7,15 @@ noinst_PROGRAMS = \
 
 tests_SOURCES = \
     tests.vala \
-    test-timer.vala
+    test-timer.vala \
+    ../lib/gnome-pomodoro.vapi
+
 
 tests_DEPENDENCIES = \
     ../lib/libgnome-pomodoro.la
 
 tests_VALAFLAGS = \
-    --vapidir=$(abs_top_srcdir) \
-    --vapidir=$(abs_top_srcdir)/lib \
-    --vapidir=$(abs_top_srcdir)/vapi \
-    --vapidir=$(abs_top_builddir)/vapi \
-    --pkg gnome-pomodoro \
+    --vapidir=$(top_builddir)/vapi \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
@@ -27,13 +25,7 @@ tests_VALAFLAGS = \
 
 tests_CPPFLAGS = \
     $(GNOME_POMODORO_CFLAGS) \
-    $(WARNING_CFLAGS) \
-    -I$(abs_top_srcdir) \
-    -I$(abs_top_srcdir)/lib \
-    -DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
-    -DPACKAGE_LOCALE_DIR=\"$(localedir)\" \
-    -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
-    -DGNOME_DESKTOP_USE_UNSTABLE_API
+    $(WARNING_CFLAGS)
 
 tests_LDADD = \
     $(GNOME_POMODORO_LIBS) \

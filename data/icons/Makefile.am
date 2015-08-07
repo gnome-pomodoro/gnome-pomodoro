@@ -12,7 +12,7 @@ public_icons = \
 noinst_DATA = \
     gnome-pomodoro.svg
 
-gtk_update_icon_cache = gtk-update-icon-cache -f -t
+gtk_update_icon_cache = GTK_UPDATE_ICON_CACHE -f -t
 
 update-icon-cache:
 	@-if test -z "$(DESTDIR)"; then \

@@ -28,7 +28,7 @@ public class Pomodoro.AboutDialog : Gtk.AboutDialog
         this.title = _("About Pomodoro");
         this.program_name = _("Pomodoro");
         this.comments = _("A simple time management utility");
-        this.logo_icon_name = Config.PACKAGE;
+        this.logo_icon_name = Config.PACKAGE_NAME;
         this.version = Config.PACKAGE_VERSION;
         this.website = Config.PACKAGE_URL;
 

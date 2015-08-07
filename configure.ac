@@ -62,15 +62,13 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
 
 # Checks for programs.
 AC_PROG_CC
-AC_PROG_CXX
 AC_PROG_INSTALL
-AC_PROG_AWK
-AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_MKDIR_P
-
 AM_PROG_VALAC([0.26])
+
 AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
+AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache)
 
 GLIB_GSETTINGS
 VAPIGEN_CHECK
@@ -130,23 +128,62 @@ else
 fi
 
 
-# Some variables to pass to Makefiles
-AC_SUBST(EXTENSION_UUID, [pomodoro@arun.codito.in])
-AC_SUBST(GETTEXT_PACKAGE)
-AC_SUBST(WARNING_CFLAGS)
+# Project constants
+GNOME_POMODORO_CFLAGS="$GNOME_POMODORO_CFLAGS -I\$(top_builddir)/lib --include config.h"
+GNOME_POMODORO_LIBS="$GNOME_POMODORO_LIBS -lm"
 
-AC_SUBST(GLIB_REQUIRED)
-AC_SUBST(GTK_REQUIRED)
-AC_SUBST(GNOME_REQUIRED)
-AC_SUBST(TELEPATHY_GLIB_REQUIRED)
+# RECURSIVE_EVAL(VALUE, RESULT)
+#
+# Interpolate the VALUE in loop until it doesn't change,
+# and set the result to $RESULT.
+# WARNING: It's easy to get an infinite loop with some unsane input.
+#
+AC_DEFUN([RECURSIVE_EVAL],
+         [_lcl_receval="$1"
+          $2=`(test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+               test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+               _lcl_receval_old=''
+               while test "[$]_lcl_receval_old" != "[$]_lcl_receval"; do
+                   _lcl_receval_old="[$]_lcl_receval"
+                   eval _lcl_receval="\"[$]_lcl_receval\""
+               done
+               echo "[$]_lcl_receval")`])
+
+RECURSIVE_EVAL("$localedir", [PACKAGE_LOCALE_DIR])
+RECURSIVE_EVAL("$datadir/gnome-pomodoro", [PACKAGE_DATA_DIR])
+RECURSIVE_EVAL("$datadir", [DATA_DIR])
+
+
+# Some variables to pass to Makefiles
+AC_SUBST([EXTENSION_UUID], [pomodoro@arun.codito.in])
+AC_SUBST([GETTEXT_PACKAGE])
+AC_SUBST([WARNING_CFLAGS])
+
+AC_SUBST([GLIB_REQUIRED])
+AC_SUBST([GTK_REQUIRED])
+AC_SUBST([GNOME_REQUIRED])
+AC_SUBST([TELEPATHY_GLIB_REQUIRED])
+
+AC_SUBST([GNOME_POMODORO_VALAFLAGS])
+AC_SUBST([GNOME_POMODORO_CPPFLAGS])
+AC_SUBST([GNOME_POMODORO_CFLAGS])
+AC_SUBST([GNOME_POMODORO_LIBS])
 
 
 # Some constants to pass to config.h
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], "$GETTEXT_PACKAGE",
                    [The name of the gettext domain])
-
 AC_DEFINE_UNQUOTED([EXTENSION_UUID], "$EXTENSION_UUID",
                    [UUID of the pomodoro extensoin])
+AC_DEFINE_UNQUOTED([PACKAGE_LOCALE_DIR], "$PACKAGE_LOCALE_DIR",
+                   [Locale dir])
+AC_DEFINE_UNQUOTED([PACKAGE_DATA_DIR], "$PACKAGE_DATA_DIR",
+                   [Data dir])
+AC_DEFINE_UNQUOTED([DATA_DIR], "$DATA_DIR",
+                   [Data dir])
+
+AC_DEFINE([GNOME_DESKTOP_USE_UNSTABLE_API], [],
+          [We are aware that GNOME_DESKTOP's API can change])
 
 if test "$enable_debug" = yes; then
 	AC_DEFINE([ENABLE_DEBUG], [1], [Debug code])

@@ -637,7 +637,7 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
         notification.add_button (_("Enable"), "app.enable-extension");
 
         try {
-            notification.set_icon (GLib.Icon.new_for_string (Config.PACKAGE));
+            notification.set_icon (GLib.Icon.new_for_string (Config.PACKAGE_NAME));
         }
         catch (Error error) {
         }

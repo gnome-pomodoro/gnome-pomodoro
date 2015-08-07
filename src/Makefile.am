@@ -6,17 +6,14 @@ BUILT_SOURCES = \
 
 gnome_pomodoro_SOURCES = \
     main.vala \
-    resources.c
+    resources.c \
+    ../lib/gnome-pomodoro.vapi
 
 gnome_pomodoro_DEPENDENCIES = \
     ../lib/libgnome-pomodoro.la
 
 gnome_pomodoro_VALAFLAGS = \
-    --vapidir=$(abs_top_srcdir) \
-    --vapidir=$(abs_top_srcdir)/lib \
-    --vapidir=$(abs_top_srcdir)/vapi \
-    --vapidir=$(abs_top_builddir)/vapi \
-    --pkg gnome-pomodoro \
+    --vapidir=$(top_builddir)/vapi \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
@@ -25,13 +22,7 @@ gnome_pomodoro_VALAFLAGS = \
 
 gnome_pomodoro_CPPFLAGS = \
     $(GNOME_POMODORO_CFLAGS) \
-    $(WARNING_CFLAGS) \
-    -I$(abs_top_srcdir) \
-    -I$(abs_top_srcdir)/lib \
-    -DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
-    -DPACKAGE_LOCALE_DIR=\"$(localedir)\" \
-    -DPACKAGE_DATA_DIR=\"$(pkgdatadir)\" \
-    -DGNOME_DESKTOP_USE_UNSTABLE_API
+    $(WARNING_CFLAGS)
 
 gnome_pomodoro_LDADD = \
     $(GNOME_POMODORO_LIBS) \
@@ -51,8 +42,5 @@ CLEANFILES = \
 #EXTRA_DIST = \
 #    $(resource_files) \
 #    gnome-pomodoro.gresource.xml
-
-dist-hook:
-	cd $(distdir) && rm -f $(CLEANFILES)
 
 -include $(top_srcdir)/git.mk

@@ -1,9 +1,6 @@
 [CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "config.h")]
 namespace Config
 {
-    /* Name of package */
-    public const string PACKAGE;
-
     /* Define to the full name of this package. */
     public const string PACKAGE_NAME;
 
@@ -25,9 +22,6 @@ namespace Config
 
     /* The name of the gettext domain */
     public const string GETTEXT_PACKAGE;
-
-    /* Version number of package */
-    public const string VERSION;
 
     public const string EXTENSION_UUID;
 
