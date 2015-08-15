@@ -87,12 +87,11 @@ const IndicatorMenu = new Lang.Class({
             }));
         this.addMenuItem(this._timerToggle);
 
-        this._actionsSeparator = new PopupMenu.PopupSeparatorMenuItem();
-        this.addMenuItem(this._actionsSeparator);
+        this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-        this._startPomodoroItem = this.addAction(_("Start Pomodoro"), Lang.bind(this, this._startPomodoro));
-        this._startPauseItem = this.addAction(_("Take a Break"), Lang.bind(this, this._startPause));
-        this._switchPauseItem = this.addAction("", Lang.bind(this, this._switchPause));
+        this.addStateAction('pomodoro', _("Pomodoro"));
+        this.addStateAction('short-break', _("Short Break"));
+        this.addStateAction('long-break', _("Long Break"));
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
@@ -111,6 +110,23 @@ const IndicatorMenu = new Lang.Class({
             }));
     },
 
+    addStateAction: function(name, label) {
+        if (!this._stateItems) {
+            this._stateItems = {};
+        }
+
+        let menuItem = this.addAction(label, Lang.bind(this,
+            function(menuItem, event) {
+                this._activateState(name);
+            }));
+
+        menuItem.actor.add_style_class_name('state-item');
+
+        this._stateItems[name] = menuItem;
+
+        return menuItem;
+    },
+
     _onActorMapped: function(actor) {
         if (actor.mapped && this._timerUpdateId == 0) {
             this._timerUpdateId = this.indicator.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
@@ -125,37 +141,33 @@ const IndicatorMenu = new Lang.Class({
 
     _onTimerUpdate: function() {
         if (this.isOpen) {
-            let timerState = this.indicator.timer.getState();
-            let hasActions = false;
+            let timer = this.indicator.timer;
+            let timerState = timer.getState();
+            let toggled = timerState != Timer.State.NULL;
+            let stateName = '';
 
-            this._timerToggle.setToggleState(this._isTimerToggled());
+            this._timerToggle.setToggleState(toggled);
 
             if (timerState == Timer.State.POMODORO || timerState == Timer.State.IDLE) {
-                this._startPauseItem.actor.show();
-                hasActions = true;
+                stateName = 'pomodoro';
             }
-            else {
-                this._startPauseItem.actor.hide();
-            }
-
-            if (timerState == Timer.State.PAUSE) {
-                this._startPomodoroItem.actor.show();
-                this._switchPauseItem.actor.show();
-
-                this._updateSwitchPauseItem();
-
-                hasActions = true;
-            }
-            else {
-                this._startPomodoroItem.actor.hide();
-                this._switchPauseItem.actor.hide();
+            else if (timerState == Timer.State.PAUSE) {
+                stateName = timer.isLongPause() ? 'long-break' : 'short-break';
             }
 
-            if (hasActions) {
-                this._actionsSeparator.actor.show();
-            }
-            else {
-                this._actionsSeparator.actor.hide();
+            for (let key in this._stateItems) {
+                let stateItem = this._stateItems[key];
+
+                stateItem.setSensitive(toggled);
+
+                if (toggled && key == stateName) {
+                    stateItem.setOrnament(PopupMenu.Ornament.DOT);
+                    stateItem.actor.add_style_class_name('active');
+                }
+                else {
+                    stateItem.setOrnament(PopupMenu.Ornament.NONE);
+                    stateItem.actor.remove_style_class_name('active');
+                }
             }
         }
     },
@@ -171,25 +183,22 @@ const IndicatorMenu = new Lang.Class({
         this.indicator.timer.showPreferences(view, timestamp);
     },
 
-    _startPomodoro: function() {
-        this.indicator.timer.setState(Timer.State.POMODORO);
-    },
-
-    _startPause: function() {
-        this.indicator.timer.setState(Timer.State.PAUSE);
-    },
-
-    _updateSwitchPauseItem: function() {
+    _activateState: function(stateName) {
         let timer = this.indicator.timer;
 
-        this._switchPauseItem.label.set_text(timer.isLongPause()
-                    ? _("Take Shorter Break") : _("Take Longer Break"));
+        switch (stateName) {
+            case 'pomodoro':
+                timer.setState(Timer.State.POMODORO);
+                break;
 
-        this._switchPauseItem.setSensitive(timer.canSwitchPause());
-    },
+            case 'short-break':
+                timer.setState(Timer.State.PAUSE, timer.getShortBreakDuration());
+                break;
 
-    _switchPause: function() {
-        this.indicator.timer.switchPause();
+            case 'long-break':
+                timer.setState(Timer.State.PAUSE, timer.getLongBreakDuration());
+                break;
+        }
     }
 });
 

@@ -208,13 +208,21 @@ const Timer = new Lang.Class({
         this._ensureProxy(Lang.bind(this,
             function() {
                 this._proxy.SetStateRemote(state,
-                                          duration || 0,
-                                          Lang.bind(this, this._onCallback));
+                                           duration || 0,
+                                           Lang.bind(this, this._onCallback));
             }));
     },
 
     getStateDuration: function() {
         return this._proxy.StateDuration;
+    },
+
+    getShortBreakDuration: function() {
+        return this._shortBreakDuration;
+    },
+
+    getLongBreakDuration: function() {
+        return this._longBreakDuration;
     },
 
     getElapsed: function() {

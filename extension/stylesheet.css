@@ -29,6 +29,10 @@
     padding-left: 30px;
 }
 
+.extension-pomodoro-indicator-menu .state-item.active {
+    font-weight: bold;
+}
+
 .extension-pomodoro-task-list {
     max-height: 400px;
 }
