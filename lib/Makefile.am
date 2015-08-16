@@ -6,7 +6,6 @@ libgnome_pomodoro_la_VALASOURCES = \
     animation.vala \
     application.vala \
     calendar-button.vala \
-    command-line.vala \
     enum-combo-box.vala \
     gnome-desktop-module.vala \
     gnome-session-manager.vala \

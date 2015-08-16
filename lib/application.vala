@@ -21,20 +21,6 @@
 using GLib;
 
 
-[Flags]
-public enum Pomodoro.HoldReason {
-    NONE = 0,
-    SERVICE,
-    TIMER
-}
-
-
-public enum Pomodoro.ExitStatus {
-    SUCCESS = 0,
-    FAILURE = 1
-}
-
-
 namespace Pomodoro.Resources {
     public const string NONE = null;
     public const string BOOKMARK = "bookmark-symbolic";
@@ -52,7 +38,38 @@ public class Pomodoro.Application : Gtk.Application
 
     private List<Pomodoro.Module> modules;
     private Pomodoro.GnomeDesktopModule desktop_module;
-    private int hold_reasons;
+
+    private enum ExitStatus
+    {
+        UNDEFINED = -1,
+        SUCCESS   =  0,
+        FAILURE   =  1
+    }
+
+    private struct Options
+    {
+        public static bool no_default_window = false;
+        public static bool preferences = false;
+        public static bool quit = false;
+
+        public static ExitStatus exit_status = ExitStatus.UNDEFINED;
+
+        public static const GLib.OptionEntry[] entries = {
+            { "no-default-window", 0, GLib.OptionFlags.HIDDEN, GLib.OptionArg.NONE,
+              ref no_default_window, N_("Run as background service"), null },
+
+            { "preferences", 0, 0, GLib.OptionArg.NONE,
+              ref preferences, N_("Show preferences"), null },
+
+            { "quit", 0, 0, GLib.OptionArg.NONE,
+              ref quit, N_("Quit application"), null },
+
+            { "version", 0, GLib.OptionFlags.NO_ARG, GLib.OptionArg.CALLBACK,
+              (void *) command_line_version_callback, N_("Print version information and exit"), null },
+
+            { null }
+        };
+    }
 
     public Application ()
     {
@@ -61,34 +78,8 @@ public class Pomodoro.Application : Gtk.Application
             flags: GLib.ApplicationFlags.HANDLES_COMMAND_LINE
         );
 
-        this.inactivity_timeout = 300000;
-        this.register_session = false;
-
         this.timer = null;
         this.service = null;
-        this.hold_reasons = HoldReason.NONE;
-    }
-
-    public new void hold (HoldReason reason = 0)
-    {
-        if (reason == 0) {
-            base.hold ();
-        }
-        else if ((this.hold_reasons & reason) == 0) {
-            this.hold_reasons |= reason;
-            base.hold ();
-        }
-    }
-
-    public new void release (HoldReason reason = 0)
-    {
-        if (reason == 0) {
-            base.release ();
-        }
-        else if ((this.hold_reasons & reason) != 0) {
-            this.hold_reasons &= ~reason;
-            base.release ();
-        }
     }
 
     public unowned Gtk.Window get_last_focused_window ()
@@ -264,18 +255,27 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
+    private static bool command_line_version_callback ()
+    {
+        stdout.printf ("%s %s\n",
+                       GLib.Environment.get_application_name (),
+                       Config.PACKAGE_VERSION);
+
+        Options.exit_status = ExitStatus.SUCCESS;
+
+        return true;
+    }
+
     /* Emitted on the primary instance immediately after registration.
      */
     public override void startup ()
     {
-        this.hold (HoldReason.SERVICE);
+        this.hold ();
 
         base.startup ();
 
         this.setup_resources ();
 
-        this.timer.state_changed.connect (this.on_timer_state_changed);
-        this.timer.destroy.connect (this.on_timer_destroy);
         this.timer.restore ();
 
         this.desktop_module = new Pomodoro.GnomeDesktopModule (this.timer);
@@ -293,6 +293,8 @@ public class Pomodoro.Application : Gtk.Application
 
         this.setup_actions ();
         this.setup_menu ();
+
+        this.release ();
     }
 
     public Pomodoro.Module? get_module_by_name (string name)
@@ -315,63 +317,81 @@ public class Pomodoro.Application : Gtk.Application
         return null;
     }
 
-//    public void enable_plugin (Pomodoro.Plugin plugin)
-//    {
-//    }
-
-//    public void disable_plugin (Pomodoro.Plugin plugin)
-//    {
-//    }
-
-    private void on_timer_state_changed (Timer timer)
+    /**
+     * This is just for local things, like showing help
+     */
+    private void parse_command_line (ref unowned string[] arguments) throws GLib.OptionError
     {
-        var is_running = timer.state != State.NULL;
+        var option_context = new GLib.OptionContext (_("- Time management utility for GNOME"));
 
-        if (is_running) {
-            this.hold (HoldReason.TIMER);
-        }
-        else {
-            this.release (HoldReason.TIMER);
-        }
+        option_context.add_main_entries (Options.entries, Config.GETTEXT_PACKAGE);
+        option_context.add_group (Gtk.get_option_group (true));
+
+        // TODO: add options from plugins
+
+        option_context.parse (ref arguments);
     }
 
-    private void on_timer_destroy (Timer timer)
+    protected override bool local_command_line ([CCode (array_length = false, array_null_terminated = true)] ref unowned string[] arguments, out int exit_status)
     {
-        this.release (HoldReason.TIMER);
-        this.timer = null;
-    }
+        string[] tmp = arguments;
+        unowned string[] arguments_copy = tmp;
 
-    private int do_command_line (ApplicationCommandLine command_line)
-    {
-        var arguments = new CommandLine ();
-
-        if (arguments.parse (command_line.get_arguments ()))
+        try
         {
-            if (arguments.preferences) {
-                this.activate_action ("preferences", null);
-            }
+            // This is just for local things, like showing help
+            this.parse_command_line (ref arguments_copy);
+        }
+        catch (GLib.Error error)
+        {
+            stderr.printf ("Failed to parse options: %s\n", error.message);
+            exit_status = ExitStatus.FAILURE;
 
-            if (arguments.no_default_window) {
-                this.hold (HoldReason.SERVICE);
-            }
-
-            if (!arguments.preferences && !arguments.no_default_window) {
-                this.activate ();
-            }
-
-            return ExitStatus.SUCCESS;
+            return true;
         }
 
-        return ExitStatus.FAILURE;
+        if (Options.exit_status != ExitStatus.UNDEFINED)
+        {
+            exit_status = Options.exit_status;
+
+            return true;
+        }
+
+        return base.local_command_line (ref arguments, out exit_status);
     }
 
     public override int command_line (ApplicationCommandLine command_line)
     {
-        this.hold ();
-        var status = this.do_command_line (command_line);
-        this.release ();
+        string[] tmp = command_line.get_arguments ();
+        unowned string[] arguments_copy = tmp;
 
-        return status;
+        var exit_status = ExitStatus.SUCCESS;
+
+        do {
+
+            try
+            {
+                this.parse_command_line (ref arguments_copy);
+            }
+            catch (GLib.Error error)
+            {
+                stderr.printf ("Failed to parse options: %s\n", error.message);
+
+                exit_status = ExitStatus.FAILURE;
+                break;
+            }
+
+            if (Options.exit_status != ExitStatus.UNDEFINED)
+            {
+                exit_status = Options.exit_status;
+                break;
+            }
+
+            this.activate ();
+        }
+        while (false);
+
+        return exit_status;
     }
 
     /* Save the state before exit.
@@ -396,7 +416,17 @@ public class Pomodoro.Application : Gtk.Application
      */
     public override void activate ()
     {
-        this.activate_action ("preferences", null);
+        this.hold ();
+
+        if (Options.quit) {
+            this.quit ();
+        }
+
+        if (Options.preferences) {
+            this.show_preferences ();
+        }
+
+        this.release ();
     }
 
     public override bool dbus_register (DBusConnection connection,
@@ -411,7 +441,13 @@ public class Pomodoro.Application : Gtk.Application
         }
 
         if (this.service == null) {
+            this.hold ();
+
             this.service = new Pomodoro.Service (connection, this.timer);
+            this.service.destroy.connect (() => {
+                this.service = null;
+                this.release ();
+            });
 
             try {
                 connection.register_object ("/org/gnome/Pomodoro", this.service);
@@ -430,14 +466,14 @@ public class Pomodoro.Application : Gtk.Application
     {
         base.dbus_unregister (connection, object_path);
 
-        if (this.service != null) {
-            this.service.dispose ();
-            this.service = null;
-        }
-
         if (this.timer != null) {
             this.timer.destroy ();
             this.timer = null;
+        }
+
+        if (this.service != null) {
+            this.service.destroy ();
+            this.service = null;
         }
     }
 }

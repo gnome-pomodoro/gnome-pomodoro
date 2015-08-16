@@ -182,4 +182,8 @@ public class Pomodoro.Service : Object
 
     public signal void notify_pomodoro_end (bool is_requested);
     public signal void notify_pomodoro_start (bool is_completed);
+
+    public virtual signal void destroy () {
+        this.dispose ();
+    }
 }

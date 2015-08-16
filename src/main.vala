@@ -23,35 +23,14 @@ using GLib;
 
 public int main (string[] args)
 {
+    Intl.bindtextdomain (Config.GETTEXT_PACKAGE, Config.PACKAGE_LOCALE_DIR);
+    Intl.bind_textdomain_codeset (Config.GETTEXT_PACKAGE, "UTF-8");
+    Intl.textdomain (Config.GETTEXT_PACKAGE);
+
     GLib.Environment.set_application_name (_("Pomodoro"));
+    GLib.Environment.set_prgname (Config.PACKAGE_NAME);
 
-    #if ENABLE_NLS
-        Intl.bindtextdomain (Config.GETTEXT_PACKAGE,
-                             Config.PACKAGE_LOCALE_DIR);
-        Intl.textdomain (Config.GETTEXT_PACKAGE);
-    #endif
+    var application = new Pomodoro.Application ();
 
-    Gtk.init (ref args);
-
-    var command_line = new Pomodoro.CommandLine ();
-
-    /* Arguments are also parsed by application.command_line signal handler,
-     * so here we work on a copy.
-     */
-    if (command_line.parse (args))
-    {
-        var application = new Pomodoro.Application ();
-        application.set_default ();
-
-        try {
-            if (application.register ()) {
-                return application.run (args);
-            }
-        }
-        catch (Error e) {
-            GLib.critical ("%s", e.message);
-        }
-    }
-
-    return Pomodoro.ExitStatus.FAILURE;
+    return application.run (args);
 }
