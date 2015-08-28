@@ -82,8 +82,6 @@ const MessagesIndicator = new Lang.Class({
         this._sources = [];
 
         this._container = new St.BoxLayout({ style_class: 'messages-indicator-contents',
-                                             reactive: true,
-                                             track_hover: true,
                                              x_expand: true,
                                              y_expand: true,
                                              x_align: Clutter.ActorAlign.CENTER });
@@ -337,6 +335,7 @@ const ModalDialog = new Lang.Class({
 
         return this._grabHelper.grab({
             actor: this._lightbox.actor,
+            focus: this.actor,
             onUngrab: Lang.bind(this, this._onUngrab)
         });
     },
@@ -369,8 +368,6 @@ const ModalDialog = new Lang.Class({
         }
 
         this._disconnectSignals();
-
-        this._lightbox.actor.reactive = true;
 
         this._grabHelper.ignoreRelease();
 
@@ -409,8 +406,6 @@ const ModalDialog = new Lang.Class({
         catch (error) {
             Extension.extension.logError(error.message);
         }
-
-        this._lightbox.actor.reactive = false;
 
         this._disconnectSignals();
     },
@@ -497,6 +492,12 @@ const PomodoroEndDialog = new Lang.Class({
 
         let messagesIndicator = new MessagesIndicator();
         this._backgroundStack.add_actor(messagesIndicator.actor);
+//        this._layout.add(messagesIndicator.actor,
+//                         { expand: false,
+//                           x_fill: false,
+//                           y_fill: false,
+//                           x_align: St.Align.MIDDLE,
+//                           y_align: St.Align.END });
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
 
