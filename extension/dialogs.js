@@ -82,7 +82,8 @@ const MessagesIndicator = new Lang.Class({
         this._sources = [];
 
         this._container = new St.BoxLayout({ style_class: 'messages-indicator-contents',
-                                             reactive: false,
+                                             reactive: true,
+                                             track_hover: true,
                                              x_expand: true,
                                              y_expand: true,
                                              x_align: Clutter.ActorAlign.CENTER });
@@ -213,8 +214,6 @@ const ModalDialog = new Lang.Class({
                                                { fadeFactor: FADE_IN_OPACITY,
                                                  inhibitEvents: false });
         this._lightbox.highlight(backgroundBin);
-        this._lightbox.actor.reactive = false;
-        this._lightbox.actor.can_focus = false;
         this._lightbox.actor.add_style_class_name('extension-pomodoro-lightbox');
         this._lightbox.show();
 
@@ -371,6 +370,8 @@ const ModalDialog = new Lang.Class({
 
         this._disconnectSignals();
 
+        this._lightbox.actor.reactive = true;
+
         this._grabHelper.ignoreRelease();
 
         /* delay pushModal to ignore current events */
@@ -408,6 +409,8 @@ const ModalDialog = new Lang.Class({
         catch (error) {
             Extension.extension.logError(error.message);
         }
+
+        this._lightbox.actor.reactive = false;
 
         this._disconnectSignals();
     },
