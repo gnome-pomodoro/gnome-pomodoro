@@ -107,7 +107,7 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
 
     private void on_timer_state_changed (Pomodoro.Timer timer)
     {
-        this.set_status_for_state (timer.state);
+//        this.set_status_for_state (timer.state);
     }
 
     private void enable_plugin (Pomodoro.Plugin plugin)
@@ -118,12 +118,12 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
         {
             plugin.enable ();
 
-            if (this.timer.state != Pomodoro.State.NULL)
-            {
-                var status = presence_plugin.get_default_status (this.timer.state);
+//            if (this.timer.state != Pomodoro.State.NULL)
+//            {
+//                var status = presence_plugin.get_default_status (this.timer.state);
 
-                presence_plugin.set_status.begin (status);
-            }
+//                presence_plugin.set_status.begin (status);
+//            }
         }
     }
 
@@ -133,12 +133,12 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
 
         if (plugin.enabled)
         {
-            if (this.timer.state != Pomodoro.State.NULL)
-            {
-                var status = presence_plugin.get_default_status (Pomodoro.State.NULL);
+//            if (this.timer.state != Pomodoro.State.NULL)
+//            {
+//                var status = presence_plugin.get_default_status (Pomodoro.State.NULL);
 
-                presence_plugin.set_status (status);
-            }
+//                presence_plugin.set_status (status);
+//            }
 
             plugin.disable ();
         }
@@ -189,11 +189,11 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
 
             // this.enable_plugins ();
 
-            this.timer.state_changed.connect (this.on_timer_state_changed);
+//            this.timer.state_changed.connect (this.on_timer_state_changed);
 
-            if (this.timer.state != Pomodoro.State.NULL) {
-                this.on_timer_state_changed (this.timer);
-            }
+//            if (this.timer.state != Pomodoro.State.NULL) {
+//                this.on_timer_state_changed (this.timer);
+//            }
         }
     }
 

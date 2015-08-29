@@ -32,8 +32,8 @@ const Settings = Extension.imports.settings;
 const State = {
     NULL: 'null',
     POMODORO: 'pomodoro',
-    PAUSE: 'pause',
-    IDLE: 'idle'
+    SHORT_BREAK: 'short-break',
+    LONG_BREAK: 'long-break'
 };
 
 
@@ -42,11 +42,10 @@ const Timer = new Lang.Class({
 
     _init: function() {
         this._proxy = null;
+        this._connected = false;
 
         this._state = null;
         this._propertiesChangedId = 0;
-        this._notifyPomodoroStartId = 0;
-        this._notifyPomodoroEndId = 0;
         this._settingsChangedId = 0;
         this._shortBreakDuration = 0;
         this._longBreakDuration = 0;
@@ -67,9 +66,9 @@ const Timer = new Lang.Class({
             Extension.extension.logError(error);
         }
 
-        if (this._isRunning()) {
+//        if (this._isRunning()) {
             this._ensureProxy();
-        }
+//        }
     },
 
     _isRunning: function() {
@@ -108,10 +107,6 @@ const Timer = new Lang.Class({
         }
 
         this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
-            if (proxy !== this._proxy) {
-                return;
-            }
-
             if (error) {
                 Extension.extension.logError(error.message);
                 this._notifyServiceNotInstalled();
@@ -127,17 +122,7 @@ const Timer = new Lang.Class({
                                            Lang.bind(this, this._onPropertiesChanged));
             }
 
-            if (this._notifyPomodoroStartId == 0) {
-                this._notifyPomodoroStartId = this._proxy.connectSignal(
-                                           'NotifyPomodoroStart',
-                                           Lang.bind(this, this._onNotifyPomodoroStart));
-            }
-
-            if (this._notifyPomodoroEndId == 0) {
-                this._notifyPomodoroEndId = this._proxy.connectSignal(
-                                           'NotifyPomodoroEnd',
-                                           Lang.bind(this, this._onNotifyPomodoroEnd));
-            }
+            this._connected = true;
 
             if (callback) {
                 callback.call(this);
@@ -156,6 +141,14 @@ const Timer = new Lang.Class({
     },
 
     _onNameVanished: function() {
+        if (this._propertiesChangedId != 0) {
+            this._proxy.disconnect(this._propertiesChangedId);
+            this._propertiesChangedId = 0;
+        }
+
+        this._proxy = null;
+        this._connected = false;
+
         this.emit('state-changed');
         this.emit('update');
         this.emit('service-disconnected');
@@ -170,14 +163,6 @@ const Timer = new Lang.Class({
         }
 
         this.emit('update');
-    },
-
-    _onNotifyPomodoroStart: function(proxy, senderName, [isRequested]) {
-        this.emit('notify-pomodoro-start', isRequested);
-    },
-
-    _onNotifyPomodoroEnd: function(proxy, senderName, [isCompleted]) {
-        this.emit('notify-pomodoro-end', isCompleted);
     },
 
     _onCallback: function(result, error) {
@@ -195,7 +180,7 @@ const Timer = new Lang.Class({
     },
 
     getState: function() {
-        if (!this._proxy || this._proxy.State == null) {
+        if (!this._connected || this._proxy.State == null) {
             return State.NULL;
         }
 
@@ -215,24 +200,12 @@ const Timer = new Lang.Class({
         return this._proxy.StateDuration;
     },
 
-    getShortBreakDuration: function() {
-        return this._shortBreakDuration;
-    },
-
-    getLongBreakDuration: function() {
-        return this._longBreakDuration;
-    },
-
     getElapsed: function() {
         return this._proxy.Elapsed;
     },
 
     getRemaining: function() {
         let state = this.getState();
-
-        if (state == State.IDLE) {  /* TODO: should be done earlier */
-            return Extension.extension.settings.get_double('pomodoro-duration');
-        }
 
         if (state == State.NULL) {
             return 0.0;
@@ -242,7 +215,7 @@ const Timer = new Lang.Class({
     },
 
     getProgress: function() {
-        return (this._proxy && this._proxy.StateDuration > 0)
+        return (this._connected && this._proxy.StateDuration > 0)
                 ? this._proxy.Elapsed / this._proxy.StateDuration
                 : 0.0;
     },
@@ -277,21 +250,27 @@ const Timer = new Lang.Class({
         }
     },
 
-    isLongPause: function() {
-        return (this.getState() == State.PAUSE) &&
-               (this.getStateDuration() > this._shortBreakDuration);
+    isBreak: function() {
+        let state = this.getState();
+
+        return state == State.SHORT_BREAK || state == State.LONG_BREAK;
     },
 
-    canSwitchPause: function() {
+    canSwitchBreak: function() {
         return (this.getElapsed() < this._shortBreakDuration) &&
                (this._shortBreakDuration < this._longBreakDuration);
     },
 
-    switchPause: function() {
-        let duration = this.isLongPause()
-                ? this._shortBreakDuration : this._longBreakDuration;
+    switchBreak: function() {
+        let state = this.getState();
 
-        this.setState(State.PAUSE, duration);
+        if (state == State.SHORT_BREAK) {
+            this.setState(State.LONG_BREAK);
+        }
+
+        if (state == State.LONG_BREAK) {
+            this.setState(State.SHORT_BREAK);
+        }
     },
 
     showMainWindow: function(timestamp) {

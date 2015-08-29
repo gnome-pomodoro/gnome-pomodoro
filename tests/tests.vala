@@ -119,16 +119,14 @@ class Pomodoro.TestRunner : Object
     private void setup_settings ()
     {
         /* prepare temporary settings */
-        var target_data_path = Path.build_filename (
-                this.tmp_dir.get_path (), "share");
-
         var target_schema_path = Path.build_filename (
                 this.tmp_dir.get_path (), "share", "glib-2.0", "schemas");
 
         var target_schema_dir = File.new_for_path (target_schema_path);
         try {
             target_schema_dir.make_directory_with_parents ();
-        } catch (Error e) {
+        }
+        catch (Error e) {
             GLib.error ("Error creating directory for schema files: %s", e.message);
         }
 
@@ -143,7 +141,8 @@ class Pomodoro.TestRunner : Object
 
             source_schema_file.copy (target_schema_file,
                                      FileCopyFlags.OVERWRITE);
-        } catch (Error e) {
+        }
+        catch (Error e) {
             GLib.error ("Error copying schema file: %s", e.message);
         }
 
@@ -197,8 +196,6 @@ class Pomodoro.TestRunner : Object
 
         this.setup_settings ();
     }
-
-    private bool is_setup = false;
 
     public virtual void global_teardown ()
     {

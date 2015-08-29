@@ -330,7 +330,7 @@ public class Pomodoro.SoundsModule : Pomodoro.Module
         this.unschedule_fade_out ();
 
         var remaining_time =
-            (uint) ((this.timer.state_duration - this.timer.elapsed) * 1000);
+            (uint) ((this.timer.state.duration - this.timer.elapsed) * 1000);
 
         if (remaining_time > PLAYER_FADE_OUT_TIME) {
             this.fade_out_timeout_id = GLib.Timeout.add (
@@ -358,9 +358,9 @@ public class Pomodoro.SoundsModule : Pomodoro.Module
             this.setup_gstreamer ();
 
             this.timer.state_changed.connect (this.on_state_changed);
-            this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
-            this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
-            this.timer.pomodoro_start.connect (this.on_pomodoro_start);
+//            this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
+//            this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
+//            this.timer.pomodoro_start.connect (this.on_pomodoro_start);
         }
 
         base.enable ();
@@ -372,12 +372,12 @@ public class Pomodoro.SoundsModule : Pomodoro.Module
         {
             SignalHandler.disconnect_by_func (this.timer,
                       (void*) this.on_state_changed, (void*) this);
-            SignalHandler.disconnect_by_func (this.timer,
-                      (void*) this.on_notify_pomodoro_end, (void*) this);
-            SignalHandler.disconnect_by_func (this.timer,
-                      (void*) this.on_notify_pomodoro_start, (void*) this);
-            SignalHandler.disconnect_by_func (this.timer,
-                      (void*) this.on_pomodoro_start, (void*) this);
+//            SignalHandler.disconnect_by_func (this.timer,
+//                      (void*) this.on_notify_pomodoro_end, (void*) this);
+//            SignalHandler.disconnect_by_func (this.timer,
+//                      (void*) this.on_notify_pomodoro_start, (void*) this);
+//            SignalHandler.disconnect_by_func (this.timer,
+//                      (void*) this.on_pomodoro_start, (void*) this);
         }
 
         base.disable ();
@@ -634,7 +634,7 @@ public class Pomodoro.SoundsModule : Pomodoro.Module
 
     private void on_state_changed ()
     {
-        if (this.timer.state != State.POMODORO && this.player != null) {
+        if (!(this.timer.state is PomodoroState) && this.player != null) {
             this.player.stop ();
         }
     }
@@ -643,7 +643,7 @@ public class Pomodoro.SoundsModule : Pomodoro.Module
     {
         this.unschedule_fade_out ();
 
-        if (this.timer.state == State.POMODORO) {
+        if (this.timer.state is PomodoroState) {
             this.schedule_fade_out ();
         }
     }

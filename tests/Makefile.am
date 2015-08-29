@@ -7,6 +7,7 @@ noinst_PROGRAMS = \
 
 tests_SOURCES = \
     tests.vala \
+    test-application.vala \
     test-timer.vala \
     ../lib/gnome-pomodoro.vapi
 

@@ -282,7 +282,7 @@ const PomodoroStartNotification = new Lang.Class({
 
         this.addAction(_("Take a break"), Lang.bind(this,
             function() {
-                this.timer.setState(Timer.State.PAUSE);
+                this.timer.skip ();
                 this.destroy();
             }));
     }
@@ -318,25 +318,20 @@ const PomodoroEndNotification = new Lang.Class({
     _onTimerUpdate: function() {
         let state = this.timer.getState();
 
-        if (state == Timer.State.PAUSE) {
-            let remaining = this.timer.getRemaining();
-            let minutes   = Math.round(remaining / 60);
-            let seconds   = Math.round(remaining % 60);
+        if (this.timer.isBreak()) {
+            let remaining = Math.max(this.timer.getRemaining(), 0.0);
+            let minutes = Math.round(remaining / 60);
+            let seconds = Math.round(remaining % 60);
 
             if (remaining > 15) {
                 seconds = Math.ceil(seconds / 15) * 15;
             }
 
-            this.bannerBodyText = (remaining <= 45)
-                    ? ngettext("You have %d second until next pomodoro.",
-                               "You have %d seconds until next pomodoro.", seconds).format(seconds)
-                    : ngettext("You have %d minute until next pomodoro.",
-                               "You have %d minutes until next pomodoro.", minutes).format(minutes);
-
-            if (this._minutes && this._minutes !== minutes) {
-                this.emit('updated', false);
-            }
-            this._minutes = minutes;
+            this.bannerBodyText = (remaining > 45)
+                    ? ngettext("You have %d minute until next pomodoro.",
+                               "You have %d minutes until next pomodoro.", minutes).format(minutes)
+                    : ngettext("You have %d second until next pomodoro.",
+                               "You have %d seconds until next pomodoro.", seconds).format(seconds);
         }
 
         this.emit('timer-updated');
@@ -352,15 +347,15 @@ const PomodoroEndNotification = new Lang.Class({
                     // banner.bodyLabel.actor.clutter_text.set_text(this.bannerBodyText);
                 }
 
-                if (this.timer.canSwitchPause()) {
-                    switchPauseButton.show();
+                if (this.timer.canSwitchBreak()) {
+                    switchBreakButton.set_label(this.timer.getState() == Timer.State.SHORT_BREAK
+                            ? _("Lengthen it") : _("Shorten it"));
+
+                    switchBreakButton.show();
                 }
                 else {
-                    switchPauseButton.hide();
+                    switchBreakButton.hide();
                 }
-
-                switchPauseButton.set_label(
-                    this.timer.isLongPause() ? _("Shorten it") : _("Lengthen it"));
             });
 
         let onDestroy = Lang.bind(this,
@@ -369,19 +364,21 @@ const PomodoroEndNotification = new Lang.Class({
                 this.disconnect(notificationDestroyId);
             });
 
-        let switchPauseButton = banner.addAction("", Lang.bind(this,
+        let switchBreakButton = banner.addAction('', Lang.bind(this,
             function() {
-                this.timer.switchPause();
+                this.timer.switchBreak();
             }));
 
         let startPomodoroButton = banner.addAction(_("Start pomodoro"), Lang.bind(this,
             function() {
-                this.timer.setState(Timer.State.POMODORO);
+                this.timer.skip ();
                 this.destroy();
             }));
 
         let notificationUpdatedId = this.connect('timer-updated', onTimerUpdated);
         let notificationDestroyId = this.connect('destroy', onDestroy);
+
+        this._onTimerUpdate();
 
         return banner;
     }

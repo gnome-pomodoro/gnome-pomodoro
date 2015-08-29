@@ -34,20 +34,16 @@ public class Pomodoro.Service : Object
         get { return this.timer.elapsed; }
     }
 
-    public double state_duration {
-        get { return this.timer.state_duration; }
-    }
-
-    public double session {
-        get { return this.timer.session; }
-    }
-
-    public double session_limit {
-        get { return this.timer.session_limit; }
-    }
-
     public string state {
-        owned get { return state_to_string (this.timer.state); }
+        get { return this.timer.state.name; }
+    }
+
+    public double state_duration {
+        get { return this.timer.state.duration; }
+    }
+
+    public bool is_paused {
+        get { return this.timer.is_paused; }
     }
 
     public string version {
@@ -63,15 +59,21 @@ public class Pomodoro.Service : Object
 
         this.cancellable = new GLib.Cancellable ();
 
-        this.timer.notify.connect (this.on_property_notify);
+        this.timer.notify.connect (this.on_timer_property_notify);
+    }
 
-        this.timer.notify_pomodoro_start.connect ((timer, is_requested) => {
-            this.notify_pomodoro_start (is_requested);
-        });
+    public void set_state (string name,
+                           double timestamp)
+    {
+        var state = TimerState.lookup (name);
 
-        this.timer.notify_pomodoro_end.connect ((timer, is_completed) => {
-            this.notify_pomodoro_end (is_completed);
-        });
+        if (timestamp > 0.0) {
+            state.timestamp = timestamp;
+        }
+
+        if (state != null) {
+            this.timer.state = state;
+        }
     }
 
     public void show_preferences (string view,
@@ -86,13 +88,6 @@ public class Pomodoro.Service : Object
         this.timer.start ();
     }
 
-    public void set_state (string state,
-                           double state_duration)
-    {
-        this.timer.set_state_full (string_to_state (state),
-                                   state_duration);
-    }
-
     public void stop ()
     {
         this.timer.stop ();
@@ -101,6 +96,21 @@ public class Pomodoro.Service : Object
     public void reset ()
     {
         this.timer.reset ();
+    }
+
+    public void pause ()
+    {
+        this.timer.pause ();
+    }
+
+    public void resume ()
+    {
+        this.timer.resume ();
+    }
+
+    public void skip ()
+    {
+        this.timer.skip ();
     }
 
     private void flush ()
@@ -149,7 +159,7 @@ public class Pomodoro.Service : Object
         }
     }
 
-    private void on_property_notify (ParamSpec param_spec)
+    private void on_timer_property_notify (ParamSpec param_spec)
     {
         switch (param_spec.name)
         {
@@ -158,32 +168,22 @@ public class Pomodoro.Service : Object
                                             new Variant.double (this.elapsed));
                 break;
 
-            case "session":
-                this.send_property_changed ("Session",
-                                            new Variant.double (this.session));
-                break;
-
-            case "session-limit":
-                this.send_property_changed ("SessionLimit",
-                                            new Variant.double (this.session_limit));
-                break;
-
             case "state":
                 this.send_property_changed ("State",
                                             new Variant.string (this.state));
-                break;
-
-            case "state-duration":
                 this.send_property_changed ("StateDuration",
                                             new Variant.double (this.state_duration));
+                break;
+
+            case "is_paused":
+                this.send_property_changed ("IsPaused",
+                                            new Variant.boolean (this.is_paused));
                 break;
         }
     }
 
-    public signal void notify_pomodoro_end (bool is_requested);
-    public signal void notify_pomodoro_start (bool is_completed);
-
-    public virtual signal void destroy () {
+    public virtual signal void destroy ()
+    {
         this.dispose ();
     }
 }

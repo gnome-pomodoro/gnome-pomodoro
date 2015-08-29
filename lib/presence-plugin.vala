@@ -58,9 +58,9 @@ public abstract class Pomodoro.PresencePlugin : Pomodoro.Plugin
         var application = GLib.Application.get_default () as Pomodoro.Application;
         var timer_state = application.timer.state;
 
-        if (timer_state != Pomodoro.State.NULL) {
-            this.set_status.begin (this.get_default_status (timer_state));
-        }
+//        if (timer_state != Pomodoro.State.NULL) {
+//            this.set_status.begin (this.get_default_status (timer_state));
+//        }
     }
 
     public bool has_custom_status ()

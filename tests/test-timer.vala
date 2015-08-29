@@ -18,258 +18,381 @@
  *
  */
 
-using GLib;
-
-
-public class Pomodoro.TimerTest : Pomodoro.TestSuite
+namespace Pomodoro
 {
-    private const double POMODORO_DURATION = 25.0;
-    private const double SHORT_BREAK_DURATION = 5.0;
-    private const double LONG_BREAK_DURATION = 15.0;
-    private const double IDLE_DURATION = 0.25;
-
-    private double global_time
+    public class TimerTest : Pomodoro.TestSuite
     {
-        get {
-            return Pomodoro.get_real_time ();
+        private const double POMODORO_DURATION = 25.0;
+        private const double SHORT_BREAK_DURATION = 5.0;
+        private const double LONG_BREAK_DURATION = 15.0;
+        private const double LONG_BREAK_INTERVAL = 4.0;
+
+        public TimerTest ()
+        {
+            this.add_test ("state_duration_setting",
+                           this.test_state_duration_setting);
+
+            this.add_test ("set_state",
+                           this.test_set_state);
+
+            this.add_test ("start",
+                           this.test_start);
+
+            this.add_test ("stop",
+                           this.test_stop);
+
+            this.add_test ("update",
+                           this.test_update);
+
+            this.add_test ("update_offset",
+                           this.test_update_offset);
+
+            this.add_test ("disabled_state",
+                           this.test_disabled_state);
+
+            this.add_test ("short_break_state",
+                           this.test_short_break_state);
+
+            this.add_test ("long_break_state",
+                           this.test_long_break_state);
+
+            this.add_test ("long_break_state_postponed",
+                           this.test_long_break_state_postponed);
+
+            this.add_test ("pomodoro_state_create_next_state",
+                           this.test_pomodoro_state_create_next_state);
+
+            this.add_test ("pause",
+                           this.test_pause);
+
+            this.add_test ("is_running",
+                           this.test_is_running);
+
+//            this.add_test ("state_duration_change",
+//                           this.test_state_duration_change);
+
+            this.add_test ("restore",
+                           this.test_restore);
+
+//            this.add_test ("state_changed_signal",
+//                           this.test_state_changed_signal);
         }
-        set {
-            Pomodoro.set_real_time (value);
+
+        public override void setup () {
+            var settings = Pomodoro.get_settings ()
+                                   .get_child ("preferences");
+            settings.set_double ("pomodoro-duration", POMODORO_DURATION);
+            settings.set_double ("short-break-duration", SHORT_BREAK_DURATION);
+            settings.set_double ("long-break-duration", LONG_BREAK_DURATION);
+            settings.set_double ("long-break-interval", LONG_BREAK_INTERVAL);
+            settings.set_boolean ("pause-when-idle", false);
         }
-    }
 
-    public TimerTest ()
-    {
-        this.add_test ("set_state_full",
-                       this.test_set_state_full);
+        public override void teardown () {
+            var settings = Pomodoro.get_settings ();
+            settings.revert ();
+        }
 
-        this.add_test ("restore",
-                       this.test_restore);
+        /**
+         * Unit test for Pomodoro.Timer.set_state_full() method.
+         *
+         * Check changing timer state.
+         */
+        public void test_set_state ()
+        {
+            var timer = new Pomodoro.Timer();
+            var timestamp = Pomodoro.get_real_time ();
 
-        this.add_test ("update",
-                       this.test_update);
+            timer.state_changed.connect ((new_state, previous_state) => {
+                
+            });
 
-        this.add_test ("update_after_suspend",
-                       this.test_update_after_suspend);
+            timer.state = new PomodoroState.with_timestamp (timestamp);
 
-        this.add_test ("update_after_suspend_with_idle",
-                       this.test_update_after_suspend_with_idle);
+            timestamp += timer.state.duration;
 
-        this.add_test ("pomodoro_duration_setting",
-                       this.test_pomodoro_duration_setting);
+            timer.state = new ShortBreakState.with_timestamp (timestamp);
 
-        this.add_test ("state_changed_signal",
-                       this.test_state_changed_signal);
-    }
+            timestamp += timer.state.duration;
 
-    public override void setup () {
-        this.global_time = Pomodoro.get_real_time ();
+            timer.state = new PomodoroState.with_timestamp (timestamp);
+        }
 
-        var settings = Pomodoro.get_settings ().get_child ("preferences");
-        settings.set_double ("pomodoro-duration", POMODORO_DURATION);
-        settings.set_double ("short-break-duration", SHORT_BREAK_DURATION);
-        settings.set_double ("long-break-duration", LONG_BREAK_DURATION);
-        settings.set_boolean ("pause-when-idle", false);
-    }
+        public void test_start ()
+        {
+            var timer = new Pomodoro.Timer();
 
-    public override void teardown () {
-        var settings = Pomodoro.get_settings ();
-        settings.revert ();
+            timer.start ();
 
-        this.global_time = 0.0;
-    }
+            assert (timer.state is PomodoroState);
+            assert (timer.is_running ());
 
-    /**
-     * Unit test for Pomodoro.Timer.set_state_full() method.
-     *
-     * Check changing timer state.
-     */
-    public void test_set_state_full ()
-    {
-        var timer = new Pomodoro.Timer();
+            timer.pause ();
+            timer.start ();
 
-        /* null --> pomodoro */
-        timer.set_state_full (Pomodoro.State.POMODORO,
-                              POMODORO_DURATION,
-                              this.global_time);
-        assert (timer.state == Pomodoro.State.POMODORO);
-        assert (timer.state_duration == POMODORO_DURATION);
+            assert (timer.state is PomodoroState);
+            assert (!timer.is_paused);
+            assert (timer.is_running ());
+        }
 
-        /* pomodoro --> pause */
-        this.global_time += POMODORO_DURATION;
+        public void test_stop ()
+        {
+            var timer = new Pomodoro.Timer();
+            timer.state = new PomodoroState ();
 
-        timer.set_state_full (Pomodoro.State.PAUSE,
-                              SHORT_BREAK_DURATION,
-                              this.global_time);
-        assert (timer.state == Pomodoro.State.PAUSE);
-        assert (timer.state_duration == SHORT_BREAK_DURATION);
+            timer.stop ();
 
-        /* pause --> idle */
-        this.global_time += SHORT_BREAK_DURATION;
+            assert (timer.state is DisabledState);
+            assert (!timer.is_running ());
+        }
 
-        timer.set_state_full (Pomodoro.State.IDLE,
-                              IDLE_DURATION,
-                              this.global_time);
-        assert (timer.state == Pomodoro.State.IDLE);
-        assert (timer.state_duration == 0.0);
+        public void test_update ()
+        {
+            var timer = new Pomodoro.Timer();
+            timer.start ();
 
-        /* idle --> pomodoro */
-        this.global_time += IDLE_DURATION;
+            timer.update (timer.state.timestamp + 0.5);
+            assert (timer.state is PomodoroState);
+            assert (timer.elapsed == 0.5);
+        }
 
-        timer.set_state_full (Pomodoro.State.POMODORO,
-                              POMODORO_DURATION,
-                              this.global_time);
-        assert (timer.state == Pomodoro.State.POMODORO);
-        assert (timer.state_duration == POMODORO_DURATION);
-    }
+        public void test_update_offset ()
+        {
+            var timer = new Pomodoro.Timer();
+            var initial_timestamp = timer.timestamp;
 
-    /**
-     * Unit test for Pomodoro.Timer.update() method.
-     *
-     * Check whether states change properly with time.
-     */
-    public void test_update ()
-    {
-        var timer = new Pomodoro.Timer();
-        timer.session_limit = 4.0;
-        timer.start ();
+            var state1 = new PomodoroState.with_timestamp (initial_timestamp);
+            state1.elapsed = 0.5;
 
-        assert (timer.state == Pomodoro.State.POMODORO);
-        assert (timer.state_duration == POMODORO_DURATION);
-        assert (timer.session == 0.0);
+            timer.state = state1;
 
-        /* pomodoro --> pause */
-        this.global_time += POMODORO_DURATION;
+            assert (timer.elapsed == 0.5);
 
-        timer.update ();
-        assert (timer.state == Pomodoro.State.PAUSE);
-        assert (timer.state_duration == SHORT_BREAK_DURATION);
-        assert (timer.session == 1.0);
+            var state2 = new PomodoroState.with_timestamp (initial_timestamp - 2.0);
+            state2.elapsed = 0.5;
 
-        /* pause --> pomodoro */
-        this.global_time += SHORT_BREAK_DURATION;
+            timer.state = state2;
+            timer.update (initial_timestamp);
 
-        timer.update ();
-        assert (timer.state == Pomodoro.State.POMODORO);
-        assert (timer.state_duration == POMODORO_DURATION);
-        assert (timer.session == 1.0);
+            assert (timer.elapsed == 2.5);
+        }
 
-        /* pomodoro --> long pause */
-        this.global_time += POMODORO_DURATION;
+        public void test_disabled_state ()
+        {
+            var timer = new Pomodoro.Timer ();
+            var initial_timestamp = timer.state.timestamp;
 
-        timer.session = 3.0;
-        timer.update ();
-        assert (timer.state == Pomodoro.State.PAUSE);
-        assert (timer.state_duration == LONG_BREAK_DURATION);
-        assert (timer.session == 4.0);
+            timer.update (initial_timestamp + 2.0);
 
-        /* long pause --> pomodoro */
-        this.global_time += LONG_BREAK_DURATION;
+            assert (timer.state is Pomodoro.DisabledState);
+            assert (!timer.is_running ());
+            assert (timer.state.duration == 0.0);
+            assert (timer.state.timestamp == initial_timestamp);
+        }
 
-        timer.update ();
-        assert (timer.state == Pomodoro.State.POMODORO);
-        assert (timer.state_duration == POMODORO_DURATION);
-        assert (timer.session == 0.0);
+        /**
+         * Unit test for Pomodoro.Timer.update() method.
+         *
+         * Check whether states change properly with time.
+         */
+        public void test_short_break_state ()
+        {
+            var timer = new Pomodoro.Timer();
+            timer.state = new PomodoroState ();
+            timer.session = 0.0;
 
-        /* TODO: idle state */
-    }
+            timer.update (timer.state.timestamp + timer.state.duration);
+            assert (timer.state is ShortBreakState);
+            assert (timer.session == 1.0);
 
-    /**
-     * Unit test for Pomodoro.Timer.restore() method.
-     *
-     * Check whether restoring timer works correctly.
-     */
-    public void test_restore ()
-    {
-        var state_settings = Pomodoro.get_settings ().get_child ("state");
+            timer.update (timer.state.timestamp + timer.state.duration);
+        }
 
-        var timer = new Pomodoro.Timer();
+        public void test_long_break_state ()
+        {
+            var timer = new Pomodoro.Timer();
+            timer.state = new PomodoroState ();
+            timer.session = 3.0;
+            // timer.session_limit = 4.0;
 
-        /* TODO */
-    }
+            timer.update (timer.state.timestamp + timer.state.duration);
+            assert (timer.state is LongBreakState);
+            assert (timer.session == 4.0);
 
-    /**
-     * Unit test for org.gnome.pomodoro.preferences.pomodoro_duration setting.
-     *
-     * Shortening pomodoro_duration shouldn't result in immediate long_break,
-     */
-    public void test_pomodoro_duration_setting ()
-    {
-        var settings = Pomodoro.get_settings ().get_child ("preferences");
-        settings.set_double ("pomodoro-duration", POMODORO_DURATION);
+            timer.update (timer.state.timestamp + timer.state.duration);
+            assert (timer.state is PomodoroState);
+            assert (timer.session == 0.0);
+        }
 
-        var timer = new Pomodoro.Timer();
-        timer.session_limit = 4.0;
-        timer.start ();
+        /**
+         * Timer should not reset session count if a long break hasn't completed. 
+         */
+        public void test_long_break_state_postponed ()
+        {
+            var timer = new Pomodoro.Timer();
+            timer.state = new PomodoroState ();
+            timer.session = 3.0;
+            // timer.session_limit = 4.0;
 
-        /* shorten pomodoro duration */
-        settings.set_double ("pomodoro-duration", 1.0);
-        timer.state_duration = 1.0;
+            timer.update (timer.state.timestamp + timer.state.duration);
+            assert (timer.state is LongBreakState);
+            assert (timer.session == 4.0);
 
-        /* pomodoro --> pause */
-        this.global_time += timer.state_duration;
+            timer.state = new PomodoroState.with_timestamp (timer.state.timestamp + 1.0);
+            assert (timer.state is PomodoroState);
+            assert (timer.session == 4.0);
+        }
 
-        timer.update ();
-        assert (timer.state == Pomodoro.State.PAUSE);
-        assert (timer.session == 1.0);
-    }
+        /**
+         * Extra time from pomodoro should be passed on to a break. If interruption happens
+         * (a reboot for instance) we can assume that user is not straining himself/herself.
+         */
+        public void test_pomodoro_state_create_next_state ()
+        {
+            var timer = new Pomodoro.Timer();
+            timer.start ();
 
-    public void test_update_after_suspend ()
-    {
-        var timer = new Pomodoro.Timer();
-        timer.session_limit = 4.0;
-        timer.start ();
+            timer.update (timer.state.timestamp + timer.state.duration + 2.0);
 
-        /* pomodoro --> pause */
-        this.global_time += timer.state_duration * timer.session_limit;
+            assert (timer.state is ShortBreakState);
+            assert (timer.elapsed == 2.0);
 
-        timer.update ();
-        assert (timer.state == Pomodoro.State.POMODORO);
-        assert (timer.session == 1.0);
-    }
+            timer.update (timer.state.timestamp + timer.state.duration + 2.0);
+            assert (timer.state is PomodoroState);
+            assert (timer.elapsed == 0.0);
+        }
 
-    public void test_update_after_suspend_with_idle ()
-    {
-        var settings = Pomodoro.get_settings ().get_child ("preferences");
-        settings.set_boolean ("pause-when-idle", true);
+        public void test_reset ()
+        {
+            // TODO
+        }
 
-        var timer = new Pomodoro.Timer();
-        timer.session_limit = 4.0;
-        timer.start ();
+        public void test_pause ()
+        {
+            var timer = new Pomodoro.Timer();
+            timer.state = new PomodoroState ();
+            timer.start ();
 
-        /* pomodoro --> pause */
-        this.global_time += timer.state_duration * timer.session_limit;
+            timer.update (timer.state.timestamp + 2.0);
+            timer.pause ();
 
-        timer.update ();
-        assert (timer.state == Pomodoro.State.IDLE);
-        assert (timer.session == 1.0);
-    }
+            timer.update (timer.state.timestamp + 2.0);
+            timer.resume ();
 
-    /**
-     * Unit test for Pomodoro.Timer.state_changed() signal.
-     *
-     * We don't want for this signal to get called twice or in bursts.
-     */
-    public void test_state_changed_signal ()
-    {
-        /* TODO */
-    }
+            assert (timer.elapsed == 2.0);
+        }
 
-    private void print_timer_state (Pomodoro.Timer timer)
-    {
-        stdout.printf ("""
-    %.2f:
-    state = %s
-    state_timestamp = %.2f
-    state_duration = %.2g
-    session = %.2g
-    session_limit = %.2g
-""",
-            this.global_time,
-            state_to_string (timer.state),
-            timer.state_timestamp,
-            timer.state_duration,
-            timer.session,
-            timer.session_limit);
+        public void test_is_running ()
+        {
+            var timer = new Pomodoro.Timer();
+            timer.pause ();
+
+            assert (!timer.is_running ());
+
+            timer.start ();
+            timer.pause ();
+
+            assert (!timer.is_running ());
+        }
+
+        public void test_state_duration_setting ()
+        {
+            TimerState state;
+
+            state = new Pomodoro.DisabledState ();
+            assert (state.duration == 0.0);
+
+            state = new Pomodoro.PomodoroState ();
+            assert (state.duration == POMODORO_DURATION);
+
+            state = new Pomodoro.ShortBreakState ();
+            assert (state.duration == SHORT_BREAK_DURATION);
+
+            state = new Pomodoro.LongBreakState ();
+            assert (state.duration == LONG_BREAK_DURATION);
+        }
+
+//        /**
+//         * Unit test for pomodoro duration.
+//         *
+//         * Shortening pomodoro_duration shouldn't result in immediate long_break,
+//         */
+//        public void test_state_resolve ()
+//        {
+//            var timer = new Pomodoro.Timer ();
+//            timer.start ();
+//
+//            timer.update (timer.state.timestamp + timer.state.duration);
+//
+//            assert (timer.state is Pomodoro.ShortBreakState);
+//            assert (timer.session == 1.0);
+//        }
+
+//        /** TODO
+//         * Unit test for pomodoro duration.
+//         *
+//         * Shortening pomodoro_duration shouldn't result in immediate long_break,
+//         */
+//        public void test_state_duration_change ()
+//        {
+//            var timer = new Pomodoro.Timer ();
+//            timer.start ();
+//
+//            /* shorten pomodoro duration */
+//            timer.state.duration = POMODORO_DURATION / 10.0;
+//
+//            timer.update (timer.state.timestamp + timer.state.duration);
+//
+////            print_timer_state (timer);
+//
+//            assert (timer.state is Pomodoro.ShortBreakState);
+//            assert (timer.session == 1.0);
+//        }
+
+        public void test_restore ()
+        {
+            var settings = Pomodoro.get_settings ()
+                                   .get_child ("state");
+
+            var timer1 = new Pomodoro.Timer();
+            timer1.start ();
+            timer1.elapsed = 2.0;  // imitate pausing or such
+            timer1.update (timer1.timestamp + 2.0);  // should not affect saved values
+            Pomodoro.Timer.save (timer1);
+
+            var timer2 = new Pomodoro.Timer();
+            Pomodoro.Timer.restore (timer2);
+            timer2.update (timer1.timestamp);
+
+            // print_timer_state (timer1);
+            // print_timer_state (timer2);
+
+            assert (timer2.state.name == timer1.state.name);
+            assert (timer2.state.duration == timer1.state.duration);
+            assert (timer2.elapsed == timer1.elapsed);
+
+            // Note: milliseconds are lost during save
+            assert (Math.floor(timer2.state.timestamp) == Math.floor(timer1.state.timestamp));
+        }
+
+        private static void print_timer_state (Pomodoro.Timer timer)
+        {
+            stdout.printf ("""
+    %s
+        state.name = %s
+        state.timestamp = %.2f
+        state.duration = %.2f
+        elapsed = %.2f
+        offset = %.2f
+        session = %.2f
+    """,
+                timer.state.get_type ().name (),
+                timer.state.name,
+                timer.state.timestamp,
+                timer.state.duration,
+                timer.elapsed,
+                timer.offset,
+                timer.session);
+        }
     }
 }

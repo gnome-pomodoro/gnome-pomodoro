@@ -521,8 +521,8 @@ const PomodoroEndDialog = new Lang.Class({
     },
 
     _onTimerUpdate: function() {
-        if (this.timer.getState() == Timer.State.PAUSE) {
-            let remaining = this.timer.getRemaining();
+        if (this.timer.isBreak()) {
+            let remaining = Math.max(this.timer.getRemaining(), 0.0);
             let minutes   = Math.floor(remaining / 60);
             let seconds   = Math.floor(remaining % 60);
 
@@ -611,7 +611,7 @@ const PomodoroEndDialog = new Lang.Class({
                         return;
                     }
 
-                    if (this.timer.getState() != Timer.State.PAUSE ||
+                    if (!this.timer.isBreak() ||
                         this.timer.getRemaining() < OPEN_WHEN_IDLE_MIN_REMAINING_TIME)
                     {
                         return;

@@ -71,8 +71,8 @@ public class Pomodoro.ScreenSaverModule : Pomodoro.Module
     public override void enable ()
     {
         if (!this.enabled) {
-            this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
-            this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
+//            this.timer.notify_pomodoro_start.connect (this.on_notify_pomodoro_start);
+//            this.timer.notify_pomodoro_end.connect (this.on_notify_pomodoro_end);
         }
 
         base.enable ();

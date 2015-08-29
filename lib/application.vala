@@ -276,7 +276,7 @@ public class Pomodoro.Application : Gtk.Application
 
         this.setup_resources ();
 
-        this.timer.restore ();
+        Pomodoro.Timer.restore (this.timer);
 
         this.desktop_module = new Pomodoro.GnomeDesktopModule (this.timer);
 
@@ -438,6 +438,9 @@ public class Pomodoro.Application : Gtk.Application
 
         if (this.timer == null) {
             this.timer = new Pomodoro.Timer ();
+            this.timer.notify["state"].connect (() => {
+                Pomodoro.Timer.save (this.timer);
+            });
         }
 
         if (this.service == null) {
@@ -476,5 +479,43 @@ public class Pomodoro.Application : Gtk.Application
             this.service = null;
         }
     }
+
+//    private void on_settings_changed (GLib.Settings settings, string key)
+//    {
+//        var state_duration = this.state_duration;
+
+//        switch (key)
+//        {
+//            case "pomodoro-duration":
+//                if (this.timer.state == State.POMODORO) {
+//                    state_duration = this.settings.get_double (key);
+//                }
+//                break;
+
+//            case "short-break-duration":
+//                if (this.timer.state == State.PAUSE && !this.is_long_break) {
+//                    state_duration = this.settings.get_double (key);
+//                }
+//                break;
+
+//            case "long-break-duration":
+//                if (this.timer.state == State.PAUSE && this.is_long_break) {
+//                    state_duration = this.settings.get_double (key);
+//                }
+//                break;
+
+//            case "long-break-interval":
+//                if (this.timer.session_limit != this.settings.get_double (key)) {
+//                    this.timer.session_limit = this.settings.get_double (key);
+//                }
+//                break;
+//        }
+
+//        if (state_duration != this.state_duration)
+//        {
+//            this.state_duration = double.max (state_duration, this.elapsed);
+//            this.timer.update ();
+//        }
+//    }
 }
 

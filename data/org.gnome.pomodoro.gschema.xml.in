@@ -139,12 +139,17 @@
       <choices>
         <choice value="null"/>
         <choice value="pomodoro"/>
-        <choice value="pause"/>
-        <choice value="idle"/>
+        <choice value="short-break"/>
+        <choice value="long-break"/>
       </choices>
       <default>"null"</default>
       <summary>Timer state</summary>
       <description>Last used timer state.</description>
+    </key>
+    <key name="state-offset" type="d">
+      <default>0</default>
+      <summary>Timer offset.</summary>
+      <description>Elapsed time offset.</description>
     </key>
     <key name="state-duration" type="d">
       <default>0</default>

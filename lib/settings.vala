@@ -25,28 +25,15 @@ namespace Pomodoro
 {
     private GLib.Settings settings = null;
 
-    private void unload_settings ()
-    {
-        if (settings != null) {
-            settings.dispose ();
-            settings = null;
-        }
-    }
-
-    private void load_settings ()
-    {
-        settings = new GLib.Settings ("org.gnome.pomodoro");
-    }
-
     public void set_settings (GLib.Settings settings)
     {
         Pomodoro.settings = settings;
     }
 
-    public GLib.Settings get_settings ()
+    public unowned GLib.Settings get_settings ()
     {
-        if (settings == null) {
-            load_settings ();
+        if (Pomodoro.settings == null) {
+            Pomodoro.settings = new GLib.Settings ("org.gnome.pomodoro");
         }
 
         return Pomodoro.settings;

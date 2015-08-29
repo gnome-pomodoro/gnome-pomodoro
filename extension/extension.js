@@ -123,7 +123,7 @@ const PomodoroExtension = new Lang.Class({
             case 'show-reminders':
                 this._showReminders = settings.get_boolean(key);
 
-                if (this._showReminders && this.timer.getState() == Timer.State.PAUSE) {
+                if (this._showReminders && this.timer.isBreak()) {
                     this._schedulePomodoroEndReminder();
                 }
                 else {
@@ -153,7 +153,7 @@ const PomodoroExtension = new Lang.Class({
         if (this._timerState !== timerState) {
             this._timerState = timerState;
 
-            if (this.dialog && timerState != Timer.State.PAUSE) {
+            if (this.dialog && !this.timer.isBreak()) {
                 this.dialog.close(true);
             }
 
@@ -164,11 +164,11 @@ const PomodoroExtension = new Lang.Class({
 
             switch (timerState) {
                 case Timer.State.POMODORO:
-                case Timer.State.IDLE:
                     this._notifyPomodoroStart();
                     break;
 
-                case Timer.State.PAUSE:
+                case Timer.State.SHORT_BREAK:
+                case Timer.State.LONG_BREAK:
                     this._notifyPomodoroEnd();
                     break;
 
@@ -204,9 +204,7 @@ const PomodoroExtension = new Lang.Class({
             this.notification = new Notifications.PomodoroEndNotification(this.timer);
             this.notification.connect('activated', Lang.bind(this,
                 function(notification) {
-                    let timerState = this.timer.getState();
-
-                    if (this.dialog && timerState == Timer.State.PAUSE) {
+                    if (this.dialog && this.timer.isBreak()) {
                         this.dialog.open(true);
                         this.dialog.pushModal();
                     }
@@ -302,12 +300,15 @@ const PomodoroExtension = new Lang.Class({
     enableNotifications: function() {
         let state = this.timer.getState();
 
-        if (state == Timer.State.POMODORO || state == Timer.State.IDLE) {
-            this._notifyPomodoroStart();
-        }
+        switch (state) {
+            case Timer.State.POMODORO:
+                this._notifyPomodoroStart();
+                break;
 
-        if (state == Timer.State.PAUSE) {
-            this._notifyPomodoroEnd();
+            case Timer.State.SHORT_BREAK:
+            case Timer.State.LONG_BREAK:
+                this._notifyPomodoroEnd();
+                break;
         }
     },
 
@@ -321,9 +322,7 @@ const PomodoroExtension = new Lang.Class({
     },
 
     enableReminders: function() {
-        let state = this.timer.getState();
-
-        if (state == Timer.State.PAUSE && this._showReminders) {
+        if (this.timer.isBreak() && this._showReminders) {
             this._schedulePomodoroEndReminder();
         }
     },
@@ -336,8 +335,7 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _updateScreenNotifications: function() {
-        if (this.dialog && this.timer.getState() == Timer.State.PAUSE)
-        {
+        if (this.dialog && this.timer.isBreak()) {
             if (this._showScreenNotifications) {
                 this.dialog.open(false);
                 this.dialog.pushModal();
@@ -372,7 +370,7 @@ const PomodoroExtension = new Lang.Class({
                 }));
             this.dialog.connect('closing', Lang.bind(this,
                 function() {
-                    if (this.timer.getState() == Timer.State.PAUSE) {
+                    if (this.timer.isBreak()) {
                         if (this.notification instanceof Notifications.PomodoroEndNotification) {
                             this.notification.show();
                         }

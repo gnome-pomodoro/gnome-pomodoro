@@ -39,7 +39,6 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 
-const DBus = Extension.imports.dbus;
 const Config = Extension.imports.config;
 const Settings = Extension.imports.settings;
 const Timer = Extension.imports.timer;
@@ -144,23 +143,15 @@ const IndicatorMenu = new Lang.Class({
             let timer = this.indicator.timer;
             let timerState = timer.getState();
             let toggled = timerState != Timer.State.NULL;
-            let stateName = '';
 
             this._timerToggle.setToggleState(toggled);
-
-            if (timerState == Timer.State.POMODORO || timerState == Timer.State.IDLE) {
-                stateName = 'pomodoro';
-            }
-            else if (timerState == Timer.State.PAUSE) {
-                stateName = timer.isLongPause() ? 'long-break' : 'short-break';
-            }
 
             for (let key in this._stateItems) {
                 let stateItem = this._stateItems[key];
 
                 stateItem.setSensitive(toggled);
 
-                if (toggled && key == stateName) {
+                if (toggled && key == timerState) {
                     stateItem.setOrnament(PopupMenu.Ornament.DOT);
                     stateItem.actor.add_style_class_name('active');
                 }
@@ -184,21 +175,7 @@ const IndicatorMenu = new Lang.Class({
     },
 
     _activateState: function(stateName) {
-        let timer = this.indicator.timer;
-
-        switch (stateName) {
-            case 'pomodoro':
-                timer.setState(Timer.State.POMODORO);
-                break;
-
-            case 'short-break':
-                timer.setState(Timer.State.PAUSE, timer.getShortBreakDuration());
-                break;
-
-            case 'long-break':
-                timer.setState(Timer.State.PAUSE, timer.getLongBreakDuration());
-                break;
-        }
+        this.indicator.timer.setState(stateName);
     }
 });
 
@@ -247,9 +224,7 @@ const TextIndicator = new Lang.Class({
         this._state = this.timer.getState();
         this._initialized = true;
 
-        if (this._state == Timer.State.POMODORO ||
-            this._state == Timer.State.IDLE)
-        {
+        if (this._state == Timer.State.POMODORO) {
             this.actor.set_opacity(FADE_IN_OPACITY * 255);
         }
         else {
@@ -283,7 +258,8 @@ const TextIndicator = new Lang.Class({
 
         if (child) {
             [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
-        } else {
+        }
+        else {
             alloc.min_size = alloc.natural_size = 0;
         }
 
@@ -301,12 +277,17 @@ const TextIndicator = new Lang.Class({
 
         if (child) {
             [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
-        } else {
+        }
+        else {
             alloc.min_size = alloc.natural_size = 0;
         }
     },
 
     _getText: function(state, remaining) {
+        if (remaining < 0.0) {
+            remaining = 0.0;
+        }
+
         let minutes = Math.floor(remaining / 60);
         let seconds = Math.floor(remaining % 60);
 
@@ -315,12 +296,12 @@ const TextIndicator = new Lang.Class({
 
     _onTimerUpdate: function() {
         let state = this.timer.getState();
+        let remaining = this.timer.getRemaining();
 
-        if (this._state != state && this._initialized)
-        {
+        if (this._state != state && this._initialized) {
             this._state = state;
 
-            if (state == Timer.State.POMODORO || state == Timer.State.IDLE) {
+            if (state == Timer.State.POMODORO) {
                 Tweener.addTween(this.actor,
                                  { opacity: FADE_IN_OPACITY * 255,
                                    time: FADE_IN_TIME / 1000,
@@ -333,8 +314,6 @@ const TextIndicator = new Lang.Class({
                                    transition: 'easeOutQuad' });
             }
         }
-
-        let remaining = this.timer.getRemaining();
 
         this.label.set_text(this._getText(state, remaining));
     },
@@ -356,7 +335,8 @@ const TextIndicator = new Lang.Class({
         if (natWidth + 2 * this._natHPadding <= availWidth) {
             childBox.x1 = this._natHPadding;
             childBox.x2 = availWidth - this._natHPadding;
-        } else {
+        }
+        else {
             childBox.x1 = this._minHPadding;
             childBox.x2 = availWidth - this._minHPadding;
         }
@@ -398,6 +378,10 @@ const ShortTextIndicator = new Lang.Class({
     },
 
     _getText: function(state, remaining) {
+        if (remaining < 0.0) {
+            remaining = 0.0;
+        }
+
         let minutes = Math.round(remaining / 60);
         let seconds = Math.round(remaining % 60);
 
@@ -405,9 +389,9 @@ const ShortTextIndicator = new Lang.Class({
             seconds = Math.ceil(seconds / 15) * 15;
         }
 
-        return (remaining <= 45)
-                ? _("%ds").format(seconds, remaining)
-                : _("%dm").format(minutes, remaining);
+        return (remaining > 45)
+                ? _("%dm").format(minutes, remaining)
+                : _("%ds").format(seconds, remaining);
     }
 });
 
@@ -473,15 +457,13 @@ const IconIndicator = new Lang.Class({
         cr.setOperator(Cairo.Operator.SOURCE);
         cr.setLineCap(Cairo.LineCap.ROUND);
 
-        if (this._state && this._state != Timer.State.NULL)
-        {
+        if (this._state && this._state != Timer.State.NULL) {
             let angle1   = - 0.5 * Math.PI;
             let angle2   = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
-            let negative = (this._state == Timer.State.PAUSE);
+            let negative = (this._state == Timer.State.SHORT_BREAK || this._state == Timer.State.LONG_BREAK);
 
             /* background pie */
-            if (!negative)
-            {
+            if (!negative) {
                 Clutter.cairo_set_source_color(cr, this._secondaryColor);
                 cr.setLineWidth(2.1);
 
@@ -546,8 +528,8 @@ const IconIndicator = new Lang.Class({
 
         if (child) {
             [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
-
-        } else {
+        }
+        else {
             alloc.min_size = alloc.natural_size = 0;
         }
 
@@ -560,7 +542,8 @@ const IconIndicator = new Lang.Class({
 
         if (child) {
             [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
-        } else {
+        }
+        else {
             alloc.min_size = alloc.natural_size = 0;
         }
 
@@ -572,14 +555,12 @@ const IconIndicator = new Lang.Class({
         let state = this.timer.getState();
         let progress = this.timer.getProgress();
 
-        if (this._state != state && this._initialized)
-        {
+        if (this._state != state && this._initialized) {
             this._state = state;
             this._progress = -1.0;  /* force refresh */
         }
 
-        if (this._progress != progress)
-        {
+        if (this._progress != progress) {
             this._progress = progress;
             this.icon.queue_repaint();
         }
@@ -603,7 +584,8 @@ const IconIndicator = new Lang.Class({
         if (natWidth + 2 * this._natHPadding <= availWidth) {
             childBox.x1 = this._natHPadding;
             childBox.x2 = availWidth - this._natHPadding;
-        } else {
+        }
+        else {
             childBox.x1 = this._minHPadding;
             childBox.x2 = availWidth - this._minHPadding;
         }
@@ -674,8 +656,7 @@ const Indicator = new Lang.Class({
             this.widget = null;
         }
 
-        switch (indicatorType)
-        {
+        switch (indicatorType) {
             case IndicatorType.ICON:
                 this.widget = new IconIndicator(this.timer);
                 break;

@@ -29,6 +29,7 @@ libgnome_pomodoro_la_VALASOURCES = \
     symbolic-button.vala \
     telepathy-plugin.vala \
     timer.vala \
+    timer-state.vala \
     utils.vala
 
 libgnome_pomodoro_la_SOURCES = \
@@ -50,7 +51,8 @@ libgnome_pomodoro_la_VALAFLAGS = \
     --pkg gnome-desktop-3.0 \
     --pkg libcanberra \
     --pkg gstreamer-1.0 \
-    --pkg telepathy-glib
+    --pkg telepathy-glib \
+    --enable-experimental
 
 libgnome_pomodoro_la_CPPFLAGS = \
     $(GNOME_POMODORO_CPPFLAGS)
