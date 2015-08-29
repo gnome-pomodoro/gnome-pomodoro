@@ -156,8 +156,6 @@ const Timer = new Lang.Class({
     },
 
     _onNameVanished: function() {
-        this._proxy = null;
-
         this.emit('state-changed');
         this.emit('update');
         this.emit('service-disconnected');
