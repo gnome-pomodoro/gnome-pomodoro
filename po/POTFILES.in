@@ -16,7 +16,6 @@ lib/about-dialog.vala
 lib/animation.vala
 lib/application.vala
 lib/calendar-button.vala
-lib/command-line.vala
 lib/enum-combo-box.vala
 lib/gnome-desktop-module.vala
 lib/gnome-session-manager-plugin.vala
