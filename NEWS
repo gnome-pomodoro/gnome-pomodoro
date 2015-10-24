@@ -1,3 +1,9 @@
+2015-10-24  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.11.1:
+
+	* Support for GNOME Shell 3.18
+	* Turkish translation (thanks @ErkanMDR)
+
 2015-06-13  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.11.0:
 
