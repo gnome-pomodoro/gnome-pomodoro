@@ -1,9 +1,9 @@
 public_sounds = \
-    bell.ogg \
-    birds.ogg \
-    clock.ogg \
-    loud-bell.ogg \
-    timer.ogg
+	bell.ogg \
+	birds.ogg \
+	clock.ogg \
+	loud-bell.ogg \
+	timer.ogg
 
 install-sounds:
 	for sound in $(public_sounds); do \
@@ -21,7 +21,7 @@ install-data-local: install-sounds
 uninstall-local: uninstall-sounds
 
 EXTRA_DIST = \
-    $(public_sounds)
+	$(public_sounds)
 
 -include $(top_srcdir)/git.mk
 

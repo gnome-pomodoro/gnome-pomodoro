@@ -1,16 +1,16 @@
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 SUBDIRS = \
-    vapi \
-    lib \
-    src \
-    plugins \
-    extension \
-    data \
-    po \
-    man \
-    tests \
-    packages
+	vapi \
+	lib \
+	src \
+	plugins \
+	extension \
+	data \
+	po \
+	man \
+	tests \
+	packages
 
 distdir = $(PACKAGE_TARNAME)-$(VERSION)
 
@@ -29,11 +29,11 @@ test:
 	cd tests && $(MAKE) $@
 
 EXTRA_DIST = \
-    autogen.sh \
-    config.vapi \
-    COPYING \
-    NEWS \
-    README.md
+	autogen.sh \
+	config.vapi \
+	COPYING \
+	NEWS \
+	README.md
 
 DISTCLEANFILES = \
 	intltool-extract \

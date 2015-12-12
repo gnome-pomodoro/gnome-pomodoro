@@ -1,6 +1,6 @@
 SUBDIRS = \
-    icons \
-    sounds
+	icons \
+	sounds
 
 #BUILT_SOURCES = \
 #	gschemas.compiled
@@ -18,16 +18,15 @@ gsettings_SCHEMAS = $(gsettings_in_files:.xml.in=.xml)
 
 servicedir = $(datadir)/dbus-1/services
 service_in_files = \
-    org.gnome.Pomodoro.service.in
+	org.gnome.Pomodoro.service.in
 service_DATA = $(service_in_files:.service.in=.service)
 
 $(service_DATA): $(service_in_files)
-	$(AM_V_GEN) sed -e "s|@bindir[@]|$(bindir)|g" \
-	                $< > $@
+	$(AM_V_GEN) sed -e "s|@bindir[@]|$(bindir)|g" $< > $@
 
 appdatadir = $(datadir)/appdata
 appdata_in_files = \
-    org.gnome.Pomodoro.appdata.xml.in
+	org.gnome.Pomodoro.appdata.xml.in
 appdata_DATA = org.gnome.Pomodoro.appdata.xml
 
 # We need to compile schemas at make time
@@ -38,17 +37,17 @@ appdata_DATA = org.gnome.Pomodoro.appdata.xml
 #		--targetdir=$(builddir)
 
 EXTRA_DIST = \
-    $(appdata_in_files) \
-    $(desktop_in_files) \
-    $(gsettings_in_files) \
-    $(service_in_files)
+	$(appdata_in_files) \
+	$(desktop_in_files) \
+	$(gsettings_in_files) \
+	$(service_in_files)
 
 CLEANFILES = \
-    $(appdata_DATA) \
-    $(desktop_DATA) \
-    $(gsettings_SCHEMAS) \
-    $(service_DATA)
-#    gschemas.compiled
+	$(appdata_DATA) \
+	$(desktop_DATA) \
+	$(gsettings_SCHEMAS) \
+	$(service_DATA)
+#	gschemas.compiled
 
 dist-hook:
 	cd $(distdir) && rm -f $(CLEANFILES)

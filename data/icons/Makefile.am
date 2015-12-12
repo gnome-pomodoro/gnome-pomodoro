@@ -1,16 +1,16 @@
 public_icon_themes = \
-    hicolor
+	hicolor
 
 public_icons = \
-    hicolor_apps_16x16_gnome-pomodoro.png \
-    hicolor_apps_24x24_gnome-pomodoro.png \
-    hicolor_apps_32x32_gnome-pomodoro.png \
-    hicolor_apps_48x48_gnome-pomodoro.png \
-    hicolor_apps_256x256_gnome-pomodoro.png \
-    hicolor_apps_scalable_gnome-pomodoro-symbolic.svg
+	hicolor_apps_16x16_gnome-pomodoro.png \
+	hicolor_apps_24x24_gnome-pomodoro.png \
+	hicolor_apps_32x32_gnome-pomodoro.png \
+	hicolor_apps_48x48_gnome-pomodoro.png \
+	hicolor_apps_256x256_gnome-pomodoro.png \
+	hicolor_apps_scalable_gnome-pomodoro-symbolic.svg
 
 noinst_DATA = \
-    gnome-pomodoro.svg
+	gnome-pomodoro.svg
 
 gtk_update_icon_cache = GTK_UPDATE_ICON_CACHE -f -t
 
@@ -51,8 +51,8 @@ install-data-local: install-icons update-icon-cache
 uninstall-local: uninstall-icons update-icon-cache
 
 EXTRA_DIST = \
-    $(public_icons) \
-    $(noinst_DATA)
+	$(public_icons) \
+	$(noinst_DATA)
 
 -include $(top_srcdir)/git.mk
 

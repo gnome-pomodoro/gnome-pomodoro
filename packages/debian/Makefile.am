@@ -2,43 +2,43 @@
 DEB_RELEASE = 1
 
 SUBST=sed \
-    -e "s|@GETTEXT_PACKAGE[@]|$(GETTEXT_PACKAGE)|g" \
-    -e "s|@PACKAGE_BUGREPORT[@]|$(PACKAGE_BUGREPORT)|g" \
-    -e "s|@PACKAGE_NAME[@]|$(PACKAGE_NAME)|g" \
-    -e "s|@PACKAGE_STRING[@]|$(PACKAGE_STRING)|g" \
-    -e "s|@PACKAGE_TARNAME[@]|$(PACKAGE_TARNAME)|g" \
-    -e "s|@PACKAGE_URL[@]|$(PACKAGE_URL)|g" \
-    -e "s|@PACKAGE_VERSION[@]|$(PACKAGE_VERSION)|g" \
-    -e "s|@EXTENSION_UUID[@]|$(EXTENSION_UUID)|g" \
-    -e "s|@GLIB_REQUIRED[@]|$(GLIB_REQUIRED)|g" \
-    -e "s|@GTK_REQUIRED[@]|$(GTK_REQUIRED)|g" \
-    -e "s|@GNOME_REQUIRED[@]|$(GNOME_REQUIRED)|g" \
-    -e "s|@TELEPATHY_GLIB_REQUIRED[@]|$(TELEPATHY_GLIB_REQUIRED)|g" \
-    -e "s|@prefix[@]|$(prefix)|g" \
-    -e "s|@datadir[@]|$(datadir)|g" \
-    -e "s|@pkgdatadir[@]|$(pkgdatadir)|g"
+	-e "s|@GETTEXT_PACKAGE[@]|$(GETTEXT_PACKAGE)|g" \
+	-e "s|@PACKAGE_BUGREPORT[@]|$(PACKAGE_BUGREPORT)|g" \
+	-e "s|@PACKAGE_NAME[@]|$(PACKAGE_NAME)|g" \
+	-e "s|@PACKAGE_STRING[@]|$(PACKAGE_STRING)|g" \
+	-e "s|@PACKAGE_TARNAME[@]|$(PACKAGE_TARNAME)|g" \
+	-e "s|@PACKAGE_URL[@]|$(PACKAGE_URL)|g" \
+	-e "s|@PACKAGE_VERSION[@]|$(PACKAGE_VERSION)|g" \
+	-e "s|@EXTENSION_UUID[@]|$(EXTENSION_UUID)|g" \
+	-e "s|@GLIB_REQUIRED[@]|$(GLIB_REQUIRED)|g" \
+	-e "s|@GTK_REQUIRED[@]|$(GTK_REQUIRED)|g" \
+	-e "s|@GNOME_REQUIRED[@]|$(GNOME_REQUIRED)|g" \
+	-e "s|@TELEPATHY_GLIB_REQUIRED[@]|$(TELEPATHY_GLIB_REQUIRED)|g" \
+	-e "s|@prefix[@]|$(prefix)|g" \
+	-e "s|@datadir[@]|$(datadir)|g" \
+	-e "s|@pkgdatadir[@]|$(pkgdatadir)|g"
 
 
 gnome_pomodoro_debian_in_files = \
-    debian/changelog.in \
-    debian/compat.in \
-    debian/control.in \
-    debian/rules.in
+	debian/changelog.in \
+	debian/compat.in \
+	debian/control.in \
+	debian/rules.in
 gnome_pomodoro_debian = $(gnome_pomodoro_debian_in_files:.in=)
 
 gnome_pomodoro_orig_tar_gz = \
-    $(PACKAGE_NAME)_$(PACKAGE_VERSION).orig.tar.gz
+	$(PACKAGE_NAME)_$(PACKAGE_VERSION).orig.tar.gz
 
 gnome_pomodoro_debian_tar_gz = \
-    $(PACKAGE_NAME)_$(PACKAGE_VERSION)-$(DEB_RELEASE).debian.tar.gz
+	$(PACKAGE_NAME)_$(PACKAGE_VERSION)-$(DEB_RELEASE).debian.tar.gz
 
 gnome_pomodoro_dsc_in_files = \
-    gnome-pomodoro.dsc.in
+	gnome-pomodoro.dsc.in
 gnome_pomodoro_dsc_deps = \
-    $(gnome_pomodoro_orig_tar_gz) \
-    $(gnome_pomodoro_debian_tar_gz)
+	$(gnome_pomodoro_orig_tar_gz) \
+	$(gnome_pomodoro_debian_tar_gz)
 gnome_pomodoro_dsc = \
-    $(PACKAGE_NAME)_$(PACKAGE_VERSION)-$(DEB_RELEASE).dsc
+	$(PACKAGE_NAME)_$(PACKAGE_VERSION)-$(DEB_RELEASE).dsc
 
 
 deb-src:
@@ -60,14 +60,14 @@ deb-src:
 
 
 EXTRA_DIST = \
-    $(gnome_pomodoro_debian_in_files) \
-    $(gnome_pomodoro_dsc_in_files)
+	$(gnome_pomodoro_debian_in_files) \
+	$(gnome_pomodoro_dsc_in_files)
 
 CLEANFILES = \
-    $(gnome_pomodoro_orig_tar_gz) \
-    $(gnome_pomodoro_debian_tar_gz) \
-    $(gnome_pomodoro_debian) \
-    $(gnome_pomodoro_dsc)
+	$(gnome_pomodoro_orig_tar_gz) \
+	$(gnome_pomodoro_debian_tar_gz) \
+	$(gnome_pomodoro_debian) \
+	$(gnome_pomodoro_dsc)
 
 .PHONY: all deb-src
 

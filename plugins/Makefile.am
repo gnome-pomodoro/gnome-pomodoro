@@ -1,4 +1,4 @@
 SUBDIRS = \
-    gnome
+	gnome
 
 # vi:ts=4:noet
