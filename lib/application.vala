@@ -95,7 +95,7 @@ public class Pomodoro.Application : Gtk.Application
     {
         var css_provider = new Gtk.CssProvider ();
         try {
-           var css_file = File.new_for_uri ("resource:///org/gnome/pomodoro/gtk-style.css");
+           var css_file = File.new_for_uri ("resource:///org/gnome/pomodoro/ui/style.css");
 
            css_provider.load_from_file (css_file);
         }
@@ -245,7 +245,7 @@ public class Pomodoro.Application : Gtk.Application
     {
         var builder = new Gtk.Builder ();
         try {
-            builder.add_from_resource ("/org/gnome/pomodoro/menu.ui");
+            builder.add_from_resource ("/org/gnome/pomodoro/ui/menus.ui");
 
             var menu = builder.get_object ("app-menu") as GLib.MenuModel;
             this.set_app_menu (menu);

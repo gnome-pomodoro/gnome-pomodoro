@@ -1,9 +1,6 @@
 bin_PROGRAMS = \
     gnome-pomodoro
 
-BUILT_SOURCES = \
-    resources.c
-
 gnome_pomodoro_SOURCES = \
     main.vala \
     resources.c \
@@ -29,18 +26,10 @@ gnome_pomodoro_LDADD = \
     $(top_builddir)/lib/libgnome-pomodoro.la
 
 
-resources.c: $(top_srcdir)/data/gnome-pomodoro.gresource.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir=$(top_srcdir)/data/ $(top_srcdir)/data/gnome-pomodoro.gresource.xml)
-	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --target=$@ --sourcedir=$(top_srcdir)/data/ --generate-source $<
-
-
 CLEANFILES = \
     $(BUILT_SOURCES) \
     $(gnome_pomodoro_SOURCES:.vala=.c) \
     gnome-pomodoro \
     gnome_pomodoro_vala.stamp
-
-#EXTRA_DIST = \
-#    $(resource_files) \
-#    gnome-pomodoro.gresource.xml
 
 -include $(top_srcdir)/git.mk

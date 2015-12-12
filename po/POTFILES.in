@@ -2,7 +2,6 @@ data/org.gnome.Pomodoro.appdata.xml.in
 data/org.gnome.Pomodoro.desktop.in
 data/org.gnome.pomodoro.gschema.xml.in
 data/org.gnome.Pomodoro.service.in
-data/resources/menu.ui
 extension/dbus.js
 extension/dialogs.js
 extension/extension.js

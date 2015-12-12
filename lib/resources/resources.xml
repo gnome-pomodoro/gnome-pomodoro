@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/gnome/pomodoro">
+    <file preprocess="xml-stripblanks">ui/menus.ui</file>
+    <file>ui/style.css</file>
+  </gresource>
+</gresources>

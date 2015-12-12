@@ -33,7 +33,8 @@ libgnome_pomodoro_la_VALASOURCES = \
     utils.vala
 
 libgnome_pomodoro_la_SOURCES = \
-    $(libgnome_pomodoro_la_VALASOURCES)
+    $(libgnome_pomodoro_la_VALASOURCES) \
+	resources.c
 
 libgnome_pomodoro_la_VALAFLAGS = \
     --library=gnome-pomodoro \
@@ -52,7 +53,8 @@ libgnome_pomodoro_la_VALAFLAGS = \
     --pkg libcanberra \
     --pkg gstreamer-1.0 \
     --pkg telepathy-glib \
-    --enable-experimental
+    --enable-experimental \
+	--gresources resources/resources.xml
 
 libgnome_pomodoro_la_CPPFLAGS = \
     $(GNOME_POMODORO_CPPFLAGS)
@@ -67,11 +69,29 @@ libgnome_pomodoro_la_LIBADD = \
 libgnome_pomodoro_la_DEPENDENCIES = \
     $(top_builddir)/vapi/gnome-desktop-3.0.vapi
 
+resources = \
+	resources/resources.xml
+resources_deps = \
+	$(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir=resources $(resources))
+
+resources.c: $(resources) $(resources_deps)
+	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --generate-source --sourcedir=resources --target=$@ $<
+
+# A hack to make plugins/ and src/ build after the lib/
+# gnome-pomodoro.vapi: libgnome-pomodoro.la
+
+BUILT_SOURCES = \
+	resources.c
+
 CLEANFILES = \
     $(libgnome_pomodoro_la_SOURCES:.vala=.c) \
     gnome-pomodoro.h \
     gnome-pomodoro.vapi \
     libgnome-pomodoro.la \
-    libgnome_pomodoro_la_vala.stamp
+    libgnome_pomodoro_la_vala.stamp \
+    resources.c
+
+EXTRA_DIST = \
+	$(resources_deps)
 
 -include $(top_srcdir)/git.mk
