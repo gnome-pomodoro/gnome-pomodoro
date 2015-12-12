@@ -54,13 +54,9 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
     gmodule-no-export-2.0 >= $GLIB_REQUIRED
     gtk+-3.0 >= $GTK_REQUIRED
     gsettings-desktop-schemas >= $GTK_REQUIRED
-    gnome-desktop-3.0 >= $GNOME_REQUIRED
     dbus-glib-1
     gobject-introspection-1.0 >= $INTROSPECTION_REQUIRED
     libpeas-1.0 >= $LIBPEAS_REQUIRED_VERSION
-    libcanberra >= 0.30
-    gstreamer-1.0 >= 1.0.10
-    telepathy-glib >= $TELEPATHY_GLIB_REQUIRED
 ])
 
 

@@ -5,11 +5,7 @@ noinst_LTLIBRARIES = \
 #	gnome-pomodoro.vapi
 
 libgnome_pomodoro_la_VALASOURCES = \
-	presence-module.vala \
-	sounds-module.vala \
-	\
 	about-dialog.vala \
-	animation.vala \
 	application.vala \
 	calendar-button.vala \
 	enum-combo-box.vala \
@@ -19,6 +15,7 @@ libgnome_pomodoro_la_VALASOURCES = \
 	mode-button.vala \
 	plugin-manager.vala \
 	preferences-dialog.vala \
+	presence.vala \
 	service.vala \
 	settings.vala \
 	sound-chooser-button.vala \
@@ -26,19 +23,6 @@ libgnome_pomodoro_la_VALASOURCES = \
 	timer.vala \
 	timer-state.vala \
 	utils.vala
-
-#	module.vala \
-#	plugin.vala \
-#	presence-module.vala \
-#	presence-plugin.vala \
-#	screensaver-module.vala \
-#	sounds-module.vala \
-#	skype.vala \
-#	skype-plugin.vala \
-#	telepathy-plugin.vala \
-#	gnome-desktop-module.vala
-#	gnome-session-manager.vala
-#	gnome-session-manager-plugin.vala
 
 libgnome_pomodoro_la_SOURCES = \
 	$(libgnome_pomodoro_la_VALASOURCES) \
@@ -59,10 +43,6 @@ libgnome_pomodoro_la_VALAFLAGS = \
 	--pkg libpeas-1.0 \
 	--pkg pango \
 	--pkg cairo \
-	--pkg gnome-desktop-3.0 \
-	--pkg libcanberra \
-	--pkg gstreamer-1.0 \
-	--pkg telepathy-glib \
 	--enable-experimental \
 	--gresources resources/resources.xml
 

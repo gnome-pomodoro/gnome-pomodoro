@@ -37,6 +37,12 @@ private void set_default_current_folder_uri (string current_folder)
 }
 
 
+public enum SoundBackend {
+    CANBERRA,
+    GSTREAMER
+}
+
+
 public class Pomodoro.Widgets.SoundChooserButton : Gtk.Box
 {
     private enum RowType {

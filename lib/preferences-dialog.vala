@@ -1079,6 +1079,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
         this.field_size_group.add_widget (toggle_key_field);
         this.field_size_group.add_widget (indicator_type_field);
 
+/*
         if (Pomodoro.Player.is_supported ())
         {
             var ticking_sound_button = new Widgets.SoundChooserButton ();
@@ -1119,6 +1120,7 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
 
             this.combo_box_size_group.add_widget (ticking_sound_button.combo_box);
         }
+*/
     }
 
     private void add_notifications_section ()
@@ -1190,23 +1192,23 @@ public class Pomodoro.PreferencesDialog : Gtk.ApplicationWindow
                             "active",
                             SETTINGS_BIND_FLAGS);
 
-        this.settings.bind_with_mapping ("pomodoro-end-sound",
-                                         pomodoro_end_sound,
-                                         "file",
-                                         SETTINGS_BIND_FLAGS,
-                                         (SettingsBindGetMappingShared) SoundsModule.get_file_mapping,
-                                         (SettingsBindSetMappingShared) SoundsModule.set_file_mapping,
-                                         null,
-                                         null);
+//        this.settings.bind_with_mapping ("pomodoro-end-sound",
+//                                         pomodoro_end_sound,
+//                                         "file",
+//                                         SETTINGS_BIND_FLAGS,
+//                                         (SettingsBindGetMappingShared) SoundsModule.get_file_mapping,
+//                                         (SettingsBindSetMappingShared) SoundsModule.set_file_mapping,
+//                                         null,
+//                                         null);
 
-        this.settings.bind_with_mapping ("pomodoro-start-sound",
-                                         pomodoro_start_sound,
-                                         "file",
-                                         SETTINGS_BIND_FLAGS,
-                                         (SettingsBindGetMappingShared) SoundsModule.get_file_mapping,
-                                         (SettingsBindSetMappingShared) SoundsModule.set_file_mapping,
-                                         null,
-                                         null);
+//        this.settings.bind_with_mapping ("pomodoro-start-sound",
+//                                         pomodoro_start_sound,
+//                                         "file",
+//                                         SETTINGS_BIND_FLAGS,
+//                                         (SettingsBindGetMappingShared) SoundsModule.get_file_mapping,
+//                                         (SettingsBindSetMappingShared) SoundsModule.set_file_mapping,
+//                                         null,
+//                                         null);
 
         this.settings.bind ("pomodoro-end-sound-volume",
                             pomodoro_end_sound,
