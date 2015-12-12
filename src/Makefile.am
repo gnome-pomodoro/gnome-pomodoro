@@ -3,11 +3,10 @@ bin_PROGRAMS = \
 
 gnome_pomodoro_SOURCES = \
     main.vala \
-    resources.c \
-    ../lib/gnome-pomodoro.vapi
+    $(top_builddir)/lib/gnome-pomodoro.vapi
 
 gnome_pomodoro_DEPENDENCIES = \
-    ../lib/libgnome-pomodoro.la
+    $(top_builddir)/lib/libgnome-pomodoro.la
 
 gnome_pomodoro_VALAFLAGS = \
     --vapidir=$(top_builddir)/vapi \
@@ -15,7 +14,8 @@ gnome_pomodoro_VALAFLAGS = \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
     --pkg gdk-3.0 \
-    --pkg gtk+-3.0
+    --pkg gtk+-3.0 \
+    --pkg libpeas-1.0
 
 gnome_pomodoro_CPPFLAGS = \
     $(GNOME_POMODORO_CFLAGS) \

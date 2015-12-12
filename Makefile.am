@@ -4,6 +4,7 @@ SUBDIRS = \
     vapi \
     lib \
     src \
+    plugins \
     extension \
     data \
     po \

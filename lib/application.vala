@@ -36,8 +36,8 @@ public class Pomodoro.Application : Gtk.Application
     private Gtk.Window preferences_dialog;
     private Gtk.Window about_dialog;
 
-    private List<Pomodoro.Module> modules;
-    private Pomodoro.GnomeDesktopModule desktop_module;
+//    private List<Pomodoro.Module> modules;
+//    private Pomodoro.GnomeDesktopModule desktop_module;
 
     private enum ExitStatus
     {
@@ -180,11 +180,11 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
-    private void action_enable_extension (SimpleAction action,
-                                          Variant?     parameter)
-    {
-        this.desktop_module.enable_extension ();
-    }
+//    private void action_enable_extension (SimpleAction action,
+//                                          Variant?     parameter)
+//    {
+//        this.desktop_module.enable_extension ();
+//    }
 
     private void action_about (SimpleAction action, Variant? parameter)
     {
@@ -224,8 +224,8 @@ public class Pomodoro.Application : Gtk.Application
         var report_issue_action = new GLib.SimpleAction ("report-issue", null);
         report_issue_action.activate.connect (this.action_report_issue);
 
-        var enable_extension_action = new GLib.SimpleAction ("enable-extension", null);
-        enable_extension_action.activate.connect (this.action_enable_extension);
+//        var enable_extension_action = new GLib.SimpleAction ("enable-extension", null);
+//        enable_extension_action.activate.connect (this.action_enable_extension);
 
         var about_action = new GLib.SimpleAction ("about", null);
         about_action.activate.connect (this.action_about);
@@ -236,7 +236,7 @@ public class Pomodoro.Application : Gtk.Application
         this.add_action (preferences_action);
         this.add_action (visit_website_action);
         this.add_action (report_issue_action);
-        this.add_action (enable_extension_action);
+//        this.add_action (enable_extension_action);
         this.add_action (about_action);
         this.add_action (quit_action);
     }
@@ -278,6 +278,9 @@ public class Pomodoro.Application : Gtk.Application
 
         Pomodoro.Timer.restore (this.timer);
 
+        var plugin_manager = Pomodoro.PluginManager.get_default ();
+
+/*
         this.desktop_module = new Pomodoro.GnomeDesktopModule (this.timer);
 
         this.modules = new List<Pomodoro.Module> ();
@@ -290,6 +293,7 @@ public class Pomodoro.Application : Gtk.Application
         {
             module.enable ();
         }
+*/
 
         this.setup_actions ();
         this.setup_menu ();
@@ -297,25 +301,25 @@ public class Pomodoro.Application : Gtk.Application
         this.release ();
     }
 
-    public Pomodoro.Module? get_module_by_name (string name)
-    {
-        foreach (var module in this.modules)
-        {
-            if (module != null && module.name == name) {
-//                module.plugin_enabled.connect ((plugin) => {
-//                    message ("Plugin enabled");
-//                });
-
-//                module.plugin_disabled.connect ((plugin) => {
-//                    message ("Plugin disabled");
-//                });
-
-                return module;
-            }
-        }
-
-        return null;
-    }
+//    public Pomodoro.Module? get_module_by_name (string name)
+//    {
+//        foreach (var module in this.modules)
+//        {
+//            if (module != null && module.name == name) {
+////                module.plugin_enabled.connect ((plugin) => {
+////                    message ("Plugin enabled");
+////                });
+//
+////                module.plugin_disabled.connect ((plugin) => {
+////                    message ("Plugin disabled");
+////                });
+//
+//                return module;
+//            }
+//        }
+//
+//        return null;
+//    }
 
     /**
      * This is just for local things, like showing help
@@ -401,12 +405,12 @@ public class Pomodoro.Application : Gtk.Application
      */
     public override void shutdown ()
     {
-        foreach (var module in this.modules)
-        {
-            module.disable ();
-        }
+//        foreach (var module in this.modules)
+//        {
+//            module.disable ();
+//        }
 
-        this.modules = null;
+//        this.modules = null;
 
         base.shutdown ();
     }

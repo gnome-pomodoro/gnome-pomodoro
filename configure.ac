@@ -43,6 +43,8 @@ GLIB_REQUIRED=2.36.0
 GTK_REQUIRED=3.13.0
 GNOME_REQUIRED=3.13.0
 TELEPATHY_GLIB_REQUIRED=0.17.5
+INTROSPECTION_REQUIRED=0.10.1
+LIBPEAS_REQUIRED_VERSION=1.5.0
 
 PKG_CHECK_MODULES(GNOME_POMODORO, [
     glib-2.0 >= $GLIB_REQUIRED
@@ -54,6 +56,8 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
     gsettings-desktop-schemas >= $GTK_REQUIRED
     gnome-desktop-3.0 >= $GNOME_REQUIRED
     dbus-glib-1
+    gobject-introspection-1.0 >= $INTROSPECTION_REQUIRED
+    libpeas-1.0 >= $LIBPEAS_REQUIRED_VERSION
     libcanberra >= 0.30
     gstreamer-1.0 >= 1.0.10
     telepathy-glib >= $TELEPATHY_GLIB_REQUIRED
@@ -70,6 +74,7 @@ AM_PROG_VALAC([0.26])
 AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache)
 
+GOBJECT_INTROSPECTION_REQUIRE($INTROSPECTION_REQUIRED)
 GLIB_GSETTINGS
 VAPIGEN_CHECK
 
@@ -131,6 +136,22 @@ fi
 # Project constants
 GNOME_POMODORO_CFLAGS="$GNOME_POMODORO_CFLAGS -I\$(top_builddir)/lib --include config.h"
 GNOME_POMODORO_LIBS="$GNOME_POMODORO_LIBS -lm"
+GNOME_POMODORO_VALAFLAGS=" \
+    --target-glib \$(GLIB_REQUIRED) \
+    --vapidir=\$(top_builddir)/vapi \
+    --vapidir=\$(top_srcddir)/vapi \
+    --pkg config \
+    --pkg gobject-2.0 \
+    --pkg gio-2.0 \
+    --pkg gtk+-3.0 \
+    --pkg libpeas-1.0"
+
+GNOME_POMODORO_PLUGIN_VALAFLAGS="$GNOME_POMODORO_VALAFLAGS"
+GNOME_POMODORO_PLUGIN_CPPFLAGS="$GNOME_POMODORO_CPPFLAGS"
+GNOME_POMODORO_PLUGIN_CFLAGS="$GNOME_POMODORO_CFLAGS"
+GNOME_POMODORO_PLUGIN_LIBS="$GNOME_POMODORO_LIBS"
+GNOME_POMODORO_PLUGIN_LIBTOOL_FLAGS="-module -avoid-version"
+
 
 # RECURSIVE_EVAL(VALUE, RESULT)
 #
@@ -151,17 +172,27 @@ AC_DEFUN([RECURSIVE_EVAL],
 
 RECURSIVE_EVAL("$localedir", [PACKAGE_LOCALE_DIR])
 RECURSIVE_EVAL("$datadir/gnome-pomodoro", [PACKAGE_DATA_DIR])
-RECURSIVE_EVAL("$datadir", [DATA_DIR])
+RECURSIVE_EVAL("$libdir/gnome-pomodoro", [PACKAGE_LIB_DIR])
+RECURSIVE_EVAL("$datadir/gnome-pomodoro/plugins", [PLUGIN_DATA_DIR])
+RECURSIVE_EVAL("$libdir/gnome-pomodoro/plugins", [PLUGIN_LIB_DIR])
+RECURSIVE_EVAL("$datadir/gnome-shell/extensions/pomodoro@arun.codito.in", [EXTENSION_DIR])
+RECURSIVE_EVAL("$gsettingsschemadir", [GSETTINGS_SCHEMA_DIR])
 
 
 # Some variables to pass to Makefiles
 AC_SUBST([EXTENSION_UUID], [pomodoro@arun.codito.in])
+AC_SUBST([EXTENSION_DIR])
 AC_SUBST([GETTEXT_PACKAGE])
 AC_SUBST([WARNING_CFLAGS])
+AC_SUBST([PACKAGE_DATA_DIR])
+AC_SUBST([PACKAGE_LOCALE_DIR])
+AC_SUBST([GSETTINGS_SCHEMA_DIR])
 
 AC_SUBST([GLIB_REQUIRED])
 AC_SUBST([GTK_REQUIRED])
 AC_SUBST([GNOME_REQUIRED])
+AC_SUBST([INTROSPECTION_REQUIRED])
+AC_SUBST([LIBPEAS_REQUIRED_VERSION])
 AC_SUBST([TELEPATHY_GLIB_REQUIRED])
 
 AC_SUBST([GNOME_POMODORO_VALAFLAGS])
@@ -169,18 +200,34 @@ AC_SUBST([GNOME_POMODORO_CPPFLAGS])
 AC_SUBST([GNOME_POMODORO_CFLAGS])
 AC_SUBST([GNOME_POMODORO_LIBS])
 
+AC_SUBST([GNOME_POMODORO_PLUGIN_DATA_DIR], [$PLUGIN_DATA_DIR])
+AC_SUBST([GNOME_POMODORO_PLUGIN_LIB_DIR], [$PLUGIN_LIB_DIR])
+AC_SUBST([GNOME_POMODORO_PLUGIN_VALAFLAGS])
+AC_SUBST([GNOME_POMODORO_PLUGIN_CPPFLAGS])
+AC_SUBST([GNOME_POMODORO_PLUGIN_CFLAGS])
+AC_SUBST([GNOME_POMODORO_PLUGIN_LIBS])
+AC_SUBST([GNOME_POMODORO_PLUGIN_LIBTOOL_FLAGS])
+
 
 # Some constants to pass to config.h
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], "$GETTEXT_PACKAGE",
                    [The name of the gettext domain])
+AC_DEFINE_UNQUOTED([GSETTINGS_SCHEMA_DIR], "$GSETTINGS_SCHEMA_DIR",
+                   [GSettings schema dir])
 AC_DEFINE_UNQUOTED([EXTENSION_UUID], "$EXTENSION_UUID",
-                   [UUID of the pomodoro extensoin])
+                   [UUID of the pomodoro extension])
+AC_DEFINE_UNQUOTED([EXTENSION_DIR], "$EXTENSION_DIR",
+                   [Path of the pomodoro extension])
 AC_DEFINE_UNQUOTED([PACKAGE_LOCALE_DIR], "$PACKAGE_LOCALE_DIR",
                    [Locale dir])
 AC_DEFINE_UNQUOTED([PACKAGE_DATA_DIR], "$PACKAGE_DATA_DIR",
                    [Data dir])
-AC_DEFINE_UNQUOTED([DATA_DIR], "$DATA_DIR",
-                   [Data dir])
+AC_DEFINE_UNQUOTED([PACKAGE_LIB_DIR], "$PACKAGE_LIB_DIR",
+                   [Lib dir])
+AC_DEFINE_UNQUOTED([PLUGIN_DATA_DIR], "$PLUGIN_DATA_DIR",
+                   [Plugin data dir])
+AC_DEFINE_UNQUOTED([PLUGIN_LIB_DIR], "$PLUGIN_LIB_DIR",
+                   [Plugin lib dir])
 
 AC_DEFINE([GNOME_DESKTOP_USE_UNSTABLE_API], [],
           [We are aware that GNOME_DESKTOP's API can change])
@@ -203,6 +250,8 @@ AC_CONFIG_FILES([
     vapi/Makefile
     lib/Makefile
     src/Makefile
+    extension/config.js
+    extension/metadata.json
     extension/Makefile
     data/Makefile
     data/icons/Makefile
@@ -212,6 +261,8 @@ AC_CONFIG_FILES([
     packages/Makefile
     packages/debian/Makefile
     packages/rpm/Makefile
+    plugins/Makefile
+    plugins/gnome/Makefile
     tests/Makefile
 ])
 

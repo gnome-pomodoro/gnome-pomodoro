@@ -1,0 +1,11 @@
+[Plugin]
+Loader=C
+Module=gnome
+Name=GNOME
+Description=GNOME desktop integration
+Authors=Kamil Prusko <kamilprusko@gmail.com>
+Copyright=Copyright © 2015 Kamil Prusko
+Website=
+Hidden=1
+Builtin=1
+Version=1.0

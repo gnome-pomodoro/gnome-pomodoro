@@ -502,7 +502,7 @@ Signals.addSignalMethods(PomodoroExtension.prototype);
 
 function init(metadata) {
     Gettext.bindtextdomain(Config.GETTEXT_PACKAGE,
-                           Config.LOCALE_DIR);
+                           Config.PACKAGE_LOCALE_DIR);
 }
 
 

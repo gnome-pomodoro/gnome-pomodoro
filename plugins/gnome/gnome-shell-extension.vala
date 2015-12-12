@@ -1,30 +1,6 @@
-/*
- * Copyright (c) 2013 gnome-pomodoro contributors
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Authors: Kamil Prusko <kamilprusko@gmail.com>
- */
-
-using GLib;
-
-
-namespace Pomodoro
+namespace Gnome
 {
-//    internal const string DESKTOP_SESSION_ENV_VARIABLE = "DESKTOP_SESSION";
-
-    public class GnomeShellExtension : Pomodoro.Plugin
+    public class ShellExtension : GLib.Object
     {
         private Gnome.Shell shell_proxy;
         private Gnome.ShellExtensions shell_extensions_proxy;
@@ -560,33 +536,6 @@ namespace Pomodoro
 
                 return false;
             });
-        }
-    }
-
-    public class GnomeIdleMonitor : Pomodoro.Plugin
-    {
-        private unowned Pomodoro.Timer timer;
-    }
-
-    public class GnomeDesktopModule : Pomodoro.Module
-    {
-        private Gnome.IdleMonitor idle_monitor;
-        private uint became_active_id;
-
-        public GnomeDesktopModule (Pomodoro.Timer timer)
-        {
-//            this.plugins.
-
-//            GnomeShellExtension
-//            GnomeIdleMonitor
-        }
-
-        public static bool can_enable () {
-//            var desktop_session = GLib.Environment.get_variable
-//                                           (DESKTOP_SESSION_ENV_VARIABLE);
-
-//            return desktop_session == "gnome";
-            return true;
         }
     }
 }
