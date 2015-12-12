@@ -50,3 +50,5 @@ uninstall-hook:
 	-rm -rf $(pkgdatadir)
 
 -include $(top_srcdir)/git.mk
+
+# vi:ts=4:noet

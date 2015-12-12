@@ -23,3 +23,5 @@ EXTRA_DIST = \
 	gnome-pomodoro.sgml
 
 -include $(top_srcdir)/git.mk
+
+# vi:ts=4:noet

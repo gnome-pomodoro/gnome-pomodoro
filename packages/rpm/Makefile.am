@@ -51,3 +51,5 @@ CLEANFILES = \
 .PHONY: all rpm rpm-src
 
 -include $(top_srcdir)/git.mk
+
+# vi:ts=4:noet

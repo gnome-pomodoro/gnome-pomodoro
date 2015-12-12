@@ -17,3 +17,5 @@ dist-hook:
 	cd $(distdir) && rm -f $(CLEANFILES)
 
 -include $(top_srcdir)/git.mk
+
+# vi:ts=4:noet

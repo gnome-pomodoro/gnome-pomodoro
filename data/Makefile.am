@@ -56,3 +56,5 @@ dist-hook:
 # all-local: gschemas.compiled
 
 -include $(top_srcdir)/git.mk
+
+# vi:ts=4:noet

@@ -24,3 +24,5 @@ EXTRA_DIST = \
     $(public_sounds)
 
 -include $(top_srcdir)/git.mk
+
+# vi:ts=4:noet

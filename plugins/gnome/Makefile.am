@@ -38,3 +38,5 @@ EXTRA_DIST = \
 	$(libgnome_la_plugindata_DATA)
 
 -include $(top_srcdir)/git.mk
+
+# vi:ts=4:noet

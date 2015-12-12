@@ -33,3 +33,5 @@ CLEANFILES = \
     gnome_pomodoro_vala.stamp
 
 -include $(top_srcdir)/git.mk
+
+# vi:ts=4:noet
