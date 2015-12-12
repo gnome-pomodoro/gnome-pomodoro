@@ -18,4 +18,10 @@
   </screenshots>
   <url type="homepage">https://github.com/codito/gnome-shell-pomodoro</url>
   <updatecontact>kamilprusko@gmail.com</updatecontact>
+  <kudos>
+    <kudo>AppMenu</kudo>
+    <kudo>HiDpiIcon</kudo>
+    <kudo>ModernToolkit</kudo>
+    <kudo>Notifications</kudo>
+  </kudos>
 </application>
