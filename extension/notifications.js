@@ -259,7 +259,7 @@ const Notification = new Lang.Class({
             this.source.notify(this);
         }
         else {
-            Extension.extension.logError('Called Notification.show() after destroy()');
+            Utils.logWarning('Called Notification.show() after destroy()');
         }
     }
 });
@@ -420,7 +420,7 @@ const ReminderManager = new Lang.Class({
         this._blockCount -= 1;
 
         if (this._blockCount < 0) {
-            Extension.extension.logError('Spurious call for reminder unblock');
+            Utils.logWarning('Spurious call for reminder unblock');
         }
 
         if (!this.isBlocked && this.isScheduled) {

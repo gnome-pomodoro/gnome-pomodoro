@@ -23,6 +23,7 @@ const Lang = imports.lang;
 const Shell = imports.gi.Shell;
 
 const Main = imports.ui.main;
+const ExtensionSystem = imports.ui.extensionSystem;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 
@@ -49,13 +50,11 @@ const Hook = new Lang.Class({
 
     check: function() {
         if (this.initial === undefined) {
-            Extension.extension.logError('Hook "%s" for %s is not defined'.format(
-                                                    this.property, this.object));
+            logWarning('Hook "%s" for %s is not defined'.format(this.property, this.object));
             return;
         }
         if (!(this.initial instanceof Function)) {
-            Extension.extension.logError('Hook "%s" for %s is not callable'.format(
-                                                    this.property, this.object));
+            logWarning('Hook "%s" for %s is not callable'.format(this.property, this.object));
             return;
         }
     },
@@ -141,6 +140,16 @@ function getFocusedWindowInfo() {
     }
 
     return result;
+}
+
+
+function logError(message) {
+    ExtensionSystem.logExtensionError(Extension.metadata.uuid, message);
+}
+
+
+function logWarning(message) {
+    log(message);
 }
 
 

@@ -27,6 +27,7 @@ const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
 const DBus = Extension.imports.dbus;
 const Settings = Extension.imports.settings;
+const Utils = Extension.imports.utils;
 
 
 const State = {
@@ -57,34 +58,29 @@ const Timer = new Lang.Class({
                                        Lang.bind(this, this._onNameVanished));
 
         let settings = Extension.extension.settings;
-        try {
-            this._settingsChangedId  = settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
-            this._shortBreakDuration = settings.get_double('short-break-duration');
-            this._longBreakDuration  = settings.get_double('long-break-duration');
-        }
-        catch (error) {
-            Extension.extension.logError(error);
-        }
+        this._settingsChangedId  = settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
+        this._shortBreakDuration = settings.get_double('short-break-duration');
+        this._longBreakDuration  = settings.get_double('long-break-duration');
 
-//        if (this._isRunning()) {
-            this._ensureProxy();
-//        }
+        // if (this._isRunning()) {
+        this._ensureProxy();
+        // }
     },
 
-    _isRunning: function() {
-        let settings;
-        let state;
-
-        try {
-            settings = Settings.getSettings('org.gnome.pomodoro.state');
-            state = settings.get_string('state');
-        }
-        catch (error) {
-            Extension.extension.logError(error);
-        }
-
-        return state && state != State.NULL;
-    },
+    //_isRunning: function() {
+    //    let settings;
+    //    let state;
+    //
+    //    try {
+    //        settings = Settings.getSettings('org.gnome.pomodoro.state');
+    //        state = settings.get_string('state');
+    //    }
+    //    catch (error) {
+    //        Utils.logWarning(error.message);
+    //    }
+    //
+    //    return state && state != State.NULL;
+    //},
 
     _onSettingsChanged: function(settings, key) {
         switch (key) {
@@ -108,7 +104,7 @@ const Timer = new Lang.Class({
 
         this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
             if (error) {
-                Extension.extension.logError(error.message);
+                Utils.logWarning(error.message);
                 this._notifyServiceNotInstalled();
                 return;
             }
@@ -167,7 +163,7 @@ const Timer = new Lang.Class({
 
     _onCallback: function(result, error) {
         if (error) {
-            Extension.extension.logError(error.message);
+            Utils.logWarning(error.message);
 
             /* timer toggle assumes success right away, so we need to
                straighten it out */

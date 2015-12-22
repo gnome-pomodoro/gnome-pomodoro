@@ -83,7 +83,7 @@ const Presence = new Lang.Class({
                 }
             }
             catch (error) {
-                Extension.extension.logError(error.message);
+                Utils.logWarning(error.message);
             }
         }
 
@@ -93,7 +93,7 @@ const Presence = new Lang.Class({
                                        Lang.bind(this, this._onSettingsChanged));
         }
         catch (error) {
-            Extension.extension.logError(error.message);
+            Utils.logWarning(error.message);
         }
 
         this._timerStateChangedId = Extension.extension.timer.connect('state-changed',
@@ -178,7 +178,7 @@ const Presence = new Lang.Class({
             }
         }
         catch (error) {
-            Extension.extension.logError(error.message);
+            Utils.logWarning(error.message);
         }
     },
 
@@ -230,7 +230,7 @@ const Presence = new Lang.Class({
             }
         }
         catch (error) {
-            Extension.extension.logError(error.message);
+            Utils.logWarning(error.message);
         }
 
         this._updateNotificationsMenuItem();

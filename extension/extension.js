@@ -24,7 +24,6 @@ const Lang = imports.lang;
 const Gettext = imports.gettext;
 const Signals = imports.signals;
 
-const ExtensionSystem = imports.ui.extensionSystem;
 const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
 const Meta = imports.gi.Meta;
@@ -71,22 +70,21 @@ const PomodoroExtension = new Lang.Class({
 
             this._showScreenNotifications = this.settings.get_boolean('show-screen-notifications');
             this._showReminders = this.settings.get_boolean('show-reminders');
+
+            this.timer = new Timer.Timer();
+
+            this.dbus = new DBus.PomodoroExtension();
+
+            this.timer.connect('service-connected', Lang.bind(this, this._onServiceConnected));
+            this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
+            this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
+
+            Main.sessionMode.connect('updated', Lang.bind(this, this._onSessionModeUpdated));
         }
         catch (error) {
-            this.logError(error);
-
-            // TODO: Notify issue
+            this.logError(error.message);
         }
 
-        this.timer = new Timer.Timer();
-
-        this.dbus = new DBus.PomodoroExtension();
-
-        this.timer.connect('service-connected', Lang.bind(this, this._onServiceConnected));
-        this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
-        this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
-
-        Main.sessionMode.connect('updated', Lang.bind(this, this._onSessionModeUpdated));
         this._onSessionModeUpdated();
     },
 
@@ -357,7 +355,7 @@ const PomodoroExtension = new Lang.Class({
                         }
                     }
                     catch (error) {
-                        this.logError(error.message);
+                        Utils.logWarning(error.message);
                     }
 
                     if (this.presence) {
@@ -466,10 +464,6 @@ const PomodoroExtension = new Lang.Class({
     notifyIssue: function(message) {
         let notification = new Notifications.IssueNotification(message);
         notification.show();
-    },
-
-    logError: function(message) {
-        ExtensionSystem.logExtensionError(Extension.metadata.uuid, message);
     },
 
     destroy: function() {

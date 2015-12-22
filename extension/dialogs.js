@@ -404,7 +404,7 @@ const ModalDialog = new Lang.Class({
             }
         }
         catch (error) {
-            Extension.extension.logError(error.message);
+            Utils.logWarning(error.message);
         }
 
         this._disconnectSignals();
