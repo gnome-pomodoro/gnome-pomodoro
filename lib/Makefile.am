@@ -14,6 +14,7 @@ libgnome_pomodoro_la_VALASOURCES = \
 	log-scale.vala \
 	mode-button.vala \
 	plugin-manager.vala \
+	plugin-manager-dialog.vala \
 	preferences-dialog.vala \
 	presence.vala \
 	service.vala \
@@ -29,6 +30,7 @@ libgnome_pomodoro_la_SOURCES = \
 	resources.c
 
 libgnome_pomodoro_la_VALAFLAGS = \
+	--target-glib=$(GLIB_REQUIRED) \
 	--library=gnome-pomodoro \
 	--header=gnome-pomodoro.h \
 	--vapi=gnome-pomodoro.vapi \
@@ -44,7 +46,7 @@ libgnome_pomodoro_la_VALAFLAGS = \
 	--pkg pango \
 	--pkg cairo \
 	--enable-experimental \
-	--gresources resources/resources.xml
+	--gresources=resources/resources.xml
 
 libgnome_pomodoro_la_CPPFLAGS = \
 	$(GNOME_POMODORO_CPPFLAGS)

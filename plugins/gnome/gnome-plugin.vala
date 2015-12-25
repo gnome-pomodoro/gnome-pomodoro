@@ -1,37 +1,26 @@
-namespace Plugins
+namespace Pomodoro.Plugins
 {
-    public class GnomeDesktopPlugin : GLib.Object, Pomodoro.DesktopExtension
+    public class GnomeDesktopPlugin : Peas.ExtensionBase, Pomodoro.DesktopExtension
     {
-//        private const string version = Config.PACKAGE_VERSION;
-
-//        public string id
-//        {
-//            owned get { return "/org/gnome/gitg/Panels/Diff"; }
-//        }
-
-//        public bool available
-//        {
-//            get { return true; }
-//        }
-
-//        public string display_name
-//        {
-//            owned get { return _("Diff"); }
-//        }
-
-//        public string description
-//        {
-//            owned get { return _("Show the changes introduced by the selected commit"); }
-//        }
-
-//        public string? icon
-//        {
-//            owned get { return "diff-symbolic"; }
-//        }
+        private GnomeShellExtension shell_extension { get; private set; }
+        private Gnome.IdleMonitor   idle_monitor;
 
         construct
         {
-            message ("GnomeDesktopPlugin.construct()");
+            GLib.message ("GnomeDesktopPlugin.construct()");
+
+            this.shell_extension = new GnomeShellExtension (Config.EXTENSION_UUID);
+            this.shell_extension.enable.begin ((obj, res) => {
+                var success = this.shell_extension.enable.end (res);
+
+                if (success) {
+                    GLib.message ("Extension enabled");
+                }
+            });
+        }
+
+        public virtual signal void presence_changed ()
+        {
         }
     }
 }
@@ -68,5 +57,5 @@ public void peas_register_types (GLib.TypeModule module)
     var object_module = module as Peas.ObjectModule;
 
     object_module.register_extension_type (typeof (Pomodoro.DesktopExtension),
-                                           typeof (Plugins.GnomeDesktopPlugin));
+                                           typeof (Pomodoro.Plugins.GnomeDesktopPlugin));
 }

@@ -3,31 +3,31 @@ namespace Gnome
     public const string SHELL_SCHEMA = "org.gnome.shell";
     public const string SHELL_ENABLED_EXTENSIONS_KEY = "enabled-extensions";
 
-//    public enum ExtensionState
-//    {
-//        /* Custom value suggesting there was DBus error */
-//        UNKNOWN = 0,
-//
-//        ENABLED = 1,
-//        DISABLED = 2,
-//        ERROR = 3,
-//        OUT_OF_DATE = 4,
-//        DOWNLOADING = 5,
-//        INITIALIZED = 6,
-//
-//        /* Used as an error state for operations on unknown extensions,
-//         * should never be in a real extensionMeta object.
-//         */
-//        UNINSTALLED = 99
-//    }
+    public enum ExtensionState
+    {
+        /* Custom value suggesting there was DBus error */
+        UNKNOWN = 0,
 
-//    public struct ExtensionInfo
-//    {
-//        public string uuid;
-//        public string path;
-//        public string version;
-//        public ExtensionState state;
-//    }
+        ENABLED = 1,
+        DISABLED = 2,
+        ERROR = 3,
+        OUT_OF_DATE = 4,
+        DOWNLOADING = 5,
+        INITIALIZED = 6,
+
+        /* Used as an error state for operations on unknown extensions,
+         * should never be in a real extensionMeta object.
+         */
+        UNINSTALLED = 99
+    }
+
+    public struct ExtensionInfo
+    {
+        public string uuid;
+        public string path;
+        public string version;
+        public ExtensionState state;
+    }
 
     [DBus (name = "org.gnome.Shell")]
     public interface Shell : GLib.Object

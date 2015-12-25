@@ -9,6 +9,7 @@ gnome_pomodoro_DEPENDENCIES = \
 	$(top_builddir)/lib/libgnome-pomodoro.la
 
 gnome_pomodoro_VALAFLAGS = \
+	--target-glib=$(GLIB_REQUIRED) \
 	--vapidir=$(top_builddir)/vapi \
 	--pkg config \
 	--pkg gobject-2.0 \
@@ -17,12 +18,13 @@ gnome_pomodoro_VALAFLAGS = \
 	--pkg gtk+-3.0 \
 	--pkg libpeas-1.0
 
-gnome_pomodoro_CPPFLAGS = \
+gnome_pomodoro_CFLAGS = \
 	$(GNOME_POMODORO_CFLAGS) \
 	$(WARNING_CFLAGS)
 
 gnome_pomodoro_LDADD = \
 	$(GNOME_POMODORO_LIBS) \
+	-lm \
 	$(top_builddir)/lib/libgnome-pomodoro.la
 
 

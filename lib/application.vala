@@ -27,17 +27,20 @@ namespace Pomodoro.Resources {
     public const string BOOKMARK_ADD = "bookmark-add-symbolic";
 }
 
+namespace Pomodoro.Envirionment
+{
+    internal const string DESKTOP_SESSION_VARIABLE = "DESKTOP_SESSION";
+}
 
 public class Pomodoro.Application : Gtk.Application
 {
     public Pomodoro.Service service;
     public Pomodoro.Timer timer;
+//    public Pomodoro.PluginManager plugin_manager;
 
     private Gtk.Window preferences_dialog;
     private Gtk.Window about_dialog;
-
-//    private List<Pomodoro.Module> modules;
-//    private Pomodoro.GnomeDesktopModule desktop_module;
+    private Gtk.Window plugins_dialog;
 
     private enum ExitStatus
     {
@@ -93,20 +96,54 @@ public class Pomodoro.Application : Gtk.Application
 
     private void setup_resources ()
     {
-        var css_provider = new Gtk.CssProvider ();
         try {
-           var css_file = File.new_for_uri ("resource:///org/gnome/pomodoro/ui/style.css");
+            var css_file = File.new_for_uri ("resource:///org/gnome/pomodoro/ui/style.css");
 
-           css_provider.load_from_file (css_file);
+            var css_provider = new Gtk.CssProvider ();
+            css_provider.load_from_file (css_file);
+
+            Gtk.StyleContext.add_provider_for_screen (
+                                         Gdk.Screen.get_default (),
+                                         css_provider,
+                                         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         }
         catch (Error e) {
             GLib.warning (e.message);
         }
+    }
 
-        Gtk.StyleContext.add_provider_for_screen (
-                                     Gdk.Screen.get_default (),
-                                     css_provider,
-                                     Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+    public Pomodoro.DesktopExtension desktop { get; private set; }
+
+    private void setup_plugin_manager ()
+    {
+        var plugin_manager = Pomodoro.PluginManager.get_default ();
+
+//        var extension_set = new Peas.ExtensionSet (plugin_manager,
+//                                                   typeof (Pomodoro.DesktopExtension));
+
+        // Enable desktop plugin
+
+        var desktop_session = GLib.Environment.get_variable (Pomodoro.Envirionment.DESKTOP_SESSION_VARIABLE);
+        var plugin_info     = plugin_manager.get_plugin_info (desktop_session);
+
+        if (plugin_info != null)
+        {
+            if (!plugin_info.is_loaded ()) {
+                plugin_manager.load_plugin (plugin_info);
+            }
+
+            this.desktop = plugin_manager.create_extension (plugin_info,
+                                                            typeof (Pomodoro.DesktopExtension))
+                                                           as Pomodoro.DesktopExtension;
+        }
+        else {
+            // TODO: fallback
+        }
+
+        //extension_set.@foreach ((@set, plugin, extension) => {
+        //    if 
+        //    message ("desktop plugins: %s", plugin.get_name ());
+        //});
     }
 
     public void show_preferences_full (string? view,
@@ -270,15 +307,16 @@ public class Pomodoro.Application : Gtk.Application
      */
     public override void startup ()
     {
+        message ("startup");
+
         this.hold ();
 
         base.startup ();
 
         this.setup_resources ();
+        this.setup_plugin_manager ();
 
         Pomodoro.Timer.restore (this.timer);
-
-        var plugin_manager = Pomodoro.PluginManager.get_default ();
 
 /*
         this.desktop_module = new Pomodoro.GnomeDesktopModule (this.timer);
@@ -338,6 +376,8 @@ public class Pomodoro.Application : Gtk.Application
 
     protected override bool local_command_line ([CCode (array_length = false, array_null_terminated = true)] ref unowned string[] arguments, out int exit_status)
     {
+        message ("local_command_line");
+
         string[] tmp = arguments;
         unowned string[] arguments_copy = tmp;
 
@@ -366,6 +406,8 @@ public class Pomodoro.Application : Gtk.Application
 
     public override int command_line (ApplicationCommandLine command_line)
     {
+        message ("command_line");
+
         string[] tmp = command_line.get_arguments ();
         unowned string[] arguments_copy = tmp;
 
@@ -422,6 +464,9 @@ public class Pomodoro.Application : Gtk.Application
     {
         this.hold ();
 
+        this.plugins_dialog = new PluginManagerDialog () as Gtk.Window;
+        this.plugins_dialog.present ();
+
         if (Options.quit) {
             this.quit ();
         }
@@ -433,9 +478,28 @@ public class Pomodoro.Application : Gtk.Application
         this.release ();
     }
 
+//    private Pomodoro.DesktopExtension desktop_extension;
+
+//    public unowned Pomodoro.DesktopExtension get_desktop_extension ()
+//    {
+//        var extension_set = new Peas.ExtensionSet (this, typeof (Pomodoro.DesktopExtension));
+//
+//        
+//    }
+
+//    private void load_plugins () {
+//        var extension_set = new Peas.ExtensionSet (this, typeof (Pomodoro.TimerExtension));
+//
+//        extension_set.@foreach ((@set, plugin, extension) => {
+//            message ("timer plugins: %s", plugin.get_name ());
+//        });
+//    }
+
     public override bool dbus_register (DBusConnection connection,
                                         string         object_path) throws GLib.Error
     {
+        message ("dbus_register");
+
         if (!base.dbus_register (connection, object_path)) {
             return false;
         }

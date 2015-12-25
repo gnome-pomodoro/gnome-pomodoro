@@ -2,6 +2,8 @@
 <gresources>
   <gresource prefix="/org/gnome/pomodoro">
     <file preprocess="xml-stripblanks">ui/menus.ui</file>
+    <file preprocess="xml-stripblanks">ui/plugins-dialog.ui</file>
+    <file preprocess="xml-stripblanks">ui/plugin-row.ui</file>
     <file>ui/style.css</file>
   </gresource>
 </gresources>
