@@ -18,15 +18,12 @@
  *
  */
 
-using GLib;
-
-
 [DBus (name = "org.gnome.Pomodoro")]
-public class Pomodoro.Service : Object
+public class Pomodoro.Service : GLib.Object
 {
-    private weak DBusConnection connection;
+    private weak GLib.DBusConnection connection;
     private Pomodoro.Timer timer;
-    private HashTable<string, Variant> changed_properties;
+    private GLib.HashTable<string, GLib.Variant> changed_properties;
     private uint idle_id;
     private GLib.Cancellable cancellable;
 
@@ -50,11 +47,12 @@ public class Pomodoro.Service : Object
         get { return Config.PACKAGE_VERSION; }
     }
 
-    public Service (DBusConnection connection, Pomodoro.Timer timer)
+    public Service (GLib.DBusConnection connection,
+                    Pomodoro.Timer      timer)
     {
         this.connection = connection;
         this.timer = timer;
-        this.changed_properties = new HashTable<string, Variant> (str_hash, str_equal);
+        this.changed_properties = new GLib.HashTable<string, GLib.Variant> (str_hash, str_equal);
         this.idle_id = 0;
 
         this.cancellable = new GLib.Cancellable ();
@@ -76,11 +74,11 @@ public class Pomodoro.Service : Object
         }
     }
 
-    public void show_preferences (string view,
+    public void show_preferences (string page,
                                   uint32 timestamp)
     {
         var application = GLib.Application.get_default () as Pomodoro.Application;
-        application.show_preferences_full (view, timestamp);
+        application.show_preferences_full (page, timestamp);
     }
 
     public void start ()
@@ -115,8 +113,8 @@ public class Pomodoro.Service : Object
 
     private void flush ()
     {
-        var builder_properties = new VariantBuilder (VariantType.ARRAY);
-        var builder_invalid = new VariantBuilder (VariantType.STRING_ARRAY);
+        var builder_properties = new GLib.VariantBuilder (GLib.VariantType.ARRAY);
+        var builder_invalid = new GLib.VariantBuilder (GLib.VariantType.STRING_ARRAY);
 
         /* FIXME: Compile warnings from C compiler */
         this.changed_properties.foreach ((key, value) => {
@@ -129,24 +127,25 @@ public class Pomodoro.Service : Object
                                          "/org/gnome/Pomodoro",
                                          "org.freedesktop.DBus.Properties",
                                          "PropertiesChanged",
-                                         new Variant ("(sa{sv}as)",
-                                                      "org.gnome.Pomodoro",
-                                                      builder_properties,
-                                                      builder_invalid)
+                                         new GLib.Variant ("(sa{sv}as)",
+                                                           "org.gnome.Pomodoro",
+                                                           builder_properties,
+                                                           builder_invalid)
                                          );
             this.connection.flush_sync (this.cancellable);
         }
-        catch (Error e) {
-            GLib.warning ("%s", e.message);
+        catch (GLib.Error error) {
+            GLib.warning ("%s", error.message);
         }
 
         if (this.idle_id != 0) {
-            Source.remove (this.idle_id);
+            GLib.Source.remove (this.idle_id);
             this.idle_id = 0;
         }
     }
 
-    private void send_property_changed (string property_name, Variant new_value)
+    private void send_property_changed (string       property_name,
+                                        GLib.Variant new_value)
     {
         this.changed_properties.replace (property_name, new_value);
 
@@ -159,7 +158,7 @@ public class Pomodoro.Service : Object
         }
     }
 
-    private void on_timer_property_notify (ParamSpec param_spec)
+    private void on_timer_property_notify (GLib.ParamSpec param_spec)
     {
         switch (param_spec.name)
         {
@@ -175,7 +174,12 @@ public class Pomodoro.Service : Object
                                             new Variant.double (this.state_duration));
                 break;
 
-            case "is_paused":
+            case "state-duration":
+                this.send_property_changed ("StateDuration",
+                                            new Variant.double (this.state_duration));
+                break;
+
+            case "is-paused":
                 this.send_property_changed ("IsPaused",
                                             new Variant.boolean (this.is_paused));
                 break;

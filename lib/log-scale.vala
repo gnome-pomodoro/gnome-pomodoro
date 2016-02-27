@@ -18,8 +18,6 @@
  *
  */
 
-using GLib;
-
 
 public class Pomodoro.Widgets.LogScale : Gtk.Scale
 {
@@ -29,7 +27,7 @@ public class Pomodoro.Widgets.LogScale : Gtk.Scale
 
     public double exponent { get; set; default = 1.0; }
 
-    private Gtk.Adjustment base_adjustment;
+    public Gtk.Adjustment base_adjustment { get; private set; }
 
     public LogScale (Gtk.Adjustment adjustment,
                      double         exponent)
@@ -70,9 +68,9 @@ public class Pomodoro.Widgets.LogScale : Gtk.Scale
                                             this.transform_from);
     }
 
-    private bool transform_from (Binding   binding,
-                                 Value     source_value,
-                                 ref Value target_value)
+    private bool transform_from (GLib.Binding   binding,
+                                 GLib.Value     source_value,
+                                 ref GLib.Value target_value)
     {
         var lower = this.base_adjustment.lower;
         var upper = this.base_adjustment.upper;
@@ -85,9 +83,9 @@ public class Pomodoro.Widgets.LogScale : Gtk.Scale
         return true;
     }
 
-    private bool transform_to (Binding   binding,
-                               Value     source_value,
-                               ref Value target_value)
+    private bool transform_to (GLib.Binding   binding,
+                               GLib.Value     source_value,
+                               ref GLib.Value target_value)
     {
         var lower = this.base_adjustment.lower;
         var upper = this.base_adjustment.upper;
@@ -97,6 +95,11 @@ public class Pomodoro.Widgets.LogScale : Gtk.Scale
                 1.0 / this.exponent));
 
         return true;
+    }
+
+    public override bool scroll_event (Gdk.EventScroll event)
+    {
+        return false;
     }
 }
 

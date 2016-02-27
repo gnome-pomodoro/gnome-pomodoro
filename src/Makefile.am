@@ -5,16 +5,12 @@ gnome_pomodoro_SOURCES = \
 	main.vala \
 	$(top_builddir)/lib/gnome-pomodoro.vapi
 
-gnome_pomodoro_DEPENDENCIES = \
-	$(top_builddir)/lib/libgnome-pomodoro.la
-
 gnome_pomodoro_VALAFLAGS = \
 	--target-glib=$(GLIB_REQUIRED) \
 	--vapidir=$(top_builddir)/vapi \
 	--pkg config \
 	--pkg gobject-2.0 \
 	--pkg gio-2.0 \
-	--pkg gdk-3.0 \
 	--pkg gtk+-3.0 \
 	--pkg libpeas-1.0
 

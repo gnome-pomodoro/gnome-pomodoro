@@ -40,10 +40,10 @@ namespace Pomodoro
 
     public abstract class TimerState : GLib.Object
     {
-        public string name;
-        public double elapsed;
-        public double duration;
-        public double timestamp;
+        public string name { get; construct set; }
+        public double elapsed { get; construct set; }
+        public double duration { get; construct set; }
+        public double timestamp { get; construct set; }
 
         construct
         {

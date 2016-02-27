@@ -1,4 +1,5 @@
 SUBDIRS = \
+	builtin \
 	gnome
 
 -include $(top_srcdir)/git.mk

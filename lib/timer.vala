@@ -21,17 +21,6 @@
 using GLib;
 
 
-namespace Pomodoro
-{
-    public enum State {
-        NULL = 0,
-        POMODORO = 1,
-        PAUSE = 2,
-        IDLE = 3
-    }
-}
-
-
 /**
  * Pomodoro.Timer class.
  *
@@ -40,11 +29,27 @@ namespace Pomodoro
  *
  * TODO: Ability to stop/continue after timer runs out
  */
-public class Pomodoro.Timer : Object
+public class Pomodoro.Timer : GLib.Object
 {
+    private static Pomodoro.Timer? instance = null;
+
+    public static unowned Pomodoro.Timer get_default ()
+    {
+        if (Timer.instance == null) {
+            Timer.instance = new Timer ();
+            Timer.instance.destroy.connect (() => {
+                Timer.instance = null;
+            });
+        }
+
+        return Timer.instance;
+    }
+
     private uint timeout_source;
     private double current_timestamp;
     private double elapsed_offset;
+    private TimerState _state;
+    private bool _is_paused;
 
     public double elapsed {
         get {
@@ -56,7 +61,6 @@ public class Pomodoro.Timer : Object
         }
     }
 
-    private TimerState _state;
     public TimerState state {
         get {
             return this._state;
@@ -79,6 +83,33 @@ public class Pomodoro.Timer : Object
         }
     }
 
+    [CCode (notify = false)]
+    public double state_duration {
+        get {
+            return this._state != null ? this._state.duration : 0.0;
+        }
+        set {
+            if (this._state != null) {
+                this._state.duration = value;
+            }
+        }
+    }
+
+    [CCode (notify = false)]
+    public bool is_paused {
+        get {
+            return this._is_paused;
+        }
+        set {
+            if (value != this._is_paused) {
+                this._is_paused = value;
+                this.update_timeout ();
+
+                this.notify_property ("is-paused");
+            }
+        }
+    }
+
     public double offset {
         get {
             return this.elapsed_offset;
@@ -95,26 +126,6 @@ public class Pomodoro.Timer : Object
     }
 
     public double session { get; set; default = 0.0; }  // TODO: rename to cycle or score
- 
-    private bool _is_paused;
-    public bool is_paused {
-        get {
-            return this._is_paused;
-        }
-        set {
-            this._is_paused = value;
-
-            if (this._is_paused)
-            {
-                this.stop_timeout ();
-            }
-            else {
-                this.update_offset ();
-
-                this.start_timeout ();
-            }
-        }
-    }
 
     public Timer ()
     {
@@ -158,16 +169,18 @@ public class Pomodoro.Timer : Object
 
     public void pause ()
     {
-        if (!this.is_paused) {
-            this.is_paused = true;
-        }
+        this.is_paused = true;
     }
 
     public void resume ()
     {
-        if (this.is_paused) {
-            this.is_paused = false;
+        if (this.timeout_source == 0) {
+            this.current_timestamp = Pomodoro.get_real_time ();
+
+            this.update_offset ();
         }
+
+        this.is_paused = false;
     }
 
     public void reset ()
@@ -225,7 +238,7 @@ public class Pomodoro.Timer : Object
     private bool resolve_state ()
     {
         var original_state = this._state as TimerState;
-        var state_changed = true;
+        var state_changed = false;
 
         while (this._state.duration > 0.0 &&
                this._state.elapsed >= this._state.duration)
@@ -240,8 +253,7 @@ public class Pomodoro.Timer : Object
             this.state_enter (this._state);
         }
 
-        if (state_changed)
-        {
+        if (state_changed) {
             this.state_changed (this._state, original_state);
         }
 
@@ -261,10 +273,13 @@ public class Pomodoro.Timer : Object
 
     public virtual signal void state_enter (TimerState state)
     {
+        state.notify["duration"].connect (this.on_state_duration_notify);
     }
 
     public virtual signal void state_leave (TimerState state)
     {
+        state.notify["duration"].disconnect (this.on_state_duration_notify);
+
         this.session += state.get_score (this);
     }
 
@@ -273,15 +288,27 @@ public class Pomodoro.Timer : Object
         // TODO: Notifications module should determine wether timer timeouted (and need notification) or change was made uppon request.
 
         /* Run the timer */
-        if (state is DisabledState) {
+        this.update_timeout ();
+
+        this.notify_property ("state");  // TODO: is it needed?
+        this.notify_property ("elapsed");
+    }
+
+    private void update_timeout ()
+    {
+        if (this.state is DisabledState || this.is_paused) {
             this.stop_timeout ();
         }
         else {
             this.start_timeout ();  // TODO: align to miliseconds
         }
+    }
 
-        this.notify_property ("state");  // TODO: is it needed?
-        this.notify_property ("elapsed");
+    private void on_state_duration_notify ()
+    {
+        this.update ();
+
+        this.notify_property ("state-duration");
     }
 
     public override void dispose ()
@@ -298,104 +325,4 @@ public class Pomodoro.Timer : Object
     {
         this.dispose ();
     }
-
-    public static void save (Timer timer)
-    {
-        var state_settings = Pomodoro.get_settings ()
-                                     .get_child ("state");
-
-        var state_datetime = new DateTime.from_unix_utc (
-                             (int64) Math.floor (timer.state.timestamp));
-
-        state_settings.set_double ("session",
-                                   timer.session);
-        state_settings.set_string ("state",
-                                   timer.state.name);
-        state_settings.set_string ("state-date",
-                                   datetime_to_string (state_datetime));
-        state_settings.set_double ("state-offset",
-                                   timer.offset);  // - timer.state.timestamp % 1.0);
-        state_settings.set_double ("state-duration",
-                                   timer.state.duration);
-    }
-
-    public static void restore (Timer timer)
-    {
-        timer.stop ();
-
-        var state_settings = Pomodoro.get_settings ()
-                                     .get_child ("state");
-
-        var state = TimerState.lookup (state_settings.get_string ("state"));
-
-        if (state != null)
-        {
-            state.elapsed = state_settings.get_double ("state-offset");
-            state.duration = state_settings.get_double ("state-duration");
-
-            try {
-                var state_date = state_settings.get_string ("state-date");
-
-                if (state_date != "") {
-                    var state_datetime = datetime_from_string (state_date);
-                    state.timestamp = (double) state_datetime.to_unix ();
-                }
-            }
-            catch (DateTimeError error) {
-                /* In case there is no valid state-date, elapsed time
-                 * will be lost.
-                 */
-                state = null;
-            }
-        }
-
-        if (state != null)
-        {
-            timer.state = state;
-            timer.session = state_settings.get_double ("session");
-        }
-        else {
-            GLib.warning ("Could not restore time");
-        }
-
-        timer.update ();
-    }
-
-//    private void on_settings_changed (GLib.Settings settings, string key)
-//    {
-//        var state_duration = this.state_duration;
-
-//        switch (key)
-//        {
-//            case "pomodoro-duration":
-//                if (this.timer.state == State.POMODORO) {
-//                    state_duration = this.settings.get_double (key);
-//                }
-//                break;
-
-//            case "short-break-duration":
-//                if (this.timer.state == State.PAUSE && !this.is_long_break) {
-//                    state_duration = this.settings.get_double (key);
-//                }
-//                break;
-
-//            case "long-break-duration":
-//                if (this.timer.state == State.PAUSE && this.is_long_break) {
-//                    state_duration = this.settings.get_double (key);
-//                }
-//                break;
-
-//            case "long-break-interval":
-//                if (this.timer.session_limit != this.settings.get_double (key)) {
-//                    this.timer.session_limit = this.settings.get_double (key);
-//                }
-//                break;
-//        }
-
-//        if (state_duration != this.state_duration)
-//        {
-//            this.state_duration = double.max (state_duration, this.elapsed);
-//            this.timer.update ();
-//        }
-//    }
 }

@@ -1,25 +1,19 @@
-noinst_LTLIBRARIES = \
+lib_LTLIBRARIES = \
 	libgnome-pomodoro.la
 
-#BUILT_SOURCES = \
-#	gnome-pomodoro.vapi
-
 libgnome_pomodoro_la_VALASOURCES = \
+	animation.vala \
 	about-dialog.vala \
+	accelerator.vala \
 	application.vala \
-	calendar-button.vala \
+	desktop-extension.vala \
 	enum-combo-box.vala \
-	keybinding-chooser-button.vala \
-	keybindings.vala \
 	log-scale.vala \
 	mode-button.vala \
-	plugin-manager.vala \
-	plugin-manager-dialog.vala \
 	preferences-dialog.vala \
 	presence.vala \
 	service.vala \
 	settings.vala \
-	sound-chooser-button.vala \
 	symbolic-button.vala \
 	timer.vala \
 	timer-state.vala \
@@ -30,23 +24,11 @@ libgnome_pomodoro_la_SOURCES = \
 	resources.c
 
 libgnome_pomodoro_la_VALAFLAGS = \
-	--target-glib=$(GLIB_REQUIRED) \
+	$(GNOME_POMODORO_VALAFLAGS) \
 	--library=gnome-pomodoro \
 	--header=gnome-pomodoro.h \
 	--vapi=gnome-pomodoro.vapi \
-	--vapidir=$(top_builddir)/vapi \
-	--pkg config \
-	--pkg gobject-2.0 \
-	--pkg gio-2.0 \
-	--pkg gdk-3.0 \
-	--pkg gtk+-3.0 \
-	--pkg dbus-glib-1 \
-	--pkg gobject-introspection-1.0 \
-	--pkg libpeas-1.0 \
-	--pkg pango \
-	--pkg cairo \
-	--enable-experimental \
-	--gresources=resources/resources.xml
+	--gresources $(top_srcdir)/lib/resources/resources.xml
 
 libgnome_pomodoro_la_CPPFLAGS = \
 	$(GNOME_POMODORO_CPPFLAGS)
@@ -54,6 +36,9 @@ libgnome_pomodoro_la_CPPFLAGS = \
 libgnome_pomodoro_la_CFLAGS = \
 	$(GNOME_POMODORO_CFLAGS) \
 	$(WARNING_CFLAGS)
+
+libgnome_pomodoro_la_LDFLAGS = \
+	-export-dynamic
 
 libgnome_pomodoro_la_LIBADD = \
 	$(GNOME_POMODORO_LIBS)
@@ -67,10 +52,7 @@ resources_deps = \
 	$(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir=resources $(resources))
 
 resources.c: $(resources) $(resources_deps)
-	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --generate-source --sourcedir=resources --target=$@ $<
-
-# A hack to make plugins/ and src/ build after the lib/
-# gnome-pomodoro.vapi: libgnome-pomodoro.la
+	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --generate-source --c-name="pomodoro" --sourcedir=resources --target=$@ $<
 
 BUILT_SOURCES = \
 	resources.c
@@ -84,6 +66,7 @@ CLEANFILES = \
 	resources.c
 
 EXTRA_DIST = \
+	$(resources) \
 	$(resources_deps)
 
 -include $(top_srcdir)/git.mk

@@ -358,10 +358,10 @@ namespace Pomodoro
             timer1.start ();
             timer1.elapsed = 2.0;  // imitate pausing or such
             timer1.update (timer1.timestamp + 2.0);  // should not affect saved values
-            Pomodoro.Timer.save (timer1);
+            Pomodoro.save_timer (timer1);
 
             var timer2 = new Pomodoro.Timer();
-            Pomodoro.Timer.restore (timer2);
+            Pomodoro.restore_timer (timer2);
             timer2.update (timer1.timestamp);
 
             // print_timer_state (timer1);

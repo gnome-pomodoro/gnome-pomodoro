@@ -1,14 +1,4 @@
-//namespace Pomodoro
-//{
-//    [DBus (name = "org.gnome.Pomodoro.Extension")]
-//    public interface Extension : GLib.Object
-//    {
-//        public abstract void get_capabilities (string[] capabilities)
-//                                               throws IOError;
-//    }
-//}
-
-namespace Pomodoro.Plugins
+namespace GnomePlugin
 {
     private class GnomeShellExtension : GLib.Object
     {
@@ -220,10 +210,6 @@ namespace Pomodoro.Plugins
             return false;
         }
 
-//        public async void check_state ()
-//        {
-//        }
-
         private async void wait_enabled ()
         {
             var callback_id = this.shell_extensions_proxy.extension_status_changed.connect (
@@ -249,8 +235,6 @@ namespace Pomodoro.Plugins
                 /* Wait until connected to shell d-bus */
                 yield this.connect_shell ();
             }
-
-            message ("connected");
 
             /* Enable extension in gnome-shell settings */
             var gnome_shell_settings = new GLib.Settings (Gnome.SHELL_SCHEMA);

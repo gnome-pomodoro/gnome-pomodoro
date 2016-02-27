@@ -1,17 +1,32 @@
-
-GtkMenuButton .title {
-    margin-right: 0px;
-    padding-right: 0px;
+.keybinding {
+    font-size: 16pt;
 }
 
-.preferences-dialog {
+.keybinding .key {
+    font-weight: bold;
+    background: @theme_base_color;
+    padding: 8px 16px;
+    border: 1px solid alpha(@borders, 0.4);
+    border-radius: 5px;
 }
 
-.preferences-dialog GtkViewport {
-    background: @theme_bg_color;
+.pomodoro-list > row {
+    padding: 12px 20px;
 }
 
-PomodoroSymbolicButton {
-    icon-shadow: none;
+.pomodoro-list > row.pomodoro-wide-row {
+    padding: 12px 15px;
 }
 
+.pomodoro-list > row.pomodoro-slim-row {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.pomodoro-plugin-name {
+    font-weight: bold;
+}
+
+.pomodoro-plugin-description {
+    font-size: small;
+}

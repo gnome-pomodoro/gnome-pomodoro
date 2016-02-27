@@ -61,7 +61,13 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
 
 PKG_CHECK_MODULES(PLUGIN, [
     glib-2.0 >= $GLIB_REQUIRED
+    gtk+-3.0 >= $GTK_REQUIRED
     libpeas-1.0 >= $LIBPEAS_REQUIRED_VERSION
+])
+
+PKG_CHECK_MODULES(BUILTIN_PLUGIN, [
+    gstreamer-1.0 >= 1.0.10
+    libcanberra >= 0.30
 ])
 
 PKG_CHECK_MODULES(GNOME_PLUGIN, [
@@ -143,11 +149,13 @@ GNOME_POMODORO_CFLAGS="$GNOME_POMODORO_CFLAGS -I\$(top_builddir)/lib --include c
 GNOME_POMODORO_LIBS="$GNOME_POMODORO_LIBS -lm"
 GNOME_POMODORO_VALAFLAGS=" \
     --target-glib \$(GLIB_REQUIRED) \
+    --enable-experimental \
     --vapidir=\$(top_builddir)/vapi \
     --vapidir=\$(top_srcddir)/vapi \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
+    --pkg dbus-glib-1 \
     --pkg gtk+-3.0 \
     --pkg libpeas-1.0"
 
@@ -158,7 +166,7 @@ PLUGIN_VALAFLAGS="$PLUGIN_VALAFLAGS \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
-    --pkg dbus-glib-1 \
+    --pkg gtk+-3.0 \
     --pkg libpeas-1.0"
 PLUGIN_CFLAGS="$PLUGIN_CFLAGS -I\$(top_builddir)/lib --include config.h"
 PLUGIN_LIBS="$PLUGIN_LIBS -lm"
@@ -273,6 +281,7 @@ AC_CONFIG_FILES([
     packages/debian/Makefile
     packages/rpm/Makefile
     plugins/Makefile
+    plugins/builtin/Makefile
     plugins/gnome/Makefile
     tests/Makefile
 ])

@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/org/gnome/pomodoro">
-    <file preprocess="xml-stripblanks">ui/menus.ui</file>
-    <file preprocess="xml-stripblanks">ui/plugins-dialog.ui</file>
-    <file preprocess="xml-stripblanks">ui/plugin-row.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/menus.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences-keyboard-shortcut-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences-main-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences-plugins-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences-presence-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences-sound-page.ui</file>
     <file>ui/style.css</file>
   </gresource>
 </gresources>
