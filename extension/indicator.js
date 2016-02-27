@@ -119,13 +119,14 @@ const IndicatorMenu = new Lang.Class({
     },
 
     _onPauseClicked: function() {
-        this.indicator.timer.pause();
-    },
+        if (!this.indicator.timer.isPaused ()) {
+            this.indicator.timer.pause();
+        }
+        else {
+            this.indicator.timer.resume();
 
-    _onResumeClicked: function() {
-        this.indicator.timer.resume();
-
-        this.close();
+            this.close();
+        }
     },
 
     _createTimerMenuItem: function() {
@@ -147,10 +148,6 @@ const IndicatorMenu = new Lang.Class({
         this._startAction = this._createActionButton('media-playback-start-symbolic', _("Start Timer"));
         this._startAction.connect('clicked', Lang.bind(this, this._onStartClicked));
         hbox.add_actor(this._startAction);
-
-        this._resumeAction = this._createActionButton('media-playback-start-symbolic', _("Resume Timer"));
-        this._resumeAction.connect('clicked', Lang.bind(this, this._onStartClicked));
-        hbox.add_actor(this._resumeAction);
 
         this._pauseAction = this._createActionButton('media-playback-pause-symbolic', _("Pause Timer"));
         this._pauseAction.connect('clicked', Lang.bind(this, this._onPauseClicked));
@@ -218,8 +215,13 @@ const IndicatorMenu = new Lang.Class({
             this._timerLabel.visible = isRunning;
             this._startAction.visible = !isRunning;
             this._stopAction.visible = isRunning;
-            this._pauseAction.visible = isRunning && !isPaused;
-            this._resumeAction.visible = isRunning && isPaused;
+            this._pauseAction.visible = isRunning;
+            this._pauseAction.child.icon_name = isPaused
+                                                ? 'media-playback-start-symbolic'
+                                                : 'media-playback-pause-symbolic';
+            this._pauseAction.accessible_name = isPaused
+                                                ? _("Resume Timer")
+                                                : _("Pause Timer");
 
             if (isRunning) {
                 this._timerMenuItem.actor.add_style_class_name('extension-pomodoro-menu-timer-running');
