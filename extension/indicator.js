@@ -77,20 +77,7 @@ const IndicatorMenu = new Lang.Class({
 
         this.indicator = indicator;
 
-        /* Toggle timer state button */
-        this._timerToggle = new PopupMenu.PopupSwitchMenuItem(_("Pomodoro Timer"),
-                                                              this._isTimerToggled());
-        this._timerToggle.connect('toggled', Lang.bind(this,
-            function() {
-                this.indicator.timer.toggle();
-            }));
-        this.addMenuItem(this._timerToggle);
-
-        this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-
-        this.addStateAction('pomodoro', _("Pomodoro"));
-        this.addStateAction('short-break', _("Short Break"));
-        this.addStateAction('long-break', _("Long Break"));
+        this._createTimerMenuItem();
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
@@ -109,7 +96,81 @@ const IndicatorMenu = new Lang.Class({
             }));
     },
 
-    addStateAction: function(name, label) {
+    _createActionButton: function(iconName, accessibleName) {
+        let icon = new St.Button({ reactive: true,
+                                   can_focus: true,
+                                   track_hover: true,
+                                   accessible_name: accessibleName,
+                                   style_class: 'system-menu-action extension-pomodoro-menu-action' });
+        icon.child = new St.Icon({ icon_name: iconName });
+        return icon;
+    },
+
+    _onStartClicked: function() {
+        this.indicator.timer.start();
+
+        this.close();
+    },
+
+    _onStopClicked: function() {
+        this.indicator.timer.stop();
+
+        this.close();
+    },
+
+    _onPauseClicked: function() {
+        this.indicator.timer.pause();
+    },
+
+    _onResumeClicked: function() {
+        this.indicator.timer.resume();
+
+        this.close();
+    },
+
+    _createTimerMenuItem: function() {
+        let item;
+        let hbox;
+
+        item = new PopupMenu.PopupMenuItem(_("Pomodoro Timer"),
+                                           { style_class: 'extension-pomodoro-menu-timer',
+                                            reactive: false,
+                                            can_focus: false });
+        item.label.y_align = Clutter.ActorAlign.CENTER;
+
+        this._timerMenuItem = item;
+        this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-menu-timer-label',
+                                          y_align: Clutter.ActorAlign.CENTER });
+
+        hbox = new St.BoxLayout();
+
+        this._startAction = this._createActionButton('media-playback-start-symbolic', _("Start Timer"));
+        this._startAction.connect('clicked', Lang.bind(this, this._onStartClicked));
+        hbox.add_actor(this._startAction);
+
+        this._resumeAction = this._createActionButton('media-playback-start-symbolic', _("Resume Timer"));
+        this._resumeAction.connect('clicked', Lang.bind(this, this._onStartClicked));
+        hbox.add_actor(this._resumeAction);
+
+        this._pauseAction = this._createActionButton('media-playback-pause-symbolic', _("Pause Timer"));
+        this._pauseAction.connect('clicked', Lang.bind(this, this._onPauseClicked));
+        hbox.add_actor(this._pauseAction);
+
+        this._stopAction = this._createActionButton('media-playback-stop-symbolic', _("Stop Timer"));
+        this._stopAction.connect('clicked', Lang.bind(this, this._onStopClicked));
+        hbox.add_actor(this._stopAction);
+
+        item.actor.add(this._timerLabel, { expand: true });
+        item.actor.add(hbox);
+
+        this.addMenuItem(item);
+
+        this.addStateMenuItem('pomodoro', _("Pomodoro"));
+        this.addStateMenuItem('short-break', _("Short Break"));
+        this.addStateMenuItem('long-break', _("Long Break"));
+    },
+
+    addStateMenuItem: function(name, label) {
         if (!this._stateItems) {
             this._stateItems = {};
         }
@@ -139,19 +200,40 @@ const IndicatorMenu = new Lang.Class({
     },
 
     _onTimerUpdate: function() {
-        if (this.isOpen) {
-            let timer = this.indicator.timer;
-            let timerState = timer.getState();
-            let toggled = timerState != Timer.State.NULL;
+        let timer = this.indicator.timer;
+        let timerState = timer.getState();
+        let remaining = timer.getRemaining();
+        let isRunning = timerState != Timer.State.NULL;
+        let isPaused = timer.isPaused();
 
-            this._timerToggle.setToggleState(toggled);
+        if (this._isRunning !== isRunning ||
+            this._isPaused !== isPaused ||
+            this._timerState !== timerState)
+        {
+            this._isRunning = isRunning;
+            this._isPaused = isPaused;
+            this._timerState = timerState;
+
+            this._timerMenuItem.label.visible = !isRunning;
+            this._timerLabel.visible = isRunning;
+            this._startAction.visible = !isRunning;
+            this._stopAction.visible = isRunning;
+            this._pauseAction.visible = isRunning && !isPaused;
+            this._resumeAction.visible = isRunning && isPaused;
+
+            if (isRunning) {
+                this._timerMenuItem.actor.add_style_class_name('extension-pomodoro-menu-timer-running');
+            }
+            else {
+                this._timerMenuItem.actor.remove_style_class_name('extension-pomodoro-menu-timer-running');
+            }
 
             for (let key in this._stateItems) {
                 let stateItem = this._stateItems[key];
 
-                stateItem.setSensitive(toggled);
+                stateItem.actor.visible = isRunning;
 
-                if (toggled && key == timerState) {
+                if (key == timerState) {
                     stateItem.setOrnament(PopupMenu.Ornament.DOT);
                     stateItem.actor.add_style_class_name('active');
                 }
@@ -161,10 +243,19 @@ const IndicatorMenu = new Lang.Class({
                 }
             }
         }
+
+        this._timerLabel.set_text(this._formatTime(remaining));
     },
 
-    _isTimerToggled: function() {
-        return this.indicator.timer.getState() != Timer.State.NULL;
+    _formatTime: function(remaining) {
+        if (remaining < 0.0) {
+            remaining = 0.0;
+        }
+
+        let minutes = Math.floor(remaining / 60);
+        let seconds = Math.floor(remaining % 60);
+
+        return '%02d:%02d'.format(minutes, seconds);
     },
 
     _showPreferences: function() {

@@ -216,6 +216,10 @@ const Timer = new Lang.Class({
                 : 0.0;
     },
 
+    isPaused: function() {
+        return this._proxy.IsPaused;
+    },
+
     start: function() {
         this._ensureProxy(Lang.bind(this,
             function() {
@@ -227,6 +231,20 @@ const Timer = new Lang.Class({
         this._ensureProxy(Lang.bind(this,
             function() {
                 this._proxy.StopRemote(Lang.bind(this, this._onCallback));
+            }));
+    },
+
+    pause: function() {
+        this._ensureProxy(Lang.bind(this,
+            function() {
+                this._proxy.PauseRemote(Lang.bind(this, this._onCallback));
+            }));
+    },
+
+    resume: function() {
+        this._ensureProxy(Lang.bind(this,
+            function() {
+                this._proxy.ResumeRemote(Lang.bind(this, this._onCallback));
             }));
     },
 

@@ -25,8 +25,37 @@
     max-width: 400px;
 }
 
-.extension-pomodoro-indicator-menu .toggle-switch {
-    padding-left: 30px;
+.extension-pomodoro-menu-timer {
+    color: inherit;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.extension-pomodoro-menu-timer-running {
+    margin-bottom: 8px;
+}
+
+.extension-pomodoro-menu-timer-label {
+    color: inherit;
+    font-size: 1.5em;
+    text-align: left;
+}
+
+.extension-pomodoro-menu-timer > StBoxLayout {
+    margin-left: 10px;
+    spacing: 4px;
+}
+
+.extension-pomodoro-menu-action,
+.extension-pomodoro-menu-action:hover,
+.extension-pomodoro-menu-action:focus,
+.extension-pomodoro-menu-action:active {
+    padding: 10px;
+    border: none;
+}
+
+.extension-pomodoro-menu-action > StIcon {
+    icon-size: 16px;
 }
 
 .extension-pomodoro-indicator-menu .state-item.active {
