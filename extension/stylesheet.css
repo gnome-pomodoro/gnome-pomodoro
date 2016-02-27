@@ -42,6 +42,13 @@
     text-align: left;
 }
 
+.extension-pomodoro-menu-timer-label-button {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: none;
+}
+
 .extension-pomodoro-menu-timer > StBoxLayout {
     margin-left: 10px;
     spacing: 4px;

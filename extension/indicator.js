@@ -106,6 +106,15 @@ const IndicatorMenu = new Lang.Class({
         return icon;
     },
 
+    _onTimerClicked: function() {
+        this.close();
+
+        if (Extension.extension && Extension.extension.dialog) {
+            Extension.extension.dialog.open(true);
+            Extension.extension.dialog.pushModal();
+        }
+    },
+
     _onStartClicked: function() {
         this.indicator.timer.start();
 
@@ -142,6 +151,12 @@ const IndicatorMenu = new Lang.Class({
         this._timerMenuItem = item;
         this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-menu-timer-label',
                                           y_align: Clutter.ActorAlign.CENTER });
+        this._timerLabelButton = new St.Button({ reactive: false,
+                                                 can_focus: false,
+                                                 track_hover: false,
+                                                 style_class: 'extension-pomodoro-menu-timer-label-button' });
+        this._timerLabelButton.child = this._timerLabel;
+        this._timerLabelButton.connect('clicked', Lang.bind(this, this._onTimerClicked));
 
         hbox = new St.BoxLayout();
 
@@ -157,7 +172,7 @@ const IndicatorMenu = new Lang.Class({
         this._stopAction.connect('clicked', Lang.bind(this, this._onStopClicked));
         hbox.add_actor(this._stopAction);
 
-        item.actor.add(this._timerLabel, { expand: true });
+        item.actor.add(this._timerLabelButton, { expand: true });
         item.actor.add(hbox);
 
         this.addMenuItem(item);
@@ -213,6 +228,7 @@ const IndicatorMenu = new Lang.Class({
 
             this._timerMenuItem.label.visible = !isRunning;
             this._timerLabel.visible = isRunning;
+            this._timerLabelButton.reactive = isRunning && !isPaused && timerState != Timer.State.POMODORO;
             this._startAction.visible = !isRunning;
             this._stopAction.visible = isRunning;
             this._pauseAction.visible = isRunning;
