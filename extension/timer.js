@@ -46,6 +46,7 @@ const Timer = new Lang.Class({
         this._connected = false;
 
         this._state = null;
+        this._isPaused = null;
         this._propertiesChangedId = 0;
         this._settingsChangedId = 0;
         this._shortBreakDuration = 0;
@@ -152,10 +153,16 @@ const Timer = new Lang.Class({
 
     _onPropertiesChanged: function(proxy, properties) {
         let state = proxy.State;
+        let isPaused = proxy.IsPaused;
 
         if (this._state !== state) {
             this._state = state;
             this.emit('state-changed');
+        }
+
+        if (this._isPaused !== isPaused) {
+            this._isPaused = isPaused;
+            this.emit(isPaused ? 'paused' : 'resumed');
         }
 
         this.emit('update');

@@ -47,10 +47,10 @@ const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
 
 
-const FADE_IN_TIME = 250;
+const FADE_IN_TIME = 1250;
 const FADE_IN_OPACITY = 1.0;
 
-const FADE_OUT_TIME = 250;
+const FADE_OUT_TIME = 1250;
 const FADE_OUT_OPACITY = 0.38;
 
 const IndicatorType = {
@@ -147,13 +147,13 @@ const IndicatorMenu = new Lang.Class({
         item.label.y_align = Clutter.ActorAlign.CENTER;
 
         this._timerMenuItem = item;
-        this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-menu-timer-label',
-                                          y_align: Clutter.ActorAlign.CENTER });
+        this.timerLabel = new St.Label({ style_class: 'extension-pomodoro-menu-timer-label',
+                                         y_align: Clutter.ActorAlign.CENTER });
         this._timerLabelButton = new St.Button({ reactive: false,
                                                  can_focus: false,
                                                  track_hover: false,
                                                  style_class: 'extension-pomodoro-menu-timer-label-button' });
-        this._timerLabelButton.child = this._timerLabel;
+        this._timerLabelButton.child = this.timerLabel;
         this._timerLabelButton.connect('clicked', Lang.bind(this, this._onTimerClicked));
 
         hbox = new St.BoxLayout();
@@ -224,8 +224,8 @@ const IndicatorMenu = new Lang.Class({
             this._isPaused = isPaused;
             this._timerState = timerState;
 
+            this.timerLabel.visible = isRunning;
             this._timerMenuItem.label.visible = !isRunning;
-            this._timerLabel.visible = isRunning;
             this._timerLabelButton.reactive = isRunning && !isPaused && timerState != Timer.State.POMODORO;
             this._startAction.visible = !isRunning;
             this._stopAction.visible = isRunning;
@@ -260,7 +260,7 @@ const IndicatorMenu = new Lang.Class({
             }
         }
 
-        this._timerLabel.set_text(this._formatTime(remaining));
+        this.timerLabel.set_text(this._formatTime(remaining));
     },
 
     _formatTime: function(remaining) {
@@ -724,6 +724,7 @@ const Indicator = new Lang.Class({
         this.actor.add_style_class_name('extension-pomodoro-indicator');
 
         this._arrow = PopupMenu.arrowIcon(St.Side.BOTTOM);
+        this._blinking = false;
 
         this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
         this._hbox.pack_start = true;
@@ -739,6 +740,10 @@ const Indicator = new Lang.Class({
 
         this._onSettingsChanged();
 
+        this._onBlinked();
+
+        this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
+
         this.connect('destroy', Lang.bind(this,
             function() {
                 if (this._settingsChangedId) {
@@ -746,6 +751,42 @@ const Indicator = new Lang.Class({
                     this._settingsChangedId = 0;
                 }
             }));
+    },
+
+    _onBlinked: function() {
+        this._blinking = false;
+
+        if (this.timer.isPaused()) {
+            this._blink();
+        }
+    },
+
+    _blink: function() {
+        if (!this._blinking) {
+            this._blinking = true;
+
+            let fadeOutParams = {
+                time: FADE_OUT_TIME / 1000,
+                transition: 'easeInOutQuad',
+                opacity: FADE_OUT_OPACITY * 255
+            };
+            let fadeInParams = {
+                time: FADE_IN_TIME / 1000,
+                transition: 'easeInOutQuad',
+                delay: FADE_OUT_TIME / 1000,
+                opacity: FADE_IN_OPACITY * 255,
+                onComplete: Lang.bind(this, this._onBlinked)
+            };
+
+            Tweener.addTween(this._hbox, fadeOutParams);
+            Tweener.addTween(this._hbox, fadeInParams);
+            Tweener.addTween(this.menu.timerLabel, fadeOutParams);
+            Tweener.addTween(this.menu.timerLabel, fadeInParams);
+        }
+    },
+
+    _onTimerPaused: function() {
+        this._blink();
     },
 
     _onSettingsChanged: function() {
