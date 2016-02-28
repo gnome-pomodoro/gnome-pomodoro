@@ -72,6 +72,10 @@ public class Pomodoro.Service : GLib.Object
         if (state != null) {
             this.timer.state = state;
         }
+
+        if (this.timer.is_paused) {
+            this.timer.resume ();
+        }
     }
 
     public void show_preferences (string page,
