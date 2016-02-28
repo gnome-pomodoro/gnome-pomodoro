@@ -53,8 +53,6 @@ const FADE_IN_OPACITY = 1.0;
 const FADE_OUT_TIME = 250;
 const FADE_OUT_OPACITY = 0.38;
 
-const ICON_STEPS = 360;
-
 const IndicatorType = {
     TEXT: 'text',
     TEXT_SMALL: 'text-small',
@@ -509,9 +507,8 @@ const IconIndicator = new Lang.Class({
     Name: 'PomodoroIconIndicator',
 
     _init : function(timer) {
-        this._initialized     = false;
         this._state           = Timer.State.NULL;
-        this._progress        = -1.0;
+        this._progress        = 0.0;
         this._minHPadding     = 0;
         this._natHPadding     = 0;
         this._minVPadding     = 0;
@@ -542,7 +539,6 @@ const IconIndicator = new Lang.Class({
         this._onTimerUpdate();
 
         this._state = this.timer.getState();
-        this._initialized = true;
     },
 
     _onIconStyleChanged: function(actor) {
@@ -560,48 +556,47 @@ const IconIndicator = new Lang.Class({
         let [width, height] = area.get_surface_size();
 
         let radius = 0.5 * this._iconSize - 2.0;
-        let progress = Math.max(this._progress, 0.001);
+        let progress = Math.min(Math.max(this._progress, 0), 1);
+        let isRunning = this._state != Timer.State.NULL;
+        let isBreak = (this._state == Timer.State.SHORT_BREAK ||
+                       this._state == Timer.State.LONG_BREAK);
 
         cr.translate(0.5 * width, 0.5 * height);
         cr.setOperator(Cairo.Operator.SOURCE);
         cr.setLineCap(Cairo.LineCap.ROUND);
 
-        if (this._state && this._state != Timer.State.NULL) {
-            let angle1   = - 0.5 * Math.PI;
-            let angle2   = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
-            let negative = (this._state == Timer.State.SHORT_BREAK || this._state == Timer.State.LONG_BREAK);
+        let angle1 = - 0.5 * Math.PI;
+        let angle2 = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
 
-            /* background pie */
-            if (!negative) {
-                Clutter.cairo_set_source_color(cr, this._secondaryColor);
-                cr.setLineWidth(2.1);
-
-                cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
-                cr.stroke();
-            }
-
-            /* foreground pie */
-            Clutter.cairo_set_source_color(cr, this._primaryColor);
-            if (!negative) {
-                cr.arc(0, 0, radius, angle1, angle2);
-            }
-            else {
+        /* background pie */
+        if (isBreak || !isRunning) {
+            Clutter.cairo_set_source_color(cr, this._secondaryColor);
+            if (angle2 > angle1) {
                 cr.arcNegative(0, 0, radius, angle1, angle2);
             }
-
-            cr.setOperator(Cairo.Operator.CLEAR);
-            cr.setLineWidth(3.5);
-            cr.strokePreserve();
-
-            cr.setOperator(Cairo.Operator.SOURCE);
+            else {
+                cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
+            }
             cr.setLineWidth(2.2);
             cr.stroke();
         }
         else {
             Clutter.cairo_set_source_color(cr, this._secondaryColor);
-            cr.setLineWidth(2.1);
             cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
+            cr.setLineWidth(2.2);
             cr.stroke();
+
+            if (angle2 > angle1) {
+                Clutter.cairo_set_source_color(cr, this._primaryColor);
+                cr.arc(0, 0, radius, angle1, angle2);
+                cr.setOperator(Cairo.Operator.CLEAR);
+                cr.setLineWidth(3.5);
+                cr.strokePreserve();
+
+                cr.setOperator(Cairo.Operator.SOURCE);
+                cr.setLineWidth(2.2);
+                cr.stroke();
+            }
         }
 
         cr.$dispose();
@@ -664,12 +659,8 @@ const IconIndicator = new Lang.Class({
         let state = this.timer.getState();
         let progress = this.timer.getProgress();
 
-        if (this._state != state && this._initialized) {
+        if (this._progress !== progress || this._state !== state) {
             this._state = state;
-            this._progress = -1.0;  /* force refresh */
-        }
-
-        if (this._progress != progress) {
             this._progress = progress;
             this.icon.queue_repaint();
         }
