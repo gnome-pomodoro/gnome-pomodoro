@@ -33,16 +33,6 @@
       <summary>Timer toggle key</summary>
       <description>Key to toggle the timer.</description>
     </key>
-    <key name="indicator-type" type="s">
-      <choices>
-        <choice value="text"/>
-        <choice value="text-small"/>
-        <choice value="icon"/>
-      </choices>
-      <default>"text"</default>
-      <summary>Indicator format</summary>
-      <description>The look of the indicator.</description>
-    </key>
     <key name="show-screen-notifications" type="b">
       <default>true</default>
       <summary>Screen notifications</summary>

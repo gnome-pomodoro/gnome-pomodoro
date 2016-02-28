@@ -125,25 +125,6 @@ namespace GnomePlugin
 //        }
 //    }
 
-
-//            var indicator_type_label = new Gtk.Label (_("Show indicator in top panel"));
-//            indicator_type_label.set_alignment (0.0f, 0.5f);
-//            var indicator_type_combo_box = this.create_indicator_type_combo_box ();
-
-//            var indicator_type_hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 10);
-//            indicator_type_hbox.pack_start (indicator_type_label, true, true);
-//            indicator_type_hbox.pack_start (indicator_type_combo_box, false, false);
-//            this.box.pack_start (indicator_type_hbox);
-
-//            this.settings.bind_with_mapping ("indicator-type",
-//                                             indicator_type_combo_box,
-//                                             "value",
-//                                             SETTINGS_BIND_FLAGS,
-//                                             (SettingsBindGetMappingShared) get_indicator_type_mapping,
-//                                             (SettingsBindSetMappingShared) set_indicator_type_mapping,
-//                                             null,
-//                                             null);
-
     public class PreferencesDialogExtension : Peas.ExtensionBase, Pomodoro.PreferencesDialogExtension
     {
         private Pomodoro.PreferencesDialog dialog;
