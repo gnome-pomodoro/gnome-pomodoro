@@ -141,13 +141,13 @@ const IndicatorMenu = new Lang.Class({
         item.label.y_align = Clutter.ActorAlign.CENTER;
 
         this._timerMenuItem = item;
-        this.timerLabel = new St.Label({ style_class: 'extension-pomodoro-menu-timer-label',
-                                         y_align: Clutter.ActorAlign.CENTER });
+        this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-menu-timer-label',
+                                          y_align: Clutter.ActorAlign.CENTER });
         this._timerLabelButton = new St.Button({ reactive: false,
                                                  can_focus: false,
                                                  track_hover: false,
                                                  style_class: 'extension-pomodoro-menu-timer-label-button' });
-        this._timerLabelButton.child = this.timerLabel;
+        this._timerLabelButton.child = this._timerLabel;
         this._timerLabelButton.connect('clicked', Lang.bind(this, this._onTimerClicked));
 
         hbox = new St.BoxLayout();
@@ -168,6 +168,9 @@ const IndicatorMenu = new Lang.Class({
         item.actor.add(hbox);
 
         this.addMenuItem(item);
+
+        this.timerLabel = this._timerLabel;
+        this.pauseAction = this._pauseAction;
 
         this.addStateMenuItem('pomodoro', _("Pomodoro"));
         this.addStateMenuItem('short-break', _("Short Break"));
@@ -218,8 +221,8 @@ const IndicatorMenu = new Lang.Class({
             this._isPaused = isPaused;
             this._timerState = timerState;
 
-            this.timerLabel.visible = isRunning;
             this._timerMenuItem.label.visible = !isRunning;
+            this._timerLabel.visible = isRunning;
             this._timerLabelButton.reactive = isRunning && !isPaused && timerState != Timer.State.POMODORO;
             this._startAction.visible = !isRunning;
             this._stopAction.visible = isRunning;
@@ -514,6 +517,7 @@ const Indicator = new Lang.Class({
         this._onBlinked();
 
         this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
+        this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
     },
 
     _onBlinked: function() {
@@ -545,10 +549,31 @@ const Indicator = new Lang.Class({
             Tweener.addTween(this._hbox, fadeInParams);
             Tweener.addTween(this.menu.timerLabel, fadeOutParams);
             Tweener.addTween(this.menu.timerLabel, fadeInParams);
+            Tweener.addTween(this.menu.pauseAction.child, fadeOutParams);
+            Tweener.addTween(this.menu.pauseAction.child, fadeInParams);
         }
     },
 
     _onTimerPaused: function() {
         this._blink();
+    },
+
+    _onTimerResumed: function() {
+        if (this._blinking) {
+            let fadeInParams = {
+                time: 200 / 1000,
+                transition: 'easeOutQuad',
+                opacity: FADE_IN_OPACITY * 255,
+                onComplete: Lang.bind(this, this._onBlinked)
+            };
+
+            Tweener.removeTweens(this._hbox);
+            Tweener.removeTweens(this.menu.timerLabel);
+            Tweener.removeTweens(this.menu.pauseAction.child);
+
+            Tweener.addTween(this._hbox, fadeInParams);
+            Tweener.addTween(this.menu.timerLabel, fadeInParams);
+            Tweener.addTween(this.menu.pauseAction.child, fadeInParams);
+        }
     }
 });

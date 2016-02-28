@@ -1,6 +1,6 @@
 namespace SoundsPlugin
 {
-    private const uint FADE_IN_TIME = 4000;
+    private const uint FADE_IN_TIME = 1500;
     private const uint FADE_OUT_MIN_TIME = 200;
     private const uint FADE_OUT_MAX_TIME = 10000;
 
@@ -890,7 +890,7 @@ namespace SoundsPlugin
                                                              this.on_fade_out_timeout);
             }
             else {
-                this.on_fade_out_timeout ();
+                (this.ticking_sound as Fadeable).fade_out (FADE_OUT_MIN_TIME);
             }
         }
 
