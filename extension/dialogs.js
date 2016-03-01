@@ -271,6 +271,8 @@ const ModalDialog = new Lang.Class({
     },
 
     close: function(animate) {
+        this._cancelOpenWhenIdle();
+
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             return;
         }
@@ -305,7 +307,6 @@ const ModalDialog = new Lang.Class({
             this.emit('closing');
             this.emit('closed');
         }
-
     },
 
     _onPushModalDelayTimeout: function() {
@@ -630,6 +631,7 @@ const PomodoroEndDialog = new Lang.Class({
         }
     },
 
+    // TODO: should be private
     closeWhenActive: function() {
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             return;
