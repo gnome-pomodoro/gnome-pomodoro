@@ -1,3 +1,6 @@
+SUBDIRS = \
+	extension
+
 libgnome_la_pluginexecdir = $(PLUGIN_LIB_DIR)
 libgnome_la_pluginexec_LTLIBRARIES = \
 	libgnome.la

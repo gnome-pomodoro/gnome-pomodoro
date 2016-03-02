@@ -5,7 +5,6 @@ SUBDIRS = \
 	lib \
 	src \
 	plugins \
-	extension \
 	data \
 	po \
 	man \

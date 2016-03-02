@@ -267,9 +267,6 @@ AC_CONFIG_FILES([
     vapi/Makefile
     lib/Makefile
     src/Makefile
-    extension/config.js
-    extension/metadata.json
-    extension/Makefile
     data/Makefile
     data/icons/Makefile
     data/sounds/Makefile
@@ -281,6 +278,9 @@ AC_CONFIG_FILES([
     plugins/Makefile
     plugins/builtin/Makefile
     plugins/gnome/Makefile
+    plugins/gnome/extension/config.js
+    plugins/gnome/extension/metadata.json
+    plugins/gnome/extension/Makefile
     tests/Makefile
 ])
 
