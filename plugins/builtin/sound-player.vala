@@ -583,6 +583,8 @@ namespace SoundsPlugin
             }
             else if (this.is_playing)
             {
+                // FIXME: this.is_playing should be set after fade_out, currently can't stop the fading once it starts
+
                 this.is_playing = false;
 
                 if (this.get_refs () == 0) {
