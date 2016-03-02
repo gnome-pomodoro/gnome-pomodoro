@@ -54,7 +54,6 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
     gmodule-no-export-2.0 >= $GLIB_REQUIRED
     gtk+-3.0 >= $GTK_REQUIRED
     gsettings-desktop-schemas >= $GTK_REQUIRED
-    dbus-glib-1
     gobject-introspection-1.0 >= $INTROSPECTION_REQUIRED
     libpeas-1.0 >= $LIBPEAS_REQUIRED_VERSION
 ])
@@ -155,7 +154,6 @@ GNOME_POMODORO_VALAFLAGS=" \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
-    --pkg dbus-glib-1 \
     --pkg gtk+-3.0 \
     --pkg libpeas-1.0"
 
