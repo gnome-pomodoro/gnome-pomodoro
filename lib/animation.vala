@@ -30,7 +30,8 @@ namespace Pomodoro
         EASE_OUT,
         EASE_IN_CUBIC,
         EASE_IN_OUT_CUBIC,
-        EASE_OUT_CUBIC
+        EASE_OUT_CUBIC,
+        BLINK
     }
 
     private delegate double AnimationFunc (double progress);
@@ -106,6 +107,29 @@ namespace Pomodoro
             }
         }
 
+        // TODO: it's so hackish...
+        public void start_with_value (double value_from)
+        {
+            this.value_from = value_from;
+            this.func       = Animation.get_func (mode);
+            this.timestamp  = GLib.get_real_time () / 1000;
+
+            if (this.timeout_id != 0) {
+                GLib.Source.remove (this.timeout_id);
+                this.timeout_id = 0;
+            }
+
+            if (this.duration > 0) {
+                this.timeout_id = GLib.Timeout.add (
+                                    uint.min (1000 / this.frames_per_second, this.duration),
+                                    (GLib.SourceFunc) this.on_timeout);
+                this.progress   = 0.0;
+            }
+            else {
+                this.progress   = 1.0;
+            }
+        }
+
         public void stop ()
         {
             if (this.timeout_id != 0) {
@@ -166,6 +190,9 @@ namespace Pomodoro
                 case AnimationMode.EASE_OUT_CUBIC:
                     return calculate_ease_out_cubic;
 
+                case AnimationMode.BLINK:
+                    return calculate_blink;
+
                 default:
                     return calculate_linear;
             }
@@ -215,6 +242,13 @@ namespace Pomodoro
         private static double calculate_ease_out_cubic (double t)
         {
             return ((t - 3.0) * t + 3.0) * t;
+        }
+
+        private static double calculate_blink (double t)
+        {
+            return t < 0.5
+                    ? calculate_ease_in_out (2.0 * t)
+                    : 1.0 - calculate_ease_in_out (2.0 * t - 1.0);
         }
 
         public signal void complete ();

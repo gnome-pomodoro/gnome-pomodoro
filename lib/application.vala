@@ -421,6 +421,13 @@ public class Pomodoro.Application : Gtk.Application
         if (Options.preferences) {
             this.show_preferences ();
         }
+        else {
+            var window = new Pomodoro.Window ();
+            window.application = this;
+            window.present ();
+
+            this.add_window (window);
+        }
 
         this.release ();
     }

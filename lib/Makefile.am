@@ -17,7 +17,8 @@ libgnome_pomodoro_la_VALASOURCES = \
 	symbolic-button.vala \
 	timer.vala \
 	timer-state.vala \
-	utils.vala
+	utils.vala \
+	window.vala
 
 libgnome_pomodoro_la_SOURCES = \
 	$(libgnome_pomodoro_la_VALASOURCES) \

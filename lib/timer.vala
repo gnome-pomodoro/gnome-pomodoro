@@ -96,6 +96,13 @@ public class Pomodoro.Timer : GLib.Object
     }
 
     [CCode (notify = false)]
+    public double remaining {
+        get {
+            return (this._state != null ? this._state.duration : 0.0) - this._state.elapsed;
+        }
+    }
+
+    [CCode (notify = false)]
     public bool is_paused {
         get {
             return this._is_paused;
