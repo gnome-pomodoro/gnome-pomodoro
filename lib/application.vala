@@ -34,8 +34,8 @@ public class Pomodoro.Application : Gtk.Application
     public Pomodoro.DesktopExtension desktop { get; private set; }
 
     private Pomodoro.PreferencesDialog preferences_dialog;
+    private Pomodoro.Window window;
     private Gtk.Window about_dialog;
-    private Gtk.Window plugins_dialog;
     private Peas.ExtensionSet extensions;
     private GLib.Settings settings;
 
@@ -152,6 +152,22 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
+    public void show_window ()
+    {
+        if (this.window == null) {
+            this.window = new Pomodoro.Window ();
+            this.window.application = this;
+            this.window.destroy.connect (() => {
+                this.remove_window (this.window);
+                this.window = null;
+            });
+
+            this.add_window (this.window);
+        }
+
+        this.window.present ();
+    }
+
     public void show_preferences_full (string? page,
                                        uint32  timestamp)
     {
@@ -181,6 +197,12 @@ public class Pomodoro.Application : Gtk.Application
     public void show_preferences ()
     {
         this.show_preferences_full (null, 0);
+    }
+
+    private void action_timer (SimpleAction action,
+                               Variant?     parameter)
+    {
+        this.show_window ();
     }
 
     private void action_preferences (SimpleAction action,
@@ -256,6 +278,9 @@ public class Pomodoro.Application : Gtk.Application
 
     private void setup_actions ()
     {
+        var timer_action = new GLib.SimpleAction ("timer", null);
+        timer_action.activate.connect (this.action_timer);
+
         var preferences_action = new GLib.SimpleAction ("preferences", null);
         preferences_action.activate.connect (this.action_preferences);
 
@@ -271,6 +296,7 @@ public class Pomodoro.Application : Gtk.Application
         var quit_action = new GLib.SimpleAction ("quit", null);
         quit_action.activate.connect (this.action_quit);
 
+        this.add_action (timer_action);
         this.add_action (preferences_action);
         this.add_action (visit_website_action);
         this.add_action (report_issue_action);
@@ -422,11 +448,7 @@ public class Pomodoro.Application : Gtk.Application
             this.show_preferences ();
         }
         else {
-            var window = new Pomodoro.Window ();
-            window.application = this;
-            window.present ();
-
-            this.add_window (window);
+            this.show_window ();
         }
 
         this.release ();
