@@ -28,7 +28,7 @@ namespace Pomodoro
         private static const int MIN_HEIGHT = 700;
 
         private static const double FADED_IN = 1.0;
-        private static const double FADED_OUT = 0.1;
+        private static const double FADED_OUT = 0.2;
 
         private static const double TIMER_LINE_WIDTH = 6.0;
         private static const double TIMER_RADIUS = 200.0;
@@ -166,8 +166,8 @@ namespace Pomodoro
         }
 
         [GtkCallback]
-        private bool on_disabled_frame_draw (Gtk.Widget    widget,
-                                             Cairo.Context context)
+        private bool on_stack_draw (Gtk.Widget    widget,
+                                    Cairo.Context context)
         {
             var style_context = widget.get_style_context ();
             var color         = style_context.get_color (widget.get_state_flags ());
@@ -181,7 +181,7 @@ namespace Pomodoro
             context.set_source_rgba (color.red,
                                      color.green,
                                      color.blue,
-                                     color.alpha * FADED_OUT);
+                                     color.alpha * 0.1);
             context.arc (x, y, TIMER_RADIUS, 0.0, 2 * Math.PI);
             context.stroke ();
 
@@ -189,8 +189,8 @@ namespace Pomodoro
         }
 
         [GtkCallback]
-        private bool on_enabled_frame_draw (Gtk.Widget    widget,
-                                            Cairo.Context context)
+        private bool on_timer_frame_draw (Gtk.Widget    widget,
+                                          Cairo.Context context)
         {
             var style_context = widget.get_style_context ();
             var color         = style_context.get_color (widget.get_state_flags ());
@@ -204,14 +204,6 @@ namespace Pomodoro
 
             var angle1 = - 0.5 * Math.PI;
             var angle2 = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
-
-            context.set_line_width (TIMER_LINE_WIDTH);
-            context.set_source_rgba (color.red,
-                                     color.green,
-                                     color.blue,
-                                     color.alpha * FADED_OUT);
-            context.arc (x, y, TIMER_RADIUS, 0.0, 2 * Math.PI);
-            context.stroke ();
 
             context.set_line_width (TIMER_LINE_WIDTH);
             context.set_line_cap (Cairo.LineCap.ROUND);
