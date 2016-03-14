@@ -76,6 +76,8 @@ public class Pomodoro.Service : GLib.Object
         if (this.timer.is_paused) {
             this.timer.resume ();
         }
+
+        this.timer.update ();  // TODO: perhaps timer should have "changed" signal
     }
 
     public void show_preferences (string page,

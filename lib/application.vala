@@ -39,7 +39,7 @@ public class Pomodoro.Application : Gtk.Application
     private Peas.ExtensionSet extensions;
     private GLib.Settings settings;
 
-    public string[] enabled_plugins = { "sounds" }; // TODO FIXME: remove that
+    public string[] enabled_plugins = { "notifications", "sounds" }; // TODO FIXME: remove that
 
     private enum ExitStatus
     {
@@ -199,20 +199,20 @@ public class Pomodoro.Application : Gtk.Application
         this.show_preferences_full (null, 0);
     }
 
-    private void action_timer (SimpleAction action,
-                               Variant?     parameter)
+    private void action_timer (GLib.SimpleAction action,
+                               GLib.Variant?     parameter)
     {
         this.show_window ();
     }
 
-    private void action_preferences (SimpleAction action,
-                                     Variant?     parameter)
+    private void action_preferences (GLib.SimpleAction action,
+                                     GLib.Variant?     parameter)
     {
         this.show_preferences ();
     }
 
-    private void action_visit_website (SimpleAction action,
-                                       Variant?     parameter)
+    private void action_visit_website (GLib.SimpleAction action,
+                                       GLib.Variant?     parameter)
     {
         try {
             string[] spawn_args = { "xdg-open", Config.PACKAGE_URL };
@@ -230,8 +230,8 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
-    private void action_report_issue (SimpleAction action,
-                                      Variant?     parameter)
+    private void action_report_issue (GLib.SimpleAction action,
+                                      GLib.Variant?     parameter)
     {
         try {
             string[] spawn_args = { "xdg-open", Config.PACKAGE_BUGREPORT };
@@ -249,7 +249,8 @@ public class Pomodoro.Application : Gtk.Application
         }
     }
 
-    private void action_about (SimpleAction action, Variant? parameter)
+    private void action_about (GLib.SimpleAction action,
+                               GLib.Variant?     parameter)
     {
         if (this.about_dialog == null)
         {
@@ -271,9 +272,29 @@ public class Pomodoro.Application : Gtk.Application
         this.about_dialog.present ();
     }
 
-    private void action_quit (SimpleAction action, Variant? parameter)
+    private void action_quit (SimpleAction action,
+                              Variant?     parameter)
     {
         this.quit ();
+    }
+
+    private void action_timer_skip (GLib.SimpleAction action,
+                                    GLib.Variant?     parameter)
+    {
+        this.service.skip ();
+    }
+
+    private void action_timer_set_state (GLib.SimpleAction action,
+                                         GLib.Variant?     parameter)
+    {
+        this.service.set_state (parameter.get_string (), 0.0);
+    }
+
+    private void action_timer_switch_state (GLib.SimpleAction action,
+                                            GLib.Variant? parameter)
+    {
+        this.service.set_state (parameter.get_string (),
+                                this.timer.state.timestamp);
     }
 
     private void setup_actions ()
@@ -296,12 +317,25 @@ public class Pomodoro.Application : Gtk.Application
         var quit_action = new GLib.SimpleAction ("quit", null);
         quit_action.activate.connect (this.action_quit);
 
+        var timer_skip_action = new GLib.SimpleAction ("timer-skip", null);
+        timer_skip_action.activate.connect (this.action_timer_skip);
+
+        var timer_set_state_action = new GLib.SimpleAction ("timer-set-state", GLib.VariantType.STRING);
+        timer_set_state_action.activate.connect (this.action_timer_set_state);
+
+        var timer_switch_state_action = new GLib.SimpleAction ("timer-switch-state", GLib.VariantType.STRING);
+        timer_switch_state_action.activate.connect (this.action_timer_switch_state);
+
         this.add_action (timer_action);
         this.add_action (preferences_action);
         this.add_action (visit_website_action);
         this.add_action (report_issue_action);
         this.add_action (about_action);
         this.add_action (quit_action);
+
+        this.add_action (timer_skip_action);
+        this.add_action (timer_set_state_action);
+        this.add_action (timer_switch_state_action);
     }
 
     private void setup_menu ()
