@@ -7,14 +7,11 @@ libgnome_pomodoro_la_VALASOURCES = \
 	accelerator.vala \
 	application.vala \
 	desktop-extension.vala \
-	enum-combo-box.vala \
 	log-scale.vala \
-	mode-button.vala \
 	preferences-dialog.vala \
 	presence.vala \
 	service.vala \
 	settings.vala \
-	symbolic-button.vala \
 	timer.vala \
 	timer-state.vala \
 	utils.vala \
