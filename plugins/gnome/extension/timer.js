@@ -52,36 +52,19 @@ const Timer = new Lang.Class({
         this._shortBreakDuration = 0;
         this._longBreakDuration = 0;
 
-        this._nameWatcherId = Gio.DBus.session.watch_name(
-                                       'org.gnome.Pomodoro',
-                                       Gio.BusNameWatcherFlags.AUTO_START,
-                                       Lang.bind(this, this._onNameAppeared),
-                                       Lang.bind(this, this._onNameVanished));
-
         let settings = Extension.extension.settings;
         this._settingsChangedId  = settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
         this._shortBreakDuration = settings.get_double('short-break-duration');
         this._longBreakDuration  = settings.get_double('long-break-duration');
 
-        // if (this._isRunning()) {
         this._ensureProxy();
-        // }
-    },
 
-    //_isRunning: function() {
-    //    let settings;
-    //    let state;
-    //
-    //    try {
-    //        settings = Settings.getSettings('org.gnome.pomodoro.state');
-    //        state = settings.get_string('state');
-    //    }
-    //    catch (error) {
-    //        Utils.logWarning(error.message);
-    //    }
-    //
-    //    return state && state != State.NULL;
-    //},
+        this._nameWatcherId = Gio.DBus.session.watch_name(
+                                       'org.gnome.Pomodoro',
+                                       Gio.BusNameWatcherFlags.AUTO_START,
+                                       Lang.bind(this, this._onNameAppeared),
+                                       Lang.bind(this, this._onNameVanished));
+    },
 
     _onSettingsChanged: function(settings, key) {
         switch (key) {
@@ -172,10 +155,6 @@ const Timer = new Lang.Class({
         if (error) {
             Utils.logWarning(error.message);
 
-            /* timer toggle assumes success right away, so we need to
-               straighten it out */
-            this.emit('state-changed');
-
             if (error.matches(Gio.DBusError, Gio.DBusError.SERVICE_UNKNOWN)) {
                 this._notifyServiceNotInstalled();
             }
@@ -191,12 +170,9 @@ const Timer = new Lang.Class({
     },
 
     setState: function(state, duration) {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.SetStateRemote(state,
-                                           duration || 0,
-                                           Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.SetStateRemote(state,
+                                   duration || 0,
+                                   Lang.bind(this, this._onCallback));
     },
 
     getStateDuration: function() {
@@ -224,42 +200,27 @@ const Timer = new Lang.Class({
     },
 
     isPaused: function() {
-        return this._proxy.IsPaused;
+        return this._isPaused;
     },
 
     start: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.StartRemote(Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.StartRemote(Lang.bind(this, this._onCallback));
     },
 
     stop: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.StopRemote(Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.StopRemote(Lang.bind(this, this._onCallback));
     },
 
     pause: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.PauseRemote(Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.PauseRemote(Lang.bind(this, this._onCallback));
     },
 
     resume: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.ResumeRemote(Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.ResumeRemote(Lang.bind(this, this._onCallback));
     },
 
     reset: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.ResetRemote(Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.ResetRemote(Lang.bind(this, this._onCallback));
     },
 
     toggle: function() {
@@ -295,17 +256,11 @@ const Timer = new Lang.Class({
     },
 
     showMainWindow: function(timestamp) {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.ShowMainWindowRemote(timestamp, Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.ShowMainWindowRemote(timestamp, Lang.bind(this, this._onCallback));
     },
 
     showPreferences: function(view, timestamp) {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.ShowPreferencesRemote(view, timestamp, Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.ShowPreferencesRemote(view, timestamp, Lang.bind(this, this._onCallback));
     },
 
     _notifyServiceNotInstalled: function() {
