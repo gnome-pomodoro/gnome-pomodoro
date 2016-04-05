@@ -200,7 +200,7 @@ const Timer = new Lang.Class({
     },
 
     isPaused: function() {
-        return this._isPaused;
+        return this._connected && this._proxy.IsPaused;
     },
 
     start: function() {
