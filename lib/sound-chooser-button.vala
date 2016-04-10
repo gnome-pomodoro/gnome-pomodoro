@@ -98,7 +98,7 @@ public class Pomodoro.Widgets.SoundChooserButton : Gtk.Box
         }
     }
 
-    public bool focus_on_click {
+    public new bool focus_on_click {
         get {
             return this.combo_box.focus_on_click;
         }
