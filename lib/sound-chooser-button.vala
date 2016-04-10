@@ -98,17 +98,6 @@ public class Pomodoro.Widgets.SoundChooserButton : Gtk.Box
         }
     }
 
-    public new bool focus_on_click {
-        get {
-            return this.combo_box.focus_on_click;
-        }
-        set {
-            if (this.combo_box.focus_on_click != value) {
-                this.combo_box.focus_on_click = value;
-            }
-        }
-    }
-
     public bool has_volume_button { get; set; default=false; }
 
     public Gtk.ComboBox combo_box;
