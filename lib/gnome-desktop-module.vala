@@ -133,7 +133,7 @@ public class Pomodoro.GnomeDesktopModule : Pomodoro.Module
         this.timer = timer;
     }
 
-    public static bool can_enable () {
+    public new static bool can_enable () {
         var desktop_session = GLib.Environment.get_variable
                                        (DESKTOP_SESSION_ENV_VARIABLE);
 
