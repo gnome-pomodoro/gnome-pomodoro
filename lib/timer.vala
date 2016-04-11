@@ -310,7 +310,6 @@ public class Pomodoro.Timer : Object
         var state_tmp = this._state;
         var state_duration_tmp = this.state_duration;
         var elapsed_tmp = this.elapsed;
-        var session_tmp = this.session;
 
         var changed = this.do_set_state_full (state, duration, timestamp);
 

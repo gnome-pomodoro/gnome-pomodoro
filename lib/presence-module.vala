@@ -137,7 +137,7 @@ public class Pomodoro.PresenceModule : Pomodoro.Module
             {
                 var status = presence_plugin.get_default_status (Pomodoro.State.NULL);
 
-                presence_plugin.set_status (status);
+                presence_plugin.set_status.begin (status);
             }
 
             plugin.disable ();

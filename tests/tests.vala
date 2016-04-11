@@ -198,8 +198,6 @@ class Pomodoro.TestRunner : Object
         this.setup_settings ();
     }
 
-    private bool is_setup = false;
-
     public virtual void global_teardown ()
     {
         if (this.tmp_dir != null) {
