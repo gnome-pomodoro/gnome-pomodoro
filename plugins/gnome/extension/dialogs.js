@@ -54,6 +54,7 @@ const ngettext = Gettext.ngettext;
 const IDLE_TIME_TO_PUSH_MODAL = 600;
 const PUSH_MODAL_TIME_LIMIT = 1000;
 const PUSH_MODAL_RATE = Clutter.get_default_frame_rate();
+const MOTION_THRESHOLD_TO_CLOSE = 20;
 
 const IDLE_TIME_TO_OPEN = 60000;
 const IDLE_TIME_TO_CLOSE = 600;
@@ -336,7 +337,7 @@ const ModalDialog = new Lang.Class({
 
         return this._grabHelper.grab({
             actor: this._lightbox.actor,
-            focus: this.actor,
+            focus: this._lightbox.actor,
             onUngrab: Lang.bind(this, this._onUngrab)
         });
     },
@@ -370,7 +371,9 @@ const ModalDialog = new Lang.Class({
 
         this._disconnectSignals();
 
-        this._grabHelper.ignoreRelease();
+        this._lightbox.actor.reactive = true;
+
+        // this._grabHelper.ignoreRelease();
 
         /* delay pushModal to ignore current events */
         Mainloop.idle_add(Lang.bind(this,
@@ -464,9 +467,9 @@ const PomodoroEndDialog = new Lang.Class({
         this._openWhenIdleWatchId        = 0;
         this._closeWhenActiveDelaySource = 0;
         this._closeWhenActiveIdleWatchId = 0;
-        this._closeWhenActiveWatchId     = 0;
         this._actorMappedId              = 0;
         this._timerUpdateId              = 0;
+        this._eventId                    = 0;
 
         this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-timer' });
 
@@ -563,6 +566,39 @@ const PomodoroEndDialog = new Lang.Class({
         }
     },
 
+    _onEvent: function(actor, event) {
+        let type = event.type();
+        let [x, y] = event.get_coords();
+
+        if (type == Clutter.EventType.MOTION) {
+            if (this._eventX >= 0 && this._eventY >= 0) {
+                let distance = Math.sqrt((x - this._eventX) * (x - this._eventX) +
+                                         (y - this._eventY) * (y - this._eventY));
+
+                if (distance > MOTION_THRESHOLD_TO_CLOSE) {
+                    this.close(true);
+                }
+            }
+
+            this._eventX = x;
+            this._eventY = y;
+
+            return Clutter.EVENT_STOP;
+        }
+
+        if (type == Clutter.EventType.LEAVE || Clutter.EventType.KEY_PRESS || Clutter.EventType.BUTTON_PRESS || Clutter.EventType.TOUCH_BEGIN) {
+            this.close(true);
+
+            return Clutter.EVENT_STOP;
+        }
+
+        if (type == Clutter.EventType.ENTER) {
+            return Clutter.EVENT_PROPAGATE;
+        }
+
+        return Clutter.EVENT_STOP;
+    },
+
     /**
      * Open the dialog and setup closing when user becomes active.
      */
@@ -625,9 +661,9 @@ const PomodoroEndDialog = new Lang.Class({
     },
 
     _cancelCloseWhenActive: function() {
-        if (this._closeWhenActiveWatchId) {
-            this._idleMonitor.remove_watch(this._closeWhenActiveWatchId);
-            this._closeWhenActiveWatchId = 0;
+        if (this._eventId) {
+            this._lightbox.actor.disconnect(this._eventId);
+            this._eventId = 0;
         }
     },
 
@@ -637,12 +673,10 @@ const PomodoroEndDialog = new Lang.Class({
             return;
         }
 
-        if (this._closeWhenActiveWatchId == 0) {
-            this._closeWhenActiveWatchId = this._idleMonitor.add_user_active_watch(Lang.bind(this,
-                function(monitor) {
-                    this.close(true);
-                }
-            ));
+        if (this._eventId == 0) {
+            this._eventX = -1;
+            this._eventY = -1;
+            this._eventId = this._lightbox.actor.connect('event', Lang.bind(this, this._onEvent));
         }
     },
 
