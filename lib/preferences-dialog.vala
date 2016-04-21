@@ -587,8 +587,6 @@ namespace Pomodoro
                                                                      as Gtk.SpinButton;
             var accelerator_label = builder.get_object ("accelerator_label")
                                                         as Gtk.Label;
-            var ticking_sound_label = builder.get_object ("ticking_sound_label")
-                                                          as Gtk.Label;
 
             this.settings.bind ("pomodoro-duration",
                                 pomodoro_scale.base_adjustment,
@@ -609,12 +607,8 @@ namespace Pomodoro
 
             this.accelerator = new Pomodoro.Accelerator ();
             this.accelerator.changed.connect(() => {
-                if (this.accelerator.display_name != "") {
-                    accelerator_label.label = this.accelerator.display_name;
-                }
-                else {
-                    accelerator_label.label = _("Off");
-                }
+                accelerator_label.label = this.accelerator.display_name != ""
+                        ? this.accelerator.display_name : _("Off");
             });
             this.settings.bind_with_mapping ("toggle-timer-key",
                                              this.accelerator,
@@ -628,36 +622,21 @@ namespace Pomodoro
 
         private void setup_notifications_section (Gtk.Builder builder)
         {
-            var screen_notifications_toggle = builder.get_object ("screen_notifications_toggle")
-                                              as Gtk.Switch;
-
-            var reminders_toggle = builder.get_object ("reminders_toggle") as Gtk.Switch;
-
-            var pomodoro_end_sound_label = builder.get_object ("pomodoro_end_sound_label")
-                                                               as Gtk.Label;
-            var pomodoro_start_sound_label = builder.get_object ("pomodoro_start_sound_label")
-                                                                 as Gtk.Label;
-
             this.settings.bind ("show-screen-notifications",
-                                screen_notifications_toggle,
+                                builder.get_object ("screen_notifications_toggle"),
                                 "active",
                                 SETTINGS_BIND_FLAGS);
 
             this.settings.bind ("show-reminders",
-                                reminders_toggle,
+                                builder.get_object ("reminders_toggle"),
                                 "active",
                                 SETTINGS_BIND_FLAGS);
         }
 
         private void setup_other_section (Gtk.Builder builder)
         {
-            var pomodoro_presence_label = builder.get_object ("pomodoro_presence_label")
-                                                              as Gtk.Label;
-            var break_presence_label = builder.get_object ("break_presence_label")
-                                                           as Gtk.Label;
-
             this.settings.bind_with_mapping ("presence-during-pomodoro",
-                                             pomodoro_presence_label,
+                                             builder.get_object ("pomodoro_presence_label"),
                                              "label",
                                              GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET,
                                              (GLib.SettingsBindGetMappingShared) get_presence_status_label_mapping,
@@ -666,7 +645,7 @@ namespace Pomodoro
                                              null);
 
             this.settings.bind_with_mapping ("presence-during-break",
-                                             break_presence_label,
+                                             builder.get_object ("break_presence_label"),
                                              "label",
                                              GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET,
                                              (GLib.SettingsBindGetMappingShared) get_presence_status_label_mapping,

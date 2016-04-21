@@ -73,8 +73,6 @@ const PomodoroExtension = new Lang.Class({
 
             this.timer = new Timer.Timer();
 
-            this.dbus = new DBus.PomodoroExtension();
-
             this.timer.connect('service-connected', Lang.bind(this, this._onServiceConnected));
             this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
             this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
@@ -475,7 +473,6 @@ const PomodoroExtension = new Lang.Class({
             this.notificationSource.destroy();
         }
 
-        this.dbus.destroy();
         this.timer.destroy();
 
         this.settings.run_dispose();

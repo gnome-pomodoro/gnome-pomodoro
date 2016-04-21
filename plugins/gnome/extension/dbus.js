@@ -46,62 +46,8 @@ const PomodoroInterface = '<node> \
 </interface> \
 </node>';
 
-const PomodoroExtensionInterface = '<node> \
-<interface name="org.gnome.Pomodoro.Extension"> \
-<method name="GetCapabilities"> \
-    <arg type="a{sv}" direction="out"/> \
-</method> \
-</interface> \
-</node>';
-
 
 var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
 function Pomodoro(callback, cancellable) {
     return new PomodoroProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', callback, cancellable);
 }
-
-
-const PomodoroExtension = new Lang.Class({
-    Name: 'PomodoroExtensionDBus',
-
-    _init: function() {
-        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(PomodoroExtensionInterface, this);
-        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Pomodoro/Extension');
-
-        this._dbusId = Gio.DBus.session.own_name('org.gnome.Pomodoro.Extension',
-                                                 Gio.BusNameOwnerFlags.ALLOW_REPLACEMENT,
-                                                 null,
-                                                 null);
-    },
-
-    GetCapabilities: function() {
-        let capabilities = {};
-
-        let out = {};
-        for (let key in capabilities) {
-            let val = capabilities[key];
-            let type;
-            switch (typeof val) {
-                case 'string':
-                    type = 's';
-                    break;
-                case 'number':
-                    type = 'd';
-                    break;
-                case 'boolean':
-                    type = 'b';
-                    break;
-                default:
-                    continue;
-            }
-            out[key] = GLib.Variant.new(type, val);
-        }
-
-        return out;
-    },
-
-    destroy: function() {
-        this._dbusImpl.unexport();
-        Gio.DBus.session.unown_name(this._dbusId);
-    }
-});

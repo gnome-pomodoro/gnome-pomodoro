@@ -8,6 +8,7 @@
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences-plugins-page.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences-presence-page.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences-sound-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/screen-notification.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/window.ui</file>
     <file>ui/style.css</file>
   </gresource>

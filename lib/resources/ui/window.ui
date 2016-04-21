@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.19.0 -->
 <interface>
-  <requires lib="gtk+" version="3.16"/>
+  <requires lib="gtk+" version="3.18"/>
   <!-- interface-css-provider-path style.css -->
   <template class="PomodoroWindow" parent="GtkApplicationWindow">
     <property name="can_focus">False</property>
@@ -22,12 +22,15 @@
             <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
-              <object class="GtkLabel" id="label2">
+              <object class="GtkToggleButton">
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
+                <property name="receives_default">False</property>
                 <property name="halign">center</property>
+                <property name="relief">none</property>
                 <style>
-                  <class name="pomodoro-state-label"/>
+                  <class name="pomodoro-button"/>
                 </style>
               </object>
               <packing>
@@ -40,6 +43,7 @@
               <object class="GtkBox" id="box2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="opacity">0.10000000000000001</property>
                 <property name="halign">center</property>
                 <child>
                   <object class="GtkLabel" id="label3">
@@ -156,12 +160,14 @@
                 <property name="orientation">vertical</property>
                 <property name="spacing">6</property>
                 <child>
-                  <object class="GtkLabel" id="state_label">
+                  <object class="GtkToggleButton" id="state_togglebutton">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
                     <property name="halign">center</property>
+                    <property name="relief">none</property>
                     <style>
-                      <class name="pomodoro-state-label"/>
+                      <class name="pomodoro-button"/>
                     </style>
                   </object>
                   <packing>
@@ -319,4 +325,93 @@
       </object>
     </child>
   </template>
+  <object class="GtkPopoverMenu" id="state_popover">
+    <property name="can_focus">False</property>
+    <property name="relative_to">state_togglebutton</property>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
+        <property name="margin_top">10</property>
+        <property name="margin_bottom">10</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkModelButton">
+            <property name="name">pomodoro</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="text" translatable="yes">Pomodoro</property>
+            <property name="centered">True</property>
+            <signal name="clicked" handler="on_state_button_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton">
+            <property name="name">short-break</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="text" translatable="yes">Short Break</property>
+            <property name="centered">True</property>
+            <signal name="clicked" handler="on_state_button_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkModelButton">
+            <property name="name">long-break</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="text" translatable="yes">Long Break</property>
+            <property name="centered">True</property>
+            <signal name="clicked" handler="on_state_button_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="submenu">main</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+  </object>
+  <object class="GtkListStore" id="timer_state_liststore">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name display_name -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0">pomodoro</col>
+        <col id="1" translatable="yes">Pomodoro</col>
+      </row>
+      <row>
+        <col id="0">short-break</col>
+        <col id="1" translatable="yes">Short Break</col>
+      </row>
+      <row>
+        <col id="0">long-break</col>
+        <col id="1" translatable="yes">Long Break</col>
+      </row>
+    </data>
+  </object>
 </interface>

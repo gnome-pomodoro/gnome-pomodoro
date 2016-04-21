@@ -6,10 +6,13 @@ libgnome_pomodoro_la_VALASOURCES = \
 	about-dialog.vala \
 	accelerator.vala \
 	application.vala \
+	capability.vala \
+	capability-group.vala \
 	desktop-extension.vala \
 	log-scale.vala \
 	preferences-dialog.vala \
 	presence.vala \
+	screen-notification.vala \
 	service.vala \
 	settings.vala \
 	timer.vala \

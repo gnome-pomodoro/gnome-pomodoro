@@ -271,14 +271,19 @@ public static int main (string[] args)
     Gtk.init (ref args);
     Test.init (ref args);
 
-	var test_runner = new Pomodoro.TestRunner ();
-	test_runner.add (new Pomodoro.TimerTest ());
+    var tests = new Pomodoro.TestRunner ();
+    tests.add (new Pomodoro.ApplicationTest ());
+    tests.add (new Pomodoro.TimerTest ());
+    tests.add (new Pomodoro.CapabilityTest ());
+    tests.add (new Pomodoro.VirtualCapabilityTest ());
+    tests.add (new Pomodoro.CapabilityGroupTest ());
 
     var exit_status = 0;
 
     GLib.Idle.add (() => {
-        exit_status = test_runner.run ();
+        exit_status = tests.run ();
         Gtk.main_quit ();
+
         return false;
     });
 

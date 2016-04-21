@@ -31,7 +31,7 @@ public class Pomodoro.Application : Gtk.Application
 {
     public Pomodoro.Service service;
     public Pomodoro.Timer timer;
-    public Pomodoro.DesktopExtension desktop { get; private set; }
+    public Pomodoro.BaseDesktopExtension desktop { get; private set; }
 
     private Pomodoro.PreferencesDialog preferences_dialog;
     private Pomodoro.Window window;
@@ -39,7 +39,7 @@ public class Pomodoro.Application : Gtk.Application
     private Peas.ExtensionSet extensions;
     private GLib.Settings settings;
 
-    public string[] enabled_plugins = { "notifications", "sounds" }; // TODO FIXME: remove that
+    public string[] enabled_plugins = { "sounds" }; // TODO FIXME: remove that
 
     private enum ExitStatus
     {
@@ -123,19 +123,18 @@ public class Pomodoro.Application : Gtk.Application
             }
         }
 
-        /* Application plugins */
         this.extensions = new Peas.ExtensionSet (engine, typeof (Pomodoro.ApplicationExtension));
 
-        /* Desktop plugin */
-        this.setup_desktop_plugin ();
+        /* desktop plugin is initialized during startup() */
     }
 
     private void setup_desktop_plugin ()
     {
-        var engine          = Peas.Engine.get_default ();
-        // TODO: Move out to desktop-extension.vala
         var desktop_session = GLib.Environment.get_variable (Pomodoro.DESKTOP_SESSION_VARIABLE);
+        var engine          = Peas.Engine.get_default ();
         var plugin_info     = engine.get_plugin_info (desktop_session);
+
+        GLib.debug ("Looking for \"%s\" plugin", desktop_session);
 
         if (plugin_info != null) {
             if (!plugin_info.is_loaded ()) {
@@ -144,12 +143,15 @@ public class Pomodoro.Application : Gtk.Application
 
             this.desktop = engine.create_extension (plugin_info,
                                                     typeof (Pomodoro.DesktopExtension))
-                                                    as Pomodoro.DesktopExtension;
-            this.desktop.presence_changed.connect (this.on_desktop_presence_changed);
+                                                    as Pomodoro.BaseDesktopExtension;
         }
         else {
-            // TODO: fallback
+            this.desktop = new Pomodoro.FallbackDesktopExtension ();
         }
+
+        this.desktop.configure.begin ();
+
+        this.desktop.notify["presence-status"].connect (this.on_desktop_presence_status_notify);
     }
 
     public void show_window ()
@@ -363,7 +365,8 @@ public class Pomodoro.Application : Gtk.Application
         return true;
     }
 
-    /* Emitted on the primary instance immediately after registration.
+    /**
+     * Emitted on the primary instance immediately after registration.
      */
     public override void startup ()
     {
@@ -372,9 +375,10 @@ public class Pomodoro.Application : Gtk.Application
         base.startup ();
 
         this.setup_resources ();
-        this.setup_plugins ();
         this.setup_actions ();
         this.setup_menu ();
+        this.setup_plugins ();
+        this.setup_desktop_plugin ();
 
         this.restore_timer ();
 
@@ -465,6 +469,10 @@ public class Pomodoro.Application : Gtk.Application
     public override void shutdown ()
     {
         base.shutdown ();
+
+        if (this.desktop != null) {
+            this.desktop = null;
+        }
     }
 
     /* Emitted on the primary instance when an activation occurs.
@@ -498,12 +506,13 @@ public class Pomodoro.Application : Gtk.Application
         if (this.timer == null) {
             this.timer = Pomodoro.Timer.get_default ();
             this.timer.state_changed.connect (this.on_timer_state_changed);
+            this.timer.notify["state"].connect (this.on_timer_state_notify);
         }
 
         if (this.settings == null) {
             this.settings = Pomodoro.get_settings ()
                                     .get_child ("preferences");
-            this.settings.changed.connect (this.on_settings_changed);
+            this.settings.changed.connect (this.on_settings_changed); // TODO: should be postponed until desktop extension is ready, or settings should work in delayed mode
         }
 
         if (this.service == null) {
@@ -577,6 +586,11 @@ public class Pomodoro.Application : Gtk.Application
                     state_duration = settings.get_double (key);
                 }
                 break;
+
+            case "show-screen-notifications":
+                this.desktop.get_capabilities ().set_enabled ("screen-notifications",
+                                                              this.settings.get_boolean (key));
+                break;
         }
 
         if (state_duration != this.timer.state_duration)
@@ -596,24 +610,31 @@ public class Pomodoro.Application : Gtk.Application
             previous_state is Pomodoro.BreakState &&
             state is Pomodoro.PomodoroState)
         {
-            this.desktop.set_presence_status (Pomodoro.PresenceStatus.IDLE);
+            this.desktop.presence_status = Pomodoro.PresenceStatus.IDLE;
         }
 
         this.save_timer ();
     }
 
+    private void on_timer_state_notify ()
+    {
+        if (this.timer.is_paused) {
+            this.timer.resume ();
+        }
+    }
+
     /**
      * Pause timer when idle.
      */
-    private void on_desktop_presence_changed ()
+    private void on_desktop_presence_status_notify ()
     {
-        GLib.message ("on_desktop_presence_changed %s", presence_status_to_string (this.desktop.get_presence_status ()));
+        GLib.debug ("on_desktop_presence_status_notify %s", presence_status_to_string (this.desktop.presence_status));
 
-        if (this.desktop.get_presence_status () == Pomodoro.PresenceStatus.IDLE) {
-            timer.pause ();
+        if (this.desktop.presence_status == Pomodoro.PresenceStatus.IDLE) {
+            this.timer.pause ();
         }
         else {
-            timer.resume ();
+            this.timer.resume ();
         }
     }
 }

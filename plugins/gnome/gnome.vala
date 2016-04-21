@@ -18,7 +18,37 @@ namespace Gnome
         /* Used as an error state for operations on unknown extensions,
          * should never be in a real extensionMeta object.
          */
-        UNINSTALLED = 99
+        UNINSTALLED = 99;
+
+        public string to_string ()
+        {
+            switch (this)
+            {
+                case ENABLED:
+                    return "enabled";
+
+                case DISABLED:
+                    return "disabled";
+
+                case ERROR:
+                    return "error";
+
+                case OUT_OF_DATE:
+                    return "out-of-date";
+
+                case DOWNLOADING:
+                    return "downloading";
+
+                case INITIALIZED:
+                    return "initialized";
+
+                case UNINSTALLED:
+                    return "uninstalled";
+
+                default:
+                    assert_not_reached ();
+            }
+        }
     }
 
     public struct ExtensionInfo

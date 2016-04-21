@@ -71,8 +71,8 @@ namespace Pomodoro
 //            this.add_test ("state_duration_change",
 //                           this.test_state_duration_change);
 
-            this.add_test ("restore",
-                           this.test_restore);
+//            this.add_test ("restore",
+//                           this.test_restore);
 
 //            this.add_test ("state_changed_signal",
 //                           this.test_state_changed_signal);

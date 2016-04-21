@@ -58,7 +58,7 @@ namespace Pomodoro
         [GtkChild]
         private Gtk.Stack stack;
         [GtkChild]
-        private Gtk.Label state_label;
+        private Gtk.ToggleButton state_togglebutton;
         [GtkChild]
         private Gtk.Label minutes_label;
         [GtkChild]
@@ -96,6 +96,12 @@ namespace Pomodoro
 
             base.parser_finished (builder);
 
+            var state_togglebutton = builder.get_object ("state_togglebutton");
+            state_togglebutton.bind_property ("active",
+                                              builder.get_object ("state_popover"),
+                                              "visible",
+                                              GLib.BindingFlags.BIDIRECTIONAL);
+
             this.timer.notify["state"].connect_after (this.on_timer_state_notify);
             this.timer.notify["elapsed"].connect_after (this.on_timer_elapsed_notify);
             this.timer.notify["is-paused"].connect_after (this.on_timer_is_paused_notify);
@@ -116,7 +122,7 @@ namespace Pomodoro
             foreach (var mapping in state_names)
             {
                 if (mapping.name == this.timer.state.name) {
-                    this.state_label.label = mapping.display_name;
+                    this.state_togglebutton.label = mapping.display_name;
                 }
             }
         }
@@ -192,29 +198,45 @@ namespace Pomodoro
         private bool on_timer_frame_draw (Gtk.Widget    widget,
                                           Cairo.Context context)
         {
-            var style_context = widget.get_style_context ();
-            var color         = style_context.get_color (widget.get_state_flags ());
+            if (!(this.timer.state is Pomodoro.DisabledState))
+            {
+                var style_context = widget.get_style_context ();
+                var color         = style_context.get_color (widget.get_state_flags ());
 
-            var width  = widget.get_allocated_width ();
-            var height = widget.get_allocated_height ();
-            var x      = 0.5 * width;
-            var y      = 0.5 * height;
-            var progress = this.timer.state_duration > 0.0
-                    ? this.timer.elapsed / this.timer.state_duration : 0.0;
+                var width  = widget.get_allocated_width ();
+                var height = widget.get_allocated_height ();
+                var x      = 0.5 * width;
+                var y      = 0.5 * height;
+                var progress = this.timer.state_duration > 0.0
+                        ? this.timer.elapsed / this.timer.state_duration : 0.0;
 
-            var angle1 = - 0.5 * Math.PI;
-            var angle2 = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
+                var angle1 = - 0.5 * Math.PI;
+                var angle2 = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
 
-            context.set_line_width (TIMER_LINE_WIDTH);
-            context.set_line_cap (Cairo.LineCap.ROUND);
-            context.set_source_rgba (color.red,
-                                     color.green,
-                                     color.blue,
-                                     color.alpha * (FADED_IN - FADED_OUT));
-            context.arc (x, y, TIMER_RADIUS, angle1, angle2);
-            context.stroke ();
+                context.set_line_width (TIMER_LINE_WIDTH);
+                context.set_line_cap (Cairo.LineCap.ROUND);
+                context.set_source_rgba (color.red,
+                                         color.green,
+                                         color.blue,
+                                         color.alpha * (FADED_IN - FADED_OUT));
+                context.arc (x, y, TIMER_RADIUS, angle1, angle2);
+                context.stroke ();
+            }
 
             return false;
+        }
+
+        [GtkCallback]
+        private void on_state_button_clicked (Gtk.Button button)
+        {
+            var timer_state = Pomodoro.TimerState.lookup (button.name);
+
+            if (timer_state != null) {
+                this.timer.state = timer_state;
+            }
+            else {
+                GLib.critical ("Unknown timer state \"%s\"", button.name);
+            }
         }
 
         private void on_start_activate (GLib.SimpleAction action,

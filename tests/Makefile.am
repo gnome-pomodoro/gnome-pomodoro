@@ -8,7 +8,10 @@ noinst_PROGRAMS = \
 tests_SOURCES = \
 	tests.vala \
 	test-application.vala \
+	test-capability.vala \
+	test-capability-group.vala \
 	test-timer.vala \
+	test-virtual-capability.vala \
 	../lib/gnome-pomodoro.vapi
 
 

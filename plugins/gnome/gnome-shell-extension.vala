@@ -38,7 +38,7 @@ namespace GnomePlugin
             {
                 var new_state = (Gnome.ExtensionState) state;
 
-                GLib.debug ("Extension changed state to %d", new_state);
+                GLib.debug ("Extension %s changed state to %s", uuid, new_state.to_string ());
 
                 this.state = new_state;
 
@@ -54,8 +54,8 @@ namespace GnomePlugin
         private Gnome.ExtensionInfo? get_info ()
         {
             var info = Gnome.ExtensionInfo ();
-            
-            HashTable<string,Variant> tmp;
+
+            GLib.HashTable<string,Variant> tmp;
 
             try {
                 this.shell_extensions_proxy.get_extension_info (this.uuid, out tmp);
@@ -137,16 +137,12 @@ namespace GnomePlugin
 
         private async void connect_shell ()
         {
-            var shell_proxy_flags = GLib.DBusProxyFlags.DO_NOT_LOAD_PROPERTIES
-                                           | GLib.DBusProxyFlags.DO_NOT_CONNECT_SIGNALS
-                                           | GLib.DBusProxyFlags.DO_NOT_AUTO_START;
-
             if (this.shell_proxy == null)
             {
                 GLib.Bus.get_proxy.begin<Gnome.Shell> (GLib.BusType.SESSION,
                                                        "org.gnome.Shell",
                                                        "/org/gnome/Shell",
-                                                       shell_proxy_flags,
+                                                       GLib.DBusProxyFlags.DO_NOT_AUTO_START,
                                                        null,
                                                        (obj, res) =>
                     {
@@ -172,7 +168,7 @@ namespace GnomePlugin
                 GLib.Bus.get_proxy.begin<Gnome.ShellExtensions> (GLib.BusType.SESSION,
                                                                  "org.gnome.Shell",
                                                                  "/org/gnome/Shell",
-                                                                 shell_proxy_flags,
+                                                                 GLib.DBusProxyFlags.DO_NOT_AUTO_START,
                                                                  null,
                                                                  (obj, res) =>
                     {
@@ -180,8 +176,7 @@ namespace GnomePlugin
                         {
                             this.shell_extensions_proxy = GLib.Bus.get_proxy.end (res);
 
-                            this.shell_extensions_proxy.extension_status_changed.connect (
-                                    this.on_status_changed);
+                            this.shell_extensions_proxy.extension_status_changed.connect (this.on_status_changed);
                         }
                         catch (GLib.IOError error)
                         {
@@ -208,21 +203,6 @@ namespace GnomePlugin
             this.enable_timeout_id = 0;
 
             return false;
-        }
-
-        private async void wait_enabled ()
-        {
-            var callback_id = this.shell_extensions_proxy.extension_status_changed.connect (
-                (uuid, state, error) => {
-                    if (uuid == this.uuid && state == Gnome.ExtensionState.ENABLED)
-                    {
-                        this.wait_enabled.callback ();
-                    }
-                });
-
-            yield;
-
-            this.shell_extensions_proxy.disconnect (callback_id);
         }
 
         public async bool enable ()
@@ -293,7 +273,7 @@ namespace GnomePlugin
                 }
                 else
                 {
-                    GLib.debug ("Extension state = %d", info.state);
+                    GLib.debug ("Extension state = %s", info.state.to_string ());
 
                     var is_boundled = (info.uuid == this.uuid &&
                                        info.path == Config.EXTENSION_DIR &&
@@ -320,12 +300,6 @@ namespace GnomePlugin
                     this.state   = info.state;
                     this.path    = info.path;
                     this.version = info.version;
-
-                    // TODO FIXME
-                    //if (info.state != Gnome.ExtensionState.ENABLED)
-                    //{
-                    //    yield this.wait_enabled ();
-                    //}
 
                     if (info.state == Gnome.ExtensionState.ENABLED)
                     {
@@ -453,25 +427,6 @@ namespace GnomePlugin
                             .send_notification ("extension", notification);
         }
 
-//        private void notify_disabled ()
-//        {
-//            GLib.return_if_fail (this.state == Gnome.ExtensionState.DISABLED);
-//
-//            var notification = new GLib.Notification (_("Pomodoro extension is disabled"));
-//            notification.set_body (_("Extension provides better desktop integration for the pomodoro app."));
-//            notification.add_button (_("Enable"), "app.enable-extension");
-//
-//            try {
-//                notification.set_icon (GLib.Icon.new_for_string (Config.PACKAGE_NAME));
-//            }
-//            catch (GLib.Error error) {
-//                GLib.warning (error.message);
-//            }
-//
-//            GLib.Application.get_default ()
-//                            .send_notification ("extension", notification);
-//        }
-
         public virtual signal void enabled ()
         {
             this.is_enabled = true;
@@ -490,10 +445,6 @@ namespace GnomePlugin
                 case Gnome.ExtensionState.UNINSTALLED:
                     this.notify_uninstalled ();
                     break;
-
-                //case Gnome.ExtensionState.DISABLED:
-                //    this.notify_disabled ();
-                //    break;
 
                 case Gnome.ExtensionState.OUT_OF_DATE:
                     this.notify_out_of_date ();
