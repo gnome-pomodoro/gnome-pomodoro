@@ -70,45 +70,6 @@
     font-weight: bold;
 }
 
-.extension-pomodoro-task-list {
-    max-height: 400px;
-}
-
-.extension-pomodoro-task-list-item:selected .extension-pomodoro-task-list-item-name {
-    font-weight: bold;
-}
-
-.extension-pomodoro-task-entry {
-    font-size: 12pt;
-    padding: 4px 4px;
-    color: rgb(128, 128, 128);
-    caret-color: rgb(128, 128, 128);
-    caret-size: 1px;
-
-    border: 2px solid rgba(245,245,245,0.2);
-    border-radius: 5px;
-    background-gradient-start: rgba(5,5,6,0.1);
-    background-gradient-end: rgba(254,254,254,0.1);
-    background-gradient-direction: vertical;
-    box-shadow: inset 0px 2px 4px rgba(0,0,0,0.6);
-
-    transition-duration: 300ms;
-}
-
-.extension-pomodoro-task-entry:focus {
-    font-weight: bold;
-    color: rgb(64, 64, 64);
-    caret-color: rgb(64, 64, 64);
-
-    border: 2px solid rgb(136,138,133);
-    background-gradient-start: rgb(200,200,200);
-    background-gradient-end: white;
-    background-gradient-direction: vertical;
-    box-shadow: inset 0px 2px 4px rgba(0,0,0,0.6);
-
-    transition-duration: 0ms;
-}
-
 .extension-pomodoro-lightbox {
     background-color: black;
 }
@@ -123,7 +84,7 @@
     font-weight: normal;
     font-family: Droid Sans, DejaVu Sans, Bitstream Vera Sans, sans-serif;
     text-align: center;
-    text-shadow: 0.0px 5.0px 8.0px rgba(0, 0, 0, 0.10);
+    text-shadow: 0px 5px 8px rgba(0, 0, 0, 0.10);
     color: white;
 }
 
@@ -131,7 +92,7 @@
     font-size: 13pt;
     font-weight: normal;
     text-align: center;
-    text-shadow: 0.0px 1.0px 2.0px rgba(0, 0, 0, 0.35);
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.35);
     color: white;
 }
 
@@ -140,7 +101,7 @@
 }
 
 .extension-pomodoro-dialog .messages-indicator {
-    text-shadow: 0.0px 1.0px 2.0px rgba(0, 0, 0, 0.35);
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.35);
     color: white;
     padding-bottom: 25px;
 }
