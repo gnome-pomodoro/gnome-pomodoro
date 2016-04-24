@@ -81,13 +81,16 @@ const PomodoroExtension = new Lang.Class({
             this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
             this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
 
-            Main.sessionMode.connect('updated', Lang.bind(this, this._onSessionModeUpdated));
+            this.enableIndicator();
+            this.enableScreenNotifications();
+            this.enableReminders();
+            this.enableKeybinding();
+            this.enableNotifications();
+            this.enablePresence();
         }
         catch (error) {
             this.logError(error.message);
         }
-
-        this._onSessionModeUpdated();
     },
 
     _destroyNotifications: function() {
@@ -132,10 +135,6 @@ const PomodoroExtension = new Lang.Class({
 
                 break;
         }
-    },
-
-    _onSessionModeUpdated: function() {
-        this.setInLockScreen(Main.sessionMode.isLocked);
     },
 
     _onServiceConnected: function() {
@@ -347,12 +346,14 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _updateScreenNotifications: function() {
-        if (this.dialog && this._showScreenNotifications && this.timer.isBreak() && !this.timer.isPaused()) {
-            this.dialog.open(false);
-            this.dialog.pushModal();
-        }
-        else {
-            this.dialog.close(false);
+        if (this.dialog) {
+            if (this._showScreenNotifications && this.timer.isBreak() && !this.timer.isPaused()) {
+                this.dialog.open(false);
+                this.dialog.pushModal();
+            }
+            else {
+                this.dialog.close(false);
+            }
         }
     },
 
@@ -452,27 +453,6 @@ const PomodoroExtension = new Lang.Class({
         this.reminderManager.schedule();
     },
 
-    setInLockScreen: function(inLockScreen) {
-        if (this.inLockScreen !== inLockScreen) {
-            this.inLockScreen = inLockScreen;
-
-            if (inLockScreen) {
-                this.disableIndicator();
-                this.disableScreenNotifications();
-                this.disableReminders();
-            }
-            else {
-                this.enableIndicator();
-                this.enableScreenNotifications();
-                this.enableReminders();
-            }
-
-            this.enableKeybinding();
-            this.enableNotifications();
-            this.enablePresence();
-        }
-    },
-
     notifyIssue: function(message) {
         let notification = new Notifications.IssueNotification(message);
         notification.show();
@@ -514,23 +494,17 @@ function init(metadata) {
 
 function enable() {
     if (!extension) {
-        if (Main.pomodoro && Main.pomodoro !== extension) {
-            Main.pomodoro.destroy();
-        }
-
         extension = new PomodoroExtension();
         extension.connect('destroy', Lang.bind(this,
             function() {
                 extension = null;
             }));
-
-        Main.pomodoro = extension;
     }
 }
 
 
 function disable() {
-    if (extension && !Main.sessionMode.isLocked) {
+    if (extension) {
         extension.destroy();
         extension = null;
     }
