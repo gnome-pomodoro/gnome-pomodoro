@@ -89,7 +89,7 @@ const PomodoroExtension = new Lang.Class({
             this.enablePresence();
         }
         catch (error) {
-            this.logError(error.message);
+            Utils.logError(error.message);
         }
     },
 
@@ -265,7 +265,7 @@ const PomodoroExtension = new Lang.Class({
                 Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
             }
             catch (error) {
-                this.logError(error.message);
+                Utils.logError(error.message);
             }
         }
     },
