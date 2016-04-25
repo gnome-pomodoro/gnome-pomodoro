@@ -73,19 +73,6 @@ const IndicatorMenu = new Lang.Class({
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         this.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
-
-        this.connect('destroy', Lang.bind(this,
-            function() {
-                if (this._timerUpdateId) {
-                    this.indicator.timer.disconnect(this._timerUpdateId);
-                    this._timerUpdateId = 0;
-                }
-
-                if (this._actorMappedId) {
-                    this.actor.disconnect(this._actorMappedId);
-                    this._actorMappedId = 0;
-                }
-            }));
     },
 
     _createActionButton: function(iconName, accessibleName) {
@@ -280,6 +267,22 @@ const IndicatorMenu = new Lang.Class({
 
     _activateState: function(stateName) {
         this.indicator.timer.setState(stateName);
+    },
+
+    destroy: function() {
+        if (this._timerUpdateId) {
+            this.indicator.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+
+        if (this._actorMappedId) {
+            this.actor.disconnect(this._actorMappedId);
+            this._actorMappedId = 0;
+        }
+
+        this.indicator = null;
+
+        this.parent();
     }
 });
 
@@ -480,6 +483,9 @@ const IndicatorIcon = new Lang.Class({
             this._onTimerUpdateId = 0;
         }
 
+        this.timer = null;
+        this.icon = null;
+
         this.actor._delegate = null;
 
         this.emit('destroy');
@@ -575,5 +581,19 @@ const Indicator = new Lang.Class({
             Tweener.addTween(this.menu.timerLabel, fadeInParams);
             Tweener.addTween(this.menu.pauseAction.child, fadeInParams);
         }
+    },
+
+    destroy: function() {
+        Tweener.removeTweens(this._hbox);
+        Tweener.removeTweens(this.menu.timerLabel);
+        Tweener.removeTweens(this.menu.pauseAction.child);
+
+        this.timer = null;
+
+        if (this.icon) {
+            this.icon.destroy();
+        }
+
+        this.parent();
     }
 });
