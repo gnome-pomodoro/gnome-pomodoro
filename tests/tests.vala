@@ -23,251 +23,253 @@
 using GLib;
 
 
-public delegate void Pomodoro.TestCaseFunc ();
-
-
-private class Pomodoro.TestSuiteAdaptor
+namespace Pomodoro
 {
-	public string name;
+    public delegate void TestCaseFunc ();
 
-	private Pomodoro.TestCaseFunc func;
-	private Pomodoro.TestSuite test_suite;
-
-	public TestSuiteAdaptor (string                      name,
-	                         owned Pomodoro.TestCaseFunc test_case_func,
-	                         Pomodoro.TestSuite          test_suite)
-	{
-        this.name = name;
-		this.func = (owned) test_case_func;
-		this.test_suite = test_suite;
-	}
-
-    public void setup (void* fixture) {
-        this.test_suite.setup ();
-    }
-
-    public void run (void* fixture) {
-        this.func ();
-    }
-
-    public void teardown (void* fixture) {
-        this.test_suite.teardown ();
-    }
-
-	public GLib.TestCase get_g_test_case () {
-		return new GLib.TestCase (this.name,
-			                      this.setup,
-			                      this.run,
-			                      this.teardown);
-	}
-}
-
-
-public abstract class Pomodoro.TestSuite : Object
-{
-    private GLib.TestSuite g_test_suite;
-    private TestSuiteAdaptor[] adaptors = new TestSuiteAdaptor[0];
-
-    public TestSuite () {
-        var name = this.get_name ();
-        this.g_test_suite = new GLib.TestSuite (name);
-    }
-
-    public string get_name () {
-        return this.get_type ().name ();
-    }
-
-    public GLib.TestSuite get_g_test_suite () {
-        return this.g_test_suite;
-    }
-
-    public void add_test (string name, owned Pomodoro.TestCaseFunc func)
+    private class TestSuiteAdaptor
     {
-        var adaptor = new TestSuiteAdaptor (name, (owned) func, this);
-        this.adaptors += adaptor;
+        public string name;
 
-        this.g_test_suite.add (adaptor.get_g_test_case ());
+        private Pomodoro.TestCaseFunc func;
+        private Pomodoro.TestSuite test_suite;
+
+        public TestSuiteAdaptor (string                      name,
+                                 owned Pomodoro.TestCaseFunc test_case_func,
+                                 Pomodoro.TestSuite          test_suite)
+        {
+            this.name = name;
+            this.func = (owned) test_case_func;
+            this.test_suite = test_suite;
+        }
+
+        public void setup (void* fixture) {
+            this.test_suite.setup ();
+        }
+
+        public void run (void* fixture) {
+            this.func ();
+        }
+
+        public void teardown (void* fixture) {
+            this.test_suite.teardown ();
+        }
+
+        public GLib.TestCase get_g_test_case () {
+            return new GLib.TestCase (this.name,
+                                      this.setup,
+                                      this.run,
+                                      this.teardown);
+        }
     }
 
-    public virtual void setup () {
-    }
-
-    public virtual void teardown () {
-    }
-}
-
-
-class Pomodoro.TestRunner : Object
-{
-    private GLib.TestSuite root_suite;
-    private GLib.File tmp_dir;
-    private const string SCHEMA_FILE_NAME = "org.gnome.pomodoro.gschema.xml";
-
-    public TestRunner (GLib.TestSuite? root_suite = null)
+    public abstract class TestSuite : GLib.Object
     {
-        if (root_suite == null) {
-            this.root_suite = GLib.TestSuite.get_root ();
-        } else {
-            this.root_suite = root_suite;
+        private GLib.TestSuite g_test_suite;
+        private TestSuiteAdaptor[] adaptors = new TestSuiteAdaptor[0];
+
+        public TestSuite () {
+            var name = this.get_name ();
+            this.g_test_suite = new GLib.TestSuite (name);
+        }
+
+        public string get_name () {
+            return this.get_type ().name ();
+        }
+
+        public GLib.TestSuite get_g_test_suite () {
+            return this.g_test_suite;
+        }
+
+        public void add_test (string name, owned Pomodoro.TestCaseFunc func)
+        {
+            var adaptor = new TestSuiteAdaptor (name, (owned) func, this);
+            this.adaptors += adaptor;
+
+            this.g_test_suite.add (adaptor.get_g_test_case ());
+        }
+
+        public virtual void setup () {
+        }
+
+        public virtual void teardown () {
         }
     }
 
-    public void add (Pomodoro.TestSuite test_suite) {
-        this.root_suite.add_suite (test_suite.get_g_test_suite ());
-    }
-
-    private void setup_settings ()
+    public class TestRunner : GLib.Object
     {
-        /* prepare temporary settings */
-        var target_schema_path = Path.build_filename (
-                this.tmp_dir.get_path (), "share", "glib-2.0", "schemas");
+        private GLib.TestSuite root_suite;
+        private GLib.File tmp_dir;
+        private const string SCHEMA_FILE_NAME = "org.gnome.pomodoro.gschema.xml";
 
-        var target_schema_dir = File.new_for_path (target_schema_path);
-        try {
-            target_schema_dir.make_directory_with_parents ();
-        }
-        catch (Error e) {
-            GLib.error ("Error creating directory for schema files: %s", e.message);
-        }
-
-        try {
-            var top_builddir = TestRunner.get_top_builddir ();
-
-            var source_schema_file = File.new_for_path (
-                Path.build_filename (top_builddir, "data", SCHEMA_FILE_NAME));
-
-            var target_schema_file = File.new_for_path (
-                Path.build_filename (target_schema_path, SCHEMA_FILE_NAME));
-
-            source_schema_file.copy (target_schema_file,
-                                     FileCopyFlags.OVERWRITE);
-        }
-        catch (Error e) {
-            GLib.error ("Error copying schema file: %s", e.message);
-        }
-
-        var compile_schemas_result = 0;
-        try {
-            GLib.Process.spawn_command_line_sync (
-                        "glib-compile-schemas %s".printf (target_schema_path),
-                        null,
-                        null,
-                        out compile_schemas_result);
-        } catch (SpawnError e) {
-            error (e.message);
-        }
-
-        if (compile_schemas_result != 0) {
-            error ("Could not compile schemas '%s'.", target_schema_path);
-        }
-
-        /* set default settings object */
-        try {
-		    var schema_source = new SettingsSchemaSource
-                                        .from_directory (target_schema_path,
-                                                         null,
-                                                         false);
-		    var schema = schema_source.lookup ("org.gnome.pomodoro", false);
-
-            if (schema != null) {
-		        var settings = new Settings.full (schema, null, null);
-                Pomodoro.set_settings (settings);
-            }
-            else {
-	            GLib.error ("Schema could not found");
+        public TestRunner (GLib.TestSuite? root_suite = null)
+        {
+            if (root_suite == null) {
+                this.root_suite = GLib.TestSuite.get_root ();
+            } else {
+                this.root_suite = root_suite;
             }
         }
-        catch (Error e) {
-            GLib.error (e.message);
-        }
-    }
 
-    public virtual void global_setup ()
-    {
-        Environment.set_variable ("LANGUAGE", "C", true);
-        Environment.set_variable ("GSETTINGS_BACKEND", "memory", true);
-
-        try {
-            this.tmp_dir = File.new_for_path (
-                    DirUtils.make_tmp ("gnome-pomodoro-test-XXXXXX"));
-        } catch (Error e) {
-            error ("Error creating temporary directory for test files: %s".printf (e.message));
+        public void add (Pomodoro.TestSuite test_suite) {
+            this.root_suite.add_suite (test_suite.get_g_test_suite ());
         }
 
-        this.setup_settings ();
-    }
+        private void setup_settings ()
+        {
+            /* prepare temporary settings */
+            var target_schema_path = GLib.Path.build_filename (
+                    this.tmp_dir.get_path (), "share", "glib-2.0", "schemas");
 
-    public virtual void global_teardown ()
-    {
-        if (this.tmp_dir != null) {
-            var tmp_dir_path = this.tmp_dir.get_path ();
-            var delete_tmp_result = 0;
+            var target_schema_dir = GLib.File.new_for_path (target_schema_path);
+            try {
+                target_schema_dir.make_directory_with_parents ();
+            }
+            catch (GLib.Error error) {
+                GLib.error ("Error creating directory for schema files: %s", error.message);
+            }
 
             try {
-                GLib.Process.spawn_command_line_sync (
-                                        "rm -rf %s".printf (tmp_dir_path),
-                                        null,
-                                        null,
-                                        out delete_tmp_result);
-            } catch (SpawnError e) {
-                warning (e.message);
+                var top_builddir = TestRunner.get_top_builddir ();
+
+                var source_schema_file = GLib.File.new_for_path (
+                    Path.build_filename (top_builddir, "data", SCHEMA_FILE_NAME));
+
+                var target_schema_file = GLib.File.new_for_path (
+                    Path.build_filename (target_schema_path, SCHEMA_FILE_NAME));
+
+                source_schema_file.copy (target_schema_file,
+                                         GLib.FileCopyFlags.OVERWRITE);
+            }
+            catch (GLib.Error error) {
+                GLib.error ("Error copying schema file: %s", error.message);
             }
 
-            if (delete_tmp_result != 0) {
-                GLib.warning ("Could not delete temporary directory '%s'",
-                              tmp_dir_path);
+            var compile_schemas_result = 0;
+            try {
+                GLib.Process.spawn_command_line_sync (
+                            "glib-compile-schemas %s".printf (target_schema_path),
+                            null,
+                            null,
+                            out compile_schemas_result);
+            } catch (GLib.SpawnError error) {
+                GLib.error (error.message);
+            }
+
+            if (compile_schemas_result != 0) {
+                error ("Could not compile schemas '%s'.", target_schema_path);
+            }
+
+            /* set default settings object */
+            try {
+                var schema_source = new SettingsSchemaSource
+                                            .from_directory (target_schema_path,
+                                                             null,
+                                                             false);
+                var schema = schema_source.lookup ("org.gnome.pomodoro", false);
+
+                if (schema != null) {
+                    var settings = new Settings.full (schema, null, null);
+                    Pomodoro.set_settings (settings);
+                }
+                else {
+                    GLib.error ("Schema could not found");
+                }
+            }
+            catch (GLib.Error error) {
+                GLib.error (error.message);
             }
         }
-    }
 
-    public int run ()
-    {
-        /* TODO: spawn a child process to tun tests, if it fails than we
-                 will be able to exit cleanly */
-
-        this.global_setup ();
-        var exit_status = GLib.Test.run ();
-        this.global_teardown ();
-
-        return exit_status;
-    }
-
-    private static string get_top_builddir ()
-    {
-        var builddir = Environment.get_variable ("top_builddir");
-
-        if (builddir == null)
+        public virtual void global_setup ()
         {
-            var dir = File.new_for_path (Environment.get_current_dir ());
+            Environment.set_variable ("LANGUAGE", "C", true);
+            Environment.set_variable ("GSETTINGS_BACKEND", "memory", true);
 
-            while (dir != null)
-            {
-                var schema_path = GLib.Path.build_filename (dir.get_path (),
-                                                            "data",
-                                                            SCHEMA_FILE_NAME);
+            try {
+                this.tmp_dir = GLib.File.new_for_path (
+                        DirUtils.make_tmp ("gnome-pomodoro-test-XXXXXX"));
+            } catch (GLib.Error error) {
+                GLib.error ("Error creating temporary directory for test files: %s".printf (error.message));
+            }
 
-                if (FileUtils.test (schema_path, FileTest.IS_REGULAR)) {
-                    builddir = dir.get_path ();
-                    break;
+            this.setup_settings ();
+        }
+
+        public virtual void global_teardown ()
+        {
+            if (this.tmp_dir != null) {
+                var tmp_dir_path = this.tmp_dir.get_path ();
+                var delete_tmp_result = 0;
+
+                try {
+                    GLib.Process.spawn_command_line_sync (
+                                            "rm -rf %s".printf (tmp_dir_path),
+                                            null,
+                                            null,
+                                            out delete_tmp_result);
+                } catch (GLib.SpawnError error) {
+                    GLib.warning (error.message);
                 }
 
-                dir = dir.get_parent ();
+                if (delete_tmp_result != 0) {
+                    GLib.warning ("Could not delete temporary directory '%s'",
+                                  tmp_dir_path);
+                }
             }
         }
 
-        if (builddir == null)
+        public int run ()
         {
-            builddir = "..";  /* fallback to parent dir, test should be ran
-                                 from 'tests' dir */
+            /* TODO: spawn a child process to tun tests, if it fails than we
+                     will be able to exit cleanly */
+
+            this.global_setup ();
+            var exit_status = GLib.Test.run ();
+            this.global_teardown ();
+
+            return exit_status;
         }
 
-        return builddir;
+        private static string get_top_builddir ()
+        {
+            var builddir = Environment.get_variable ("top_builddir");
+
+            if (builddir == null)
+            {
+                var dir = GLib.File.new_for_path (Environment.get_current_dir ());
+
+                while (dir != null)
+                {
+                    var schema_path = GLib.Path.build_filename (dir.get_path (),
+                                                                "data",
+                                                                SCHEMA_FILE_NAME);
+
+                    if (GLib.FileUtils.test (schema_path, GLib.FileTest.IS_REGULAR)) {
+                        builddir = dir.get_path ();
+                        break;
+                    }
+
+                    dir = dir.get_parent ();
+                }
+            }
+
+            if (builddir == null)
+            {
+                builddir = "..";  /* fallback to parent dir, test should be ran
+                                     from 'tests' dir */
+            }
+
+            return builddir;
+        }
     }
 }
 
 
 public static int main (string[] args)
 {
+    var exit_status = 0;
+
     Gtk.init (ref args);
     Test.init (ref args);
 
@@ -277,8 +279,6 @@ public static int main (string[] args)
     tests.add (new Pomodoro.CapabilityTest ());
     tests.add (new Pomodoro.VirtualCapabilityTest ());
     tests.add (new Pomodoro.CapabilityGroupTest ());
-
-    var exit_status = 0;
 
     GLib.Idle.add (() => {
         exit_status = tests.run ();

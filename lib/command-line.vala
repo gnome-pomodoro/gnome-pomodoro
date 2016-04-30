@@ -21,55 +21,57 @@
 using GLib;
 
 
-[Compact]
-public class Pomodoro.CommandLine
+namespace Pomodoro
 {
-    public bool no_default_window = false;
-    public bool preferences = false;
-
-    public bool parse_ref ([CCode (array_length_pos = 0.9)] ref unowned string[]? args)
+    [Compact]
+    public class CommandLine
     {
-        var option_context = new GLib.OptionContext ("- Time management utility for GNOME");
-        option_context.set_help_enabled (true);
-        option_context.add_group (Gtk.get_option_group (true));
-        option_context.add_group (Gst.init_get_option_group ());
+        public bool no_default_window = false;
+        public bool preferences = false;
 
-        var options = new GLib.OptionEntry[3];
-        options[0] = { "preferences", 0, 0, GLib.OptionArg.NONE, ref this.preferences,
-                       "Show preferences", null };
-        options[1] = { "no-default-window", 0, 0, GLib.OptionArg.NONE, ref this.no_default_window,
-                       "Run as background service", null };
-        options[2] = { null };
+        public bool parse_ref ([CCode (array_length_pos = 0.9)] ref unowned string[]? args)
+        {
+            var option_context = new GLib.OptionContext ("- Time management utility for GNOME");
+            option_context.set_help_enabled (true);
+            option_context.add_group (Gtk.get_option_group (true));
 
-        option_context.add_main_entries (options, Config.GETTEXT_PACKAGE);
+            var options = new GLib.OptionEntry[3];
+            options[0] = { "preferences", 0, 0, GLib.OptionArg.NONE, ref this.preferences,
+                           "Show preferences", null };
+            options[1] = { "no-default-window", 0, 0, GLib.OptionArg.NONE, ref this.no_default_window,
+                           "Run as background service", null };
+            options[2] = { null };
 
-        try {
-            if (!option_context.parse (ref args)) {
+            option_context.add_main_entries (options, Config.GETTEXT_PACKAGE);
+
+            try {
+                if (!option_context.parse (ref args)) {
+                    return false;
+                }
+            }
+            catch (GLib.OptionError error) {
+                stdout.printf ("Could not parse arguments: %s\n", error.message);
+                stdout.printf ("Run '%s --help' to see a full list of available command line options.\n", args[0]);
+
                 return false;
             }
-        }
-        catch (GLib.OptionError e) {
-            stdout.printf ("Could not parse arguments: %s\n", e.message);
-            stdout.printf ("Run '%s --help' to see a full list of available command line options.\n", args[0]);
 
-            return false;
+            return true;
         }
 
-        return true;
-    }
+        public bool parse (string[]? args)
+        {
+            /* We have to make an extra copy of the array, since parse() assumes
+             * that it can remove strings from the array without freeing them.
+             */
+            var tmp = new string[args.length];
+            for (int i = 0; i < args.length; i++) {
+                tmp[i] = args[i];
+            }
 
-    public bool parse (string[]? args)
-    {
-        /* We have to make an extra copy of the array, since parse() assumes
-         * that it can remove strings from the array without freeing them.
-         */
-        var tmp = new string[args.length];
-        for (int i = 0; i < args.length; i++) {
-            tmp[i] = args[i];
+            unowned string[] unowned_args = tmp;
+
+            return this.parse_ref (ref unowned_args);
         }
-
-        unowned string[] unowned_args = tmp;
-
-        return this.parse_ref (ref unowned_args);
     }
 }

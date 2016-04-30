@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2016 gnome-pomodoro contributors
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+using GLib;
+
+
 namespace SoundsPlugin
 {
     public errordomain SoundPlayerError
@@ -15,9 +36,9 @@ namespace SoundsPlugin
 
         if (scheme == null && uri != "")
         {
-            var path = Path.build_filename (Config.PACKAGE_DATA_DIR,
-                                            "sounds",
-                                            uri);
+            var path = GLib.Path.build_filename (Config.PACKAGE_DATA_DIR,
+                                                 "sounds",
+                                                 uri);
 
             try {
                 return GLib.Filename.to_uri (path);
@@ -335,7 +356,7 @@ namespace SoundsPlugin
             }
             set {
                 this._file = value != null
-                        ? File.new_for_uri (get_absolute_uri (value.get_uri ()))
+                        ? GLib.File.new_for_uri (get_absolute_uri (value.get_uri ()))
                         : null;
 
                 this.cache_file (this._file);

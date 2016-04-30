@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013,2014 gnome-pomodoro contributors
+ * Copyright (c) 2013,2014,2016 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -752,7 +752,7 @@ namespace Pomodoro
 
             if (this.pages.contains (name)) {
                 var meta = this.pages.lookup (name);
-                var page = Object.new (meta.type) as Pomodoro.PreferencesPage;
+                var page = GLib.Object.new (meta.type) as Pomodoro.PreferencesPage;
 
                 this.stack.add_titled (page as Gtk.Widget,
                                        meta.name,

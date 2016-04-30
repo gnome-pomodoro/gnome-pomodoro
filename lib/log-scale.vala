@@ -18,88 +18,92 @@
  *
  */
 
+using GLib;
 
-public class Pomodoro.Widgets.LogScale : Gtk.Scale
+
+namespace Pomodoro.Widgets
 {
-    /* TODO: This widget is quite bad. We need custom GtkRange to
-     *       do it right.
-     */
-
-    public double exponent { get; set; default = 1.0; }
-
-    public Gtk.Adjustment base_adjustment { get; private set; }
-
-    public LogScale (Gtk.Adjustment adjustment,
-                     double         exponent)
+    public class LogScale : Gtk.Scale
     {
-        GLib.Object (
-            orientation: Gtk.Orientation.HORIZONTAL,
-            digits: 0,
-            draw_value: false,
-            margin_top: 4,
-            halign: Gtk.Align.FILL
-        );
+        /* TODO: This widget is quite bad. We need custom GtkRange to
+         *       do it right.
+         */
 
-        this.exponent = exponent;
+        public double exponent { get; set; default = 1.0; }
 
-        this.do_set_adjustment (adjustment);
-    }
+        public Gtk.Adjustment base_adjustment { get; private set; }
 
-    private void do_set_adjustment (Gtk.Adjustment base_adjustment)
-    {
-        var binding_flags =
-                GLib.BindingFlags.DEFAULT |
-                GLib.BindingFlags.BIDIRECTIONAL |
-                GLib.BindingFlags.SYNC_CREATE;
+        public LogScale (Gtk.Adjustment adjustment,
+                         double         exponent)
+        {
+            GLib.Object (
+                orientation: Gtk.Orientation.HORIZONTAL,
+                digits: 0,
+                draw_value: false,
+                margin_top: 4,
+                halign: Gtk.Align.FILL
+            );
 
-        this.adjustment = new Gtk.Adjustment (0.0,
-                                              0.0,
-                                              1.0,
-                                              0.0001,
-                                              0.001,
-                                              0.0);
+            this.exponent = exponent;
 
-        this.base_adjustment = base_adjustment;
-        this.base_adjustment.bind_property ("value",
-                                            this.adjustment,
-                                            "value",
-                                            binding_flags,
-                                            this.transform_to,
-                                            this.transform_from);
-    }
+            this.do_set_adjustment (adjustment);
+        }
 
-    private bool transform_from (GLib.Binding   binding,
-                                 GLib.Value     source_value,
-                                 ref GLib.Value target_value)
-    {
-        var lower = this.base_adjustment.lower;
-        var upper = this.base_adjustment.upper;
-        var step_increment = this.base_adjustment.step_increment;
+        private void do_set_adjustment (Gtk.Adjustment base_adjustment)
+        {
+            var binding_flags =
+                    GLib.BindingFlags.DEFAULT |
+                    GLib.BindingFlags.BIDIRECTIONAL |
+                    GLib.BindingFlags.SYNC_CREATE;
 
-        var value = Math.pow (source_value.get_double (), this.exponent) * (upper - lower) + lower;
+            this.adjustment = new Gtk.Adjustment (0.0,
+                                                  0.0,
+                                                  1.0,
+                                                  0.0001,
+                                                  0.001,
+                                                  0.0);
 
-        target_value.set_double (step_increment * Math.floor (value / step_increment));
+            this.base_adjustment = base_adjustment;
+            this.base_adjustment.bind_property ("value",
+                                                this.adjustment,
+                                                "value",
+                                                binding_flags,
+                                                this.transform_to,
+                                                this.transform_from);
+        }
 
-        return true;
-    }
+        private bool transform_from (GLib.Binding   binding,
+                                     GLib.Value     source_value,
+                                     ref GLib.Value target_value)
+        {
+            var lower = this.base_adjustment.lower;
+            var upper = this.base_adjustment.upper;
+            var step_increment = this.base_adjustment.step_increment;
 
-    private bool transform_to (GLib.Binding   binding,
-                               GLib.Value     source_value,
-                               ref GLib.Value target_value)
-    {
-        var lower = this.base_adjustment.lower;
-        var upper = this.base_adjustment.upper;
+            var value = Math.pow (source_value.get_double (), this.exponent) * (upper - lower) + lower;
 
-        target_value.set_double (Math.pow (
-                (source_value.get_double () - lower) / (upper - lower),
-                1.0 / this.exponent));
+            target_value.set_double (step_increment * Math.floor (value / step_increment));
 
-        return true;
-    }
+            return true;
+        }
 
-    public override bool scroll_event (Gdk.EventScroll event)
-    {
-        return false;
+        private bool transform_to (GLib.Binding   binding,
+                                   GLib.Value     source_value,
+                                   ref GLib.Value target_value)
+        {
+            var lower = this.base_adjustment.lower;
+            var upper = this.base_adjustment.upper;
+
+            target_value.set_double (Math.pow (
+                    (source_value.get_double () - lower) / (upper - lower),
+                    1.0 / this.exponent));
+
+            return true;
+        }
+
+        public override bool scroll_event (Gdk.EventScroll event)
+        {
+            return false;
+        }
     }
 }
-
