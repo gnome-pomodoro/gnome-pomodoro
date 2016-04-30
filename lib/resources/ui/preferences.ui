@@ -14,35 +14,13 @@
     <property name="startup_id">gnome-pomodoro-preferences</property>
     <property name="show_menubar">False</property>
     <child>
-      <object class="GtkBox" id="box">
+      <object class="GtkStack" id="stack">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="vhomogeneous">False</property>
+        <property name="transition_type">crossfade</property>
         <child>
-          <object class="GtkStackSidebar" id="stacksidebar">
-            <property name="can_focus">False</property>
-            <property name="stack">stack</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkStack" id="stack">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="vhomogeneous">False</property>
-            <property name="transition_type">crossfade</property>
-            <child>
-              <placeholder/>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
+          <placeholder/>
         </child>
       </object>
     </child>

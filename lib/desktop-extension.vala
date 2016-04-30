@@ -138,6 +138,9 @@ namespace Pomodoro
                 });
             }
 
+            var application = Pomodoro.Application.get_default ();
+            application.add_window (this.screen_notification);
+
             this.screen_notification.present ();
         }
 

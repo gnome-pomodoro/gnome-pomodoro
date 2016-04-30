@@ -84,6 +84,11 @@ public class Pomodoro.Application : Gtk.Application
         this.service = null;
     }
 
+    public static unowned Application get_default ()
+    {
+        return GLib.Application.get_default () as Pomodoro.Application;
+    }
+
     public unowned Gtk.Window get_last_focused_window ()
     {
         unowned List<weak Gtk.Window> windows = this.get_windows ();
