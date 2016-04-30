@@ -27,18 +27,22 @@ namespace GnomePlugin
         private static const string[] SHELL_CAPABILITIES = {
             "notifications",
             "indicator",
-            "hotkey",
             "reminders"
         };
 
+        private GLib.Settings                   settings;
         private Pomodoro.CapabilityGroup        capabilities;
         private GnomePlugin.GnomeShellExtension shell_extension;
         private Gnome.IdleMonitor               idle_monitor;
+        private Gnome.Shell                     shell_proxy;
         private uint                            become_active_id = 0;
+        private uint                            accelerator_id = 0;
         private bool                            configured = false;
 
         construct
         {
+            this.settings = Pomodoro.get_settings ().get_child ("preferences");
+
             this.idle_monitor = new Gnome.IdleMonitor ();
 
 //            this.notify["presence-status"].connect (this.on_presence_status_notify);
@@ -48,6 +52,8 @@ namespace GnomePlugin
             this.capabilities = new Pomodoro.CapabilityGroup ();
             this.capabilities.fallback = base.get_capabilities ();
             this.capabilities.enabled_changed.connect (this.on_capability_enabled_changed);
+
+            this.settings.changed["toggle-timer-key"].connect (this.on_toggle_timer_key_changed);
         }
 
         public override unowned Pomodoro.CapabilityGroup get_capabilities ()
@@ -76,6 +82,8 @@ namespace GnomePlugin
 
         public override async void configure ()
         {
+            yield this.connect_shell ();
+
             /* wait for status of gnome-shell extension */
             this.shell_extension.enable.begin ((obj, res) => {
                 var success = this.shell_extension.enable.end (res);
@@ -98,6 +106,36 @@ namespace GnomePlugin
             yield base.configure ();
 
             this.shell_extension.notify["is-enabled"].connect (this.on_shell_extension_is_enabled_notify);
+        }
+
+
+        private async void connect_shell ()
+        {
+            if (this.shell_proxy == null)
+            {
+                GLib.Bus.get_proxy.begin<Gnome.Shell> (GLib.BusType.SESSION,
+                                                       "org.gnome.Shell",
+                                                       "/org/gnome/Shell",
+                                                       GLib.DBusProxyFlags.DO_NOT_AUTO_START,
+                                                       null,
+                                                       (obj, res) =>
+                {
+                    try
+                    {
+                        this.shell_proxy = GLib.Bus.get_proxy.end (res);
+
+                        this.shell_connected (this.shell_proxy);
+                    }
+                    catch (GLib.IOError error)
+                    {
+                        GLib.critical ("%s", error.message);
+                    }
+
+                    this.connect_shell.callback ();
+                });
+
+                yield;
+            }
         }
 
         private void on_shell_extension_is_enabled_notify ()
@@ -124,6 +162,64 @@ namespace GnomePlugin
                     this.capabilities.remove (capability.name);
                 }
             }
+        }
+
+        private void on_toggle_timer_key_changed ()
+        {
+            var capability = this.capabilities.lookup ("hotkey");
+
+            if (capability != null && capability.enabled) {
+                capability.disable ();
+                capability.enable ();
+            }
+        }
+
+        public virtual signal void shell_connected (Gnome.Shell proxy)
+        {
+            var hotkey_capability = new Pomodoro.Capability (Pomodoro.Capabilities.HOTKEY);
+
+            hotkey_capability.enabled_signal.connect (() => {
+                try {
+                    this.accelerator_id = proxy.grab_accelerator (this.settings.get_string ("toggle-timer-key"),
+                                                                  Gnome.ActionMode.ALL);
+
+                    proxy.accelerator_activated.connect (this.on_accelerator_activated);
+                }
+                catch (GLib.IOError error) {
+                    GLib.error ("error while grabbing accelerator: %s", error.message);
+                }
+            });
+
+            hotkey_capability.disabled_signal.connect (() => {
+                try {
+                    if (this.accelerator_id != 0) {
+                        proxy.ungrab_accelerator (this.accelerator_id);
+                        this.accelerator_id = 0;
+                    }
+                }
+                catch (GLib.IOError error) {
+                    GLib.error ("error while ungrabbing accelerator: %s", error.message);
+                }
+
+                proxy.accelerator_activated.disconnect (this.on_accelerator_activated);
+            });
+
+            hotkey_capability.enable ();
+
+            this.capabilities.add (hotkey_capability);
+        }
+
+        public virtual signal void shell_disconnected (Gnome.Shell proxy)
+        {
+            this.capabilities.remove (Pomodoro.Capabilities.HOTKEY);
+        }
+
+        private void on_accelerator_activated (uint32 action,
+                                               GLib.HashTable<string, GLib.Variant> accelerator_params)
+        {
+            var timer = Pomodoro.Timer.get_default ();
+
+            timer.toggle ();
         }
 
 //        private void on_presence_status_notify ()
@@ -153,49 +249,13 @@ namespace GnomePlugin
     {
         private Pomodoro.PreferencesDialog dialog;
 
-        private GLib.Settings settings;
-        private GLib.List<Gtk.ListBoxRow> rows;
-
         construct
         {
-            this.settings = Pomodoro.get_settings ()
-                                    .get_child ("preferences");
-
             this.dialog = Pomodoro.PreferencesDialog.get_default ();
         }
 
         ~PreferencesDialogExtension ()
         {
-            foreach (var row in this.rows) {
-                row.destroy ();
-            }
-
-            this.rows = null;
-        }
-
-        private Gtk.ListBoxRow create_row (string label,
-                                           string name,
-                                           string settings_key)
-        {
-            var name_label = new Gtk.Label (label);
-            name_label.halign = Gtk.Align.START;
-            name_label.valign = Gtk.Align.BASELINE;
-
-            var value_label = new Gtk.Label (null);
-            value_label.halign = Gtk.Align.END;
-            value_label.get_style_context ().add_class ("dim-label");
-
-            var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 30);
-            box.pack_start (name_label, true, true, 0);
-            box.pack_start (value_label, false, true, 0);
-
-            var row = new Gtk.ListBoxRow ();
-            row.name = name;
-            row.selectable = false;
-            row.add (box);
-            row.show_all ();
-
-            return row;
         }
     }
 }

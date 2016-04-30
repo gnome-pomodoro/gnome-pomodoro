@@ -35,50 +35,6 @@ namespace Pomodoro
                                        GLib.SettingsBindFlags.SET;
 
     /**
-     * Mapping from settings to accelerator
-     */
-    private bool get_accelerator_mapping (GLib.Value   value,
-                                          GLib.Variant variant,
-                                          void*        user_data)
-    {
-        var accelerators = variant.get_strv ();
-
-        foreach (var accelerator in accelerators)
-        {
-            value.set_string (accelerator);
-
-            return true;
-        }
-
-        value.set_string ("");
-
-        return true;
-    }
-
-    /**
-     * Mapping from accelerator to settings
-     */
-    [CCode (has_target = false)]
-    private GLib.Variant set_accelerator_mapping (GLib.Value       value,
-                                                  GLib.VariantType expected_type,
-                                                  void*            user_data)
-    {
-        var accelerator_name = value.get_string ();
-
-        if (accelerator_name == "")
-        {
-            string[] strv = {};
-
-            return new GLib.Variant.strv (strv);
-        }
-        else {
-            string[] strv = { accelerator_name };
-
-            return new GLib.Variant.strv (strv);
-        }
-    }
-
-    /**
      * Mapping from settings to presence combobox
      */
     private static bool get_presence_status_mapping (GLib.Value   value,
@@ -200,6 +156,7 @@ namespace Pomodoro
         [GtkChild]
         private Gtk.Label error_label;
 
+        private Pomodoro.Capability capability;
         private GLib.Settings settings;
         private ulong key_press_event_id = 0;
         private ulong key_release_event_id = 0;
@@ -214,14 +171,10 @@ namespace Pomodoro
                                     .get_child ("preferences");
             this.settings.delay ();
 
-            this.settings.bind_with_mapping ("toggle-timer-key",
-                                             this.accelerator,
-                                             "name",
-                                             SETTINGS_BIND_FLAGS,
-                                             (GLib.SettingsBindGetMappingShared) get_accelerator_mapping,
-                                             (GLib.SettingsBindSetMappingShared) set_accelerator_mapping,
-                                             null,
-                                             null);
+            this.settings.bind ("toggle-timer-key",
+                                this.accelerator,
+                                "name",
+                                SETTINGS_BIND_FLAGS);
             this.on_accelerator_changed ();
         }
 
@@ -376,6 +329,14 @@ namespace Pomodoro
             if (this.focus_out_event_id == 0) {
                 this.focus_out_event_id = toplevel.focus_out_event.connect (this.on_focus_out_event);
             }
+
+            var application = GLib.Application.get_default () as Pomodoro.Application;
+
+            this.capability = application.desktop.get_capabilities ().lookup ("hotkey");
+
+            if (this.capability != null) {
+                this.capability.inhibit ();
+            }
         }
 
         public override void unmap ()
@@ -397,6 +358,11 @@ namespace Pomodoro
             if (this.focus_out_event_id != 0) {
                 toplevel.focus_out_event.disconnect (this.on_focus_out_event);
                 this.focus_out_event_id != 0;
+            }
+
+            if (this.capability != null) {
+                this.capability.uninhibit ();
+                this.capability = null;
             }
         }
     }
@@ -610,14 +576,10 @@ namespace Pomodoro
                 accelerator_label.label = this.accelerator.display_name != ""
                         ? this.accelerator.display_name : _("Off");
             });
-            this.settings.bind_with_mapping ("toggle-timer-key",
-                                             this.accelerator,
-                                             "name",
-                                             SETTINGS_BIND_FLAGS,
-                                             (GLib.SettingsBindGetMappingShared) get_accelerator_mapping,
-                                             (GLib.SettingsBindSetMappingShared) set_accelerator_mapping,
-                                             null,
-                                             null);
+            this.settings.bind ("toggle-timer-key",
+                                this.accelerator,
+                                "name",
+                                SETTINGS_BIND_FLAGS);
         }
 
         private void setup_notifications_section (Gtk.Builder builder)

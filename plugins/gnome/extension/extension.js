@@ -58,7 +58,6 @@ const PomodoroExtension = new Lang.Class({
         this.dialog             = null;
         this.reminderManager    = null;
         this.presence           = null;
-        this.keybinding         = false;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
@@ -82,7 +81,6 @@ const PomodoroExtension = new Lang.Class({
             this.enableIndicator();
             this.enableScreenNotifications();
             this.enableReminders();
-            this.enableKeybinding();
             this.enableNotifications();
             this.enablePresence();
         }
@@ -239,12 +237,6 @@ const PomodoroExtension = new Lang.Class({
         this._destroyPreviousNotifications();
     },
 
-    _onKeybindingPressed: function() {
-        if (this.timer) {
-            this.timer.toggle();
-        }
-    },
-
     _onNotificationDestroy: function(notification) {
         if (this.notification === notification) {
             this.notification = null;
@@ -272,24 +264,6 @@ const PomodoroExtension = new Lang.Class({
         if (this.indicator) {
             this.indicator.destroy();
             this.indicator = null;
-        }
-    },
-
-    enableKeybinding: function() {
-        if (!this.keybinding) {
-            this.keybinding = true;
-            Main.wm.addKeybinding('toggle-timer-key',
-                                  this.settings,
-                                  Meta.KeyBindingFlags.NONE,
-                                  Utils.versionCheck('3.16') ? Shell.ActionMode.ALL : Shell.KeyBindingMode.ALL,
-                                  Lang.bind(this, this._onKeybindingPressed));
-        }
-    },
-
-    disableKeybinding: function() {
-        if (this.keybinding) {
-            this.keybinding = false;
-            Main.wm.removeKeybinding('toggle-timer-key');
         }
     },
 
@@ -462,7 +436,6 @@ const PomodoroExtension = new Lang.Class({
         }
         this._destroying = true;
 
-        this.disableKeybinding();
         this.disablePresence();
         this.disableIndicator();
         this.disableReminders();

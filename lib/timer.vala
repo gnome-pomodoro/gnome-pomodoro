@@ -174,6 +174,16 @@ public class Pomodoro.Timer : GLib.Object
         }
     }
 
+    public void toggle ()
+    {
+        if (this.state is Pomodoro.DisabledState) {
+            this.start ();
+        }
+        else {
+            this.stop ();
+        }
+    }
+
     public void pause ()
     {
         this.is_paused = true;

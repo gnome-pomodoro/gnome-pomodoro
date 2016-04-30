@@ -16,7 +16,7 @@ namespace GnomePlugin
         private string                 path;
         private string                 version;
         private Gnome.ExtensionState   state;
-        private Gnome.Shell?           shell_proxy            = null;
+        private Gnome.Shell?           shell_proxy            = null;  // TODO: not needed all the time, remove it
         private Gnome.ShellExtensions? shell_extensions_proxy = null;
         private uint                   enable_timeout_id      = 0;
 

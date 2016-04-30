@@ -28,8 +28,8 @@
       <summary>Long pause interval</summary>
       <description>Number of pomodoros to a long break.</description>
     </key>
-    <key type="as" name="toggle-timer-key">
-      <default><![CDATA[["<Ctrl><Alt>p"]]]></default>
+    <key name="toggle-timer-key" type="s">
+      <default><![CDATA["<Ctrl><Alt>p"]]></default>
       <summary>Timer toggle key</summary>
       <description>Key to toggle the timer.</description>
     </key>
