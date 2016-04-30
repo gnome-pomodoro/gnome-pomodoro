@@ -259,7 +259,7 @@ namespace Pomodoro
                 this.focus_out_event_id = toplevel.focus_out_event.connect (this.on_focus_out_event);
             }
 
-            var application = GLib.Application.get_default () as Pomodoro.Application;
+            var application = Pomodoro.Application.get_default ();
 
             this.capability = application.desktop.get_capabilities ().lookup ("hotkey");
 

@@ -79,7 +79,7 @@ public class Pomodoro.Service : GLib.Object
     public void show_preferences (string page,
                                   uint32 timestamp)
     {
-        var application = GLib.Application.get_default () as Pomodoro.Application;
+        var application = Pomodoro.Application.get_default ();
         application.show_preferences_full (page, timestamp);
     }
 
