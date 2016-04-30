@@ -34,7 +34,7 @@ namespace Pomodoro
         private static const uint MIN_DISPLAY_TIME = 500;
         private static const uint FADE_IN_TIME = 180;
         private static const uint FADE_OUT_TIME = 180;
-        private static const uint MOTION_DISTANCE_THRESHOLD = 50;
+        private static const uint MOTION_DISTANCE_TO_CLOSE = 20;
 
         private GLib.Object idle_monitor;  /* TODO */
 
@@ -229,57 +229,49 @@ namespace Pomodoro
 
         public override bool event (Gdk.Event event)
         {
+            if (!this.close_on_activity) {
+                return base.event (event);
+            }
+
             var event_time = event.get_time ();
             var idle_time  = this.get_idle_time ();
 
             switch (event.type)
             {
-                case Gdk.EventType.BUTTON_PRESS:
-                case Gdk.EventType.BUTTON_RELEASE:
                 case Gdk.EventType.MOTION_NOTIFY:
-                case Gdk.EventType.KEY_PRESS:
-                case Gdk.EventType.KEY_RELEASE:
-                case Gdk.EventType.TOUCH_BEGIN:
-                case Gdk.EventType.TOUCH_UPDATE:
-                case Gdk.EventType.TOUCH_END:
-                case Gdk.EventType.TOUCH_CANCEL:
-                    if (event.type == Gdk.EventType.MOTION_NOTIFY) {
-                        if (event.motion.is_hint == 1) {
-                            break;
-                        }
-
-                        var is_first = this.last_motion_x < 0.0 || this.last_motion_y < 0.0;
-                        var dx       = event.motion.x_root - this.last_motion_x;
-                        var dy       = event.motion.y_root - this.last_motion_y;
-                        var distance = dx * dx + dy * dy;
-
-                        this.last_motion_x = event.motion.x_root;
-                        this.last_motion_y = event.motion.y_root;
-
-                        if (is_first || distance <= MOTION_DISTANCE_THRESHOLD * MOTION_DISTANCE_THRESHOLD) {
-                            break;
-                        }
+                    if (event.motion.is_hint == 1) {
+                        return true;
                     }
 
+                    var dx       = this.last_motion_x >= 0.0 ? event.motion.x_root - this.last_motion_x : 0.0;
+                    var dy       = this.last_motion_y >= 0.0 ? event.motion.y_root - this.last_motion_y : 0.0;
+                    var distance = dx * dx + dy * dy;
+
+                    this.last_motion_x   = event.motion.x_root;
+                    this.last_motion_y   = event.motion.y_root;
                     this.last_event_time = event_time;
 
-                    if (this.close_on_activity) {
-                        if (idle_time > IDLE_TIME_TO_CLOSE) {
-                            this.close ();
-                        }
+                    if (distance > MOTION_DISTANCE_TO_CLOSE * MOTION_DISTANCE_TO_CLOSE) {
+                        this.close ();
+                    }
 
-                        return true;
+                    break;
+
+                case Gdk.EventType.BUTTON_PRESS:
+                case Gdk.EventType.KEY_PRESS:
+                case Gdk.EventType.TOUCH_BEGIN:
+                    this.last_event_time = event_time;
+
+                    if (idle_time > IDLE_TIME_TO_CLOSE) {
+                        this.close ();
                     }
 
                     break;
 
                 case Gdk.EventType.FOCUS_CHANGE:
-                case Gdk.EventType.LEAVE_NOTIFY:
-                    if (this.close_on_activity) {
-                        this.close ();
+                    this.last_event_time = event_time;
 
-                        return true;
-                    }
+                    this.close ();
 
                     break;
 
@@ -287,7 +279,7 @@ namespace Pomodoro
                     break;
             }
 
-            return base.event (event);
+            return true;
         }
 
         private bool on_close_on_activity_timeout ()

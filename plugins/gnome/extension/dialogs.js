@@ -54,7 +54,7 @@ const ngettext = Gettext.ngettext;
 const IDLE_TIME_TO_PUSH_MODAL = 600;
 const PUSH_MODAL_TIME_LIMIT = 1000;
 const PUSH_MODAL_RATE = Clutter.get_default_frame_rate();
-const MOTION_THRESHOLD_TO_CLOSE = 20;
+const MOTION_DISTANCE_TO_CLOSE = 20;
 
 const IDLE_TIME_TO_OPEN = 60000;
 const IDLE_TIME_TO_CLOSE = 600;
@@ -567,33 +567,42 @@ const PomodoroEndDialog = new Lang.Class({
     },
 
     _onEvent: function(actor, event) {
-        let type = event.type();
-        let [x, y] = event.get_coords();
+        let dx, dy, distance;
 
-        if (type == Clutter.EventType.MOTION) {
-            if (this._eventX >= 0 && this._eventY >= 0) {
-                let distance = Math.sqrt((x - this._eventX) * (x - this._eventX) +
-                                         (y - this._eventY) * (y - this._eventY));
+        if (!event.get_device () || event.any.flags & Clutter.EventFlag.FLAG_SYNTHETIC) {
+            return Clutter.EVENT_STOP;
+        }
 
-                if (distance > MOTION_THRESHOLD_TO_CLOSE) {
+        switch (event.type())
+        {
+            case Clutter.EventType.ENTER:
+            case Clutter.EventType.LEAVE:
+            case Clutter.EventType.STAGE_STATE:
+            case Clutter.EventType.DESTROY_NOTIFY:
+            case Clutter.EventType.CLIENT_MESSAGE:
+            case Clutter.EventType.DELETE:
+                return Clutter.EVENT_PROPAGATE;
+
+            case Clutter.EventType.MOTION:
+                dx       = this._eventX >= 0 ? event.x - this._eventX : 0;
+                dy       = this._eventY >= 0 ? event.y - this._eventY : 0;
+                distance = dx * dx + dy * dy;
+
+                this._eventX = x;
+                this._eventY = y;
+
+                if (distance > MOTION_DISTANCE_TO_CLOSE * MOTION_DISTANCE_TO_CLOSE) {
                     this.close(true);
                 }
-            }
 
-            this._eventX = x;
-            this._eventY = y;
+                break;
 
-            return Clutter.EVENT_STOP;
-        }
+            case Clutter.EventType.KEY_PRESS:
+            case Clutter.EventType.BUTTON_PRESS:
+            case Clutter.EventType.TOUCH_BEGIN:
+                this.close(true);
 
-        if (type == Clutter.EventType.LEAVE || Clutter.EventType.KEY_PRESS || Clutter.EventType.BUTTON_PRESS || Clutter.EventType.TOUCH_BEGIN) {
-            this.close(true);
-
-            return Clutter.EVENT_STOP;
-        }
-
-        if (type == Clutter.EventType.ENTER) {
-            return Clutter.EVENT_PROPAGATE;
+                break;
         }
 
         return Clutter.EVENT_STOP;
