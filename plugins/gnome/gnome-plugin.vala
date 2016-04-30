@@ -35,9 +35,8 @@ namespace GnomePlugin
         private GnomePlugin.GnomeShellExtension shell_extension;
         private Gnome.IdleMonitor               idle_monitor;
         private Gnome.Shell                     shell_proxy;
-        private uint                            become_active_id = 0;
+//        private uint                            become_active_id = 0;
         private uint                            accelerator_id = 0;
-        private bool                            configured = false;
 
         construct
         {

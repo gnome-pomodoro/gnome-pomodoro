@@ -76,9 +76,6 @@ namespace GnomePlugin
             catch (GLib.IOError error) {
                 return null;
             }
-            catch (GLib.DBusError error) {
-                return null;
-            }
 
             return info;
         }
@@ -316,43 +313,43 @@ namespace GnomePlugin
             return this.is_enabled;
         }
 
-        private async void disable ()
-        {
-            string[] tmp = null;
-
-            /* Disable extension in gnome-shell settings */
-            var gnome_shell_settings = new GLib.Settings (Gnome.SHELL_SCHEMA);
-            var enabled_extensions = gnome_shell_settings.get_strv
-                                           (Gnome.SHELL_ENABLED_EXTENSIONS_KEY);
-            var enabled_in_settings = false;
-
-            foreach (var uuid in enabled_extensions)
-            {
-                if (uuid == this.uuid)
-                {
-                    enabled_in_settings = true;
-
-                    break;
-                }
-            }
-
-            if (enabled_in_settings)
-            {
-                GLib.debug ("Disabling extension \"%s\" in settings",
-                            this.uuid);
-
-                foreach (var uuid in enabled_extensions)
-                {
-                    if (uuid == this.uuid)
-                    {
-                        tmp += uuid;
-                    }
-                }
-
-                gnome_shell_settings.set_strv ("enabled-extensions", tmp);
-                gnome_shell_settings.apply ();
-            }
-        }
+//        private async void disable ()
+//        {
+//            string[] tmp = null;
+//
+//            /* Disable extension in gnome-shell settings */
+//            var gnome_shell_settings = new GLib.Settings (Gnome.SHELL_SCHEMA);
+//            var enabled_extensions = gnome_shell_settings.get_strv
+//                                           (Gnome.SHELL_ENABLED_EXTENSIONS_KEY);
+//            var enabled_in_settings = false;
+//
+//            foreach (var uuid in enabled_extensions)
+//            {
+//                if (uuid == this.uuid)
+//                {
+//                    enabled_in_settings = true;
+//
+//                    break;
+//                }
+//            }
+//
+//            if (enabled_in_settings)
+//            {
+//                GLib.debug ("Disabling extension \"%s\" in settings",
+//                            this.uuid);
+//
+//                foreach (var uuid in enabled_extensions)
+//                {
+//                    if (uuid == this.uuid)
+//                    {
+//                        tmp += uuid;
+//                    }
+//                }
+//
+//                gnome_shell_settings.set_strv ("enabled-extensions", tmp);
+//                gnome_shell_settings.apply ();
+//            }
+//        }
 
         private void notify_uninstalled ()
         {

@@ -18,7 +18,13 @@ namespace SoundsPlugin
             var path = Path.build_filename (Config.PACKAGE_DATA_DIR,
                                             "sounds",
                                             uri);
-            return GLib.Filename.to_uri (path);
+
+            try {
+                return GLib.Filename.to_uri (path);
+            }
+            catch (GLib.ConvertError error) {
+                GLib.warning ("Failed to convert \"%s\" to uri: %s", path, error.message);
+            }
         }
 
         return uri;

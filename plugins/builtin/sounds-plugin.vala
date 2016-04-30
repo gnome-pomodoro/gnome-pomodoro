@@ -18,11 +18,6 @@ namespace SoundsPlugin
         { "loud-bell.ogg", N_("Loud Bell") },
     };
 
-    private const GLib.SettingsBindFlags SETTINGS_BIND_FLAGS =
-                                       GLib.SettingsBindFlags.DEFAULT |
-                                       GLib.SettingsBindFlags.GET |
-                                       GLib.SettingsBindFlags.SET;
-
     private void list_box_separator_func (Gtk.ListBoxRow  row,
                                           Gtk.ListBoxRow? before)
     {
@@ -102,13 +97,13 @@ namespace SoundsPlugin
             this.notify["uri"].connect (this.on_uri_notify);
 
             /* Drag and drop */
-            var target_list = new Gtk.TargetList (this.target_entries);
+            var target_list = new Gtk.TargetList (PreferencesSoundPage.target_entries);
             target_list.add_uri_targets (TargetType.TEXT_URI_LIST);
             target_list.add_text_targets (TargetType.TEXT_PLAIN);
 
             Gtk.drag_dest_set (this.chooser_listbox,
                                Gtk.DestDefaults.ALL,
-                               this.target_entries,
+                               PreferencesSoundPage.target_entries,
                                Gdk.DragAction.COPY);
             Gtk.drag_dest_set_target_list (this.chooser_listbox, target_list);
         }
@@ -368,7 +363,12 @@ namespace SoundsPlugin
 
         protected virtual void setup_player ()
         {
-            this.player = new SoundsPlugin.GStreamerPlayer ();
+            try {
+                this.player = new SoundsPlugin.GStreamerPlayer ();
+            }
+            catch (SoundsPlugin.SoundPlayerError error) {
+                GLib.critical ("Failed to setup sound player");
+            }
         }
     }
 
@@ -395,12 +395,12 @@ namespace SoundsPlugin
             this.settings.bind ("ticking-sound",
                                 this,
                                 "uri",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
 
             this.settings.bind ("ticking-sound-volume",
                                 this,
                                 "volume",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
 
             this.add_presets (presets);
         }
@@ -436,19 +436,24 @@ namespace SoundsPlugin
             this.settings.bind ("pomodoro-end-sound",
                                 this,
                                 "uri",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
 
             this.settings.bind ("pomodoro-end-sound-volume",
                                 this,
                                 "volume",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
 
             this.add_presets (presets);
         }
 
         protected override void setup_player ()
         {
-            this.player = new SoundsPlugin.CanberraPlayer ();
+            try {
+                this.player = new SoundsPlugin.CanberraPlayer ();
+            }
+            catch (SoundsPlugin.SoundPlayerError error) {
+                GLib.critical ("Failed to setup sound player");
+            }
         }
     }
 
@@ -471,19 +476,24 @@ namespace SoundsPlugin
             this.settings.bind ("pomodoro-start-sound",
                                 this,
                                 "uri",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
 
             this.settings.bind ("pomodoro-start-sound-volume",
                                 this,
                                 "volume",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
 
             this.add_presets (presets);
         }
 
         protected override void setup_player ()
         {
-            this.player = new SoundsPlugin.CanberraPlayer ();
+            try {
+                this.player = new SoundsPlugin.CanberraPlayer ();
+            }
+            catch (SoundsPlugin.SoundPlayerError error) {
+                GLib.critical ("Failed to setup sound player");
+            }
         }
     }
 
@@ -608,19 +618,19 @@ namespace SoundsPlugin
 
             var value_label = new Gtk.Label (null);
             value_label.halign = Gtk.Align.END;
-            value_label.margin_left = 30;
+            value_label.margin_start = 30;
             value_label.get_style_context ().add_class ("dim-label");
 
-            var volume_icon = new Gtk.Image ();
-            volume_icon.icon_size = Gtk.IconSize.BUTTON;
-            volume_icon.halign = Gtk.Align.END;
-            volume_icon.margin_left = 10;
-            volume_icon.get_style_context ().add_class ("dim-label");
+            var volume_image = new Gtk.Image ();
+            volume_image.icon_size = Gtk.IconSize.BUTTON;
+            volume_image.halign = Gtk.Align.END;
+            volume_image.margin_start = 10;
+            volume_image.get_style_context ().add_class ("dim-label");
 
             var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             box.pack_start (name_label, true, true, 0);
             box.pack_start (value_label, false, true, 0);
-            box.pack_start (volume_icon, false, true, 0);
+            box.pack_start (volume_image, false, true, 0);
 
             var row = new Gtk.ListBoxRow ();
             row.name = name;
@@ -631,25 +641,25 @@ namespace SoundsPlugin
             this.settings.bind_with_mapping (settings_key,
                                              value_label,
                                              "label",
-                                             GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET,
+                                             GLib.SettingsBindFlags.GET,
                                              (GLib.SettingsBindGetMappingShared) settings_sound_label_getter,
                                              null,
                                              null,
                                              null);
 
             this.settings.bind_with_mapping (settings_key,
-                                             volume_icon,
+                                             volume_image,
                                              "visible",
-                                             GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET,
+                                             GLib.SettingsBindFlags.GET,
                                              (GLib.SettingsBindGetMappingShared) settings_sound_toggled_getter,
                                              null,
                                              null,
                                              null);
 
             this.settings.bind_with_mapping (settings_key + "-volume",
-                                             volume_icon,
+                                             volume_image,
                                              "icon-name",
-                                             GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET,
+                                             GLib.SettingsBindFlags.GET,
                                              (GLib.SettingsBindGetMappingShared) settings_volume_icon_getter,
                                              null,
                                              null,
@@ -789,7 +799,7 @@ namespace SoundsPlugin
                 this.settings.bind_with_mapping ("ticking-sound",
                                                  player,
                                                  "file",
-                                                 GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET,
+                                                 GLib.SettingsBindFlags.GET,
                                                  (GLib.SettingsBindGetMappingShared) settings_file_getter,
                                                  (GLib.SettingsBindSetMappingShared) settings_file_setter,
                                                  null,
@@ -797,7 +807,7 @@ namespace SoundsPlugin
                 this.settings.bind ("ticking-sound-volume",
                                     player,
                                     "volume",
-                                    GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET);
+                                    GLib.SettingsBindFlags.GET);
             }
             catch (SoundsPlugin.SoundPlayerError error) {
                 GLib.critical ("Failed to setup player for \"timer-ticking\" sound");
@@ -812,7 +822,7 @@ namespace SoundsPlugin
                 this.settings.bind_with_mapping ("pomodoro-end-sound",
                                                  this.pomodoro_end_sound,
                                                  "file",
-                                                 GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET,
+                                                 GLib.SettingsBindFlags.GET,
                                                  (GLib.SettingsBindGetMappingShared) settings_file_getter,
                                                  (GLib.SettingsBindSetMappingShared) settings_file_setter,
                                                  null,
@@ -821,7 +831,7 @@ namespace SoundsPlugin
                 this.settings.bind ("pomodoro-end-sound-volume",
                                     this.pomodoro_end_sound,
                                     "volume",
-                                    GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET);
+                                    GLib.SettingsBindFlags.GET);
             }
             catch (SoundsPlugin.SoundPlayerError error) {
                 GLib.critical ("Failed to setup player for \"pomodoro-end\" sound");
@@ -836,7 +846,7 @@ namespace SoundsPlugin
                 this.settings.bind_with_mapping ("pomodoro-start-sound",
                                                  this.pomodoro_start_sound,
                                                  "file",
-                                                 GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET,
+                                                 GLib.SettingsBindFlags.GET,
                                                  (GLib.SettingsBindGetMappingShared) settings_file_getter,
                                                  (GLib.SettingsBindSetMappingShared) settings_file_setter,
                                                  null,
@@ -845,7 +855,7 @@ namespace SoundsPlugin
                 this.settings.bind ("pomodoro-start-sound-volume",
                                     this.pomodoro_start_sound,
                                     "volume",
-                                    GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET);
+                                    GLib.SettingsBindFlags.GET);
             }
             catch (SoundsPlugin.SoundPlayerError error) {
                 GLib.critical ("Failed to setup player for \"pomodoro-start\" sound");

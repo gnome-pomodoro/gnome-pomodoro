@@ -28,46 +28,66 @@ namespace Pomodoro
         INVISIBLE = 1,
         BUSY = 2,
         IDLE = 3,
-        DEFAULT = -1
-    }
+        DEFAULT = -1;
 
-    public string presence_status_to_string (PresenceStatus presence_status)
-    {
-        switch (presence_status)
+        public string to_string ()
         {
-            case PresenceStatus.AVAILABLE:
-                return "available";
+            switch (this)
+            {
+                case AVAILABLE:
+                    return "available";
 
-            case PresenceStatus.INVISIBLE:
-                return "invisible";
+                case BUSY:
+                    return "busy";
 
-            case PresenceStatus.BUSY:
-                return "busy";
+                case IDLE:
+                    return "idle";
 
-            case PresenceStatus.IDLE:
-                return "idle";
+                case INVISIBLE:
+                    return "invisible";
+            }
+
+            return "";
         }
 
-        return "";
-    }
-
-    public PresenceStatus string_to_presence_status (string? presence_status)
-    {
-        switch (presence_status)
+        public static PresenceStatus from_string (string? presence_status)
         {
-            case "available":
-                return PresenceStatus.AVAILABLE;
+            switch (presence_status)
+            {
+                case "available":
+                    return PresenceStatus.AVAILABLE;
 
-            case "invisible":
-                return PresenceStatus.INVISIBLE;
+                case "busy":
+                    return PresenceStatus.BUSY;
 
-            case "busy":
-                return PresenceStatus.BUSY;
+                case "idle":
+                    return PresenceStatus.IDLE;
 
-            case "idle":
-                return PresenceStatus.IDLE;
+                case "invisible":
+                    return PresenceStatus.INVISIBLE;
+            }
+
+            return PresenceStatus.DEFAULT;
         }
 
-        return PresenceStatus.DEFAULT;
+        public string get_label ()
+        {
+            switch (this)
+            {
+                case AVAILABLE:
+                    return _("Available");
+
+                case BUSY:
+                    return _("Busy");
+
+                case IDLE:
+                    return _("Idle");
+
+                case INVISIBLE:
+                    return _("Invisible");
+            }
+
+            return "";
+        }
     }
 }

@@ -29,33 +29,6 @@ namespace Pomodoro
     const double LONG_BREAK_INTERVAL_LOWER = 1.0;
     const double LONG_BREAK_INTERVAL_UPPER = 10.0;
 
-    private const GLib.SettingsBindFlags SETTINGS_BIND_FLAGS =
-                                       GLib.SettingsBindFlags.DEFAULT |
-                                       GLib.SettingsBindFlags.GET |
-                                       GLib.SettingsBindFlags.SET;
-
-    /**
-     * Mapping from settings to presence combobox
-     */
-    private static bool get_presence_status_mapping (GLib.Value   value,
-                                                     GLib.Variant variant,
-                                                     void*        user_data)
-    {
-        var status = string_to_presence_status (variant.get_string ());
-
-        value.set_int ((int) status);
-
-        //if (variant.is_of_type (GLib.VariantType.STRING))
-        //{
-        //    value.set_string (get_presence_status_label (status));
-        //}
-        //else {
-        //    value.set_int ((int) status);
-        //}
-
-        return true;
-    }
-
     /**
      * Mapping from settings to presence combobox
      */
@@ -63,55 +36,11 @@ namespace Pomodoro
                                                            GLib.Variant variant,
                                                            void*        user_data)
     {
-        var status = string_to_presence_status (variant.get_string ());
+        var presence_status = Pomodoro.PresenceStatus.from_string (variant.get_string ());
 
-        value.set_string (get_presence_status_label (status));
+        value.set_string (presence_status.get_label ());
 
         return true;
-    }
-
-    /**
-     * Mapping from presence combobox to settings
-     */
-    [CCode (has_target = false)]
-    private static GLib.Variant set_presence_status_mapping (GLib.Value       value,
-                                                             GLib.VariantType expected_type,
-                                                             void*            user_data)
-    {
-        var status = (Pomodoro.PresenceStatus) value.get_int ();
-
-        return new GLib.Variant.string (presence_status_to_string (status));
-    }
-
-    private string? get_presence_status_label (Pomodoro.PresenceStatus status)
-    {
-        switch (status)
-        {
-            case PresenceStatus.AVAILABLE:
-                return _("Available");
-
-            case PresenceStatus.BUSY:
-                return _("Busy");
-
-            case PresenceStatus.INVISIBLE:
-                return _("Invisible");
-
-            // case PresenceStatus.AWAY:
-            //     return _("Away");
-
-            case PresenceStatus.IDLE:
-                return _("Idle");
-        }
-
-        return null;
-    }
-
-    [CCode (has_target = false)]
-    private static Variant dummy_setter (GLib.Value       value,
-                                         GLib.VariantType expected_type,
-                                         void*            user_data)
-    {
-        return new Variant.string ("");
     }
 
     private static void list_box_separator_func (Gtk.ListBoxRow  row,
@@ -174,7 +103,7 @@ namespace Pomodoro
             this.settings.bind ("toggle-timer-key",
                                 this.accelerator,
                                 "name",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
             this.on_accelerator_changed ();
         }
 
@@ -557,19 +486,19 @@ namespace Pomodoro
             this.settings.bind ("pomodoro-duration",
                                 pomodoro_scale.base_adjustment,
                                 "value",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
             this.settings.bind ("short-break-duration",
                                 short_break_scale.base_adjustment,
                                 "value",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
             this.settings.bind ("long-break-duration",
                                 long_break_scale.base_adjustment,
                                 "value",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
             this.settings.bind ("long-break-interval",
                                 long_break_interval_spinbutton.adjustment,
                                 "value",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
 
             this.accelerator = new Pomodoro.Accelerator ();
             this.accelerator.changed.connect(() => {
@@ -579,7 +508,7 @@ namespace Pomodoro
             this.settings.bind ("toggle-timer-key",
                                 this.accelerator,
                                 "name",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.GET);
         }
 
         private void setup_notifications_section (Gtk.Builder builder)
@@ -587,12 +516,12 @@ namespace Pomodoro
             this.settings.bind ("show-screen-notifications",
                                 builder.get_object ("screen_notifications_toggle"),
                                 "active",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
 
             this.settings.bind ("show-reminders",
                                 builder.get_object ("reminders_toggle"),
                                 "active",
-                                SETTINGS_BIND_FLAGS);
+                                GLib.SettingsBindFlags.DEFAULT);
         }
 
         private void setup_other_section (Gtk.Builder builder)
@@ -600,18 +529,18 @@ namespace Pomodoro
             this.settings.bind_with_mapping ("presence-during-pomodoro",
                                              builder.get_object ("pomodoro_presence_label"),
                                              "label",
-                                             GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET,
+                                             GLib.SettingsBindFlags.GET,
                                              (GLib.SettingsBindGetMappingShared) get_presence_status_label_mapping,
-                                             (GLib.SettingsBindSetMappingShared) dummy_setter,
+                                             null,
                                              null,
                                              null);
 
             this.settings.bind_with_mapping ("presence-during-break",
                                              builder.get_object ("break_presence_label"),
                                              "label",
-                                             GLib.SettingsBindFlags.DEFAULT | GLib.SettingsBindFlags.GET,
+                                             GLib.SettingsBindFlags.GET,
                                              (GLib.SettingsBindGetMappingShared) get_presence_status_label_mapping,
-                                             (GLib.SettingsBindSetMappingShared) dummy_setter,
+                                             null,
                                              null,
                                              null);
         }
@@ -847,7 +776,6 @@ namespace Pomodoro
             }
             else {
                 unowned GLib.List<string> last = this.history.last ();
-                string? last_name = null;
 
                 /* ignore if last element is the same */
                 if (last != null && last.data == name) {

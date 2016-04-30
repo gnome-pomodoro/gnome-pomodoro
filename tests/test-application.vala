@@ -24,48 +24,42 @@ namespace Pomodoro
     {
         public ApplicationTest ()
         {
+//            this.add_test ("timer_save",
+//                           this.test_timer_save);
+
 //            this.add_test ("timer_restore",
 //                           this.test_timer_restore);
         }
 
         public override void setup () {
-//            var settings = Pomodoro.get_settings ()
-//                                   .get_child ("preferences");
-//            settings.set_double ("pomodoro-duration", POMODORO_DURATION);
-//            settings.set_double ("short-break-duration", SHORT_BREAK_DURATION);
-//            settings.set_double ("long-break-duration", LONG_BREAK_DURATION);
-//            settings.set_double ("long-break-interval", LONG_BREAK_INTERVAL);
-//            settings.set_boolean ("pause-when-idle", false);
         }
 
         public override void teardown () {
-            var settings = Pomodoro.get_settings ();
-            settings.revert ();
         }
 
-        public void test_save ()
-        {
-            var settings = Pomodoro.get_settings ()
-                                   .get_child ("state");
+//        public void test_save ()
+//        {
+//            var settings = Pomodoro.get_settings ()
+//                                   .get_child ("state");
+//
+//            var timer = new Pomodoro.Timer();
+//
+//            /* TODO */
+//        }
 
-            var timer = new Pomodoro.Timer();
-
-            /* TODO */
-        }
-
-        /**
-         * Unit test for Pomodoro.Timer.restore() method.
-         *
-         * Check whether restoring timer works correctly.
-         */
-        public void test_restore ()
-        {
-            var settings = Pomodoro.get_settings ()
-                                   .get_child ("state");
-
-            var timer = new Pomodoro.Timer();
-
-            /* TODO */
-        }
+//        /**
+//         * Unit test for Pomodoro.Timer.restore() method.
+//         *
+//         * Check whether restoring timer works correctly.
+//         */
+//        public void test_restore ()
+//        {
+//            var settings = Pomodoro.get_settings ()
+//                                   .get_child ("state");
+//
+//            var timer = new Pomodoro.Timer();
+//
+//            /* TODO */
+//        }
     }
 }

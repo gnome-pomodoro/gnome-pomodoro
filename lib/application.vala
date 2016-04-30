@@ -95,18 +95,13 @@ public class Pomodoro.Application : Gtk.Application
 
     private void setup_resources ()
     {
-        try {
-            var css_provider = new Gtk.CssProvider ();
-            css_provider.load_from_resource ("/org/gnome/pomodoro/ui/style.css");
+        var css_provider = new Gtk.CssProvider ();
+        css_provider.load_from_resource ("/org/gnome/pomodoro/ui/style.css");
 
-            Gtk.StyleContext.add_provider_for_screen (
-                                         Gdk.Screen.get_default (),
-                                         css_provider,
-                                         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-        }
-        catch (GLib.Error error) {
-            GLib.warning (error.message);
-        }
+        Gtk.StyleContext.add_provider_for_screen (
+                                     Gdk.Screen.get_default (),
+                                     css_provider,
+                                     Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
 
     private void setup_plugins ()
@@ -628,7 +623,7 @@ public class Pomodoro.Application : Gtk.Application
      */
     private void on_desktop_presence_status_notify ()
     {
-        GLib.debug ("on_desktop_presence_status_notify %s", presence_status_to_string (this.desktop.presence_status));
+        GLib.debug ("on_desktop_presence_status_notify %s", this.desktop.presence_status.to_string ());
 
         if (this.desktop.presence_status == Pomodoro.PresenceStatus.IDLE) {
             this.timer.pause ();

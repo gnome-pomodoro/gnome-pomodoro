@@ -209,8 +209,6 @@ namespace Pomodoro
         private void on_settings_changed (GLib.Settings settings,
                                           string        key)
         {
-            var state_duration = this.timer.state_duration;
-
             switch (key)
             {
                 case "show-screen-notifications":

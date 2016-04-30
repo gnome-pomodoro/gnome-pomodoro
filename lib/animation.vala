@@ -192,12 +192,9 @@ namespace Pomodoro
 
                 case AnimationMode.BLINK:
                     return calculate_blink;
-
-                default:
-                    return calculate_linear;
             }
 
-            return null;
+            return calculate_linear;
         }
 
         private static double calculate_linear (double t)
