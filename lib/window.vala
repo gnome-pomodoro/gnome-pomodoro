@@ -66,6 +66,8 @@ namespace Pomodoro
         [GtkChild]
         private Gtk.Widget timer_box;
         [GtkChild]
+        private Gtk.Widget timer_frame;
+        [GtkChild]
         private Gtk.Button pause_button;
 
         private Pomodoro.Animation blink_animation;
@@ -135,6 +137,8 @@ namespace Pomodoro
 
             this.minutes_label.label = "%02u".printf (minutes);
             this.seconds_label.label = "%02u".printf (seconds);
+
+            this.timer_frame.queue_draw ();
         }
 
         private void on_timer_is_paused_notify ()
