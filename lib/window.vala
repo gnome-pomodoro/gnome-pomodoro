@@ -222,7 +222,8 @@ namespace Pomodoro
                 context.set_source_rgba (color.red,
                                          color.green,
                                          color.blue,
-                                         color.alpha * (FADED_IN - FADED_OUT));
+                                         color.alpha * FADED_IN - (color.alpha * 0.1) * (1.0 - FADED_IN));
+
                 context.arc (x, y, TIMER_RADIUS, angle1, angle2);
                 context.stroke ();
             }
