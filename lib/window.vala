@@ -244,6 +244,19 @@ namespace Pomodoro
             }
         }
 
+        [GtkCallback]
+        private bool on_button_press (Gtk.Widget      widget,
+                                      Gdk.EventButton event)
+        {
+            if (event.button == 1) {
+                this.begin_move_drag ((int) event.button, (int) event.x_root, (int) event.y_root, event.time);
+
+                return true;
+            }
+
+            return false;
+        }
+
         private void on_start_activate (GLib.SimpleAction action,
                                         GLib.Variant?     parameter)
         {
