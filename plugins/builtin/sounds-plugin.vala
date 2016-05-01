@@ -428,13 +428,31 @@ namespace SoundsPlugin
 
         protected override void setup_player ()
         {
-            var player = SoundsPlugin.ApplicationExtension.instance.ticking_sound;
+            try {
+                var player = new SoundsPlugin.GStreamerPlayer ();
+                player.repeat = true;
 
-            if (player is SoundPlayerProxy) {
-                player = (player as SoundPlayerProxy).player;
+                this.player = player;
             }
+            catch (SoundsPlugin.SoundPlayerError error) {
+                GLib.critical ("Failed to setup player for \"timer-ticking\" sound");
+            }
+        }
 
-            this.player = new SoundPlayerProxy (player);
+        public override void map ()
+        {
+            var application_extension = SoundsPlugin.ApplicationExtension.instance;
+            application_extension.inhibit_ticking_sound ();
+
+            base.map ();
+        }
+
+        public override void unmap ()
+        {
+            var application_extension = SoundsPlugin.ApplicationExtension.instance;
+            application_extension.uninhibit_ticking_sound ();
+
+            base.unmap ();
         }
     }
 
@@ -744,6 +762,7 @@ namespace SoundsPlugin
         private Pomodoro.Timer timer;
         private GLib.Settings  settings;
         private uint           fade_out_timeout_id;
+        private bool           ticking_sound_inhibited;
 
         construct
         {
@@ -771,6 +790,28 @@ namespace SoundsPlugin
         ~ApplicationExtension ()
         {
             this.timer.state_changed.disconnect (this.on_timer_state_changed);
+        }
+
+        public void inhibit_ticking_sound ()
+        {
+            if (this.ticking_sound_inhibited) {
+                return;
+            }
+
+            this.ticking_sound_inhibited = true;
+
+            this.update_ticking_sound ();
+        }
+
+        public void uninhibit_ticking_sound ()
+        {
+            if (!this.ticking_sound_inhibited) {
+                return;
+            }
+
+            this.ticking_sound_inhibited = false;
+
+            this.update_ticking_sound ();
         }
 
         /**
@@ -815,8 +856,6 @@ namespace SoundsPlugin
                 var player = new SoundsPlugin.GStreamerPlayer ();
                 player.repeat = true;
 
-                this.ticking_sound = new SoundPlayerProxy (player);
-
                 this.settings.bind_with_mapping ("ticking-sound",
                                                  player,
                                                  "file",
@@ -829,6 +868,8 @@ namespace SoundsPlugin
                                     player,
                                     "volume",
                                     GLib.SettingsBindFlags.GET);
+
+                this.ticking_sound = player;
             }
             catch (SoundsPlugin.SoundPlayerError error) {
                 GLib.critical ("Failed to setup player for \"timer-ticking\" sound");
@@ -928,8 +969,10 @@ namespace SoundsPlugin
         private void update_ticking_sound ()
                      requires (this.timer != null)
         {
-            if (this.timer.state is Pomodoro.PomodoroState && !this.timer.is_paused) {
+            if (this.timer.state is Pomodoro.PomodoroState && !this.timer.is_paused && !this.ticking_sound_inhibited) {
                 this.schedule_fade_out ();
+
+                (this.ticking_sound as Fadeable).fade_in (FADE_IN_TIME);
             }
             else {
                 this.unschedule_fade_out ();
