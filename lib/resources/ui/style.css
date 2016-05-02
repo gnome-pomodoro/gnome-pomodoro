@@ -41,6 +41,36 @@
     font-size: 14px;
 }
 
+.pomodoro-symbolic-button {
+    outline: 0;
+    border: 0;
+    padding: 25px;
+    -gtk-icon-shadow: none;
+    border-radius: 50%;
+    -gtk-outline-radius: 50%;
+    box-shadow: none;
+}
+
+.pomodoro-symbolic-button:focus {
+    outline: 1px dashed alpha(@theme_fg_color, 0.1);
+}
+
+.pomodoro-symbolic-button:hover,
+.pomodoro-symbolic-button.suggested-action {
+    outline: 0;
+    color: @theme_fg_color;
+    background-color: @theme_base_color;
+    background-image: none;
+}
+
+.pomodoro-symbolic-button:active,
+.pomodoro-symbolic-button.suggested-action:active {
+    outline: 0;
+    color: shade(@theme_fg_color, 1.5);
+    background-color: @theme_base_color;
+    background-image: none;
+}
+
 .pomodoro-timer-label {
     font-size: 64px;
 }

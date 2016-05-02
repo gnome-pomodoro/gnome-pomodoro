@@ -16,161 +16,63 @@
           <object class="GtkStack" id="stack">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">20</property>
+            <property name="margin_right">20</property>
+            <property name="margin_top">50</property>
+            <property name="margin_bottom">50</property>
             <property name="transition_type">crossfade</property>
-            <signal name="draw" handler="on_stack_draw" swapped="no"/>
             <child>
-              <object class="GtkBox" id="box1">
+              <object class="GtkButton" id="start_button">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
+                <property name="receives_default">True</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
-                <property name="margin_bottom">24</property>
-                <property name="orientation">vertical</property>
-                <property name="spacing">6</property>
+                <property name="action_name">win.start</property>
+                <property name="use_underline">True</property>
                 <child>
-                  <object class="GtkToggleButton">
-                    <property name="visible">True</property>
-                    <property name="sensitive">False</property>
-                    <property name="can_focus">False</property>
-                    <property name="receives_default">False</property>
-                    <property name="halign">center</property>
-                    <property name="relief">none</property>
-                    <style>
-                      <class name="pomodoro-button"/>
-                    </style>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkBox" id="box2">
+                  <object class="GtkImage">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="opacity">0.10000000000000001</property>
-                    <property name="halign">center</property>
-                    <child>
-                      <object class="GtkLabel" id="label3">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">00</property>
-                        <property name="justify">center</property>
-                        <property name="width_chars">2</property>
-                        <style>
-                          <class name="pomodoro-timer-label"/>
-                        </style>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="label4">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="margin_bottom">12</property>
-                        <property name="label" translatable="yes">:</property>
-                        <style>
-                          <class name="pomodoro-timer-label"/>
-                          <class name="pomodoro-separator-label"/>
-                        </style>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="label5">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">00</property>
-                        <property name="justify">center</property>
-                        <property name="width_chars">2</property>
-                        <style>
-                          <class name="pomodoro-timer-label"/>
-                        </style>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
+                    <property name="margin_left">50</property>
+                    <property name="margin_right">50</property>
+                    <property name="margin_top">50</property>
+                    <property name="margin_bottom">50</property>
+                    <property name="pixel_size">64</property>
+                    <property name="icon_name">media-playback-start-symbolic</property>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">1</property>
-                  </packing>
                 </child>
-                <child>
-                  <object class="GtkBox" id="box3">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="margin_top">12</property>
-                    <property name="spacing">16</property>
-                    <property name="homogeneous">True</property>
-                    <child>
-                      <object class="GtkButton" id="start_button">
-                        <property name="label" translatable="yes">_Start</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="can_default">True</property>
-                        <property name="has_default">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="action_name">win.start</property>
-                        <property name="use_underline">True</property>
-                        <style>
-                          <class name="suggested-action"/>
-                          <class name="pomodoro-button"/>
-                        </style>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">2</property>
-                  </packing>
-                </child>
+                <style>
+                  <class name="suggested-action"/>
+                  <class name="pomodoro-symbolic-button"/>
+                </style>
               </object>
               <packing>
                 <property name="name">disabled</property>
               </packing>
             </child>
             <child>
-              <object class="GtkFrame" id="timer_frame">
+              <object class="GtkBox" id="box4">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label_xalign">0</property>
-                <property name="shadow_type">none</property>
-                <signal name="draw" handler="on_timer_frame_draw" swapped="no"/>
+                <property name="valign">center</property>
+                <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkBox" id="box4">
+                  <object class="GtkBox" id="timer_box">
+                    <property name="height_request">400</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">center</property>
-                    <property name="valign">center</property>
-                    <property name="margin_bottom">24</property>
                     <property name="orientation">vertical</property>
-                    <property name="spacing">6</property>
+                    <signal name="draw" handler="on_timer_box_draw" swapped="no"/>
                     <child>
                       <object class="GtkToggleButton" id="state_togglebutton">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="halign">center</property>
+                        <property name="margin_top">90</property>
                         <property name="relief">none</property>
                         <style>
                           <class name="pomodoro-button"/>
@@ -182,11 +84,12 @@
                         <property name="position">0</property>
                       </packing>
                     </child>
-                    <child>
-                      <object class="GtkBox" id="timer_box">
+                    <child type="center">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="halign">center</property>
+                        <property name="valign">center</property>
                         <child>
                           <object class="GtkLabel" id="minutes_label">
                             <property name="visible">True</property>
@@ -241,67 +144,84 @@
                       </object>
                       <packing>
                         <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkBox" id="box6">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="margin_top">12</property>
-                        <property name="spacing">16</property>
-                        <property name="homogeneous">True</property>
-                        <child>
-                          <object class="GtkButton" id="pause_button">
-                            <property name="label" translatable="yes">_Pause</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="can_default">True</property>
-                            <property name="has_default">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="action_name">win.pause</property>
-                            <property name="use_underline">True</property>
-                            <style>
-                              <class name="suggested-action"/>
-                              <class name="pomodoro-button"/>
-                            </style>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkButton" id="stop_button">
-                            <property name="label" translatable="yes">_Stop</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="action_name">win.stop</property>
-                            <property name="use_underline">True</property>
-                            <style>
-                              <class name="pomodoro-button"/>
-                            </style>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="position">2</property>
                       </packing>
                     </child>
                   </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
-                <child type="label_item">
-                  <placeholder/>
+                <child>
+                  <object class="GtkBox" id="box6">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="margin_bottom">24</property>
+                    <property name="spacing">24</property>
+                    <child>
+                      <object class="GtkButton" id="pause_button">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="can_default">True</property>
+                        <property name="has_default">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="action_name">win.pause</property>
+                        <property name="use_underline">True</property>
+                        <child>
+                          <object class="GtkImage" id="pause_button_image">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="pixel_size">32</property>
+                            <property name="icon_name">media-playback-pause-symbolic</property>
+                          </object>
+                        </child>
+                        <style>
+                          <class name="flat"/>
+                          <class name="pomodoro-symbolic-button"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="stop_button">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="action_name">win.stop</property>
+                        <property name="use_underline">True</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="pixel_size">32</property>
+                            <property name="icon_name">media-playback-stop-symbolic</property>
+                          </object>
+                        </child>
+                        <style>
+                          <class name="flat"/>
+                          <class name="pomodoro-symbolic-button"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
                 </child>
               </object>
               <packing>

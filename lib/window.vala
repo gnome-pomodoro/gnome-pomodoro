@@ -24,14 +24,14 @@ namespace Pomodoro
     [GtkTemplate (ui = "/org/gnome/pomodoro/ui/window.ui")]
     public class Window : Gtk.ApplicationWindow, Gtk.Buildable
     {
-        private static const int MIN_WIDTH = 540;
-        private static const int MIN_HEIGHT = 700;
+        private static const int MIN_WIDTH = 500;
+        private static const int MIN_HEIGHT = 650;
 
         private static const double FADED_IN = 1.0;
         private static const double FADED_OUT = 0.2;
 
         private static const double TIMER_LINE_WIDTH = 6.0;
-        private static const double TIMER_RADIUS = 200.0;
+        private static const double TIMER_RADIUS = 165.0;
 
         private struct Name
         {
@@ -66,9 +66,9 @@ namespace Pomodoro
         [GtkChild]
         private Gtk.Widget timer_box;
         [GtkChild]
-        private Gtk.Widget timer_frame;
-        [GtkChild]
         private Gtk.Button pause_button;
+        [GtkChild]
+        private Gtk.Image pause_button_image;
 
         private Pomodoro.Animation blink_animation;
 
@@ -138,7 +138,7 @@ namespace Pomodoro
             this.minutes_label.label = "%02u".printf (minutes);
             this.seconds_label.label = "%02u".printf (seconds);
 
-            this.timer_frame.queue_draw ();
+            this.timer_box.queue_draw ();
         }
 
         private void on_timer_is_paused_notify ()
@@ -149,8 +149,8 @@ namespace Pomodoro
             }
 
             if (this.timer.is_paused) {
-                this.pause_button.label       = _("_Resume");
-                this.pause_button.action_name = "win.resume";
+                this.pause_button_image.icon_name = "media-playback-start-symbolic";
+                this.pause_button.action_name     = "win.resume";
 
                 this.blink_animation = new Pomodoro.Animation (Pomodoro.AnimationMode.BLINK,
                                                                2500,
@@ -162,8 +162,8 @@ namespace Pomodoro
                 this.blink_animation.start_with_value (1.0);
             }
             else {
-                this.pause_button.label       = _("_Pause");
-                this.pause_button.action_name = "win.pause";
+                this.pause_button_image.icon_name = "media-playback-pause-symbolic";
+                this.pause_button.action_name     = "win.pause";
 
                 this.blink_animation = new Pomodoro.Animation (Pomodoro.AnimationMode.EASE_OUT,
                                                                200,
@@ -176,31 +176,8 @@ namespace Pomodoro
         }
 
         [GtkCallback]
-        private bool on_stack_draw (Gtk.Widget    widget,
-                                    Cairo.Context context)
-        {
-            var style_context = widget.get_style_context ();
-            var color         = style_context.get_color (widget.get_state_flags ());
-
-            var width  = widget.get_allocated_width ();
-            var height = widget.get_allocated_height ();
-            var x      = 0.5 * width;
-            var y      = 0.5 * height;
-
-            context.set_line_width (TIMER_LINE_WIDTH);
-            context.set_source_rgba (color.red,
-                                     color.green,
-                                     color.blue,
-                                     color.alpha * 0.1);
-            context.arc (x, y, TIMER_RADIUS, 0.0, 2 * Math.PI);
-            context.stroke ();
-
-            return false;
-        }
-
-        [GtkCallback]
-        private bool on_timer_frame_draw (Gtk.Widget    widget,
-                                          Cairo.Context context)
+        private bool on_timer_box_draw (Gtk.Widget    widget,
+                                        Cairo.Context context)
         {
             if (!(this.timer.state is Pomodoro.DisabledState))
             {
@@ -218,6 +195,14 @@ namespace Pomodoro
                 var angle2 = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
 
                 context.set_line_width (TIMER_LINE_WIDTH);
+
+                context.set_source_rgba (color.red,
+                                         color.green,
+                                         color.blue,
+                                         color.alpha * 0.1);
+                context.arc (x, y, TIMER_RADIUS, 0.0, 2 * Math.PI);
+                context.stroke ();
+
                 context.set_line_cap (Cairo.LineCap.ROUND);
                 context.set_source_rgba (color.red,
                                          color.green,
