@@ -28,6 +28,7 @@
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
                 <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">Start Pomodoro</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
                 <property name="action_name">win.start</property>
@@ -169,6 +170,7 @@
                         <property name="can_default">True</property>
                         <property name="has_default">True</property>
                         <property name="receives_default">True</property>
+                        <property name="tooltip_text" translatable="yes">Pause</property>
                         <property name="action_name">win.pause</property>
                         <property name="use_underline">True</property>
                         <child>
@@ -195,6 +197,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <property name="tooltip_text" translatable="yes">Stop</property>
                         <property name="action_name">win.stop</property>
                         <property name="use_underline">True</property>
                         <child>

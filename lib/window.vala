@@ -151,6 +151,7 @@ namespace Pomodoro
             if (this.timer.is_paused) {
                 this.pause_button_image.icon_name = "media-playback-start-symbolic";
                 this.pause_button.action_name     = "win.resume";
+                this.pause_button.tooltip_text    = _("Resume");
 
                 this.blink_animation = new Pomodoro.Animation (Pomodoro.AnimationMode.BLINK,
                                                                2500,
@@ -164,6 +165,7 @@ namespace Pomodoro
             else {
                 this.pause_button_image.icon_name = "media-playback-pause-symbolic";
                 this.pause_button.action_name     = "win.pause";
+                this.pause_button.tooltip_text    = _("Pause");
 
                 this.blink_animation = new Pomodoro.Animation (Pomodoro.AnimationMode.EASE_OUT,
                                                                200,
