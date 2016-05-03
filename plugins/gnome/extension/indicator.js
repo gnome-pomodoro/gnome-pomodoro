@@ -339,28 +339,23 @@ const IndicatorIcon = new Lang.Class({
         let cr = area.get_context();
         let [width, height] = area.get_surface_size();
 
-        let radius = 0.5 * this._iconSize - 2.0;
-        let progress = Math.min(Math.max(this._progress, 0), 1);
+        let radius    = 0.5 * this._iconSize - 2.0;
+        let progress  = this._progress;
         let isRunning = this._state != Timer.State.NULL;
-        let isBreak = (this._state == Timer.State.SHORT_BREAK ||
-                       this._state == Timer.State.LONG_BREAK);
+        let isBreak   = (this._state == Timer.State.SHORT_BREAK ||
+                         this._state == Timer.State.LONG_BREAK);
 
         cr.translate(0.5 * width, 0.5 * height);
         cr.setOperator(Cairo.Operator.SOURCE);
         cr.setLineCap(Cairo.LineCap.ROUND);
 
-        let angle1 = - 0.5 * Math.PI;
-        let angle2 = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
+        let angle1 = - 0.5 * Math.PI - 2.0 * Math.PI * Math.min(Math.max(progress, 0.000001), 1.0);
+        let angle2 = - 0.5 * Math.PI;
 
         /* background pie */
         if (isBreak || !isRunning) {
             Clutter.cairo_set_source_color(cr, this._secondaryColor);
-            if (angle2 > angle1) {
-                cr.arcNegative(0, 0, radius, angle1, angle2);
-            }
-            else {
-                cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
-            }
+            cr.arcNegative(0, 0, radius, angle1, angle2);
             cr.setLineWidth(2.2);
             cr.stroke();
         }
@@ -372,7 +367,7 @@ const IndicatorIcon = new Lang.Class({
 
             if (angle2 > angle1) {
                 Clutter.cairo_set_source_color(cr, this._primaryColor);
-                cr.arc(0, 0, radius, angle1, angle2);
+                cr.arcNegative(0, 0, radius, angle1, angle2);
                 cr.setOperator(Cairo.Operator.CLEAR);
                 cr.setLineWidth(3.5);
                 cr.strokePreserve();

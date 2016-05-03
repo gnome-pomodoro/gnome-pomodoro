@@ -193,8 +193,8 @@ namespace Pomodoro
                 var progress = this.timer.state_duration > 0.0
                         ? this.timer.elapsed / this.timer.state_duration : 0.0;
 
-                var angle1 = - 0.5 * Math.PI;
-                var angle2 = - 0.5 * Math.PI + 2.0 * Math.PI * progress;
+                var angle1 = - 0.5 * Math.PI - 2.0 * Math.PI * progress.clamp (0.000001, 1.0);
+                var angle2 = - 0.5 * Math.PI;
 
                 context.set_line_width (TIMER_LINE_WIDTH);
 
@@ -211,7 +211,7 @@ namespace Pomodoro
                                          color.blue,
                                          color.alpha * FADED_IN - (color.alpha * 0.1) * (1.0 - FADED_IN));
 
-                context.arc (x, y, TIMER_RADIUS, angle1, angle2);
+                context.arc_negative (x, y, TIMER_RADIUS, angle1, angle2);
                 context.stroke ();
             }
 
