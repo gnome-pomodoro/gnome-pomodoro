@@ -567,9 +567,9 @@ const PomodoroEndDialog = new Lang.Class({
     },
 
     _onEvent: function(actor, event) {
-        let dx, dy, distance;
+        let x, y, dx, dy, distance;
 
-        if (!event.get_device () || event.any.flags & Clutter.EventFlag.FLAG_SYNTHETIC) {
+        if (!event.get_device ()) {
             return Clutter.EVENT_STOP;
         }
 
@@ -584,8 +584,9 @@ const PomodoroEndDialog = new Lang.Class({
                 return Clutter.EVENT_PROPAGATE;
 
             case Clutter.EventType.MOTION:
-                dx       = this._eventX >= 0 ? event.x - this._eventX : 0;
-                dy       = this._eventY >= 0 ? event.y - this._eventY : 0;
+                [x, y]   = event.get_coords();
+                dx       = this._eventX >= 0 ? x - this._eventX : 0;
+                dy       = this._eventY >= 0 ? y - this._eventY : 0;
                 distance = dx * dx + dy * dy;
 
                 this._eventX = x;
