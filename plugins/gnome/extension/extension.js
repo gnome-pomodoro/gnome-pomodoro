@@ -288,7 +288,6 @@ const PomodoroExtension = new Lang.Class({
     disableIndicator: function() {
         if (this.indicator) {
             this.indicator.destroy();
-            this.indicator = null;
         }
     },
 

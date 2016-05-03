@@ -299,7 +299,7 @@ const IndicatorIcon = new Lang.Class({
         this._natVPadding     = 0;
         this._primaryColor    = null;
         this._secondaryColor  = null;
-        this._onTimerUpdateId = 0;
+        this._timerUpdateId = 0;
 
         this.timer = timer;
 
@@ -318,7 +318,7 @@ const IndicatorIcon = new Lang.Class({
         this.actor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
         this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
 
-        this._onTimerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+        this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
 
         this._onTimerUpdate();
 
@@ -387,9 +387,9 @@ const IndicatorIcon = new Lang.Class({
     },
 
     _onIconDestroy: function() {
-        if (this._onTimerUpdateId) {
-            this.timer.disconnect(this._onTimerUpdateId);
-            this._onTimerUpdateId = 0;
+        if (this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
         }
     },
 
@@ -478,9 +478,9 @@ const IndicatorIcon = new Lang.Class({
     },
 
     _onActorDestroy: function() {
-        if (this._onTimerUpdateId) {
-            this.timer.disconnect(this._onTimerUpdateId);
-            this._onTimerUpdateId = 0;
+        if (this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
         }
 
         this.timer = null;
@@ -509,6 +509,7 @@ const Indicator = new Lang.Class({
         this.icon = new IndicatorIcon(this.timer);
 
         this.actor.add_style_class_name('extension-pomodoro-indicator');
+        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
 
         this._arrow = PopupMenu.arrowIcon(St.Side.BOTTOM);
         this._blinking = false;
@@ -522,8 +523,8 @@ const Indicator = new Lang.Class({
 
         this._onBlinked();
 
-        this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
-        this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
+        this._timerPausedId = this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
+        this._timerResumedId = this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
     },
 
     _onBlinked: function() {
@@ -583,17 +584,22 @@ const Indicator = new Lang.Class({
         }
     },
 
-    destroy: function() {
+    _onActorDestroy: function() {
         Tweener.removeTweens(this._hbox);
         Tweener.removeTweens(this.menu.timerLabel);
         Tweener.removeTweens(this.menu.pauseAction.child);
 
+        this.timer.disconnect(this._timerPausedId);
+        this.timer.disconnect(this._timerResumedId);
         this.timer = null;
 
         if (this.icon) {
             this.icon.destroy();
+            this.icon = null;
         }
+    },
 
+    destroy: function() {
         this.parent();
     }
 });
