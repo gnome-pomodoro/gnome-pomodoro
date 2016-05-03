@@ -53,6 +53,8 @@ const FADE_IN_OPACITY = 1.0;
 const FADE_OUT_TIME = 1250;
 const FADE_OUT_OPACITY = 0.38;
 
+const STEPS = 120;
+
 
 const IndicatorMenu = new Lang.Class({
     Name: 'PomodoroIndicatorMenu',
@@ -436,7 +438,7 @@ const IndicatorIcon = new Lang.Class({
 
     _onTimerUpdate: function() {
         let state = this.timer.getState();
-        let progress = this.timer.getProgress();
+        let progress = Math.floor(this.timer.getProgress() * STEPS) / STEPS;
 
         if (this._progress !== progress || this._state !== state) {
             this._state = state;
