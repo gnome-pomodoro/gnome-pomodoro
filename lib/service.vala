@@ -56,12 +56,13 @@ namespace Pomodoro
                         Pomodoro.Timer      timer)
         {
             this.connection = connection;
-            this.timer = timer;
             this.changed_properties = new GLib.HashTable<string, GLib.Variant> (str_hash, str_equal);
             this.idle_id = 0;
 
             this.cancellable = new GLib.Cancellable ();
 
+            this.timer = timer;
+            this.timer.state_changed.connect (this.on_timer_state_changed);
             this.timer.notify.connect (this.on_timer_property_notify);
         }
 
@@ -192,6 +193,28 @@ namespace Pomodoro
             }
         }
 
+        private static GLib.HashTable<string, GLib.Variant> serialize_timer_state (Pomodoro.TimerState state)
+        {
+            var serialized = new GLib.HashTable<string, GLib.Variant> (str_hash, str_equal);
+            serialized.insert ("name", new GLib.Variant.string (state.name));
+            serialized.insert ("elapsed", new GLib.Variant.double (state.elapsed));
+            serialized.insert ("duration", new GLib.Variant.double (state.duration));
+            serialized.insert ("timestamp", new GLib.Variant.double (state.timestamp));
+
+            return serialized;
+        }
+
+        private void on_timer_state_changed (Pomodoro.TimerState state,
+                                             Pomodoro.TimerState previous_state)
+        {
+            this.state_changed (serialize_timer_state (state),
+                                serialize_timer_state (previous_state));
+        }
+
+        public signal void state_changed (GLib.HashTable<string, GLib.Variant> state,
+                                          GLib.HashTable<string, GLib.Variant> previous_state);
+
+        [DBus (visible = false)]
         public virtual signal void destroy ()
         {
             this.dispose ();
