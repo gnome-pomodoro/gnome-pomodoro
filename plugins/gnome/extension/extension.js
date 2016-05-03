@@ -44,10 +44,16 @@ const Utils = Extension.imports.utils;
 let extension = null;
 
 
+const ExtensionMode = {
+    DEFAULT: 0,
+    SCREEN_SHIELD: 1
+};
+
+
 const PomodoroExtension = new Lang.Class({
     Name: 'PomodoroExtension',
 
-    _init: function() {
+    _init: function(mode) {
         Extension.extension = this;
 
         this.settings           = null;
@@ -58,6 +64,7 @@ const PomodoroExtension = new Lang.Class({
         this.dialog             = null;
         this.reminderManager    = null;
         this.presence           = null;
+        this.mode               = null;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
@@ -78,14 +85,32 @@ const PomodoroExtension = new Lang.Class({
             this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
             this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
 
-            this.enableIndicator();
-            this.enableScreenNotifications();
-            this.enableReminders();
-            this.enableNotifications();
-            this.enablePresence();
+            this.dbus = new DBus.PomodoroExtension();
+
+            this.setMode(mode);
         }
         catch (error) {
             Utils.logError(error.message);
+        }
+    },
+
+    setMode: function(mode) {
+        if (this.mode !== mode) {
+            this.mode = mode;
+
+            if (mode == ExtensionMode.SCREEN_SHIELD) {
+                this.disableIndicator();
+                this.disableScreenNotifications();
+                this.disableReminders();
+            }
+            else {
+                this.enableIndicator();
+                this.enableScreenNotifications();
+                this.enableReminders();
+            }
+
+            this.enableNotifications();
+            this.enablePresence();
         }
     },
 
@@ -446,6 +471,7 @@ const PomodoroExtension = new Lang.Class({
             this.notificationSource.destroy();
         }
 
+        this.dbus.destroy();
         this.timer.destroy();
 
         this.settings.run_dispose();
@@ -463,19 +489,51 @@ function init(metadata) {
 
 
 function enable() {
+    let pomodoroExtension, sessionModeUpdatedId;
+
+    if (Main.pomodoroExtension) {
+        Main.pomodoroExtension.destroy();
+    }
+
     if (!extension) {
-        extension = new PomodoroExtension();
-        extension.connect('destroy', Lang.bind(this,
+        pomodoroExtension = new PomodoroExtension(Main.sessionMode.isLocked
+                                                  ? ExtensionMode.SCREEN_SHIELD : ExtensionMode.DEFAULT);
+        pomodoroExtension.connect('destroy',
             function() {
                 extension = null;
-            }));
+
+                if (sessionModeUpdatedId != 0) {
+                    Main.sessionMode.disconnect(sessionModeUpdatedId);
+                    sessionModeUpdatedId = 0;
+                }
+
+                if (Main.pomodoroExtension === pomodoroExtension) {
+                    delete Main.pomodoroExtension;
+                }
+            });
+
+        sessionModeUpdatedId = Main.sessionMode.connect('updated',
+            function() {
+                if (!Main.sessionMode.isLocked && pomodoroExtension.mode == ExtensionMode.SCREEN_SHIELD) {
+                    pomodoroExtension.destroy();
+                }
+                // pomodoroExtension.setMode(Main.sessionMode.isLocked
+                //                           ? ExtensionMode.SCREEN_SHIELD : ExtensionMode.DEFAULT);
+            });
+
+        extension = pomodoroExtension;
+        Main.pomodoroExtension = pomodoroExtension;
     }
 }
 
 
 function disable() {
     if (extension) {
-        extension.destroy();
-        extension = null;
+        if (Main.sessionMode.isLocked) {
+            extension.setMode(ExtensionMode.SCREEN_SHIELD);
+        }
+        else {
+            extension.destroy();
+        }
     }
 }
