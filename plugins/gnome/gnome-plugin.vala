@@ -18,11 +18,12 @@
  *
  */
 
-// TODO: open screen notification when coming back from lockscreen and using fallback-only
+using GLib;
+
 
 namespace GnomePlugin
 {
-    public class DesktopExtension : Pomodoro.FallbackDesktopExtension  // Pomodoro.BaseDesktopExtension
+    public class DesktopExtension : Pomodoro.FallbackDesktopExtension
     {
         private static const string[] SHELL_CAPABILITIES = {
             "notifications",
@@ -107,7 +108,6 @@ namespace GnomePlugin
             this.shell_extension.notify["is-enabled"].connect (this.on_shell_extension_is_enabled_notify);
         }
 
-
         private async void connect_shell ()
         {
             if (this.shell_proxy == null)
@@ -185,7 +185,7 @@ namespace GnomePlugin
                     proxy.accelerator_activated.connect (this.on_accelerator_activated);
                 }
                 catch (GLib.IOError error) {
-                    GLib.error ("error while grabbing accelerator: %s", error.message);
+                    GLib.warning ("error while grabbing accelerator: %s", error.message);
                 }
             });
 
@@ -197,7 +197,7 @@ namespace GnomePlugin
                     }
                 }
                 catch (GLib.IOError error) {
-                    GLib.error ("error while ungrabbing accelerator: %s", error.message);
+                    GLib.warning ("error while ungrabbing accelerator: %s", error.message);
                 }
 
                 proxy.accelerator_activated.disconnect (this.on_accelerator_activated);

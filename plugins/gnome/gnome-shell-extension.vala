@@ -37,7 +37,6 @@ namespace GnomePlugin
         private string                 path;
         private string                 version;
         private Gnome.ExtensionState   state;
-        private Gnome.Shell?           shell_proxy            = null;  // TODO: not needed all the time, remove it
         private Gnome.ShellExtensions? shell_extensions_proxy = null;
         private uint                   enable_timeout_id      = 0;
 
@@ -107,8 +106,6 @@ namespace GnomePlugin
          */
         private void load ()
         {
-            var success = false;
-
             try
             {
                 var script = """
@@ -131,7 +128,12 @@ namespace GnomePlugin
     finder.scanExtensions();
 })();
 """;
-                success = this.shell_proxy.eval (script);
+                var shell_proxy = GLib.Bus.get_proxy_sync<Gnome.Shell> (GLib.BusType.SESSION,
+                                                                        "org.gnome.Shell",
+                                                                        "/org/gnome/Shell",
+                                                                        GLib.DBusProxyFlags.DO_NOT_AUTO_START);
+
+                var success = shell_proxy.eval (script);
 
                 GLib.debug ("Reloaded extensions");
             }
@@ -155,63 +157,29 @@ namespace GnomePlugin
 
         private async void connect_shell ()
         {
-            if (this.shell_proxy == null)
-            {
-                GLib.Bus.get_proxy.begin<Gnome.Shell> (GLib.BusType.SESSION,
-                                                       "org.gnome.Shell",
-                                                       "/org/gnome/Shell",
-                                                       GLib.DBusProxyFlags.DO_NOT_AUTO_START,
-                                                       null,
-                                                       (obj, res) =>
-                    {
-                        try
-                        {
-                            this.shell_proxy = GLib.Bus.get_proxy.end (res);
-                        }
-                        catch (GLib.IOError error)
-                        {
-                            GLib.critical ("%s", error.message);
-                        }
-
-                        if (this.shell_proxy != null &&
-                            this.shell_extensions_proxy != null)
-                        {
-                            this.connect_shell.callback ();
-                        }
-                    });
-            }
-
             if (this.shell_extensions_proxy == null)
             {
                 GLib.Bus.get_proxy.begin<Gnome.ShellExtensions> (GLib.BusType.SESSION,
-                                                                 "org.gnome.Shell",
-                                                                 "/org/gnome/Shell",
-                                                                 GLib.DBusProxyFlags.DO_NOT_AUTO_START,
-                                                                 null,
-                                                                 (obj, res) =>
+                                                                   "org.gnome.Shell",
+                                                                   "/org/gnome/Shell",
+                                                                   GLib.DBusProxyFlags.DO_NOT_AUTO_START,
+                                                                   null,
+                                                                   (obj, res) =>
+                {
+                    try
                     {
-                        try
-                        {
-                            this.shell_extensions_proxy = GLib.Bus.get_proxy.end (res);
+                        this.shell_extensions_proxy = GLib.Bus.get_proxy.end (res);
 
-                            this.shell_extensions_proxy.extension_status_changed.connect (this.on_status_changed);
-                        }
-                        catch (GLib.IOError error)
-                        {
-                            GLib.critical ("%s", error.message);
-                        }
+                        this.shell_extensions_proxy.extension_status_changed.connect (this.on_status_changed);
+                    }
+                    catch (GLib.IOError error)
+                    {
+                        GLib.critical ("%s", error.message);
+                    }
 
-                        if (this.shell_proxy != null &&
-                            this.shell_extensions_proxy != null)
-                        {
-                            this.connect_shell.callback ();
-                        }
-                    });
-            }
+                    this.connect_shell.callback ();
+                });
 
-            if (this.shell_proxy == null ||
-                this.shell_extensions_proxy == null)
-            {
                 yield;
             }
         }
@@ -227,8 +195,7 @@ namespace GnomePlugin
         {
             this.enable_timeout_id = GLib.Timeout.add (5000, this.on_enable_timeout);
 
-            if (this.shell_proxy == null ||
-                this.shell_extensions_proxy == null)
+            if (this.shell_extensions_proxy == null)
             {
                 /* Wait until connected to shell d-bus */
                 yield this.connect_shell ();
@@ -479,7 +446,6 @@ namespace GnomePlugin
 
         public override void dispose ()
         {
-            this.shell_proxy = null;
             this.shell_extensions_proxy = null;
 
             GLib.Application.get_default ()
