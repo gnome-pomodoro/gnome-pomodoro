@@ -1,13 +1,12 @@
 [Desktop Entry]
 _Name=Pomodoro
 _Comment=A simple time management utility
-_Keywords=time;timer;tasks;manage;organize;
+_Keywords=timer;
 Exec=gnome-pomodoro
 Icon=gnome-pomodoro
-StartupNotify=true
+StartupNotify=false
 Terminal=false
 Type=Application
 Categories=GNOME;GTK;Utility;
-OnlyShowIn=GNOME;
 X-GNOME-UsesNotifications=true
 DBusActivatable=true
