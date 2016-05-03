@@ -161,7 +161,7 @@
                                         <property name="valign">baseline</property>
                                         <property name="margin_left">5</property>
                                         <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Short break duration</property>
+                                        <property name="label" translatable="yes">Break duration</property>
                                       </object>
                                       <packing>
                                         <property name="left_attach">0</property>
@@ -246,7 +246,7 @@
                                         <property name="halign">start</property>
                                         <property name="valign">baseline</property>
                                         <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Pomodoros until long break</property>
+                                        <property name="label" translatable="yes">Pomodoros before a long break</property>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
