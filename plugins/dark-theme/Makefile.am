@@ -20,17 +20,14 @@ libdark_theme_la_VALAFLAGS = \
 	$(PLUGIN_VALAFLAGS)
 
 libdark_theme_la_CPPFLAGS = \
-	$(PLUGIN_CPPFLAGS) \
-	$(BUILTIN_PLUGIN_CPPFLAGS)
+	$(PLUGIN_CPPFLAGS)
 
 libdark_theme_la_CFLAGS = \
-	$(PLUGIN_CFLAGS) \
-	$(BUILTIN_PLUGIN_CFLAGS)
+	$(PLUGIN_CFLAGS)
 
 libdark_theme_la_LDFLAGS = \
 	$(PLUGIN_LIBS) \
-	$(PLUGIN_LIBTOOL_FLAGS) \
-	$(BUILTIN_PLUGIN_LIBS)
+	$(PLUGIN_LIBTOOL_FLAGS)
 
 libdark_theme_la_LIBADD = \
 	$(top_builddir)/lib/libgnome-pomodoro.la

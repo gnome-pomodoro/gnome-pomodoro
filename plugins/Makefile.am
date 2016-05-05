@@ -1,6 +1,7 @@
 SUBDIRS = \
-	builtin \
-	gnome
+	dark-theme \
+	gnome \
+	sounds
 
 -include $(top_srcdir)/git.mk
 

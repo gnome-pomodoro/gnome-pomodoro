@@ -64,7 +64,7 @@ PKG_CHECK_MODULES(PLUGIN, [
     libpeas-1.0 >= $LIBPEAS_REQUIRED_VERSION
 ])
 
-PKG_CHECK_MODULES(BUILTIN_PLUGIN, [
+PKG_CHECK_MODULES(SOUNDS_PLUGIN, [
     gstreamer-1.0 >= 1.0.10
     libcanberra >= 0.30
 ])
@@ -276,13 +276,12 @@ AC_CONFIG_FILES([
     packages/debian/Makefile
     packages/rpm/Makefile
     plugins/Makefile
-    plugins/builtin/Makefile
-    plugins/builtin/dark-theme/Makefile
-    plugins/builtin/sounds/Makefile
+    plugins/dark-theme/Makefile
     plugins/gnome/Makefile
     plugins/gnome/extension/config.js
     plugins/gnome/extension/metadata.json
     plugins/gnome/extension/Makefile
+    plugins/sounds/Makefile
     tests/Makefile
 ])
 

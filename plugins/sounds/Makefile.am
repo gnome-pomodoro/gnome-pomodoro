@@ -25,16 +25,16 @@ libsounds_la_VALAFLAGS = \
 
 libsounds_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS) \
-	$(BUILTIN_PLUGIN_CPPFLAGS)
+	$(SOUNDS_PLUGIN_CPPFLAGS)
 
 libsounds_la_CFLAGS = \
 	$(PLUGIN_CFLAGS) \
-	$(BUILTIN_PLUGIN_CFLAGS)
+	$(SOUNDS_PLUGIN_CFLAGS)
 
 libsounds_la_LDFLAGS = \
 	$(PLUGIN_LIBS) \
 	$(PLUGIN_LIBTOOL_FLAGS) \
-	$(BUILTIN_PLUGIN_LIBS)
+	$(SOUNDS_PLUGIN_LIBS)
 
 libsounds_la_LIBADD = \
 	$(top_builddir)/lib/libgnome-pomodoro.la
