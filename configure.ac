@@ -277,6 +277,7 @@ AC_CONFIG_FILES([
     packages/rpm/Makefile
     plugins/Makefile
     plugins/builtin/Makefile
+    plugins/builtin/dark-theme/Makefile
     plugins/builtin/sounds/Makefile
     plugins/gnome/Makefile
     plugins/gnome/extension/config.js

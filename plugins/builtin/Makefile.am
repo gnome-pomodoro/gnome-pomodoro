@@ -1,4 +1,5 @@
 SUBDIRS = \
+	dark-theme \
 	sounds
 
 -include $(top_srcdir)/git.mk
