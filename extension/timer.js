@@ -41,8 +41,7 @@ const Timer = new Lang.Class({
     Name: 'PomodoroTimer',
 
     _init: function() {
-        this._proxy = null;
-
+        this._connected = false;
         this._state = null;
         this._propertiesChangedId = 0;
         this._notifyPomodoroStartId = 0;
@@ -50,6 +49,14 @@ const Timer = new Lang.Class({
         this._settingsChangedId = 0;
         this._shortBreakDuration = 0;
         this._longBreakDuration = 0;
+
+        this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
+            if (error) {
+                log('Pomodoro: ' + error.message);
+                this._notifyServiceNotInstalled();
+                return;
+            }
+        }));
 
         this._nameWatcherId = Gio.DBus.session.watch_name(
                                        'org.gnome.Pomodoro',
@@ -66,25 +73,6 @@ const Timer = new Lang.Class({
         catch (error) {
             Extension.extension.logError(error);
         }
-
-        if (this._isRunning()) {
-            this._ensureProxy();
-        }
-    },
-
-    _isRunning: function() {
-        let settings;
-        let state;
-
-        try {
-            settings = Settings.getSettings('org.gnome.pomodoro.state');
-            state = settings.get_string('state');
-        }
-        catch (error) {
-            Extension.extension.logError(error);
-        }
-
-        return state && state != State.NULL;
     },
 
     _onSettingsChanged: function(settings, key) {
@@ -99,64 +87,30 @@ const Timer = new Lang.Class({
         }
     },
 
-    _ensureProxy: function(callback) {
-        if (this._proxy) {
-            if (callback) {
-                callback.call(this);
-            }
-            return;
+    _onNameAppeared: function() {
+        if (this._propertiesChangedId != 0) {
+            this._proxy.disconnect(this._propertiesChangedId);
         }
 
-        this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
-            if (proxy !== this._proxy) {
-                return;
-            }
+        this._connected = true;
 
-            if (error) {
-                Extension.extension.logError(error.message);
-                this._notifyServiceNotInstalled();
-                return;
-            }
+        this._propertiesChangedId = this._proxy.connect(
+                                   'g-properties-changed',
+                                   Lang.bind(this, this._onPropertiesChanged));
+        this._onPropertiesChanged(this._proxy, null);
 
-            /* Keep in mind that signals won't be called right after initialization
-             * when gnome-pomodoro comes back and gets restored
-             */
-            if (this._propertiesChangedId == 0) {
-                this._propertiesChangedId = this._proxy.connect(
-                                           'g-properties-changed',
-                                           Lang.bind(this, this._onPropertiesChanged));
-            }
-
-            if (this._notifyPomodoroStartId == 0) {
-                this._notifyPomodoroStartId = this._proxy.connectSignal(
-                                           'NotifyPomodoroStart',
-                                           Lang.bind(this, this._onNotifyPomodoroStart));
-            }
-
-            if (this._notifyPomodoroEndId == 0) {
-                this._notifyPomodoroEndId = this._proxy.connectSignal(
-                                           'NotifyPomodoroEnd',
-                                           Lang.bind(this, this._onNotifyPomodoroEnd));
-            }
-
-            if (callback) {
-                callback.call(this);
-            }
-
-            this.emit('service-connected');
-            this.emit('state-changed');
-            this.emit('update');
-
-            this._onPropertiesChanged(this._proxy, null);
-        }));
-    },
-
-    _onNameAppeared: function() {
-        this._ensureProxy();
+        this.emit('service-connected');
+        this.emit('state-changed');
+        this.emit('update');
     },
 
     _onNameVanished: function() {
-        this._proxy = null;
+        if (this._propertiesChangedId != 0) {
+            this._proxy.disconnect(this._propertiesChangedId);
+            this._propertiesChangedId = 0;
+        }
+
+        this._connected = false;
 
         this.emit('state-changed');
         this.emit('update');
@@ -184,7 +138,7 @@ const Timer = new Lang.Class({
 
     _onCallback: function(result, error) {
         if (error) {
-            Extension.extension.logError(error.message);
+            log('Pomodoro: ' + error.message);
 
             /* timer toggle assumes success right away, so we need to
                straighten it out */
@@ -197,7 +151,7 @@ const Timer = new Lang.Class({
     },
 
     getState: function() {
-        if (!this._proxy || this._proxy.State == null) {
+        if (!this._connected || this._proxy.State == null) {
             return State.NULL;
         }
 
@@ -205,12 +159,9 @@ const Timer = new Lang.Class({
     },
 
     setState: function(state, duration) {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.SetStateRemote(state,
-                                          duration || 0,
-                                          Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.SetStateRemote(state,
+                                   duration || 0,
+                                   Lang.bind(this, this._onCallback));
     },
 
     getStateDuration: function() {
@@ -236,30 +187,21 @@ const Timer = new Lang.Class({
     },
 
     getProgress: function() {
-        return (this._proxy && this._proxy.StateDuration > 0)
+        return (this._connected && this._proxy.StateDuration > 0)
                 ? this._proxy.Elapsed / this._proxy.StateDuration
                 : 0.0;
     },
 
     start: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.StartRemote(Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.StartRemote(Lang.bind(this, this._onCallback));
     },
 
     stop: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.StopRemote(Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.StopRemote(Lang.bind(this, this._onCallback));
     },
 
     reset: function() {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.ResetRemote(Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.ResetRemote(Lang.bind(this, this._onCallback));
     },
 
     toggle: function() {
@@ -289,17 +231,11 @@ const Timer = new Lang.Class({
     },
 
     showMainWindow: function(timestamp) {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.ShowMainWindowRemote(timestamp, Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.ShowMainWindowRemote(timestamp, Lang.bind(this, this._onCallback));
     },
 
     showPreferences: function(view, timestamp) {
-        this._ensureProxy(Lang.bind(this,
-            function() {
-                this._proxy.ShowPreferencesRemote(view, timestamp, Lang.bind(this, this._onCallback));
-            }));
+        this._proxy.ShowPreferencesRemote(view, timestamp, Lang.bind(this, this._onCallback));
     },
 
     _notifyServiceNotInstalled: function() {
