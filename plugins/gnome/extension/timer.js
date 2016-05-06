@@ -42,9 +42,7 @@ const Timer = new Lang.Class({
     Name: 'PomodoroTimer',
 
     _init: function() {
-        this._proxy = null;
         this._connected = false;
-
         this._state = null;
         this._isPaused = null;
         this._propertiesChangedId = 0;
@@ -57,7 +55,13 @@ const Timer = new Lang.Class({
         this._shortBreakDuration = settings.get_double('short-break-duration');
         this._longBreakDuration  = settings.get_double('long-break-duration');
 
-        this._ensureProxy();
+        this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
+            if (error) {
+                Utils.logWarning(error.message);
+                this._notifyServiceNotInstalled();
+                return;
+            }
+        }));
 
         this._nameWatcherId = Gio.DBus.session.watch_name(
                                        'org.gnome.Pomodoro',
@@ -78,46 +82,21 @@ const Timer = new Lang.Class({
         }
     },
 
-    _ensureProxy: function(callback) {
-        if (this._proxy) {
-            if (callback) {
-                callback.call(this);
-            }
-            return;
+    _onNameAppeared: function() {
+        if (this._propertiesChangedId != 0) {
+            this._proxy.disconnect(this._propertiesChangedId);
         }
 
-        this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
-            if (error) {
-                Utils.logWarning(error.message);
-                this._notifyServiceNotInstalled();
-                return;
-            }
+        this._connected = true;
 
-            /* Keep in mind that signals won't be called right after initialization
-             * when gnome-pomodoro comes back and gets restored
-             */
-            if (this._propertiesChangedId == 0) {
-                this._propertiesChangedId = this._proxy.connect(
-                                           'g-properties-changed',
-                                           Lang.bind(this, this._onPropertiesChanged));
-            }
+        this._propertiesChangedId = this._proxy.connect(
+                                   'g-properties-changed',
+                                   Lang.bind(this, this._onPropertiesChanged));
+        this._onPropertiesChanged(this._proxy, null);
 
-            this._connected = true;
-
-            if (callback) {
-                callback.call(this);
-            }
-
-            this.emit('service-connected');
-            this.emit('state-changed');
-            this.emit('update');
-
-            this._onPropertiesChanged(this._proxy, null);
-        }));
-    },
-
-    _onNameAppeared: function() {
-        this._ensureProxy();
+        this.emit('service-connected');
+        this.emit('state-changed');
+        this.emit('update');
     },
 
     _onNameVanished: function() {
@@ -126,7 +105,6 @@ const Timer = new Lang.Class({
             this._propertiesChangedId = 0;
         }
 
-        this._proxy = null;
         this._connected = false;
 
         this.emit('state-changed');
