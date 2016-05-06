@@ -18,8 +18,13 @@
  *
  */
 
+using GLib;
+
+
 namespace Pomodoro
 {
+    private const string DESKTOP_SESSION_VARIABLE = "DESKTOP_SESSION";
+
     namespace Capabilities
     {
         public const string NOTIFICATIONS = "notifications";
@@ -27,6 +32,61 @@ namespace Pomodoro
         public const string INDICATOR = "indicator";
         public const string HOTKEY = "hotkey";
         public const string PRESENCE = "presence";
+    }
+
+    public class Desktop : GLib.Object
+    {
+        private Pomodoro.DesktopExtension extension;
+        private GLib.Settings             settings;
+
+        construct
+        {
+            this.settings = Pomodoro.get_settings ()
+                                    .get_child ("preferences");
+
+            this.extension = this.find_extension ();
+            this.extension.configure.begin ();
+            // this.extension.notify["presence-status"].connect (this.on_desktop_presence_status_notify);
+
+            this.settings.changed.connect (this.on_settings_changed); // TODO: connect it after extension has been configured
+        }
+
+        private Pomodoro.DesktopExtension find_extension ()
+        {
+            Pomodoro.DesktopExtension extension;
+
+            var desktop_session = GLib.Environment.get_variable (DESKTOP_SESSION_VARIABLE);
+            var engine          = Peas.Engine.get_default ();
+            var plugin_info     = engine.get_plugin_info (desktop_session);
+
+            GLib.debug ("Looking for \"%s\" plugin", desktop_session);
+
+            if (plugin_info != null) {
+                engine.try_load_plugin (plugin_info);
+
+                extension = engine.create_extension (plugin_info,
+                                                     typeof (Pomodoro.DesktopExtension))
+                                                     as Pomodoro.DesktopExtension;
+            }
+            else {
+                extension = new Pomodoro.FallbackDesktopExtension () as Pomodoro.DesktopExtension;
+            }
+
+            return extension;
+        }
+
+        private void on_settings_changed (GLib.Settings settings,
+                                          string        key)
+        {
+            switch (key)
+            {
+                case "show-screen-notifications":
+                    this.extension.get_capabilities ().set_enabled ("screen-notifications",
+                                                                    this.settings.get_boolean (key));
+
+                    break;
+            }
+        }
     }
 
     public interface DesktopExtension : Peas.ExtensionBase
@@ -54,7 +114,7 @@ namespace Pomodoro
 
         public override void dispose ()
         {
-            this.capabilities.disable_all ();
+//            this.capabilities.disable_all ();
 
             base.dispose ();
         }

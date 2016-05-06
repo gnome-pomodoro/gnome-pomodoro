@@ -261,11 +261,11 @@ namespace Pomodoro
 
             var application = Pomodoro.Application.get_default ();
 
-            this.capability = application.desktop.get_capabilities ().lookup ("hotkey");
+//            this.capability = application.desktop.get_capabilities ().lookup ("hotkey");
 
-            if (this.capability != null) {
-                this.capability.inhibit ();
-            }
+//            if (this.capability != null) {
+//                this.capability.inhibit ();
+//            }
         }
 
         public override void unmap ()
@@ -341,15 +341,68 @@ namespace Pomodoro
         [GtkChild]
         private Gtk.ListBox plugins_listbox;
 
+        private GLib.Settings settings;
         private Peas.Engine engine;
+        private GLib.HashTable<string, unowned Gtk.Switch> toggles;
 
         construct
         {
+            this.settings = Pomodoro.get_settings ()
+                                    .get_child ("preferences");
+
             this.engine = Peas.Engine.get_default ();
+            this.engine.load_plugin.connect (this.on_engine_load_plugin);
+            this.engine.unload_plugin.connect (this.on_engine_unload_plugin);
 
             this.plugins_listbox.set_header_func (Pomodoro.list_box_separator_func);
 
+            this.toggles = new GLib.HashTable<string, unowned Gtk.Switch> (str_hash, str_equal);
+
             this.populate ();
+        }
+
+        private void on_engine_load_plugin (Peas.PluginInfo plugin_info)
+        {
+            var toggle = this.toggles.lookup (plugin_info.get_module_name ());
+
+            if (toggle != null) {
+                toggle.state = true;
+            }
+        }
+
+        private void on_engine_unload_plugin (Peas.PluginInfo plugin_info)
+        {
+            var toggle = this.toggles.lookup (plugin_info.get_module_name ());
+
+            if (toggle != null) {
+                toggle.state = false;
+            }
+        }
+
+        private void set_plugin_enabled (string name,
+                                         bool   value)
+        {
+            var enabled_plugins = this.settings.get_strv ("enabled-plugins");
+            var enabled_in_settings = false;
+
+            string[] tmp = {};
+
+            foreach (var plugin_name in enabled_plugins) {
+                if (plugin_name == name) {
+                    enabled_in_settings = true;
+                }
+                else {
+                    tmp += plugin_name;
+                }
+            }
+
+            if (value) {
+                tmp += name;
+            }
+
+            if (enabled_in_settings != value) {
+                this.settings.set_strv ("enabled-plugins", tmp);
+            }
         }
 
         private Gtk.ListBoxRow create_row (Peas.PluginInfo plugin_info)
@@ -365,23 +418,17 @@ namespace Pomodoro
 
             var toggle = new Gtk.Switch ();
             toggle.valign = Gtk.Align.CENTER;
-            toggle.active = plugin_info.is_loaded ();
-            toggle.notify["active"].connect_after (() => {
-                var is_loaded = false;
-
-                if (toggle.active) {
-                    is_loaded = this.engine.try_load_plugin (plugin_info);
-                }
-                else {
-                    is_loaded = !this.engine.try_unload_plugin (plugin_info);
-                }
-
-                if (toggle.active != is_loaded) {
-                    toggle.freeze_notify ();
-                    toggle.active = is_loaded;
-                    toggle.thaw_notify ();
-                }
+            toggle.state = plugin_info.is_loaded ();
+            toggle.notify["active"].connect (() => {
+                this.set_plugin_enabled (plugin_info.get_module_name (), toggle.active);
             });
+            toggle.state_set.connect ((state) => {
+                var success = (state == plugin_info.is_loaded ());
+
+                return !success;
+            });
+
+            this.toggles.insert (plugin_info.get_module_name (), toggle);
 
             var vbox = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
             vbox.pack_start (name_label, false, false, 0);
@@ -401,6 +448,8 @@ namespace Pomodoro
 
         private void populate ()
         {
+            this.engine.rescan_plugins ();
+
             foreach (var plugin_info in this.engine.get_plugin_list ())
             {
                 if (plugin_info.is_hidden ()) {

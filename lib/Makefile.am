@@ -8,7 +8,7 @@ libgnome_pomodoro_la_VALASOURCES = \
 	application.vala \
 	capability.vala \
 	capability-group.vala \
-	desktop-extension.vala \
+	desktop.vala \
 	log-scale.vala \
 	preferences-dialog.vala \
 	presence.vala \
