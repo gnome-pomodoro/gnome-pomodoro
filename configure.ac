@@ -271,6 +271,12 @@ AC_CONFIG_FILES([
     src/Makefile
     data/Makefile
     data/icons/Makefile
+    data/icons/16x16/Makefile
+    data/icons/24x24/Makefile
+    data/icons/32x32/Makefile
+    data/icons/48x48/Makefile
+    data/icons/256x256/Makefile
+    data/icons/symbolic/Makefile
     data/sounds/Makefile
     po/Makefile.in
     man/Makefile
