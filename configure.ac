@@ -71,7 +71,7 @@ PKG_CHECK_MODULES(SOUNDS_PLUGIN, [
 
 PKG_CHECK_MODULES(GNOME_PLUGIN, [
     gnome-desktop-3.0 >= $GNOME_REQUIRED
-])
+], [with_gnome_plugin=yes], [with_gnome_plugin=no])
 
 
 # Checks for programs.
@@ -224,6 +224,8 @@ AC_SUBST([PLUGIN_CPPFLAGS])
 AC_SUBST([PLUGIN_CFLAGS])
 AC_SUBST([PLUGIN_LIBS])
 AC_SUBST([PLUGIN_LIBTOOL_FLAGS])
+
+AM_CONDITIONAL([WITH_GNOME_PLUGIN], [test "$with_gnome_plugin" = yes])
 
 
 # Some constants to pass to config.h
