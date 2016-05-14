@@ -44,9 +44,6 @@ libgnome_pomodoro_la_LDFLAGS = \
 libgnome_pomodoro_la_LIBADD = \
 	$(GNOME_POMODORO_LIBS)
 
-libgnome_pomodoro_la_DEPENDENCIES = \
-	$(top_builddir)/vapi/gnome-desktop-3.0.vapi
-
 resources = \
 	resources/resources.xml
 resources_deps = \
