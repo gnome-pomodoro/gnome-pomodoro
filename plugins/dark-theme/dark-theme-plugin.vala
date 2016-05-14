@@ -34,7 +34,11 @@ namespace DarkThemePlugin
         {
             var gtk_settings = Gtk.Settings.get_default ();
 
-            gtk_settings.reset_property ("gtk-application-prefer-dark-theme");
+            #if VALA_0_32
+                gtk_settings.reset_property ("gtk-application-prefer-dark-theme");
+            #else
+                gtk_settings.gtk_application_prefer_dark_theme = false;
+            #endif
         }
     }
 }
