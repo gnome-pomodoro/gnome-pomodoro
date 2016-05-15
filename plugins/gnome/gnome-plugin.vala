@@ -86,13 +86,10 @@ namespace GnomePlugin
 
             /* wait for status of gnome-shell extension */
             this.shell_extension.enable.begin ((obj, res) => {
-                var success = this.shell_extension.enable.end (res);
+                this.shell_extension.enable.end (res);
 
-                if (success) {
+                if (this.shell_extension.enabled) {
                     GLib.debug ("Extension enabled");
-                }
-                else {
-                    // TODO: disable extension
                 }
 
                 this.configure.callback ();
@@ -101,11 +98,11 @@ namespace GnomePlugin
             yield;
 
             /* add capabilities */
-            this.on_shell_extension_is_enabled_notify ();
+            this.on_shell_extension_enabled_notify ();
 
             yield base.configure ();
 
-            this.shell_extension.notify["is-enabled"].connect (this.on_shell_extension_is_enabled_notify);
+            this.shell_extension.notify["enabled"].connect (this.on_shell_extension_enabled_notify);
         }
 
         private async void connect_shell ()
@@ -137,9 +134,9 @@ namespace GnomePlugin
             }
         }
 
-        private void on_shell_extension_is_enabled_notify ()
+        private void on_shell_extension_enabled_notify ()
         {
-            if (this.shell_extension.is_enabled) {
+            if (this.shell_extension.enabled) {
                 for (var i=0; i < SHELL_CAPABILITIES.length; i++)
                 {
                     var capability = new Pomodoro.Capability (SHELL_CAPABILITIES[i]);

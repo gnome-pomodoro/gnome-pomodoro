@@ -28,10 +28,10 @@ const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
+const ExtensionSystem = imports.ui.extensionSystem;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
-const DBus = Extension.imports.dbus;
 const Indicator = Extension.imports.indicator;
 const Notifications = Extension.imports.notifications;
 const Dialogs = Extension.imports.dialogs;
@@ -46,7 +46,7 @@ let extension = null;
 
 const ExtensionMode = {
     DEFAULT: 0,
-    SCREEN_SHIELD: 1
+    RESTRICTED: 1
 };
 
 
@@ -85,8 +85,6 @@ const PomodoroExtension = new Lang.Class({
             this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
             this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
 
-            this.dbus = new DBus.PomodoroExtension();
-
             this.setMode(mode);
         }
         catch (error) {
@@ -98,7 +96,7 @@ const PomodoroExtension = new Lang.Class({
         if (this.mode !== mode) {
             this.mode = mode;
 
-            if (mode == ExtensionMode.SCREEN_SHIELD) {
+            if (mode == ExtensionMode.RESTRICTED) {
                 this.disableIndicator();
                 this.disableScreenNotifications();
                 this.disableReminders();
@@ -470,7 +468,6 @@ const PomodoroExtension = new Lang.Class({
             this.notificationSource.destroy();
         }
 
-        this.dbus.destroy();
         this.timer.destroy();
 
         this.settings.run_dispose();
@@ -488,16 +485,12 @@ function init(metadata) {
 
 
 function enable() {
-    let pomodoroExtension, sessionModeUpdatedId;
-
-    if (Main.pomodoroExtension) {
-        Main.pomodoroExtension.destroy();
-    }
+    let sessionModeUpdatedId;
 
     if (!extension) {
-        pomodoroExtension = new PomodoroExtension(Main.sessionMode.isLocked
-                                                  ? ExtensionMode.SCREEN_SHIELD : ExtensionMode.DEFAULT);
-        pomodoroExtension.connect('destroy',
+        extension = new PomodoroExtension(Main.sessionMode.isLocked
+                                          ? ExtensionMode.RESTRICTED : ExtensionMode.DEFAULT);
+        extension.connect('destroy',
             function() {
                 extension = null;
 
@@ -505,23 +498,17 @@ function enable() {
                     Main.sessionMode.disconnect(sessionModeUpdatedId);
                     sessionModeUpdatedId = 0;
                 }
-
-                if (Main.pomodoroExtension === pomodoroExtension) {
-                    delete Main.pomodoroExtension;
-                }
             });
 
         sessionModeUpdatedId = Main.sessionMode.connect('updated',
             function() {
-                if (!Main.sessionMode.isLocked && pomodoroExtension.mode == ExtensionMode.SCREEN_SHIELD) {
-                    pomodoroExtension.destroy();
+                if (Main.sessionMode.isLocked) {
+                    ExtensionSystem.enableExtension(Config.EXTENSION_UUID);
                 }
-                // pomodoroExtension.setMode(Main.sessionMode.isLocked
-                //                           ? ExtensionMode.SCREEN_SHIELD : ExtensionMode.DEFAULT);
+                else {
+                    extension.setMode(ExtensionMode.DEFAULT);
+                }
             });
-
-        extension = pomodoroExtension;
-        Main.pomodoroExtension = pomodoroExtension;
     }
 }
 
@@ -529,7 +516,7 @@ function enable() {
 function disable() {
     if (extension) {
         if (Main.sessionMode.isLocked) {
-            extension.setMode(ExtensionMode.SCREEN_SHIELD);
+            extension.setMode(ExtensionMode.RESTRICTED);
         }
         else {
             extension.destroy();

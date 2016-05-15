@@ -47,33 +47,7 @@ const PomodoroInterface = '<node> \
 </node>';
 
 
-const PomodoroExtensionInterface = '<node> \
-<interface name="org.gnome.Pomodoro.Extension"> \
-</interface> \
-</node>';
-
-
 const PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
 function Pomodoro(callback, cancellable) {
     return new PomodoroProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', callback, cancellable);
 }
-
-
-const PomodoroExtension = new Lang.Class({
-    Name: 'PomodoroExtensionDBus',
-
-    _init: function() {
-        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(PomodoroExtensionInterface, this);
-        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Pomodoro/Extension');
-
-        this._dbusId = Gio.DBus.session.own_name('org.gnome.Pomodoro.Extension',
-                                                 Gio.BusNameOwnerFlags.ALLOW_REPLACEMENT,
-                                                 null,
-                                                 null);
-    },
-
-    destroy: function() {
-        this._dbusImpl.unexport();
-        Gio.DBus.session.unown_name(this._dbusId);
-    }
-});
