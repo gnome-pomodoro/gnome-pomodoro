@@ -481,12 +481,16 @@ namespace Pomodoro
             if (Options.quit) {
                 this.quit ();
             }
-
-            if (Options.preferences) {
-                this.show_preferences ();
-            }
             else {
-                this.show_window ();
+                if (Options.preferences) {
+                    this.show_preferences ();
+                }
+                else if (!Options.no_default_window) {
+                    this.show_window ();
+                }
+
+                Options.preferences = false;
+                Options.no_default_window = false;
             }
 
             this.release ();
