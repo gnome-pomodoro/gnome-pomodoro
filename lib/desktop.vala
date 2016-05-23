@@ -143,6 +143,23 @@ namespace Pomodoro
             this.get_capabilities ().disable_all ();
         }
 
+        private bool have_notification_actions ()
+        {
+            var desktop_session = GLib.Environment.get_variable (DESKTOP_SESSION_VARIABLE);
+
+            /* It's a quick hack for stupid notify-osd, which uses GTK+ dialogs for notifications
+             * with buttons... just horrible.
+             *
+             * We could check for "actions" from org.freedesktop.Notifications.GetCapabilities(),
+             * but GNotification supports more backends than freedesktop.
+             */
+            if (desktop_session == "ubuntu" || desktop_session == "mate") {
+                return false;
+            }
+
+            return true;
+        }
+
         public override unowned Pomodoro.CapabilityGroup get_capabilities ()
         {
             return this.capabilities;
@@ -217,7 +234,9 @@ namespace Pomodoro
                 GLib.warning (error.message);
             }
 
-            notification.add_button (_("Take a break"), "app.timer-skip");
+            if (this.have_notification_actions ()) {
+                notification.add_button (_("Take a break"), "app.timer-skip");
+            }
 
             GLib.Application.get_default ()
                             .send_notification ("timer", notification);
@@ -241,7 +260,6 @@ namespace Pomodoro
                                                       : _("Take a longer break"));
             notification.set_body (body);
             notification.set_priority (GLib.NotificationPriority.HIGH);
-            notification.set_default_action ("app.show-screen-notification");
 
             try {
                 notification.set_icon (GLib.Icon.new_for_string (Config.PACKAGE_NAME));
@@ -250,20 +268,25 @@ namespace Pomodoro
                 GLib.warning (error.message);
             }
 
-            if (this.timer.state is Pomodoro.ShortBreakState) {
-                notification.add_button_with_target_value (_("Lengthen it"),
-                                                           "app.timer-switch-state",
-                                                           new GLib.Variant.string ("long-break"));
-            }
-            else {
-                notification.add_button_with_target_value (_("Shorten it"),
-                                                           "app.timer-switch-state",
-                                                           new GLib.Variant.string ("short-break"));
-            }
+            if (this.have_notification_actions ())
+            {
+                notification.set_default_action ("app.show-screen-notification");
 
-            notification.add_button_with_target_value (_("Start pomodoro"),
-                                                       "app.timer-set-state",
-                                                       new GLib.Variant.string ("pomodoro"));
+                if (this.timer.state is Pomodoro.ShortBreakState) {
+                    notification.add_button_with_target_value (_("Lengthen it"),
+                                                               "app.timer-switch-state",
+                                                               new GLib.Variant.string ("long-break"));
+                }
+                else {
+                    notification.add_button_with_target_value (_("Shorten it"),
+                                                               "app.timer-switch-state",
+                                                               new GLib.Variant.string ("short-break"));
+                }
+
+                notification.add_button_with_target_value (_("Start pomodoro"),
+                                                           "app.timer-set-state",
+                                                           new GLib.Variant.string ("pomodoro"));
+            }
 
             GLib.Application.get_default ()
                             .send_notification ("timer", notification);
