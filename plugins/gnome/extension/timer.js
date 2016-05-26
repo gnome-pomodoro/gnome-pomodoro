@@ -63,6 +63,10 @@ const Timer = new Lang.Class({
             }
         }));
 
+        this._propertiesChangedId = this._proxy.connect(
+                                       'g-properties-changed',
+                                       Lang.bind(this, this._onPropertiesChanged));
+
         this._nameWatcherId = Gio.DBus.session.watch_name(
                                        'org.gnome.Pomodoro',
                                        Gio.BusNameWatcherFlags.AUTO_START,
@@ -83,16 +87,7 @@ const Timer = new Lang.Class({
     },
 
     _onNameAppeared: function() {
-        if (this._propertiesChangedId != 0) {
-            this._proxy.disconnect(this._propertiesChangedId);
-        }
-
         this._connected = true;
-
-        this._propertiesChangedId = this._proxy.connect(
-                                   'g-properties-changed',
-                                   Lang.bind(this, this._onPropertiesChanged));
-        this._onPropertiesChanged(this._proxy, null);
 
         this.emit('service-connected');
         this.emit('state-changed');
@@ -100,11 +95,6 @@ const Timer = new Lang.Class({
     },
 
     _onNameVanished: function() {
-        if (this._propertiesChangedId != 0) {
-            this._proxy.disconnect(this._propertiesChangedId);
-            this._propertiesChangedId = 0;
-        }
-
         this._connected = false;
 
         this.emit('state-changed');
@@ -246,6 +236,11 @@ const Timer = new Lang.Class({
     },
 
     destroy: function() {
+        if (this._propertiesChangedId != 0) {
+            this._proxy.disconnect(this._propertiesChangedId);
+            this._propertiesChangedId = 0;
+        }
+
         if (this._nameWatcherId) {
             Gio.DBus.session.unwatch_name(this._nameWatcherId);
             this._nameWatcherId = 0;
