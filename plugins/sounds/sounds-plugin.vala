@@ -715,9 +715,19 @@ namespace SoundsPlugin
             main_page.timer_listbox.row_activated.connect (this.on_row_activated);
             main_page.notifications_listbox.row_activated.connect (this.on_row_activated);
 
+            var ticking_sound_index = 0;
+
+            foreach (var child in main_page.timer_listbox.get_children ()) {
+                ticking_sound_index += 1;
+
+                if (child.name == "keyboard-shortcut") {
+                    break;
+                }
+            }
+
             row = this.create_row (_("Ticking sound"), "ticking-sound", "ticking-sound");
             main_page.lisboxrow_sizegroup.add_widget (row);
-            main_page.timer_listbox.insert (row, -1);
+            main_page.timer_listbox.insert (row, ticking_sound_index);
             this.rows.prepend (row);
 
             row = this.create_row (_("Start of break sound"), "start-of-break-sound", "pomodoro-end-sound");

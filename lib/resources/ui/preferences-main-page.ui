@@ -323,6 +323,48 @@
                                 </child>
                               </object>
                             </child>
+                            <child>
+                              <object class="GtkListBoxRow" id="listboxrow11">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="activatable">False</property>
+                                <property name="selectable">False</property>
+                                <child>
+                                  <object class="GtkBox" id="box3">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="spacing">30</property>
+                                    <child>
+                                      <object class="GtkLabel" id="label2">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="valign">baseline</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Wait for activity after a break</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkSwitch" id="pause_when_idle_toggle">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="valign">center</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">False</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
                             <style>
                               <class name="pomodoro-list"/>
                             </style>
@@ -662,13 +704,14 @@
     <property name="mode">vertical</property>
     <property name="ignore_hidden">True</property>
     <widgets>
-      <widget name="listboxrow5"/>
-      <widget name="listboxrow6"/>
-      <widget name="listboxrow4"/>
-      <widget name="listboxrow3"/>
-      <widget name="listboxrow2"/>
-      <widget name="listboxrow10"/>
       <widget name="listboxrow9"/>
+      <widget name="listboxrow10"/>
+      <widget name="listboxrow11"/>
+      <widget name="listboxrow2"/>
+      <widget name="listboxrow3"/>
+      <widget name="listboxrow4"/>
+      <widget name="listboxrow6"/>
+      <widget name="listboxrow5"/>
     </widgets>
   </object>
 </interface>

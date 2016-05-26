@@ -531,6 +531,8 @@ namespace Pomodoro
                                                                      as Gtk.SpinButton;
             var accelerator_label = builder.get_object ("accelerator_label")
                                                         as Gtk.Label;
+            var pause_when_idle_toggle = builder.get_object ("pause_when_idle_toggle")
+                                                             as Gtk.Switch;
 
             this.settings.bind ("pomodoro-duration",
                                 pomodoro_scale.base_adjustment,
@@ -547,6 +549,10 @@ namespace Pomodoro
             this.settings.bind ("long-break-interval",
                                 long_break_interval_spinbutton.adjustment,
                                 "value",
+                                GLib.SettingsBindFlags.DEFAULT);
+            this.settings.bind ("pause-when-idle",
+                                pause_when_idle_toggle,
+                                "active",
                                 GLib.SettingsBindFlags.DEFAULT);
 
             this.accelerator = new Pomodoro.Accelerator ();
