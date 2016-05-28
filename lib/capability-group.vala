@@ -74,7 +74,6 @@ namespace Pomodoro
         }
 
         public void add (Pomodoro.Capability capability)
-                         requires (capability != null)
         {
             var current_capability = this.capabilities.lookup (capability.name);
 
@@ -95,6 +94,27 @@ namespace Pomodoro
 
                     this.added (capability.name);
                 }
+            }
+        }
+
+        public void replace (Pomodoro.Capability capability)
+        {
+            var current_capability = this.capabilities.lookup (capability.name);
+
+            this.connect_capability (capability);
+
+            if (current_capability != null) {
+                this.disconnect_capability (current_capability);
+
+                capability.fallback = current_capability.is_virtual ()
+                                        ? current_capability.fallback : current_capability;
+
+                this.capabilities.replace (capability.name, capability);
+            }
+            else {
+                this.capabilities.insert (capability.name, capability);
+
+                this.added (capability.name);
             }
         }
 

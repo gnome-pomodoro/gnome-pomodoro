@@ -39,6 +39,7 @@ namespace GnomePlugin
         private Gnome.Shell                     shell_proxy;
         private uint                            become_active_id = 0;
         private uint                            accelerator_id = 0;
+        private uint                            name_watcher_id = 0;
 
         construct
         {
@@ -94,7 +95,19 @@ namespace GnomePlugin
 
         public override async void configure ()
         {
-            yield this.connect_shell ();
+            this.shell_proxy = GLib.Bus.get_proxy_sync<Gnome.Shell>
+                                       (GLib.BusType.SESSION,
+                                        "org.gnome.Shell",
+                                        "/org/gnome/Shell",
+                                        GLib.DBusProxyFlags.DO_NOT_AUTO_START,
+                                        null);
+
+            this.name_watcher_id = GLib.Bus.watch_name
+                                       (GLib.BusType.SESSION,
+                                        "org.gnome.Shell",
+                                        GLib.BusNameWatcherFlags.NONE,
+                                        () => { this.on_name_appeared (); } ,
+                                        () => { this.on_name_vanished (); });
 
             /* wait for status of gnome-shell extension */
             this.shell_extension.enable.begin ((obj, res) => {
@@ -115,35 +128,6 @@ namespace GnomePlugin
             yield base.configure ();
 
             this.shell_extension.notify["enabled"].connect (this.on_shell_extension_enabled_notify);
-        }
-
-        private async void connect_shell ()
-        {
-            if (this.shell_proxy == null)
-            {
-                GLib.Bus.get_proxy.begin<Gnome.Shell> (GLib.BusType.SESSION,
-                                                       "org.gnome.Shell",
-                                                       "/org/gnome/Shell",
-                                                       GLib.DBusProxyFlags.DO_NOT_AUTO_START,
-                                                       null,
-                                                       (obj, res) =>
-                {
-                    try
-                    {
-                        this.shell_proxy = GLib.Bus.get_proxy.end (res);
-
-                        this.shell_connected (this.shell_proxy);
-                    }
-                    catch (GLib.IOError error)
-                    {
-                        GLib.critical ("%s", error.message);
-                    }
-
-                    this.connect_shell.callback ();
-                });
-
-                yield;
-            }
         }
 
         private void on_shell_extension_enabled_notify ()
@@ -174,7 +158,7 @@ namespace GnomePlugin
 
         private void on_toggle_timer_key_changed ()
         {
-            var capability = this.capabilities.lookup ("hotkey");
+            var capability = this.capabilities.lookup (Pomodoro.Capabilities.HOTKEY);
 
             if (capability != null && capability.enabled) {
                 capability.disable ();
@@ -182,44 +166,57 @@ namespace GnomePlugin
             }
         }
 
-        public virtual signal void shell_connected (Gnome.Shell proxy)
+        private void on_name_appeared ()
         {
-            var hotkey_capability = new Pomodoro.Capability (Pomodoro.Capabilities.HOTKEY);
+            var capability = this.capabilities.lookup (Pomodoro.Capabilities.HOTKEY);
 
-            hotkey_capability.enabled_signal.connect (() => {
-                try {
-                    this.accelerator_id = proxy.grab_accelerator (this.settings.get_string ("toggle-timer-key"),
-                                                                  Gnome.ActionMode.ALL);
+            if (capability != null)
+            {
+                // handle hnome-shell restart
+                GLib.Timeout.add (2000, () => {
+                    capability.disable ();
+                    capability.enable ();
 
-                    proxy.accelerator_activated.connect (this.on_accelerator_activated);
-                }
-                catch (GLib.IOError error) {
-                    GLib.warning ("error while grabbing accelerator: %s", error.message);
-                }
-            });
+                    return GLib.Source.REMOVE;
+                });
+            }
+            else {
+                capability = new Pomodoro.Capability (Pomodoro.Capabilities.HOTKEY);
 
-            hotkey_capability.disabled_signal.connect (() => {
-                try {
-                    if (this.accelerator_id != 0) {
-                        proxy.ungrab_accelerator (this.accelerator_id);
-                        this.accelerator_id = 0;
+                capability.enabled_signal.connect (() => {
+                    try {
+                        this.accelerator_id = this.shell_proxy.grab_accelerator (this.settings.get_string ("toggle-timer-key"),
+                                                                                 Gnome.ActionMode.ALL);
+
+                        this.shell_proxy.accelerator_activated.connect (this.on_accelerator_activated);
                     }
-                }
-                catch (GLib.IOError error) {
-                    GLib.warning ("error while ungrabbing accelerator: %s", error.message);
-                }
+                    catch (GLib.IOError error) {
+                        GLib.warning ("error while grabbing accelerator: %s", error.message);
+                    }
+                });
 
-                proxy.accelerator_activated.disconnect (this.on_accelerator_activated);
-            });
+                capability.disabled_signal.connect (() => {
+                    try {
+                        if (this.accelerator_id != 0) {
+                            this.shell_proxy.ungrab_accelerator (this.accelerator_id);
+                            this.accelerator_id = 0;
+                        }
+                    }
+                    catch (GLib.IOError error) {
+                        GLib.warning ("error while ungrabbing accelerator: %s", error.message);
+                    }
 
-            hotkey_capability.enable ();
+                    this.shell_proxy.accelerator_activated.disconnect (this.on_accelerator_activated);
+                });
 
-            this.capabilities.add (hotkey_capability);
+                capability.enable ();
+
+                this.capabilities.add (capability);
+            }
         }
 
-        public virtual signal void shell_disconnected (Gnome.Shell proxy)
+        private void on_name_vanished ()
         {
-            this.capabilities.remove (Pomodoro.Capabilities.HOTKEY);
         }
 
         private void on_accelerator_activated (uint32 action,
