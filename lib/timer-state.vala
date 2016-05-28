@@ -88,6 +88,11 @@ namespace Pomodoro
 
             return state;
         }
+
+        public bool is_completed ()
+        {
+            return this.elapsed >= this.duration;
+        }
     }
 
     public class DisabledState : TimerState

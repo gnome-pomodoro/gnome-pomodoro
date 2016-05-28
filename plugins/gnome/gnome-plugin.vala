@@ -31,12 +31,13 @@ namespace GnomePlugin
             "reminders"
         };
 
+        private Pomodoro.Timer                  timer;
         private GLib.Settings                   settings;
         private Pomodoro.CapabilityGroup        capabilities;
         private GnomePlugin.GnomeShellExtension shell_extension;
         private Gnome.IdleMonitor               idle_monitor;
         private Gnome.Shell                     shell_proxy;
-//        private uint                            become_active_id = 0;
+        private uint                            become_active_id = 0;
         private uint                            accelerator_id = 0;
 
         construct
@@ -45,15 +46,26 @@ namespace GnomePlugin
 
             this.idle_monitor = new Gnome.IdleMonitor ();
 
-//            this.notify["presence-status"].connect (this.on_presence_status_notify);
-
             this.shell_extension = new GnomePlugin.GnomeShellExtension (Config.EXTENSION_UUID);
 
             this.capabilities = new Pomodoro.CapabilityGroup ();
             this.capabilities.fallback = base.get_capabilities ();
             this.capabilities.enabled_changed.connect (this.on_capability_enabled_changed);
 
+            this.timer = Pomodoro.Timer.get_default ();
+            this.timer.state_changed.connect_after (this.on_timer_state_changed);
+
             this.settings.changed["toggle-timer-key"].connect (this.on_toggle_timer_key_changed);
+        }
+
+        ~DesktopExtension ()
+        {
+            this.timer.state_changed.disconnect (this.on_timer_state_changed);
+
+            if (this.become_active_id != 0) {
+                this.idle_monitor.remove_watch (this.become_active_id);
+                this.become_active_id = 0;
+            }
         }
 
         public override unowned Pomodoro.CapabilityGroup get_capabilities ()
@@ -213,32 +225,35 @@ namespace GnomePlugin
         private void on_accelerator_activated (uint32 action,
                                                GLib.HashTable<string, GLib.Variant> accelerator_params)
         {
-            var timer = Pomodoro.Timer.get_default ();
-
-            timer.toggle ();
+            this.timer.toggle ();
         }
 
-//        private void on_presence_status_notify ()
-//        {
-//            if (this.presence_status == Pomodoro.PresenceStatus.IDLE)
-//            {
-//                if (this.become_active_id == 0) {
-//                    this.become_active_id = this.idle_monitor.add_user_active_watch (this.on_become_active);
-//                }
-//            }
-//            else {
-//                if (this.become_active_id != 0) {
-//                    this.idle_monitor.remove_watch (this.become_active_id);
-//                    this.become_active_id = 0;
-//                }
-//            }
-//        }
+        private void on_timer_state_changed (Pomodoro.TimerState state,
+                                             Pomodoro.TimerState previous_state)
+        {
+            if (this.become_active_id != 0) {
+                this.idle_monitor.remove_watch (this.become_active_id);
+                this.become_active_id = 0;
+            }
 
-//        private void on_become_active (Gnome.IdleMonitor monitor,
-//                                       uint              id)
-//        {
-//            this.presence_status = Pomodoro.PresenceStatus.AVAILABLE;
-//        }
+            if (state is Pomodoro.PomodoroState &&
+                previous_state is Pomodoro.BreakState &&
+                previous_state.is_completed () &&
+                this.settings.get_boolean ("pause-when-idle"))
+            {
+                this.become_active_id = this.idle_monitor.add_user_active_watch (this.on_become_active);
+
+                this.timer.pause ();
+            }
+        }
+
+        private void on_become_active (Gnome.IdleMonitor monitor,
+                                       uint              id)
+        {
+            this.become_active_id = 0;
+
+            this.timer.resume ();
+        }
     }
 
     public class PreferencesDialogExtension : Peas.ExtensionBase, Pomodoro.PreferencesDialogExtension
@@ -248,10 +263,21 @@ namespace GnomePlugin
         construct
         {
             this.dialog = Pomodoro.PreferencesDialog.get_default ();
+
+            this.setup_main_page ();
         }
 
-        ~PreferencesDialogExtension ()
+        private void setup_main_page ()
         {
+            var main_page = this.dialog.get_page ("main") as Pomodoro.PreferencesMainPage;
+
+            /* toggle/row is defined in the .ui because we would like same feature for other desktops.
+             */
+            foreach (var child in main_page.timer_listbox.get_children ()) {
+                if (child.name == "pause-when-idle") {
+                    child.show ();
+                }
+            }
         }
     }
 }

@@ -325,7 +325,7 @@
                             </child>
                             <child>
                               <object class="GtkListBoxRow" id="listboxrow11">
-                                <property name="visible">True</property>
+                                <property name="name">pause-when-idle</property>
                                 <property name="can_focus">True</property>
                                 <property name="activatable">False</property>
                                 <property name="selectable">False</property>
