@@ -38,10 +38,8 @@ const Presence = new Lang.Class({
 
     _init: function() {
         this._settingsChangedId = 0;
-        this._menuItemToggledId = 0;
         this._timerStateChangedId = 0;
         this._timerState;
-        this._menuItemText;
 
         // Setup a patch for suppressing presence handlers.
         // When applied the main presence controller becomes gnome-pomodoro.
@@ -54,38 +52,6 @@ const Presence = new Lang.Class({
                     this._updateState();
                 }
         });
-
-        if (!Utils.versionCheck('3.16')) {
-            this._patch.addHooks(MessageTray.MessageTrayMenu.prototype, {
-                _onStatusChanged:
-                    function(status) {
-                        this._sessionStatus = status;
-                    },
-                _onIMPresenceChanged:
-                    function(accountManager, type) {
-                    },
-                _updatePresence:
-                    Lang.bind(this, this._onNotificationsMenuItemToggled),
-            });
-
-            // We need to reconnect the 'toggled' signal to use method from
-            // the prototype.
-            try {
-                let menu = this._getMessageTrayMenu();
-                let menuItem = this._getNotificationsMenuItem();
-
-                if (menuItem && menu) {
-                    menuItem.disconnectAll();
-                    menuItem.connect('toggled', Lang.bind(menu,
-                        function(item, state) {
-                            this._updatePresence(item, state);
-                        }));
-                }
-            }
-            catch (error) {
-                Utils.logWarning(error.message);
-            }
-        }
 
         try {
             this._settingsChangedId = Extension.extension.settings.connect(
@@ -132,88 +98,15 @@ const Presence = new Lang.Class({
         }
     },
 
-    _onNotificationsMenuItemToggled: function(item, state) {
-        if (!this._notificationsMenuItemLock) {
-            let isRunning = (this._timerState != Timer.State.NULL);
-
-            if (isRunning && this._timerState == Timer.State.POMODORO) {
-                this.setNotificationsDuringPomodoro(state);
-            }
-
-            if (isRunning && this._timerState != Timer.State.POMODORO) {
-                this.setNotificationsDuringBreak(state);
-            }
-        }
-    },
-
-    _updateNotificationsMenuItem: function() {
-        let timerState = this._timerState;
-        let isRunning = timerState != Timer.State.NULL;
-
-        try {
-            let menuItem = this._getNotificationsMenuItem();
-            let menuItemMarkup;
-            let menuItemHint;
-
-            if (menuItem) {
-                if (!this._menuItemText) {
-                    this._menuItemText = menuItem.label.get_text();
-                }
-
-                if (isRunning) {
-                    // translators: Full text is actually "Notifications during...",
-                    //              the "Notifications" label is taken from gnome-shell
-                    menuItemHint = timerState == Timer.State.POMODORO
-                                       ? _("during pomodoro")
-                                       : _("during break");
-
-                    menuItemMarkup = '%s\n<small><i>%s</i></small>'.format(this._menuItemText,
-                                                                           menuItemHint);
-
-                    menuItem.label.clutter_text.set_markup(menuItemMarkup);
-                }
-                else {
-                    menuItem.label.clutter_text.set_markup(this._menuItemText);
-                }
-            }
-        }
-        catch (error) {
-            Utils.logWarning(error.message);
-        }
-    },
-
-    _getMessageTray: function() {
-        return Main.messageTray;
-    },
-
-    _getMessageTrayMenu: function() {
-        if (Utils.versionCheck('3.16'))
-            return undefined;
-
-        return Main.messageTray._messageTrayMenuButton
-            ? Main.messageTray._messageTrayMenuButton._menu : undefined;
-    },
-
-    _getNotificationsMenuItem: function() {
-        if (Utils.versionCheck('3.16'))
-            return undefined;
-
-        let menu = this._getMessageTrayMenu();
-
-        return menu && menu._busyItem
-            ? Main.messageTray._messageTrayMenuButton._menu._busyItem : undefined;
-    },
-
     _setNotificationDefaults: function() {
         this._notificationsDuringPomodoro =
                 !Extension.extension.settings.get_boolean('hide-notifications-during-pomodoro');
+        this._notificationsDuringBreak = NOTIFICATIONS_DURING_BREAK;
     },
 
     update: function() {
         try {
-            let messageTray = this._getMessageTray();
-            let menuItem = this._getNotificationsMenuItem();
-
+            let messageTray = Main.messageTray;
             let busy = this._timerState == Timer.State.POMODORO
                                  ? !this._notificationsDuringPomodoro
                                  : !this._notificationsDuringBreak;
@@ -222,18 +115,10 @@ const Presence = new Lang.Class({
 
             messageTray._busy = busy || isDialogOpened;
             messageTray._updateState();
-
-            if (menuItem && menuItem.state != !messageTray._busy) {
-                this._notificationsMenuItemLock = true;
-                menuItem.toggle();
-                this._notificationsMenuItemLock = false;
-            }
         }
         catch (error) {
             Utils.logWarning(error.message);
         }
-
-        this._updateNotificationsMenuItem();
     },
 
     setNotificationsDuringPomodoro: function(enabled) {
@@ -253,8 +138,6 @@ const Presence = new Lang.Class({
     },
 
     destroy: function() {
-        let menuItem = this._getNotificationsMenuItem();
-
         if (this._settingsChangedId) {
             Extension.extension.settings.disconnect(this._settingsChangedId);
             this._settingsChangedId = 0;
@@ -263,10 +146,6 @@ const Presence = new Lang.Class({
         if (this._timerStateChangedId) {
             Extension.extension.timer.disconnect(this._timerStateChangedId);
             this._timerStateChangedId = 0;
-        }
-
-        if (menuItem && this._menuItemText) {
-            menuItem.label.clutter_text.set_markup(this._menuItemText);
         }
 
         if (this._patch) {

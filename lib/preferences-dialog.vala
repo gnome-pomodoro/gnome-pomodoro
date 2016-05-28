@@ -480,6 +480,8 @@ namespace Pomodoro
                                                         as Gtk.Label;
             var pause_when_idle_toggle = builder.get_object ("pause_when_idle_toggle")
                                                              as Gtk.Switch;
+            var disable_other_notifications_toggle = builder.get_object ("disable_other_notifications_toggle")
+                                                                         as Gtk.Switch;
 
             this.settings.bind ("pomodoro-duration",
                                 pomodoro_scale.base_adjustment,
@@ -499,6 +501,10 @@ namespace Pomodoro
                                 GLib.SettingsBindFlags.DEFAULT);
             this.settings.bind ("pause-when-idle",
                                 pause_when_idle_toggle,
+                                "active",
+                                GLib.SettingsBindFlags.DEFAULT);
+            this.settings.bind ("hide-notifications-during-pomodoro",
+                                disable_other_notifications_toggle,
                                 "active",
                                 GLib.SettingsBindFlags.DEFAULT);
 

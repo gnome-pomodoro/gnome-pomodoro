@@ -323,48 +323,6 @@
                                 </child>
                               </object>
                             </child>
-                            <child>
-                              <object class="GtkListBoxRow" id="listboxrow11">
-                                <property name="name">pause-when-idle</property>
-                                <property name="can_focus">True</property>
-                                <property name="activatable">False</property>
-                                <property name="selectable">False</property>
-                                <child>
-                                  <object class="GtkBox" id="box3">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="spacing">30</property>
-                                    <child>
-                                      <object class="GtkLabel" id="label2">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="halign">start</property>
-                                        <property name="valign">baseline</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Wait for activity after a break</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkSwitch" id="pause_when_idle_toggle">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="valign">center</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">False</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
                             <style>
                               <class name="pomodoro-list"/>
                             </style>
@@ -550,6 +508,8 @@
                   <object class="GtkLabel" id="notifications_label1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">6</property>
+                    <property name="margin_right">6</property>
                     <property name="margin_bottom">6</property>
                     <property name="label" translatable="yes">Extras</property>
                     <property name="xalign">0</property>
@@ -580,6 +540,88 @@
                             <property name="can_focus">False</property>
                             <property name="selection_mode">none</property>
                             <signal name="row-activated" handler="on_row_activated" swapped="no"/>
+                            <child>
+                              <object class="GtkListBoxRow" id="listboxrow11">
+                                <property name="name">pause-when-idle</property>
+                                <property name="can_focus">True</property>
+                                <property name="activatable">False</property>
+                                <property name="selectable">False</property>
+                                <child>
+                                  <object class="GtkBox" id="box3">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="spacing">30</property>
+                                    <child>
+                                      <object class="GtkLabel" id="label2">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="valign">baseline</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Wait for activity after a break</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkSwitch" id="pause_when_idle_toggle">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="valign">center</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">False</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkListBoxRow" id="listboxrow4">
+                                <property name="name">disable-other-notifications</property>
+                                <property name="can_focus">True</property>
+                                <child>
+                                  <object class="GtkBox" id="box4">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="spacing">30</property>
+                                    <child>
+                                      <object class="GtkLabel" id="label5">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="valign">baseline</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Hide other notifications</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkSwitch" id="disable_other_notifications_toggle">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="valign">center</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">False</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
                             <child>
                               <object class="GtkListBoxRow" id="listboxrow5">
                                 <property name="name">plugins</property>
@@ -635,6 +677,8 @@
       <widget name="listboxrow2"/>
       <widget name="listboxrow5"/>
       <widget name="listboxrow9"/>
+      <widget name="listboxrow4"/>
+      <widget name="listboxrow11"/>
     </widgets>
   </object>
 </interface>

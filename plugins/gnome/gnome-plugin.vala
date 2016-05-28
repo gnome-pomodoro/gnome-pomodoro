@@ -273,8 +273,11 @@ namespace GnomePlugin
 
             /* toggle/row is defined in the .ui because we would like same feature for other desktops.
              */
-            foreach (var child in main_page.timer_listbox.get_children ()) {
+            foreach (var child in main_page.other_listbox.get_children ()) {
                 if (child.name == "pause-when-idle") {
+                    child.show ();
+                }
+                else if (child.name == "disable-other-notifications") {
                     child.show ();
                 }
             }

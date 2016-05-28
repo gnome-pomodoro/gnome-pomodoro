@@ -44,7 +44,7 @@
       <description>Whether to remind about ongoing break.</description>
     </key>
     <key name="hide-notifications-during-pomodoro" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>Hide notifications during pomodoro</summary>
       <description>Whether to hide other notifications during pomodoro.</description>
     </key>
