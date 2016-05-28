@@ -94,11 +94,6 @@ const Source = new Lang.Class({
                                                     detailsInLockScreen: true });
     },
 
-    /* deprecated in 3.16, override parent method */
-    get isClearable() {
-        return false;
-    },
-
     _lastNotificationRemoved: function() {
         this._idleId = Mainloop.idle_add(Lang.bind(this,
                                          function() {
@@ -147,63 +142,12 @@ const Source = new Lang.Class({
 });
 
 
-const NotificationBannerBridge = new Lang.Class({
-    Name: 'NotificationBannerBridge',
-
-    _init: function(notification) {
-        this._useBodyMarkup = false;
-
-        this.bodyLabel = new MessageTray.URLHighlighter('', true, this._useBodyMarkup);
-
-        this.notification = notification;
-        this.notification.addActor(this.bodyLabel.actor);
-    },
-
-    setBody: function(text) {
-        this.bodyLabel.setMarkup(text, this._useBodyMarkup);
-        this.notification._bannerUrlHighlighter.setMarkup(text, this._useBodyMarkup);
-    },
-
-    addAction: function(label, callback) {
-        return this.notification.addAction(label, callback);
-    }
-});
-
-
 const Notification = new Lang.Class({
     Name: 'PomodoroNotification',
     Extends: MessageTray.Notification,
 
     _init: function(title, description, params) {
-        if (Utils.versionCheck('3.16')) {
-            this.parent(null, title, description, params);
-        }
-        else {
-            /* We need source to be reused or created in show() method, but
-               3.14 needs it in notification constructor. */
-            let source = new Source();
-            source.isPlaceholder = true;
-
-            this.parent(source, title, null, params);
-
-            this.actor.child.add_style_class_name('extension-pomodoro-notification');
-
-            this._banner = this.createBanner();
-            this._banner.setBody(description);
-
-            let clickedId = this.connect('clicked', Lang.bind(this,
-                function() {
-                    this.activate();
-                }));
-
-            let destroyId = this.connect('destroy', Lang.bind(this,
-                function() {
-                    this._banner = null;
-
-                    this.disconnect(clickedId);
-                    this.disconnect(destroyId);
-                }));
-        }
+        this.parent(null, title, description, params);
 
         this._restoreForFeedback = false;
 
@@ -214,23 +158,8 @@ const Notification = new Lang.Class({
     },
 
     activate: function() {
-        if (Utils.versionCheck('3.16')) {
-            this.parent();
-            Main.panel.closeCalendar();
-        }
-        else {
-            this.emit('activated');
-            if (!this.resident) {
-                this.destroy();
-            }
-            Main.messageTray.close();
-        }
-    },
-
-    createBanner: function() {
-        return Utils.versionCheck('3.16')
-                ? this.parent()
-                : new NotificationBannerBridge(this);
+        this.parent();
+        Main.panel.closeCalendar();
     },
 
     show: function() {
