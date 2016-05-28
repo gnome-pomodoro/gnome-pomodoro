@@ -29,20 +29,6 @@ namespace Pomodoro
     const double LONG_BREAK_INTERVAL_LOWER = 1.0;
     const double LONG_BREAK_INTERVAL_UPPER = 10.0;
 
-    /**
-     * Mapping from settings to presence combobox
-     */
-    private static bool get_presence_status_label_mapping (GLib.Value   value,
-                                                           GLib.Variant variant,
-                                                           void*        user_data)
-    {
-        var presence_status = Pomodoro.PresenceStatus.from_string (variant.get_string ());
-
-        value.set_string (presence_status.get_label ());
-
-        return true;
-    }
-
     private static void list_box_separator_func (Gtk.ListBoxRow  row,
                                                  Gtk.ListBoxRow? before)
     {
@@ -296,45 +282,6 @@ namespace Pomodoro
         }
     }
 
-    [GtkTemplate (ui = "/org/gnome/pomodoro/ui/preferences-presence-page.ui")]
-    public abstract class PreferencesPresencePage : Gtk.ScrolledWindow, Gtk.Buildable, Pomodoro.PreferencesPage
-    {
-        /* TODO
-        private Pomodoro.PreferencesSection section;
-
-        construct
-        {
-            this.section = new Pomodoro.PreferencesSection (_("General"));
-            this.section.show_all ();
-
-            this.populate ();
-        }
-
-        private void populate ()
-        {
-            var empathy_section = new Pomodoro.PreferencesSection (_("Empathy"),
-                                                                   new Gtk.Switch ());
-            empathy_section.show_all ();
-
-            var skype_section = new Pomodoro.PreferencesSection (_("Skype"),
-                                                                 new Gtk.Switch ());
-            skype_section.show_all ();
-
-            this.box.pack_start (this.section);
-            this.box.pack_start (empathy_section);
-            this.box.pack_start (skype_section);
-        }
-        */
-    }
-
-    public class PreferencesPomodoroPresencePage : PreferencesPresencePage
-    {
-    }
-
-    public class PreferencesBreakPresencePage : PreferencesPresencePage
-    {
-    }
-
     [GtkTemplate (ui = "/org/gnome/pomodoro/ui/preferences-plugins-page.ui")]
     public class PreferencesPluginsPage : Gtk.ScrolledWindow, Gtk.Buildable, Pomodoro.PreferencesPage
     {
@@ -581,23 +528,6 @@ namespace Pomodoro
 
         private void setup_other_section (Gtk.Builder builder)
         {
-            this.settings.bind_with_mapping ("presence-during-pomodoro",
-                                             builder.get_object ("pomodoro_presence_label"),
-                                             "label",
-                                             GLib.SettingsBindFlags.GET,
-                                             (GLib.SettingsBindGetMappingShared) get_presence_status_label_mapping,
-                                             null,
-                                             null,
-                                             null);
-
-            this.settings.bind_with_mapping ("presence-during-break",
-                                             builder.get_object ("break_presence_label"),
-                                             "label",
-                                             GLib.SettingsBindFlags.GET,
-                                             (GLib.SettingsBindGetMappingShared) get_presence_status_label_mapping,
-                                             null,
-                                             null,
-                                             null);
         }
 
         private void parser_finished (Gtk.Builder builder)
@@ -622,14 +552,6 @@ namespace Pomodoro
             {
                 case "keyboard-shortcut":
                     preferences_dialog.set_page ("keyboard-shortcut");
-                    break;
-
-                case "pomodoro-presence-status":
-                    preferences_dialog.set_page ("presence-pomodoro");
-                    break;
-
-                case "break-presence-status":
-                    preferences_dialog.set_page ("presence-break");
                     break;
 
                 case "plugins":
@@ -701,14 +623,6 @@ namespace Pomodoro
             this.add_page ("keyboard-shortcut",
                           _("Keyboard Shortcut"),
                           typeof (Pomodoro.PreferencesKeyboardShortcutPage));
-
-            this.add_page ("presence-pomodoro",
-                           _("Presence During Pomodoro"),
-                           typeof (Pomodoro.PreferencesPomodoroPresencePage));
-
-            this.add_page ("presence-break",
-                           _("Presence During Break"),
-                           typeof (Pomodoro.PreferencesBreakPresencePage));
 
             this.add_action_entries (PreferencesDialog.action_entries, this);
 

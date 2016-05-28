@@ -91,16 +91,12 @@ namespace Pomodoro
 
     public interface DesktopExtension : Peas.ExtensionBase
     {
-        public abstract Pomodoro.PresenceStatus presence_status { get; set; default = Pomodoro.PresenceStatus.AVAILABLE; }
-
         public abstract async void configure ();
         public abstract unowned Pomodoro.CapabilityGroup get_capabilities ();
     }
 
     public abstract class BaseDesktopExtension : Peas.ExtensionBase, Pomodoro.DesktopExtension
     {
-        public Pomodoro.PresenceStatus  presence_status { get; set; }
-
         private Pomodoro.CapabilityGroup capabilities = null;
 
         public virtual async void configure ()

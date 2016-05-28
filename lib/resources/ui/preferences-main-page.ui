@@ -3,6 +3,10 @@
 <interface domain="gnome-pomodoro">
   <requires lib="gtk+" version="3.16"/>
   <!-- interface-css-provider-path style.css -->
+  <object class="GtkSizeGroup" id="lisboxrow_sizegroup">
+    <property name="mode">vertical</property>
+    <property name="ignore_hidden">True</property>
+  </object>
   <object class="GtkAdjustment" id="long_break_interval_adjustment">
     <property name="lower">1</property>
     <property name="upper">10</property>
@@ -547,6 +551,23 @@
                 <property name="margin_bottom">24</property>
                 <property name="orientation">vertical</property>
                 <child>
+                  <object class="GtkLabel" id="notifications_label1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_bottom">6</property>
+                    <property name="label" translatable="yes">Extras</property>
+                    <property name="xalign">0</property>
+                    <attributes>
+                      <attribute name="weight" value="bold"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkFrame" id="other_frame">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
@@ -563,97 +584,6 @@
                             <property name="can_focus">False</property>
                             <property name="selection_mode">none</property>
                             <signal name="row-activated" handler="on_row_activated" swapped="no"/>
-                            <child>
-                              <object class="GtkListBoxRow" id="listboxrow4">
-                                <property name="name">pomodoro-presence-status</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="selectable">False</property>
-                                <child>
-                                  <object class="GtkBox" id="box4">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="spacing">30</property>
-                                    <child>
-                                      <object class="GtkLabel" id="label5">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="halign">start</property>
-                                        <property name="valign">baseline</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Presence during pomodoro</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel" id="pomodoro_presence_label">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="valign">baseline</property>
-                                        <property name="label">Off</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkListBoxRow" id="listboxrow6">
-                                <property name="name">break-presence-status</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="selectable">False</property>
-                                <child>
-                                  <object class="GtkBox" id="box7">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="spacing">30</property>
-                                    <child>
-                                      <object class="GtkLabel" id="label8">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="halign">start</property>
-                                        <property name="valign">baseline</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Presence during break</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel" id="break_presence_label">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="label">Off</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
                             <child>
                               <object class="GtkListBoxRow" id="listboxrow5">
                                 <property name="name">plugins</property>
@@ -685,7 +615,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">0</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
               </object>
@@ -700,18 +630,4 @@
       </object>
     </child>
   </template>
-  <object class="GtkSizeGroup" id="lisboxrow_sizegroup">
-    <property name="mode">vertical</property>
-    <property name="ignore_hidden">True</property>
-    <widgets>
-      <widget name="listboxrow9"/>
-      <widget name="listboxrow10"/>
-      <widget name="listboxrow11"/>
-      <widget name="listboxrow2"/>
-      <widget name="listboxrow3"/>
-      <widget name="listboxrow4"/>
-      <widget name="listboxrow6"/>
-      <widget name="listboxrow5"/>
-    </widgets>
-  </object>
 </interface>
