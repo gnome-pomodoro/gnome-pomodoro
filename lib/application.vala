@@ -148,7 +148,7 @@ namespace Pomodoro
             }
         }
 
-        public void show_window ()
+        public void show_window (uint32 timestamp = 0)
         {
             if (this.window == null) {
                 this.window = new Pomodoro.Window ();
@@ -161,11 +161,15 @@ namespace Pomodoro
                 this.add_window (this.window);
             }
 
-            this.window.present ();
+            if (timestamp > 0) {
+                this.window.present_with_time (timestamp);
+            }
+            else {
+                this.window.present ();
+            }
         }
 
-        public void show_preferences_full (string? page,
-                                           uint32  timestamp)
+        public void show_preferences (uint32 timestamp = 0)
         {
             if (this.preferences_dialog == null) {
                 this.preferences_dialog = new Pomodoro.PreferencesDialog ();
@@ -177,10 +181,6 @@ namespace Pomodoro
             }
 
             if (this.preferences_dialog != null) {
-                if (page != null) {
-                    this.preferences_dialog.set_page (page);
-                }
-
                 if (timestamp > 0) {
                     this.preferences_dialog.present_with_time (timestamp);
                 }
@@ -188,11 +188,6 @@ namespace Pomodoro
                     this.preferences_dialog.present ();
                 }
             }
-        }
-
-        public void show_preferences ()
-        {
-            this.show_preferences_full (null, 0);
         }
 
         private void action_timer (GLib.SimpleAction action,

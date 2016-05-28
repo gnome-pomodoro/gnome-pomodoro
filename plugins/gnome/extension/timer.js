@@ -227,8 +227,8 @@ const Timer = new Lang.Class({
         this._proxy.ShowMainWindowRemote(timestamp, Lang.bind(this, this._onCallback));
     },
 
-    showPreferences: function(view, timestamp) {
-        this._proxy.ShowPreferencesRemote(view, timestamp, Lang.bind(this, this._onCallback));
+    showPreferences: function(timestamp) {
+        this._proxy.ShowPreferencesRemote(timestamp, Lang.bind(this, this._onCallback));
     },
 
     _notifyServiceNotInstalled: function() {

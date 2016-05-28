@@ -82,11 +82,16 @@ namespace Pomodoro
             this.timer.update ();  // TODO: perhaps timer should have "changed" signal
         }
 
-        public void show_preferences (string page,
-                                      uint32 timestamp)
+        public void show_main_window (uint32 timestamp)
         {
             var application = Pomodoro.Application.get_default ();
-            application.show_preferences_full (page, timestamp);
+            application.show_window (timestamp);
+        }
+
+        public void show_preferences (uint32 timestamp)
+        {
+            var application = Pomodoro.Application.get_default ();
+            application.show_preferences (timestamp);
         }
 
         public void start ()

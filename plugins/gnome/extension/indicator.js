@@ -261,10 +261,9 @@ const IndicatorMenu = new Lang.Class({
     },
 
     _showPreferences: function() {
-        let view = 'timer';
         let timestamp = global.get_current_time();
 
-        this.indicator.timer.showPreferences(view, timestamp);
+        this.indicator.timer.showPreferences(timestamp);
     },
 
     _activateState: function(stateName) {
