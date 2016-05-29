@@ -217,6 +217,10 @@ const PomodoroExtension = new Lang.Class({
         }
         else {
             this.notification = new Notifications.PomodoroStartNotification(this.timer);
+            this.notification.connect('activated', Lang.bind(this,
+                function(notification) {
+                    this._getApp().activate();
+                }));
             this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
             this.notification.show();
         }
@@ -237,6 +241,9 @@ const PomodoroExtension = new Lang.Class({
                     if (this.dialog) {
                         this.dialog.open(true);
                         this.dialog.pushModal();
+                    }
+                    else {
+                        this._getApp().activate();
                     }
 
                     if (this.reminderManager) {
@@ -423,6 +430,9 @@ const PomodoroExtension = new Lang.Class({
                                 this.dialog.open(true);
                                 this.dialog.pushModal();
                             }
+                            else {
+                                this._getApp().activate();
+                            }
 
                             notification.destroy();
                         }));
@@ -445,6 +455,10 @@ const PomodoroExtension = new Lang.Class({
         }
 
         this.reminderManager.schedule();
+    },
+
+    _getApp: function() {
+        return Shell.AppSystem.get_default().lookup_app('org.gnome.Pomodoro.desktop');
     },
 
     notifyIssue: function(message) {
