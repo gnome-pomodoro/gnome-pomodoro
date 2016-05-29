@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-06-06 14:24+0200\n"
-"PO-Revision-Date: 2015-06-06 15:03+0200\n"
+"PO-Revision-Date: 2016-05-21 15:56+0200\n"
 "Last-Translator: Kamil Prusko <kamilprusko@gmail.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -36,7 +36,7 @@ msgid ""
 "25 minutes of work."
 msgstr ""
 "Narzędzie dla pulpitu GNOME do zarządzania czasem techniką Pomodoro. Dzięki "
-"robieniu regularnych przeerw ma na celu zmniejszyć zmęczenie i poprawić "
+"robieniu regularnych przerw ma na celu zmniejszyć zmęczenie i poprawić "
 "produktywność."
 
 #: ../data/org.gnome.Pomodoro.desktop.in.h:2 ../lib/about-dialog.vala:30
@@ -57,7 +57,7 @@ msgstr[2] "%d nowych wiadomości"
 
 #: ../extension/dialogs.js:466
 msgid "It's time to take a break"
-msgstr "To właściwy czas na zrobienie przerwy"
+msgstr "Naszedł czas na zrobienie przerwy"
 
 #. Toggle timer state button
 #: ../extension/indicator.js:82
@@ -169,7 +169,7 @@ msgstr ""
 
 #: ../lib/gnome-desktop-module.vala:490
 msgid "Indicator for Pomodoro will show up after you restart your desktop."
-msgstr "Indykator Pomodoro pokaże się po zrestartowaniu pulpitu."
+msgstr "Wskaźnik Pomodoro pokaże się po zrestartowaniu pulpitu."
 
 #: ../lib/gnome-desktop-module.vala:491 ../lib/sound-chooser-button.vala:126
 msgid "_Cancel"
@@ -319,7 +319,7 @@ msgstr "Skrót klawiszowy minutnika"
 
 #: ../lib/preferences-dialog.vala:1059
 msgid "Indicator appearance"
-msgstr "Wygląd indykatora"
+msgstr "Wygląd wskaźnika"
 
 #: ../lib/preferences-dialog.vala:1085
 msgid "Select ticking sound"
@@ -339,7 +339,7 @@ msgstr "Powiadomienia ekranowe"
 
 #: ../lib/preferences-dialog.vala:1141
 msgid "Remind to take a break"
-msgstr "Przypomnaj o porzerwie"
+msgstr "Przypominaj o przerwie"
 
 #: ../lib/preferences-dialog.vala:1146
 msgid "Wake up screen"
