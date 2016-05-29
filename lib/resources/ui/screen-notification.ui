@@ -9,9 +9,7 @@
     <property name="default_width">400</property>
     <property name="default_height">400</property>
     <property name="icon_name">gnome-pomodoro</property>
-    <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
-    <property name="urgency_hint">True</property>
     <child>
       <object class="GtkBox" id="timer_container">
         <property name="visible">True</property>
