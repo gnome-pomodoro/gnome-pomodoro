@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-10 14:23+0100\n"
+"POT-Creation-Date: 2016-05-29 17:23+0100\n"
 "PO-Revision-Date: 2013-06-03 12:11+0200\n"
-"Last-Translator: liberumed <liberumed@gmail.com>\n"
+"Last-Translator: Igor Dyatlov <dyatlov.igor@gmail.com>\n"
 "Language-Team: ru <>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -30,13 +30,12 @@ msgstr "Настройки"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
-#, fuzzy
 msgid "Pomodoro"
 msgstr "Помодоро"
 
 #: ../extension/notifications.js:389
 msgid "It's time to take a break"
-msgstr ""
+msgstr "Пришло время сделать перерыв"
 
 #: ../extension/notifications.js:574
 #, fuzzy
@@ -82,7 +81,7 @@ msgstr ""
 
 #: ../extension/notifications.js:772
 msgid "Could not run pomodoro"
-msgstr ""
+msgstr "Не удалось запустить Помодоро"
 
 #: ../extension/notifications.js:774
 msgid "Something went badly wrong..."
@@ -90,11 +89,11 @@ msgstr ""
 
 #: ../extension/notifications.js:775
 msgid "Looks like gnome-pomodoro is not installed"
-msgstr ""
+msgstr "Похоже, gnome-pomodoro не установлен"
 
 #: ../extension/notifications.js:784
 msgid "Report issue"
-msgstr ""
+msgstr "Сообщить о проблеме"
 
 #: ../extension/notifications.js:787
 msgid "Install"
@@ -102,11 +101,11 @@ msgstr ""
 
 #: ../src/about-dialog.vala:29
 msgid "About Pomodoro"
-msgstr ""
+msgstr "О Помодоро"
 
 #: ../src/about-dialog.vala:31
 msgid "A simple time management utility"
-msgstr ""
+msgstr "Простой инструмент для тайм-менеджмента"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
@@ -126,17 +125,15 @@ msgstr "Таймер"
 
 #: ../src/preferences-dialog.vala:396
 msgid "Pomodoro duration"
-msgstr "Длительность Помодоро"
+msgstr "Продолжительность Помодоро"
 
 #: ../src/preferences-dialog.vala:399
-#, fuzzy
 msgid "Short break duration"
-msgstr "Длительность Короткого Перерыва"
+msgstr "Продолжительность короткого перерыва"
 
 #: ../src/preferences-dialog.vala:402
-#, fuzzy
 msgid "Long break duration"
-msgstr "Длительность Большого Перерыва"
+msgstr "Продолжительность длительного перерыва"
 
 #. @translators: You can refer it to number of pomodoros in a cycle
 #: ../src/preferences-dialog.vala:411
@@ -144,27 +141,24 @@ msgid "Pomodoros to a long break"
 msgstr ""
 
 #: ../src/preferences-dialog.vala:418
-#, fuzzy
 msgid "Shortcut to toggle the timer"
-msgstr "Кнопка для запуска и остановки таймера"
+msgstr "Комбинации клавишь для переключения таймера"
 
 #: ../src/preferences-dialog.vala:426
-#, fuzzy
 msgid "Notifications"
 msgstr "Уведомления"
 
 #: ../src/preferences-dialog.vala:432
-#, fuzzy
 msgid "Screen notifications"
-msgstr "Звуковые Уведомления"
+msgstr "Экранные уведомления"
 
 #: ../src/preferences-dialog.vala:437
 msgid "Remind to take a break"
-msgstr ""
+msgstr "Напоминания для перерывов"
 
 #: ../src/preferences-dialog.vala:459
 msgid "Sounds"
-msgstr ""
+msgstr "Звуки"
 
 #: ../src/preferences-dialog.vala:464
 msgid "Clock Ticking"
@@ -197,7 +191,7 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:521
 msgid "Select sound for start of break"
-msgstr ""
+msgstr "Выберите звук для начала перерыва"
 
 #: ../src/preferences-dialog.vala:530
 msgid "Start of break sound"
@@ -266,9 +260,9 @@ msgstr ""
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d час"
+msgstr[1] "%d часы"
+msgstr[2] "%d часов"
 
 #: ../src/utils.vala:101
 #, c-format
@@ -296,7 +290,7 @@ msgstr "_Без звука"
 
 #: ../src/widgets.vala:514
 msgid "_Cancel"
-msgstr "О_тменить"
+msgstr "_Отменить"
 
 #: ../src/widgets.vala:516
 msgid "_Open"
@@ -324,7 +318,7 @@ msgstr ""
 
 #: ../data/gnome-pomodoro.desktop.in.h:2
 msgid "Manage your time and tasks"
-msgstr ""
+msgstr "Управление временем и задачами"
 
 #: ../data/gnome-pomodoro.desktop.in.h:3
 msgid "time;timer;tasks;manage;organize;"
