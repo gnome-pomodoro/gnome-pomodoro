@@ -131,14 +131,17 @@ namespace Pomodoro
 
         private void on_timer_elapsed_notify ()
         {
-            var remaining = (uint) double.max (Math.ceil (this.timer.remaining), 0.0);
-            var minutes   = remaining / 60;
-            var seconds   = remaining % 60;
+            if (!(this.timer.state is Pomodoro.DisabledState))
+            {
+                var remaining = (uint) double.max (Math.ceil (this.timer.remaining), 0.0);
+                var minutes   = remaining / 60;
+                var seconds   = remaining % 60;
 
-            this.minutes_label.label = "%02u".printf (minutes);
-            this.seconds_label.label = "%02u".printf (seconds);
+                this.minutes_label.label = "%02u".printf (minutes);
+                this.seconds_label.label = "%02u".printf (seconds);
 
-            this.timer_box.queue_draw ();
+                this.timer_box.queue_draw ();
+            }
         }
 
         private void on_timer_is_paused_notify ()
