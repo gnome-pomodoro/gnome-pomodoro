@@ -149,8 +149,7 @@ GNOME_POMODORO_LIBS="$GNOME_POMODORO_LIBS -lm"
 GNOME_POMODORO_VALAFLAGS=" \
     --target-glib \$(GLIB_REQUIRED) \
     --enable-experimental \
-    --vapidir=\$(top_builddir)/vapi \
-    --vapidir=\$(top_srcddir)/vapi \
+    --vapidir=\$(top_builddir) \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
@@ -159,7 +158,7 @@ GNOME_POMODORO_VALAFLAGS=" \
 
 PLUGIN_VALAFLAGS="$PLUGIN_VALAFLAGS \
     --target-glib \$(GLIB_REQUIRED) \
-    --vapidir=\$(top_builddir)/vapi \
+    --vapidir=\$(top_builddir) \
     --vapidir=\$(top_buildddir)/lib \
     --pkg config \
     --pkg gobject-2.0 \
@@ -266,7 +265,6 @@ fi
 
 AC_CONFIG_FILES([
     Makefile
-    vapi/Makefile
     lib/Makefile
     src/Makefile
     data/Makefile

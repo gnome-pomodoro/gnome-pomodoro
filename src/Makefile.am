@@ -7,7 +7,7 @@ gnome_pomodoro_SOURCES = \
 
 gnome_pomodoro_VALAFLAGS = \
 	--target-glib=$(GLIB_REQUIRED) \
-	--vapidir=$(top_builddir)/vapi \
+	--vapidir=$(top_builddir) \
 	--pkg config \
 	--pkg gobject-2.0 \
 	--pkg gio-2.0 \

@@ -19,7 +19,7 @@ tests_DEPENDENCIES = \
 	../lib/libgnome-pomodoro.la
 
 tests_VALAFLAGS = \
-	--vapidir=$(top_builddir)/vapi \
+	--vapidir=$(top_builddir) \
 	--pkg config \
 	--pkg gobject-2.0 \
 	--pkg gio-2.0 \
