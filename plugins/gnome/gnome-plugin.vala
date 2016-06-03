@@ -23,6 +23,11 @@ using GLib;
 
 namespace GnomePlugin
 {
+    /* Leas amount of time in seconds between detected events
+     * to say that user become active
+     */
+    private double IDLE_MONITOR_MIN_IDLE_TIME = 0.5;
+
     public class DesktopExtension : Pomodoro.FallbackDesktopExtension
     {
         private static const string[] SHELL_CAPABILITIES = {
@@ -39,6 +44,7 @@ namespace GnomePlugin
         private Gnome.IdleMonitor               idle_monitor;
         private uint                            become_active_id = 0;
         private bool                            configured = false;
+        private double                          last_activity_time = 0.0;
 
         construct
         {
@@ -158,12 +164,26 @@ namespace GnomePlugin
             }
         }
 
+        /**
+         * on_become_active callback
+         *
+         * We want to detect user/human activity so it sparse lone events.
+         */
         private void on_become_active (Gnome.IdleMonitor monitor,
                                        uint              id)
         {
-            this.become_active_id = 0;
+            var timestamp = Pomodoro.get_real_time ();
 
-            this.timer.resume ();
+            if (timestamp - this.last_activity_time < IDLE_MONITOR_MIN_IDLE_TIME) {
+                this.become_active_id = 0;
+
+                this.timer.resume ();
+            }
+            else {
+                this.become_active_id = this.idle_monitor.add_user_active_watch (this.on_become_active);
+            }
+
+            this.last_activity_time = timestamp;
         }
     }
 
