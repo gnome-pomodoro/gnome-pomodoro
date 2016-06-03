@@ -599,6 +599,19 @@ const PomodoroEndDialog = new Lang.Class({
                 break;
 
             case Clutter.EventType.KEY_PRESS:
+                switch (event.get_key_symbol())
+                {
+                    case Clutter.KEY_AudioLowerVolume:
+                    case Clutter.KEY_AudioRaiseVolume:
+                        return Clutter.EVENT_PROPAGATE;
+
+                    default:
+                        this.close(true);
+                        break;
+                }
+
+                break;
+
             case Clutter.EventType.BUTTON_PRESS:
             case Clutter.EventType.TOUCH_BEGIN:
                 this.close(true);
