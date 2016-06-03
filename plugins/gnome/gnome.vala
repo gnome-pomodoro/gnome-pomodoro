@@ -53,9 +53,9 @@ namespace Gnome
 
     public struct ExtensionInfo
     {
-        public string uuid;
-        public string path;
-        public string version;
+        public string         uuid;
+        public string         path;
+        public string         version;
         public ExtensionState state;
     }
 
@@ -80,16 +80,6 @@ namespace Gnome
                                        (uint32 action,
                                         uint32 device_id,
                                         uint32 timestamp);
-
-        public abstract bool @lock () throws IOError;
-
-        public abstract bool get_active () throws IOError;
-
-        public abstract void set_active (bool active) throws IOError;
-
-        public abstract uint get_active_time () throws IOError;
-
-        public signal void active_changed (bool active);
     }
 
     [DBus (name = "org.gnome.Shell.Extensions")]
