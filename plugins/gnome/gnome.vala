@@ -3,21 +3,6 @@ namespace Gnome
     public const string SHELL_SCHEMA = "org.gnome.shell";
     public const string SHELL_ENABLED_EXTENSIONS_KEY = "enabled-extensions";
 
-    [Flags]
-    public enum ActionMode
-    {
-        NONE          = 0,
-        NORMAL        = 1,
-        OVERVIEW      = 2,
-        LOCK_SCREEN   = 4,
-        UNLOCK_SCREEN = 8,
-        LOGIN_SCREEN  = 16,
-        SYSTEM_MODAL  = 32,
-        LOOKING_GLASS = 64,
-        POPUP         = 128,
-        ALL           = 255,
-    }
-
     public enum ExtensionState
     {
         /* Custom value suggesting there was DBus error */
@@ -78,20 +63,33 @@ namespace Gnome
     public interface Shell : GLib.Object
     {
         public abstract bool eval (string script)
-                                   throws GLib.IOError;
+                                   throws IOError;
 
-        public abstract uint32 grab_accelerator
+        public abstract bool grab_accelerator
                                        (string accelerator,
-                                        uint32 flags)
-                                        throws GLib.IOError;
+                                        uint32 flags,
+                                        out uint action)
+                                        throws IOError;
 
         public abstract bool ungrab_accelerator
-                                       (uint32 action)
-                                        throws GLib.IOError;
+                                       (uint32 action,
+                                        out bool success)
+                                        throws IOError;
 
         public signal void accelerator_activated
                                        (uint32 action,
-                                        GLib.HashTable<string, GLib.Variant> accelerator_params);
+                                        uint32 device_id,
+                                        uint32 timestamp);
+
+        public abstract bool @lock () throws IOError;
+
+        public abstract bool get_active () throws IOError;
+
+        public abstract void set_active (bool active) throws IOError;
+
+        public abstract uint get_active_time () throws IOError;
+
+        public signal void active_changed (bool active);
     }
 
     [DBus (name = "org.gnome.Shell.Extensions")]
@@ -99,17 +97,17 @@ namespace Gnome
     {
         public abstract void get_extension_info
                                        (string uuid,
-                                        out GLib.HashTable<string, GLib.Variant> info)
-                                        throws GLib.IOError;
+                                        out HashTable<string,Variant> info)
+                                        throws IOError;
 
         public abstract void get_extension_errors
                                        (string uuid,
                                         out string[] errors)
-                                        throws GLib.IOError;
+                                        throws IOError;
 
         public abstract void reload_extension
                                        (string uuid)
-                                        throws GLib.IOError;
+                                        throws IOError;
 
         public signal void extension_status_changed
                                        (string uuid,

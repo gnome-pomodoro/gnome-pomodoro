@@ -28,6 +28,7 @@ namespace GnomePlugin
         private static const string[] SHELL_CAPABILITIES = {
             "notifications",
             "indicator",
+            "hotkey",
             "reminders"
         };
 
@@ -36,10 +37,8 @@ namespace GnomePlugin
         private Pomodoro.CapabilityGroup        capabilities;
         private GnomePlugin.GnomeShellExtension shell_extension;
         private Gnome.IdleMonitor               idle_monitor;
-        private Gnome.Shell                     shell_proxy;
         private uint                            become_active_id = 0;
-        private uint                            accelerator_id = 0;
-        private uint                            name_watcher_id = 0;
+        private bool                            configured = false;
 
         construct
         {
@@ -55,8 +54,6 @@ namespace GnomePlugin
 
             this.timer = Pomodoro.Timer.get_default ();
             this.timer.state_changed.connect_after (this.on_timer_state_changed);
-
-            this.settings.changed["toggle-timer-key"].connect (this.on_toggle_timer_key_changed);
         }
 
         ~DesktopExtension ()
@@ -95,20 +92,6 @@ namespace GnomePlugin
 
         public override async void configure ()
         {
-            this.shell_proxy = GLib.Bus.get_proxy_sync<Gnome.Shell>
-                                       (GLib.BusType.SESSION,
-                                        "org.gnome.Shell",
-                                        "/org/gnome/Shell",
-                                        GLib.DBusProxyFlags.DO_NOT_AUTO_START,
-                                        null);
-
-            this.name_watcher_id = GLib.Bus.watch_name
-                                       (GLib.BusType.SESSION,
-                                        "org.gnome.Shell",
-                                        GLib.BusNameWatcherFlags.NONE,
-                                        () => { this.on_name_appeared (); } ,
-                                        () => { this.on_name_vanished (); });
-
             /* wait for status of gnome-shell extension */
             this.shell_extension.enable.begin ((obj, res) => {
                 this.shell_extension.enable.end (res);
@@ -156,75 +139,6 @@ namespace GnomePlugin
             }
         }
 
-        private void on_toggle_timer_key_changed ()
-        {
-            var capability = this.capabilities.lookup (Pomodoro.Capabilities.HOTKEY);
-
-            if (capability != null && capability.enabled) {
-                capability.disable ();
-                capability.enable ();
-            }
-        }
-
-        private void on_name_appeared ()
-        {
-            var capability = this.capabilities.lookup (Pomodoro.Capabilities.HOTKEY);
-
-            if (capability != null)
-            {
-                // handle hnome-shell restart
-                GLib.Timeout.add (2000, () => {
-                    capability.disable ();
-                    capability.enable ();
-
-                    return GLib.Source.REMOVE;
-                });
-            }
-            else {
-                capability = new Pomodoro.Capability (Pomodoro.Capabilities.HOTKEY);
-
-                capability.enabled_signal.connect (() => {
-                    try {
-                        this.accelerator_id = this.shell_proxy.grab_accelerator (this.settings.get_string ("toggle-timer-key"),
-                                                                                 Gnome.ActionMode.ALL);
-
-                        this.shell_proxy.accelerator_activated.connect (this.on_accelerator_activated);
-                    }
-                    catch (GLib.IOError error) {
-                        GLib.warning ("error while grabbing accelerator: %s", error.message);
-                    }
-                });
-
-                capability.disabled_signal.connect (() => {
-                    try {
-                        if (this.accelerator_id != 0) {
-                            this.shell_proxy.ungrab_accelerator (this.accelerator_id);
-                            this.accelerator_id = 0;
-                        }
-                    }
-                    catch (GLib.IOError error) {
-                        GLib.warning ("error while ungrabbing accelerator: %s", error.message);
-                    }
-
-                    this.shell_proxy.accelerator_activated.disconnect (this.on_accelerator_activated);
-                });
-
-                capability.enable ();
-
-                this.capabilities.add (capability);
-            }
-        }
-
-        private void on_name_vanished ()
-        {
-        }
-
-        private void on_accelerator_activated (uint32 action,
-                                               GLib.HashTable<string, GLib.Variant> accelerator_params)
-        {
-            this.timer.toggle ();
-        }
-
         private void on_timer_state_changed (Pomodoro.TimerState state,
                                              Pomodoro.TimerState previous_state)
         {
@@ -257,8 +171,14 @@ namespace GnomePlugin
     {
         private Pomodoro.PreferencesDialog dialog;
 
+        private GLib.Settings settings;
+        private GLib.List<Gtk.ListBoxRow> rows;
+
         construct
         {
+            this.settings = Pomodoro.get_settings ()
+                                    .get_child ("preferences");
+
             this.dialog = Pomodoro.PreferencesDialog.get_default ();
 
             this.setup_main_page ();
@@ -278,7 +198,7 @@ namespace GnomePlugin
                     child.show ();
                 }
             }
-        }
+       }
     }
 }
 

@@ -25,14 +25,14 @@ namespace Pomodoro
         public string name { get; set; }
 
         [CCode (notify = false)]
-        public bool enabled {  /* TODO rename to "is_enabled" */
+        public bool enabled {
             get {
                 return this.is_inhibited () ? false : this.enabled_request;
             }
         }
 
         [CCode (notify = false)]
-        public bool enabled_request {  /* TODO rename to "is_requested" */
+        public bool enabled_request {  /* TODO? rename to "requested" */
             get {
                 return this._enabled_request;
             }
@@ -92,18 +92,6 @@ namespace Pomodoro
         private int                  inhibit_count = 0;
         private GLib.Binding         enabled_binding;
 
-        construct
-        {
-            this.notify["enabled"].connect (() => {
-                if (this.enabled) {
-                    this.enabled_signal ();
-                }
-                else {
-                    this.disabled_signal ();
-                }
-            });
-        }
-
         public Capability (string name,
                            bool   enabled = false)
         {
@@ -117,11 +105,6 @@ namespace Pomodoro
             this.name            = fallback.name;
             this.enabled_request = enabled;
             this.fallback        = fallback;
-        }
-
-        public bool is_enabled ()
-        {
-            return this.enabled;
         }
 
         public bool is_virtual ()
@@ -178,10 +161,6 @@ namespace Pomodoro
                 this.notify_property ("enabled");
             }
         }
-
-        public signal void enabled_signal ();
-
-        public signal void disabled_signal ();
 
 //        private void on_fallback_toggle_ref_notify (GLib.Object fallback_object, bool is_last_ref)
 //        {
