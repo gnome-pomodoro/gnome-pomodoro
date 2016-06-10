@@ -1,9 +1,6 @@
 SUBDIRS = \
 	extension
 
-BUILT_SOURCES = \
-	gnome-desktop-3.0.vapi
-
 libgnome_la_pluginexecdir = $(PLUGIN_LIB_DIR)
 libgnome_la_pluginexec_LTLIBRARIES = \
 	libgnome.la
@@ -42,11 +39,10 @@ libgnome_la_LDFLAGS = \
 libgnome_la_LIBADD = \
 	$(top_builddir)/lib/libgnome-pomodoro.la
 
-gnome-desktop-3.0.vapi: $(INTROSPECTION_GIRDIR)/GnomeDesktop-3.0.gir GnomeDesktop-3.0.metadata gnome-desktop-3.0.deps
-	$(AM_V_GEN) $(VAPIGEN) --library gnome-desktop-3.0 --metadatadir=$(srcdir) $<
+# gnome-desktop-3.0.vapi: $(INTROSPECTION_GIRDIR)/GnomeDesktop-3.0.gir GnomeDesktop-3.0.metadata gnome-desktop-3.0.deps
+# 	$(AM_V_GEN) $(VAPIGEN) --library gnome-desktop-3.0 --metadatadir=$(srcdir) $<
 
 CLEANFILES = \
-	$(BUILT_SOURCES) \
 	$(libgnome_la_SOURCES:.vala=.c) \
 	libgnome.la \
 	libgnome_la_vala.stamp
