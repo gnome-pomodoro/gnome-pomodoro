@@ -100,7 +100,6 @@
 .pomodoro-screen-notification .pomodoro-timer-label:backdrop {
     font-size: 55pt;
     font-weight: normal;
-    font-family: Droid Sans, DejaVu Sans, Bitstream Vera Sans, sans-serif;
     text-shadow: 0px 5px 8px rgba(0, 0, 0, 0.10);
     color: white;
 }

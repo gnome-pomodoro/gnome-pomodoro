@@ -28,7 +28,6 @@ Architecture: any
 Depends: gnome-shell (>= @GNOME_REQUIRED@),
          ${misc:Depends},
          ${shlibs:Depends}
-Recommends: fonts-droid
 Description: A time management utility for GNOME
  A GNOME utility that helps managing time according to Pomodoro Technique. It
  intends to improve productivity and focus by taking short breaks after every
