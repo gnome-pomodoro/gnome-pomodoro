@@ -1,6 +1,8 @@
 lib_LTLIBRARIES = \
 	libgnome-pomodoro.la
 
+noinst_HEADERS = gnome-pomodoro.h
+
 libgnome_pomodoro_la_VALASOURCES = \
 	animation.vala \
 	about-dialog.vala \
@@ -32,14 +34,14 @@ libgnome_pomodoro_la_VALAFLAGS = \
 	--gresources $(top_srcdir)/lib/resources/resources.xml
 
 libgnome_pomodoro_la_CPPFLAGS = \
-	$(GNOME_POMODORO_CPPFLAGS)
+	$(GNOME_POMODORO_CPPFLAGS) \
+	-DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
+	-DPACKAGE_LOCALE_DIR=\""$(localedir)\"" \
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)\""
 
 libgnome_pomodoro_la_CFLAGS = \
 	$(GNOME_POMODORO_CFLAGS) \
 	$(WARNING_CFLAGS)
-
-libgnome_pomodoro_la_LDFLAGS = \
-	-export-dynamic
 
 libgnome_pomodoro_la_LIBADD = \
 	$(GNOME_POMODORO_LIBS)
@@ -56,12 +58,12 @@ BUILT_SOURCES = \
 	resources.c
 
 CLEANFILES = \
+	$(BUILT_SOURCES) \
 	$(libgnome_pomodoro_la_SOURCES:.vala=.c) \
 	gnome-pomodoro.h \
 	gnome-pomodoro.vapi \
 	libgnome-pomodoro.la \
-	libgnome_pomodoro_la_vala.stamp \
-	resources.c
+	libgnome_pomodoro_la_vala.stamp
 
 EXTRA_DIST = \
 	$(resources) \

@@ -13,18 +13,16 @@ Group: Productivity/Office/Other
 BuildRequires: gettext
 BuildRequires: intltool
 BuildRequires: docbook-utils
-BuildRequires: vala
+BuildRequires: vala >= @VALA_REQUIRED@
 BuildRequires: gnome-common
 BuildRequires: gnome-shell >= @GNOME_REQUIRED@
 BuildRequires: desktop-file-utils
-BuildRequires: pkgconfig(dbus-1)
 BuildRequires: pkgconfig(glib-2.0) >= @GLIB_REQUIRED@
 BuildRequires: pkgconfig(gnome-desktop-3.0) >= @GNOME_REQUIRED@
-BuildRequires: pkgconfig(gobject-introspection-1.0)
+BuildRequires: pkgconfig(gobject-introspection-1.0) >= @INTROSPECTION_REQUIRED@
 BuildRequires: pkgconfig(gstreamer-1.0)
 BuildRequires: pkgconfig(gtk+-3.0) >= @GTK_REQUIRED@
 BuildRequires: pkgconfig(libcanberra)
-BuildRequires: pkgconfig(telepathy-glib) >= @TELEPATHY_GLIB_REQUIRED@
 
 
 %if %{defined fedora}
@@ -93,6 +91,8 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %files -f %{name}.lang
 %doc README.md COPYING NEWS
 %{_bindir}/gnome-pomodoro
+%{_libdir}/gnome-pomodoro/plugins/*
+%{_libdir}/libgnome-pomodoro.so*
 %{_datadir}/appdata/org.gnome.Pomodoro.appdata.xml
 %{_datadir}/applications/org.gnome.Pomodoro.desktop
 %{_datadir}/dbus-1/services/org.gnome.Pomodoro.service

@@ -6,13 +6,13 @@ gnome_pomodoro_SOURCES = \
 	$(top_builddir)/lib/gnome-pomodoro.vapi
 
 gnome_pomodoro_VALAFLAGS = \
-	--target-glib=$(GLIB_REQUIRED) \
-	--vapidir=$(top_builddir) \
-	--pkg config \
-	--pkg gobject-2.0 \
-	--pkg gio-2.0 \
-	--pkg gtk+-3.0 \
-	--pkg libpeas-1.0
+	$(GNOME_POMODORO_VALAFLAGS)
+
+gnome_pomodoro_CPPFLAGS = \
+	$(GNOME_POMODORO_CPPFLAGS) \
+	-DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
+	-DPACKAGE_LOCALE_DIR=\""$(localedir)\"" \
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)\""
 
 gnome_pomodoro_CFLAGS = \
 	$(GNOME_POMODORO_CFLAGS) \
@@ -20,12 +20,10 @@ gnome_pomodoro_CFLAGS = \
 
 gnome_pomodoro_LDADD = \
 	$(GNOME_POMODORO_LIBS) \
-	-lm \
 	$(top_builddir)/lib/libgnome-pomodoro.la
 
 
 CLEANFILES = \
-	$(BUILT_SOURCES) \
 	$(gnome_pomodoro_SOURCES:.vala=.c) \
 	gnome-pomodoro \
 	gnome_pomodoro_vala.stamp

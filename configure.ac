@@ -39,29 +39,26 @@ AC_ARG_ENABLE([more-warnings],
 
 
 # Checks for pkg-config packages.
+VALA_REQUIRED=0.28
 GLIB_REQUIRED=2.38.0
-GTK_REQUIRED=3.14.0
-GNOME_REQUIRED=3.14.0
-TELEPATHY_GLIB_REQUIRED=0.17.5
+GTK_REQUIRED=3.16.0
+GNOME_REQUIRED=3.16.0
 INTROSPECTION_REQUIRED=0.10.1
-LIBPEAS_REQUIRED_VERSION=1.5.0
+LIBPEAS_REQUIRED=1.5.0
 
 PKG_CHECK_MODULES(GNOME_POMODORO, [
     glib-2.0 >= $GLIB_REQUIRED
     gio-2.0 >= $GLIB_REQUIRED
-    gio-unix-2.0 >= $GLIB_REQUIRED
-    gthread-2.0 >= $GLIB_REQUIRED
-    gmodule-no-export-2.0 >= $GLIB_REQUIRED
     gtk+-3.0 >= $GTK_REQUIRED
     gsettings-desktop-schemas >= $GTK_REQUIRED
     gobject-introspection-1.0 >= $INTROSPECTION_REQUIRED
-    libpeas-1.0 >= $LIBPEAS_REQUIRED_VERSION
+    libpeas-1.0 >= $LIBPEAS_REQUIRED
 ])
 
 PKG_CHECK_MODULES(PLUGIN, [
     glib-2.0 >= $GLIB_REQUIRED
     gtk+-3.0 >= $GTK_REQUIRED
-    libpeas-1.0 >= $LIBPEAS_REQUIRED_VERSION
+    libpeas-1.0 >= $LIBPEAS_REQUIRED
 ])
 
 PKG_CHECK_MODULES(SOUNDS_PLUGIN, [
@@ -79,7 +76,7 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_MKDIR_P
-AM_PROG_VALAC([0.26])
+AM_PROG_VALAC($VALA_REQUIRED)
 
 AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache)
@@ -144,28 +141,32 @@ fi
 
 
 # Project constants
-GNOME_POMODORO_CFLAGS="$GNOME_POMODORO_CFLAGS -I\$(top_builddir)/lib --include config.h"
-GNOME_POMODORO_LIBS="$GNOME_POMODORO_LIBS -lm"
 GNOME_POMODORO_VALAFLAGS=" \
     --target-glib \$(GLIB_REQUIRED) \
-    --enable-experimental \
-    --vapidir=\$(top_builddir) \
+    --vapidir=\$(top_srcdir) \
+    --vapidir=\$(top_builddir)/lib \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
     --pkg gtk+-3.0 \
     --pkg libpeas-1.0"
+GNOME_POMODORO_CPPFLAGS="$GNOME_POMODORO_CPPFLAGS \
+    -I\$(abs_top_srcdir) \
+    -I\$(abs_top_srcdir)/lib"
+GNOME_POMDORO_LIBS="$GNOME_POMDORO_LIBS -lm"
 
 PLUGIN_VALAFLAGS="$PLUGIN_VALAFLAGS \
     --target-glib \$(GLIB_REQUIRED) \
-    --vapidir=\$(top_builddir) \
+    --vapidir=\$(top_srcdir) \
     --vapidir=\$(top_buildddir)/lib \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
     --pkg gtk+-3.0 \
     --pkg libpeas-1.0"
-PLUGIN_CFLAGS="$PLUGIN_CFLAGS -I\$(top_builddir)/lib --include config.h"
+PLUGIN_CPPFLAGS="$PLUGIN_CPPFLAGS \
+    -I\$(abs_top_srcdir) \
+    -I\$(abs_top_srcdir)/lib"
 PLUGIN_LIBS="$PLUGIN_LIBS -lm"
 PLUGIN_LIBTOOL_FLAGS="-module -avoid-version"
 
@@ -208,8 +209,8 @@ AC_SUBST([GLIB_REQUIRED])
 AC_SUBST([GTK_REQUIRED])
 AC_SUBST([GNOME_REQUIRED])
 AC_SUBST([INTROSPECTION_REQUIRED])
-AC_SUBST([LIBPEAS_REQUIRED_VERSION])
-AC_SUBST([TELEPATHY_GLIB_REQUIRED])
+AC_SUBST([LIBPEAS_REQUIRED])
+AC_SUBST([VALA_REQUIRED])
 
 AC_SUBST([GNOME_POMODORO_VALAFLAGS])
 AC_SUBST([GNOME_POMODORO_CPPFLAGS])

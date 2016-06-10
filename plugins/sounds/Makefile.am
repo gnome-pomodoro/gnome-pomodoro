@@ -6,9 +6,6 @@ libsounds_la_plugindatadir = $(PLUGIN_LIB_DIR)
 libsounds_la_plugindata_DATA = \
 	sounds.plugin
 
-libsounds_la_DEPENDENCIES = \
-	$(top_builddir)/lib/libgnome-pomodoro.la
-
 libsounds_la_VALASOURCES = \
 	sound-player.vala \
 	sounds-plugin.vala \
@@ -25,7 +22,10 @@ libsounds_la_VALAFLAGS = \
 
 libsounds_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS) \
-	$(SOUNDS_PLUGIN_CPPFLAGS)
+	$(SOUNDS_PLUGIN_CPPFLAGS) \
+	-DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
+	-DPACKAGE_LOCALE_DIR=\""$(localedir)\"" \
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)\""
 
 libsounds_la_CFLAGS = \
 	$(PLUGIN_CFLAGS) \
@@ -41,7 +41,9 @@ libsounds_la_LIBADD = \
 
 
 CLEANFILES = \
-	$(libsounds_la_SOURCES:.vala=.c)
+	$(libsounds_la_SOURCES:.vala=.c) \
+	libsounds.la \
+	libsounds_la_vala.stamp
 
 EXTRA_DIST = \
 	$(libsounds_la_plugindata_DATA)

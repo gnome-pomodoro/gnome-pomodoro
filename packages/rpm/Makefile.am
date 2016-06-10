@@ -15,7 +15,9 @@ SUBST=sed \
 	-e "s|@GLIB_REQUIRED[@]|$(GLIB_REQUIRED)|g" \
 	-e "s|@GTK_REQUIRED[@]|$(GTK_REQUIRED)|g" \
 	-e "s|@GNOME_REQUIRED[@]|$(GNOME_REQUIRED)|g" \
-	-e "s|@TELEPATHY_GLIB_REQUIRED[@]|$(TELEPATHY_GLIB_REQUIRED)|g" \
+	-e "s|@INTROSPECTION_REQUIRED[@]|$(INTROSPECTION_REQUIRED)|g" \
+	-e "s|@LIBPEAS_REQUIRED[@]|$(LIBPEAS_REQUIRED)|g" \
+	-e "s|@VALA_REQUIRED[@]|$(VALA_REQUIRED)|g" \
 	-e "s|@prefix[@]|$(prefix)|g" \
 	-e "s|@datadir[@]|$(datadir)|g" \
 	-e "s|@pkgdatadir[@]|$(pkgdatadir)|g"
@@ -33,9 +35,9 @@ gnome_pomodoro_tar_gz = \
 
 rpm-src:
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) dist-xz;
-	$(AM_V_GEN) cp $(top_builddir)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.xz $(gnome_pomodoro_tar_gz);
+	cp $(top_builddir)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.xz $(gnome_pomodoro_tar_gz);
 	\
-	$(AM_V_GEN) $(SUBST) $(gnome_pomodoro_spec_in_files) > $(gnome_pomodoro_spec)
+	$(SUBST) $(gnome_pomodoro_spec_in_files) > $(gnome_pomodoro_spec)
 
 rpm: rpm-src
 	env -i PATH=/usr/bin/:/bin SHELL=$(SHELL) HOSTNAME=$${HOSTNAME} HOME=$${HOME} \

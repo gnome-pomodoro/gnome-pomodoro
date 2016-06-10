@@ -167,7 +167,7 @@ namespace GnomePlugin
         /**
          * on_become_active callback
          *
-         * We want to detect user/human activity so it sparse lone events.
+         * We want to detect user/human activity so it sparse events.
          */
         private void on_become_active (Gnome.IdleMonitor monitor,
                                        uint              id)
