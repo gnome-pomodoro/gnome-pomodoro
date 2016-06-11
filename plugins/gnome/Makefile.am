@@ -43,7 +43,9 @@ libgnome_la_LIBADD = \
 # 	$(AM_V_GEN) $(VAPIGEN) --library gnome-desktop-3.0 --metadatadir=$(srcdir) $<
 
 CLEANFILES = \
-	$(libgnome_la_SOURCES:.vala=.c) \
+	gnome.c \
+	gnome-plugin.c \
+	gnome-shell-extension.c \
 	libgnome.la \
 	libgnome_la_vala.stamp
 

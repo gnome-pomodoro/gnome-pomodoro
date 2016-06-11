@@ -51,10 +51,34 @@ namespace Pomodoro
             public static bool no_default_window = false;
             public static bool preferences = false;
             public static bool quit = false;
+            public static bool start_stop = false;
+            public static bool start = false;
+            public static bool stop = false;
+            public static bool pause_resume = false;
+            public static bool pause = false;
+            public static bool resume = false;
 
             public static ExitStatus exit_status = ExitStatus.UNDEFINED;
 
             public static const GLib.OptionEntry[] entries = {
+                { "start-stop", 0, 0, GLib.OptionArg.NONE,
+                  ref start_stop, N_("Start/Stop"), null },
+
+                { "start", 0, 0, GLib.OptionArg.NONE,
+                  ref start, N_("Start"), null },
+
+                { "stop", 0, 0, GLib.OptionArg.NONE,
+                  ref stop, N_("Stop"), null },
+
+                { "pause-resume", 0, 0, GLib.OptionArg.NONE,
+                  ref pause_resume, N_("Pause/Resume"), null },
+
+                { "pause", 0, 0, GLib.OptionArg.NONE,
+                  ref pause, N_("Pause"), null },
+
+                { "resume", 0, 0, GLib.OptionArg.NONE,
+                  ref resume, N_("Resume"), null },
+
                 { "no-default-window", 0, GLib.OptionFlags.HIDDEN, GLib.OptionArg.NONE,
                   ref no_default_window, N_("Run as background service"), null },
 
@@ -69,6 +93,19 @@ namespace Pomodoro
 
                 { null }
             };
+
+            public static void reset ()
+            {
+                Options.no_default_window = false;
+                Options.preferences = false;
+                Options.quit = false;
+                Options.start_stop = false;
+                Options.start = false;
+                Options.stop = false;
+                Options.pause_resume = false;
+                Options.pause = false;
+                Options.resume = false;
+            }
         }
 
         public Application ()
@@ -379,8 +416,7 @@ namespace Pomodoro
          */
         private void parse_command_line (ref unowned string[] arguments) throws GLib.OptionError
         {
-            var option_context = new GLib.OptionContext (_("- Time management utility for GNOME"));
-
+            var option_context = new GLib.OptionContext ();
             option_context.add_main_entries (Options.entries, Config.GETTEXT_PACKAGE);
             option_context.add_group (Gtk.get_option_group (true));
 
@@ -477,6 +513,40 @@ namespace Pomodoro
                 this.quit ();
             }
             else {
+                Options.no_default_window =
+                        Options.no_default_window |
+                        Options.start_stop |
+                        Options.start |
+                        Options.stop |
+                        Options.pause_resume |
+                        Options.pause |
+                        Options.resume;
+
+                if (Options.start_stop) {
+                    this.timer.toggle ();
+                }
+                else if (Options.start) {
+                    this.timer.start ();
+                }
+                else if (Options.stop) {
+                    this.timer.stop ();
+                }
+
+                if (Options.pause_resume) {
+                    if (this.timer.is_paused) {
+                        this.timer.resume ();
+                    }
+                    else {
+                        this.timer.pause ();
+                    }
+                }
+                else if (Options.pause) {
+                    this.timer.pause ();
+                }
+                else if (Options.resume) {
+                    this.timer.resume ();
+                }
+
                 if (Options.preferences) {
                     this.show_preferences ();
                 }
@@ -484,8 +554,7 @@ namespace Pomodoro
                     this.show_window ();
                 }
 
-                Options.preferences = false;
-                Options.no_default_window = false;
+                Options.reset ();
             }
 
             this.release ();
