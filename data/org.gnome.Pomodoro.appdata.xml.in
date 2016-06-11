@@ -14,9 +14,20 @@
     </_p>
   </description>
   <screenshots>
-    <screenshot type="default" width="624" height="351">http://kamilprusko.org/files/gnome-pomodoro/0.11/indicator.png</screenshot>
+    <screenshot type="default">
+       <image>http://gnomepomodoro.org/release/0.12/window.png</image>
+       <caption>Main window</caption>
+    </screenshot>
+    <screenshot>
+       <image>http://gnomepomodoro.org/release/0.12/preferences.png</image>
+       <caption>Preferences</caption>
+    </screenshot>
+    <screenshot>
+       <image>http://gnomepomodoro.org/release/0.12/indicator.png</image>
+       <caption>Indicator for GNOME Shell</caption>
+    </screenshot>
   </screenshots>
-  <url type="homepage">https://github.com/codito/gnome-shell-pomodoro</url>
+  <url type="homepage">http://gnomepomodoro.org</url>
   <updatecontact>kamilprusko@gmail.com</updatecontact>
   <kudos>
     <kudo>AppMenu</kudo>
