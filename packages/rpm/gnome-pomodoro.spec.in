@@ -15,21 +15,21 @@ BuildRequires: intltool
 BuildRequires: docbook-utils
 BuildRequires: vala >= @VALA_REQUIRED@
 BuildRequires: gnome-common
-BuildRequires: gnome-shell >= @GNOME_REQUIRED@
 BuildRequires: desktop-file-utils
 BuildRequires: pkgconfig(glib-2.0) >= @GLIB_REQUIRED@
-BuildRequires: pkgconfig(gnome-desktop-3.0) >= @GNOME_REQUIRED@
-BuildRequires: pkgconfig(gobject-introspection-1.0) >= @INTROSPECTION_REQUIRED@
-BuildRequires: pkgconfig(gstreamer-1.0)
+BuildRequires: pkgconfig(gio-2.0) >= @GLIB_REQUIRED@
 BuildRequires: pkgconfig(gtk+-3.0) >= @GTK_REQUIRED@
-BuildRequires: pkgconfig(libcanberra)
-
+BuildRequires: pkgconfig(gsettings-desktop-schemas) >= @GTK_REQUIRED@
+BuildRequires: pkgconfig(gobject-introspection-1.0) >= @INTROSPECTION_REQUIRED@
+BuildRequires: pkgconfig(libpeas-1.0) >= @LIBPEAS_REQUIRED@
+BuildRequires: pkgconfig(gstreamer-1.0) >= 1.0.10
+BuildRequires: pkgconfig(libcanberra) >= 0.30
+BuildRequires: pkgconfig(gnome-desktop-3.0) >= @GNOME_REQUIRED@
 
 %if %{defined fedora}
 BuildRequires: vala-tools
 %endif
 
-Requires: gnome-shell >= @GNOME_REQUIRED@
 Requires: gtk3 >= @GTK_REQUIRED@
 Requires: hicolor-icon-theme
 
@@ -89,7 +89,7 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %files -f %{name}.lang
 %doc README.md COPYING NEWS
 %{_bindir}/gnome-pomodoro
-%{_libdir}/gnome-pomodoro/plugins/*
+%{_libdir}/gnome-pomodoro
 %{_libdir}/libgnome-pomodoro.so*
 %{_datadir}/appdata/org.gnome.Pomodoro.appdata.xml
 %{_datadir}/applications/org.gnome.Pomodoro.desktop

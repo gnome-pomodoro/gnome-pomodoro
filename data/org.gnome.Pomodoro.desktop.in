@@ -7,6 +7,6 @@ Icon=gnome-pomodoro
 StartupNotify=false
 Terminal=false
 Type=Application
-Categories=GNOME;GTK;Utility;
+Categories=GTK;GNOME;Utility;Clock;
 X-GNOME-UsesNotifications=true
 DBusActivatable=true

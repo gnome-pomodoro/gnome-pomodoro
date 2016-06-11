@@ -4,7 +4,6 @@ Section: gnome
 Priority: optional
 Build-Depends: debhelper (>= 9.0.0),
                dh-autoreconf,
-               docbook-utils,
                gettext,
                intltool,
                valac (>= @VALA_REQUIRED@),
@@ -14,7 +13,7 @@ Build-Depends: debhelper (>= 9.0.0),
                libglib2.0-dev (>= @GLIB_REQUIRED@),
                libgnome-desktop-3-dev (>= @GNOME_REQUIRED@),
                gsettings-desktop-schemas (>= @GNOME_REQUIRED@),
-               gobject-introspection-dev (>= @INTROSPECTION_REQUIRED@),
+               gobject-introspection (>= @INTROSPECTION_REQUIRED@),
                libgirepository1.0-dev,
                libgstreamer1.0-dev (>= 1.2.0),
                libgtk-3-dev (>= @GTK_REQUIRED@),
@@ -25,8 +24,7 @@ Homepage: @PACKAGE_URL@
 
 Package: @PACKAGE_NAME@
 Architecture: any
-Depends: gnome-shell (>= @GNOME_REQUIRED@),
-         ${misc:Depends},
+Depends: ${misc:Depends},
          ${shlibs:Depends}
 Description: A time management utility for GNOME
  A GNOME utility that helps managing time according to Pomodoro Technique. It
