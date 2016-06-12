@@ -11,3 +11,9 @@ override_dh_autoreconf:
 
 override_dh_auto_test:
 
+
+postinst:
+	su - $SUDO_USER -c "xdg-desktop-icon install @datadir@/applications/org.gnome.Pomodoro.desktop"
+
+postrem:
+	su - $SUDO_USER -c "xdg-desktop-icon uninstall @datadir@/applications/org.gnome.Pomodoro.desktop"
