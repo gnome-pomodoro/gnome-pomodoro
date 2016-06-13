@@ -30,6 +30,10 @@ BuildRequires: pkgconfig(gnome-desktop-3.0) >= @GNOME_REQUIRED@
 BuildRequires: vala-tools
 %endif
 
+%if %{undefined fedora}
+BuildRequires: gnome-shell >= @GNOME_REQUIRED@
+%endif
+
 Requires: gtk3 >= @GTK_REQUIRED@
 Requires: hicolor-icon-theme
 
