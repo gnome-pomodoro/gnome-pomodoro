@@ -1,8 +1,6 @@
 lib_LTLIBRARIES = \
 	libgnome-pomodoro.la
 
-noinst_HEADERS = gnome-pomodoro.h
-
 libgnome_pomodoro_la_VALASOURCES = \
 	animation.vala \
 	about-dialog.vala \
