@@ -143,8 +143,7 @@ fi
 # Project constants
 GNOME_POMODORO_VALAFLAGS=" \
     --target-glib \$(GLIB_REQUIRED) \
-    --vapidir=\$(top_srcdir) \
-    --vapidir=\$(top_builddir)/lib \
+    --vapidir=\$(abs_top_srcdir) \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
@@ -157,8 +156,7 @@ GNOME_POMDORO_LIBS="$GNOME_POMDORO_LIBS -lm"
 
 PLUGIN_VALAFLAGS="$PLUGIN_VALAFLAGS \
     --target-glib \$(GLIB_REQUIRED) \
-    --vapidir=\$(top_srcdir) \
-    --vapidir=\$(top_buildddir)/lib \
+    --vapidir=\$(abs_top_srcdir) \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \

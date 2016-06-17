@@ -29,7 +29,7 @@ libgnome_pomodoro_la_VALAFLAGS = \
 	--library=gnome-pomodoro \
 	--header=gnome-pomodoro.h \
 	--vapi=gnome-pomodoro.vapi \
-	--gresources $(top_srcdir)/lib/resources/resources.xml
+	--gresources resources/resources.xml
 
 libgnome_pomodoro_la_CPPFLAGS = \
 	$(GNOME_POMODORO_CPPFLAGS) \
@@ -65,7 +65,9 @@ CLEANFILES = \
 
 EXTRA_DIST = \
 	$(resources) \
-	$(resources_deps)
+	$(resources_deps) \
+	gnome-pomodoro.h \
+	gnome-pomodoro.vapi
 
 -include $(top_srcdir)/git.mk
 

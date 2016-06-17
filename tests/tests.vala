@@ -27,6 +27,8 @@ namespace Pomodoro
 {
     public delegate void TestCaseFunc ();
 
+    public GLib.SettingsSchemaSource schema_source;
+
     private class TestSuiteAdaptor
     {
         public string name;
@@ -117,17 +119,11 @@ namespace Pomodoro
 
         private void setup_settings ()
         {
-            /* prepare temporary settings */
-            var target_schema_path = GLib.Path.build_filename (
-                    this.tmp_dir.get_path (), "share", "glib-2.0", "schemas");
+            Environment.set_variable ("GSETTINGS_BACKEND", "memory", true);
+            Environment.set_variable ("GSETTINGS_SCHEMA_DIR", this.tmp_dir.get_path (), true);
 
-            var target_schema_dir = GLib.File.new_for_path (target_schema_path);
-            try {
-                target_schema_dir.make_directory_with_parents ();
-            }
-            catch (GLib.Error error) {
-                GLib.error ("Error creating directory for schema files: %s", error.message);
-            }
+            /* prepare temporary settings */
+            var target_schema_path = this.tmp_dir.get_path ();
 
             try {
                 var top_builddir = TestRunner.get_top_builddir ();
@@ -152,44 +148,27 @@ namespace Pomodoro
                             null,
                             null,
                             out compile_schemas_result);
-            } catch (GLib.SpawnError error) {
+            }
+            catch (GLib.SpawnError error) {
                 GLib.error (error.message);
             }
 
             if (compile_schemas_result != 0) {
-                error ("Could not compile schemas '%s'.", target_schema_path);
-            }
-
-            /* set default settings object */
-            try {
-                var schema_source = new SettingsSchemaSource
-                                            .from_directory (target_schema_path,
-                                                             null,
-                                                             false);
-                var schema = schema_source.lookup ("org.gnome.pomodoro", false);
-
-                if (schema != null) {
-                    var settings = new Settings.full (schema, null, null);
-                    Pomodoro.set_settings (settings);
-                }
-                else {
-                    GLib.error ("Schema could not found");
-                }
-            }
-            catch (GLib.Error error) {
-                GLib.error (error.message);
+                GLib.error ("Could not compile schemas '%s'.", target_schema_path);
             }
         }
 
         public virtual void global_setup ()
         {
             Environment.set_variable ("LANGUAGE", "C", true);
-            Environment.set_variable ("GSETTINGS_BACKEND", "memory", true);
 
             try {
                 this.tmp_dir = GLib.File.new_for_path (
-                        DirUtils.make_tmp ("gnome-pomodoro-test-XXXXXX"));
-            } catch (GLib.Error error) {
+                        GLib.DirUtils.make_tmp ("gnome-pomodoro-test-XXXXXX"));
+
+
+            }
+            catch (GLib.Error error) {
                 GLib.error ("Error creating temporary directory for test files: %s".printf (error.message));
             }
 
@@ -208,7 +187,8 @@ namespace Pomodoro
                                             null,
                                             null,
                                             out delete_tmp_result);
-                } catch (GLib.SpawnError error) {
+                }
+                catch (GLib.SpawnError error) {
                     GLib.warning (error.message);
                 }
 
