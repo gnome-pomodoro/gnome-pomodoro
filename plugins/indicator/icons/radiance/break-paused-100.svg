@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16pt" height="16pt" viewBox="0 0 16 16" version="1.1">
+<g id="surface665">
+<path style="fill:none;stroke-width:2.2;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:0.298039;stroke-miterlimit:10;" d="M 1.101562 0 L 1.101562 6 M 4.898438 0 L 4.898438 6 " transform="matrix(1,0,0,1,10,10)"/>
+<path style="fill:none;stroke-width:2.2;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(23.529412%,23.529412%,23.529412%);stroke-opacity:1;stroke-miterlimit:10;" d="M 1.101562 0 L 1.101562 6 M 4.898438 0 L 4.898438 6 " transform="matrix(1,0,0,1,9,9)"/>
+<path style="fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:miter;stroke:rgb(100%,100%,100%);stroke-opacity:0.0473356;stroke-miterlimit:10;" d="M 1 -4.898438 L 1 -4.898438 " transform="matrix(1,0,0,1,8,8)"/>
+<path style="fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:miter;stroke:rgb(23.529412%,23.529412%,23.529412%);stroke-opacity:0.235294;stroke-miterlimit:10;" d="M 0 -5.898438 L 0 -5.898438 " transform="matrix(1,0,0,1,8,8)"/>
+</g>
+</svg>

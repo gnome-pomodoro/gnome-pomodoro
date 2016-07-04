@@ -1,0 +1,224 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+import argparse
+import cairo
+import json
+import math
+
+
+THEME_DEFAULTS = {
+    'format': 'svg',
+    'width': 16,
+    'height': 16,
+    'primary-color': "#FFFFFFFF",
+    'secondary-color': "#FFFFFF4c",
+    'shadow-color': None,
+    'shadow-offset-x': 0.0,
+    'shadow-offset-y': 0.0,
+    'padding-top': 0.0,
+    'padding-left': 0.0,
+    'padding-right': 0.0,
+    'padding-bottom': 0.0,
+    'line-width': 2.2,
+    'line-outset': 1.0,
+}
+
+THEME_COLOR_KEYS = ('primary-color', 'secondary-color', 'shadow-color')
+
+PAUSE_ICON_SIZE = 6
+
+STATES = ('pomodoro', 'break')
+
+
+class IndicatorTheme:
+
+    def __init__(self, data):
+        self._data = self._prepare_data(data)
+
+    def __getattr__(self, attr):
+        return self._data.get(attr.replace('_', '-'), None)
+
+    def _prepare_data(self, data):
+        tmp = THEME_DEFAULTS.copy()
+        tmp.update(data)
+
+        for key in THEME_COLOR_KEYS:
+            tmp[key] = self._parse_color(tmp[key])
+
+        return tmp
+
+    def _parse_color(self, value):
+        """
+        Parse hex color to rgba list.
+        """
+        value = (value or '#00000000').lstrip('#')
+
+        return list(int(value[i : i + 2] or 'FF', 16) / 255.0 for i in range(0, 8, 2))
+
+
+def premultiply_alpha(color, alpha):
+    color = list(color)
+    color[3] = color[3] * alpha - (color[3] * 0.1) * (1.0 - alpha)
+
+    return color
+
+
+def draw_pause_icon(cr, theme, width=PAUSE_ICON_SIZE, height=PAUSE_ICON_SIZE):
+    cr.save()
+
+    cr.set_line_cap(cairo.LINE_CAP_BUTT)
+    cr.set_line_width(theme.line_width)
+
+    cr.translate(theme.shadow_offset_x, theme.shadow_offset_y)
+    cr.move_to(theme.line_width / 2, 0)
+    cr.rel_line_to(0, height)
+    cr.move_to(width - theme.line_width / 2, 0)
+    cr.rel_line_to(0, height)
+    cr.set_source_rgba(*theme.shadow_color)
+    cr.stroke()
+    cr.translate(-theme.shadow_offset_x, -theme.shadow_offset_y)
+
+    cr.move_to(theme.line_width / 2, 0)
+    cr.rel_line_to(0, height)
+    cr.move_to(width - theme.line_width / 2, 0)
+    cr.rel_line_to(0, height)
+    cr.set_source_rgba(*theme.primary_color)
+    cr.stroke()
+
+    cr.restore()
+
+
+def draw_indicator(cr, theme, state, progress, is_paused=False):
+    content_width  = theme.width - theme.padding_left - theme.padding_right
+    content_height = theme.height - theme.padding_top - theme.padding_bottom
+    radius         = 0.5 * (min(content_width, content_height) - theme.line_width)
+    angle1         = - 0.5 * math.pi - 2.0 * math.pi * min(max(progress, 0.000001), 1.0)
+    angle2         = - 0.5 * math.pi
+
+    if is_paused:
+        cr.save()
+        cr.translate(theme.padding_left + content_width - PAUSE_ICON_SIZE,
+                     theme.padding_top + content_height - PAUSE_ICON_SIZE)
+
+        draw_pause_icon(cr, theme)
+        cr.restore()
+
+        icon_padding = theme.line_width
+
+        cr.move_to(0, 0)
+        cr.rel_line_to(theme.width, 0)
+        cr.rel_line_to(0, theme.height - theme.padding_bottom - PAUSE_ICON_SIZE - icon_padding)
+        cr.rel_line_to(-icon_padding - PAUSE_ICON_SIZE - theme.padding_right, 0)
+        cr.rel_line_to(0, PAUSE_ICON_SIZE + icon_padding + theme.padding_bottom)
+        cr.line_to(0, theme.height)
+        cr.close_path()
+        cr.clip()
+
+    cr.save()
+    cr.translate(theme.padding_left + 0.5 * content_width,
+                 theme.padding_top + 0.5 * content_height)
+    cr.set_line_cap(cairo.LINE_CAP_ROUND)
+
+    if theme.format != 'svg':
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+
+    if state == 'break':
+        if theme.shadow_color[3]:
+            cr.save()
+
+            cr.set_source_rgba(*premultiply_alpha(theme.shadow_color, theme.secondary_color[3]))
+            cr.set_line_width(theme.line_width)
+            cr.arc_negative(theme.shadow_offset_x, theme.shadow_offset_y, radius, angle1, angle2)
+            cr.stroke()
+
+            cr.restore()
+
+        cr.set_source_rgba(*theme.secondary_color)
+        cr.set_line_width(theme.line_width)
+        cr.arc_negative(0, 0, radius, angle1, angle2)
+        cr.stroke()
+
+    elif state == 'pomodoro':
+        if theme.shadow_color[3]:
+            cr.save()
+            cr.set_line_width(theme.line_width)
+
+            secondary_shadow_color = premultiply_alpha(theme.shadow_color, theme.secondary_color[3])
+            primary_shadow_color = premultiply_alpha(
+                    premultiply_alpha(theme.shadow_color, theme.primary_color[3]),
+                    1.0 - secondary_shadow_color[3])
+
+            cr.set_source_rgba(*secondary_shadow_color)
+            cr.arc(theme.shadow_offset_x, theme.shadow_offset_y, radius, 0.0, 2.0 * math.pi)
+            cr.stroke()
+
+            cr.set_source_rgba(*primary_shadow_color)
+            cr.arc_negative(theme.shadow_offset_x, theme.shadow_offset_y, radius, angle1, angle2)
+            cr.stroke()
+
+            cr.restore()
+
+        cr.set_source_rgba(*theme.secondary_color)
+        cr.set_line_width(theme.line_width)
+        cr.arc(0, 0, radius, 0.0, 2.0 * math.pi)
+        cr.stroke()
+
+        cr.arc_negative(0, 0, radius, angle1, angle2)
+
+        if theme.format != 'svg':
+            cr.set_operator(cairo.OPERATOR_CLEAR)
+            cr.set_line_width(theme.line_width + theme.line_outset)
+            cr.stroke_preserve()
+            cr.set_operator(cairo.OPERATOR_SOURCE)
+
+        cr.set_source_rgba(*theme.primary_color)
+        cr.set_line_width(theme.line_width)
+        cr.stroke()
+
+    cr.restore()
+
+
+def main(args):
+    assert 1 <= args.steps <= 101
+
+    for theme_file in args.files:
+        theme_dir = os.path.dirname(os.path.abspath(theme_file.name))
+
+        theme = IndicatorTheme(json.load(theme_file))
+
+        for state in STATES:
+            for step in range(args.steps):
+                for is_paused in (True, False):
+                    progress = step / (args.steps - 1)
+                    filename = '{state}{paused}-{percent:0>3}.{format}'.format(state=state,
+                                                                               paused='-paused' if is_paused else '',
+                                                                               percent=int(100 * progress),
+                                                                               format=theme.format)
+                    filename = os.path.join(theme_dir, filename)
+
+                    if theme.format == 'svg':
+                        surface = cairo.SVGSurface(filename, theme.width, theme.height)
+                        surface.set_fallback_resolution(72, 72)
+                    else:
+                        surface = cairo.ImageSurface(filename, theme.width, theme.height)
+
+                    draw_indicator(cairo.Context(surface), theme, state, progress, is_paused=is_paused)
+
+                    surface.finish()
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate indicator icons for Pomodoro')
+    parser.add_argument('files', nargs='+',
+                        type=argparse.FileType('r'),
+                        help='theme.json files')
+    parser.add_argument('--steps', dest='steps',
+                        type=int, default=21,
+                        help='number images per state')
+
+    args = parser.parse_args()
+
+    main(args)
+

@@ -49,6 +49,8 @@ Recommends: gstreamer1-plugins-base
 Recommends: gstreamer-plugins-base
 %endif
 
+Recommends: libappindicator-gtk3-devel
+
 %if %{defined fedora}
 Obsoletes: gnome-shell-extension-pomodoro
 %endif
