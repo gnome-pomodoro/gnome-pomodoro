@@ -46,13 +46,6 @@ namespace Pomodoro
             { "long-break", "Long Break" }
         };
 
-        private static const GLib.ActionEntry[] action_entries = {
-            { "start", on_start_activate },
-            { "stop", on_stop_activate },
-            { "pause", on_pause_activate },
-            { "resume", on_resume_activate }
-        };
-
         private unowned Pomodoro.Timer timer;
 
         [GtkChild]
@@ -80,12 +73,7 @@ namespace Pomodoro
                 min_height = MIN_HEIGHT,
                 max_height = -1
             };
-            var geometry_hints = Gdk.WindowHints.MIN_SIZE;
-            this.set_geometry_hints (this,
-                                     geometry,
-                                     geometry_hints);
-
-            this.add_action_entries (Window.action_entries, this);
+            this.set_geometry_hints (this, geometry, Gdk.WindowHints.MIN_SIZE);
 
             this.on_timer_state_notify ();
             this.on_timer_elapsed_notify ();
@@ -95,6 +83,7 @@ namespace Pomodoro
         public void parser_finished (Gtk.Builder builder)
         {
             this.timer = Pomodoro.Timer.get_default ();
+            this.insert_action_group ("timer", this.timer.get_action_group ());
 
             base.parser_finished (builder);
 
@@ -125,6 +114,7 @@ namespace Pomodoro
             {
                 if (mapping.name == this.timer.state.name) {
                     this.state_togglebutton.label = mapping.display_name;
+                    break;
                 }
             }
         }
@@ -153,7 +143,7 @@ namespace Pomodoro
 
             if (this.timer.is_paused) {
                 this.pause_button_image.icon_name = "media-playback-start-symbolic";
-                this.pause_button.action_name     = "win.resume";
+                this.pause_button.action_name     = "timer.resume";
                 this.pause_button.tooltip_text    = _("Resume");
 
                 this.blink_animation = new Pomodoro.Animation (Pomodoro.AnimationMode.BLINK,
@@ -167,7 +157,7 @@ namespace Pomodoro
             }
             else {
                 this.pause_button_image.icon_name = "media-playback-pause-symbolic";
-                this.pause_button.action_name     = "win.pause";
+                this.pause_button.action_name     = "timer.pause";
                 this.pause_button.tooltip_text    = _("Pause");
 
                 this.blink_animation = new Pomodoro.Animation (Pomodoro.AnimationMode.EASE_OUT,
@@ -222,19 +212,6 @@ namespace Pomodoro
         }
 
         [GtkCallback]
-        private void on_state_button_clicked (Gtk.Button button)
-        {
-            var timer_state = Pomodoro.TimerState.lookup (button.name);
-
-            if (timer_state != null) {
-                this.timer.state = timer_state;
-            }
-            else {
-                GLib.critical ("Unknown timer state \"%s\"", button.name);
-            }
-        }
-
-        [GtkCallback]
         private bool on_button_press (Gtk.Widget      widget,
                                       Gdk.EventButton event)
         {
@@ -245,30 +222,6 @@ namespace Pomodoro
             }
 
             return false;
-        }
-
-        private void on_start_activate (GLib.SimpleAction action,
-                                        GLib.Variant?     parameter)
-        {
-            this.timer.start ();
-        }
-
-        private void on_stop_activate (GLib.SimpleAction action,
-                                       GLib.Variant?     parameter)
-        {
-            this.timer.stop ();
-        }
-
-        private void on_pause_activate (GLib.SimpleAction action,
-                                        GLib.Variant?     parameter)
-        {
-            this.timer.pause ();
-        }
-
-        private void on_resume_activate (GLib.SimpleAction action,
-                                         GLib.Variant?     parameter)
-        {
-            this.timer.resume ();
         }
     }
 }

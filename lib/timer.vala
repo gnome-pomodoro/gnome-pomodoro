@@ -330,6 +330,11 @@ namespace Pomodoro
             this.notify_property ("state-duration");
         }
 
+        public GLib.ActionGroup get_action_group ()
+        {
+            return Pomodoro.TimerActionGroup.for_timer (this);
+        }
+
         public override void dispose ()
         {
             if (this.timeout_source != 0) {

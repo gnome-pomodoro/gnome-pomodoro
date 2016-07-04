@@ -16,6 +16,7 @@ libgnome_pomodoro_la_VALASOURCES = \
 	service.vala \
 	settings.vala \
 	timer.vala \
+	timer-action-group.vala \
 	timer-state.vala \
 	utils.vala \
 	window.vala

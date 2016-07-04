@@ -228,20 +228,20 @@ namespace Pomodoro
             }
         }
 
-        private void action_timer (GLib.SimpleAction action,
-                                   GLib.Variant?     parameter)
+        private void activate_timer (GLib.SimpleAction action,
+                                     GLib.Variant?     parameter)
         {
             this.show_window ();
         }
 
-        private void action_preferences (GLib.SimpleAction action,
-                                         GLib.Variant?     parameter)
+        private void activate_preferences (GLib.SimpleAction action,
+                                           GLib.Variant?     parameter)
         {
             this.show_preferences ();
         }
 
-        private void action_visit_website (GLib.SimpleAction action,
-                                           GLib.Variant?     parameter)
+        private void activate_visit_website (GLib.SimpleAction action,
+                                             GLib.Variant?     parameter)
         {
             try {
                 string[] spawn_args = { "xdg-open", Config.PACKAGE_URL };
@@ -259,8 +259,8 @@ namespace Pomodoro
             }
         }
 
-        private void action_report_issue (GLib.SimpleAction action,
-                                          GLib.Variant?     parameter)
+        private void activate_report_issue (GLib.SimpleAction action,
+                                            GLib.Variant?     parameter)
         {
             try {
                 string[] spawn_args = { "xdg-open", Config.PACKAGE_BUGREPORT };
@@ -278,8 +278,8 @@ namespace Pomodoro
             }
         }
 
-        private void action_about (GLib.SimpleAction action,
-                                   GLib.Variant?     parameter)
+        private void activate_about (GLib.SimpleAction action,
+                                     GLib.Variant?     parameter)
         {
             if (this.about_dialog == null)
             {
@@ -301,26 +301,26 @@ namespace Pomodoro
             this.about_dialog.present ();
         }
 
-        private void action_quit (GLib.SimpleAction action,
-                                  GLib.Variant?     parameter)
+        private void activate_quit (GLib.SimpleAction action,
+                                    GLib.Variant?     parameter)
         {
             this.quit ();
         }
 
-        private void action_timer_skip (GLib.SimpleAction action,
-                                        GLib.Variant?     parameter)
+        private void activate_timer_skip (GLib.SimpleAction action,
+                                          GLib.Variant?     parameter)
         {
             this.service.skip ();
         }
 
-        private void action_timer_set_state (GLib.SimpleAction action,
-                                             GLib.Variant?     parameter)
+        private void activate_timer_set_state (GLib.SimpleAction action,
+                                               GLib.Variant?     parameter)
         {
             this.service.set_state (parameter.get_string (), 0.0);
         }
 
-        private void action_timer_switch_state (GLib.SimpleAction action,
-                                                GLib.Variant? parameter)
+        private void activate_timer_switch_state (GLib.SimpleAction action,
+                                                  GLib.Variant? parameter)
         {
             this.service.set_state (parameter.get_string (),
                                     this.timer.state.timestamp);
@@ -328,43 +328,43 @@ namespace Pomodoro
 
         private void setup_actions ()
         {
-            var timer_action = new GLib.SimpleAction ("timer", null);
-            timer_action.activate.connect (this.action_timer);
+            GLib.SimpleAction action;
 
-            var preferences_action = new GLib.SimpleAction ("preferences", null);
-            preferences_action.activate.connect (this.action_preferences);
+            action = new GLib.SimpleAction ("timer", null);
+            action.activate.connect (this.activate_timer);
+            this.add_action (action);
 
-            var visit_website_action = new GLib.SimpleAction ("visit-website", null);
-            visit_website_action.activate.connect (this.action_visit_website);
+            action = new GLib.SimpleAction ("preferences", null);
+            action.activate.connect (this.activate_preferences);
+            this.add_action (action);
 
-            var report_issue_action = new GLib.SimpleAction ("report-issue", null);
-            report_issue_action.activate.connect (this.action_report_issue);
+            action = new GLib.SimpleAction ("visit-website", null);
+            action.activate.connect (this.activate_visit_website);
+            this.add_action (action);
 
-            var about_action = new GLib.SimpleAction ("about", null);
-            about_action.activate.connect (this.action_about);
+            action = new GLib.SimpleAction ("report-issue", null);
+            action.activate.connect (this.activate_report_issue);
+            this.add_action (action);
 
-            var quit_action = new GLib.SimpleAction ("quit", null);
-            quit_action.activate.connect (this.action_quit);
+            action = new GLib.SimpleAction ("about", null);
+            action.activate.connect (this.activate_about);
+            this.add_action (action);
 
-            var timer_skip_action = new GLib.SimpleAction ("timer-skip", null);
-            timer_skip_action.activate.connect (this.action_timer_skip);
+            action = new GLib.SimpleAction ("quit", null);
+            action.activate.connect (this.activate_quit);
+            this.add_action (action);
 
-            var timer_set_state_action = new GLib.SimpleAction ("timer-set-state", GLib.VariantType.STRING);
-            timer_set_state_action.activate.connect (this.action_timer_set_state);
+            action = new GLib.SimpleAction ("timer-skip", null);
+            action.activate.connect (this.activate_timer_skip);
+            this.add_action (action);
 
-            var timer_switch_state_action = new GLib.SimpleAction ("timer-switch-state", GLib.VariantType.STRING);
-            timer_switch_state_action.activate.connect (this.action_timer_switch_state);
+            action = new GLib.SimpleAction ("timer-set-state", GLib.VariantType.STRING);
+            action.activate.connect (this.activate_timer_set_state);
+            this.add_action (action);
 
-            this.add_action (timer_action);
-            this.add_action (preferences_action);
-            this.add_action (visit_website_action);
-            this.add_action (report_issue_action);
-            this.add_action (about_action);
-            this.add_action (quit_action);
-
-            this.add_action (timer_skip_action);
-            this.add_action (timer_set_state_action);
-            this.add_action (timer_switch_state_action);
+            action = new GLib.SimpleAction ("timer-switch-state", GLib.VariantType.STRING);
+            action.activate.connect (this.activate_timer_switch_state);
+            this.add_action (action);
         }
 
         private void setup_menu ()
@@ -401,13 +401,13 @@ namespace Pomodoro
 
             base.startup ();
 
+            this.restore_timer ();
+
             this.setup_resources ();
             this.setup_actions ();
             this.setup_menu ();
             this.setup_plugins ();
             this.setup_desktop ();
-
-            this.restore_timer ();
 
             this.release ();
         }
@@ -572,8 +572,7 @@ namespace Pomodoro
 
             if (this.timer == null) {
                 this.timer = Pomodoro.Timer.get_default ();
-                this.timer.state_changed.connect (this.on_timer_state_changed);
-                this.timer.notify["state"].connect (this.on_timer_state_notify);
+                this.timer.state_changed.connect_after (this.on_timer_state_changed);
             }
 
             if (this.settings == null) {
@@ -673,18 +672,15 @@ namespace Pomodoro
                                              Pomodoro.TimerState state,
                                              Pomodoro.TimerState previous_state)
         {
-            if (this.desktop != null &&
-                previous_state is Pomodoro.BreakState &&
-                state is Pomodoro.PomodoroState)
-            {
+//            if (this.desktop != null &&
+//                previous_state is Pomodoro.BreakState &&
+//                state is Pomodoro.PomodoroState)
+//            {
 //                this.desktop.presence_status = Pomodoro.PresenceStatus.IDLE;
-            }
+//            }
 
             this.save_timer ();
-        }
 
-        private void on_timer_state_notify ()
-        {
             if (this.timer.is_paused) {
                 this.timer.resume ();
             }
