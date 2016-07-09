@@ -8,8 +8,9 @@ libgnome_pomodoro_la_VALASOURCES = \
 	application.vala \
 	capability.vala \
 	capability-group.vala \
-	desktop.vala \
+	capability-manager.vala \
 	log-scale.vala \
+	notifications-capability.vala \
 	preferences-dialog.vala \
 	presence.vala \
 	screen-notification.vala \

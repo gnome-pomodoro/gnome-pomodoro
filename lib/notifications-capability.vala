@@ -25,121 +25,23 @@ namespace Pomodoro
 {
     private const string DESKTOP_SESSION_VARIABLE = "DESKTOP_SESSION";
 
-    namespace Capabilities
-    {
-        public const string NOTIFICATIONS = "notifications";
-        public const string REMINDERS = "reminders";
-        public const string INDICATOR = "indicator";
-        public const string HOTKEY = "hotkey";
-        public const string PRESENCE = "presence";
-    }
-
-    public class Desktop : GLib.Object
-    {
-        private Pomodoro.DesktopExtension extension;
-        private GLib.Settings             settings;
-
-        construct
-        {
-            this.settings = Pomodoro.get_settings ()
-                                    .get_child ("preferences");
-
-            this.extension = this.find_extension ();
-            this.extension.configure.begin ();
-            // this.extension.notify["presence-status"].connect (this.on_desktop_presence_status_notify);
-
-            this.settings.changed.connect (this.on_settings_changed); // TODO: connect it after extension has been configured
-        }
-
-        private Pomodoro.DesktopExtension find_extension ()
-        {
-            Pomodoro.DesktopExtension extension;
-
-            var desktop_session = GLib.Environment.get_variable (DESKTOP_SESSION_VARIABLE);
-            var engine          = Peas.Engine.get_default ();
-            var plugin_info     = engine.get_plugin_info (desktop_session);
-
-            GLib.debug ("Looking for \"%s\" plugin", desktop_session);
-
-            if (plugin_info != null) {
-                engine.try_load_plugin (plugin_info);
-
-                extension = engine.create_extension (plugin_info,
-                                                     typeof (Pomodoro.DesktopExtension))
-                                                     as Pomodoro.DesktopExtension;
-            }
-            else {
-                extension = new Pomodoro.FallbackDesktopExtension () as Pomodoro.DesktopExtension;
-            }
-
-            return extension;
-        }
-
-        private void on_settings_changed (GLib.Settings settings,
-                                          string        key)
-        {
-            switch (key)
-            {
-                case "show-screen-notifications":
-                    this.extension.get_capabilities ().set_enabled ("screen-notifications",
-                                                                    this.settings.get_boolean (key));
-
-                    break;
-            }
-        }
-    }
-
-    public interface DesktopExtension : Peas.ExtensionBase
-    {
-        public abstract async void configure ();
-        public abstract unowned Pomodoro.CapabilityGroup get_capabilities ();
-    }
-
-    public abstract class BaseDesktopExtension : Peas.ExtensionBase, Pomodoro.DesktopExtension
-    {
-        private Pomodoro.CapabilityGroup capabilities = null;
-
-        public virtual async void configure ()
-        {
-        }
-
-        public virtual unowned Pomodoro.CapabilityGroup get_capabilities ()
-        {
-            return this.capabilities;
-        }
-
-        public override void dispose ()
-        {
-//            this.capabilities.disable_all ();
-
-            base.dispose ();
-        }
-    }
-
-    public class FallbackDesktopExtension : Pomodoro.BaseDesktopExtension
+    public class NotificationsCapability : Pomodoro.Capability
     {
         private GLib.Settings               settings;
         private Pomodoro.Timer              timer;
         private Pomodoro.ScreenNotification screen_notification;
-        private Pomodoro.CapabilityGroup    capabilities;
 
-        construct
+        public NotificationsCapability (string name)
         {
+            base (name);
+
+            this.timer = Pomodoro.Timer.get_default ();
+
             this.settings = Pomodoro.get_settings ().get_child ("preferences");
-            this.timer    = Pomodoro.Timer.get_default ();
-
-            this.capabilities = new Pomodoro.CapabilityGroup ();
-            this.capabilities.enabled_changed.connect (this.on_capability_enabled_changed);
-
             this.settings.changed.connect (this.on_settings_changed);
         }
 
-        ~FallbackDesktopExtension ()
-        {
-            this.get_capabilities ().disable_all ();
-        }
-
-        private bool have_notification_actions ()
+        private bool has_actions_support ()
         {
             var desktop_session = GLib.Environment.get_variable (DESKTOP_SESSION_VARIABLE);
 
@@ -154,18 +56,6 @@ namespace Pomodoro
             }
 
             return true;
-        }
-
-        public override unowned Pomodoro.CapabilityGroup get_capabilities ()
-        {
-            return this.capabilities;
-        }
-
-        public override async void configure ()
-        {
-            this.capabilities.add (new Pomodoro.Capability (Capabilities.NOTIFICATIONS));
-
-            this.capabilities.set_enabled (Capabilities.NOTIFICATIONS, true);
         }
 
         private void notify_pomodoro_start ()
@@ -230,7 +120,7 @@ namespace Pomodoro
                 GLib.warning (error.message);
             }
 
-            if (this.have_notification_actions ()) {
+            if (this.has_actions_support ()) {
                 notification.add_button (_("Take a break"), "app.timer-skip");
             }
 
@@ -264,7 +154,7 @@ namespace Pomodoro
                 GLib.warning (error.message);
             }
 
-            if (this.have_notification_actions ())
+            if (this.has_actions_support ())
             {
                 notification.set_default_action ("app.show-screen-notification");
 
@@ -328,53 +218,38 @@ namespace Pomodoro
             this.show_screen_notification ();
         }
 
-        private void on_capability_enabled (string capability_name)
+        public override void enable ()
         {
-            switch (capability_name)
-            {
-                case Capabilities.NOTIFICATIONS:
-                    var show_screen_notification_action = new GLib.SimpleAction ("show-screen-notification", null);
-                    show_screen_notification_action.activate.connect (this.on_show_screen_notification_activate);
+            if (!this.enabled) {
+                var show_screen_notification_action = new GLib.SimpleAction ("show-screen-notification", null);
+                show_screen_notification_action.activate.connect (this.on_show_screen_notification_activate);
 
-                    var application = GLib.Application.get_default ();
-                    application.add_action (show_screen_notification_action);
+                var application = GLib.Application.get_default ();
+                application.add_action (show_screen_notification_action);
 
-                    this.timer.state_changed.connect_after (this.on_timer_state_changed);
-                    this.timer.notify["state-duration"].connect (this.on_timer_state_duration_notify);
+                this.timer.state_changed.connect_after (this.on_timer_state_changed);
+                this.timer.notify["state-duration"].connect (this.on_timer_state_duration_notify);
 
-                    this.on_timer_state_changed (this.timer.state,
-                                                 this.timer.state);
-
-                    break;
+                this.on_timer_state_changed (this.timer.state,
+                                             this.timer.state);
             }
+
+            base.enable ();
         }
 
-        private void on_capability_disabled (string capability_name)
+        public override void disable ()
         {
-            switch (capability_name)
-            {
-                case Capabilities.NOTIFICATIONS:
-                    this.timer.state_changed.disconnect (this.on_timer_state_changed);
-                    this.timer.notify["state-duration"].disconnect (this.on_timer_state_duration_notify);
+            if (!this.enabled) {
+                this.timer.state_changed.disconnect (this.on_timer_state_changed);
+                this.timer.notify["state-duration"].disconnect (this.on_timer_state_duration_notify);
 
-                    this.withdraw_notifications ();
+                this.withdraw_notifications ();
 
-                    var application = GLib.Application.get_default ();
-                    application.remove_action ("show-screen-notification");
-
-                    break;
+                var application = GLib.Application.get_default ();
+                application.remove_action ("show-screen-notification");
             }
-        }
 
-        private void on_capability_enabled_changed (string capability_name,
-                                                    bool   enabled)
-        {
-            if (enabled) {
-                this.on_capability_enabled (capability_name);
-            }
-            else {
-                this.on_capability_disabled (capability_name);
-            }
+            base.disable ();
         }
     }
 }

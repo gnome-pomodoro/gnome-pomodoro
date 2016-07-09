@@ -18,174 +18,73 @@
  *
  */
 
+using GLib;
+
+
 namespace Pomodoro
 {
+    public delegate void CapabilityFunc (Capability capability);
+
+
     public class Capability : GLib.InitiallyUnowned
     {
         public string name { get; set; }
+        public bool enabled { get; private set; }
+        public unowned Pomodoro.CapabilityGroup group { get; set; }
 
-        [CCode (notify = false)]
-        public bool enabled {
-            get {
-                return this.is_inhibited () ? false : this.enabled_request;
-            }
+        private Pomodoro.CapabilityFunc enable_func;
+        private Pomodoro.CapabilityFunc disable_func;
+
+        public Capability (string                   name,
+                           Pomodoro.CapabilityFunc? enable_func  = null,
+                           Pomodoro.CapabilityFunc? disable_func = null)
+        {
+            this.name = name;
+            this.enable_func = enable_func;
+            this.disable_func = disable_func;
         }
 
-        [CCode (notify = false)]
-        public bool enabled_request {  /* TODO? rename to "requested" */
-            get {
-                return this._enabled_request;
-            }
-            set {
-                if (this._enabled_request != value) {
-                    this._enabled_request = value;
+        [Signal (run = "first")]
+        // [HasEmitter]  TODO: looks like emitters need to be written in C
+        public virtual signal void enable ()
+        {
+            if (!this.enabled) {
+                GLib.debug ("Enable capability %s.%s",
+                            this.group != null ? this.group.name : "unknown",
+                            this.name);
 
-                    this.notify_property ("enabled-request");
-
-                    if (!this.is_inhibited ()) {
-                        this.notify_property ("enabled");
-                    }
+                if (this.enable_func != null) {
+                    this.enable_func (this);
                 }
+
+                this.enabled = true;
             }
-            default = false;
         }
 
-        [CCode (notify = false)]
-        public unowned Pomodoro.Capability? fallback {
-            get {
-                return this._fallback;
-            }
-            set {
-                var new_fallback = value;
+        [Signal (run = "last")]
+        // [HasEmitter]  TODO: looks like emitters need to be written in C
+        public virtual signal void disable ()
+        {
+            if (this.enabled) {
+                GLib.debug ("Disable capability %s.%s",
+                            this.group != null ? this.group.name : "unknown",
+                            this.name);
 
-                if (this._fallback != new_fallback)
-                {
-                    if (this.enabled_binding != null) {
-                        this.enabled_binding.unbind ();
-                    }
-
-                    if (new_fallback != null)
-                    {
-                        if (this.is_virtual ()) {
-                            this.enabled_binding = this.bind_property ("enabled-request",
-                                                                       new_fallback,
-                                                                       "enabled-request",
-                                                                       GLib.BindingFlags.SYNC_CREATE | GLib.BindingFlags.BIDIRECTIONAL);
-                        }
-                        else {
-                            new_fallback.inhibit ();
-                        }
-                    }
-
-                    if (this._fallback != null && !this.is_virtual ()) {
-                        this._fallback.uninhibit ();
-                    }
-
-                    this._fallback = new_fallback;
-                    this.notify_property ("fallback");
+                if (this.disable_func != null) {
+                    this.disable_func (this);
                 }
+
+                this.enabled = false;
             }
-        }
-
-        private Pomodoro.Capability? _fallback;
-        private bool                 _enabled_request;
-        private int                  inhibit_count = 0;
-        private GLib.Binding         enabled_binding;
-
-        public Capability (string name,
-                           bool   enabled = false)
-        {
-            this.name            = name;
-            this.enabled_request = enabled;
-        }
-
-        public Capability.with_fallback (Pomodoro.Capability fallback,
-                                         bool                enabled = false)
-        {
-            this.name            = fallback.name;
-            this.enabled_request = enabled;
-            this.fallback        = fallback;
-        }
-
-        public bool is_virtual ()
-        {
-            return this is Pomodoro.VirtualCapability;
-        }
-
-        public bool is_inhibited ()
-        {
-            return this.inhibit_count > 0;
         }
 
         public override void dispose ()
         {
-            if (this.enabled_binding != null) {
-                this.enabled_binding.unbind ();
-            }
-
-            if (this.fallback != null && !this.is_virtual ()) {
-                this.fallback.uninhibit ();
+            if (this.enabled) {
+                this.disable ();
             }
 
             base.dispose ();
-        }
-
-        public bool enable ()
-        {
-            this.enabled_request = true;
-
-            return this.enabled == true;
-        }
-
-        public bool disable ()
-        {
-            this.enabled_request = false;
-
-            return this.enabled == false;
-        }
-
-        public void inhibit ()
-        {
-            this.inhibit_count += 1;
-
-            if (this.inhibit_count == 1) {
-                this.notify_property ("enabled");
-            }
-        }
-
-        public void uninhibit ()
-        {
-            this.inhibit_count -= 1;
-
-            if (this.inhibit_count == 0) {
-                this.notify_property ("enabled");
-            }
-        }
-
-//        private void on_fallback_toggle_ref_notify (GLib.Object fallback_object, bool is_last_ref)
-//        {
-//            if (is_last_ref) {
-//                this._fallback = null;
-//
-//                this.set_fallback_full (null, this.is_virtual);
-//            }
-//        }
-    }
-
-    public class VirtualCapability : Pomodoro.Capability
-    {
-        public VirtualCapability (string name,
-                                  bool   enabled = true)
-        {
-            base (name, enabled);
-        }
-
-        public VirtualCapability.with_fallback (Pomodoro.Capability fallback,
-                                                bool                enabled = true)
-        {
-            assert (fallback != null);
-
-            base.with_fallback (fallback, enabled);
         }
     }
 }

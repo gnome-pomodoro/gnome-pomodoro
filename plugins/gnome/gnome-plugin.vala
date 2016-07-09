@@ -28,12 +28,12 @@ namespace GnomePlugin
      */
     private double IDLE_MONITOR_MIN_IDLE_TIME = 0.5;
 
-    public class DesktopExtension : Pomodoro.FallbackDesktopExtension
+    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
     {
         private static const string[] SHELL_CAPABILITIES = {
             "notifications",
             "indicator",
-            "hotkey",
+            "accelerator",
             "reminders"
         };
 
@@ -54,15 +54,18 @@ namespace GnomePlugin
 
             this.shell_extension = new GnomePlugin.GnomeShellExtension (Config.EXTENSION_UUID);
 
-            this.capabilities = new Pomodoro.CapabilityGroup ();
-            this.capabilities.fallback = base.get_capabilities ();
-            this.capabilities.enabled_changed.connect (this.on_capability_enabled_changed);
+            this.capabilities = new Pomodoro.CapabilityGroup ("gnome");
+            for (var i=0; i < SHELL_CAPABILITIES.length; i++) {
+                this.capabilities.add (new Pomodoro.Capability (SHELL_CAPABILITIES[i]));
+            }
 
             this.timer = Pomodoro.Timer.get_default ();
             this.timer.state_changed.connect_after (this.on_timer_state_changed);
+
+            this.setup ();
         }
 
-        ~DesktopExtension ()
+        ~ApplicationExtension ()
         {
             this.timer.state_changed.disconnect (this.on_timer_state_changed);
 
@@ -72,76 +75,26 @@ namespace GnomePlugin
             }
         }
 
-        public override unowned Pomodoro.CapabilityGroup get_capabilities ()
+        private void setup ()
         {
-            return this.capabilities != null ? this.capabilities : base.get_capabilities ();
-        }
-
-        private void on_capability_enabled_changed (string capability_name,
-                                                    bool   enabled)
-        {
-            if (enabled) {
-                this.on_capability_enabled (capability_name);
-            }
-            else {
-                this.on_capability_disabled (capability_name);
-            }
-        }
-
-        private void on_capability_enabled (string capability_name)
-        {
-        }
-
-        private void on_capability_disabled (string capability_name)
-        {
-        }
-
-        public override async void configure ()
-        {
-            /* wait for status of gnome-shell extension */
-            this.shell_extension.enable.begin ((obj, res) => {
-                this.shell_extension.enable.end (res);
-
-                if (this.shell_extension.enabled) {
-                    GLib.debug ("Extension enabled");
-                }
-
-                this.configure.callback ();
-            });
-
-            yield;
-
-            /* add capabilities */
-            this.on_shell_extension_enabled_notify ();
-
-            yield base.configure ();
+            // take over capabilities until extension status is resolved
+            var application = Pomodoro.Application.get_default ();
+            application.capabilities.add_group (this.capabilities, Pomodoro.Priority.HIGH);
 
             this.shell_extension.notify["enabled"].connect (this.on_shell_extension_enabled_notify);
+
+            this.shell_extension.enable.begin ();
         }
 
         private void on_shell_extension_enabled_notify ()
         {
+            var application = Pomodoro.Application.get_default ();
+
             if (this.shell_extension.enabled) {
-                for (var i=0; i < SHELL_CAPABILITIES.length; i++)
-                {
-                    var capability = new Pomodoro.Capability (SHELL_CAPABILITIES[i]);
-
-                    this.capabilities.add (capability);
-
-                    capability.enable ();
-                }
+                application.capabilities.add_group (this.capabilities, Pomodoro.Priority.HIGH);
             }
             else {
-                for (var i=0; i < SHELL_CAPABILITIES.length; i++)
-                {
-                    var capability = this.capabilities.lookup (SHELL_CAPABILITIES[i]);
-
-                    if (capability == null) {
-                        continue;
-                    }
-
-                    this.capabilities.remove (capability.name);
-                }
+                application.capabilities.remove_group (this.capabilities);
             }
         }
 
@@ -228,8 +181,8 @@ public void peas_register_types (GLib.TypeModule module)
 {
     var object_module = module as Peas.ObjectModule;
 
-    object_module.register_extension_type (typeof (Pomodoro.DesktopExtension),
-                                           typeof (GnomePlugin.DesktopExtension));
+    object_module.register_extension_type (typeof (Pomodoro.ApplicationExtension),
+                                           typeof (GnomePlugin.ApplicationExtension));
 
     object_module.register_extension_type (typeof (Pomodoro.PreferencesDialogExtension),
                                            typeof (GnomePlugin.PreferencesDialogExtension));

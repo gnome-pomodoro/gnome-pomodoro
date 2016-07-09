@@ -24,11 +24,14 @@ namespace Pomodoro
     {
         public CapabilityGroupTest ()
         {
-            this.add_test ("set_capability_enabled",
-                           this.test_set_capability_enabled);
+            this.add_test ("add",
+                           this.test_add);
 
-            this.add_test ("fallback",
-                           this.test_fallback);
+            this.add_test ("remove",
+                           this.test_remove);
+
+            this.add_test ("dispose",
+                           this.test_dispose);
         }
 
         public override void setup ()
@@ -40,76 +43,73 @@ namespace Pomodoro
         }
 
         /**
-         * Unit test for Pomodoro.Timer.set_state_full() method.
-         *
-         * Check changing timer state.
+         * Unit test for Pomodoro.CapabilityGroup.add() method.
          */
-        public void test_set_capability_enabled ()
+        public void test_add ()
         {
-            /* Case 1 */
-            var group1      = new Pomodoro.CapabilityGroup ();
-            var capability1 = new Pomodoro.Capability ("anti-gravity", false);
+            var signal_emit_count = 0;
 
-            group1.add (capability1);
-            assert (group1.contains ("anti-gravity"));
+            var group      = new Pomodoro.CapabilityGroup ();
+            var capability = new Pomodoro.Capability ("anti-gravity");
 
-            group1.set_enabled ("anti-gravity", true);
-            assert (capability1.enabled);
+            group.capability_added.connect (() => {
+                signal_emit_count++;
+            });
+
+            group.add (capability);
+
+            assert (group.contains ("anti-gravity"));
+            assert (signal_emit_count == 1);
         }
 
-        public void test_fallback ()
+        /**
+         * Unit test for Pomodoro.CapabilityGroup.remove() method.
+         */
+        public void test_remove ()
         {
-            /* Case 1: change enabled state */
-            var group1      = new Pomodoro.CapabilityGroup ();
-            var capability1 = new Pomodoro.Capability ("anti-gravity", false);
-            var fallback1   = new Pomodoro.Capability ("anti-gravity", true);
+            var signal_emit_count = 0;
 
-            capability1.fallback = fallback1;
+            var group      = new Pomodoro.CapabilityGroup ();
+            var capability = new Pomodoro.Capability ("anti-gravity");
 
-            group1.add (capability1);
+            group.capability_removed.connect (() => {
+                signal_emit_count++;
+            });
 
-            capability1.enable ();
-            assert (capability1.enabled);
-            assert (!fallback1.enabled);
+            group.add (capability);
+            group.remove ("anti-gravity");
 
-            /* Case 2: change enabled state */
-            var group2      = new Pomodoro.CapabilityGroup ();
-            var capability2 = new Pomodoro.Capability ("anti-gravity", true);
-            var fallback2   = new Pomodoro.Capability ("anti-gravity", false);
+            assert (!group.contains ("anti-gravity"));
+            assert (signal_emit_count == 1);
+        }
 
-            capability2.fallback = fallback2;
+        /**
+         * Unit test for Pomodoro.CapabilityGroup.dispose() method.
+         */
+        public void test_dispose ()
+        {
+            var capability_removed_count = 0;
+            var capability_disabled_count = 0;
 
-            group2.add (capability2);
+            var group      = new Pomodoro.CapabilityGroup ();
+            var capability = new Pomodoro.Capability ("anti-gravity");
 
-            capability2.enable ();
-            assert (capability2.enabled);
-            assert (!fallback2.enabled);
+            group.capability_removed.connect (() => {
+                capability_removed_count++;
+            });
 
-            /* Case 3: fallback added later */
-            var group3      = new Pomodoro.CapabilityGroup ();
-            var capability3 = new Pomodoro.Capability ("anti-gravity", true);
-            var fallback3   = new Pomodoro.Capability ("anti-gravity", true);
+            capability.disable.connect (() => {
+                capability_disabled_count++;
+            });
 
-            group3.add (capability3);
+            group.add (capability);
+            capability.enable ();
 
-            capability3.enable ();
-            capability3.fallback = fallback3;
+            capability = null;
+            group = null;
 
-            assert (capability3.enabled);
-            assert (!fallback3.enabled);
-
-            /* Case 4: primary capability added later */
-            var group4      = new Pomodoro.CapabilityGroup ();
-            var fallback4   = new Pomodoro.Capability ("anti-gravity", true);
-
-            group4.set_capability_fallback (fallback4.name, fallback4);
-
-            var capability4 = new Pomodoro.Capability ("anti-gravity", true);
-            group4.add (capability4);
-
-            assert (capability4.fallback == fallback4);
-            assert (capability4.enabled);
-            assert (!fallback4.enabled);
+            assert (capability_disabled_count == 1);
+            assert (capability_removed_count == 0);
         }
     }
 }

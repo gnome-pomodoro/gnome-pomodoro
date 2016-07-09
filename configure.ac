@@ -310,4 +310,8 @@ gnome-pomodoro ${VERSION}:
     cflags:                 ${CFLAGS}
     cppflags:               ${CPPFLAGS}
     ldflags:                ${LDFLAGS}
+
+plugins:
+    gnome:                  ${with_gnome_plugin}
+    indicator:              ${with_indicator_plugin}
 "

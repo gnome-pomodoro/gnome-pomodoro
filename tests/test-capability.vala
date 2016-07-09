@@ -22,153 +22,87 @@ namespace Pomodoro
 {
     public class CapabilityTest : Pomodoro.TestSuite
     {
+        private int enable_count;
+        private int disable_count;
+
         public CapabilityTest ()
         {
-            this.add_test ("is_virtual",
-                           this.test_is_virtual);
+            this.add_test ("enable",
+                           this.test_enable);
 
-            this.add_test ("set_fallback",
-                           this.test_set_fallback);
+            this.add_test ("disable",
+                           this.test_disable);
 
-            this.add_test ("new_with_fallback",
-                           this.test_new_with_fallback);
-
-//            this.add_test ("dispose",
-//                           this.test_dispose);
-
-//            this.add_test ("fallback_dispose",
-//                           this.test_fallback_dispose);
+            this.add_test ("dispose",
+                           this.test_dispose);
         }
 
         public override void setup ()
         {
+            this.enable_count = 0;
+            this.disable_count = 0;
         }
 
         public override void teardown ()
         {
         }
 
-        /**
-         * Unit test for Pomodoro.Capability.is_virtual() method.
-         */
-        public void test_is_virtual ()
+        private void handle_capability_enable (Pomodoro.Capability capability)
         {
-            var capability = new Pomodoro.Capability ("anti-gravity", true);
+            this.enable_count++;
+        }
 
-            assert (!capability.is_virtual ());
+        private void handle_capability_disable (Pomodoro.Capability capability)
+        {
+            this.disable_count++;
         }
 
         /**
-         * Unit test for Pomodoro.Capability.with_fallback() method.
+         * Unit test for Pomodoro.Capability.enable() method.
          */
-        public void test_new_with_fallback ()
+        public void test_enable ()
         {
-            var fallback = new Pomodoro.Capability ("anti-gravity", true);
+            var capability = new Pomodoro.Capability ("anti-gravity",
+                                                      this.handle_capability_enable,
+                                                      this.handle_capability_disable);
 
-            var capability1 = new Pomodoro.Capability.with_fallback (fallback);
-            assert (capability1.name == fallback.name);
+            capability.enable ();
+
+            assert (capability.enabled);
+            assert (this.enable_count == 1);
+            assert (this.disable_count == 0);
         }
 
         /**
-         * Unit test for Pomodoro.Capability.set_fallback() method.
-         *
-         * Capability enabled state should not change but fallback should be disabled,
-         * in other words - fallback should never be used if there is a better implementation.
+         * Unit test for Pomodoro.Capability.disable() method.
          */
-        public void test_set_fallback ()
+        public void test_disable ()
         {
-            /* Case 1 */
-            var capability1 = new Pomodoro.Capability ("anti-gravity", false);
-            var fallback1   = new Pomodoro.Capability ("anti-gravity", false);
+            var capability = new Pomodoro.Capability ("anti-gravity",
+                                                      this.handle_capability_enable,
+                                                      this.handle_capability_disable);
+            capability.enable ();
+            capability.disable ();
 
-            capability1.fallback = fallback1;
-
-            assert (!capability1.enabled);
-            assert (!fallback1.enabled);
-
-            /* Case 2 */
-            var capability2 = new Pomodoro.Capability ("anti-gravity", false);
-            var fallback2   = new Pomodoro.Capability ("anti-gravity", true);
-
-            capability2.fallback = fallback2;
-
-            assert (!capability2.enabled);
-            assert (!fallback2.enabled);
-
-            /* Case 3 */
-            var capability3 = new Pomodoro.Capability ("anti-gravity", true);
-            var fallback3   = new Pomodoro.Capability ("anti-gravity", true);
-
-            capability3.fallback = fallback3;
-
-            assert (capability3.enabled);
-            assert (!fallback3.enabled);
-
-            /* Case 4 */
-            var capability4 = new Pomodoro.Capability ("anti-gravity", true);
-            var fallback4   = new Pomodoro.Capability ("anti-gravity", false);
-
-            capability4.fallback = fallback4;
-
-            assert (capability4.enabled);
-            assert (!fallback4.enabled);
+            assert (!capability.enabled);
+            assert (this.enable_count == 1);
+            assert (this.disable_count == 1);
         }
-
-//        /**
-//         *
-//         */
-//        public void test_set_fallback_rebind ()
-//        {
-//        }
-
-//        /**
-//         *
-//         */
-//        public void test_enabled_change ()
-//        {
-//        }
 
         /**
          * Unit test for Pomodoro.Capability.dispose() method.
-         *
-         * Enabled state should be passed to fallback.
          */
         public void test_dispose ()
         {
-            /* Case 1 */
-            var fallback1   = new Pomodoro.Capability ("anti-gravity", false);
-            var capability1 = new Pomodoro.Capability ("anti-gravity", true);
+            var capability = new Pomodoro.Capability ("anti-gravity",
+                                                      this.handle_capability_enable,
+                                                      this.handle_capability_disable);
+            capability.enable ();
 
-            capability1.fallback = fallback1;
-            capability1.dispose ();
+            capability = null;
 
-            assert (fallback1.enabled);
-
-            /* Case 2 */
-            var fallback2   = new Pomodoro.Capability ("anti-gravity", true);
-            var capability2 = new Pomodoro.Capability ("anti-gravity", false);
-
-            capability2.fallback = fallback2;
-            capability2.dispose ();
-
-            assert (!fallback2.enabled);
+            assert (this.enable_count == 1);
+            assert (this.disable_count == 1);
         }
-
-//        /**
-//         * Unit test for Pomodoro.Capability.fallback.dispose() method.
-//         *
-//         * When capability is virtual and fallback gets destroyed enabled should be turned to false.
-//         */
-//        public void test_fallback_dispose ()
-//        {
-//            var capability1 = new Pomodoro.Capability ("anti-gravity", true);
-//            var fallback1   = new Pomodoro.Capability ("anti-gravity", true);
-//
-//            capability1.set_fallback_full (fallback1, true);
-//
-//            fallback1.dispose ();
-//
-//            assert (capability1.fallback == null);
-//        }
     }
 }

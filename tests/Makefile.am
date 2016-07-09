@@ -6,8 +6,8 @@ tests_SOURCES = \
 	test-application.vala \
 	test-capability.vala \
 	test-capability-group.vala \
+	test-capability-manager.vala \
 	test-timer.vala \
-	test-virtual-capability.vala \
 	$(top_builddir)/lib/gnome-pomodoro.vapi
 
 tests_VALAFLAGS = \

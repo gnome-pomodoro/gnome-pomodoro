@@ -18,44 +18,25 @@
  *
  */
 
+using GLib;
+
+
 namespace Pomodoro
 {
     public class CapabilityGroup : GLib.Object
     {
-        public Pomodoro.CapabilityGroup? fallback {
-            get {
-                return this._fallback;
-            }
-            set {
-                var capability_group = value;
-
-                if (capability_group != null) {
-                    var capability_names = capability_group.list_names ();
-
-                    for (var i=0; i < capability_names.length; i++) {
-                        this.set_capability_fallback (capability_names[i],
-                                                      capability_group.lookup (capability_names[i]));
-                    }
-
-                    capability_group.added.connect (this.on_fallback_capability_added);
-                    capability_group.removed.connect (this.on_fallback_capability_removed);
-                }
-
-                if (this._fallback != null) {
-                    this._fallback.added.disconnect (this.on_fallback_capability_added);
-                    this._fallback.removed.disconnect (this.on_fallback_capability_removed);
-                }
-
-                this._fallback = capability_group;
-            }
-        }
+        public string name { get; construct set; }
 
         private GLib.HashTable<string,Pomodoro.Capability> capabilities;
-        private Pomodoro.CapabilityGroup                   _fallback;
+
+        public CapabilityGroup (string? name = null)
+        {
+            this.name = name;
+        }
 
         construct
         {
-            this.capabilities = new GLib.HashTable<string,Pomodoro.Capability?> (str_hash, str_equal);
+            this.capabilities = new GLib.HashTable<string, Pomodoro.Capability> (str_hash, str_equal);
         }
 
         public bool contains (string capability_name)
@@ -65,189 +46,70 @@ namespace Pomodoro
 
         public unowned Pomodoro.Capability lookup (string capability_name)
         {
-            return this.capabilities.lookup (capability_name);
+            return this.capabilities.lookup (capability_name) as Pomodoro.Capability;
         }
 
-        public string[] list_names ()
+        public void @foreach (GLib.HFunc<string, Pomodoro.Capability> func)
         {
-            return this.capabilities.get_keys_as_array ();
+            this.capabilities.@foreach (func);
         }
 
-        public void add (Pomodoro.Capability capability)
+        public bool add (Pomodoro.Capability capability)
         {
-            var current_capability = this.capabilities.lookup (capability.name);
+            var existing_capability = this.capabilities.lookup (capability.name);
 
-            if (capability != current_capability)
-            {
-                this.connect_capability (capability);
-
-                if (current_capability != null) {
-                    this.disconnect_capability (current_capability);
-
-                    capability.fallback = current_capability.is_virtual ()
-                                            ? current_capability.fallback : current_capability;
-
-                    this.capabilities.replace (capability.name, capability);
-                }
-                else {
-                    this.capabilities.insert (capability.name, capability);
-
-                    this.added (capability.name);
-                }
+            if (existing_capability != null) {
+                return false;
             }
+
+            this.capabilities.insert (capability.name, capability);
+
+            capability.group = this;
+
+            this.capability_added (capability);
+
+            return true;
         }
 
         public void replace (Pomodoro.Capability capability)
         {
-            var current_capability = this.capabilities.lookup (capability.name);
+            var existing_capability = this.capabilities.lookup (capability.name);
 
-            this.connect_capability (capability);
+            if (existing_capability == capability) {
+                return;
+            }
 
-            if (current_capability != null) {
-                this.disconnect_capability (current_capability);
-
-                capability.fallback = current_capability.is_virtual ()
-                                        ? current_capability.fallback : current_capability;
-
-                this.capabilities.replace (capability.name, capability);
+            if (existing_capability == null) {
+                this.capabilities.insert (capability.name, capability);
             }
             else {
-                this.capabilities.insert (capability.name, capability);
+                this.capabilities.replace (capability.name, capability);
 
-                this.added (capability.name);
+                this.capability_removed (existing_capability);
             }
+
+            capability.group = this;
+
+            this.capability_added (capability);
         }
 
         public void remove (string capability_name)
         {
             var capability = this.lookup (capability_name);
 
-            if (capability != null && !capability.is_virtual ()) {
-                this.disconnect_capability (capability);
-
-                if (capability.fallback != null) {
-                    var virtual_capability = new Pomodoro.VirtualCapability.with_fallback (capability.fallback);
-                    virtual_capability.enabled_request = capability.enabled_request;
-
-                    this.capabilities.replace (capability_name, virtual_capability);
-                }
-                else {
-                    this.capabilities.remove (capability_name);
-
-                    this.removed (capability_name);
-                }
-            }
-        }
-
-        public void add_virtual_capability (Pomodoro.Capability capability)
-        {
-            this.add (new Pomodoro.VirtualCapability.with_fallback (capability,
-                                                                    capability.enabled));
-        }
-
-        public void remove_virtual_capability (string capability_name)
-        {
-            var capability = this.lookup (capability_name);
-
-            if (capability != null && capability.is_virtual ()) {
-                this.disconnect_capability (capability);
-
+            if (capability != null) {
                 this.capabilities.remove (capability_name);
 
-                this.removed (capability_name);
+                if (capability.group == this) {
+                    capability.group = null;
+                }
+
+                this.capability_removed (capability);
             }
         }
 
-        public bool get_enabled (string capability_name)
-        {
-            var capability = this.lookup (capability_name);
+        public signal void capability_added (Pomodoro.Capability capability);
 
-            return capability != null ? capability.enabled : false;
-        }
-
-        public void set_enabled (string capability_name,
-                                 bool   enabled)
-        {
-            var capability = this.lookup (capability_name);
-
-            if (capability != null) {
-                capability.enabled_request = enabled;
-            }
-        }
-
-        public void disable_all ()
-        {
-            var capability_names = this.list_names ();
-
-            for (var i=0; i < capability_names.length; i++)
-            {
-                this.set_enabled (capability_names[i], false);
-            }
-        }
-
-        public void remove_all ()
-        {
-            var capability_names = this.list_names ();
-
-            for (var i=0; i < capability_names.length; i++)
-            {
-                this.remove (capability_names[i]);
-                this.remove_virtual_capability (capability_names[i]);
-            }
-        }
-
-        public void set_capability_fallback (string              capability_name,
-                                             Pomodoro.Capability fallback_capability)
-        {
-            var capability = this.lookup (capability_name);
-
-            if (capability != null) {
-                capability.fallback = fallback_capability;
-            }
-            else {
-                this.add_virtual_capability (fallback_capability);
-            }
-        }
-
-        private void connect_capability (Pomodoro.Capability capability)
-        {
-            capability.notify["enabled"].connect (this.on_capability_enabled_notify);
-        }
-
-        private void disconnect_capability (Pomodoro.Capability capability)
-        {
-            capability.notify["enabled"].disconnect (this.on_capability_enabled_notify);
-        }
-
-        private void on_capability_enabled_notify (GLib.Object    object,
-                                                   GLib.ParamSpec pspec)
-        {
-            var capability = object as Pomodoro.Capability;
-
-            this.enabled_changed (capability.name, capability.enabled);
-        }
-
-        private void on_fallback_capability_added (Pomodoro.CapabilityGroup capability_group,
-                                                   string                   capability_name)
-        {
-            this.set_capability_fallback (capability_name, capability_group.lookup (capability_name));
-        }
-
-        private void on_fallback_capability_removed (Pomodoro.CapabilityGroup capability_group,
-                                                     string                   capability_name)
-        {
-            var capability = this.lookup (capability_name);
-
-            if (capability.is_virtual ()) {
-                this.remove_virtual_capability (capability_name);
-            }
-        }
-
-        public signal void added (string capability_name);
-
-        public signal void removed (string capability_name);
-
-        public signal void enabled_changed (string capability_name,
-                                            bool   enabled);
+        public signal void capability_removed (Pomodoro.Capability capability);
     }
 }

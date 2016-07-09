@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 gnome-pomodoro contributors
+ * Copyright (c) 2013-2016 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ namespace Pomodoro
     {
         public Pomodoro.Service service;
         public Pomodoro.Timer timer;
-        public Pomodoro.Desktop desktop { get; private set; }
+        public Pomodoro.CapabilityManager capabilities;
 
         private Pomodoro.PreferencesDialog preferences_dialog;
         private Pomodoro.Window window;
@@ -155,9 +155,14 @@ namespace Pomodoro
             this.extensions = new Peas.ExtensionSet (engine, typeof (Pomodoro.ApplicationExtension));
         }
 
-        private void setup_desktop ()
+        private void setup_capabilities ()
         {
-            this.desktop = new Pomodoro.Desktop ();
+            var default_capabilities = new Pomodoro.CapabilityGroup ("default");
+
+            default_capabilities.add (new Pomodoro.NotificationsCapability ("notifications"));
+
+            this.capabilities = new Pomodoro.CapabilityManager ();
+            this.capabilities.add_group (default_capabilities, Pomodoro.Priority.LOW);
         }
 
         private void load_plugins ()
@@ -173,11 +178,7 @@ namespace Pomodoro
 
             foreach (var plugin_info in engine.get_plugin_list ())
             {
-                if (plugin_info.is_hidden ()) {
-                    continue;
-                }
-
-                if (enabled_hash.contains (plugin_info.get_module_name ())) {
+                if (plugin_info.is_hidden () || enabled_hash.contains (plugin_info.get_module_name ())) {
                     engine.try_load_plugin (plugin_info);
                 }
                 else {
@@ -406,8 +407,13 @@ namespace Pomodoro
             this.setup_resources ();
             this.setup_actions ();
             this.setup_menu ();
+            this.setup_capabilities ();
             this.setup_plugins ();
-            this.setup_desktop ();
+
+            this.capabilities.enable ("notifications");
+            this.capabilities.enable ("indicator");
+            this.capabilities.enable ("accelerator");
+            this.capabilities.enable ("reminders");
 
             this.release ();
         }
@@ -497,10 +503,6 @@ namespace Pomodoro
         public override void shutdown ()
         {
             base.shutdown ();
-
-            if (this.desktop != null) {
-                this.desktop = null;
-            }
         }
 
         /* Emitted on the primary instance when an activation occurs.
@@ -672,33 +674,11 @@ namespace Pomodoro
                                              Pomodoro.TimerState state,
                                              Pomodoro.TimerState previous_state)
         {
-//            if (this.desktop != null &&
-//                previous_state is Pomodoro.BreakState &&
-//                state is Pomodoro.PomodoroState)
-//            {
-//                this.desktop.presence_status = Pomodoro.PresenceStatus.IDLE;
-//            }
-
             this.save_timer ();
 
             if (this.timer.is_paused) {
                 this.timer.resume ();
             }
         }
-
-//        /**
-//         * Pause timer when idle.
-//         */
-//        private void on_desktop_presence_status_notify ()
-//        {
-//            GLib.debug ("on_desktop_presence_status_notify %s", this.desktop.presence_status.to_string ());
-//
-//            if (this.desktop.presence_status == Pomodoro.PresenceStatus.IDLE) {
-//                this.timer.pause ();
-//            }
-//            else {
-//                this.timer.resume ();
-//            }
-//        }
     }
 }

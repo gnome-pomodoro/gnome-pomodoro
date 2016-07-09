@@ -292,12 +292,8 @@ namespace Pomodoro
                 this.focus_out_event_id = toplevel.focus_out_event.connect (this.on_focus_out_event);
             }
 
-//            var application = Pomodoro.Application.get_default ();
-//            this.capability = application.desktop.get_capabilities ().lookup ("hotkey");
-//
-//            if (this.capability != null) {
-//                this.capability.inhibit ();
-//            }
+            var application = Pomodoro.Application.get_default ();
+            application.capabilities.disable ("accelerator");
         }
 
         public override void unmap ()
@@ -320,6 +316,9 @@ namespace Pomodoro
                 toplevel.focus_out_event.disconnect (this.on_focus_out_event);
                 this.focus_out_event_id != 0;
             }
+
+            var application = Pomodoro.Application.get_default ();
+            application.capabilities.enable ("accelerator");
         }
     }
 

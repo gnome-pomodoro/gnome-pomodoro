@@ -257,8 +257,8 @@ public static int main (string[] args)
     tests.add (new Pomodoro.ApplicationTest ());
     tests.add (new Pomodoro.TimerTest ());
     tests.add (new Pomodoro.CapabilityTest ());
-    tests.add (new Pomodoro.VirtualCapabilityTest ());
     tests.add (new Pomodoro.CapabilityGroupTest ());
+    tests.add (new Pomodoro.CapabilityManagerTest ());
 
     GLib.Idle.add (() => {
         exit_status = tests.run ();

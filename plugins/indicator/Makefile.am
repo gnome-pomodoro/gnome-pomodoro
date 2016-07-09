@@ -10,6 +10,7 @@ libindicator_la_plugindata_DATA = \
 	indicator.plugin
 
 libindicator_la_VALASOURCES = \
+	indicator-capability.vala \
 	indicator-plugin.vala \
 	$(top_builddir)/lib/gnome-pomodoro.vapi
 
