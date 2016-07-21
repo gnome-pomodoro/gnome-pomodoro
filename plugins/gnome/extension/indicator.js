@@ -27,6 +27,7 @@ const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
+const Gtk = imports.gi.Gtk;
 const Meta = imports.gi.Meta;
 const Pango = imports.gi.Pango;
 const Shell = imports.gi.Shell;
@@ -509,6 +510,7 @@ const Indicator = new Lang.Class({
 
         this._arrow = PopupMenu.arrowIcon(St.Side.BOTTOM);
         this._blinking = false;
+        this._blinkTimeoutSource = 0;
 
         this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
         this._hbox.add_actor(this.icon.actor);
@@ -548,12 +550,32 @@ const Indicator = new Lang.Class({
                 onComplete: Lang.bind(this, this._onBlinked)
             };
 
-            Tweener.addTween(this._hbox, fadeOutParams);
-            Tweener.addTween(this._hbox, fadeInParams);
-            Tweener.addTween(this.menu.timerLabel, fadeOutParams);
-            Tweener.addTween(this.menu.timerLabel, fadeInParams);
-            Tweener.addTween(this.menu.pauseAction.child, fadeOutParams);
-            Tweener.addTween(this.menu.pauseAction.child, fadeInParams);
+            if (Gtk.Settings.get_default().gtk_enable_animations) {
+                Tweener.addTween(this._hbox, fadeOutParams);
+                Tweener.addTween(this._hbox, fadeInParams);
+                Tweener.addTween(this.menu.timerLabel, fadeOutParams);
+                Tweener.addTween(this.menu.timerLabel, fadeInParams);
+                Tweener.addTween(this.menu.pauseAction.child, fadeOutParams);
+                Tweener.addTween(this.menu.pauseAction.child, fadeInParams);
+            }
+            else if (this._blinkTimeoutSource == 0) {
+                Tweener.addTween(this._hbox, fadeOutParams);
+
+                this._blinkTimeoutSource = Mainloop.timeout_add (FADE_OUT_TIME, Lang.bind(this,
+                    function () {
+                        Tweener.addTween(this._hbox, fadeInParams);
+
+                        this._blinkTimeoutSource = Mainloop.timeout_add (FADE_IN_TIME, Lang.bind(this, function () {
+                            this._blinkTimeoutSource = 0;
+
+                            this._onBlinked ();
+
+                            return GLib.SOURCE_REMOVE;
+                        }));
+
+                        return GLib.SOURCE_REMOVE;
+                    }));
+            }
         }
     },
 
@@ -577,6 +599,11 @@ const Indicator = new Lang.Class({
             Tweener.addTween(this._hbox, fadeInParams);
             Tweener.addTween(this.menu.timerLabel, fadeInParams);
             Tweener.addTween(this.menu.pauseAction.child, fadeInParams);
+
+            if (this._blinkTimeoutSource != 0) {
+                Mainloop.source_remove(this._blinkTimeoutSource);
+                this._blinkTimeoutSource = 0;
+            }
         }
     },
 
@@ -584,6 +611,11 @@ const Indicator = new Lang.Class({
         Tweener.removeTweens(this._hbox);
         Tweener.removeTweens(this.menu.timerLabel);
         Tweener.removeTweens(this.menu.pauseAction.child);
+
+        if (this._blinkTimeoutSource != 0) {
+            Mainloop.source_remove(this._blinkTimeoutSource);
+            this._blinkTimeoutSource = 0;
+        }
 
         this.timer.disconnect(this._timerPausedId);
         this.timer.disconnect(this._timerResumedId);
