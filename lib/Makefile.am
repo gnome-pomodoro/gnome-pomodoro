@@ -36,8 +36,8 @@ libgnome_pomodoro_la_VALAFLAGS = \
 libgnome_pomodoro_la_CPPFLAGS = \
 	$(GNOME_POMODORO_CPPFLAGS) \
 	-DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
-	-DPACKAGE_LOCALE_DIR=\""$(localedir)\"" \
-	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)\""
+	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
 libgnome_pomodoro_la_CFLAGS = \
 	$(GNOME_POMODORO_CFLAGS) \

@@ -24,8 +24,8 @@ libsounds_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS) \
 	$(SOUNDS_PLUGIN_CPPFLAGS) \
 	-DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
-	-DPACKAGE_LOCALE_DIR=\""$(localedir)\"" \
-	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)\""
+	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
 libsounds_la_CFLAGS = \
 	$(PLUGIN_CFLAGS) \
