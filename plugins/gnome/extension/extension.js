@@ -98,7 +98,7 @@ const PomodoroExtension = new Lang.Class({
             this.mode = mode;
 
             if (mode == ExtensionMode.RESTRICTED) {
-                this.disableIndicator();
+                this.disableIndicator(true);
                 this.disableScreenNotifications();
                 this.disableReminders();
             }
@@ -296,11 +296,19 @@ const PomodoroExtension = new Lang.Class({
                 Utils.logError(error.message);
             }
         }
+        else {
+            this.indicator.actor.show();
+        }
     },
 
-    disableIndicator: function() {
+    disableIndicator: function(keepInstance) {
         if (this.indicator) {
-            this.indicator.destroy();
+            if (keepInstance) {
+                this.indicator.actor.hide();
+            }
+            else {
+                this.indicator.destroy();
+            }
         }
     },
 
