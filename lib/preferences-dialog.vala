@@ -342,10 +342,20 @@ namespace Pomodoro
             this.engine.unload_plugin.connect (this.on_engine_unload_plugin);
 
             this.plugins_listbox.set_header_func (Pomodoro.list_box_separator_func);
+            this.plugins_listbox.set_sort_func (list_box_sort_func);
 
             this.toggles = new GLib.HashTable<string, unowned Gtk.Switch> (str_hash, str_equal);
 
             this.populate ();
+        }
+
+        private static int list_box_sort_func (Gtk.ListBoxRow row1,
+                                               Gtk.ListBoxRow row2)
+        {
+            var name1 = row1.get_data<string> ("name");
+            var name2 = row2.get_data<string> ("name");
+
+            return GLib.strcmp (name1, name2);
         }
 
         private void on_engine_load_plugin (Peas.PluginInfo plugin_info)
@@ -426,6 +436,7 @@ namespace Pomodoro
             hbox.pack_start (toggle, false, true, 0);
 
             var row = new Gtk.ListBoxRow ();
+            row.set_data<string> ("name", plugin_info.get_name ());
             row.activatable = false;
             row.add (hbox);
             row.show_all ();
