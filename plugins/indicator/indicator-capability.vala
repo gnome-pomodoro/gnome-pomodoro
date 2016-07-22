@@ -157,6 +157,10 @@ namespace IndicatorPlugin
                 gtk_settings.notify["gtk-theme-name"].connect (this.on_gtk_settings_gtk_theme_name_notify);
 
                 this.on_timer_elapsed_notify ();
+
+                if (this.timer.is_paused) {
+                    this.schedule_blinking ();
+                }
             }
 
             base.enable ();

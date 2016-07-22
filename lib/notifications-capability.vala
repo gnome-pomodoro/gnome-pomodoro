@@ -34,11 +34,6 @@ namespace Pomodoro
         public NotificationsCapability (string name)
         {
             base (name);
-
-            this.timer = Pomodoro.Timer.get_default ();
-
-            this.settings = Pomodoro.get_settings ().get_child ("preferences");
-            this.settings.changed.connect (this.on_settings_changed);
         }
 
         private bool has_actions_support ()
@@ -60,16 +55,20 @@ namespace Pomodoro
 
         private void notify_pomodoro_start ()
         {
-            this.show_pomodoro_start_notification ();
+            if (!this.timer.is_paused) {
+                this.show_pomodoro_start_notification ();
+            }
         }
 
         private void notify_pomodoro_end ()
         {
-            if (this.settings.get_boolean ("show-screen-notifications")) {
-                this.show_screen_notification ();
-            }
-            else {
-                this.show_pomodoro_end_notification ();
+            if (!this.timer.is_paused) {
+                if (this.settings.get_boolean ("show-screen-notifications")) {
+                    this.show_screen_notification ();
+                }
+                else {
+                    this.show_pomodoro_end_notification ();
+                }
             }
         }
 
@@ -87,15 +86,10 @@ namespace Pomodoro
         {
             if (this.screen_notification == null) {
                 this.screen_notification = new Pomodoro.ScreenNotification ();
-                this.screen_notification.notify["visible"].connect(() => {
-                    if (this.timer.state is Pomodoro.BreakState) {
-                        this.show_pomodoro_end_notification ();
-                    }
-                });
                 this.screen_notification.destroy.connect (() => {
                     this.screen_notification = null;
 
-                    if (this.timer.state is Pomodoro.BreakState) {
+                    if (!this.timer.is_paused && this.timer.state is Pomodoro.BreakState) {
                         this.show_pomodoro_end_notification ();
                     }
                 });
@@ -133,7 +127,7 @@ namespace Pomodoro
             // TODO: resident notifications won't be updated, might be better not to display scheduled time
 
             var remaining = (int) Math.ceil (this.timer.remaining);
-            var minutes   = (int) Math.floor (remaining / 60);
+            var minutes   = (int) Math.round ((double) remaining / 60.0);
             var seconds   = (int) Math.floor (remaining % 60);
             var body      = remaining > 45
                   ? ngettext ("You have %d minute",
@@ -207,7 +201,25 @@ namespace Pomodoro
 
         private void on_timer_state_duration_notify ()
         {
-            if (this.timer.state is Pomodoro.BreakState) {
+            if (!this.timer.is_paused) {
+                if (this.timer.state is Pomodoro.PomodoroState) {
+                    this.show_pomodoro_start_notification ();
+                }
+
+                if (this.timer.state is Pomodoro.BreakState) {
+                    this.show_pomodoro_end_notification ();
+                }
+            }
+        }
+
+        private void on_timer_is_paused_notify ()
+        {
+            this.withdraw_notifications ();
+
+            if (this.timer.state is Pomodoro.PomodoroState) {
+                this.notify_pomodoro_start ();
+            }
+            else if (this.timer.state is Pomodoro.BreakState) {
                 this.notify_pomodoro_end ();
             }
         }
@@ -227,8 +239,13 @@ namespace Pomodoro
                 var application = GLib.Application.get_default ();
                 application.add_action (show_screen_notification_action);
 
+                this.timer = Pomodoro.Timer.get_default ();
                 this.timer.state_changed.connect_after (this.on_timer_state_changed);
                 this.timer.notify["state-duration"].connect (this.on_timer_state_duration_notify);
+                this.timer.notify["is-paused"].connect (this.on_timer_is_paused_notify);
+
+                this.settings = Pomodoro.get_settings ().get_child ("preferences");
+                this.settings.changed.connect (this.on_settings_changed);
 
                 this.on_timer_state_changed (this.timer.state,
                                              this.timer.state);
@@ -239,11 +256,16 @@ namespace Pomodoro
 
         public override void disable ()
         {
-            if (!this.enabled) {
+            if (this.enabled) {
+                this.withdraw_notifications ();
+
                 this.timer.state_changed.disconnect (this.on_timer_state_changed);
                 this.timer.notify["state-duration"].disconnect (this.on_timer_state_duration_notify);
+                this.timer.notify["is-paused"].disconnect (this.on_timer_is_paused_notify);
+                this.timer = null;
 
-                this.withdraw_notifications ();
+                this.settings.changed.disconnect (this.on_settings_changed);
+                this.settings = null;
 
                 var application = GLib.Application.get_default ();
                 application.remove_action ("show-screen-notification");

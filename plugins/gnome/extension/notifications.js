@@ -273,7 +273,6 @@ const PomodoroEndNotification = new Lang.Class({
             function() {
                 if (banner.bodyLabel && banner.bodyLabel.actor.clutter_text) {
                     banner.setBody(this.bannerBodyText);
-                    // banner.bodyLabel.actor.clutter_text.set_text(this.bannerBodyText);
                 }
 
                 if (this.timer.canSwitchBreak()) {
