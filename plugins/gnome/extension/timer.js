@@ -187,6 +187,10 @@ const Timer = new Lang.Class({
         this._proxy.ResumeRemote(Lang.bind(this, this._onCallback));
     },
 
+    skip: function() {
+        this._proxy.SkipRemote(Lang.bind(this, this._onCallback));
+    },
+
     reset: function() {
         this._proxy.ResetRemote(Lang.bind(this, this._onCallback));
     },
