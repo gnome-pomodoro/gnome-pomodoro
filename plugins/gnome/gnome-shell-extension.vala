@@ -264,7 +264,7 @@ namespace GnomePlugin
                                        info.path == Config.EXTENSION_DIR &&
                                        info.version == Config.PACKAGE_VERSION);
 
-                    if (!is_boundled && !loaded && !reloaded)
+                    if (!reloaded && (!is_boundled && !loaded || info.state == Gnome.ExtensionState.ERROR))
                     {
                         this.reload ();
 
