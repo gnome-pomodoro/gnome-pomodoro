@@ -474,6 +474,14 @@ namespace Pomodoro
         public Gtk.ListBox other_listbox;
         [GtkChild]
         public Gtk.SizeGroup lisboxrow_sizegroup;
+        [GtkChild]
+        public Gtk.ListBoxRow listboxrow_accelerator;
+        [GtkChild]
+        public Gtk.ListBoxRow listboxrow_reminders;
+        [GtkChild]
+        public Gtk.ListBoxRow listboxrow_idle_monitor;
+        [GtkChild]
+        public Gtk.ListBoxRow listboxrow_hide_system_notifications;
 
         private GLib.Settings settings;
         private Pomodoro.Accelerator accelerator;
@@ -483,6 +491,12 @@ namespace Pomodoro
             this.timer_listbox.set_header_func (Pomodoro.list_box_separator_func);
             this.notifications_listbox.set_header_func (Pomodoro.list_box_separator_func);
             this.other_listbox.set_header_func (Pomodoro.list_box_separator_func);
+
+            var application = Pomodoro.Application.get_default ();
+            application.capabilities.capability_enabled.connect (this.on_capability_enabled);
+            application.capabilities.capability_disabled.connect (this.on_capability_disabled);
+
+            this.update_capabilities ();
         }
 
         private unowned Widgets.LogScale setup_time_scale (Gtk.Builder builder,
@@ -622,6 +636,36 @@ namespace Pomodoro
                 default:
                     break;
             }
+        }
+
+        private void update_capabilities ()
+        {
+            var application  = Pomodoro.Application.get_default ();
+            var capabilities = application.capabilities;
+
+            this.listboxrow_accelerator.visible = capabilities.has_enabled ("accelerator");
+            this.listboxrow_reminders.visible = capabilities.has_enabled ("reminders");
+            this.listboxrow_idle_monitor.visible = capabilities.has_enabled ("idle-monitor");
+            this.listboxrow_hide_system_notifications.visible = capabilities.has_enabled ("hide-system-notifications");
+        }
+
+        private void on_capability_enabled (string capability_name)
+        {
+            this.update_capabilities ();
+        }
+
+        private void on_capability_disabled (string capability_name)
+        {
+            this.update_capabilities ();
+        }
+
+        public override void dispose ()
+        {
+            var application = Pomodoro.Application.get_default ();
+            application.capabilities.capability_enabled.disconnect (this.on_capability_enabled);
+            application.capabilities.capability_disabled.disconnect (this.on_capability_disabled);
+
+            base.dispose ();
         }
     }
 

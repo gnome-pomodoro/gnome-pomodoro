@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.19.0 -->
+<!-- Generated with glade 3.20.0 -->
 <interface domain="gnome-pomodoro">
   <requires lib="gtk+" version="3.16"/>
   <!-- interface-css-provider-path style.css -->
@@ -278,7 +278,7 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkListBoxRow" id="listboxrow10">
+                              <object class="GtkListBoxRow" id="listboxrow_accelerator">
                                 <property name="name">keyboard-shortcut</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -432,7 +432,7 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkListBoxRow" id="listboxrow3">
+                              <object class="GtkListBoxRow" id="listboxrow_reminders">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="activatable">False</property>
@@ -541,8 +541,8 @@
                             <property name="selection_mode">none</property>
                             <signal name="row-activated" handler="on_row_activated" swapped="no"/>
                             <child>
-                              <object class="GtkListBoxRow" id="listboxrow11">
-                                <property name="name">pause-when-idle</property>
+                              <object class="GtkListBoxRow" id="listboxrow_idle_monitor">
+                                <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="activatable">False</property>
                                 <property name="selectable">False</property>
@@ -583,9 +583,11 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkListBoxRow" id="listboxrow4">
-                                <property name="name">disable-other-notifications</property>
+                              <object class="GtkListBoxRow" id="listboxrow_hide_system_notifications">
+                                <property name="visible">True</property>
                                 <property name="can_focus">True</property>
+                                <property name="activatable">False</property>
+                                <property name="selectable">False</property>
                                 <child>
                                   <object class="GtkBox" id="box4">
                                     <property name="visible">True</property>
@@ -672,13 +674,13 @@
     <property name="mode">vertical</property>
     <property name="ignore_hidden">True</property>
     <widgets>
-      <widget name="listboxrow10"/>
-      <widget name="listboxrow3"/>
+      <widget name="listboxrow_accelerator"/>
+      <widget name="listboxrow_reminders"/>
       <widget name="listboxrow2"/>
       <widget name="listboxrow5"/>
       <widget name="listboxrow9"/>
-      <widget name="listboxrow4"/>
-      <widget name="listboxrow11"/>
+      <widget name="listboxrow_hide_system_notifications"/>
+      <widget name="listboxrow_idle_monitor"/>
     </widgets>
   </object>
 </interface>

@@ -58,6 +58,13 @@ namespace Pomodoro
             return this.capabilities.contains (capability_name);
         }
 
+        public bool has_enabled (string capability_name)
+        {
+            var capability = this.capabilities.lookup (capability_name);
+
+            return capability != null ? capability.enabled : false;
+        }
+
         public bool has_group (Pomodoro.CapabilityGroup group)
         {
             return this.groups.index (group) >= 0;
@@ -178,6 +185,8 @@ namespace Pomodoro
                 if (!capability.enabled) {
                     capability.enable ();
                 }
+
+                this.capability_enabled (capability.name);
             }
             else {
                 if (capability.enabled) {
@@ -211,6 +220,8 @@ namespace Pomodoro
 
                     iter = iter.next;
                 }
+
+                this.capability_disabled (capability.name);
             }
         }
 
@@ -244,5 +255,9 @@ namespace Pomodoro
         public signal void group_added (Pomodoro.CapabilityGroup group);
 
         public signal void group_removed (Pomodoro.CapabilityGroup group);
+
+        public signal void capability_enabled (string capability_name);
+
+        public signal void capability_disabled (string capability_name);
     }
 }

@@ -410,10 +410,13 @@ namespace Pomodoro
             this.setup_capabilities ();
             this.setup_plugins ();
 
+            // FIXME: shouldn't these be enabled by settings?!
             this.capabilities.enable ("notifications");
             this.capabilities.enable ("indicator");
             this.capabilities.enable ("accelerator");
             this.capabilities.enable ("reminders");
+            this.capabilities.enable ("hide-system-notifications");
+            this.capabilities.enable ("idle-monitor");
 
             this.release ();
         }

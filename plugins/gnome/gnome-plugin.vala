@@ -26,7 +26,9 @@ namespace GnomePlugin
     /* Leas amount of time in seconds between detected events
      * to say that user become active
      */
-    private double IDLE_MONITOR_MIN_IDLE_TIME = 0.5;
+    private const double IDLE_MONITOR_MIN_IDLE_TIME = 0.5;
+
+    private const string CURRENT_DESKTOP_VARIABLE = "XDG_CURRENT_DESKTOP";
 
     public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
     {
@@ -34,12 +36,14 @@ namespace GnomePlugin
             "notifications",
             "indicator",
             "accelerator",
-            "reminders"
+            "reminders",
+            "hide-system-notifications"
         };
 
         private Pomodoro.Timer                  timer;
         private GLib.Settings                   settings;
         private Pomodoro.CapabilityGroup        capabilities;
+        private Pomodoro.CapabilityGroup        shell_capabilities;
         private GnomePlugin.GnomeShellExtension shell_extension;
         private Gnome.IdleMonitor               idle_monitor;
         private uint                            become_active_id = 0;
@@ -55,8 +59,11 @@ namespace GnomePlugin
             this.shell_extension = new GnomePlugin.GnomeShellExtension (Config.EXTENSION_UUID);
 
             this.capabilities = new Pomodoro.CapabilityGroup ("gnome");
+            this.capabilities.add (new Pomodoro.Capability ("idle-monitor"));
+
+            this.shell_capabilities = new Pomodoro.CapabilityGroup ("gnome-shell");
             for (var i=0; i < SHELL_CAPABILITIES.length; i++) {
-                this.capabilities.add (new Pomodoro.Capability (SHELL_CAPABILITIES[i]));
+                this.shell_capabilities.add (new Pomodoro.Capability (SHELL_CAPABILITIES[i]));
             }
 
             this.timer = Pomodoro.Timer.get_default ();
@@ -77,13 +84,22 @@ namespace GnomePlugin
 
         private void setup ()
         {
-            // take over capabilities until extension status is resolved
-            var application = Pomodoro.Application.get_default ();
-            application.capabilities.add_group (this.capabilities, Pomodoro.Priority.HIGH);
+            if (GLib.Environment.get_variable (CURRENT_DESKTOP_VARIABLE) == "GNOME")
+            {
+                var application = Pomodoro.Application.get_default ();
+                application.capabilities.add_group (this.capabilities, Pomodoro.Priority.HIGH);
 
-            this.shell_extension.notify["enabled"].connect (this.on_shell_extension_enabled_notify);
+                // take over capabilities until extension status is resolved
+                application.capabilities.add_group (this.shell_capabilities, Pomodoro.Priority.HIGH);
 
-            this.shell_extension.enable.begin ();
+                this.shell_extension.enable.begin ((obj, res) => {
+                    this.shell_extension.enable.end (res);
+
+                    this.shell_extension.notify["enabled"].connect (this.on_shell_extension_enabled_notify);
+
+                    this.on_shell_extension_enabled_notify ();
+                });
+            }
         }
 
         private void on_shell_extension_enabled_notify ()
@@ -91,10 +107,10 @@ namespace GnomePlugin
             var application = Pomodoro.Application.get_default ();
 
             if (this.shell_extension.enabled) {
-                application.capabilities.add_group (this.capabilities, Pomodoro.Priority.HIGH);
+                application.capabilities.add_group (this.shell_capabilities, Pomodoro.Priority.HIGH);
             }
             else {
-                application.capabilities.remove_group (this.capabilities);
+                application.capabilities.remove_group (this.shell_capabilities);
             }
         }
 
@@ -140,39 +156,39 @@ namespace GnomePlugin
         }
     }
 
-    public class PreferencesDialogExtension : Peas.ExtensionBase, Pomodoro.PreferencesDialogExtension
-    {
-        private Pomodoro.PreferencesDialog dialog;
-
-        private GLib.Settings settings;
-        private GLib.List<Gtk.ListBoxRow> rows;
-
-        construct
-        {
-            this.settings = Pomodoro.get_settings ()
-                                    .get_child ("preferences");
-
-            this.dialog = Pomodoro.PreferencesDialog.get_default ();
-
-            this.setup_main_page ();
-        }
-
-        private void setup_main_page ()
-        {
-            var main_page = this.dialog.get_page ("main") as Pomodoro.PreferencesMainPage;
-
-            /* toggle/row is defined in the .ui because we would like same feature for other desktops.
-             */
-            foreach (var child in main_page.other_listbox.get_children ()) {
-                if (child.name == "pause-when-idle") {
-                    child.show ();
-                }
-                else if (child.name == "disable-other-notifications") {
-                    child.show ();
-                }
-            }
-       }
-    }
+//    public class PreferencesDialogExtension : Peas.ExtensionBase, Pomodoro.PreferencesDialogExtension
+//    {
+//        private Pomodoro.PreferencesDialog dialog;
+//
+//        private GLib.Settings settings;
+//        private GLib.List<Gtk.ListBoxRow> rows;
+//
+//        construct
+//        {
+//            this.settings = Pomodoro.get_settings ()
+//                                    .get_child ("preferences");
+//
+//            this.dialog = Pomodoro.PreferencesDialog.get_default ();
+//
+//            this.setup_main_page ();
+//        }
+//
+//        private void setup_main_page ()
+//        {
+//            var main_page = this.dialog.get_page ("main") as Pomodoro.PreferencesMainPage;
+//
+//            /* toggle/row is defined in the .ui because we would like same feature for other desktops.
+//             */
+//            foreach (var child in main_page.other_listbox.get_children ()) {
+//                if (child.name == "pause-when-idle") {
+//                    child.show ();
+//                }
+//                else if (child.name == "disable-other-notifications") {
+//                    child.show ();
+//                }
+//            }
+//       }
+//    }
 }
 
 
@@ -184,6 +200,6 @@ public void peas_register_types (GLib.TypeModule module)
     object_module.register_extension_type (typeof (Pomodoro.ApplicationExtension),
                                            typeof (GnomePlugin.ApplicationExtension));
 
-    object_module.register_extension_type (typeof (Pomodoro.PreferencesDialogExtension),
-                                           typeof (GnomePlugin.PreferencesDialogExtension));
+//    object_module.register_extension_type (typeof (Pomodoro.PreferencesDialogExtension),
+//                                           typeof (GnomePlugin.PreferencesDialogExtension));
 }
