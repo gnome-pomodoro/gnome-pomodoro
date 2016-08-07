@@ -293,6 +293,7 @@ AC_CONFIG_FILES([
     plugins/indicator/Makefile
     plugins/indicator/icons/Makefile
     plugins/indicator/icons/ambiance/Makefile
+    plugins/indicator/icons/arc/Makefile
     plugins/indicator/icons/radiance/Makefile
     plugins/sounds/Makefile
     tests/Makefile

@@ -1,0 +1,11 @@
+{
+  "primary-color": "#ffffffe0",
+  "secondary-color": "#ffffff40",
+  "shadow-color": "#00000050",
+  "shadow-offset-x": 1.0,
+  "shadow-offset-y": 1.0,
+  "padding-left": 2.0,
+  "padding-top": 2.0,
+  "padding-right": 2.0,
+  "padding-bottom": 2.0
+}

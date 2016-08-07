@@ -1,5 +1,6 @@
 SUBDIRS = \
 	ambiance \
+	arc \
 	radiance
 
 generate-icons:
