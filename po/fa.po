@@ -1,14 +1,14 @@
 # Persian translation for gnome-pomodoro
-# Copyright (c) 2012 gnome-pomodoro contributors
+# Copyright (c) 2016 gnome-pomodoro contributors
 # This file is distributed under the same license as the gnome-pomodoro package.
-# Arash Mousavi <mousavi.arash@gmail.com>, 2012.
+# Arash Mousavi <mousavi.arash@gmail.com>, 2012, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:23+0100\n"
-"PO-Revision-Date: 2012-12-25 20:56+0330\n"
+"PO-Revision-Date: 2016-06-19 12:20+0430\n"
 "Last-Translator: Arash Mousavi <mousavi.arash@gmail.com>\n"
 "Language-Team: Persian <mousavi.arash@gmail.com>\n"
 "Language: fa\n"
@@ -17,6 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.8.7.1\n"
 
 #. Toggle timer state button */
 #: ../extension/indicator.js:87
@@ -30,73 +31,68 @@ msgstr "ترجیحات"
 
 #: ../extension/notifications.js:115 ../src/about-dialog.vala:30
 #: ../data/gnome-pomodoro.desktop.in.h:1
-#, fuzzy
 msgid "Pomodoro"
 msgstr "پومودورو"
 
 #: ../extension/notifications.js:389
-#, fuzzy
 msgid "It's time to take a break"
-msgstr "حالا وقت استراحت است!"
+msgstr "وقتشه کمی استراحت کنی"
 
 #: ../extension/notifications.js:574
-#, fuzzy
 msgid "A new pomodoro is starting"
-msgstr "یک پومودورو دیگه شروع شد."
+msgstr "یک پومودورو دیگه شروع شد"
 
 #: ../extension/notifications.js:587
 msgid "Take a break!"
 msgstr "یکم استراحت کن!"
 
 #: ../extension/notifications.js:610
-#, fuzzy
 msgid "Start pomodoro"
-msgstr "شروع یک پومودورو جدید"
+msgstr "شروع پومودورو"
 
 #: ../extension/notifications.js:652
 msgid "Shorten the break"
-msgstr ""
+msgstr "کوتاه کردن استراحت"
 
 #: ../extension/notifications.js:658
 msgid "Lengthen the break"
-msgstr ""
+msgstr "طولانی کردن استراحت"
 
 #: ../extension/notifications.js:672
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "You have %d second left"
 msgid_plural "You have %d seconds left"
-msgstr[0] "شما %Id ثانیه زمان دارید\n"
+msgstr[0] "شما %Id ثانیه زمان دارید"
 
 #: ../extension/notifications.js:674
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "You have %d minute left"
 msgid_plural "You have %d minutes left"
-msgstr[0] "شما %Id دقیقه زمان دارید\n"
+msgstr[0] "شما %Id دقیقه زمان دارید"
 
 #: ../extension/notifications.js:693
-#, fuzzy
 msgid "Hey, you're missing out on a break"
-msgstr "ای بابا. داری یک زمان استراحت رو از دست میدی."
+msgstr "ای بابا، داری زمان استراحتت رو از دست میدی"
 
 #: ../extension/notifications.js:772
 msgid "Could not run pomodoro"
-msgstr ""
+msgstr "امکان اجرا پومودورو نبود"
 
 #: ../extension/notifications.js:774
 msgid "Something went badly wrong..."
-msgstr ""
+msgstr "یک اتفاق ناجوری افتاد…"
 
 #: ../extension/notifications.js:775
 msgid "Looks like gnome-pomodoro is not installed"
-msgstr ""
+msgstr "به نظر میاد gnome-pomodoro نصب نشده است"
 
 #: ../extension/notifications.js:784
 msgid "Report issue"
-msgstr ""
+msgstr "گزارش خطا"
 
 #: ../extension/notifications.js:787
 msgid "Install"
-msgstr ""
+msgstr "نصب"
 
 #: ../src/about-dialog.vala:29
 msgid "About Pomodoro"
@@ -104,19 +100,22 @@ msgstr "پومودورو دربارهٔ"
 
 #: ../src/about-dialog.vala:31
 msgid "A simple time management utility"
-msgstr ""
+msgstr "یک ابزار مدیریت زمان ساده"
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
-msgstr ""
+msgstr "آرش موسوی <mousavi.arash@gmail.com>"
 
 #: ../src/about-dialog.vala:45
 msgid ""
 "This program is free software: you can  redistribute it and/or modify it "
 "under the terms of the GNU General Public License as published by the Free "
-"Software Foundation; either version 3 of the License, or (at your option) "
-"any later version."
+"Software Foundation; either version 3 of the License, or (at your option) any "
+"later version."
 msgstr ""
+"این برنامه یک برنامه آزاد است: شما می‌توانید براساس شرایط گواهینامه GNU "
+"General Public آن را بازنشر و/یا تغییر دهید؛ یا نسخه ۳ گواهینامه، یا (بر اساس "
+"سلیقه شما) هر نسخه جدیدتری."
 
 #: ../src/preferences-dialog.vala:329
 msgid "Timer"
@@ -127,91 +126,81 @@ msgid "Pomodoro duration"
 msgstr "طول مدت پومودورو"
 
 #: ../src/preferences-dialog.vala:399
-#, fuzzy
 msgid "Short break duration"
-msgstr "طول مدت استراحت کوتاه"
+msgstr "طول مدت استراحتِ کوتاه"
 
 #: ../src/preferences-dialog.vala:402
-#, fuzzy
 msgid "Long break duration"
-msgstr "طول مدت استراحت بلند"
+msgstr "طول مدت استراحتِ بلند"
 
 #. @translators: You can refer it to number of pomodoros in a cycle
 #: ../src/preferences-dialog.vala:411
-#, fuzzy
 msgid "Pomodoros to a long break"
-msgstr "طول مدت پومودورو"
+msgstr "تعداد پومودورو تا اجرا استراحت طولانی"
 
 #: ../src/preferences-dialog.vala:418
-#, fuzzy
 msgid "Shortcut to toggle the timer"
-msgstr "کلیدی برای تغییرحالت زمانسنج"
+msgstr "میانبر برای تغییرحالت زمانسنج"
 
 #: ../src/preferences-dialog.vala:426
-#, fuzzy
 msgid "Notifications"
 msgstr "اعلان‌ها"
 
 #: ../src/preferences-dialog.vala:432
-#, fuzzy
 msgid "Screen notifications"
-msgstr "نمایش محاوره‌ی پیام‌ها"
+msgstr "اعلان‌های صفحه‌نمایش"
 
 #: ../src/preferences-dialog.vala:437
-#, fuzzy
 msgid "Remind to take a break"
-msgstr "حالا وقت استراحت است!"
+msgstr "یادآوری برای استراحت کردن"
 
 #: ../src/preferences-dialog.vala:459
 msgid "Sounds"
-msgstr ""
+msgstr "صداها"
 
 #: ../src/preferences-dialog.vala:464
 msgid "Clock Ticking"
-msgstr ""
+msgstr "تیک تیک ساعت"
 
 #: ../src/preferences-dialog.vala:468
 msgid "Timer Ticking"
-msgstr ""
+msgstr "تیک تیک زمانسنج"
 
 #: ../src/preferences-dialog.vala:472
 msgid "Woodland Birds"
-msgstr ""
+msgstr "پرنده‌های قفسی"
 
 #: ../src/preferences-dialog.vala:479
-#, fuzzy
 msgid "Select ticking sound"
-msgstr "استفاده از صوت در اعلان‌ها"
+msgstr "انتخاب صدای تیک تیک"
 
 #: ../src/preferences-dialog.vala:490
 msgid "Ticking sound"
-msgstr ""
+msgstr "صدای تیک تیک"
 
 #: ../src/preferences-dialog.vala:510
 msgid "Loud bell"
-msgstr ""
+msgstr "زنگ بلند"
 
 #: ../src/preferences-dialog.vala:514
 msgid "Bell"
-msgstr ""
+msgstr "زنگ"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Select sound for start of break"
-msgstr ""
+msgstr "صدای هشدار برای شروع استراحت را انتخاب کنید"
 
 #: ../src/preferences-dialog.vala:530
 msgid "Start of break sound"
-msgstr ""
+msgstr "صدا برای شروع استراحت"
 
 #: ../src/preferences-dialog.vala:534
-#, fuzzy
 msgid "Select sound for pomodoro start"
-msgstr "پرونده‌ی صوتی که در شروع و پایان پومودورو اجرا شود."
+msgstr "انتخاب صدا برای شروع پومودورو"
 
 #: ../src/preferences-dialog.vala:543
-#, fuzzy
 msgid "Pomodoro start sound"
-msgstr "طول مدت پومودورو"
+msgstr "صدا شروع پومودورو"
 
 #: ../src/preferences-dialog.vala:575
 msgid "Available"
@@ -232,41 +221,39 @@ msgstr "حضور"
 
 #: ../src/preferences-dialog.vala:603
 msgid "Postpone pomodoro when idle"
-msgstr ""
+msgstr "تعویق کردن پومودورو هنگام بیکاری"
 
 #: ../src/preferences-dialog.vala:608
-#, fuzzy
 msgid "Status during pomodoro"
-msgstr "شروع یک پومودورو جدید"
+msgstr "وضعیت هنگام شروع پومودورو"
 
 #: ../src/preferences-dialog.vala:613
-#, fuzzy
 msgid "Status during break"
-msgstr "نمایش  محاوره‌ی اعلان‌ها در طول مدت استراحت‌ها"
+msgstr "وضعیت هنگام استراحت"
 
 #: ../src/preferences-dialog.vala:686
 msgid ""
 "System notifications including chat messages won't show up during pomodoro."
 msgstr ""
+"اعلان‌های سیستم، شامل گپ‌ها، در هنگام اجرای پومودورو نمایش داده نخواهند شد."
 
 #: ../src/preferences-dialog.vala:690
-msgid ""
-"System notifications including chat messages won't show up during break."
-msgstr ""
+msgid "System notifications including chat messages won't show up during break."
+msgstr "اعلان‌های سیستم شامل پیام‌های هنگام استراحت نمایش داده نخواهند شد."
 
 #: ../src/preferences-dialog.vala:694
 msgid "System notifications including chat messages won't show up."
-msgstr ""
+msgstr "اعلان‌های سیستم شامل پیام‌های گپ نمایش داده نخواهند شد."
 
 #: ../src/preferences-dialog.vala:707
 msgid "OK"
-msgstr ""
+msgstr "تایید"
 
 #: ../src/utils.vala:92
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
+msgstr[0] "%Id ساعت"
 
 #: ../src/utils.vala:101
 #, c-format
@@ -285,10 +272,13 @@ msgid ""
 "using this key.\n"
 "Please try with a key such as Control, Alt or Shift at the same time."
 msgstr ""
+"میانبر «%s» قابل استفاده نیست چرا که استفاده از این کلید برای تایپ غیرممکن "
+"خواهد شد.\n"
+"لطفا با یک کلید مانند Control، Alt و Shift با هم امتحان کنید."
 
 #: ../src/widgets.vala:512
 msgid "_No sound"
-msgstr ""
+msgstr "_بدون صدا"
 
 #: ../src/widgets.vala:514
 msgid "_Cancel"
@@ -300,11 +290,11 @@ msgstr "_بازکردن"
 
 #: ../src/widgets.vala:523
 msgid "Select a file"
-msgstr ""
+msgstr "انتخاب یک پرونده"
 
 #: ../src/widgets.vala:583
 msgid "All files"
-msgstr ""
+msgstr "تمام پرونده‌ها"
 
 #: ../src/widgets.vala:711
 msgid "Other…"
@@ -316,15 +306,15 @@ msgstr "هیچ‌کدام"
 
 #: ../src/widgets.vala:1061 ../src/widgets.vala:1070
 msgid "Supported audio files"
-msgstr ""
+msgstr "پرونده‌های صوتی پیشیبانی شده"
 
 #: ../data/gnome-pomodoro.desktop.in.h:2
 msgid "Manage your time and tasks"
-msgstr ""
+msgstr "وظایف و زمان خود را مدیریت کنید"
 
 #: ../data/gnome-pomodoro.desktop.in.h:3
 msgid "time;timer;tasks;manage;organize;"
-msgstr ""
+msgstr "time;timer;tasks;manage;organize;زمان;زمانسنج;وظایف;مدیریت;سازماندهی;"
 
 #~ msgid "Options"
 #~ msgstr "گزینه‌ها"
