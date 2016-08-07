@@ -12,7 +12,6 @@ Group: Productivity/Office/Other
 
 BuildRequires: gettext
 BuildRequires: intltool
-BuildRequires: docbook-utils
 BuildRequires: vala >= @VALA_REQUIRED@
 BuildRequires: gnome-common
 BuildRequires: desktop-file-utils
@@ -25,6 +24,7 @@ BuildRequires: pkgconfig(libpeas-1.0) >= @LIBPEAS_REQUIRED@
 BuildRequires: pkgconfig(gstreamer-1.0) >= 1.0.10
 BuildRequires: pkgconfig(libcanberra) >= 0.30
 BuildRequires: pkgconfig(gnome-desktop-3.0) >= @GNOME_REQUIRED@
+BuildRequires: pkgconfig(appindicator3-0.1)
 
 %if %{defined fedora}
 BuildRequires: vala-tools
@@ -48,8 +48,6 @@ Recommends: gstreamer1-plugins-base
 %else
 Recommends: gstreamer-plugins-base
 %endif
-
-Recommends: libappindicator-gtk3-devel
 
 %if %{defined fedora}
 Obsoletes: gnome-shell-extension-pomodoro
@@ -104,4 +102,3 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/gnome-pomodoro
 %{_datadir}/gnome-shell/extensions/@EXTENSION_UUID@
 %{_datadir}/icons/hicolor/*/apps/*
-%{_mandir}/man1/gnome-pomodoro.1*

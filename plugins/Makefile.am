@@ -5,6 +5,7 @@ SUBDIRS = \
 DIST_SUBDIRS = \
 	dark-theme \
 	gnome \
+	indicator \
 	sounds
 
 if WITH_GNOME_PLUGIN
