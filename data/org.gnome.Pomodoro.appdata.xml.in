@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2014 Kamil Prusko <kamilprusko@gmail.com> -->
-<application>
-  <id type="desktop">org.gnome.Pomodoro.desktop</id>
+<component type="desktop">
+  <id>org.gnome.Pomodoro.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <_name>Pomodoro</_name>
@@ -15,24 +15,26 @@
   </description>
   <screenshots>
     <screenshot type="default">
-       <image>http://gnomepomodoro.org/release/0.12/window.png</image>
-       <caption>Main window</caption>
+      <image>http://gnomepomodoro.org/release/0.12/window.png</image>
+      <caption>Main window</caption>
     </screenshot>
     <screenshot>
-       <image>http://gnomepomodoro.org/release/0.12/preferences.png</image>
-       <caption>Preferences</caption>
+      <image>http://gnomepomodoro.org/release/0.12/preferences.png</image>
+      <caption>Preferences</caption>
     </screenshot>
     <screenshot>
-       <image>http://gnomepomodoro.org/release/0.12/indicator.png</image>
-       <caption>Indicator for GNOME Shell</caption>
+      <image>http://gnomepomodoro.org/release/0.12/indicator.png</image>
+      <caption>Indicator for GNOME Shell</caption>
     </screenshot>
   </screenshots>
   <url type="homepage">http://gnomepomodoro.org</url>
-  <updatecontact>kamilprusko@gmail.com</updatecontact>
+  <url type="bugtracker">https://github.com/codito/gnome-pomodoro</url>
+  <developer_name>Kamil Prusko</developer_name>
+  <update_contact>kamilprusko@gmail.com</update_contact>
   <kudos>
     <kudo>AppMenu</kudo>
     <kudo>HiDpiIcon</kudo>
     <kudo>ModernToolkit</kudo>
     <kudo>Notifications</kudo>
   </kudos>
-</application>
+</component>
