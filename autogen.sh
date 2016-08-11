@@ -1,18 +1,25 @@
 #!/bin/sh
 # Run this to generate all the initial makefiles, etc.
+test -n "$srcdir" || srcdir=`dirname "$0"`
+test -n "$srcdir" || srcdir=.
 
-srcdir=`dirname $0`
-test -z "$srcdir" && srcdir=.
+olddir=`pwd`
+cd $srcdir
 
-(test -f $srcdir/configure.ac) || {
-    echo -n "**Error**: Directory \"\'$srcdir\'\" does not look like the"
-    echo " top-level package directory"
+(test -f configure.ac) || {
+    echo "*** ERROR: Directory "\`$srcdir\'" does not look like the top-level project directory ***"
     exit 1
 }
 
-which gnome-autogen.sh || {
-    echo "You need to install gnome-common!"
-    exit 1
-}
+PKG_NAME=`autoconf --trace 'AC_INIT:$1' configure.ac`
 
-REQUIRED_AUTOMAKE_VERSION=1.9 GNOME_DATADIR="$gnome_datadir" . gnome-autogen.sh
+aclocal --install || exit 1
+autoreconf --verbose --force --install -Wno-portability || exit 1
+
+cd $olddir
+if [ "$NOCONFIGURE" = "" ]; then
+    $srcdir/configure "$@" || exit 1
+    echo "Now type \`make' to compile $PKG_NAME" || exit 1
+else
+    echo "Skipping configure process."
+fi
