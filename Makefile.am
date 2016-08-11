@@ -38,6 +38,9 @@ MAINTAINERCLEANFILES = \
 	$(GITIGNORE_MAINTAINERCLEANFILES_MAKEFILE_IN) \
 	$(GITIGNORE_MAINTAINERCLEANFILES_M4_LIBTOOL)
 
+# We currently have no custom macros
+GITIGNOREFILES = m4
+
 .PHONY: test packages rpm rpm-src deb-src
 
 clean-local:
