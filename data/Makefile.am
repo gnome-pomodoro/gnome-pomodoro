@@ -5,13 +5,14 @@ SUBDIRS = \
 #BUILT_SOURCES = \
 #	gschemas.compiled
 
-@INTLTOOL_DESKTOP_RULE@
 desktopdir = $(datadir)/applications
 desktop_in_files = org.gnome.Pomodoro.desktop.in
 desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
+%.desktop: %.desktop.in
+	msgfmt --desktop -d $(top_srcdir)/po --template $< -o $@
+
 @GSETTINGS_RULES@
-@INTLTOOL_XML_NOMERGE_RULE@
 gsettings_in_files = org.gnome.pomodoro.gschema.xml.in
 gsettings_SCHEMAS = $(gsettings_in_files:.xml.in=.xml)
 .PRECIOUS: $(gsettings_SCHEMAS)
@@ -28,6 +29,9 @@ appdatadir = $(datadir)/appdata
 appdata_in_files = \
 	org.gnome.Pomodoro.appdata.xml.in
 appdata_DATA = org.gnome.Pomodoro.appdata.xml
+
+$(appdata_DATA): $(appdata_in_files)
+	$(AM_V_GEN) $(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@
 
 # We need to compile schemas at make time
 # to run from source tree

@@ -1,7 +1,7 @@
 [Desktop Entry]
-_Name=Pomodoro
-_Comment=A simple time management utility
-_Keywords=timer;
+Name=Pomodoro
+Comment=A simple time management utility
+Keywords=timer;
 Exec=gnome-pomodoro
 Icon=gnome-pomodoro
 StartupNotify=false

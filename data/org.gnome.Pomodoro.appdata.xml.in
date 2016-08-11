@@ -4,14 +4,14 @@
   <id>org.gnome.Pomodoro.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
-  <_name>Pomodoro</_name>
-  <_summary>A time management utility for GNOME</_summary>
+  <name>Pomodoro</name>
+  <summary>A time management utility for GNOME</summary>
   <description>
-    <_p>
+    <p>
     A GNOME utility that helps managing time according to Pomodoro Technique.
     It intends to improve productivity and focus by taking short breaks after
     every 25 minutes of work.
-    </_p>
+    </p>
   </description>
   <screenshots>
     <screenshot type="default">
