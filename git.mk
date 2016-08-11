@@ -86,6 +86,7 @@ GITIGNORE_MAINTAINERCLEANFILES_TOPLEVEL = \
 		ar-lib \
 		compile \
 		config.guess \
+		config.rpath \
 		config.sub \
 		depcomp \
 		install-sh \
@@ -235,6 +236,7 @@ $(srcdir)/.gitignore: Makefile.am $(top_srcdir)/git.mk
 		fi; \
 		if test -f $(srcdir)/po/Makefile.in.in; then \
 			for x in \
+				ABOUT-NLS \
 				po/Makefile.in.in \
 				po/Makefile.in.in~ \
 				po/Makefile.in \
