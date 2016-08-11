@@ -55,6 +55,9 @@ CLEANFILES = \
 
 AM_DISTCHECK_CONFIGURE_FLAGS == --enable-appdata-check
 
+check-local: $(desktop_DATA)
+	$(DESKTOP_FILE_VALIDATE) $(desktop_DATA)
+
 dist-hook:
 	cd $(distdir) && rm -f $(CLEANFILES)
 
