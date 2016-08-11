@@ -32,11 +32,11 @@ libgnome_la_CFLAGS = \
 	$(GNOME_PLUGIN_CFLAGS)
 
 libgnome_la_LDFLAGS = \
-	$(PLUGIN_LIBS) \
-	$(PLUGIN_LIBTOOL_FLAGS) \
-	$(GNOME_PLUGIN_LIBS)
+	$(PLUGIN_LDFLAGS)
 
 libgnome_la_LIBADD = \
+	$(PLUGIN_LIBS) \
+	$(GNOME_PLUGIN_LIBS) \
 	$(top_builddir)/lib/libgnome-pomodoro.la
 
 # gnome-desktop-3.0.vapi: $(INTROSPECTION_GIRDIR)/GnomeDesktop-3.0.gir GnomeDesktop-3.0.metadata gnome-desktop-3.0.deps

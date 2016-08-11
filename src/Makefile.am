@@ -15,8 +15,7 @@ gnome_pomodoro_CPPFLAGS = \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
 gnome_pomodoro_CFLAGS = \
-	$(GNOME_POMODORO_CFLAGS) \
-	$(WARNING_CFLAGS)
+	$(GNOME_POMODORO_CFLAGS)
 
 gnome_pomodoro_LDADD = \
 	$(GNOME_POMODORO_LIBS) \

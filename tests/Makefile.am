@@ -17,13 +17,11 @@ tests_CPPFLAGS = \
 	$(GNOME_POMODORO_CPPFLAGS)
 
 tests_CFLAGS = \
-	$(GNOME_POMODORO_CFLAGS) \
-	$(WARNING_CFLAGS)
+	$(GNOME_POMODORO_CFLAGS)
 
 tests_LDADD = \
 	$(GNOME_POMODORO_LIBS) \
 	$(top_builddir)/lib/libgnome-pomodoro.la
-
 
 test: tests
 	$(builddir)/$<

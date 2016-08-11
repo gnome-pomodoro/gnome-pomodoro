@@ -23,10 +23,10 @@ libdark_theme_la_CFLAGS = \
 	$(PLUGIN_CFLAGS)
 
 libdark_theme_la_LDFLAGS = \
-	$(PLUGIN_LIBS) \
-	$(PLUGIN_LIBTOOL_FLAGS)
+	$(PLUGIN_LDFLAGS)
 
 libdark_theme_la_LIBADD = \
+	$(PLUGIN_LIBS) \
 	$(top_builddir)/lib/libgnome-pomodoro.la
 
 

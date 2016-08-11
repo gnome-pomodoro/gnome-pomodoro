@@ -30,11 +30,11 @@ libindicator_la_CFLAGS = \
 	$(INDICATOR_PLUGIN_CFLAGS)
 
 libindicator_la_LDFLAGS = \
-	$(PLUGIN_LIBS) \
-	$(PLUGIN_LIBTOOL_FLAGS) \
-	$(INDICATOR_PLUGIN_LIBS)
+	$(PLUGIN_LDFLAGS)
 
 libindicator_la_LIBADD = \
+	$(PLUGIN_LIBS) \
+	$(INDICATOR_PLUGIN_LIBS) \
 	$(top_builddir)/lib/libgnome-pomodoro.la
 
 

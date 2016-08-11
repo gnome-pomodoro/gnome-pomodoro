@@ -4,15 +4,17 @@ AC_INIT([gnome-pomodoro],
         [https://github.com/codito/gnome-pomodoro/issues],
         [gnome-pomodoro],
         [http://gnomepomodoro.org])
+
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz foreign])
-AM_MAINTAINER_MODE([enable])
+AX_IS_RELEASE([git-directory])
 
-# enable nice build output if available
-m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+AM_INIT_AUTOMAKE([1.12 no-dist-gzip dist-xz no-define foreign -Wno-portability])
+AM_SILENT_RULES([yes])
+
+AX_CHECK_ENABLE_DEBUG()
 
 LT_INIT
 
@@ -21,23 +23,6 @@ AM_GNU_GETTEXT_VERSION([0.19.8])
 
 PKG_PROG_PKG_CONFIG([0.22])
 GOBJECT_INTROSPECTION_REQUIRE([1.36.0])
-
-WARNING_CFLAGS=
-
-
-# Extra configuration arguments.
-AC_ARG_ENABLE(debug,
-    AS_HELP_STRING([--enable-debug], [Turn on debugging]),,
-    [enable_debug=no])
-
-AC_ARG_ENABLE(profiling,
-    AS_HELP_STRING([--enable-profiling], [Turn on profiling]),,
-    [enable_profiling=no])
-
-AC_ARG_ENABLE([more-warnings],
-    AS_HELP_STRING([--enable-more-warnings], [Maximum compiler warnings]),,
-    [enable_more_warnings=no])
-
 
 # Checks for pkg-config packages.
 VALA_REQUIRED=0.28
@@ -86,9 +71,16 @@ AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 AC_PATH_PROG(GTK_UPDATE_ICON_CACHE, gtk-update-icon-cache)
 AC_PATH_PROG([DESKTOP_FILE_VALIDATE], [desktop-file-validate], [/bin/true])
 
+AX_REQUIRE_DEFINED([GOBJECT_INTROSPECTION_REQUIRE])
 GOBJECT_INTROSPECTION_REQUIRE($INTROSPECTION_REQUIRED)
+
+AX_REQUIRE_DEFINED([GLIB_GSETTINGS])
 GLIB_GSETTINGS
+
+AX_REQUIRE_DEFINED([VAPIGEN_CHECK])
 VAPIGEN_CHECK
+
+AX_REQUIRE_DEFINED([APPSTREAM_XML])
 APPSTREAM_XML
 
 # Is docbook2man available?
@@ -113,37 +105,6 @@ AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_CHECK_FUNCS([atexit floor memchr memset mallopt])
-
-
-# Checks for --enable-more-warnings.
-AC_MSG_CHECKING([for more warnings, including -Werror])
-if test "$GCC" = yes -a "$enable_more_warnings" = yes; then
-    AC_MSG_RESULT(yes)
-    WARNING_CFLAGS="\
--Wall \
--Wmissing-declarations -Wmissing-prototypes \
--Wnested-externs -Wpointer-arith \
--Wcast-align "
-
-    for option in -Wstrict-aliasing=0 -Wno-pointer-sign; do
-        SAVE_CFLAGS="$CFLAGS"
-        CFLAGS="$CFLAGS $option"
-        AC_MSG_CHECKING([whether gcc understands $option])
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],
-                          [has_option=yes],
-                          [has_option=no])
-        if test "$has_option" = yes; then
-            WARNING_CFLAGS="$WARNING_CFLAGS $option"
-        fi
-        AC_MSG_RESULT($has_option)
-        CFLAGS="$SAVE_CFLAGS"
-        unset has_option
-        unset SAVE_CFLAGS
-    done
-    unset option
-else
-    AC_MSG_RESULT(no)
-fi
 
 
 # Project constants
@@ -172,7 +133,7 @@ PLUGIN_CPPFLAGS="$PLUGIN_CPPFLAGS \
     -I\$(abs_top_srcdir) \
     -I\$(abs_top_srcdir)/lib"
 PLUGIN_LIBS="$PLUGIN_LIBS -lm"
-PLUGIN_LIBTOOL_FLAGS="-module -avoid-version"
+PLUGIN_LDFLAGS="-module -avoid-version"
 
 # RECURSIVE_EVAL(VALUE, RESULT)
 #
@@ -204,7 +165,6 @@ RECURSIVE_EVAL("$gsettingsschemadir", [GSETTINGS_SCHEMA_DIR])
 AC_SUBST([EXTENSION_UUID], [pomodoro@arun.codito.in])
 AC_SUBST([EXTENSION_DIR])
 AC_SUBST([GETTEXT_PACKAGE], [gnome-pomodoro])
-AC_SUBST([WARNING_CFLAGS])
 AC_SUBST([PACKAGE_DATA_DIR])
 AC_SUBST([PACKAGE_LOCALE_DIR])
 AC_SUBST([GSETTINGS_SCHEMA_DIR])
@@ -255,18 +215,6 @@ AC_DEFINE_UNQUOTED([PLUGIN_LIB_DIR], "$PLUGIN_LIB_DIR",
 
 AC_DEFINE([GNOME_DESKTOP_USE_UNSTABLE_API], [],
           [We are aware that GNOME_DESKTOP's API can change])
-
-if test "$enable_debug" = yes; then
-	AC_DEFINE([ENABLE_DEBUG], [1], [Debug code])
-else
-	AC_DEFINE([ENABLE_DEBUG], [0], [Debug code])
-fi
-
-if test "$enable_profiling" = yes; then
-	AC_DEFINE([ENABLE_PROFILING], [1], [Debug code])
-else
-	AC_DEFINE([ENABLE_PROFILING], [0], [Debug code])
-fi
 
 
 AC_CONFIG_FILES([
