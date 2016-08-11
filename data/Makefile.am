@@ -25,10 +25,10 @@ service_DATA = $(service_in_files:.service.in=.service)
 $(service_DATA): $(service_in_files)
 	$(AM_V_GEN) sed -e "s|@bindir[@]|$(bindir)|g" $< > $@
 
-appdatadir = $(datadir)/appdata
-appdata_in_files = \
+appstream_in_files = \
 	org.gnome.Pomodoro.appdata.xml.in
-appdata_DATA = org.gnome.Pomodoro.appdata.xml
+appstream_XML = $(appstream_in_files:.appdata.xml.in=.appdata.xml)
+@APPSTREAM_XML_RULES@
 
 $(appdata_DATA): $(appdata_in_files)
 	$(AM_V_GEN) $(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@
@@ -41,17 +41,19 @@ $(appdata_DATA): $(appdata_in_files)
 #		--targetdir=$(builddir)
 
 EXTRA_DIST = \
-	$(appdata_in_files) \
+	$(appstream_in_files) \
 	$(desktop_in_files) \
 	$(gsettings_in_files) \
 	$(service_in_files)
 
 CLEANFILES = \
-	$(appdata_DATA) \
+	$(appstream_XML) \
 	$(desktop_DATA) \
 	$(gsettings_SCHEMAS) \
 	$(service_DATA)
 #	gschemas.compiled
+
+AM_DISTCHECK_CONFIGURE_FLAGS == --enable-appdata-check
 
 dist-hook:
 	cd $(distdir) && rm -f $(CLEANFILES)
