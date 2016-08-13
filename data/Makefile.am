@@ -11,9 +11,6 @@ desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
 gsettings_SCHEMAS = \
 	org.gnome.pomodoro.gschema.xml
-
-.PRECIOUS: $(gsettings_SCHEMAS)
-
 @GSETTINGS_RULES@
 
 servicedir = $(datadir)/dbus-1/services
@@ -26,8 +23,11 @@ $(service_DATA): $(service_in_files)
 
 appstream_in_files = \
 	org.gnome.Pomodoro.appdata.xml.in
-appstream_XML = $(appstream_in_files:.appdata.xml.in=.appdata.xml)
+appstream_XML = $(appstream_in_files:.xml.in=.xml)
 @APPSTREAM_XML_RULES@
+
+%.appdata.xml: %.appdata.xml.in
+	$(AM_V_GEN)$(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@
 
 $(appdata_DATA): $(appdata_in_files)
 	$(AM_V_GEN) $(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@
@@ -35,13 +35,11 @@ $(appdata_DATA): $(appdata_in_files)
 EXTRA_DIST = \
 	$(appstream_in_files) \
 	$(desktop_in_files) \
-	$(gsettings_in_files) \
 	$(service_in_files)
 
 CLEANFILES = \
 	$(appstream_XML) \
 	$(desktop_DATA) \
-	$(gsettings_SCHEMAS) \
 	$(service_DATA)
 
 AM_DISTCHECK_CONFIGURE_FLAGS = \

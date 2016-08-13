@@ -37,4 +37,5 @@
     <kudo>ModernToolkit</kudo>
     <kudo>Notifications</kudo>
   </kudos>
+  <translation type="gettext">gnome-pomodoro</translation>
 </component>
