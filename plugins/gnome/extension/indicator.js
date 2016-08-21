@@ -508,13 +508,11 @@ const Indicator = new Lang.Class({
         this.actor.add_style_class_name('extension-pomodoro-indicator');
         this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
 
-        this._arrow = PopupMenu.arrowIcon(St.Side.BOTTOM);
         this._blinking = false;
         this._blinkTimeoutSource = 0;
 
         this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
         this._hbox.add_actor(this.icon.actor);
-        this._hbox.add_actor(this._arrow);
         this.actor.add_child(this._hbox);
 
         this.setMenu(new IndicatorMenu(this));
