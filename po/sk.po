@@ -92,7 +92,7 @@ msgstr "%ds"
 #: ../extension/indicator.js:401
 #, javascript-format
 msgid "%dm"
-msgstr "%ds"
+msgstr "%dm"
 
 #: ../extension/notifications.js:274
 msgid "Focus on your task."
