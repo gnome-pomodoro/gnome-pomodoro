@@ -1,0 +1,437 @@
+# Slovak translations for gnome-pomodoro package.
+# Copyright (C) 2016 THE gnome-pomodoro'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-pomodoro package.
+#  simob, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-pomodoro 0.11.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-08-24 09:38+0200\n"
+"PO-Revision-Date: 2016-08-23 16:01+0200\n"
+"Last-Translator:  <ja@pankrac>\n"
+"Language-Team: Slovak\n"
+"Language: sk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: ../data/org.gnome.Pomodoro.appdata.xml.in.h:1
+#: ../data/org.gnome.Pomodoro.desktop.in.h:1 ../extension/indicator.js:628
+#: ../extension/notifications.js:86 ../extension/notifications.js:273
+#: ../extension/notifications.js:532 ../lib/about-dialog.vala:29
+#: ../src/main.vala:26
+msgid "Pomodoro"
+msgstr "Pomodoro"
+
+#: ../data/org.gnome.Pomodoro.appdata.xml.in.h:2
+msgid "A time management utility for GNOME"
+msgstr "Nástroj pre správu času pre GNOME"
+
+#: ../data/org.gnome.Pomodoro.appdata.xml.in.h:3
+msgid ""
+"A GNOME utility that helps managing time according to Pomodoro Technique. It "
+"intends to improve productivity and focus by taking short breaks after every "
+"25 minutes of work."
+msgstr ""
+"Nástroj pre GNOME, ktorý má pomôcť pri využívaní času podľa metódy Pomodoro. "
+"Zameriava sa na zvýšenie produktivity a sústredenia prostredníctvom krátkych "
+"prestávok každých 25 minút práce."
+
+#: ../data/org.gnome.Pomodoro.desktop.in.h:2 ../lib/about-dialog.vala:30
+msgid "A simple time management utility"
+msgstr "jednoduchý nástroj pre správu času"
+
+#: ../data/org.gnome.Pomodoro.desktop.in.h:3
+msgid "time;timer;tasks;manage;organize;"
+msgstr "čas;časovač;úlohy;správa;organizovanie;"
+
+#: ../extension/dialogs.js:142
+#, javascript-format
+msgid "%d new message"
+msgid_plural "%d new messages"
+msgstr[0] "%d nová správa"
+msgstr[1] "%d nové správy"
+msgstr[2] "%d nových správ"
+
+#: ../extension/dialogs.js:466
+msgid "It's time to take a break"
+msgstr "Je čas na prestávku"
+
+#. Toggle timer state button
+#: ../extension/indicator.js:82
+msgid "Pomodoro Timer"
+msgstr "Pomodoro časovač"
+
+#: ../extension/indicator.js:93
+msgid "Start Pomodoro"
+msgstr "Spusti Pomodoro"
+
+#: ../extension/indicator.js:94
+msgid "Take a Break"
+msgstr "Urob si prestávku"
+
+#: ../extension/indicator.js:98 ../lib/preferences-dialog.vala:841
+msgid "Preferences"
+msgstr "Voľby"
+
+#: ../extension/indicator.js:186
+msgid "Take Shorter Break"
+msgstr "Urob si kratšiu prestávku"
+
+#: ../extension/indicator.js:186
+msgid "Take Longer Break"
+msgstr "Urob si dlhšiu prestávku"
+
+#: ../extension/indicator.js:400
+#, javascript-format
+msgid "%ds"
+msgstr "%ds"
+
+#: ../extension/indicator.js:401
+#, javascript-format
+msgid "%dm"
+msgstr "%ds"
+
+#: ../extension/notifications.js:274
+msgid "Focus on your task."
+msgstr "Upriam sa na svoju úlohu"
+
+#: ../extension/notifications.js:283
+msgid "Take a break"
+msgstr "Urob si prestávku"
+
+#: ../extension/notifications.js:297
+msgid "Take a break!"
+msgstr "Urob si prestávku!"
+
+#: ../extension/notifications.js:331
+#, javascript-format
+msgid "You have %d second until next pomodoro."
+msgid_plural "You have %d seconds until next pomodoro."
+msgstr[0] "Máš %d sekundu do ďalšieho pomodora."
+msgstr[1] "Máš %d sekundy do ďalšieho pomodora."
+msgstr[2] "Máš %d sekúnd do ďalšieho pomodora."
+
+#: ../extension/notifications.js:333
+#, javascript-format
+msgid "You have %d minute until next pomodoro."
+msgid_plural "You have %d minutes until next pomodoro."
+msgstr[0] "Máš %d minútu do ďalšieho pomodora."
+msgstr[1] "Máš %d minúty do ďalšieho pomodora."
+msgstr[2] "Máš %d minút do ďalšieho pomodora."
+
+#: ../extension/notifications.js:363
+msgid "Shorten it"
+msgstr "Skráťiť"
+
+#: ../extension/notifications.js:363
+msgid "Lengthen it"
+msgstr "Predĺžiť"
+
+#: ../extension/notifications.js:377
+msgid "Start pomodoro"
+msgstr "Spusti pomodoro"
+
+#: ../extension/notifications.js:515
+msgid "Hey!"
+msgstr "Hej!"
+
+#: ../extension/notifications.js:516
+msgid "You're missing out on a break"
+msgstr "Potrebuješ prestávku"
+
+#: ../extension/notifications.js:540 ../lib/gnome-desktop-module.vala:620
+msgid "Report issue"
+msgstr "Nahlás problém"
+
+#: ../extension/presence.js:166
+msgid "during pomodoro"
+msgstr "počas pomodora"
+
+#: ../extension/presence.js:167
+msgid "during break"
+msgstr "počas prestávky"
+
+#: ../extension/timer.js:306
+#, javascript-format
+msgid "Failed to run <i>%s</i> service"
+msgstr "Zlyhalo spustenie <i>%s</i> služby"
+
+#: ../lib/about-dialog.vala:28
+msgid "About Pomodoro"
+msgstr "O Pomodoro"
+
+#: ../lib/about-dialog.vala:39
+msgid "translator-credits"
+msgstr "translator-credits"
+
+#: ../lib/gnome-desktop-module.vala:496
+msgid "Indicator for Pomodoro will show up after you restart your desktop."
+msgstr ""
+"Ukazovateľ pre Pomodoro sa ukáže potom, čo opäť spustiš pracovnú plochu"
+
+#: ../lib/gnome-desktop-module.vala:497 ../lib/sound-chooser-button.vala:126
+msgid "_Cancel"
+msgstr "_Zrušiť"
+
+#: ../lib/gnome-desktop-module.vala:498
+msgid "_Restart"
+msgstr "_Reštartovať"
+
+#: ../lib/gnome-desktop-module.vala:580
+msgid "Extension does not support shell version"
+msgstr "Rozšírenie nepodporuje túto verziu shellu"
+
+#: ../lib/gnome-desktop-module.vala:581
+msgid "You need to upgrade Pomodoro."
+msgstr "To tvoje Pomodoro potrebuje upgrade"
+
+#: ../lib/gnome-desktop-module.vala:582
+msgid "Upgrade"
+msgstr "Upgrade"
+
+#: ../lib/gnome-desktop-module.vala:606
+#, c-format
+msgid "Could not find extension \"%s\" in \"%s\""
+msgstr "Nebolo možné nájsť rozšírenie \"%s\" v \"%s\""
+
+#: ../lib/gnome-desktop-module.vala:619
+msgid "Error loading extension"
+msgstr "Chyba pri spúštaní rozšírenia"
+
+#: ../lib/gnome-desktop-module.vala:634
+msgid "Pomodoro extension is disabled"
+msgstr "Rozšírenie Pomodoro je deaktivované"
+
+#: ../lib/gnome-desktop-module.vala:635
+msgid "Extension provides better desktop integration for the pomodoro app."
+msgstr ""
+"Rozšírenie poskytuje lepšiu integráciu Pomodoro aplikácie do pracovného "
+"prostredia."
+
+#: ../lib/gnome-desktop-module.vala:636
+msgid "Enable"
+msgstr "Aktivovať"
+
+#: ../lib/keybinding-chooser-button.vala:99
+#, fuzzy
+msgid "Disabled"
+msgstr "Deaktivovať"
+
+#: ../lib/keybinding-chooser-button.vala:156
+#, c-format
+msgid ""
+"The shortcut \"%s\" cannot be used because it will become impossible to type "
+"using this key.\n"
+"Please try with a key such as Control, Alt or Shift at the same time."
+msgstr ""
+"Klávesovú skratku \"%s\" nemožno použiť, pretože by nebolo možné písať s "
+"použitím tejto klávesy."
+
+#: ../lib/preferences-dialog.vala:204 ../lib/preferences-dialog.vala:613
+msgid "On"
+msgstr "Zapnuté"
+
+#: ../lib/preferences-dialog.vala:204 ../lib/preferences-dialog.vala:617
+msgid "Off"
+msgstr "Vypnuté"
+
+#: ../lib/preferences-dialog.vala:214
+msgid "Available"
+msgstr "K dispozícii"
+
+#: ../lib/preferences-dialog.vala:217
+msgid "Busy"
+msgstr "Zaneprázdnený"
+
+#: ../lib/preferences-dialog.vala:220
+msgid "Invisible"
+msgstr "Neviditeľný"
+
+#: ../lib/preferences-dialog.vala:226
+msgid "Idle"
+msgstr "Nečinný"
+
+#: ../lib/preferences-dialog.vala:393
+msgid "Change Presence Status"
+msgstr "Zmeniť stav prítomnosti"
+
+#: ../lib/preferences-dialog.vala:489 ../lib/preferences-dialog.vala:651
+#: ../lib/preferences-dialog.vala:747
+msgid "Status during pomodoro"
+msgstr "Stav počas pomodoro"
+
+#: ../lib/preferences-dialog.vala:497 ../lib/preferences-dialog.vala:657
+#: ../lib/preferences-dialog.vala:753
+msgid "Status during break"
+msgstr "Stav počas prestávky"
+
+#: ../lib/preferences-dialog.vala:648 ../lib/preferences-dialog.vala:744
+msgid "Set custom status"
+msgstr "Nataviť svojvoľný stav"
+
+#: ../lib/preferences-dialog.vala:663
+msgid "Authenticate"
+msgstr "Overiť"
+
+#: ../lib/preferences-dialog.vala:815
+msgid "Clock Ticking"
+msgstr "Tikanie hodín"
+
+#: ../lib/preferences-dialog.vala:819
+msgid "Timer Ticking"
+msgstr "Tikanie časovača"
+
+#: ../lib/preferences-dialog.vala:823
+msgid "Woodland Birds"
+msgstr "Vtáky z Krajiny stromov"
+
+#: ../lib/preferences-dialog.vala:830
+msgid "Loud bell"
+msgstr "Hlasný zvonec"
+
+#: ../lib/preferences-dialog.vala:834
+msgid "Bell"
+msgstr "Zvonec"
+
+#: ../lib/preferences-dialog.vala:963
+msgid "Timer"
+msgstr "Časovač"
+
+#: ../lib/preferences-dialog.vala:1031
+msgid "Pomodoro duration"
+msgstr "Trvanie pomodora"
+
+#: ../lib/preferences-dialog.vala:1035
+msgid "Short break duration"
+msgstr "Trvanie krátkej prestávky"
+
+#: ../lib/preferences-dialog.vala:1039
+msgid "Long break duration"
+msgstr "Trvanie dlhej prestávky"
+
+#: ../lib/preferences-dialog.vala:1049
+msgid "Pomodoros to a long break"
+msgstr "Pomodorá do dlhej prestávky"
+
+#: ../lib/preferences-dialog.vala:1054
+msgid "Shortcut to toggle the timer"
+msgstr "Klávesová skratka pre zapnutie časovača"
+
+#: ../lib/preferences-dialog.vala:1059
+msgid "Indicator appearance"
+msgstr "Ukazovateľ prítomnosti"
+
+#: ../lib/preferences-dialog.vala:1085
+msgid "Select ticking sound"
+msgstr "Vyper tikajúci zvuk"
+
+#: ../lib/preferences-dialog.vala:1099
+msgid "Ticking sound"
+msgstr "Tikajúci zvuk"
+
+#: ../lib/preferences-dialog.vala:1129
+msgid "Notifications"
+msgstr "Upozornenia"
+
+#: ../lib/preferences-dialog.vala:1136
+msgid "Screen notifications"
+msgstr "Upozornenia obrazovky"
+
+#: ../lib/preferences-dialog.vala:1141
+msgid "Remind to take a break"
+msgstr "Pripomenút prestávku"
+
+#: ../lib/preferences-dialog.vala:1146
+msgid "Wake up screen"
+msgstr "Obrazovka prebudenia"
+
+#: ../lib/preferences-dialog.vala:1150
+msgid "Select sound for start of break"
+msgstr "Vyber zvuk pre začatie prestávky"
+
+#: ../lib/preferences-dialog.vala:1160
+msgid "Start of break sound"
+msgstr "Zvuk na začiatku prestávky"
+
+#: ../lib/preferences-dialog.vala:1164
+msgid "Select sound for end of break"
+msgstr "Vyber zvuk pre koniec prestávky"
+
+#: ../lib/preferences-dialog.vala:1174
+msgid "End of break sound"
+msgstr "Zvuk na konci prestávky"
+
+#: ../lib/preferences-dialog.vala:1241
+msgid "Text"
+msgstr "Text"
+
+#: ../lib/preferences-dialog.vala:1242
+msgid "Short Text"
+msgstr "Krátky text"
+
+#: ../lib/preferences-dialog.vala:1243
+msgid "Icon"
+msgstr "Ikona"
+
+#: ../lib/preferences-dialog.vala:1255
+msgid "Presence"
+msgstr "Prítomnosť"
+
+#: ../lib/preferences-dialog.vala:1273
+msgid "Wait for activity after a break"
+msgstr "Čakať na činnosť po prestávke"
+
+#: ../lib/preferences-dialog.vala:1284
+msgid "Hide notifications during pomodoro"
+msgstr "Skryť oznámenia počas priebehu pomodora"
+
+#: ../lib/preferences-dialog.vala:1296
+msgid "Change presence status"
+msgstr "Zmeniť stav prítomnosti"
+
+#: ../lib/sound-chooser-button.vala:124
+msgid "_No sound"
+msgstr "_Bez zvuku"
+
+#: ../lib/sound-chooser-button.vala:128
+msgid "_Open"
+msgstr "_Otvoriť"
+
+#: ../lib/sound-chooser-button.vala:135
+msgid "Select a file"
+msgstr "Vyber súbor"
+
+#: ../lib/sound-chooser-button.vala:195
+msgid "All files"
+msgstr "Všetky súbory"
+
+#: ../lib/sound-chooser-button.vala:321
+msgid "Other…"
+msgstr "Ostatné..."
+
+#: ../lib/sound-chooser-button.vala:332
+msgid "None"
+msgstr "Žiaden"
+
+#: ../lib/sound-chooser-button.vala:671 ../lib/sound-chooser-button.vala:680
+msgid "Supported audio files"
+msgstr "Podporované zvukové súbory"
+
+#: ../lib/utils.vala:64
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d hodina"
+msgstr[1] "%d hodiny"
+msgstr[2] "%d hodín"
+
+#: ../lib/utils.vala:73
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minúta"
+msgstr[1] "%d minúty"
+msgstr[2] "%d minút"
