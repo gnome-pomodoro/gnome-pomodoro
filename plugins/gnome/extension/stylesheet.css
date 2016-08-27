@@ -59,11 +59,22 @@
 .extension-pomodoro-menu-action:focus,
 .extension-pomodoro-menu-action:active {
     padding: 10px;
-    border: none;
+    border-width: 0px;
 }
 
 .extension-pomodoro-menu-action > StIcon {
     icon-size: 16px;
+}
+
+.extension-pomodoro-menu-action-border {
+    padding: 9px;
+    border-width: 1px;
+}
+.extension-pomodoro-menu-action-border:hover,
+.extension-pomodoro-menu-action-border:focus,
+.extension-pomodoro-menu-action-border:active {
+    padding: 10px;
+    border-width: 0px;
 }
 
 .extension-pomodoro-indicator-menu .state-item.active {

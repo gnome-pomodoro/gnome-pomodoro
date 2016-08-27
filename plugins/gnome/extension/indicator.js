@@ -79,13 +79,13 @@ const IndicatorMenu = new Lang.Class({
     },
 
     _createActionButton: function(iconName, accessibleName) {
-        let icon = new St.Button({ reactive: true,
-                                   can_focus: true,
-                                   track_hover: true,
-                                   accessible_name: accessibleName,
-                                   style_class: 'system-menu-action extension-pomodoro-menu-action' });
-        icon.child = new St.Icon({ icon_name: iconName });
-        return icon;
+        let button = new St.Button({ reactive: true,
+                                     can_focus: true,
+                                     track_hover: true,
+                                     accessible_name: accessibleName,
+                                     style_class: 'system-menu-action extension-pomodoro-menu-action' });
+        button.child = new St.Icon({ icon_name: iconName });
+        return button;
     },
 
     _onTimerClicked: function() {
@@ -143,6 +143,7 @@ const IndicatorMenu = new Lang.Class({
         hbox = new St.BoxLayout();
 
         this._startAction = this._createActionButton('media-playback-start-symbolic', _("Start Timer"));
+        this._startAction.add_style_class_name('extension-pomodoro-menu-action-border');
         this._startAction.connect('clicked', Lang.bind(this, this._onStartClicked));
         hbox.add_actor(this._startAction);
 
