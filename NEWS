@@ -6,6 +6,11 @@
 	* Updated translations
 	* Bug fixes
 
+2016-09-19  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.12.3:
+
+	* Support for GNOME Shell 3.22
+
 2016-08-07  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.12.2:
 
