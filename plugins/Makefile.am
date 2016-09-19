@@ -1,8 +1,10 @@
 SUBDIRS = \
+	actions \
 	dark-theme \
 	sounds
 
 DIST_SUBDIRS = \
+	actions \
 	dark-theme \
 	gnome \
 	indicator \

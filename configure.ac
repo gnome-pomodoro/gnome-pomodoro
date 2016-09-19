@@ -236,6 +236,7 @@ AC_CONFIG_FILES([
     packages/debian/Makefile
     packages/rpm/Makefile
     plugins/Makefile
+    plugins/actions/Makefile
     plugins/dark-theme/Makefile
     plugins/gnome/Makefile
     plugins/gnome/extension/config.js
