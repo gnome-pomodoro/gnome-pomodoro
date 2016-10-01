@@ -6,8 +6,8 @@ desktopdir = $(datadir)/applications
 desktop_in_files = org.gnome.Pomodoro.desktop.in
 desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
-%.desktop: %.desktop.in
-	msgfmt --desktop -d $(top_srcdir)/po --template $< -o $@
+$(desktop_DATA): $(desktop_in_files)
+	$(AM_V_GEN) $(MSGFMT) --desktop -d $(top_srcdir)/po --template $< -o $@
 
 gsettings_SCHEMAS = \
 	org.gnome.pomodoro.gschema.xml
@@ -26,11 +26,8 @@ appstream_in_files = \
 appstream_XML = $(appstream_in_files:.xml.in=.xml)
 @APPSTREAM_XML_RULES@
 
-%.appdata.xml: %.appdata.xml.in
-	$(AM_V_GEN)$(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@
-
-$(appdata_DATA): $(appdata_in_files)
-	$(AM_V_GEN) $(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@
+$(appstream_XML): $(appstream_in_files)
+	$(AM_V_GEN) $(MSGFMT) --xml -d $(top_srcdir)/po --template $< -o $@
 
 EXTRA_DIST = \
 	$(appstream_in_files) \

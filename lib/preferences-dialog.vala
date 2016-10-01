@@ -73,8 +73,8 @@ namespace Pomodoro
         }
     }
 
-    private static void list_box_separator_func (Gtk.ListBoxRow  row,
-                                                 Gtk.ListBoxRow? before)
+    private void list_box_separator_func (Gtk.ListBoxRow  row,
+                                          Gtk.ListBoxRow? before)
     {
         if (before != null) {
             var header = row.get_header ();
@@ -759,7 +759,7 @@ namespace Pomodoro
             base.parser_finished (builder);
         }
 
-        public virtual signal void page_changed (Pomodoro.PreferencesPage page)
+        private void on_page_notify (Pomodoro.PreferencesPage page)
         {
             string name;
             string title;
@@ -789,7 +789,7 @@ namespace Pomodoro
 
             var page = this.stack.visible_child as Pomodoro.PreferencesPage;
 
-            this.page_changed (page);
+            this.on_page_notify (page);
 
             /* calculate window size */
             this.header_bar.get_preferred_height (null,

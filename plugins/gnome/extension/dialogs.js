@@ -321,7 +321,7 @@ const ModalDialog = new Lang.Class({
                         this._idleMonitor.remove_watch(this._pushModalWatchId);
                         this._pushModalWatchId = 0;
                     }
-                    this.pushModal(global.get_current_time());
+                    this.pushModal();
                 }
             ));
         }
@@ -350,7 +350,7 @@ const ModalDialog = new Lang.Class({
 
         this._pushModalTries += 1;
 
-        if (this._pushModal(global.get_current_time())) {
+        if (this._pushModal()) {
             this._pushModalSource = 0;
             return GLib.SOURCE_REMOVE; /* dialog finally opened */
         }
@@ -380,7 +380,7 @@ const ModalDialog = new Lang.Class({
             function() {
                 this._pushModalTries = 1;
 
-                if (this._pushModal(global.get_current_time())) {
+                if (this._pushModal()) {
                     /* dialog became modal */
                 }
                 else {

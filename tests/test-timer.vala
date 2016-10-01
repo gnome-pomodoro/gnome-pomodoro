@@ -375,6 +375,8 @@ namespace Pomodoro
             assert (Math.floor(timer2.state.timestamp) == Math.floor(timer1.state.timestamp));
         }
 
+        // TODO: test resetting session cycle
+
         private static void print_timer_state (Pomodoro.Timer timer)
         {
             stdout.printf ("""
