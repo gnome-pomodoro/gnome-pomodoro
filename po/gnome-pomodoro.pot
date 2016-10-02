@@ -1,0 +1,392 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnome-pomodoro package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-pomodoro 0.13.0\n"
+"Report-Msgid-Bugs-To: https://github.com/codito/gnome-pomodoro/issues\n"
+"POT-Creation-Date: 2016-10-02 19:50+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:7
+#: data/org.gnome.Pomodoro.desktop.in:3 lib/resources/ui/menus.ui:51
+#: lib/resources/ui/window.ui:275 lib/about-dialog.vala:31
+#: lib/notifications-capability.vala:106 src/main.vala:30
+msgid "Pomodoro"
+msgstr ""
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:8
+msgid "A time management utility for GNOME"
+msgstr ""
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:10
+msgid ""
+"A GNOME utility that helps managing time according to Pomodoro Technique. It "
+"intends to improve productivity and focus by taking short breaks after every "
+"25 minutes of work."
+msgstr ""
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:19
+msgid "Main window"
+msgstr ""
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:23 lib/preferences-dialog.vala:721
+msgid "Preferences"
+msgstr ""
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:27
+msgid "Indicator for GNOME Shell"
+msgstr ""
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:32
+msgid "Kamil Prusko"
+msgstr ""
+
+#: data/org.gnome.Pomodoro.desktop.in:4 lib/about-dialog.vala:32
+msgid "A simple time management utility"
+msgstr ""
+
+#: data/org.gnome.Pomodoro.desktop.in:5
+msgid "timer;"
+msgstr ""
+
+#: data/org.gnome.Pomodoro.desktop.in:7
+msgid "gnome-pomodoro"
+msgstr ""
+
+#: lib/resources/ui/menus.ui:6 lib/resources/ui/menus.ui:68
+msgid "_Timer"
+msgstr ""
+
+#: lib/resources/ui/menus.ui:10 lib/resources/ui/menus.ui:72
+msgid "_Preferences"
+msgstr ""
+
+#: lib/resources/ui/menus.ui:16
+msgid "_About"
+msgstr ""
+
+#: lib/resources/ui/menus.ui:20 lib/resources/ui/menus.ui:76
+msgid "_Quit"
+msgstr ""
+
+#: lib/resources/ui/menus.ui:29 lib/application.vala:69
+msgid "Start"
+msgstr ""
+
+#: lib/resources/ui/menus.ui:34 lib/resources/ui/window.ui:173
+#: lib/application.vala:78 lib/window.vala:161
+msgid "Pause"
+msgstr ""
+
+#: lib/resources/ui/menus.ui:39 lib/application.vala:81 lib/window.vala:147
+msgid "Resume"
+msgstr ""
+
+#: lib/resources/ui/menus.ui:44 lib/resources/ui/window.ui:200
+#: lib/application.vala:72
+msgid "Stop"
+msgstr ""
+
+#: lib/resources/ui/menus.ui:56 lib/resources/ui/window.ui:290
+msgid "Short Break"
+msgstr ""
+
+#: lib/resources/ui/menus.ui:61 lib/resources/ui/window.ui:305
+msgid "Long Break"
+msgstr ""
+
+#: lib/resources/ui/preferences.ui:8 lib/preferences-dialog.vala:725
+msgid "Plugins"
+msgstr ""
+
+#: lib/resources/ui/preferences.ui:47
+msgid "Back"
+msgstr ""
+
+#: lib/resources/ui/preferences-keyboard-shortcut-page.ui:29
+msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
+msgstr ""
+
+#: lib/resources/ui/preferences-keyboard-shortcut-page.ui:83
+msgid "Disable"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:45
+msgid "Timer"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:112
+msgid "Pomodoro duration"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:164
+msgid "Break duration"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:217
+msgid "Long break duration"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:249
+msgid "Pomodoros before a long break"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:298
+msgid "Keyboard shortcut"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:363
+msgid "Notifications"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:410
+msgid "Screen notifications"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:452
+msgid "Remind to take a break"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:514
+msgid "Extras"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:561
+msgid "Wait for activity after a break"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:603
+msgid "Hide other notifications"
+msgstr ""
+
+#: lib/resources/ui/preferences-main-page.ui:639
+msgid "Plugins…"
+msgstr ""
+
+#: lib/resources/ui/preferences-sound-page.ui:33
+msgid "Volume:"
+msgstr ""
+
+#: lib/resources/ui/preferences-sound-page.ui:168
+msgid "Add Sound"
+msgstr ""
+
+#: lib/resources/ui/preferences-sound-page.ui:180
+msgid "Remove Sound"
+msgstr ""
+
+#: lib/resources/ui/screen-notification.ui:31
+#: lib/resources/ui/screen-notification.ui:65 lib/resources/ui/window.ui:98
+#: lib/resources/ui/window.ui:132
+msgid "00"
+msgstr ""
+
+#: lib/resources/ui/screen-notification.ui:49 lib/resources/ui/window.ui:116
+msgid ":"
+msgstr ""
+
+#: lib/resources/ui/screen-notification.ui:89
+msgid "It's time to take a break"
+msgstr ""
+
+#: lib/resources/ui/window.ui:31
+msgid "Start Pomodoro"
+msgstr ""
+
+#: lib/about-dialog.vala:30
+msgid "About Pomodoro"
+msgstr ""
+
+#: lib/about-dialog.vala:41
+msgid "translator-credits"
+msgstr ""
+
+#: lib/application.vala:66
+msgid "Start/Stop"
+msgstr ""
+
+#: lib/application.vala:75
+msgid "Pause/Resume"
+msgstr ""
+
+#: lib/application.vala:84
+msgid "Run as background service"
+msgstr ""
+
+#: lib/application.vala:87
+msgid "Show preferences"
+msgstr ""
+
+#: lib/application.vala:90
+msgid "Quit application"
+msgstr ""
+
+#: lib/application.vala:93
+msgid "Print version information and exit"
+msgstr ""
+
+#: lib/notifications-capability.vala:107
+msgid "Focus on your task."
+msgstr ""
+
+#: lib/notifications-capability.vala:118 lib/notifications-capability.vala:139
+msgid "Take a break"
+msgstr ""
+
+#: lib/notifications-capability.vala:133
+#, c-format
+msgid "You have %d minute"
+msgid_plural "You have %d minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/notifications-capability.vala:135
+#, c-format
+msgid "You have %d second"
+msgid_plural "You have %d seconds"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/notifications-capability.vala:140
+msgid "Take a longer break"
+msgstr ""
+
+#: lib/notifications-capability.vala:156
+msgid "Lengthen it"
+msgstr ""
+
+#: lib/notifications-capability.vala:161
+msgid "Shorten it"
+msgstr ""
+
+#: lib/notifications-capability.vala:166
+msgid "Start pomodoro"
+msgstr ""
+
+#: lib/preferences-dialog.vala:158
+#, c-format
+msgid ""
+"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
+"such as Control, Alt or Shift."
+msgstr ""
+
+#: lib/preferences-dialog.vala:579 plugins/sounds/sounds-plugin.vala:595
+msgid "Off"
+msgstr ""
+
+#: lib/preferences-dialog.vala:729
+msgid "Keyboard Shortcut"
+msgstr ""
+
+#: lib/presence.vala:78
+msgid "Available"
+msgstr ""
+
+#: lib/presence.vala:81
+msgid "Busy"
+msgstr ""
+
+#: lib/presence.vala:84
+msgid "Idle"
+msgstr ""
+
+#: lib/presence.vala:87
+msgid "Invisible"
+msgstr ""
+
+#: lib/utils.vala:64
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/utils.vala:73
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: plugins/gnome/gnome-shell-extension.vala:340
+#: plugins/gnome/gnome-shell-extension.vala:359
+#: plugins/gnome/gnome-shell-extension.vala:392
+msgid "Failed to enable extension"
+msgstr ""
+
+#: plugins/gnome/gnome-shell-extension.vala:341
+msgid "It seems to be uninstalled"
+msgstr ""
+
+#: plugins/gnome/gnome-shell-extension.vala:360
+msgid "Extension is out of date"
+msgstr ""
+
+#: plugins/gnome/gnome-shell-extension.vala:361
+msgid "Upgrade"
+msgstr ""
+
+#: plugins/gnome/gnome-shell-extension.vala:394
+msgid "Report issue"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:402
+msgid "Clock Ticking"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:403
+msgid "Timer Ticking"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:404
+msgid "Woodland Birds"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:462
+#: plugins/sounds/sounds-plugin.vala:502
+msgid "Bell"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:463
+#: plugins/sounds/sounds-plugin.vala:503
+msgid "Loud Bell"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:328
+msgid "Select Custom Sound"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:561
+msgid "Ticking Sound"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:565
+msgid "End of Break Sound"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:569
+msgid "Start of Break Sound"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:728
+msgid "Ticking sound"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:733
+msgid "Start of break sound"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:738
+msgid "End of break sound"
+msgstr ""
