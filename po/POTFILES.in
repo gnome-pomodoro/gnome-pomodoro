@@ -1,6 +1,5 @@
 data/org.gnome.Pomodoro.appdata.xml.in
 data/org.gnome.Pomodoro.desktop.in
-data/org.gnome.pomodoro.gschema.xml.in
 data/org.gnome.Pomodoro.service.in
 lib/about-dialog.vala
 lib/animation.vala
