@@ -32,7 +32,9 @@ $(appstream_XML): $(appstream_in_files)
 EXTRA_DIST = \
 	$(appstream_in_files) \
 	$(desktop_in_files) \
-	$(service_in_files)
+	$(service_in_files) \
+	$(gsettings_SCHEMAS)
+
 
 CLEANFILES = \
 	$(appstream_XML) \
