@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro 0.13.0\n"
 "Report-Msgid-Bugs-To: https://github.com/codito/gnome-pomodoro/issues\n"
-"POT-Creation-Date: 2016-10-02 19:50+0200\n"
+"POT-Creation-Date: 2016-10-08 16:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,6 +22,11 @@ msgstr ""
 #: data/org.gnome.Pomodoro.desktop.in:3 lib/resources/ui/menus.ui:51
 #: lib/resources/ui/window.ui:275 lib/about-dialog.vala:31
 #: lib/notifications-capability.vala:106 src/main.vala:30
+#: plugins/actions/enums.vala:91 plugins/gnome/extension/indicator.js:166
+#: plugins/gnome/extension/indicator.js:504
+#: plugins/gnome/extension/notifications.js:86
+#: plugins/gnome/extension/notifications.js:202
+#: plugins/gnome/extension/notifications.js:458
 msgid "Pomodoro"
 msgstr ""
 
@@ -41,6 +46,7 @@ msgid "Main window"
 msgstr ""
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:23 lib/preferences-dialog.vala:721
+#: plugins/gnome/extension/indicator.js:78
 msgid "Preferences"
 msgstr ""
 
@@ -81,15 +87,18 @@ msgid "_Quit"
 msgstr ""
 
 #: lib/resources/ui/menus.ui:29 lib/application.vala:69
+#: plugins/actions/action-page.ui:155 plugins/actions/enums.vala:185
 msgid "Start"
 msgstr ""
 
 #: lib/resources/ui/menus.ui:34 lib/resources/ui/window.ui:173
 #: lib/application.vala:78 lib/window.vala:161
+#: plugins/actions/action-page.ui:200 plugins/actions/enums.vala:194
 msgid "Pause"
 msgstr ""
 
 #: lib/resources/ui/menus.ui:39 lib/application.vala:81 lib/window.vala:147
+#: plugins/actions/action-page.ui:215 plugins/actions/enums.vala:197
 msgid "Resume"
 msgstr ""
 
@@ -99,10 +108,12 @@ msgid "Stop"
 msgstr ""
 
 #: lib/resources/ui/menus.ui:56 lib/resources/ui/window.ui:290
+#: plugins/actions/enums.vala:94 plugins/gnome/extension/indicator.js:167
 msgid "Short Break"
 msgstr ""
 
 #: lib/resources/ui/menus.ui:61 lib/resources/ui/window.ui:305
+#: plugins/actions/enums.vala:97 plugins/gnome/extension/indicator.js:168
 msgid "Long Break"
 msgstr ""
 
@@ -119,6 +130,7 @@ msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
 msgstr ""
 
 #: lib/resources/ui/preferences-keyboard-shortcut-page.ui:83
+#: plugins/actions/action-page.ui:245 plugins/actions/enums.vala:203
 msgid "Disable"
 msgstr ""
 
@@ -197,6 +209,7 @@ msgid ":"
 msgstr ""
 
 #: lib/resources/ui/screen-notification.ui:89
+#: plugins/gnome/extension/dialogs.js:465
 msgid "It's time to take a break"
 msgstr ""
 
@@ -237,10 +250,12 @@ msgid "Print version information and exit"
 msgstr ""
 
 #: lib/notifications-capability.vala:107
+#: plugins/gnome/extension/notifications.js:203
 msgid "Focus on your task."
 msgstr ""
 
 #: lib/notifications-capability.vala:118 lib/notifications-capability.vala:139
+#: plugins/gnome/extension/notifications.js:212
 msgid "Take a break"
 msgstr ""
 
@@ -263,14 +278,17 @@ msgid "Take a longer break"
 msgstr ""
 
 #: lib/notifications-capability.vala:156
+#: plugins/gnome/extension/notifications.js:280
 msgid "Lengthen it"
 msgstr ""
 
 #: lib/notifications-capability.vala:161
+#: plugins/gnome/extension/notifications.js:280
 msgid "Shorten it"
 msgstr ""
 
 #: lib/notifications-capability.vala:166
+#: plugins/gnome/extension/notifications.js:300
 msgid "Start pomodoro"
 msgstr ""
 
@@ -319,6 +337,138 @@ msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
+#: plugins/actions/action-page.ui:28
+msgid "Command"
+msgstr ""
+
+#: plugins/actions/action-page.ui:41 plugins/actions/menus.ui:29
+msgid "Triggers"
+msgstr ""
+
+#: plugins/actions/action-page.ui:54
+msgid "Name"
+msgstr ""
+
+#: plugins/actions/action-page.ui:88
+msgid "_Pomodoro"
+msgstr ""
+
+#: plugins/actions/action-page.ui:102
+msgid "_Short Break"
+msgstr ""
+
+#: plugins/actions/action-page.ui:116
+msgid "_Long Break"
+msgstr ""
+
+#: plugins/actions/action-page.ui:170 plugins/actions/enums.vala:188
+msgid "Complete"
+msgstr ""
+
+#: plugins/actions/action-page.ui:185 plugins/actions/enums.vala:191
+msgid "Skip"
+msgstr ""
+
+#: plugins/actions/action-page.ui:230 plugins/actions/enums.vala:200
+msgid "Enable"
+msgstr ""
+
+#: plugins/actions/action-page.ui:299
+msgid "Add"
+msgstr ""
+
+#: plugins/actions/actions.vala:392
+msgid "Actions"
+msgstr ""
+
+#: plugins/actions/actions.vala:396
+msgid "Action"
+msgstr ""
+
+#: plugins/actions/actions.vala:421
+msgid "Actions…"
+msgstr ""
+
+#: plugins/actions/menus.ui:6
+msgid "Remove"
+msgstr ""
+
+#: plugins/actions/menus.ui:14
+msgid "State"
+msgstr ""
+
+#: plugins/actions/menus.ui:19
+msgid "State Duration"
+msgstr ""
+
+#: plugins/actions/menus.ui:24
+msgid "Elapsed Time"
+msgstr ""
+
+#: plugins/gnome/extension/dialogs.js:141
+#, javascript-format
+msgid "%d new message"
+msgid_plural "%d new messages"
+msgstr[0] ""
+msgstr[1] ""
+
+#: plugins/gnome/extension/indicator.js:127
+msgid "Pomodoro Timer"
+msgstr ""
+
+#: plugins/gnome/extension/indicator.js:145
+msgid "Start Timer"
+msgstr ""
+
+#: plugins/gnome/extension/indicator.js:150
+#: plugins/gnome/extension/indicator.js:226
+msgid "Pause Timer"
+msgstr ""
+
+#: plugins/gnome/extension/indicator.js:154
+msgid "Stop Timer"
+msgstr ""
+
+#: plugins/gnome/extension/indicator.js:225
+msgid "Resume Timer"
+msgstr ""
+
+#: plugins/gnome/extension/notifications.js:226
+msgid "Take a break!"
+msgstr ""
+
+#: plugins/gnome/extension/notifications.js:260
+#, javascript-format
+msgid "You have %d minute until next pomodoro."
+msgid_plural "You have %d minutes until next pomodoro."
+msgstr[0] ""
+msgstr[1] ""
+
+#: plugins/gnome/extension/notifications.js:262
+#, javascript-format
+msgid "You have %d second until next pomodoro."
+msgid_plural "You have %d seconds until next pomodoro."
+msgstr[0] ""
+msgstr[1] ""
+
+#: plugins/gnome/extension/notifications.js:441
+msgid "Hey!"
+msgstr ""
+
+#: plugins/gnome/extension/notifications.js:442
+msgid "You're missing out on a break"
+msgstr ""
+
+#: plugins/gnome/extension/notifications.js:466
+#: plugins/gnome/gnome-shell-extension.vala:394
+msgid "Report issue"
+msgstr ""
+
+#: plugins/gnome/extension/timer.js:239
+#, javascript-format
+msgid "Failed to run <i>%s</i> service"
+msgstr ""
+
 #: plugins/gnome/gnome-shell-extension.vala:340
 #: plugins/gnome/gnome-shell-extension.vala:359
 #: plugins/gnome/gnome-shell-extension.vala:392
@@ -335,10 +485,6 @@ msgstr ""
 
 #: plugins/gnome/gnome-shell-extension.vala:361
 msgid "Upgrade"
-msgstr ""
-
-#: plugins/gnome/gnome-shell-extension.vala:394
-msgid "Report issue"
 msgstr ""
 
 #: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:402
