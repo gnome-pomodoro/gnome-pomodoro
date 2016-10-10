@@ -42,6 +42,11 @@ libgnome_la_LIBADD = \
 # gnome-desktop-3.0.vapi: $(INTROSPECTION_GIRDIR)/GnomeDesktop-3.0.gir GnomeDesktop-3.0.metadata gnome-desktop-3.0.deps
 # 	$(AM_V_GEN) $(VAPIGEN) --library gnome-desktop-3.0 --metadatadir=$(srcdir) $<
 
+gsettings_SCHEMAS = \
+	org.gnome.pomodoro.plugins.gnome.gschema.xml
+@GSETTINGS_RULES@
+
+
 CLEANFILES = \
 	gnome.c \
 	gnome-plugin.c \
@@ -50,6 +55,7 @@ CLEANFILES = \
 	libgnome_la_vala.stamp
 
 EXTRA_DIST = \
+	$(gsettings_SCHEMAS) \
 	gnome-desktop-3.0.deps \
 	gnome-desktop-3.0.vapi \
 	GnomeDesktop-3.0.metadata \
