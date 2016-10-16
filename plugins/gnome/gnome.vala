@@ -51,6 +51,16 @@ namespace Gnome
         }
     }
 
+    [Flags]
+    public enum InhibitorFlags
+    {
+        NONE = 0,
+        INHIBIT_LOG_OUT = 1,
+        INHIBIT_USER_SWITCHING = 2,
+        INHIBIT_SUSPEND = 4,
+        INHIBIT_IDLE_MONITOR = 8
+    }
+
     public struct ExtensionInfo
     {
         public string         uuid;
@@ -103,5 +113,19 @@ namespace Gnome
                                        (string uuid,
                                         int state,
                                         string error);
+    }
+
+    [DBus (name = "org.gnome.SessionManager")]
+    public interface SessionManager : GLib.Object
+    {
+        public abstract void inhibit (string app_id,
+                                      uint toplevel_xid,
+                                      string reason,
+                                      InhibitorFlags flags,
+                                      out uint inhibit_cookie)
+                                      throws IOError;
+
+        public abstract void uninhibit (uint inhibit_cookie)
+                                        throws IOError;
     }
 }

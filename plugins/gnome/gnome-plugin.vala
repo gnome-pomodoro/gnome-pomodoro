@@ -46,7 +46,9 @@ namespace GnomePlugin
         private Pomodoro.CapabilityGroup        shell_capabilities;
         private GnomePlugin.GnomeShellExtension shell_extension;
         private Gnome.IdleMonitor               idle_monitor;
+        private Gnome.SessionManager            session_manager_proxy;
         private uint                            become_active_id = 0;
+        private uint                            inhibitor_id = 0;
         private bool                            configured = false;
         private double                          last_activity_time = 0.0;
 
@@ -67,23 +69,48 @@ namespace GnomePlugin
             }
 
             this.timer = Pomodoro.Timer.get_default ();
+            this.timer.notify["is-paused"].connect (this.on_timer_is_paused_notify);
             this.timer.state_changed.connect_after (this.on_timer_state_changed);
 
             this.setup ();
+
+            this.on_timer_state_changed (this.timer.state, this.timer.state);
         }
 
         ~ApplicationExtension ()
         {
+            this.timer.notify["is-paused"].disconnect (this.on_timer_is_paused_notify);
             this.timer.state_changed.disconnect (this.on_timer_state_changed);
 
             if (this.become_active_id != 0) {
                 this.idle_monitor.remove_watch (this.become_active_id);
                 this.become_active_id = 0;
             }
+
+            if (this.inhibitor_id != 0) {
+                try {
+                    this.session_manager_proxy.uninhibit (this.inhibitor_id);
+                    this.inhibitor_id = 0;
+                }
+                catch (GLib.IOError error) {
+                    GLib.critical ("%s", error.message);
+                }
+            }
         }
 
         private void setup ()
         {
+            try {
+                this.session_manager_proxy = GLib.Bus.get_proxy_sync<Gnome.SessionManager>
+                                                     (GLib.BusType.SESSION,
+                                                      "org.gnome.SessionManager",
+                                                      "/org/gnome/SessionManager",
+                                                      GLib.DBusProxyFlags.DO_NOT_AUTO_START);
+            }
+            catch (GLib.IOError error) {
+                GLib.critical ("%s", error.message);
+            }
+
             if (GLib.Environment.get_variable (CURRENT_DESKTOP_VARIABLE) == "GNOME")
             {
                 var application = Pomodoro.Application.get_default ();
@@ -114,9 +141,16 @@ namespace GnomePlugin
             }
         }
 
+        private void on_timer_is_paused_notify ()
+        {
+            this.on_timer_state_changed (this.timer.state, this.timer.state);
+        }
+
         private void on_timer_state_changed (Pomodoro.TimerState state,
                                              Pomodoro.TimerState previous_state)
         {
+            var is_running = !(state is Pomodoro.DisabledState) && !this.timer.is_paused;
+
             if (this.become_active_id != 0) {
                 this.idle_monitor.remove_watch (this.become_active_id);
                 this.become_active_id = 0;
@@ -130,6 +164,24 @@ namespace GnomePlugin
                 this.become_active_id = this.idle_monitor.add_user_active_watch (this.on_become_active);
 
                 this.timer.pause ();
+            }
+
+            try {
+                if (this.inhibitor_id == 0 && is_running) {
+                    this.session_manager_proxy.inhibit ("org.gnome.Pomodoro",
+                                                        0,
+                                                        _("Pomodoro timer is running"),
+                                                        Gnome.InhibitorFlags.INHIBIT_SUSPEND,
+                                                        out this.inhibitor_id);
+                }
+                else if (this.inhibitor_id != 0 && !is_running) {
+                    this.session_manager_proxy.uninhibit (this.inhibitor_id);
+                    this.inhibitor_id = 0;
+                }
+            }
+            catch (GLib.IOError error)
+            {
+                GLib.warning ("Failed to change inhibitor: %s", error.message);
             }
         }
 
