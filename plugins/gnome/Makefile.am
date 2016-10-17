@@ -25,8 +25,6 @@ libgnome_la_VALAFLAGS = \
 libgnome_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS) \
 	$(GNOME_PLUGIN_CPPFLAGS) \
-	-DGETTEXT_PACKAGE=\"$(GETTEXT_PACKAGE)\" \
-	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DGNOME_DESKTOP_USE_UNSTABLE_API
 
 libgnome_la_CFLAGS = \
