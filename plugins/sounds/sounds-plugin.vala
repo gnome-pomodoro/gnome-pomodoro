@@ -488,7 +488,7 @@ namespace SoundsPlugin
         protected override void setup_player ()
         {
             try {
-                this.player = new SoundsPlugin.CanberraPlayer ();
+                this.player = new SoundsPlugin.CanberraPlayer (null);
             }
             catch (SoundsPlugin.SoundPlayerError error) {
                 GLib.critical ("Failed to setup sound player");
@@ -528,7 +528,7 @@ namespace SoundsPlugin
         protected override void setup_player ()
         {
             try {
-                this.player = new SoundsPlugin.CanberraPlayer ();
+                this.player = new SoundsPlugin.CanberraPlayer (null);
             }
             catch (SoundsPlugin.SoundPlayerError error) {
                 GLib.critical ("Failed to setup sound player");
@@ -889,7 +889,7 @@ namespace SoundsPlugin
         private void setup_pomodoro_end_sound ()
         {
             try {
-                this.pomodoro_end_sound = new SoundsPlugin.CanberraPlayer ();
+                this.pomodoro_end_sound = new SoundsPlugin.CanberraPlayer ("pomodoro-end");
 
                 this.settings.bind_with_mapping ("pomodoro-end-sound",
                                                  this.pomodoro_end_sound,
@@ -913,7 +913,7 @@ namespace SoundsPlugin
         private void setup_pomodoro_start_sound ()
         {
             try {
-                this.pomodoro_start_sound = new SoundsPlugin.CanberraPlayer ();
+                this.pomodoro_start_sound = new SoundsPlugin.CanberraPlayer ("pomodoro-start");
 
                 this.settings.bind_with_mapping ("pomodoro-start-sound",
                                                  this.pomodoro_start_sound,

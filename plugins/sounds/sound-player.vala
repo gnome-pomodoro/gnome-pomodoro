@@ -228,7 +228,7 @@ namespace SoundsPlugin
                 this.volume_fade = 1.0;
             }
 
-            var uri = get_absolute_uri (this.file != null ? this.file.get_uri () : "");
+            var uri = get_absolute_uri (this._file != null ? this._file.get_uri () : "");
 
             if (uri != "") {
                 this.pipeline.uri = uri;
@@ -358,28 +358,23 @@ namespace SoundsPlugin
                 this._file = value != null
                         ? GLib.File.new_for_uri (get_absolute_uri (value.get_uri ()))
                         : null;
-
-                this.cache_file (this._file);
             }
         }
 
+        public string event_id { get; private construct set; }
         public double volume { get; set; default = 1.0; }
 
         private GLib.File _file;
         private Canberra.Context context;
-        private static uint next_event_id = 0;
-        private string event_id;
 
         private static double amplitude_to_decibels (double amplitude)
         {
             return 20.0 * Math.log10 (amplitude);
         }
 
-        public CanberraPlayer () throws SoundPlayerError
+        public CanberraPlayer (string? event_id) throws SoundPlayerError
         {
             Canberra.Context context;
-
-            this.event_id = "pomodoro-%u".printf (next_event_id++);
 
             /* Create context */
             var status = Canberra.Context.create (out context);
@@ -410,6 +405,7 @@ namespace SoundsPlugin
             }
 
             this.context = (owned) context;
+            this.event_id = event_id;
         }
 
         ~CanberraPlayer ()
@@ -419,44 +415,28 @@ namespace SoundsPlugin
             }
         }
 
-        private bool cache_file (GLib.File? file)
-                     requires (this.context != null)
-        {
-            var file_path = file != null ? file.get_path () : null;
-
-            if (file_path != null) {
-                var status = this.context.cache
-                            (Canberra.PROP_EVENT_ID, this.event_id,
-                             Canberra.PROP_MEDIA_FILENAME, file_path);
-
-                if (status == Canberra.SUCCESS) {
-                    return true;
-                }
-                else {
-                    GLib.warning ("Failed to cache file \"%s\": %s",
-                                  file_path,
-                                  Canberra.strerror (status));
-                }
-            }
-
-            return false;
-        }
-
         public void play ()
                     requires (this.context != null)
         {
-            if (this.file != null && this.volume > 0.0)
+            if (this._file != null)
             {
                 if (this.context != null)
                 {
                     Canberra.Proplist properties = null;
 
                     var status = Canberra.Proplist.create (out properties);
-                    properties.sets (Canberra.PROP_EVENT_ID, this.event_id);
-                    properties.sets (Canberra.PROP_MEDIA_FILENAME, this.file.get_path ());
-                    properties.sets (Canberra.PROP_MEDIA_ROLE, "alarm");
+                    properties.sets (Canberra.PROP_MEDIA_ROLE, "event");
                     properties.sets (Canberra.PROP_CANBERRA_VOLUME,
                                      amplitude_to_decibels (this.volume).to_string ());
+
+                    if (this.event_id != null) {
+                        properties.sets (Canberra.PROP_EVENT_ID, this.event_id);
+                        properties.sets (Canberra.PROP_CANBERRA_CACHE_CONTROL, "permanent");
+                    }
+
+                    if (this._file != null) {
+                        properties.sets (Canberra.PROP_MEDIA_FILENAME, this._file.get_path ());
+                    }
 
                     status = this.context.play_full (0,
                                                      properties,
@@ -464,13 +444,13 @@ namespace SoundsPlugin
 
                     if (status != Canberra.SUCCESS) {
                         GLib.warning ("Couldn't play sound '%s' - %s",
-                                      this.file.get_uri (),
+                                      this._file.get_uri (),
                                       Canberra.strerror (status));
                     }
                 }
                 else {
                     GLib.warning ("Couldn't play sound '%s'",
-                                  this.file.get_uri ());
+                                  this._file.get_uri ());
                 }
             }
         }
