@@ -16,7 +16,6 @@ libgnome_la_VALASOURCES = \
 	gnome-shell-extension.vala \
 	gnome-hacks.c \
 	gnome-hacks.vapi \
-	gnome-desktop-3.0.vapi \
 	$(top_builddir)/lib/gnome-pomodoro.vapi
 
 libgnome_la_SOURCES = \
@@ -28,8 +27,7 @@ libgnome_la_VALAFLAGS = \
 
 libgnome_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS) \
-	$(GNOME_PLUGIN_CPPFLAGS) \
-	-DGNOME_DESKTOP_USE_UNSTABLE_API
+	$(GNOME_PLUGIN_CPPFLAGS)
 
 libgnome_la_CFLAGS = \
 	$(PLUGIN_CFLAGS) \
@@ -42,9 +40,6 @@ libgnome_la_LIBADD = \
 	$(PLUGIN_LIBS) \
 	$(GNOME_PLUGIN_LIBS) \
 	$(top_builddir)/lib/libgnome-pomodoro.la
-
-# gnome-desktop-3.0.vapi: $(INTROSPECTION_GIRDIR)/GnomeDesktop-3.0.gir GnomeDesktop-3.0.metadata gnome-desktop-3.0.deps
-# 	$(AM_V_GEN) $(VAPIGEN) --library gnome-desktop-3.0 --metadatadir=$(srcdir) $<
 
 gsettings_SCHEMAS = \
 	org.gnome.pomodoro.plugins.gnome.gschema.xml
@@ -60,12 +55,8 @@ CLEANFILES = \
 
 EXTRA_DIST = \
 	$(gsettings_SCHEMAS) \
-	gnome-hacks.h \
-	gnome-desktop-3.0.deps \
-	gnome-desktop-3.0.vapi \
-	GnomeDesktop-3.0.metadata \
-	Gio-2.0.metadata \
-	$(libgnome_la_plugindata_DATA)
+	$(libgnome_la_plugindata_DATA) \
+	gnome-hacks.h
 
 -include $(top_srcdir)/git.mk
 

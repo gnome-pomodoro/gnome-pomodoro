@@ -53,7 +53,6 @@ PKG_CHECK_MODULES(SOUNDS_PLUGIN, [
 ])
 
 PKG_CHECK_MODULES(GNOME_PLUGIN, [
-    gnome-desktop-3.0 >= $GNOME_REQUIRED
     gdk-x11-3.0 >= $GTK_REQUIRED
 ], [with_gnome_plugin=yes], [with_gnome_plugin=no])
 
@@ -213,9 +212,6 @@ AC_DEFINE_UNQUOTED([PLUGIN_DATA_DIR], "$PLUGIN_DATA_DIR",
                    [Plugin data dir])
 AC_DEFINE_UNQUOTED([PLUGIN_LIB_DIR], "$PLUGIN_LIB_DIR",
                    [Plugin lib dir])
-
-AC_DEFINE([GNOME_DESKTOP_USE_UNSTABLE_API], [],
-          [We are aware that GNOME_DESKTOP's API can change])
 
 
 AC_CONFIG_FILES([

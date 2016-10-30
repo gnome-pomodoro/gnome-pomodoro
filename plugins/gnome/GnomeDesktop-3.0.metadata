@@ -1,7 +1,0 @@
-// skip methods that uses GDesktop-related types
-BG.get_color skip
-BG.set_color skip
-BG.get_placement skip
-BG.set_placement skip
-RRScreen.new skip
-WallClock.string_for_datetime skip

@@ -21,7 +21,6 @@ BuildRequires: pkgconfig(gobject-introspection-1.0) >= @INTROSPECTION_REQUIRED@
 BuildRequires: pkgconfig(libpeas-1.0) >= @LIBPEAS_REQUIRED@
 BuildRequires: pkgconfig(gstreamer-1.0) >= 1.0.10
 BuildRequires: pkgconfig(libcanberra) >= 0.30
-BuildRequires: pkgconfig(gnome-desktop-3.0) >= @GNOME_REQUIRED@
 BuildRequires: pkgconfig(appindicator3-0.1)
 BuildRequires: pkgconfig(appstream-glib)
 
