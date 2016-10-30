@@ -11,8 +11,11 @@ libgnome_la_plugindata_DATA = \
 
 libgnome_la_VALASOURCES = \
 	gnome.vala \
+	gnome-idle-monitor.vala \
 	gnome-plugin.vala \
 	gnome-shell-extension.vala \
+	gnome-hacks.c \
+	gnome-hacks.vapi \
 	gnome-desktop-3.0.vapi \
 	$(top_builddir)/lib/gnome-pomodoro.vapi
 
@@ -20,7 +23,8 @@ libgnome_la_SOURCES = \
 	$(libgnome_la_VALASOURCES)
 
 libgnome_la_VALAFLAGS = \
-	$(PLUGIN_VALAFLAGS)
+	$(PLUGIN_VALAFLAGS) \
+	--pkg gdk-x11-3.0
 
 libgnome_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS) \
@@ -56,6 +60,7 @@ CLEANFILES = \
 
 EXTRA_DIST = \
 	$(gsettings_SCHEMAS) \
+	gnome-hacks.h \
 	gnome-desktop-3.0.deps \
 	gnome-desktop-3.0.vapi \
 	GnomeDesktop-3.0.metadata \

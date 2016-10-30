@@ -54,6 +54,7 @@ PKG_CHECK_MODULES(SOUNDS_PLUGIN, [
 
 PKG_CHECK_MODULES(GNOME_PLUGIN, [
     gnome-desktop-3.0 >= $GNOME_REQUIRED
+    gdk-x11-3.0 >= $GTK_REQUIRED
 ], [with_gnome_plugin=yes], [with_gnome_plugin=no])
 
 PKG_CHECK_MODULES(INDICATOR_PLUGIN, [

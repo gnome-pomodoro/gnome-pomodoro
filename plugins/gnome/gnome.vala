@@ -105,3 +105,30 @@ namespace Gnome
                                         string error);
     }
 }
+
+
+/* Mutter interfaces */
+namespace Meta
+{
+    [DBus (name = "org.gnome.Mutter.IdleMonitor")]
+    public interface IdleMonitor : GLib.Object
+    {
+        public abstract void get_idletime
+                                       (out uint64 idletime)
+                                        throws IOError;
+
+        public abstract void add_idle_watch
+                                       (uint64   interval,
+                                        out uint id)
+                                        throws IOError;
+
+        public abstract void add_user_active_watch (out uint id)
+                                        throws IOError;
+
+        public abstract void remove_watch
+                                       (uint id)
+                                        throws IOError;
+
+        public signal void watch_fired (uint id);
+    }
+}
