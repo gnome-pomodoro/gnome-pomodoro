@@ -427,7 +427,7 @@ namespace SoundsPlugin
                     var status = Canberra.Proplist.create (out properties);
                     properties.sets (Canberra.PROP_MEDIA_ROLE, "event");
                     properties.sets (Canberra.PROP_CANBERRA_VOLUME,
-                                     amplitude_to_decibels (this.volume).to_string ());
+                                     ((float) amplitude_to_decibels (this.volume)).to_string ());
 
                     if (this.event_id != null) {
                         properties.sets (Canberra.PROP_EVENT_ID, this.event_id);
