@@ -80,7 +80,7 @@ namespace Pomodoro
                 { "resume", 0, 0, GLib.OptionArg.NONE,
                   ref resume, N_("Resume"), null },
 
-                { "no-default-window", 0, GLib.OptionFlags.HIDDEN, GLib.OptionArg.NONE,
+                { "no-default-window", 0, 0, GLib.OptionArg.NONE,
                   ref no_default_window, N_("Run as background service"), null },
 
                 { "preferences", 0, 0, GLib.OptionArg.NONE,
