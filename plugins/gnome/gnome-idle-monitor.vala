@@ -166,8 +166,6 @@ namespace GnomePlugin
         private void on_watch_fired (Meta.IdleMonitor proxy,
                                      uint             upstream_id)
         {
-            message ("** on_watch_fired: %u", upstream_id);
-
             var watch = this.watches_by_upstream_id.lookup (upstream_id);
 
             if (watch != null)
@@ -200,11 +198,10 @@ namespace GnomePlugin
                 // TODO: consider proxy.add_idle_watch to be async
                 this.proxy.add_idle_watch (watch.timeout_msec, out watch.upstream_id);
 
-                //this.watch_added (watch);
                 this.watches_by_upstream_id.insert (watch.upstream_id, watch);
             }
             catch (GLib.IOError error) {
-                // FIXME
+                GLib.warning ("Failed to add idle watch: %s", error.message);
             }
         }
 
@@ -214,11 +211,10 @@ namespace GnomePlugin
                 // TODO: consider proxy.add_user_active_watch to be async
                 this.proxy.add_user_active_watch (out watch.upstream_id);
 
-                //this.watch_added (watch);
                 this.watches_by_upstream_id.insert (watch.upstream_id, watch);
             }
             catch (GLib.IOError error) {
-                // FIXME
+                GLib.warning ("Failed to add user-active watch: %s", error.message);
             }
         }
 
@@ -258,8 +254,6 @@ namespace GnomePlugin
                                     owned IdleMonitorWatchFunc? callback)
                                     requires (interval_msec > 0)
         {
-            message ("** add_idle_watch");
-
             var watch = new IdleMonitorWatch (this,
                                               interval_msec,
                                               callback);
@@ -291,8 +285,6 @@ namespace GnomePlugin
          */
         public uint add_user_active_watch (IdleMonitorWatchFunc callback)
         {
-            message ("** add_user_active_watch");
-
             var watch = new IdleMonitorWatch (this,
                                               0,
                                               callback);
@@ -328,6 +320,7 @@ namespace GnomePlugin
                     this.proxy.remove_watch (watch.upstream_id);
                 }
                 catch (GLib.IOError error) {
+                    GLib.warning ("Failed to remove watch: %s", error.message);
                 }
             }
 
@@ -349,6 +342,7 @@ namespace GnomePlugin
                     this.proxy.get_idletime (out value);
                 }
                 catch (GLib.IOError error) {
+                    GLib.warning ("Failed to get idletime: %s", error.message);
                 }
             }
 
@@ -357,21 +351,6 @@ namespace GnomePlugin
 
         public void connect_proxy (GLib.DBusObject object)
         {
-            message ("** connect_proxy");
-
-            // var iface = object.get_interface ("org.gnome.Mutter.IdleMonitor");
-            // var object_info = iface.get_info ();
-
-            // var string_builder = new GLib.StringBuilder ();
-            // object_info.generate_xml (2, string_builder);
-	        // GLib.message ("%s",
-            //               object_info.name);
-
-            // var type = object.get_type();
-            // stdout.printf("** object.path = %s\n", object.get_object_path ());
-            // stdout.printf("** object.g_object_path = %s\n", object.g_object_path);
-
-
             var proxy = object.get_interface ("org.gnome.Mutter.IdleMonitor");
 
 	        if (proxy == null) {
@@ -423,37 +402,6 @@ namespace GnomePlugin
                                        string              name,
                                        string              name_owner)
         {
-/*
-            try {
-                this.object_manager = new GLib.DBusObjectManagerClient.sync
-                                       (connection,
-                                        GLib.DBusObjectManagerClientFlags.NONE,
-                                        name_owner,
-                                        "/org/gnome/Mutter/IdleMonitor",
-                                        (GLib.DBusProxyTypeFunc) Gnome.idle_monitor_object_manager_client_get_proxy_type,
-                                        this.cancellable);
-            }
-            catch (GLib.Error error) {
-                GLib.warning ("Failed to create object manager: %s", error.message);
-                return;
-            }
-
-            try {
-                var object = this.object_manager.get_object (this.path);
-
-                if (object != null) {
-                    this.connect_proxy (object);
-                }
-                else {
-                    this.object_manager.object_added.connect (this.on_object_added);
-                }
-            }
-            catch (GLib.IOError error)
-            {
-                GLib.warning ("Failed to acquire idle monitor object manager: %s", error.message);
-            }
-*/
-
             /**
              * acync constructor was broken until commit 4123914c1eecf16696d53cc25367440c221be94d in vala
              * by Rico Tzschichholz
