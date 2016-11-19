@@ -505,6 +505,8 @@ namespace Pomodoro
          */
         public override void shutdown ()
         {
+            this.save_timer ();
+
             base.shutdown ();
         }
 
@@ -577,6 +579,7 @@ namespace Pomodoro
 
             if (this.timer == null) {
                 this.timer = Pomodoro.Timer.get_default ();
+                this.timer.notify["is-paused"].connect (this.on_timer_is_paused_notify);
                 this.timer.state_changed.connect_after (this.on_timer_state_changed);
             }
 
@@ -625,12 +628,18 @@ namespace Pomodoro
 
         private void save_timer ()
         {
-            Pomodoro.save_timer (this.timer);
+            var state_settings = Pomodoro.get_settings ()
+                                         .get_child ("state");
+
+            this.timer.save (state_settings);
         }
 
         private void restore_timer ()
         {
-            Pomodoro.restore_timer (this.timer);
+            var state_settings = Pomodoro.get_settings ()
+                                         .get_child ("state");
+
+            this.timer.restore (state_settings);
         }
 
         private void on_settings_changed (GLib.Settings settings,
@@ -668,6 +677,11 @@ namespace Pomodoro
             {
                 this.timer.state_duration = double.max (state_duration, this.timer.elapsed);
             }
+        }
+
+        private void on_timer_is_paused_notify ()
+        {
+            this.save_timer ();
         }
 
         /**

@@ -126,12 +126,7 @@
   </schema>
 
   <schema id="org.gnome.pomodoro.state" path="/org/gnome/pomodoro/state/">
-    <key name="session" type="d">
-      <default>0</default>
-      <summary>Timer session count</summary>
-      <description>Number of sessions since long break.</description>
-    </key>
-    <key name="state" type="s">
+    <key name="timer-state" type="s">
       <choices>
         <choice value="null"/>
         <choice value="pomodoro"/>
@@ -142,25 +137,30 @@
       <summary>Timer state</summary>
       <description>Last used timer state.</description>
     </key>
-    <key name="state-offset" type="d">
-      <default>0</default>
-      <summary>Timer offset.</summary>
-      <description>Elapsed time offset.</description>
-    </key>
-    <key name="state-duration" type="d">
+    <key name="timer-state-duration" type="d">
       <default>0</default>
       <summary>State time limit</summary>
       <description>Time limit in seconds of a last state.</description>
     </key>
-    <key name="state-date" type="s">
+    <key name="timer-state-date" type="s">
       <default>""</default>
-      <summary>Timer state date</summary>
+      <summary>Timer state timestamp</summary>
       <description>Date of the last state change.</description>
     </key>
-    <key name="pomodoro-end-date" type="s">
+    <key name="timer-elapsed" type="d">
+      <default>0</default>
+      <summary>Timer elapsed</summary>
+      <description>Timer elapsed time.</description>
+    </key>
+    <key name="timer-date" type="s">
       <default>""</default>
-      <summary>Date of last pomodoro end</summary>
-      <description>Time and date when last pomodoro ended.</description>
+      <summary>Timer timestamp</summary>
+      <description>Date that timer was saved.</description>
+    </key>
+    <key name="timer-score" type="d">
+      <default>0</default>
+      <summary>Timer score</summary>
+      <description>Achieved score.</description>
     </key>
     <key name="open-uri" type="s">
       <default>""</default>

@@ -41,22 +41,25 @@ namespace Pomodoro
     public abstract class TimerState : GLib.Object
     {
         public string name { get; construct set; }
-        public double elapsed { get; construct set; }
-        public double duration { get; construct set; }
+        public double elapsed { get; set; default = 0.0; }
+        public double duration { get; set; default = 0.0; }
         public double timestamp { get; construct set; }
 
         construct
         {
-            this.elapsed = 0.0;
-            this.duration = 0.0;
-            this.timestamp = Pomodoro.get_real_time ();
+            this.timestamp = Pomodoro.get_real_time ();;
         }
 
-        public abstract TimerState create_next_state (Pomodoro.Timer timer);
+        public abstract TimerState create_next_state (double score,
+                                                      double timestamp);
 
-        public virtual double get_score (Pomodoro.Timer timer)
+        /**
+         * Returns acumulated score, or 0.0 if taken a long break.
+         */
+        public virtual double calculate_score (double score,
+                                               double timestamp)
         {
-            return 0.0;
+            return score;
         }
 
         public static TimerState? lookup (string name)
@@ -107,9 +110,10 @@ namespace Pomodoro
             this.timestamp = timestamp;
         }
 
-        public override TimerState create_next_state (Pomodoro.Timer timer)
+        public override TimerState create_next_state (double score,
+                                                      double timestamp)
         {
-            return new DisabledState.with_timestamp (timer.timestamp) as TimerState;
+            return new DisabledState.with_timestamp (timestamp) as TimerState;
         }
     }
 
@@ -129,40 +133,43 @@ namespace Pomodoro
             this.timestamp = timestamp;
         }
 
-        public override TimerState create_next_state (Pomodoro.Timer timer)
+        public override TimerState create_next_state (double score,
+                                                      double timestamp)
         {
-            var session_limit = Pomodoro.get_settings ()
-                                        .get_child ("preferences")
-                                        .get_double ("long-break-interval");
+            var score_limit = Pomodoro.get_settings ()
+                                      .get_child ("preferences")
+                                      .get_double ("long-break-interval");
 
-            var min_long_break_score = double.max(session_limit * POMODORO_THRESHOLD,
-                                                  session_limit - MISSING_SCORE_THRESHOLD);
+            var min_long_break_score = double.max (score_limit * POMODORO_THRESHOLD,
+                                                   score_limit - MISSING_SCORE_THRESHOLD);
 
-            var next_state = timer.session >= min_long_break_score
-                    ? new LongBreakState.with_timestamp (timer.timestamp) as TimerState
-                    : new ShortBreakState.with_timestamp (timer.timestamp) as TimerState;
+            var next_state = score >= min_long_break_score
+                    ? new LongBreakState.with_timestamp (timestamp) as TimerState
+                    : new ShortBreakState.with_timestamp (timestamp) as TimerState;
 
             next_state.elapsed = double.max (this.elapsed - this.duration, 0.0);
 
             return next_state;
         }
 
-        public override double get_score (Pomodoro.Timer timer)
+        public override double calculate_score (double score,
+                                                double timestamp)
         {
-            var score = this.duration > 0.0
+            var achieved_score = this.duration > 0.0
                     ? double.min (this.elapsed, this.duration) / this.duration
                     : 0.0;
 
             return this.duration <= MIN_POMODORO_TIME || this.elapsed >= MIN_POMODORO_TIME
-                    ? score : 0.0;
+                    ? score + achieved_score : score;
         }
     }
 
     public abstract class BreakState : TimerState
     {
-        public override TimerState create_next_state (Pomodoro.Timer timer)
+        public override TimerState create_next_state (double score,
+                                                      double timestamp)
         {
-            return new PomodoroState.with_timestamp (timer.timestamp) as TimerState;
+            return new PomodoroState.with_timestamp (timestamp) as TimerState;
         }
     }
 
@@ -199,21 +206,20 @@ namespace Pomodoro
             this.timestamp = timestamp;
         }
 
-        public override double get_score (Pomodoro.Timer timer)
+        public override double calculate_score (double score,
+                                                double timestamp)
         {
             var short_break_duration = Pomodoro.get_settings ()
                                                .get_child ("preferences")
                                                .get_double ("short-break-duration");
-
             var long_break_duration = this.duration;
 
-            var min_long_break_duration =
+            var min_elapsed =
                     short_break_duration +
                     (long_break_duration - short_break_duration) * SHORT_TO_LONG_BREAK_THRESHOLD;
 
-            return this.elapsed >= min_long_break_duration
-                    ? - timer.session  // reset the score
-                    : 0.0;
+            return this.elapsed >= min_elapsed || timestamp - this.timestamp >= min_elapsed
+                    ? 0.0 : score;
         }
     }
 }
