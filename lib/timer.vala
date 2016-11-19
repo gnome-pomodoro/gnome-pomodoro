@@ -91,7 +91,7 @@ namespace Pomodoro
                 return this._is_paused;
             }
             set {
-                this.set_is_paused_full (value, Pomodoro.get_real_time ());
+                this.set_is_paused_full (value, Pomodoro.get_current_time ());
             }
         }
 
@@ -148,7 +148,7 @@ namespace Pomodoro
             return this.timeout_source != 0;
         }
 
-        public void start (double timestamp = Pomodoro.get_real_time ())
+        public void start (double timestamp = Pomodoro.get_current_time ())
         {
             this.resume (timestamp);
 
@@ -157,7 +157,7 @@ namespace Pomodoro
             }
         }
 
-        public void stop (double timestamp = Pomodoro.get_real_time ())
+        public void stop (double timestamp = Pomodoro.get_current_time ())
         {
             this.resume (timestamp);
 
@@ -166,7 +166,7 @@ namespace Pomodoro
             }
         }
 
-        public void toggle (double timestamp = Pomodoro.get_real_time ())
+        public void toggle (double timestamp = Pomodoro.get_current_time ())
         {
             if (this.state is Pomodoro.DisabledState) {
                 this.start (timestamp);
@@ -176,17 +176,17 @@ namespace Pomodoro
             }
         }
 
-        public void pause (double timestamp = Pomodoro.get_real_time ())
+        public void pause (double timestamp = Pomodoro.get_current_time ())
         {
             this.set_is_paused_full (true, timestamp);
         }
 
-        public void resume (double timestamp = Pomodoro.get_real_time ())
+        public void resume (double timestamp = Pomodoro.get_current_time ())
         {
             this.set_is_paused_full (false, timestamp);
         }
 
-        public void reset (double timestamp = Pomodoro.get_real_time ())
+        public void reset (double timestamp = Pomodoro.get_current_time ())
         {
             this.resume (timestamp);
 
@@ -194,7 +194,7 @@ namespace Pomodoro
             this.state = new Pomodoro.DisabledState.with_timestamp (timestamp);
         }
 
-        public void skip (double timestamp = Pomodoro.get_real_time ())
+        public void skip (double timestamp = Pomodoro.get_current_time ())
         {
             this.state = this._state.create_next_state (this.score, timestamp);
         }
@@ -314,7 +314,7 @@ namespace Pomodoro
             return state_changed;
         }
 
-        public virtual signal void update (double timestamp = Pomodoro.get_real_time ())
+        public virtual signal void update (double timestamp = Pomodoro.get_current_time ())
         {
             this.timestamp = timestamp;
 
@@ -398,7 +398,7 @@ namespace Pomodoro
          * If exceeded time of a long break, timer would reset.
          */
         public void restore (GLib.Settings settings,
-                             double        timestamp = Pomodoro.get_real_time ())
+                             double        timestamp = Pomodoro.get_current_time ())
                              requires (settings.schema == "org.gnome.pomodoro.state")
         {
             var state = Pomodoro.TimerState.lookup (settings.get_string ("timer-state"));

@@ -47,7 +47,7 @@ namespace Pomodoro
 
         construct
         {
-            this.timestamp = Pomodoro.get_real_time ();;
+            this.timestamp = Pomodoro.get_current_time ();
         }
 
         public abstract TimerState create_next_state (double score,

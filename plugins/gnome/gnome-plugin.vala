@@ -141,7 +141,7 @@ namespace GnomePlugin
         private void on_become_active (GnomePlugin.IdleMonitor monitor,
                                        uint                    id)
         {
-            var timestamp = Pomodoro.get_real_time ();
+            var timestamp = Pomodoro.get_current_time ();
 
             if (timestamp - this.last_activity_time < IDLE_MONITOR_MIN_IDLE_TIME) {
                 this.become_active_id = 0;
