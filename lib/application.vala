@@ -137,7 +137,7 @@ namespace Pomodoro
         private void setup_resources ()
         {
             var css_provider = new Gtk.CssProvider ();
-            css_provider.load_from_resource ("/org/gnome/pomodoro/ui/style.css");
+            css_provider.load_from_resource ("/org/gnome/pomodoro/style.css");
 
             Gtk.StyleContext.add_provider_for_screen (
                                          Gdk.Screen.get_default (),
@@ -372,7 +372,7 @@ namespace Pomodoro
         {
             var builder = new Gtk.Builder ();
             try {
-                builder.add_from_resource ("/org/gnome/pomodoro/ui/menus.ui");
+                builder.add_from_resource ("/org/gnome/pomodoro/menus.ui");
 
                 var menu = builder.get_object ("app-menu") as GLib.MenuModel;
                 this.set_app_menu (menu);

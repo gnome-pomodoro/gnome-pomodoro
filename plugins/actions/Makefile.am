@@ -21,7 +21,7 @@ libactions_la_SOURCES = \
 
 libactions_la_VALAFLAGS = \
 	$(PLUGIN_VALAFLAGS) \
-	--gresources actions.gresource.xml
+	--gresources resources/resources.xml
 
 libactions_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS) \
@@ -46,12 +46,12 @@ gsettings_SCHEMAS = \
 
 
 resources = \
-	actions.gresource.xml
+	resources/resources.xml
 resources_deps = \
-	$(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies $(resources))
+	$(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir=resources $(resources))
 
 resources.c: $(resources) $(resources_deps)
-	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --generate-source --target=$@ $<
+	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --generate-source --c-name="pomodoro" --sourcedir=resources --target=$@ $<
 
 
 BUILT_SOURCES = \

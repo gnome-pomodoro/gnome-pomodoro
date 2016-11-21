@@ -27,7 +27,7 @@ namespace Pomodoro
      * Otherwise, delay blocking until window is shown.
      *
      */
-    [GtkTemplate (ui = "/org/gnome/pomodoro/ui/screen-notification.ui")]
+    [GtkTemplate (ui = "/org/gnome/pomodoro/screen-notification.ui")]
     public class ScreenNotification : Gtk.Window, Gtk.Buildable
     {
         private static const uint IDLE_TIME_TO_CLOSE = 600;

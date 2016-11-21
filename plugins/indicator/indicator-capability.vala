@@ -137,7 +137,7 @@ namespace IndicatorPlugin
 
                 try {
                     var builder = new Gtk.Builder ();
-                    builder.add_from_resource ("/org/gnome/pomodoro/ui/menus.ui");
+                    builder.add_from_resource ("/org/gnome/pomodoro/menus.ui");
 
                     var menu_model = builder.get_object ("indicator") as GLib.MenuModel;
 

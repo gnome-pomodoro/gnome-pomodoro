@@ -53,7 +53,7 @@ namespace SoundsPlugin
         }
     }
 
-    [GtkTemplate (ui = "/org/gnome/pomodoro/ui/preferences-sound-page.ui")]
+    [GtkTemplate (ui = "/org/gnome/pomodoro/plugins/sounds/preferences-sound-page.ui")]
     public abstract class PreferencesSoundPage : Gtk.Box, Pomodoro.PreferencesPage
     {
         public double volume { get; set; }
