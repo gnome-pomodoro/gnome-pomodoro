@@ -420,7 +420,11 @@ namespace Actions
 
             var row = this.create_row (_("Actions…"), "actions");
             main_page.lisboxrow_sizegroup.add_widget (row);
-            main_page.other_listbox.insert (row, 0);
+
+            var count = 0;
+            main_page.other_listbox.@foreach ((child) => { count++; });
+            main_page.other_listbox.insert (row, count - 1);
+
             this.rows.prepend (row);
         }
 
