@@ -416,14 +416,12 @@ namespace Actions
         private void setup_main_page ()
         {
             var main_page = this.dialog.get_page ("main") as Pomodoro.PreferencesMainPage;
-            main_page.other_listbox.row_activated.connect (this.on_row_activated);
+            main_page.plugins_listbox.row_activated.connect (this.on_row_activated);
 
-            var row = this.create_row (_("Actions…"), "actions");
+            var row = this.create_row (_("Custom actions…"), "actions");
             main_page.lisboxrow_sizegroup.add_widget (row);
 
-            var count = 0;
-            main_page.other_listbox.@foreach ((child) => { count++; });
-            main_page.other_listbox.insert (row, count - 1);
+            main_page.plugins_listbox.insert (row, 0);
 
             this.rows.prepend (row);
         }

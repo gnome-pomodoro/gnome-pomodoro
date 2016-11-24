@@ -473,15 +473,16 @@ namespace Pomodoro
         [GtkChild]
         public Gtk.ListBox other_listbox;
         [GtkChild]
+        public Gtk.ListBox plugins_listbox;
+        [GtkChild]
         public Gtk.SizeGroup lisboxrow_sizegroup;
+
         [GtkChild]
-        public Gtk.ListBoxRow listboxrow_accelerator;
+        private Gtk.ListBoxRow listboxrow_accelerator;
         [GtkChild]
-        public Gtk.ListBoxRow listboxrow_reminders;
+        private Gtk.ListBoxRow listboxrow_reminders;
         [GtkChild]
-        public Gtk.ListBoxRow listboxrow_idle_monitor;
-        [GtkChild]
-        public Gtk.ListBoxRow listboxrow_hide_system_notifications;
+        private Gtk.ListBoxRow listboxrow_idle_monitor;
 
         private GLib.Settings settings;
         private Pomodoro.Accelerator accelerator;
@@ -497,6 +498,9 @@ namespace Pomodoro
             application.capabilities.capability_disabled.connect (this.on_capability_disabled);
 
             this.update_capabilities ();
+
+            /* hide frame if empty */
+            this.setup_listbox (this.other_listbox);
         }
 
         private unowned Widgets.LogScale setup_time_scale (Gtk.Builder builder,
@@ -530,23 +534,24 @@ namespace Pomodoro
 
         private void setup_timer_section (Gtk.Builder builder)
         {
-            var pomodoro_scale = this.setup_time_scale (builder,
-                                                        "pomodoro_grid",
-                                                        "pomodoro_label");
-            var short_break_scale = this.setup_time_scale (builder,
-                                                           "short_break_grid",
-                                                           "short_break_label");
-            var long_break_scale = this.setup_time_scale (builder,
-                                                          "long_break_grid",
-                                                          "long_break_label");
-            var long_break_interval_spinbutton = builder.get_object ("long_break_interval_spinbutton")
-                                                                     as Gtk.SpinButton;
-            var accelerator_label = builder.get_object ("accelerator_label")
-                                                        as Gtk.Label;
-            var pause_when_idle_toggle = builder.get_object ("pause_when_idle_toggle")
-                                                             as Gtk.Switch;
-            var disable_other_notifications_toggle = builder.get_object ("disable_other_notifications_toggle")
-                                                                         as Gtk.Switch;
+            var pomodoro_scale = this.setup_time_scale
+                                       (builder,
+                                        "pomodoro_grid",
+                                        "pomodoro_label");
+            var short_break_scale = this.setup_time_scale
+                                       (builder,
+                                        "short_break_grid",
+                                        "short_break_label");
+            var long_break_scale = this.setup_time_scale
+                                       (builder,
+                                        "long_break_grid",
+                                        "long_break_label");
+            var long_break_interval_spinbutton = builder.get_object
+                                       ("long_break_interval_spinbutton")
+                                       as Gtk.SpinButton;
+            var accelerator_label = builder.get_object
+                                       ("accelerator_label")
+                                       as Gtk.Label;
 
             this.settings.bind ("pomodoro-duration",
                                 pomodoro_scale.base_adjustment,
@@ -564,28 +569,21 @@ namespace Pomodoro
                                 long_break_interval_spinbutton.adjustment,
                                 "value",
                                 GLib.SettingsBindFlags.DEFAULT);
-            this.settings.bind ("pause-when-idle",
-                                pause_when_idle_toggle,
-                                "active",
-                                GLib.SettingsBindFlags.DEFAULT);
-            this.settings.bind ("hide-notifications-during-pomodoro",
-                                disable_other_notifications_toggle,
-                                "active",
-                                GLib.SettingsBindFlags.DEFAULT);
 
             this.accelerator = new Pomodoro.Accelerator ();
             this.accelerator.changed.connect(() => {
                 accelerator_label.label = this.accelerator.display_name != ""
                         ? this.accelerator.display_name : _("Off");
             });
-            this.settings.bind_with_mapping ("toggle-timer-key",
-                                             this.accelerator,
-                                             "name",
-                                             GLib.SettingsBindFlags.DEFAULT,
-                                             (GLib.SettingsBindGetMappingShared) get_accelerator_mapping,
-                                             (GLib.SettingsBindSetMappingShared) set_accelerator_mapping,
-                                             null,
-                                             null);
+            this.settings.bind_with_mapping
+                                       ("toggle-timer-key",
+                                        this.accelerator,
+                                        "name",
+                                        GLib.SettingsBindFlags.DEFAULT,
+                                        (GLib.SettingsBindGetMappingShared) get_accelerator_mapping,
+                                        (GLib.SettingsBindSetMappingShared) set_accelerator_mapping,
+                                        null,
+                                        null);
         }
 
         private void setup_notifications_section (Gtk.Builder builder)
@@ -603,6 +601,17 @@ namespace Pomodoro
 
         private void setup_other_section (Gtk.Builder builder)
         {
+            var pause_when_idle_toggle = builder.get_object ("pause_when_idle_toggle")
+                                                             as Gtk.Switch;
+
+            this.settings.bind ("pause-when-idle",
+                                pause_when_idle_toggle,
+                                "active",
+                                GLib.SettingsBindFlags.DEFAULT);
+        }
+
+        private void setup_plugins_section (Gtk.Builder builder)
+        {
         }
 
         private void parser_finished (Gtk.Builder builder)
@@ -615,6 +624,7 @@ namespace Pomodoro
             this.setup_timer_section (builder);
             this.setup_notifications_section (builder);
             this.setup_other_section (builder);
+            this.setup_plugins_section (builder);
         }
 
         [GtkCallback]
@@ -646,7 +656,6 @@ namespace Pomodoro
             this.listboxrow_accelerator.visible = capabilities.has_enabled ("accelerator");
             this.listboxrow_reminders.visible = capabilities.has_enabled ("reminders");
             this.listboxrow_idle_monitor.visible = capabilities.has_enabled ("idle-monitor");
-            this.listboxrow_hide_system_notifications.visible = capabilities.has_enabled ("hide-system-notifications");
         }
 
         private void on_capability_enabled (string capability_name)
@@ -657,6 +666,60 @@ namespace Pomodoro
         private void on_capability_disabled (string capability_name)
         {
             this.update_capabilities ();
+        }
+
+        private void setup_listbox (Gtk.ListBox listbox)
+        {
+            listbox.@foreach ((child) => {
+                this.on_listbox_add (listbox as Gtk.Widget, child);
+            });
+
+            listbox.add.connect_after (this.on_listbox_add);
+            listbox.remove.connect_after (this.on_listbox_remove);
+        }
+
+        private void on_listboxrow_visible_notify (GLib.Object    object,
+                                                   GLib.ParamSpec pspec)
+        {
+            var widget = (object as Gtk.Widget).parent;
+            var listbox = widget as Gtk.ListBox;
+            var visible = false;
+
+            listbox.@foreach ((child) => {
+                visible |= child.visible;
+            });
+
+            if (widget.parent.visible != visible) {
+                widget.parent.visible = visible;
+            }
+        }
+
+        /* Note that the "add" signal is not emmited when calling insert() */
+        private void on_listbox_add (Gtk.Widget widget,
+                                     Gtk.Widget child)
+        {
+            child.notify["visible"].connect (this.on_listboxrow_visible_notify);
+
+            if (!widget.parent.visible && child.visible) {
+                widget.parent.visible = true;
+            }
+        }
+
+        private void on_listbox_remove (Gtk.Widget widget,
+                                        Gtk.Widget child)
+        {
+            var listbox = widget as Gtk.ListBox;
+            var visible = false;
+
+            child.notify["visible"].disconnect (this.on_listboxrow_visible_notify);
+
+            listbox.@foreach ((child) => {
+                visible |= child.visible;
+            });
+
+            if (widget.parent.visible != visible) {
+                widget.parent.visible = visible;
+            }
         }
 
         public override void dispose ()

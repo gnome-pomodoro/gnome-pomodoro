@@ -39,11 +39,9 @@ libactions_la_LIBADD = \
 	$(PLUGIN_LIBS) \
 	$(top_builddir)/lib/libgnome-pomodoro.la
 
-
 gsettings_SCHEMAS = \
 	org.gnome.pomodoro.plugins.actions.gschema.xml
 @GSETTINGS_RULES@
-
 
 resources = \
 	resources/resources.xml
@@ -64,8 +62,8 @@ CLEANFILES = \
 	libactions_la_vala.stamp
 
 EXTRA_DIST = \
-	$(libactions_la_plugindata_DATA) \
 	$(gsettings_SCHEMAS) \
+	$(libactions_la_plugindata_DATA) \
 	$(resources) \
 	$(resources_deps)
 

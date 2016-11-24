@@ -156,39 +156,70 @@ namespace GnomePlugin
         }
     }
 
-//    public class PreferencesDialogExtension : Peas.ExtensionBase, Pomodoro.PreferencesDialogExtension
-//    {
-//        private Pomodoro.PreferencesDialog dialog;
-//
-//        private GLib.Settings settings;
-//        private GLib.List<Gtk.ListBoxRow> rows;
-//
-//        construct
-//        {
-//            this.settings = Pomodoro.get_settings ()
-//                                    .get_child ("preferences");
-//
-//            this.dialog = Pomodoro.PreferencesDialog.get_default ();
-//
-//            this.setup_main_page ();
-//        }
-//
-//        private void setup_main_page ()
-//        {
-//            var main_page = this.dialog.get_page ("main") as Pomodoro.PreferencesMainPage;
-//
-//            /* toggle/row is defined in the .ui because we would like same feature for other desktops.
-//             */
-//            foreach (var child in main_page.other_listbox.get_children ()) {
-//                if (child.name == "pause-when-idle") {
-//                    child.show ();
-//                }
-//                else if (child.name == "disable-other-notifications") {
-//                    child.show ();
-//                }
-//            }
-//       }
-//    }
+    public class PreferencesDialogExtension : Peas.ExtensionBase, Pomodoro.PreferencesDialogExtension
+    {
+        private Pomodoro.PreferencesDialog dialog;
+
+        private GLib.Settings settings;
+        private GLib.List<Gtk.ListBoxRow> rows;
+
+        construct
+        {
+            this.settings = new GLib.Settings ("org.gnome.pomodoro.plugins.gnome");
+            this.dialog = Pomodoro.PreferencesDialog.get_default ();
+
+            this.setup_main_page ();
+        }
+
+        private void setup_main_page ()
+        {
+            var main_page = this.dialog.get_page ("main") as Pomodoro.PreferencesMainPage;
+
+            var hide_system_notifications_toggle = new Gtk.Switch ();
+            hide_system_notifications_toggle.valign = Gtk.Align.CENTER;
+
+            var row = this.create_row (_("Hide other notifications"),
+                                       hide_system_notifications_toggle);
+            row.name = "hide-system-notifications";
+            main_page.lisboxrow_sizegroup.add_widget (row);
+            main_page.other_listbox.add (row);
+            this.rows.prepend (row);
+
+            this.settings.bind ("hide-system-notifications",
+                                hide_system_notifications_toggle,
+                                "active",
+                                GLib.SettingsBindFlags.DEFAULT);
+        }
+
+        ~PreferencesDialogExtension ()
+        {
+            foreach (var row in this.rows) {
+                row.destroy ();
+            }
+
+            this.rows = null;
+        }
+
+        private Gtk.ListBoxRow create_row (string     label,
+                                           Gtk.Widget widget)
+        {
+            var name_label = new Gtk.Label (label);
+            name_label.halign = Gtk.Align.START;
+            name_label.valign = Gtk.Align.BASELINE;
+
+            var box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            box.pack_start (name_label, true, true, 0);
+            box.pack_start (widget, false, true, 0);
+
+            var row = new Gtk.ListBoxRow ();
+            row.activatable = false;
+            row.selectable = false;
+            row.add (box);
+            row.show_all ();
+
+            return row;
+        }
+    }
 }
 
 
@@ -200,6 +231,6 @@ public void peas_register_types (GLib.TypeModule module)
     object_module.register_extension_type (typeof (Pomodoro.ApplicationExtension),
                                            typeof (GnomePlugin.ApplicationExtension));
 
-//    object_module.register_extension_type (typeof (Pomodoro.PreferencesDialogExtension),
-//                                           typeof (GnomePlugin.PreferencesDialogExtension));
+   object_module.register_extension_type (typeof (Pomodoro.PreferencesDialogExtension),
+                                          typeof (GnomePlugin.PreferencesDialogExtension));
 }

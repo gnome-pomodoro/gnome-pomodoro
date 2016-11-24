@@ -10,5 +10,10 @@
       <summary>Indicator type</summary>
       <description>The look of the indicator.</description>
     </key>
+    <key name="hide-system-notifications" type="b">
+      <default>false</default>
+      <summary>Hide notifications during pomodoro</summary>
+      <description>Whether to hide other notifications during pomodoro.</description>
+    </key>
   </schema>
 </schemalist>

@@ -37,8 +37,12 @@ libsounds_la_LDFLAGS = \
 
 libsounds_la_LIBADD = \
 	$(PLUGIN_LIBS) \
-	$(SOUNDS_PLUGIN_LIBS)
+	$(SOUNDS_PLUGIN_LIBS) \
 	$(top_builddir)/lib/libgnome-pomodoro.la
+
+gsettings_SCHEMAS = \
+	org.gnome.pomodoro.plugins.sounds.gschema.xml
+@GSETTINGS_RULES@
 
 resources = \
 	resources/resources.xml
@@ -58,6 +62,7 @@ CLEANFILES = \
 	libsounds_la_vala.stamp
 
 EXTRA_DIST = \
+	$(gsettings_SCHEMAS) \
 	$(libsounds_la_plugindata_DATA) \
 	$(resources) \
 	$(resources_deps)

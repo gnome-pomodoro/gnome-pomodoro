@@ -410,8 +410,7 @@ namespace SoundsPlugin
         {
             this.default_uri = "clock.ogg";
 
-            this.settings = Pomodoro.get_settings ()
-                                    .get_child ("preferences");
+            this.settings = new GLib.Settings ("org.gnome.pomodoro.plugins.sounds");
 
             this.settings.bind ("ticking-sound",
                                 this,
@@ -469,8 +468,7 @@ namespace SoundsPlugin
         {
             this.default_uri = "bell.ogg";
 
-            this.settings = Pomodoro.get_settings ()
-                                    .get_child ("preferences");
+            this.settings = new GLib.Settings ("org.gnome.pomodoro.plugins.sounds");
 
             this.settings.bind ("pomodoro-end-sound",
                                 this,
@@ -509,8 +507,7 @@ namespace SoundsPlugin
         {
             this.default_uri = "loud-bell.ogg";
 
-            this.settings = Pomodoro.get_settings ()
-                                    .get_child ("preferences");
+            this.settings = new GLib.Settings ("org.gnome.pomodoro.plugins.sounds");
 
             this.settings.bind ("pomodoro-start-sound",
                                 this,
@@ -552,8 +549,7 @@ namespace SoundsPlugin
 
         construct
         {
-            this.settings = Pomodoro.get_settings ()
-                                    .get_child ("preferences");
+            this.settings = new GLib.Settings ("org.gnome.pomodoro.plugins.sounds");
 
             this.dialog = Pomodoro.PreferencesDialog.get_default ();
 
@@ -784,7 +780,7 @@ namespace SoundsPlugin
 
             this.timer = Pomodoro.Timer.get_default ();
 
-            this.settings = Pomodoro.get_settings ().get_child ("preferences");
+            this.settings = new GLib.Settings ("org.gnome.pomodoro.plugins.sounds");
 
             this.setup_ticking_sound ();
             this.setup_pomodoro_end_sound ();
