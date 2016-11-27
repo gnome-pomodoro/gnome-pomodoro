@@ -685,12 +685,15 @@ namespace Pomodoro
             var listbox = widget as Gtk.ListBox;
             var visible = false;
 
-            listbox.@foreach ((child) => {
-                visible |= child.visible;
-            });
+            if (widget.parent != null)
+            {
+                listbox.@foreach ((child) => {
+                    visible |= child.visible;
+                });
 
-            if (widget.parent.visible != visible) {
-                widget.parent.visible = visible;
+                if (widget.parent.visible != visible) {
+                    widget.parent.visible = visible;
+                }
             }
         }
 
@@ -700,7 +703,7 @@ namespace Pomodoro
         {
             child.notify["visible"].connect (this.on_listboxrow_visible_notify);
 
-            if (!widget.parent.visible && child.visible) {
+            if (widget.parent != null && !widget.parent.visible && child.visible) {
                 widget.parent.visible = true;
             }
         }
@@ -708,17 +711,20 @@ namespace Pomodoro
         private void on_listbox_remove (Gtk.Widget widget,
                                         Gtk.Widget child)
         {
-            var listbox = widget as Gtk.ListBox;
-            var visible = false;
-
             child.notify["visible"].disconnect (this.on_listboxrow_visible_notify);
 
-            listbox.@foreach ((child) => {
-                visible |= child.visible;
-            });
+            if (widget.parent != null)
+            {
+                var listbox = widget as Gtk.ListBox;
+                var visible = false;
 
-            if (widget.parent.visible != visible) {
-                widget.parent.visible = visible;
+                listbox.@foreach ((child) => {
+                    visible |= child.visible;
+                });
+
+                if (widget.parent.visible != visible) {
+                    widget.parent.visible = visible;
+                }
             }
         }
 

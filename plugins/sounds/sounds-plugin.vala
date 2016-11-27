@@ -441,7 +441,7 @@ namespace SoundsPlugin
         public override void map ()
         {
             var application_extension = SoundsPlugin.ApplicationExtension.instance;
-            application_extension.inhibit_ticking_sound ();
+            application_extension.sound_manager.inhibit_ticking_sound ();
 
             base.map ();
         }
@@ -449,7 +449,7 @@ namespace SoundsPlugin
         public override void unmap ()
         {
             var application_extension = SoundsPlugin.ApplicationExtension.instance;
-            application_extension.uninhibit_ticking_sound ();
+            application_extension.sound_manager.uninhibit_ticking_sound ();
 
             base.unmap ();
         }
@@ -545,7 +545,7 @@ namespace SoundsPlugin
         private Pomodoro.PreferencesDialog dialog;
 
         private GLib.Settings settings;
-        private GLib.List<Gtk.ListBoxRow> rows;
+        private GLib.List<unowned Gtk.ListBoxRow> rows;
 
         construct
         {
@@ -570,17 +570,19 @@ namespace SoundsPlugin
 
         ~PreferencesDialogExtension ()
         {
-            if (this.dialog != null) {
-                this.dialog.remove_page ("ticking-sound");
-                this.dialog.remove_page ("end-of-break-sound");
-                this.dialog.remove_page ("start-of-break-sound");
-            }
+            var main_page = this.dialog.get_page ("main") as Pomodoro.PreferencesMainPage;
+            main_page.timer_listbox.row_activated.disconnect (this.on_row_activated);
+            main_page.notifications_listbox.row_activated.disconnect (this.on_row_activated);
 
             foreach (var row in this.rows) {
                 row.destroy ();
             }
 
-            this.rows = null;
+            if (this.dialog != null) {
+                this.dialog.remove_page ("ticking-sound");
+                this.dialog.remove_page ("end-of-break-sound");
+                this.dialog.remove_page ("start-of-break-sound");
+            }
         }
 
         private static bool settings_sound_label_getter (GLib.Value   value,
@@ -757,27 +759,20 @@ namespace SoundsPlugin
         }
     }
 
-    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
-    {
-        public static unowned ApplicationExtension instance;
 
+    public class SoundManager : GLib.Object
+    {
         public SoundPlayer ticking_sound { get; private set; }
         public SoundPlayer pomodoro_start_sound { get; private set; }
         public SoundPlayer pomodoro_end_sound { get; private set; }
 
-        private Pomodoro.Timer timer;
         private GLib.Settings  settings;
+        private Pomodoro.Timer timer;
         private uint           fade_out_timeout_id;
         private bool           ticking_sound_inhibited;
 
         construct
         {
-            unowned string[] args_unowned = null;
-
-            ApplicationExtension.instance = this;
-
-            Gst.init (ref args_unowned);
-
             this.timer = Pomodoro.Timer.get_default ();
 
             this.settings = new GLib.Settings ("org.gnome.pomodoro.plugins.sounds");
@@ -793,9 +788,13 @@ namespace SoundsPlugin
             this.update_ticking_sound ();
         }
 
-        ~ApplicationExtension ()
+        ~SoundManager ()
         {
             this.timer.state_changed.disconnect (this.on_timer_state_changed);
+            this.timer.notify["is-paused"].disconnect (this.on_timer_is_paused_notify);
+            this.timer.notify["state-duration"].disconnect (this.on_timer_state_duration_notify);
+
+            this.ticking_sound.stop ();
         }
 
         public void inhibit_ticking_sound ()
@@ -1016,6 +1015,37 @@ namespace SoundsPlugin
                     this.pomodoro_end_sound.play ();
                 }
             }
+        }
+
+        public override void dispose ()
+        {
+            this.unschedule_fade_out ();
+
+            base.dispose ();
+        }
+    }
+
+
+    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
+    {
+        public static unowned ApplicationExtension instance;
+
+        public SoundManager sound_manager;
+
+        construct
+        {
+            unowned string[] args_unowned = null;
+
+            ApplicationExtension.instance = this;
+
+            Gst.init (ref args_unowned);
+
+            this.sound_manager = new SoundManager ();
+        }
+
+        ~ApplicationExtension ()
+        {
+            this.sound_manager.dispose ();
         }
     }
 }

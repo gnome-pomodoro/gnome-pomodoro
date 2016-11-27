@@ -229,28 +229,18 @@ namespace Actions
     }
 
 
-    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
+    private class ApplicationExtensionInternals : GLib.Object
     {
-        private Gtk.CssProvider css_provider;
-
-        private Actions.ActionManager actions_manager;
         private GLib.AsyncQueue<Actions.Context?> jobs_queue;
         private GLib.Thread<bool> jobs_thread;
+        private Actions.ActionManager actions_manager;
 
         construct
         {
-            this.css_provider = new Gtk.CssProvider ();
-            this.css_provider.load_from_resource ("/org/gnome/pomodoro/plugins/actions/style.css");
-
-            Gtk.StyleContext.add_provider_for_screen (
-                                         Gdk.Screen.get_default (),
-                                         this.css_provider,
-                                         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-
             this.actions_manager = new Actions.ActionManager ();
 
-            this.jobs_queue = new AsyncQueue<Actions.Context?> ();
-            this.jobs_thread = new Thread<bool> ("actions-queue", this.jobs_thread_func);
+            this.jobs_queue = new GLib.AsyncQueue<Actions.Context?> ();
+            this.jobs_thread = new GLib.Thread<bool> ("actions-queue", this.jobs_thread_func);
 
             var timer = Pomodoro.Timer.get_default ();
             timer.state_changed.connect (this.on_timer_state_changed);
@@ -266,11 +256,12 @@ namespace Actions
             while (true) {
                 var context = this.jobs_queue.pop ();
 
-                if (context == null) {
+                if (context.triggers != Actions.Trigger.NONE) {
+                    context.action.execute (context);
+                }
+                else {
                     break;
                 }
-
-                context.action.execute (context);
             }
 
             return true;
@@ -368,11 +359,40 @@ namespace Actions
 
         public override void dispose ()
         {
-            this.jobs_queue.push (null);
-
-            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), this.css_provider);
+            this.jobs_queue.push (Actions.Context () {
+                triggers = Actions.Trigger.NONE
+            });
 
             this.actions_manager.dispose ();
+
+            base.dispose ();
+        }
+    }
+
+
+    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
+    {
+        private Gtk.CssProvider css_provider;
+        private Actions.ApplicationExtensionInternals internals;
+
+        construct
+        {
+            this.css_provider = new Gtk.CssProvider ();
+            this.css_provider.load_from_resource ("/org/gnome/pomodoro/plugins/actions/style.css");
+
+            Gtk.StyleContext.add_provider_for_screen (
+                                         Gdk.Screen.get_default (),
+                                         this.css_provider,
+                                         Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+            this.internals = new Actions.ApplicationExtensionInternals ();
+        }
+
+        public override void dispose ()
+        {
+            Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default (), this.css_provider);
+
+            this.internals.dispose ();
 
             base.dispose ();
         }
