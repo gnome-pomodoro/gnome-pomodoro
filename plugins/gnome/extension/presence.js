@@ -26,22 +26,17 @@ const PopupMenu = imports.ui.popupMenu;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
-const Settings = Extension.imports.settings;
 const Timer = Extension.imports.timer;
 const Utils = Extension.imports.utils;
 
 
-const NOTIFICATIONS_DURING_BREAK = true;
-
-
-const Presence = new Lang.Class({
-    Name: 'PomodoroPresence',
+const PresenceManager = new Lang.Class({
+    Name: 'PomodoroPresenceManager',
 
     _init: function() {
-        this._settings = null;
-        this._settingsChangedId = 0;
-        this._timerStateChangedId = 0;
-        this._timerState;
+        this._enabled = false;
+        this._busy = false;
+        this._setHideSystemNotifications = false;
 
         // Setup a patch for suppressing presence handlers.
         // When applied the main presence controller becomes gnome-pomodoro.
@@ -52,68 +47,39 @@ const Presence = new Lang.Class({
                     this._updateState();
                 }
         });
+    },
 
+    enable: function() {
+        if (!this._enabled) {
+            this._enabled = true;
+
+            this._patch.apply();
+
+            this._onEnabledChanged();
+        }
+    },
+
+    disable: function() {
+        if (this._enabled) {
+            this._enabled = false;
+
+            this._onEnabledChanged();
+
+            this._patch.revert();
+        }
+    },
+
+    setHideSystemNotifications: function(value) {
+        this._setHideSystemNotifications = value;
+    },
+
+    setBusy: function(value) {
+        this._busy = value;
+    },
+
+    _onEnabledChanged: function() {
         try {
-            this._settings = Settings.getSettings('org.gnome.pomodoro.plugins.gnome');
-            this._settingsChangedId = this._settings.connect(
-                                       'changed::hide-system-notifications',
-                                       Lang.bind(this, this._onSettingsChanged));
-        }
-        catch (error) {
-            Utils.logWarning(error.message);
-        }
-
-        this._timerStateChangedId = Extension.extension.timer.connect('state-changed',
-                                                                      Lang.bind(this, this._onTimerStateChanged));
-
-        this._setNotificationDefaults();
-        this._onTimerStateChanged();
-    },
-
-    _onSettingsChanged: function(settings, key) {
-        switch (key) {
-            case 'hide-system-notifications':
-                this.setNotificationsDuringPomodoro(!settings.get_boolean(key));
-                break;
-        }
-    },
-
-    _onTimerStateChanged: function() {
-        let timerState = Extension.extension.timer.getState();
-        let isRunning = timerState != Timer.State.NULL;
-
-        if (timerState !== this._timerState) {
-            this._timerState = timerState;
-
-            if (isRunning) {
-                this._patch.apply();
-
-                this.update();
-            }
-            else {
-                this.update();
-
-                this._patch.revert();
-                this._setNotificationDefaults();
-            }
-        }
-    },
-
-    _setNotificationDefaults: function() {
-        this._notificationsDuringPomodoro =
-                !this._settings.get_boolean('hide-system-notifications');
-        this._notificationsDuringBreak = NOTIFICATIONS_DURING_BREAK;
-    },
-
-    update: function() {
-        try {
-            let busy = this._timerState == Timer.State.POMODORO
-                                 ? !this._notificationsDuringPomodoro
-                                 : !this._notificationsDuringBreak;
-
-            let isDialogOpened = Extension.extension.dialog && Extension.extension.dialog.isOpened;
-
-            Main.messageTray._busy = busy || isDialogOpened;
+            Main.messageTray._busy = this._enabled;
             Main.messageTray._updateState();
         }
         catch (error) {
@@ -121,33 +87,7 @@ const Presence = new Lang.Class({
         }
     },
 
-    setNotificationsDuringPomodoro: function(value) {
-        if (this._notificationsDuringPomodoro != value) {
-            this._notificationsDuringPomodoro = value;
-
-            this.update();
-        }
-    },
-
-    setNotificationsDuringBreak: function(value) {
-        if (this._notificationsDuringBreak != value) {
-            this._notificationsDuringBreak = value;
-
-            this.update();
-        }
-    },
-
     destroy: function() {
-        if (this._settingsChangedId) {
-            Extension.extension.settings.disconnect(this._settingsChangedId);
-            this._settingsChangedId = 0;
-        }
-
-        if (this._timerStateChangedId) {
-            Extension.extension.timer.disconnect(this._timerStateChangedId);
-            this._timerStateChangedId = 0;
-        }
-
         if (this._patch) {
             this._patch.revert();
             this._patch = null;

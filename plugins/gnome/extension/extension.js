@@ -57,29 +57,33 @@ const PomodoroExtension = new Lang.Class({
         Extension.extension = this;
 
         this.settings           = null;
+        this.pluginSettings     = null;
         this.timer              = null;
         this.indicator          = null;
         this.notificationSource = null;
         this.notification       = null;
         this.dialog             = null;
-        this.reminderManager    = null;
+        this.reminder           = null;
         this.presence           = null;
         this.mode               = null;
         this.keybinding         = false;
+        this._isPaused          = false;
+        this._timerState        = Timer.State.NULL;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
-
-            this.settings.connect('changed::show-screen-notifications',
-                                  Lang.bind(this, this._onSettingsChanged));
             this.settings.connect('changed::show-reminders',
                                   Lang.bind(this, this._onSettingsChanged));
+            this.settings.connect('changed::show-screen-notifications',
+                                  Lang.bind(this, this._onSettingsChanged));
 
-            this._showScreenNotifications = this.settings.get_boolean('show-screen-notifications');
-            this._showReminders = this.settings.get_boolean('show-reminders');
+            this.pluginSettings = Settings.getSettings('org.gnome.pomodoro.plugins.gnome');
+            this.pluginSettings.connect('changed::hide-system-notifications',
+                                        Lang.bind(this, this._onSettingsChanged));
+            this.pluginSettings.connect('changed::indicator-type',
+                                        Lang.bind(this, this._onSettingsChanged));
 
             this.timer = new Timer.Timer();
-
             this.timer.connect('service-connected', Lang.bind(this, this._onServiceConnected));
             this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
             this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
@@ -93,24 +97,387 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
+    get application() {
+        return Shell.AppSystem.get_default().lookup_app('org.gnome.Pomodoro.desktop');
+    },
+
     setMode: function(mode) {
         if (this.mode !== mode) {
             this.mode = mode;
 
             if (mode == ExtensionMode.RESTRICTED) {
-                this.disableIndicator(true);
-                this.disableScreenNotifications();
-                this.disableReminders();
+                this._disableIndicator();
+                this._disableScreenNotifications();
+                this._disableReminders();
             }
             else {
-                this.enableIndicator();
-                this.enableScreenNotifications();
-                this.enableReminders();
+                this._enableIndicator();
+
+                if (this.settings.get_boolean('show-screen-notifications')) {
+                    this._enableScreenNotifications();
+                }
+
+                if (this.settings.get_boolean('show-reminders')) {
+                    this._enableReminders();
+                }
             }
 
-            this.enableKeybinding();
-            this.enableNotifications();
-            this.enablePresence();
+            this._enableKeybinding();
+            this._enablePresence();
+
+            this._updateNotifications();
+        }
+    },
+
+    notifyIssue: function(message) {
+        let notification = new Notifications.IssueNotification(message);
+        notification.show();
+    },
+
+    _onSettingsChanged: function(settings, key) {
+        switch(key) {
+            case 'show-screen-notifications':
+                if (settings.get_boolean(key) && this.mode != ExtensionMode.RESTRICTED) {
+                    this._enableScreenNotifications();
+                }
+                else {
+                    this._disableScreenNotifications();
+                }
+
+                break;
+
+            case 'show-reminders':
+                if (settings.get_boolean(key) && this.mode != ExtensionMode.RESTRICTED) {
+                    this._enableReminders();
+                }
+                else {
+                    this._disableReminders();
+                }
+
+                break;
+
+            case 'hide-system-notifications':
+                if (this.presence) {
+                    this.presence.setHideSystemNotifications(settings.get_boolean(key));
+                }
+
+                break;
+
+            case 'indicator-type':
+                if (this.indicator) {
+                    this.indicator.setType(settings.get_string(key));
+                }
+
+                break;
+        }
+    },
+
+    _onServiceConnected: function() {
+        this._update();
+    },
+
+    _onServiceDisconnected: function() {
+        this._update();
+    },
+
+    _onTimerPaused: function() {
+        this._update();
+    },
+
+    _onTimerResumed: function() {
+        this._update();
+    },
+
+    _onTimerStateChanged: function() {
+        this._update();
+    },
+
+    _onKeybindingPressed: function() {
+        if (this.timer) {
+            this.timer.toggle();
+        }
+    },
+
+    _onNotificationDestroy: function(notification) {
+        if (this.notification === notification) {
+            this.notification = null;
+        }
+    },
+
+    _notifyPomodoroStart: function() {
+        if (this.notification &&
+            this.notification instanceof Notifications.PomodoroStartNotification)
+        {
+            /* do not renotify */
+        }
+        else {
+            this.notification = new Notifications.PomodoroStartNotification(this.timer);
+            this.notification.connect('activated', Lang.bind(this,
+                function(notification) {
+                    this.application.activate();
+                }));
+            this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
+            this.notification.show();
+
+            this._destroyPreviousNotifications();
+        }
+    },
+
+    _notifyPomodoroEnd: function() {
+        if (this.notification &&
+            this.notification instanceof Notifications.PomodoroEndNotification)
+        {
+            /* do not renotify */
+        }
+        else {
+            this.notification = new Notifications.PomodoroEndNotification(this.timer);
+            this.notification.connect('activated', Lang.bind(this,
+                function(notification) {
+                    if (this.dialog) {
+                        this.dialog.open(true);
+                        this.dialog.pushModal();
+                    }
+                    else {
+                        this.application.activate();
+                    }
+
+                    if (this.reminder) {
+                        this.reminder.dismiss();
+                    }
+                }));
+            this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
+
+            if (this.dialog) {
+                this.dialog.open(true);
+            }
+            else {
+                this.notification.show();
+
+                if (this.reminder && !this.reminder.acknowledged) {
+                    this.reminder.schedule();
+                }
+            }
+
+            this._destroyPreviousNotifications();
+        }
+    },
+
+    _updateNotifications: function() {
+        if (this.timer.isPaused()) {
+            this._destroyNotifications();
+        }
+        else {
+            switch (this.timer.getState()) {
+                case Timer.State.POMODORO:
+                    this._notifyPomodoroStart();
+                    break;
+
+                case Timer.State.SHORT_BREAK:
+                case Timer.State.LONG_BREAK:
+                    this._notifyPomodoroEnd();
+                    break;
+
+                default:
+                    this._destroyNotifications();
+                    break;
+            }
+        }
+    },
+
+    _updateScreenNotifications: function() {
+        if (this.dialog) {
+            if (this.timer.isBreak() && !this.timer.isPaused()) {
+                this.dialog.open(false);
+                this.dialog.pushModal();
+            }
+            else {
+                this.dialog.close(false);
+            }
+        }
+    },
+
+    _update: function() {
+        let timerState = this.timer.getState();
+        let isPaused = this.timer.isPaused();
+        let isRunning = timerState != Timer.State.NULL && !isPaused;
+
+        if (this._isPaused != isPaused || this._timerState != timerState) {
+            this._isPaused = isPaused;
+            this._timerState = timerState;
+
+            if (this.presence) {
+                this.presence.setBusy(timerState == Timer.State.POMODORO);
+            }
+
+            if (this.reminder && !this.timer.isBreak()) {
+                this.reminder.unschedule();
+            }
+
+            this._updateNotifications();
+            this._updateScreenNotifications();
+        }
+    },
+
+    _enableIndicator: function() {
+        if (!this.indicator) {
+            this.indicator = new Indicator.Indicator(this.timer,
+                                                     this.pluginSettings.get_string('indicator-type'));
+            this.indicator.connect('destroy', Lang.bind(this,
+                function() {
+                    this.indicator = null;
+                }));
+
+            try {
+                Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
+            }
+            catch (error) {
+                Utils.logError(error.message);
+            }
+        }
+        else {
+            this.indicator.actor.show();
+        }
+    },
+
+    _disableIndicator: function() {
+        if (this.indicator) {
+            this.indicator.actor.hide();
+        }
+    },
+
+    _enableKeybinding: function() {
+        if (!this.keybinding) {
+            this.keybinding = true;
+            Main.wm.addKeybinding('toggle-timer-key',
+                                  this.settings,
+                                  Meta.KeyBindingFlags.NONE,
+                                  Shell.ActionMode.ALL,
+                                  Lang.bind(this, this._onKeybindingPressed));
+        }
+    },
+
+    _disableKeybinding: function() {
+        if (this.keybinding) {
+            this.keybinding = false;
+            Main.wm.removeKeybinding('toggle-timer-key');
+        }
+    },
+
+    _enablePresence: function() {
+        let state = this.timer.getState();
+
+        if (!this.presence) {
+            this.presence = new Presence.PresenceManager();
+            this.presence.setHideSystemNotifications(this.pluginSettings.get_boolean('hide-system-notifications'));
+            this.presence.setBusy(this.timer.getState() == Timer.State.POMODORO);
+        }
+    },
+
+    _disablePresence: function() {
+        this._destroyPresence();
+    },
+
+    _enableReminders: function() {
+        if (!this.reminder) {
+            this.reminder = new Notifications.ReminderManager(this.timer);
+            this.reminder.connect('notify', Lang.bind(this,
+                function() {
+                    let notification = new Notifications.RemindPomodoroEndNotification();
+                    notification.connect('activated', Lang.bind(this,
+                        function(notification) {
+                            this.reminder.dismiss();
+
+                            if (this.dialog) {
+                                this.dialog.open(true);
+                                this.dialog.pushModal();
+                            }
+                            else {
+                                this.application.activate();
+                            }
+
+                            notification.destroy();
+                        }));
+                }));
+            this.reminder.connect('destroy', Lang.bind(this,
+                function() {
+                    this.reminder = null;
+                }));
+        }
+
+        if (this.timer.isBreak() && !this.timer.isPaused() && this.reminder && !this.reminder.acknowledged) {
+            this.reminder.schedule();
+        }
+    },
+
+    _disableReminders: function() {
+        this._destroyReminders();
+    },
+
+    _enableScreenNotifications: function() {
+        if (!this.dialog) {
+            this.dialog = new Dialogs.PomodoroEndDialog(this.timer);
+            this.dialog.connect('opening', Lang.bind(this,
+                function() {
+                    try {
+                        if (Main.messageTray._notification) {
+                            Main.messageTray._hideNotification(true);
+                        }
+                    }
+                    catch (error) {
+                        Utils.logWarning(error.message);
+                    }
+
+                    if (this.reminder) {
+                        this.reminder.unschedule();
+                    }
+                }));
+            this.dialog.connect('closing', Lang.bind(this,
+                function() {
+                    if (this.timer.isBreak() && !this.timer.isPaused()) {
+                        if (this.notification instanceof Notifications.PomodoroEndNotification) {
+                            this.notification.show();
+                        }
+
+                        if (this.dialog) {
+                            this.dialog.openWhenIdle();
+                        }
+                    }
+
+                    if (this.reminder && !this.reminder.acknowledged) {
+                        this.reminder.schedule();
+                    }
+                }));
+            this.dialog.connect('destroy', Lang.bind(this,
+                function() {
+                    this.dialog = null;
+                }));
+        }
+
+        this._updateScreenNotifications();
+    },
+
+    _disableScreenNotifications: function() {
+        this._destroyScreenNotifications();
+    },
+
+    _destroyPresence: function() {
+        if (this.presence) {
+            this.presence.destroy();
+            this.presence = null;
+        }
+    },
+
+    _destroyIndicator: function() {
+        if (this.indicator) {
+            this.indicator.destroy();
+            this.indicator = null;
+        }
+    },
+
+    _destroyReminders: function() {
+        if (this.reminder) {
+            this.reminder.destroy();
+            this.reminder = null;
         }
     },
 
@@ -134,370 +501,11 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
-    _onSettingsChanged: function(settings, key) {
-        switch(key)
-        {
-            case 'show-screen-notifications':
-                this._showScreenNotifications = settings.get_boolean(key);
-
-                this._updateScreenNotifications();
-
-                break;
-
-            case 'show-reminders':
-                this._showReminders = settings.get_boolean(key);
-
-                if (this._showReminders && this.timer.isBreak() && !this.timer.isPaused()) {
-                    this._schedulePomodoroEndReminder();
-                }
-                else {
-                    this.disableReminders();
-                }
-
-                break;
-        }
-    },
-
-    _onServiceConnected: function() {
-        this.enableNotifications();
-    },
-
-    _onServiceDisconnected: function() {
-        this._updateScreenNotifications();
-        this._destroyNotifications();
-    },
-
-    _onTimerStateChanged: function() {
-        let timerState = this.timer.getState();
-
-        if (this._timerState !== timerState) {
-            this._timerState = timerState;
-
-            if (this.dialog && !this.timer.isBreak()) {
-                this.dialog.close(true);
-            }
-
-            if (this.reminderManager) {
-                this.reminderManager.destroy();
-                this.reminderManager = null;
-            }
-
-            switch (timerState) {
-                case Timer.State.POMODORO:
-                    this._notifyPomodoroStart();
-                    break;
-
-                case Timer.State.SHORT_BREAK:
-                case Timer.State.LONG_BREAK:
-                    this._notifyPomodoroEnd();
-                    break;
-
-                case Timer.State.NULL:
-                    this._destroyNotifications();
-                    break;
-            }
-        }
-    },
-
-    _onTimerPaused: function() {
-        this.disableReminders();
-
-        this._updateScreenNotifications();
-    },
-
-    _onTimerResumed: function() {
-        this.enableReminders();
-
-        this._updateScreenNotifications();
-    },
-
-    _notifyPomodoroStart: function() {
-        if (this.notification &&
-            this.notification instanceof Notifications.PomodoroStartNotification)
-        {
-            /* do not renotify */
-        }
-        else {
-            this.notification = new Notifications.PomodoroStartNotification(this.timer);
-            this.notification.connect('activated', Lang.bind(this,
-                function(notification) {
-                    this._getApp().activate();
-                }));
-            this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
-            this.notification.show();
-        }
-
-        this._destroyPreviousNotifications();
-    },
-
-    _notifyPomodoroEnd: function() {
-        if (this.notification &&
-            this.notification instanceof Notifications.PomodoroEndNotification)
-        {
-            /* do not renotify */
-        }
-        else {
-            this.notification = new Notifications.PomodoroEndNotification(this.timer);
-            this.notification.connect('activated', Lang.bind(this,
-                function(notification) {
-                    if (this.dialog) {
-                        this.dialog.open(true);
-                        this.dialog.pushModal();
-                    }
-                    else {
-                        this._getApp().activate();
-                    }
-
-                    if (this.reminderManager) {
-                        this.reminderManager.acknowledged = true;
-                    }
-                }));
-            this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
-
-            if (this._showReminders) {
-                this._schedulePomodoroEndReminder();
-            }
-
-            if (this.dialog && this._showScreenNotifications) {
-                this.dialog.open(true);
-            }
-            else {
-                this.notification.show();
-            }
-        }
-
-        this._destroyPreviousNotifications();
-    },
-
-    _onKeybindingPressed: function() {
-        if (this.timer) {
-            this.timer.toggle();
-        }
-    },
-
-    _onNotificationDestroy: function(notification) {
-        if (this.notification === notification) {
-            this.notification = null;
-        }
-    },
-
-    enableIndicator: function() {
-        if (!this.indicator) {
-            this.indicator = new Indicator.Indicator(this.timer);
-            this.indicator.connect('destroy', Lang.bind(this,
-                function() {
-                    this.indicator = null;
-                }));
-
-            try {
-                Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
-            }
-            catch (error) {
-                Utils.logError(error.message);
-            }
-        }
-        else {
-            this.indicator.actor.show();
-        }
-    },
-
-    disableIndicator: function(keepInstance) {
-        if (this.indicator) {
-            if (keepInstance) {
-                this.indicator.actor.hide();
-            }
-            else {
-                this.indicator.destroy();
-            }
-        }
-    },
-
-    enableKeybinding: function() {
-        if (!this.keybinding) {
-            this.keybinding = true;
-            Main.wm.addKeybinding('toggle-timer-key',
-                                  this.settings,
-                                  Meta.KeyBindingFlags.NONE,
-                                  Shell.ActionMode.ALL,
-                                  Lang.bind(this, this._onKeybindingPressed));
-        }
-    },
-
-    disableKeybinding: function() {
-        if (this.keybinding) {
-            this.keybinding = false;
-            Main.wm.removeKeybinding('toggle-timer-key');
-        }
-    },
-
-    enablePresence: function() {
-        if (!this.presence) {
-            this.presence = new Presence.Presence();
-        }
-    },
-
-    disablePresence: function() {
-        if (this.presence) {
-            this.presence.destroy();
-            this.presence = null;
-        }
-    },
-
-    enableNotifications: function() {
-        let state = this.timer.getState();
-
-        switch (state) {
-            case Timer.State.POMODORO:
-                this._notifyPomodoroStart();
-                break;
-
-            case Timer.State.SHORT_BREAK:
-            case Timer.State.LONG_BREAK:
-                this._notifyPomodoroEnd();
-                break;
-        }
-    },
-
-    disableNotifications: function() {
-        if (this.notification) {
-            this.notification.destroy();
-            this.notification = null;
-        }
-
-        this._destroyNotifications();
-    },
-
-    enableReminders: function() {
-        if (this.timer.isBreak() && !this.timer.isPaused() && this._showReminders) {
-            this._schedulePomodoroEndReminder();
-        }
-    },
-
-    disableReminders: function() {
-        if (this.reminderManager) {
-            this.reminderManager.destroy();
-            this.reminderManager = null;
-        }
-    },
-
-    _updateScreenNotifications: function() {
-        if (this.dialog) {
-            if (this._showScreenNotifications && this.timer.isBreak() && !this.timer.isPaused()) {
-                this.dialog.open(false);
-                this.dialog.pushModal();
-            }
-            else {
-                this.dialog.close(false);
-            }
-        }
-    },
-
-    enableScreenNotifications: function() {
-        if (!this.dialog) {
-            this.dialog = new Dialogs.PomodoroEndDialog(this.timer);
-            this.dialog.connect('opening', Lang.bind(this,
-                function() {
-                    try {
-                        if (Main.messageTray._notification) {
-                            Main.messageTray._hideNotification(true);
-                        }
-                    }
-                    catch (error) {
-                        Utils.logWarning(error.message);
-                    }
-
-                    if (this.presence) {
-                        this.presence.update();
-                    }
-
-                    if (this.reminderManager) {
-                        this.reminderManager.block();
-                    }
-                }));
-            this.dialog.connect('closing', Lang.bind(this,
-                function() {
-                    if (this.timer.isBreak() && !this.timer.isPaused()) {
-                        if (this.notification instanceof Notifications.PomodoroEndNotification) {
-                            this.notification.show();
-                        }
-
-                        if (this._showScreenNotifications) {
-                            this.dialog.openWhenIdle();
-                        }
-                    }
-
-                    if (this.presence) {
-                        this.presence.update();
-                    }
-
-                    if (this.reminderManager) {
-                        this.reminderManager.unblock();
-                    }
-                }));
-            this.dialog.connect('destroy', Lang.bind(this,
-                function() {
-                    this.dialog = null;
-                }));
-        }
-
-        this._updateScreenNotifications();
-    },
-
-    disableScreenNotifications: function() {
+    _destroyScreenNotifications: function() {
         if (this.dialog) {
             this.dialog.destroy();
             this.dialog = null;
         }
-    },
-
-    _schedulePomodoroEndReminder: function() {
-        if (!this.reminderManager) {
-            this.reminderManager = new Notifications.ReminderManager(this.timer);
-            this.reminderManager.connect('notify', Lang.bind(this,
-                function() {
-                    let notification = new Notifications.PomodoroEndReminderNotification();
-                    notification.connect('activated', Lang.bind(this,
-                        function(notification) {
-                            this.reminderManager.acknowledged = true;
-
-                            if (this.dialog) {
-                                this.dialog.open(true);
-                                this.dialog.pushModal();
-                            }
-                            else {
-                                this._getApp().activate();
-                            }
-
-                            notification.destroy();
-                        }));
-                    // notification.connect('destroy', Lang.bind(this,
-                    //     function(notification) {
-                    //         if (!this.reminderManager.acknowledged) {
-                    //             this.reminderManager.schedule();
-                    //         }
-                    //     }));
-                    // notification.show();
-                }));
-            this.reminderManager.connect('destroy', Lang.bind(this,
-                function() {
-                    this.reminderManager = null;
-                }));
-
-            if (this.dialog && this.dialog.isOpened) {
-                this.reminderManager.block();
-            }
-        }
-
-        this.reminderManager.schedule();
-    },
-
-    _getApp: function() {
-        return Shell.AppSystem.get_default().lookup_app('org.gnome.Pomodoro.desktop');
-    },
-
-    notifyIssue: function(message) {
-        let notification = new Notifications.IssueNotification(message);
-        notification.show();
     },
 
     destroy: function() {
@@ -506,12 +514,13 @@ const PomodoroExtension = new Lang.Class({
         }
         this._destroying = true;
 
-        this.disableKeybinding();
-        this.disablePresence();
-        this.disableIndicator();
-        this.disableReminders();
-        this.disableNotifications();
-        this.disableScreenNotifications();
+        this._disableKeybinding();
+
+        this._destroyPresence();
+        this._destroyIndicator();
+        this._destroyScreenNotifications();
+        this._destroyNotifications();
+        this._destroyReminders();
 
         if (this.notificationSource) {
             this.notificationSource.destroy();

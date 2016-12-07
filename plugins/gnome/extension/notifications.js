@@ -323,50 +323,18 @@ const ReminderManager = new Lang.Class({
         this._idleMonitor = Meta.IdleMonitor.get_core();
         this._idleWatchId = 0;
         this._timeoutSource = 0;
-        this._blockCount = 0;
-        this._isScheduled = false;
     },
 
-    get isScheduled() {
-        return this._isScheduled;
-    },
-
-    get isBlocked() {
-        return this._blockCount != 0;
-    },
-
-    block: function() {
-        this._blockCount += 1;
-
-        if (this._timeoutSource) {
-            Mainloop.source_remove(this._timeoutSource);
-            this._timeoutSource = 0;
-        }
-    },
-
-    unblock: function() {
-        this._blockCount -= 1;
-
-        if (this._blockCount < 0) {
-            Utils.logWarning('Spurious call for reminder unblock');
-        }
-
-        if (!this.isBlocked && this.isScheduled) {
-            this.schedule();
-        }
-    },
-
-    _onIdleTimeout: function(monitor) {
+    _onIdleWatch: function(monitor) {
         if (this._idleWatchId) {
             this._idleMonitor.remove_watch(this._idleWatchId);
             this._idleWatchId = 0;
         }
 
-        this.acknowledged = true;
+        this.dismiss();
     },
 
     _onTimeout: function() {
-        this._isScheduled = false;
         this._timeoutSource = 0;
 
         if (this._idleWatchId) {
@@ -388,31 +356,23 @@ const ReminderManager = new Lang.Class({
         return GLib.SOURCE_REMOVE;
     },
 
-    schedule: function() {
-        let seconds = REMINDER_TIMEOUT;
-
-        this._isScheduled = true;
-
+    _schedule: function() {
         if (this._timeoutSource) {
             Mainloop.source_remove(this._timeoutSource);
             this._timeoutSource = 0;
         }
 
-        if (!this.isBlocked) {
-            this._timeoutSource = Mainloop.timeout_add_seconds(
-                                       seconds,
-                                       Lang.bind(this, this._onTimeout));
-        }
+        this._timeoutSource = Mainloop.timeout_add_seconds(
+                                   REMINDER_TIMEOUT,
+                                   Lang.bind(this, this._onTimeout));
 
         if (this._idleWatchId == 0) {
             this._idleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_ACKNOWLEDGE_REMINDER * 1000,
-                                                                 Lang.bind(this, this._onIdleTimeout));
+                                                                 Lang.bind(this, this._onIdleWatch));
         }
     },
 
-    unschedule: function() {
-        this._isScheduled = false;
-
+    _unschedule: function() {
         if (this._timeoutSource) {
             Mainloop.source_remove(this._timeoutSource);
             this._timeoutSource = 0;
@@ -424,8 +384,22 @@ const ReminderManager = new Lang.Class({
         }
     },
 
+    schedule: function() {
+        this.acknowledged = false;
+        this._schedule();
+    },
+
+    unschedule: function() {
+        this._unschedule();
+    },
+
+    dismiss: function() {
+        this.acknowledged = true;
+        this._unschedule();
+    },
+
     destroy: function() {
-        this.unschedule();
+        this._unschedule();
 
         this.emit('destroy');
     }
@@ -433,8 +407,8 @@ const ReminderManager = new Lang.Class({
 Signals.addSignalMethods(ReminderManager.prototype);
 
 
-const PomodoroEndReminderNotification = new Lang.Class({
-    Name: 'PomodoroEndReminderNotification',
+const RemindPomodoroEndNotification = new Lang.Class({
+    Name: 'RemindPomodoroEndNotification',
     Extends: Notification,
 
     _init: function() {

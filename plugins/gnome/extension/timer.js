@@ -26,7 +26,6 @@ const Main = imports.ui.main;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
 const DBus = Extension.imports.dbus;
-const Settings = Extension.imports.settings;
 const Utils = Extension.imports.utils;
 
 

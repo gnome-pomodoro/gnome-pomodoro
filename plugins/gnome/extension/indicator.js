@@ -41,7 +41,6 @@ const PopupMenu = imports.ui.popupMenu;
 const Tweener = imports.ui.tweener;
 
 const Config = Extension.imports.config;
-const Settings = Extension.imports.settings;
 const Timer = Extension.imports.timer;
 
 const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
@@ -722,7 +721,7 @@ const Indicator = new Lang.Class({
     Name: 'PomodoroIndicator',
     Extends: PanelMenu.Button,
 
-    _init: function(timer) {
+    _init: function(timer, type) {
         this.parent(St.Align.START, _("Pomodoro"), true);
 
         this.timer  = timer;
@@ -743,17 +742,42 @@ const Indicator = new Lang.Class({
         this.actor.add_child(this._hbox);
 
         this.setMenu(new IndicatorMenu(this));
-
-        this._settings = Settings.getSettings('org.gnome.pomodoro.plugins.gnome');
-        this._settingsChangedId = this._settings.connect('changed::indicator-type',
-                                                         Lang.bind(this, this._onSettingsChanged));
-
-        this._onSettingsChanged();
+        this.setType(type);
 
         this._onBlinked();
 
         this._timerPausedId = this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
         this._timerResumedId = this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
+    },
+
+    setType: function(type) {
+        if (this.widget) {
+            this.widget.destroy();
+            this.widget = null;
+        }
+
+        switch (type) {
+            case IndicatorType.TEXT:
+                this.widget = new TextIndicator(this.timer);
+                break;
+
+            case IndicatorType.SHORT_TEXT:
+                this.widget = new ShortTextIndicator(this.timer);
+                break;
+
+            default:
+                this.widget = new IconIndicator(this.timer);
+                break;
+        }
+
+        this.widget.actor.bind_property('opacity',
+                                        this._arrow,
+                                        'opacity',
+                                        GObject.BindingFlags.SYNC_CREATE);
+
+        this._hbox.add_child(this.widget.actor, { expand: false,
+                                                  x_fill: false,
+                                                  x_align: St.Align.START });
     },
 
     _onBlinked: function() {
@@ -836,38 +860,6 @@ const Indicator = new Lang.Class({
                 this._blinkTimeoutSource = 0;
             }
         }
-    },
-
-    _onSettingsChanged: function() {
-        let indicatorType = this._settings.get_string('indicator-type');
-
-        if (this.widget) {
-            this.widget.destroy();
-            this.widget = null;
-        }
-
-        switch (indicatorType) {
-            case IndicatorType.TEXT:
-                this.widget = new TextIndicator(this.timer);
-                break;
-
-            case IndicatorType.SHORT_TEXT:
-                this.widget = new ShortTextIndicator(this.timer);
-                break;
-
-            default:
-                this.widget = new IconIndicator(this.timer);
-                break;
-        }
-
-        this.widget.actor.bind_property('opacity',
-                                        this._arrow,
-                                        'opacity',
-                                        GObject.BindingFlags.SYNC_CREATE);
-
-        this._hbox.add_child(this.widget.actor, { expand: false,
-                                                  x_fill: false,
-                                                  x_align: St.Align.START });
     },
 
     _onActorDestroy: function() {
