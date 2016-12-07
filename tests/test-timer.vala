@@ -394,6 +394,7 @@ namespace Pomodoro
             timer1.pause (0.0);
             timer1.resume (5.0);
             timer1.update (15.0);
+            timer1.pause (15.0);
             timer1.save (settings);
 
             assert (settings.get_string ("timer-state") == "pomodoro");
@@ -402,6 +403,7 @@ namespace Pomodoro
             assert (settings.get_double ("timer-elapsed") == 10.0);
             assert (settings.get_double ("timer-score") == 1.0);
             assert (settings.get_string ("timer-date") == "1970-01-01T00:00:15Z");
+            assert (settings.get_boolean ("timer-paused") == true);
 
             var timer2 = new Pomodoro.Timer ();
             timer2.restore (settings, timer1.timestamp);
@@ -413,6 +415,7 @@ namespace Pomodoro
             assert (timer2.score == timer1.score);
             assert (timer2.timestamp == timer1.timestamp);
             assert (timer2.offset == timer1.offset);
+            assert (timer2.is_paused == timer1.is_paused);
         }
 
         /**
@@ -443,6 +446,7 @@ namespace Pomodoro
 
             assert (timer2.timestamp == 20.0);
             assert (timer2.offset == 10.0);
+            assert (timer2.is_paused == false);
         }
 
         /**
@@ -471,6 +475,7 @@ namespace Pomodoro
             assert (timer2.score == 0.0);
             assert (timer2.timestamp == 3620.0);
             assert (timer2.offset == 0.0);
+            assert (timer2.is_paused == false);
         }
 
         /**

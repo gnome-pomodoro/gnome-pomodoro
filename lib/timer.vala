@@ -389,6 +389,8 @@ namespace Pomodoro
                                  this.score);
             settings.set_string ("timer-date",
                                  datetime_to_string (timer_datetime));
+            settings.set_boolean ("timer-paused",
+                                  this.is_paused);
         }
 
         /**
@@ -401,7 +403,9 @@ namespace Pomodoro
                              double        timestamp = Pomodoro.get_current_time ())
                              requires (settings.schema == "org.gnome.pomodoro.state")
         {
-            var state = Pomodoro.TimerState.lookup (settings.get_string ("timer-state"));
+            var state          = Pomodoro.TimerState.lookup (settings.get_string ("timer-state"));
+            var is_paused      = settings.get_boolean ("timer-paused");
+            var score          = settings.get_double ("timer-score");
             var last_timestamp = 0.0;
 
             if (state != null)
@@ -428,13 +432,20 @@ namespace Pomodoro
 
             if (state != null && timestamp - last_timestamp < TIMER_RESTORE_TIMEOUT_TO_RESET)
             {
-                this.score = settings.get_double ("timer-score");
-
+                this.freeze_notify ();
+                this.score = score;
                 this.set_state_full (state, last_timestamp);
                 this.pause (last_timestamp);
+                this.thaw_notify ();
 
                 this.update (timestamp);
-                this.resume (timestamp);
+
+                if (is_paused) {
+                    this.notify_property ("is-paused");
+                }
+                else {
+                    this.resume (timestamp);
+                }
             }
             else {
                 this.reset (timestamp);

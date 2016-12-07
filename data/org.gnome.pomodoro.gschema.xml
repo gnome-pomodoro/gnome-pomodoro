@@ -83,6 +83,11 @@
       <summary>Timer elapsed</summary>
       <description>Timer elapsed time.</description>
     </key>
+    <key name="timer-paused" type="b">
+      <default>false</default>
+      <summary>Timer paused</summary>
+      <description>Whether timer is paused.</description>
+    </key>
     <key name="timer-date" type="s">
       <default>""</default>
       <summary>Timer timestamp</summary>
