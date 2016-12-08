@@ -336,10 +336,9 @@ namespace Pomodoro
         {
             this.settings = Pomodoro.get_settings ()
                                     .get_child ("preferences");
+            this.settings.changed["enabled-plugins"].connect (this.on_settings_changed);
 
             this.engine = Peas.Engine.get_default ();
-            this.engine.load_plugin.connect (this.on_engine_load_plugin);
-            this.engine.unload_plugin.connect (this.on_engine_unload_plugin);
 
             this.plugins_listbox.set_header_func (Pomodoro.list_box_separator_func);
             this.plugins_listbox.set_sort_func (list_box_sort_func);
@@ -358,22 +357,38 @@ namespace Pomodoro
             return GLib.strcmp (name1, name2);
         }
 
-        private void on_engine_load_plugin (Peas.PluginInfo plugin_info)
+        private void on_settings_changed (GLib.Settings settings,
+                                          string        key)
         {
-            var toggle = this.toggles.lookup (plugin_info.get_module_name ());
+            foreach (var plugin_info in this.engine.get_plugin_list ())
+            {
+                var toggle  = this.toggles.lookup (plugin_info.get_module_name ());
+                var enabled = false;
 
-            if (toggle != null) {
-                toggle.state = true;
+                if (toggle != null) {
+                    enabled = this.get_plugin_enabled (plugin_info.get_module_name ());
+
+                    if (toggle.state != enabled) {
+                        toggle.state = enabled;
+                    }
+                }
             }
         }
 
-        private void on_engine_unload_plugin (Peas.PluginInfo plugin_info)
+        private bool get_plugin_enabled (string name)
         {
-            var toggle = this.toggles.lookup (plugin_info.get_module_name ());
+            var enabled_plugins = this.settings.get_strv ("enabled-plugins");
+            var enabled_in_settings = false;
 
-            if (toggle != null) {
-                toggle.state = false;
+            foreach (var plugin_name in enabled_plugins) {
+                if (plugin_name == name) {
+                    enabled_in_settings = true;
+
+                    break;
+                }
             }
+
+            return enabled_in_settings;
         }
 
         private void set_plugin_enabled (string name,
@@ -975,14 +990,17 @@ namespace Pomodoro
 
         public void remove_page (string name)
         {
-            var child = this.stack.get_child_by_name (name);
+            if (this.stack != null)
+            {
+                var child = this.stack.get_child_by_name (name);
 
-            if (this.stack.get_visible_child_name () == name) {
-                this.set_page ("main");
-            }
+                if (this.stack.get_visible_child_name () == name) {
+                    this.set_page ("main");
+                }
 
-            if (child != null) {
-                this.stack.remove (child);
+                if (child != null) {
+                    this.stack.remove (child);
+                }
             }
 
             this.pages.remove (name);

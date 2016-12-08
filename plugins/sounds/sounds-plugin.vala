@@ -449,7 +449,10 @@ namespace SoundsPlugin
         public override void unmap ()
         {
             var application_extension = SoundsPlugin.ApplicationExtension.instance;
-            application_extension.sound_manager.uninhibit_ticking_sound ();
+
+            if (application_extension != null && application_extension.sound_manager != null) {
+                application_extension.sound_manager.uninhibit_ticking_sound ();
+            }
 
             base.unmap ();
         }

@@ -135,6 +135,19 @@ namespace Pomodoro
             }
         }
 
+        public void disable_all ()
+        {
+            this.enabled_capabilities.foreach ((capability_name) => {
+                var capability = capabilities.lookup (capability_name);
+
+                if (capability != null && capability.enabled) {
+                    capability.disable ();
+                }
+            });
+
+            this.enabled_capabilities.remove_all ();
+        }
+
         private static Pomodoro.Priority get_group_priority (Pomodoro.CapabilityGroup group)
         {
             return group.get_data<Pomodoro.Priority> ("priority");
@@ -239,15 +252,7 @@ namespace Pomodoro
 
         public override void dispose ()
         {
-            this.enabled_capabilities.foreach ((capability_name) => {
-                var capability = capabilities.lookup (capability_name);
-
-                if (capability != null && capability.enabled) {
-                    capability.disable ();
-                }
-            });
-
-            this.enabled_capabilities.remove_all ();
+            this.disable_all ();
 
             base.dispose ();
         }

@@ -234,21 +234,31 @@ namespace Actions
         private GLib.AsyncQueue<Actions.Context?> jobs_queue;
         private GLib.Thread<bool> jobs_thread;
         private Actions.ActionManager actions_manager;
+        private Pomodoro.Timer timer;
 
         construct
         {
-            this.actions_manager = new Actions.ActionManager ();
+            this.actions_manager = new Actions.ActionManager ();;
 
             this.jobs_queue = new GLib.AsyncQueue<Actions.Context?> ();
             this.jobs_thread = new GLib.Thread<bool> ("actions-queue", this.jobs_thread_func);
 
-            var timer = Pomodoro.Timer.get_default ();
-            timer.state_changed.connect (this.on_timer_state_changed);
-            timer.notify["is-paused"].connect (this.on_timer_is_paused_notify);
+            this.timer = Pomodoro.Timer.get_default ();
+            this.timer.state_changed.connect (this.on_timer_state_changed);
+            this.timer.notify["is-paused"].connect (this.on_timer_is_paused_notify);
 
-            if (!(timer.state is Pomodoro.DisabledState)) {
-                this.on_timer_state_changed (timer.state, new Pomodoro.DisabledState ());
+            if (!(this.timer.state is Pomodoro.DisabledState)) {
+                this.on_timer_state_changed (this.timer.state, new Pomodoro.DisabledState ());
             }
+            else {
+                this.on_timer_state_changed (this.timer.state, this.timer.state);
+            }
+
+            if (this.timer.is_paused) {
+               this.on_timer_is_paused_notify ();
+            }
+
+            this.@ref ();
         }
 
         private bool jobs_thread_func ()
@@ -264,13 +274,14 @@ namespace Actions
                 }
             }
 
+            this.@unref ();
+
             return true;
         }
 
-        private void on_timer_is_paused_notify (GLib.Object    object,
-                                                GLib.ParamSpec param_spec)
+        private void on_timer_is_paused_notify ()
         {
-            var timer    = object as Pomodoro.Timer;
+            var timer    = this.timer;
             var actions  = Actions.ActionManager.get_instance ().get_actions ();
             var states   = Actions.State.from_timer_state (timer.state);
             var triggers = timer.is_paused ? Actions.Trigger.PAUSE : Actions.Trigger.RESUME;
@@ -303,14 +314,7 @@ namespace Actions
             var triggers_b = Actions.Trigger.NONE;
 
             if (previous_state is Pomodoro.DisabledState) {
-                triggers_a |= Actions.Trigger.ENABLE;
-            }
-
-            if (previous_state.is_completed ()) {
-                triggers_a |= Actions.Trigger.COMPLETE;
-            }
-            else {
-                triggers_a |= Actions.Trigger.SKIP;
+                triggers_b |= Actions.Trigger.ENABLE;
             }
 
             if (state is Pomodoro.DisabledState) {
@@ -318,6 +322,13 @@ namespace Actions
             }
             else {
                 triggers_b |= Actions.Trigger.START;
+            }
+
+            if (previous_state.is_completed ()) {
+                triggers_a |= Actions.Trigger.COMPLETE;
+            }
+            else {
+                triggers_a |= Actions.Trigger.SKIP;
             }
 
             /* actions for previous state */
@@ -359,11 +370,11 @@ namespace Actions
 
         public override void dispose ()
         {
+            this.on_timer_state_changed (new Pomodoro.DisabledState (), this.timer.state);
+
             this.jobs_queue.push (Actions.Context () {
                 triggers = Actions.Trigger.NONE
             });
-
-            this.actions_manager.dispose ();
 
             base.dispose ();
         }

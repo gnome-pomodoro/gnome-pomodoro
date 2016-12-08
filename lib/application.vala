@@ -505,9 +505,25 @@ namespace Pomodoro
          */
         public override void shutdown ()
         {
+            this.hold ();
+
             this.save_timer ();
 
+            foreach (var window in this.get_windows ()) {
+                this.remove_window (window);
+            }
+
+            this.capabilities.disable_all ();
+
+            var engine = Peas.Engine.get_default ();
+
+            foreach (var plugin_info in engine.get_plugin_list ()) {
+                engine.try_unload_plugin (plugin_info);
+            }
+
             base.shutdown ();
+
+            this.release ();
         }
 
         /* Emitted on the primary instance when an activation occurs.
