@@ -10,17 +10,14 @@
     border-radius: 5px;
 }
 
-.pomodoro-list > GtkListBoxRow,
 .pomodoro-list > row {
     padding: 12px 20px;
 }
 
-.pomodoro-list > GtkListBoxRow.pomodoro-wide-row,
 .pomodoro-list > row.pomodoro-wide-row {
     padding: 12px 15px;
 }
 
-.pomodoro-list > GtkListBoxRow.pomodoro-slim-row,
 .pomodoro-list > row.pomodoro-slim-row {
     padding-top: 8px;
     padding-bottom: 8px;
@@ -99,8 +96,6 @@
     color: white;
 }
 
-.pomodoro-screen-notification GtkLabel,
-.pomodoro-screen-notification GtkLabel:backdrop,
 .pomodoro-screen-notification label,
 .pomodoro-screen-notification label:backdrop {
     font-size: 11pt;
