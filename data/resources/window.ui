@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.19.0 -->
+<!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
   <!-- interface-css-provider-path style.css -->
@@ -95,7 +95,7 @@
                           <object class="GtkLabel" id="minutes_label">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">00</property>
+                            <property name="label">00</property>
                             <property name="justify">center</property>
                             <property name="width_chars">2</property>
                             <style>
@@ -113,7 +113,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="margin_bottom">12</property>
-                            <property name="label" translatable="yes">:</property>
+                            <property name="label">:</property>
                             <style>
                               <class name="pomodoro-timer-label"/>
                               <class name="pomodoro-separator-label"/>
@@ -129,7 +129,7 @@
                           <object class="GtkLabel" id="seconds_label">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">00</property>
+                            <property name="label">00</property>
                             <property name="justify">center</property>
                             <property name="width_chars">2</property>
                             <style>
@@ -272,10 +272,11 @@
           <object class="GtkModelButton">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="text" translatable="yes">Pomodoro</property>
-            <property name="centered">True</property>
+            <property name="receives_default">False</property>
             <property name="action_name">app.timer-set-state</property>
             <property name="action_target">"pomodoro"</property>
+            <property name="text" translatable="yes">Pomodoro</property>
+            <property name="centered">True</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -287,10 +288,11 @@
           <object class="GtkModelButton">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="text" translatable="yes">Short Break</property>
-            <property name="centered">True</property>
+            <property name="receives_default">False</property>
             <property name="action_name">app.timer-set-state</property>
             <property name="action_target">"short-break"</property>
+            <property name="text" translatable="yes">Short Break</property>
+            <property name="centered">True</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -302,10 +304,11 @@
           <object class="GtkModelButton">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="text" translatable="yes">Long Break</property>
-            <property name="centered">True</property>
+            <property name="receives_default">False</property>
             <property name="action_name">app.timer-set-state</property>
             <property name="action_target">"long-break"</property>
+            <property name="text" translatable="yes">Long Break</property>
+            <property name="centered">True</property>
           </object>
           <packing>
             <property name="expand">False</property>
