@@ -493,13 +493,13 @@
                 <property name="margin_bottom">24</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkLabel" id="notifications_label1">
+                  <object class="GtkLabel" id="desktop_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_left">6</property>
                     <property name="margin_right">6</property>
                     <property name="margin_bottom">6</property>
-                    <property name="label" translatable="yes">Extras</property>
+                    <property name="label" translatable="yes">Desktop</property>
                     <property name="xalign">0</property>
                     <attributes>
                       <attribute name="weight" value="bold"/>
@@ -518,14 +518,14 @@
                     <property name="orientation">vertical</property>
                     <property name="spacing">24</property>
                     <child>
-                      <object class="GtkFrame" id="other_frame">
+                      <object class="GtkFrame" id="desktop_frame">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label_xalign">0</property>
                         <property name="label_yalign">1</property>
                         <property name="shadow_type">in</property>
                         <child>
-                          <object class="GtkListBox" id="other_listbox">
+                          <object class="GtkListBox" id="desktop_listbox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="selection_mode">none</property>

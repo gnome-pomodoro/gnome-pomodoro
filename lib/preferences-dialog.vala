@@ -486,7 +486,7 @@ namespace Pomodoro
         [GtkChild]
         public Gtk.ListBox notifications_listbox;
         [GtkChild]
-        public Gtk.ListBox other_listbox;
+        public Gtk.ListBox desktop_listbox;
         [GtkChild]
         public Gtk.ListBox plugins_listbox;
         [GtkChild]
@@ -506,7 +506,7 @@ namespace Pomodoro
         {
             this.timer_listbox.set_header_func (Pomodoro.list_box_separator_func);
             this.notifications_listbox.set_header_func (Pomodoro.list_box_separator_func);
-            this.other_listbox.set_header_func (Pomodoro.list_box_separator_func);
+            this.desktop_listbox.set_header_func (Pomodoro.list_box_separator_func);
 
             var application = Pomodoro.Application.get_default ();
             application.capabilities.capability_enabled.connect (this.on_capability_enabled);
@@ -515,7 +515,7 @@ namespace Pomodoro
             this.update_capabilities ();
 
             /* hide frame if empty */
-            this.setup_listbox (this.other_listbox);
+            this.setup_listbox (this.desktop_listbox);
         }
 
         private unowned Widgets.LogScale setup_time_scale (Gtk.Builder builder,

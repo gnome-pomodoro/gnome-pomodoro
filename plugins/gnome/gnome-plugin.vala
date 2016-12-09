@@ -182,7 +182,7 @@ namespace GnomePlugin
                                        hide_system_notifications_toggle);
             row.name = "hide-system-notifications";
             main_page.lisboxrow_sizegroup.add_widget (row);
-            main_page.other_listbox.add (row);
+            main_page.desktop_listbox.add (row);
             this.rows.prepend (row);
 
             this.settings.bind ("hide-system-notifications",
