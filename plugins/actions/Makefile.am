@@ -7,10 +7,10 @@ libactions_la_plugindata_DATA = \
 	actions.plugin
 
 libactions_la_VALASOURCES = \
-	action.vala \
 	action-listboxrow.vala \
 	action-page.vala \
 	actions.vala \
+	action.vala \
 	enums.vala \
 	preferences-page.vala \
 	$(top_builddir)/lib/gnome-pomodoro.vapi

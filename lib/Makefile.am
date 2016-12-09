@@ -2,13 +2,13 @@ lib_LTLIBRARIES = \
 	libgnome-pomodoro.la
 
 libgnome_pomodoro_la_VALASOURCES = \
-	animation.vala \
 	about-dialog.vala \
 	accelerator.vala \
+	animation.vala \
 	application.vala \
-	capability.vala \
 	capability-group.vala \
 	capability-manager.vala \
+	capability.vala \
 	log-scale.vala \
 	notifications-capability.vala \
 	preferences-dialog.vala \
