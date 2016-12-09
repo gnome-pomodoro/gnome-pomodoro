@@ -89,14 +89,12 @@ const Timer = new Lang.Class({
         this._connected = true;
 
         this.emit('service-connected');
-        this.emit('state-changed');
         this.emit('update');
     },
 
     _onNameVanished: function() {
         this._connected = false;
 
-        this.emit('state-changed');
         this.emit('update');
         this.emit('service-disconnected');
     },

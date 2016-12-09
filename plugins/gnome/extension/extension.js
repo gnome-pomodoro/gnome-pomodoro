@@ -84,8 +84,6 @@ const PomodoroExtension = new Lang.Class({
                                         Lang.bind(this, this._onSettingsChanged));
 
             this.timer = new Timer.Timer();
-            this.timer.connect('service-connected', Lang.bind(this, this._onServiceConnected));
-            this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
             this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
             this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
             this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
@@ -170,14 +168,6 @@ const PomodoroExtension = new Lang.Class({
 
                 break;
         }
-    },
-
-    _onServiceConnected: function() {
-        this._update();
-    },
-
-    _onServiceDisconnected: function() {
-        this._update();
     },
 
     _onTimerPaused: function() {
