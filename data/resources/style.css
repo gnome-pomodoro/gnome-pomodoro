@@ -39,11 +39,6 @@
     padding-bottom: 6px;
 }
 
-.pomodoro-state-label,
-.pomodoro-button {
-    font-size: 14px;
-}
-
 .pomodoro-symbolic-button {
     outline: 0;
     border: 0;
@@ -75,7 +70,7 @@
 }
 
 .pomodoro-timer-label {
-    font-size: 64px;
+    font-size: 55pt;
 }
 
 .pomodoro-separator-label:backdrop {
