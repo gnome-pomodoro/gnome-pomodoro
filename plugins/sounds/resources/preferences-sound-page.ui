@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.19.0 -->
+<!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
   <object class="GtkAdjustment" id="volume_adjustment">
@@ -98,102 +98,50 @@
       </packing>
     </child>
     <child>
-      <object class="GtkBox" id="chooser_box">
+      <object class="GtkFrame" id="chooser_frame">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
+        <property name="label_xalign">0</property>
+        <property name="shadow_type">in</property>
         <child>
-          <object class="GtkFrame" id="chooser_frame">
+          <object class="GtkAlignment" id="chooser_alignment">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label_xalign">0</property>
-            <property name="shadow_type">in</property>
             <child>
-              <object class="GtkAlignment" id="chooser_alignment">
+              <object class="GtkListBox" id="chooser_listbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <signal name="drag-data-received" handler="on_drag_data_received" after="yes" swapped="no"/>
+                <signal name="row-activated" handler="on_row_activated" swapped="no"/>
+                <signal name="row-selected" handler="on_row_selected" swapped="no"/>
                 <child>
-                  <object class="GtkListBox" id="chooser_listbox">
+                  <object class="GtkListBoxRow" id="add_listboxrow">
+                    <property name="name">add</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <signal name="drag-data-received" handler="on_drag_data_received" after="yes" swapped="no"/>
-                    <signal name="row-activated" handler="on_row_activated" swapped="no"/>
-                    <signal name="row-selected" handler="on_row_selected" swapped="no"/>
+                    <property name="can_focus">True</property>
+                    <property name="selectable">False</property>
                     <child>
-                      <object class="GtkListBoxRow" id="add_listboxrow">
-                        <property name="name">add</property>
+                      <object class="GtkImage" id="image1">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="selectable">False</property>
-                        <child>
-                          <object class="GtkImage" id="image1">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="icon_name">list-add-symbolic</property>
-                            <property name="icon_size">1</property>
-                            <style>
-                              <class name="dim-label"/>
-                            </style>
-                          </object>
-                        </child>
+                        <property name="can_focus">False</property>
+                        <property name="icon_name">list-add-symbolic</property>
+                        <property name="icon_size">1</property>
+                        <style>
+                          <class name="dim-label"/>
+                        </style>
                       </object>
                     </child>
-                    <style>
-                      <class name="pomodoro-list"/>
-                    </style>
                   </object>
                 </child>
+                <style>
+                  <class name="pomodoro-list"/>
+                </style>
               </object>
             </child>
-            <child type="label_item">
-              <placeholder/>
-            </child>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
         </child>
-        <child>
-          <object class="GtkToolbar" id="chooser_toolbar">
-            <property name="can_focus">False</property>
-            <property name="toolbar_style">icons</property>
-            <property name="show_arrow">False</property>
-            <property name="icon_size">1</property>
-            <child>
-              <object class="GtkToolButton" id="add_toolbutton">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Add Sound</property>
-                <property name="icon_name">list-add-symbolic</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="remove_toolbutton">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Remove Sound</property>
-                <property name="icon_name">list-remove-symbolic</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <style>
-              <class name="inline-toolbar"/>
-            </style>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
+        <child type="label_item">
+          <placeholder/>
         </child>
       </object>
       <packing>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro 0.13.0\n"
 "Report-Msgid-Bugs-To: https://github.com/codito/gnome-pomodoro/issues\n"
-"POT-Creation-Date: 2016-12-09 22:56+0100\n"
+"POT-Creation-Date: 2016-12-10 14:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,7 +42,8 @@ msgid ""
 msgstr ""
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:19
-msgid "Main window"
+#: data/resources/preferences-main-page.ui:45
+msgid "Timer"
 msgstr ""
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:23 lib/preferences-dialog.vala:805
@@ -132,10 +133,6 @@ msgstr ""
 #: data/resources/preferences-keyboard-shortcut-page.ui:83
 #: plugins/actions/resources/action-page.ui:245 plugins/actions/enums.vala:203
 msgid "Disable"
-msgstr ""
-
-#: data/resources/preferences-main-page.ui:45
-msgid "Timer"
 msgstr ""
 
 #: data/resources/preferences-main-page.ui:108
