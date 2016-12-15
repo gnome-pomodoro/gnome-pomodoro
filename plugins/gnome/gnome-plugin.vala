@@ -32,7 +32,7 @@ namespace GnomePlugin
 
     public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
     {
-        private static const string[] SHELL_CAPABILITIES = {
+        private const string[] SHELL_CAPABILITIES = {
             "notifications",
             "indicator",
             "accelerator",

@@ -24,14 +24,14 @@ namespace Pomodoro
     [GtkTemplate (ui = "/org/gnome/pomodoro/window.ui")]
     public class Window : Gtk.ApplicationWindow, Gtk.Buildable
     {
-        private static const int MIN_WIDTH = 500;
-        private static const int MIN_HEIGHT = 650;
+        private const int MIN_WIDTH = 500;
+        private const int MIN_HEIGHT = 650;
 
-        private static const double FADED_IN = 1.0;
-        private static const double FADED_OUT = 0.2;
+        private const double FADED_IN = 1.0;
+        private const double FADED_OUT = 0.2;
 
-        private static const double TIMER_LINE_WIDTH = 6.0;
-        private static const double TIMER_RADIUS = 165.0;
+        private const double TIMER_LINE_WIDTH = 6.0;
+        private const double TIMER_RADIUS = 165.0;
 
         private struct Name
         {
@@ -39,11 +39,11 @@ namespace Pomodoro
             public string display_name;
         }
 
-        private static const Name[] state_names = {
+        private const Name[] state_names = {
             { "null", "" },
-            { "pomodoro", "Pomodoro" },
-            { "short-break", "Short Break" },
-            { "long-break", "Long Break" }
+            { "pomodoro", N_("Pomodoro") },
+            { "short-break", N_("Short Break") },
+            { "long-break", N_("Long Break") }
         };
 
         private unowned Pomodoro.Timer timer;

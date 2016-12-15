@@ -61,7 +61,7 @@ namespace Pomodoro
 
             public static ExitStatus exit_status = ExitStatus.UNDEFINED;
 
-            public static const GLib.OptionEntry[] entries = {
+            public const GLib.OptionEntry[] ENTRIES = {
                 { "start-stop", 0, 0, GLib.OptionArg.NONE,
                   ref start_stop, N_("Start/Stop"), null },
 
@@ -427,7 +427,7 @@ namespace Pomodoro
         private void parse_command_line (ref unowned string[] arguments) throws GLib.OptionError
         {
             var option_context = new GLib.OptionContext ();
-            option_context.add_main_entries (Options.entries, Config.GETTEXT_PACKAGE);
+            option_context.add_main_entries (Options.ENTRIES, Config.GETTEXT_PACKAGE);
             option_context.add_group (Gtk.get_option_group (true));
 
             // TODO: add options from plugins

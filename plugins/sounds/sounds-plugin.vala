@@ -85,7 +85,8 @@ namespace SoundsPlugin
 
         protected SoundPlayer player;
 
-        private static const Gtk.TargetEntry[] target_entries = {};
+        private const Gtk.TargetEntry[] TARGET_ENTRIES = {
+        };
 
         private static string file_chooser_current_folder_uri;
         private static string file_chooser_current_file_uri;
@@ -118,13 +119,13 @@ namespace SoundsPlugin
             this.notify["uri"].connect (this.on_uri_notify);
 
             /* Drag and drop */
-            var target_list = new Gtk.TargetList (PreferencesSoundPage.target_entries);
+            var target_list = new Gtk.TargetList (PreferencesSoundPage.TARGET_ENTRIES);
             target_list.add_uri_targets (TargetType.TEXT_URI_LIST);
             target_list.add_text_targets (TargetType.TEXT_PLAIN);
 
             Gtk.drag_dest_set (this.chooser_listbox,
                                Gtk.DestDefaults.ALL,
-                               PreferencesSoundPage.target_entries,
+                               PreferencesSoundPage.TARGET_ENTRIES,
                                Gdk.DragAction.COPY);
             Gtk.drag_dest_set_target_list (this.chooser_listbox, target_list);
         }
@@ -398,7 +399,7 @@ namespace SoundsPlugin
      */
     public class PreferencesTickingSoundPage : PreferencesSoundPage
     {
-        private static const Preset[] presets = {
+        private const Preset[] PRESETS = {
             { "clock.ogg", N_("Clock Ticking") },
             { "timer.ogg", N_("Timer Ticking") },
             { "birds.ogg", N_("Woodland Birds") }
@@ -422,7 +423,7 @@ namespace SoundsPlugin
                                 "volume",
                                 GLib.SettingsBindFlags.DEFAULT);
 
-            this.add_presets (presets);
+            this.add_presets (PRESETS);
         }
 
         protected override void setup_player ()
@@ -460,7 +461,7 @@ namespace SoundsPlugin
 
     public class PreferencesPomodoroEndSoundPage : PreferencesSoundPage
     {
-        private static const Preset[] presets = {
+        private const Preset[] PRESETS = {
             { "bell.ogg", N_("Bell") },
             { "loud-bell.ogg", N_("Loud Bell") }
         };
@@ -483,7 +484,7 @@ namespace SoundsPlugin
                                 "volume",
                                 GLib.SettingsBindFlags.DEFAULT);
 
-            this.add_presets (presets);
+            this.add_presets (PRESETS);
         }
 
         protected override void setup_player ()
@@ -499,7 +500,7 @@ namespace SoundsPlugin
 
     public class PreferencesPomodoroStartSoundPage : PreferencesSoundPage
     {
-        private static const Preset[] presets = {
+        private const Preset[] PRESETS = {
             { "bell.ogg", N_("Bell") },
             { "loud-bell.ogg", N_("Loud Bell") }
         };
@@ -522,7 +523,7 @@ namespace SoundsPlugin
                                 "volume",
                                 GLib.SettingsBindFlags.DEFAULT);
 
-            this.add_presets (presets);
+            this.add_presets (PRESETS);
         }
 
         protected override void setup_player ()
@@ -538,7 +539,7 @@ namespace SoundsPlugin
 
     public class PreferencesDialogExtension : Peas.ExtensionBase, Pomodoro.PreferencesDialogExtension
     {
-        private static const string[] volume_icons = {
+        private const string[] VOLUME_ICONS = {
             "audio-volume-muted-symbolic",
             "audio-volume-high-symbolic",
             "audio-volume-low-symbolic",
@@ -625,14 +626,14 @@ namespace SoundsPlugin
                                                          void*        user_data)
         {
             var volume = variant.get_double ();
-            var num_icons = volume_icons.length;
+            var num_icons = VOLUME_ICONS.length;
             string icon_name;
 
             if (volume == 0.0) {
-                icon_name = volume_icons[0];
+                icon_name = VOLUME_ICONS[0];
             }
             else if (volume == 1.0) {
-                icon_name = volume_icons[1];
+                icon_name = VOLUME_ICONS[1];
             }
             else {
                 var step = (1.0 - 0.0) / (num_icons - 2);
@@ -640,7 +641,7 @@ namespace SoundsPlugin
 
                 assert (i < num_icons);
 
-                icon_name = volume_icons[i];
+                icon_name = VOLUME_ICONS[i];
             }
 
             value.set_string (icon_name);

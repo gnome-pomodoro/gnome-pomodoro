@@ -30,11 +30,11 @@ namespace Pomodoro
     [GtkTemplate (ui = "/org/gnome/pomodoro/screen-notification.ui")]
     public class ScreenNotification : Gtk.Window, Gtk.Buildable
     {
-        private static const uint IDLE_TIME_TO_CLOSE = 600;
-        private static const uint MIN_DISPLAY_TIME = 500;
-        private static const uint FADE_IN_TIME = 180;
-        private static const uint FADE_OUT_TIME = 180;
-        private static const uint MOTION_DISTANCE_TO_CLOSE = 20;
+        private const uint IDLE_TIME_TO_CLOSE = 600;
+        private const uint MIN_DISPLAY_TIME = 500;
+        private const uint FADE_IN_TIME = 180;
+        private const uint FADE_OUT_TIME = 180;
+        private const uint MOTION_DISTANCE_TO_CLOSE = 20;
 
         private GLib.Object idle_monitor;  /* TODO */
 

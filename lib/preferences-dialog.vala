@@ -756,14 +756,14 @@ namespace Pomodoro
     [GtkTemplate (ui = "/org/gnome/pomodoro/preferences.ui")]
     public class PreferencesDialog : Gtk.ApplicationWindow, Gtk.Buildable
     {
-        private static const int FIXED_WIDTH = 600;
-        private static const int FIXED_HEIGHT = 720;
+        private const int FIXED_WIDTH = 600;
+        private const int FIXED_HEIGHT = 720;
 
-        private static unowned Pomodoro.PreferencesDialog instance;
-
-        private static const GLib.ActionEntry[] action_entries = {
+        private const GLib.ActionEntry[] ACTION_ENTRIES = {
             { "back", on_back_activate }
         };
+
+        private static unowned Pomodoro.PreferencesDialog instance;
 
         [GtkChild]
         private Gtk.HeaderBar header_bar;
@@ -813,7 +813,7 @@ namespace Pomodoro
                           _("Keyboard Shortcut"),
                           typeof (Pomodoro.PreferencesKeyboardShortcutPage));
 
-            this.add_action_entries (PreferencesDialog.action_entries, this);
+            this.add_action_entries (PreferencesDialog.ACTION_ENTRIES, this);
 
             this.history_clear ();
 
