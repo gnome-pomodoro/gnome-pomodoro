@@ -4,7 +4,6 @@ SUBDIRS = \
 	plugins \
 	data \
 	po \
-	man \
 	tests \
 	packages
 
