@@ -507,6 +507,7 @@ namespace Pomodoro
             this.timer_listbox.set_header_func (Pomodoro.list_box_separator_func);
             this.notifications_listbox.set_header_func (Pomodoro.list_box_separator_func);
             this.desktop_listbox.set_header_func (Pomodoro.list_box_separator_func);
+            this.plugins_listbox.set_header_func (Pomodoro.list_box_separator_func);
 
             var application = Pomodoro.Application.get_default ();
             application.capabilities.capability_enabled.connect (this.on_capability_enabled);
