@@ -227,7 +227,6 @@ AC_CONFIG_FILES([
     data/icons/256x256/Makefile
     data/icons/symbolic/Makefile
     data/sounds/Makefile
-    po/Makefile.in
     man/Makefile
     packages/Makefile
     packages/debian/Makefile
