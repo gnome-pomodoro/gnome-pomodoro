@@ -1,0 +1,542 @@
+# Lithuanian translation for gnome-pomodoro.
+# Copyright (C) 2016 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnome-pomodoro package.
+# Paulius Šukys <paul.sukys@gmail.com>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-pomodoro 0.13.0\n"
+"Report-Msgid-Bugs-To: https://github.com/codito/gnome-pomodoro/issues\n"
+"POT-Creation-Date: 2016-12-10 14:29+0100\n"
+"PO-Revision-Date: 2016-12-13 21:32+0100\n"
+"Last-Translator: Paulius Šukys <paul.sukys@gmail.com>\n"
+"Language-Team: Lithuanian <>\n"
+"Language: lt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 ? 0 : n%10>=2 && (n"
+"%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Gtranslator 2.91.7\n"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:7
+#: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:51
+#: data/resources/window.ui:278 lib/about-dialog.vala:31
+#: lib/notifications-capability.vala:106 src/main.vala:50
+#: plugins/actions/enums.vala:91 plugins/gnome/extension/indicator.js:171
+#: plugins/gnome/extension/indicator.js:725
+#: plugins/gnome/extension/notifications.js:86
+#: plugins/gnome/extension/notifications.js:202
+#: plugins/gnome/extension/notifications.js:432
+msgid "Pomodoro"
+msgstr "Pomodoro"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:8
+msgid "A time management utility for GNOME"
+msgstr "Laiko valdymo įrankis GNOME aplinkai"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:10
+msgid ""
+"A GNOME utility that helps managing time according to Pomodoro Technique. It "
+"intends to improve productivity and focus by taking short breaks after every "
+"25 minutes of work."
+msgstr ""
+"GNOME aplinkos įrankis, kuris padeda valdyti laiką pagal Pomodoro metodiką. "
+"Jos paskirtis - patobulinti produktyvumą ir susikaupimą, darant trumpas "
+"pertraukas tarp 25 koncentruoto darbo minučių. "
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:19
+#: data/resources/preferences-main-page.ui:45
+msgid "Timer"
+msgstr "Laikmatis"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:23 lib/preferences-dialog.vala:805
+#: plugins/gnome/extension/indicator.js:83
+msgid "Preferences"
+msgstr "Nustatymai"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:27
+msgid "Indicator for GNOME Shell"
+msgstr "Indikatorius GNOME aplinkai"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:32
+msgid "Kamil Prusko"
+msgstr "Kamil Prusko"
+
+#: data/org.gnome.Pomodoro.desktop.in:4 lib/about-dialog.vala:32
+msgid "A simple time management utility"
+msgstr "Paprastas laiko valdymo įrankis"
+
+#: data/org.gnome.Pomodoro.desktop.in:5
+msgid "timer;"
+msgstr "laikmatis;"
+
+#: data/org.gnome.Pomodoro.desktop.in:7
+msgid "gnome-pomodoro"
+msgstr "gnome-pomodoro"
+
+#: data/resources/menus.ui:6 data/resources/menus.ui:68
+msgid "_Timer"
+msgstr "_Laikmatis"
+
+#: data/resources/menus.ui:10 data/resources/menus.ui:72
+msgid "_Preferences"
+msgstr "_Nustatymai"
+
+#: data/resources/menus.ui:16
+msgid "_About"
+msgstr "_Apie"
+
+#: data/resources/menus.ui:20 data/resources/menus.ui:76
+msgid "_Quit"
+msgstr "_Išeiti"
+
+#: data/resources/menus.ui:29 lib/application.vala:69
+#: plugins/actions/resources/action-page.ui:155 plugins/actions/enums.vala:185
+msgid "Start"
+msgstr "Pradėti"
+
+#: data/resources/menus.ui:34 data/resources/window.ui:173
+#: lib/application.vala:78 lib/window.vala:161
+#: plugins/actions/resources/action-page.ui:200 plugins/actions/enums.vala:194
+msgid "Pause"
+msgstr "Pauzė"
+
+#: data/resources/menus.ui:39 lib/application.vala:81 lib/window.vala:147
+#: plugins/actions/resources/action-page.ui:215 plugins/actions/enums.vala:197
+msgid "Resume"
+msgstr "Tęsti"
+
+#: data/resources/menus.ui:44 data/resources/window.ui:200
+#: lib/application.vala:72
+msgid "Stop"
+msgstr "Stabdyti"
+
+#: data/resources/menus.ui:56 data/resources/window.ui:294
+#: plugins/actions/enums.vala:94 plugins/gnome/extension/indicator.js:172
+msgid "Short Break"
+msgstr "Trumpa pertrauka"
+
+#: data/resources/menus.ui:61 data/resources/window.ui:310
+#: plugins/actions/enums.vala:97 plugins/gnome/extension/indicator.js:173
+msgid "Long Break"
+msgstr "Ilga pertrauka"
+
+#: data/resources/preferences.ui:8 lib/preferences-dialog.vala:809
+msgid "Plugins"
+msgstr "Įskiepiai"
+
+#: data/resources/preferences.ui:47
+msgid "Back"
+msgstr "Grįžti"
+
+#: data/resources/preferences-keyboard-shortcut-page.ui:29
+msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
+msgstr ""
+"Spartieji klaviatūros klavišai, skirti įjungti laikmačiui. Įveskite naują "
+"sparčiųjų klavišų kombinaciją, kad pakeistumėte."
+
+#: data/resources/preferences-keyboard-shortcut-page.ui:83
+#: plugins/actions/resources/action-page.ui:245 plugins/actions/enums.vala:203
+msgid "Disable"
+msgstr "Išjungti"
+
+#: data/resources/preferences-main-page.ui:108
+msgid "Pomodoro duration"
+msgstr "Pomodoro trukmė"
+
+#: data/resources/preferences-main-page.ui:160
+msgid "Break duration"
+msgstr "Pertraukos trukmė"
+
+#: data/resources/preferences-main-page.ui:213
+msgid "Long break duration"
+msgstr "Ilgosios pertraukos trukmė"
+
+#: data/resources/preferences-main-page.ui:245
+msgid "Pomodoros before a long break"
+msgstr "Pomodoro kiekis prieš ilgąją pertrauką"
+
+#: data/resources/preferences-main-page.ui:294
+msgid "Keyboard shortcut"
+msgstr "Spartieji klaviatūros klavišai"
+
+#: data/resources/preferences-main-page.ui:357
+msgid "Notifications"
+msgstr "Pranešimai"
+
+#: data/resources/preferences-main-page.ui:400
+msgid "Screen notifications"
+msgstr "Ekrano pranešimai"
+
+#: data/resources/preferences-main-page.ui:442
+msgid "Remind to take a break"
+msgstr "Priminti apie pertrauką"
+
+#: data/resources/preferences-main-page.ui:502
+msgid "Desktop"
+msgstr "Darbalaukis"
+
+#: data/resources/preferences-main-page.ui:551
+msgid "Wait for activity after a break"
+msgstr "Laukti aktyvumo po pertraukos"
+
+#: data/resources/preferences-main-page.ui:615
+msgid "Plugins…"
+msgstr "Įskiepiai…"
+
+#: data/resources/screen-notification.ui:89
+#: plugins/gnome/extension/dialogs.js:465
+msgid "It's time to take a break"
+msgstr "Laikas padaryti pertrauką"
+
+#: data/resources/window.ui:31
+msgid "Start Pomodoro"
+msgstr "Pradėti Pomodoro"
+
+#: lib/about-dialog.vala:30
+msgid "About Pomodoro"
+msgstr "Apie Pomodoro"
+
+#: lib/about-dialog.vala:41
+msgid "translator-credits"
+msgstr "translator-credits"
+
+#: lib/application.vala:66
+msgid "Start/Stop"
+msgstr "Pradėti/Stabdyti"
+
+#: lib/application.vala:75
+msgid "Pause/Resume"
+msgstr "Pauzė/Tęsti"
+
+#: lib/application.vala:84
+msgid "Run as background service"
+msgstr "Leisti kaip sistemos servisą"
+
+#: lib/application.vala:87
+msgid "Show preferences"
+msgstr "Rodyti nustatymus"
+
+#: lib/application.vala:90
+msgid "Quit application"
+msgstr "Išeiti iš programos"
+
+#: lib/application.vala:93
+msgid "Print version information and exit"
+msgstr "Spausdinti versijos informaciją ir išeiti"
+
+#: lib/notifications-capability.vala:107
+#: plugins/gnome/extension/notifications.js:203
+msgid "Focus on your task."
+msgstr "Susikaupkite ties savo užduotimi."
+
+#: lib/notifications-capability.vala:118 lib/notifications-capability.vala:139
+#: plugins/gnome/extension/notifications.js:212
+msgid "Take a break"
+msgstr "Daryti pertrauką"
+
+#: lib/notifications-capability.vala:133
+#, c-format
+msgid "You have %d minute"
+msgid_plural "You have %d minutes"
+msgstr[0] "Jūs turite %d minutę"
+msgstr[1] "Jūs turite %d minutes"
+msgstr[2] "Jūs turite %d minučių"
+
+#: lib/notifications-capability.vala:135
+#, c-format
+msgid "You have %d second"
+msgid_plural "You have %d seconds"
+msgstr[0] "Jūs turite %d sekundę"
+msgstr[1] "Jūs turite %d sekundes"
+msgstr[2] "Jūs turite %d sekundžių"
+
+#: lib/notifications-capability.vala:140
+msgid "Take a longer break"
+msgstr "Daryti ilgesnę pertrauką"
+
+#: lib/notifications-capability.vala:156
+#: plugins/gnome/extension/notifications.js:280
+msgid "Lengthen it"
+msgstr "Prailginti"
+
+#: lib/notifications-capability.vala:161
+#: plugins/gnome/extension/notifications.js:280
+msgid "Shorten it"
+msgstr "Sutrumpinti"
+
+#: lib/notifications-capability.vala:166
+#: plugins/gnome/extension/notifications.js:300
+msgid "Start pomodoro"
+msgstr "Pradėti pomodoro"
+
+#: lib/preferences-dialog.vala:158
+#, c-format
+msgid ""
+"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
+"such as Control, Alt or Shift."
+msgstr ""
+"\"%s\" sparčiosios klaviatūros klavišų kombinacijos naudojimas gali kirstis "
+"su rašymu. Pabandykite panaudoti kitą klavišą, pavyzdžiui: Control, Alt arba "
+"Shift"
+
+#: lib/preferences-dialog.vala:591 plugins/sounds/sounds-plugin.vala:596
+msgid "Off"
+msgstr "Išjungta"
+
+#: lib/preferences-dialog.vala:813
+msgid "Keyboard Shortcut"
+msgstr "Spartieji klaviatūros klavišai"
+
+#: lib/presence.vala:78
+msgid "Available"
+msgstr "Pasiekiama"
+
+#: lib/presence.vala:81
+msgid "Busy"
+msgstr "Užimta"
+
+#: lib/presence.vala:84
+msgid "Idle"
+msgstr "Laisva"
+
+#: lib/presence.vala:87
+msgid "Invisible"
+msgstr "Nematoma"
+
+#: lib/utils.vala:64
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d valanda"
+msgstr[1] "%d valandos"
+msgstr[2] "%d valandų"
+
+#: lib/utils.vala:73
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minutė"
+msgstr[1] "%d minutės"
+msgstr[2] "%d minučių"
+
+#: plugins/actions/resources/action-page.ui:28
+msgid "Command"
+msgstr "Komanda"
+
+#: plugins/actions/resources/action-page.ui:41
+#: plugins/actions/resources/menus.ui:29
+msgid "Triggers"
+msgstr "Trigeriai"
+
+#: plugins/actions/resources/action-page.ui:54
+msgid "Name"
+msgstr "Vardas"
+
+#: plugins/actions/resources/action-page.ui:88
+msgid "_Pomodoro"
+msgstr "_Pomodoro"
+
+#: plugins/actions/resources/action-page.ui:102
+msgid "_Short Break"
+msgstr "_Trumpa pertrauka"
+
+#: plugins/actions/resources/action-page.ui:116
+msgid "_Long Break"
+msgstr "_Ilga pertrauka"
+
+#: plugins/actions/resources/action-page.ui:170 plugins/actions/enums.vala:188
+msgid "Complete"
+msgstr "Užbaigta"
+
+#: plugins/actions/resources/action-page.ui:185 plugins/actions/enums.vala:191
+msgid "Skip"
+msgstr "Praleisti"
+
+#: plugins/actions/resources/action-page.ui:230 plugins/actions/enums.vala:200
+msgid "Enable"
+msgstr "Įjungti"
+
+#: plugins/actions/resources/action-page.ui:299
+msgid "Add"
+msgstr "Pridėti"
+
+#: plugins/actions/resources/menus.ui:6
+msgid "Remove"
+msgstr "Pašalinti"
+
+#: plugins/actions/resources/menus.ui:14
+msgid "State"
+msgstr "Būsena"
+
+#: plugins/actions/resources/menus.ui:19
+msgid "State Duration"
+msgstr "Būsenos trukmė"
+
+#: plugins/actions/resources/menus.ui:24
+msgid "Elapsed Time"
+msgstr "Praėjęs laikas"
+
+#: plugins/actions/actions.vala:423
+msgid "Actions"
+msgstr "Veiksmai"
+
+#: plugins/actions/actions.vala:427
+msgid "Action"
+msgstr "Veiksmas"
+
+#: plugins/actions/actions.vala:452
+msgid "Custom actions…"
+msgstr "Pritaikomi veiksmai…"
+
+#: plugins/gnome/extension/dialogs.js:141
+#, javascript-format
+msgid "%d new message"
+msgid_plural "%d new messages"
+msgstr[0] "%d nauja žinutė"
+msgstr[1] "%d naujos žinutės"
+msgstr[2] "%d naujų žinučių"
+
+#: plugins/gnome/extension/indicator.js:132
+msgid "Pomodoro Timer"
+msgstr "Pomodoro Laikmatis"
+
+#: plugins/gnome/extension/indicator.js:150
+msgid "Start Timer"
+msgstr "Pradėti Laikamtį"
+
+#: plugins/gnome/extension/indicator.js:155
+#: plugins/gnome/extension/indicator.js:231
+msgid "Pause Timer"
+msgstr "Pristabdyti laikmatį"
+
+#: plugins/gnome/extension/indicator.js:159
+msgid "Stop Timer"
+msgstr "Sustabdyti laikmatį"
+
+#: plugins/gnome/extension/indicator.js:230
+msgid "Resume Timer"
+msgstr "Pratęsti laikmatį"
+
+#: plugins/gnome/extension/notifications.js:226
+msgid "Take a break!"
+msgstr "Laikas pertraukai!"
+
+#: plugins/gnome/extension/notifications.js:260
+#, javascript-format
+msgid "You have %d minute until next pomodoro."
+msgid_plural "You have %d minutes until next pomodoro."
+msgstr[0] "Jums liko %d minutė iki sekančio pomodoro."
+msgstr[1] "Jums liko %d minutės iki sekančio pomodoro."
+msgstr[2] "Jums liko %d minučių iki sekančio pomodoro."
+
+#: plugins/gnome/extension/notifications.js:262
+#, javascript-format
+msgid "You have %d second until next pomodoro."
+msgid_plural "You have %d seconds until next pomodoro."
+msgstr[0] "Jums liko %d sekundė iki sekančio pomodoro."
+msgstr[1] "Jums liko %d sekundės iki sekančio pomodoro."
+msgstr[2] "Jums liko %d sekundžių iki sekančio pomodoro."
+
+#: plugins/gnome/extension/notifications.js:415
+msgid "Hey!"
+msgstr "Labas!"
+
+#: plugins/gnome/extension/notifications.js:416
+msgid "You're missing out on a break"
+msgstr "Jūs praleidžiate pertrauką"
+
+#: plugins/gnome/extension/notifications.js:440
+#: plugins/gnome/gnome-shell-extension.vala:394
+msgid "Report issue"
+msgstr "Pranešti problemą"
+
+#: plugins/gnome/extension/timer.js:236
+#, javascript-format
+msgid "Failed to run <i>%s</i> service"
+msgstr "Nepavyko paleisti <i>%s</i> serviso"
+
+#: plugins/gnome/gnome-plugin.vala:181
+msgid "Hide other notifications"
+msgstr "Slėpti kitus pranešimus"
+
+#: plugins/gnome/gnome-shell-extension.vala:340
+#: plugins/gnome/gnome-shell-extension.vala:359
+#: plugins/gnome/gnome-shell-extension.vala:392
+msgid "Failed to enable extension"
+msgstr "Nepavyko įjungti įskiepio"
+
+#: plugins/gnome/gnome-shell-extension.vala:341
+msgid "It seems to be uninstalled"
+msgstr "Panašu, kad tai ištrinta"
+
+#: plugins/gnome/gnome-shell-extension.vala:360
+msgid "Extension is out of date"
+msgstr "Pasenęs įskiepis"
+
+#: plugins/gnome/gnome-shell-extension.vala:361
+msgid "Upgrade"
+msgstr "Atnaujinti"
+
+#: plugins/sounds/resources/preferences-sound-page.ui:33
+msgid "Volume:"
+msgstr "Garsumas:"
+
+#: plugins/sounds/resources/preferences-sound-page.ui:168
+msgid "Add Sound"
+msgstr "Pridėti garsą:"
+
+#: plugins/sounds/resources/preferences-sound-page.ui:180
+msgid "Remove Sound"
+msgstr "Pašalinti garsą:"
+
+#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:402
+msgid "Clock Ticking"
+msgstr "Laikrodžio tiksėjimas"
+
+#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:403
+msgid "Timer Ticking"
+msgstr "Laikmačio tiksėjimas"
+
+#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:404
+msgid "Woodland Birds"
+msgstr "Miško paukščiai"
+
+#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:464
+#: plugins/sounds/sounds-plugin.vala:503
+msgid "Bell"
+msgstr "Varpelis"
+
+#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:465
+#: plugins/sounds/sounds-plugin.vala:504
+msgid "Loud Bell"
+msgstr "Garsus varpas"
+
+#: plugins/sounds/sounds-plugin.vala:328
+msgid "Select Custom Sound"
+msgstr "Pasirinkti kitą garsą"
+
+#: plugins/sounds/sounds-plugin.vala:560
+msgid "Ticking Sound"
+msgstr "Tiksėjimo garsas"
+
+#: plugins/sounds/sounds-plugin.vala:564
+msgid "End of Break Sound"
+msgstr "Pertraukos pabaigos garsas"
+
+#: plugins/sounds/sounds-plugin.vala:568
+msgid "Start of Break Sound"
+msgstr "Pertraukos pradžios garsas"
+
+#: plugins/sounds/sounds-plugin.vala:729
+msgid "Ticking sound"
+msgstr "Tiksėjimo garsas"
+
+#: plugins/sounds/sounds-plugin.vala:734
+msgid "Start of break sound"
+msgstr "Pertraukos pradžios garsas"
+
+#: plugins/sounds/sounds-plugin.vala:739
+msgid "End of break sound"
+msgstr "Petraukos pabaigos garsas"
