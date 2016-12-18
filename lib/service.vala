@@ -124,6 +124,14 @@ namespace Pomodoro
             this.timer.skip ();
         }
 
+        public void quit ()
+        {
+            this.timer.stop ();
+
+            var application = Pomodoro.Application.get_default ();
+            application.quit ();
+        }
+
         private void flush ()
         {
             var builder_properties = new GLib.VariantBuilder (GLib.VariantType.ARRAY);

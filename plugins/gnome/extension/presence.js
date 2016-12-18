@@ -26,7 +26,6 @@ const PopupMenu = imports.ui.popupMenu;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
-const Timer = Extension.imports.timer;
 const Utils = Extension.imports.utils;
 
 

@@ -45,6 +45,7 @@ const PomodoroInterface = '<node> \
     <method name="Pause"/> \
     <method name="Resume"/> \
     <method name="Skip"/> \
+    <method name="Quit"/> \
 </interface> \
 </node>';
 

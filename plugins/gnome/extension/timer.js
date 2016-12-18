@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 gnome-pomodoro contributors
+ * Copyright (c) 2014-2016 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -230,6 +230,12 @@ const Timer = new Lang.Class({
 
     showPreferences: function(timestamp) {
         this._proxy.ShowPreferencesRemote(timestamp, Lang.bind(this, this._onCallback));
+    },
+
+    quit: function() {
+        this._proxy.QuitRemote(Lang.bind(this, function(result, error) {
+            Utils.disableExtension(Config.EXTENSION_UUID);
+        }));
     },
 
     _notifyServiceNotInstalled: function() {

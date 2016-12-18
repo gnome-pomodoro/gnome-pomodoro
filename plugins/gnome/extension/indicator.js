@@ -80,7 +80,8 @@ const IndicatorMenu = new Lang.Class({
         this._createTimerMenuItem();
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.addAction(_("Preferences"), Lang.bind(this, this._showPreferences));
+        this.addAction(_("Preferences"), Lang.bind(this, this._activatePreferences));
+        this.addAction(_("Quit"), Lang.bind(this, this._activateQuit));
     },
 
     _createActionButton: function(iconName, accessibleName) {
@@ -267,10 +268,14 @@ const IndicatorMenu = new Lang.Class({
         return '%02d:%02d'.format(minutes, seconds);
     },
 
-    _showPreferences: function() {
+    _activatePreferences: function() {
         let timestamp = global.get_current_time();
 
         this.indicator.timer.showPreferences(timestamp);
+    },
+
+    _activateQuit: function() {
+        this.indicator.timer.quit();
     },
 
     _activateState: function(stateName) {

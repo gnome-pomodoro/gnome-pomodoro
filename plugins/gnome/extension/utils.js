@@ -167,3 +167,13 @@ function versionCheck(required) {
 
     return false;
 }
+
+function disableExtension(uuid) {
+    let enabledExtensions = global.settings.get_strv(ExtensionSystem.ENABLED_EXTENSIONS_KEY);
+    let extensionIndex = enabledExtensions.indexOf(uuid);
+
+    if (extensionIndex != -1) {
+        enabledExtensions.splice(extensionIndex, 1);
+        global.settings.set_strv(ExtensionSystem.ENABLED_EXTENSIONS_KEY, enabledExtensions);
+    }
+}
