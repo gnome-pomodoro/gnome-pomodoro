@@ -145,14 +145,42 @@ namespace Pomodoro
                                          Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         }
 
-        private void setup_plugins ()
+        private async void setup_plugins ()
         {
             var engine = Peas.Engine.get_default ();
             engine.add_search_path (Config.PLUGIN_LIB_DIR, Config.PLUGIN_DATA_DIR);
 
-            this.load_plugins ();
+            var wait_count = 0;
 
             this.extensions = new Peas.ExtensionSet (engine, typeof (Pomodoro.ApplicationExtension));
+            this.extensions.extension_added.connect ((extension_set,
+                                                      info,
+                                                      extension) => {
+                if (extension is GLib.AsyncInitable) {
+                    var async_initable = extension as GLib.AsyncInitable;
+
+                    async_initable.init_async.begin (GLib.Priority.DEFAULT, null, (obj, res) => {
+                        try {
+                            async_initable.init_async.end (res);
+                        }
+                        catch (GLib.Error error) {
+                            GLib.warning ("Error while initializing extension %s: %s", info.get_module_name (), error.message);
+                        }
+
+                        wait_count--;
+
+                        this.setup_plugins.callback ();
+                    });
+
+                    wait_count++;
+                }
+		    });
+
+            this.load_plugins ();
+
+            while (wait_count > 0) {
+                yield;
+            }
         }
 
         private void setup_capabilities ()
@@ -408,17 +436,24 @@ namespace Pomodoro
             this.setup_actions ();
             this.setup_menu ();
             this.setup_capabilities ();
-            this.setup_plugins ();
+            this.setup_plugins.begin ((obj, res) => {
+                try {
+                    this.setup_plugins.end (res);
+                }
+                catch (GLib.Error error) {
+                    GLib.warning ("Error while setting up plugins: %s", error.message);
+                }
 
-            // FIXME: shouldn't these be enabled by settings?!
-            this.capabilities.enable ("notifications");
-            this.capabilities.enable ("indicator");
-            this.capabilities.enable ("accelerator");
-            this.capabilities.enable ("reminders");
-            this.capabilities.enable ("hide-system-notifications");
-            this.capabilities.enable ("idle-monitor");
+                // FIXME: shouldn't these be enabled by settings?!
+                this.capabilities.enable ("notifications");
+                this.capabilities.enable ("indicator");
+                this.capabilities.enable ("accelerator");
+                this.capabilities.enable ("reminders");
+                this.capabilities.enable ("hide-system-notifications");
+                this.capabilities.enable ("idle-monitor");
 
-            this.release ();
+                this.release ();
+            });
         }
 
         /**

@@ -30,7 +30,7 @@ namespace GnomePlugin
 
     private const string CURRENT_DESKTOP_VARIABLE = "XDG_CURRENT_DESKTOP";
 
-    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
+    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension, GLib.AsyncInitable
     {
         private const string[] SHELL_CAPABILITIES = {
             "notifications",
@@ -47,29 +47,63 @@ namespace GnomePlugin
         private GnomePlugin.GnomeShellExtension shell_extension;
         private GnomePlugin.IdleMonitor         idle_monitor;
         private uint                            become_active_id = 0;
+        private bool                            can_enable = false;
         private bool                            configured = false;
         private double                          last_activity_time = 0.0;
 
         construct
         {
             this.settings = Pomodoro.get_settings ().get_child ("preferences");
+            this.can_enable = GLib.Environment.get_variable (CURRENT_DESKTOP_VARIABLE) == "GNOME";
 
-            this.idle_monitor = new GnomePlugin.IdleMonitor ();
+            // try {
+            //     this.init_async.begin (GLib.Priority.DEFAULT, null);
+            // }
+            // catch (GLib.Error error) {
+            //     warning ("Failed to initialize ApplicationExtension");
+            // }
+        }
 
-            this.shell_extension = new GnomePlugin.GnomeShellExtension (Config.EXTENSION_UUID);
+        public async bool init_async (int               io_priority = GLib.Priority.DEFAULT,
+                                      GLib.Cancellable? cancellable = null)
+                                      throws GLib.Error
+        {
+            var application = Pomodoro.Application.get_default ();
 
-            this.capabilities = new Pomodoro.CapabilityGroup ("gnome");
-            this.capabilities.add (new Pomodoro.Capability ("idle-monitor"));
+            /* Mutter IdleMonitor */
+            if (this.idle_monitor == null) {
+                this.capabilities = new Pomodoro.CapabilityGroup ("gnome");
 
-            this.shell_capabilities = new Pomodoro.CapabilityGroup ("gnome-shell");
-            for (var i=0; i < SHELL_CAPABILITIES.length; i++) {
-                this.shell_capabilities.add (new Pomodoro.Capability (SHELL_CAPABILITIES[i]));
+                try {
+                    this.idle_monitor = new GnomePlugin.IdleMonitor ();
+
+                    this.timer = Pomodoro.Timer.get_default ();
+                    this.timer.state_changed.connect_after (this.on_timer_state_changed);
+
+                    this.capabilities.add (new Pomodoro.Capability ("idle-monitor"));
+
+                    application.capabilities.add_group (this.capabilities, Pomodoro.Priority.HIGH);
+                }
+                catch (GLib.Error error) {
+                    // Gnome.IdleMonitor not available
+                }
             }
 
-            this.timer = Pomodoro.Timer.get_default ();
-            this.timer.state_changed.connect_after (this.on_timer_state_changed);
+            /* GNOME Shell extension */
+            if (this.can_enable && this.shell_extension == null) {
+                this.shell_extension = new GnomePlugin.GnomeShellExtension (Config.EXTENSION_UUID);
+                this.shell_extension.notify["enabled"].connect (this.on_shell_extension_enabled_notify);
 
-            this.setup ();
+                this.shell_capabilities = new Pomodoro.CapabilityGroup ("gnome-shell");
+
+                for (var i=0; i < SHELL_CAPABILITIES.length; i++) {
+                    this.shell_capabilities.add (new Pomodoro.Capability (SHELL_CAPABILITIES[i]));
+                }
+
+                yield this.shell_extension.enable ();
+            }
+
+            return true;
         }
 
         ~ApplicationExtension ()
@@ -79,26 +113,6 @@ namespace GnomePlugin
             if (this.become_active_id != 0) {
                 this.idle_monitor.remove_watch (this.become_active_id);
                 this.become_active_id = 0;
-            }
-        }
-
-        private void setup ()
-        {
-            if (GLib.Environment.get_variable (CURRENT_DESKTOP_VARIABLE) == "GNOME")
-            {
-                var application = Pomodoro.Application.get_default ();
-                application.capabilities.add_group (this.capabilities, Pomodoro.Priority.HIGH);
-
-                // take over capabilities until extension status is resolved
-                application.capabilities.add_group (this.shell_capabilities, Pomodoro.Priority.HIGH);
-
-                this.shell_extension.enable.begin ((obj, res) => {
-                    this.shell_extension.enable.end (res);
-
-                    this.shell_extension.notify["enabled"].connect (this.on_shell_extension_enabled_notify);
-
-                    this.on_shell_extension_enabled_notify ();
-                });
             }
         }
 

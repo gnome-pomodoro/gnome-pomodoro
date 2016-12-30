@@ -418,7 +418,14 @@ namespace GnomePlugin
                     try
                     {
                         this.object_manager = GLib.DBusObjectManagerClient.@new.end (res);
+                    }
+                    catch (GLib.Error error)
+                    {
+                        GLib.warning ("Failed to acquire idle monitor object manager: %s", error.message);
+                        return;
+                    }
 
+                    try {
                         var object = this.object_manager.get_object (this.path);
 
                         if (object != null) {
@@ -430,7 +437,7 @@ namespace GnomePlugin
                     }
                     catch (GLib.IOError error)
                     {
-                        GLib.warning ("Failed to acquire idle monitor object manager: %s", error.message);
+                        GLib.warning ("Failed to initialize idle monitor object manager: %s", error.message);
                     }
                 });
             }
