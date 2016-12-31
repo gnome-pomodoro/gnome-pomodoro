@@ -48,7 +48,6 @@ namespace GnomePlugin
         private GnomePlugin.IdleMonitor         idle_monitor;
         private uint                            become_active_id = 0;
         private bool                            can_enable = false;
-        private bool                            configured = false;
         private double                          last_activity_time = 0.0;
 
         construct

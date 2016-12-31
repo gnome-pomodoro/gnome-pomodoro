@@ -147,7 +147,7 @@ namespace GnomePlugin
                                                                         "/org/gnome/Shell",
                                                                         GLib.DBusProxyFlags.DO_NOT_AUTO_START);
 
-                var success = shell_proxy.eval (script);
+                shell_proxy.eval (script);
             }
             catch (GLib.IOError error) {
                 GLib.warning ("Failed to load extension: %s",

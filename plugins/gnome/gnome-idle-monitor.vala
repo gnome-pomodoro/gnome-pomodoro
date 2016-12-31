@@ -50,7 +50,7 @@ namespace GnomePlugin
         {
             this.monitor = monitor;
             this.timeout_msec = timeout_msec;
-            this.callback = callback;
+            this.callback = (owned) callback;
         }
 
         private uint get_next_id ()
@@ -65,33 +65,11 @@ namespace GnomePlugin
 
     public class IdleMonitor : GLib.Object, GLib.Initable
     {
-        /**
-         * GnomeIdleMonitor:device:
-         *
-         * The device to listen to idletime on.
-         */
-        public Gdk.Device device {
-            construct {
-                this._device = value; // TODO: .dup_object ();
-
-                this.path = this._device != null
-                        ? "/org/gnome/Mutter/IdleMonitor/Device%d".printf (Gdk.X11.device_get_id (this._device as Gdk.X11.DeviceCore))
-                        : "/org/gnome/Mutter/IdleMonitor/Core";
-            }
-            owned get {
-                return this._device;
-            }
-        }
-
         private GLib.Cancellable         cancellable;
         private Meta.IdleMonitor         proxy;
         private GLib.DBusObjectManager   object_manager;
-        private uint                     name_watch_id;
         private GLib.HashTable<uint,GnomePlugin.IdleMonitorWatch>           watches;
         private GLib.HashTable<uint,unowned GnomePlugin.IdleMonitorWatch>   watches_by_upstream_id;
-        private Gdk.Device               _device;
-        private string                   path;
-
 
         construct
         {
@@ -109,30 +87,11 @@ namespace GnomePlugin
          * gnome_idle_monitor_new:
          *
          * Returns: a new #GnomeIdleMonitor that tracks the server-global
-         * idletime for all devices. To track device-specific idletime,
-         * use gnome_idle_monitor_new_for_device().
+         * idletime for all devices.
          */
         public IdleMonitor () throws GLib.Error
         {
-            ((GLib.Initable) this).init (null);
-        }
-
-        /**
-         * gnome_idle_monitor_new_for_device:
-         * @device: A #GdkDevice to get the idle time for.
-         * @error: A pointer to a #GError or %NULL.
-         *
-         * Returns: a new #GnomeIdleMonitor that tracks the device-specific
-         * idletime for @device. If device-specific idletime is not available,
-         * %NULL is returned, and @error is set. To track server-global
-         * idletime for all devices, use gnome_idle_monitor_new().
-         */
-        public IdleMonitor.for_device (Gdk.Device device)
-                                       throws GLib.Error
-        {
-            GLib.Object (device: device);
-
-            ((GLib.Initable) this).init (null);
+            ((GLib.Initable) this).init (this.cancellable);
         }
 
         public override void dispose ()
@@ -141,24 +100,29 @@ namespace GnomePlugin
                 this.cancellable.cancel ();
             }
 
-            if (this.name_watch_id != 0) {
-                GLib.Bus.unwatch_name (this.name_watch_id);
-                this.name_watch_id = 0;
-            }
-
             base.dispose ();
         }
 
         public new bool init (GLib.Cancellable? cancellable = null) throws GLib.Error
         {
-            this.name_watch_id = GLib.Bus.watch_name (
-                                       GLib.BusType.SESSION,
-                                       "org.gnome.Mutter.IdleMonitor",
-                                       GLib.BusNameWatcherFlags.NONE,
-                                       this.on_name_appeared,
-                                       this.on_name_vanished);
+            this.proxy = GLib.Bus.get_proxy_sync<Meta.IdleMonitor>
+                                   (GLib.BusType.SESSION,
+                                    "org.gnome.Mutter.IdleMonitor",
+                                    "/org/gnome/Mutter/IdleMonitor/Core",
+                                    GLib.DBusProxyFlags.DO_NOT_AUTO_START);
 
-            // TODO: we want to check wether IdleMonitor will be in a working state
+            this.proxy.watch_fired.connect (this.on_watch_fired);
+
+            this.watches.@foreach ((id, watch) => {
+                assert (watch != null);
+
+                if (watch.timeout_msec == 0) {
+                    this.add_user_active_watch_internal (watch);
+                }
+                else {
+                    this.add_idle_watch_internal (watch);
+                }
+            });
 
             return true;
         }
@@ -178,18 +142,6 @@ namespace GnomePlugin
                     this.remove_watch_internal (watch);
                 }
             }
-        }
-
-        private void on_object_added (GLib.DBusObjectManager manager,
-                                      GLib.DBusObject        object)
-        {
-            if (this.path != object.get_object_path ()) {
-                return;
-            }
-
-            this.connect_proxy (object);
-
-            GLib.SignalHandler.disconnect_by_func (manager, (void*) this.on_object_added, this);
         }
 
         private void add_idle_watch_internal (IdleMonitorWatch watch)
@@ -256,7 +208,7 @@ namespace GnomePlugin
         {
             var watch = new IdleMonitorWatch (this,
                                               interval_msec,
-                                              callback);
+                                              (owned) callback);
 
             this.watches.insert (watch.id, watch);
 
@@ -283,11 +235,11 @@ namespace GnomePlugin
          * to call this when an idle watch, as added by
          * gnome_idle_monitor_add_idle_watch(), has triggered.
          */
-        public uint add_user_active_watch (IdleMonitorWatchFunc callback)
+        public uint add_user_active_watch (owned IdleMonitorWatchFunc callback)
         {
             var watch = new IdleMonitorWatch (this,
                                               0,
-                                              callback);
+                                              (owned) callback);
 
             this.watches.insert (watch.id, watch);
 
@@ -347,115 +299,6 @@ namespace GnomePlugin
             }
 
             return value;
-        }
-
-        public void connect_proxy (GLib.DBusObject object)
-        {
-            var proxy = object.get_interface ("org.gnome.Mutter.IdleMonitor");
-
-	        if (proxy == null) {
-		        GLib.critical ("Unable to get org.gnome.Mutter.IdleMonitor interface object at %s",
-			                   object.get_object_path ());
-	        }
-
-
-            this.proxy = proxy != null ? (proxy as Meta.IdleMonitor) : null;
-
-	        if (this.proxy == null) {
-		        GLib.critical ("Unable to get idle monitor from object at %s",
-			                   object.get_object_path ());
-	        }
-            else {
-                this.proxy.watch_fired.connect (this.on_watch_fired);
-
-                this.watches.@foreach ((id, watch) => {
-                    assert (watch != null);
-
-                    if (watch.timeout_msec == 0) {
-                        this.add_user_active_watch_internal (watch);
-                    }
-                    else {
-                        this.add_idle_watch_internal (watch);
-                    }
-                });
-            }
-        }
-
-        // TODO: is there a way of getting GLib.Type of a generated Meta.IdleMonitorProxy?
-        // public static GLib.Type get_proxy_type (GLib.DBusObjectManagerClient manager,
-        //                                         string                       object_path,
-        //                                         string?                      interface_name)
-        // {
-        //     if (interface_name == null) {
-        //         return typeof (GLib.DBusObjectProxy);
-        //     }
-        //
-        //     if (interface_name == "org.gnome.Mutter.IdleMonitor") {
-        //         return typeof (Meta.IdleMonitor);
-        //     }
-        //     else {
-        //         return typeof (GLib.DBusProxy);
-        //     }
-        // }
-
-        private void on_name_appeared (GLib.DBusConnection connection,
-                                       string              name,
-                                       string              name_owner)
-        {
-            /**
-             * acync constructor was broken until commit 4123914c1eecf16696d53cc25367440c221be94d in vala
-             * by Rico Tzschichholz
-             */
-            try {
-                GLib.DBusObjectManagerClient.@new.begin
-                                       (connection,
-                                        GLib.DBusObjectManagerClientFlags.NONE,
-                                        name_owner,
-                                        "/org/gnome/Mutter/IdleMonitor",
-                                        (GLib.DBusProxyTypeFunc) Gnome.idle_monitor_object_manager_client_get_proxy_type,
-                                        this.cancellable,
-                                        (obj, res) => {
-                    try
-                    {
-                        this.object_manager = GLib.DBusObjectManagerClient.@new.end (res);
-                    }
-                    catch (GLib.Error error)
-                    {
-                        GLib.warning ("Failed to acquire idle monitor object manager: %s", error.message);
-                        return;
-                    }
-
-                    try {
-                        var object = this.object_manager.get_object (this.path);
-
-                        if (object != null) {
-                            this.connect_proxy (object);
-                        }
-                        else {
-                            this.object_manager.object_added.connect (this.on_object_added);
-                        }
-                    }
-                    catch (GLib.IOError error)
-                    {
-                        GLib.warning ("Failed to initialize idle monitor object manager: %s", error.message);
-                    }
-                });
-            }
-            catch (GLib.Error error) {
-                GLib.warning ("Failed to create object manager: %s", error.message);
-            }
-        }
-
-        private void on_name_vanished (GLib.DBusConnection connection,
-                                       string              name)
-        {
-            this.watches.@foreach ((id, watch) => {
-                this.watches_by_upstream_id.remove (watch.upstream_id);
-                watch.upstream_id = 0;
-            });
-
-            this.proxy = null;
-            this.object_manager = null;
         }
     }
 }
