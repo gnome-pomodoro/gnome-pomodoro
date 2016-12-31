@@ -22,8 +22,7 @@ libgnome_la_SOURCES = \
 	$(libgnome_la_VALASOURCES)
 
 libgnome_la_VALAFLAGS = \
-	$(PLUGIN_VALAFLAGS) \
-	--pkg gdk-x11-3.0
+	$(PLUGIN_VALAFLAGS)
 
 libgnome_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS) \
