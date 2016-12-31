@@ -21,36 +21,59 @@
 using GLib;
 
 
+namespace Freedesktop
+{
+    [DBus (name = "org.freedesktop.Notifications")]
+    public interface Notifications : GLib.Object
+    {
+        public abstract void get_capabilities (out string[] capabilities)
+                                               throws IOError;
+    }
+}
+
+
 namespace Pomodoro
 {
-    private const string DESKTOP_SESSION_VARIABLE = "DESKTOP_SESSION";
-
     public class NotificationsCapability : Pomodoro.Capability
     {
         private GLib.Settings               settings;
         private Pomodoro.Timer              timer;
         private Pomodoro.ScreenNotification screen_notification;
+        private Freedesktop.Notifications   proxy;
+
+        private bool have_actions = false;
+        private bool have_persistence = false;
+
+        construct
+        {
+            string[] capabilities;
+
+            try {
+                this.proxy = GLib.Bus.get_proxy_sync<Freedesktop.Notifications> (GLib.BusType.SESSION,
+                                                        "org.freedesktop.Notifications",
+                                                        "/org/freedesktop/Notifications",
+                                                        GLib.DBusProxyFlags.DO_NOT_AUTO_START);
+                this.proxy.get_capabilities (out capabilities);
+
+                for (var i=0; i < capabilities.length; i++) {
+                    switch (capabilities[i]) {
+                        case "actions":
+                            this.have_actions = true;
+                            break;
+
+                        case "persistence":
+                            this.have_persistence = true;
+                            break;
+                    }
+                }
+            }
+            catch (GLib.IOError error) {
+            }
+        }
 
         public NotificationsCapability (string name)
         {
             base (name);
-        }
-
-        private bool has_actions_support ()
-        {
-            var desktop_session = GLib.Environment.get_variable (DESKTOP_SESSION_VARIABLE);
-
-            /* It's a quick hack for stupid notify-osd, which uses GTK+ dialogs for notifications
-             * with buttons... just horrible.
-             *
-             * We could check for "actions" from org.freedesktop.Notifications.GetCapabilities(),
-             * but GNotification supports more backends than freedesktop.
-             */
-            if (desktop_session == "ubuntu" || desktop_session == "mate") {
-                return false;
-            }
-
-            return true;
         }
 
         private void notify_pomodoro_start ()
@@ -114,7 +137,7 @@ namespace Pomodoro
                 GLib.warning (error.message);
             }
 
-            if (this.has_actions_support ()) {
+            if (this.have_actions) {
                 notification.add_button (_("Take a break"), "app.timer-skip");
             }
 
@@ -148,7 +171,7 @@ namespace Pomodoro
                 GLib.warning (error.message);
             }
 
-            if (this.has_actions_support ())
+            if (this.have_actions)
             {
                 notification.set_default_action ("app.show-screen-notification");
 
