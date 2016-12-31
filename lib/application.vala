@@ -437,12 +437,7 @@ namespace Pomodoro
             this.setup_menu ();
             this.setup_capabilities ();
             this.setup_plugins.begin ((obj, res) => {
-                try {
-                    this.setup_plugins.end (res);
-                }
-                catch (GLib.Error error) {
-                    GLib.warning ("Error while setting up plugins: %s", error.message);
-                }
+                this.setup_plugins.end (res);
 
                 // FIXME: shouldn't these be enabled by settings?!
                 this.capabilities.enable ("notifications");

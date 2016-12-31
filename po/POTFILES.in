@@ -53,7 +53,6 @@ plugins/gnome/gnome.vala
 plugins/gnome/gnome-idle-monitor.vala
 plugins/gnome/gnome-plugin.vala
 plugins/gnome/gnome-shell-extension.vala
-plugins/gnome/gnome-hacks.c
 plugins/indicator/indicator-capability.vala
 plugins/indicator/indicator-plugin.vala
 plugins/sounds/resources/preferences-sound-page.ui

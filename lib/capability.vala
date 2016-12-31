@@ -36,12 +36,12 @@ namespace Pomodoro
         private Pomodoro.CapabilityFunc disable_func;
 
         public Capability (string                   name,
-                           Pomodoro.CapabilityFunc? enable_func  = null,
-                           Pomodoro.CapabilityFunc? disable_func = null)
+                           owned Pomodoro.CapabilityFunc? enable_func  = null,
+                           owned Pomodoro.CapabilityFunc? disable_func = null)
         {
             this.name = name;
-            this.enable_func = enable_func;
-            this.disable_func = disable_func;
+            this.enable_func = (owned) enable_func;
+            this.disable_func = (owned) disable_func;
         }
 
         [Signal (run = "first")]

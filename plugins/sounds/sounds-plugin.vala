@@ -649,6 +649,13 @@ namespace SoundsPlugin
             return true;
         }
 
+        private static bool settings_dummy_setter (GLib.Value   value,
+                                                   GLib.Variant variant,
+                                                   void*        user_data)
+        {
+            return false;
+        }
+
         private Gtk.ListBoxRow create_row (string label,
                                            string name,
                                            string settings_key)
@@ -684,7 +691,7 @@ namespace SoundsPlugin
                                              "label",
                                              GLib.SettingsBindFlags.GET,
                                              (GLib.SettingsBindGetMappingShared) settings_sound_label_getter,
-                                             null,
+                                             (GLib.SettingsBindSetMappingShared) settings_dummy_setter,
                                              null,
                                              null);
 
@@ -693,7 +700,7 @@ namespace SoundsPlugin
                                              "visible",
                                              GLib.SettingsBindFlags.GET,
                                              (GLib.SettingsBindGetMappingShared) settings_sound_toggled_getter,
-                                             null,
+                                             (GLib.SettingsBindSetMappingShared) settings_dummy_setter,
                                              null,
                                              null);
 
@@ -702,7 +709,7 @@ namespace SoundsPlugin
                                              "icon-name",
                                              GLib.SettingsBindFlags.GET,
                                              (GLib.SettingsBindGetMappingShared) settings_volume_icon_getter,
-                                             null,
+                                             (GLib.SettingsBindSetMappingShared) settings_dummy_setter,
                                              null,
                                              null);
 

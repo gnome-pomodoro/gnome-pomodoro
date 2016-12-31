@@ -443,10 +443,10 @@ namespace Pomodoro
             assert (timer2.state.duration == timer1.state.duration);
             assert (timer2.state.timestamp == timer1.state.timestamp);
             assert (timer2.score == timer1.score);
+            assert (timer2.is_paused == timer1.is_paused);
 
             assert (timer2.timestamp == 20.0);
             assert (timer2.offset == 10.0);
-            assert (timer2.is_paused == false);
         }
 
         /**
@@ -517,26 +517,26 @@ namespace Pomodoro
             assert (timer.score == 1.0);
         }
 
-        private static void print_timer_state (Pomodoro.Timer timer)
-        {
-            stdout.printf ("""
-    %s
-        state.name = %s
-        state.timestamp = %.2f
-        state.duration = %.2f
-        score = %.2f
-        elapsed = %.2f
-        offset = %.2f
-        timestamp = %.2f
-    """,
-                timer.state.get_type ().name (),
-                timer.state.name,
-                timer.state.timestamp,
-                timer.state.duration,
-                timer.score,
-                timer.elapsed,
-                timer.offset,
-                timer.timestamp);
-        }
+    //     private static void print_timer_state (Pomodoro.Timer timer)
+    //     {
+    //         stdout.printf ("""
+    // %s
+    //     state.name = %s
+    //     state.timestamp = %.2f
+    //     state.duration = %.2f
+    //     score = %.2f
+    //     elapsed = %.2f
+    //     offset = %.2f
+    //     timestamp = %.2f
+    // """,
+    //             timer.state.get_type ().name (),
+    //             timer.state.name,
+    //             timer.state.timestamp,
+    //             timer.state.duration,
+    //             timer.score,
+    //             timer.elapsed,
+    //             timer.offset,
+    //             timer.timestamp);
+    //     }
     }
 }

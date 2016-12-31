@@ -14,8 +14,6 @@ libgnome_la_VALASOURCES = \
 	gnome-idle-monitor.vala \
 	gnome-plugin.vala \
 	gnome-shell-extension.vala \
-	gnome-hacks.c \
-	gnome-hacks.vapi \
 	$(top_builddir)/lib/gnome-pomodoro.vapi
 
 libgnome_la_SOURCES = \
@@ -57,8 +55,7 @@ CLEANFILES = \
 
 EXTRA_DIST = \
 	$(gsettings_SCHEMAS) \
-	$(libgnome_la_plugindata_DATA) \
-	gnome-hacks.h
+	$(libgnome_la_plugindata_DATA)
 
 -include $(top_srcdir)/git.mk
 
