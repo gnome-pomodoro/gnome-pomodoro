@@ -35,7 +35,6 @@ EXTRA_DIST = \
 	$(service_in_files) \
 	$(gsettings_SCHEMAS)
 
-
 CLEANFILES = \
 	$(appstream_XML) \
 	$(desktop_DATA) \
