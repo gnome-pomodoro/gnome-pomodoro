@@ -256,24 +256,25 @@ namespace GnomePlugin
                 gnome_shell_settings.set_strv ("enabled-extensions",
                                                enabled_extensions);
                 gnome_shell_settings.apply ();
-            }
-            else {
-                var info = this.get_info ();
-                var is_boundled = (info.uuid == this.uuid &&
-                                   info.path == Config.EXTENSION_DIR &&
-                                   info.version == Config.PACKAGE_VERSION);
 
-                if (info == null || info.state == Gnome.ExtensionState.UNKNOWN)
-                {
-                    this.load ();
-                }
-                else if (!is_boundled || info.state == Gnome.ExtensionState.ERROR)
-                {
-                    this.reload ();
-                }
+                yield this.wait_enabled ();
             }
 
-            yield this.wait_enabled ();
+            var info = this.get_info ();
+            var is_boundled = (info.uuid == this.uuid &&
+                               info.path == Config.EXTENSION_DIR &&
+                               info.version == Config.PACKAGE_VERSION);
+
+            if (info == null || info.state == Gnome.ExtensionState.UNKNOWN)
+            {
+                this.load ();
+                yield this.wait_enabled ();
+            }
+            else if (!is_boundled || info.state == Gnome.ExtensionState.ERROR)
+            {
+                this.reload ();
+                yield this.wait_enabled ();
+            }
         }
 
 //        private async void disable ()
