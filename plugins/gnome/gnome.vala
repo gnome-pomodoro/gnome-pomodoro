@@ -24,6 +24,9 @@ namespace Gnome
         {
             switch (this)
             {
+                case UNKNOWN:
+                    return "unknown";
+
                 case ENABLED:
                     return "enabled";
 

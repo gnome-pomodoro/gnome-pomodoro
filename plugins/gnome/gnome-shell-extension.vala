@@ -107,6 +107,12 @@ namespace GnomePlugin
                                 : "";
             }
             catch (GLib.IOError error) {
+                GLib.critical ("%s", error.message);
+                return null;
+            }
+            catch (GLib.DBusError error)
+            {
+                GLib.critical ("%s", error.message);
                 return null;
             }
 
@@ -123,30 +129,31 @@ namespace GnomePlugin
 
             try {
                 var script = """
-(function () {
-    let finder = new ExtensionUtils.ExtensionFinder();
-    finder.connect('extension-found',
-        function(finder, extension) {
-            let uuid = '""" + this.uuid + """';
-            if (extension.uuid != uuid) {
-                return;
-            }
+(function() {
+    let dir = Gio.File.new_for_path('""" + Config.EXTENSION_DIR + """');
+    let uuid = '""" + this.uuid + """';
+    let existing = ExtensionUtils.extensions[uuid];
+    if (existing) {
+        ExtensionSystem.unloadExtension(existing);
+    }
 
-            let oldExtension = ExtensionUtils.extensions[uuid];
-            if (oldExtension) {
-                ExtensionSystem.unloadExtension(oldExtension);
-            }
+    let perUserDir = Gio.File.new_for_path(global.userdatadir);
+    let type = dir.has_prefix(perUserDir) ? ExtensionUtils.ExtensionType.PER_USER
+                                          : ExtensionUtils.ExtensionType.SYSTEM;
+    try {
+        let extension = ExtensionUtils.createExtensionObject(uuid, dir, type);
 
-            ExtensionSystem.loadExtension(extension);
-        });
-    finder.scanExtensions();
+        ExtensionSystem.loadExtension(extension);
+    } catch(e) {
+        logError(e, 'Could not load extension %s'.format(uuid));
+        return;
+    }
 })();
 """;
                 var shell_proxy = GLib.Bus.get_proxy_sync<Gnome.Shell> (GLib.BusType.SESSION,
                                                                         "org.gnome.Shell",
                                                                         "/org/gnome/Shell",
                                                                         GLib.DBusProxyFlags.DO_NOT_AUTO_START);
-
                 shell_proxy.eval (script);
             }
             catch (GLib.IOError error) {
@@ -231,41 +238,57 @@ namespace GnomePlugin
             }
 
             /* Enable extension in gnome-shell settings */
-            var gnome_shell_settings = new GLib.Settings (Gnome.SHELL_SCHEMA);
-            var enabled_extensions = gnome_shell_settings.get_strv
-                                           (Gnome.SHELL_ENABLED_EXTENSIONS_KEY);
-            var enabled_in_settings = false;
+            var gnome_shell_schema = GLib.SettingsSchemaSource.get_default ()
+                    .lookup (Gnome.SHELL_SCHEMA, false);
 
-            foreach (var uuid in enabled_extensions)
+            if (gnome_shell_schema != null)
             {
-                if (uuid == this.uuid)
-                {
-                    enabled_in_settings = true;
+                var gnome_shell_settings = new GLib.Settings.full (gnome_shell_schema, null, null);
+                var enabled_extensions = gnome_shell_settings.get_strv
+                                               (Gnome.SHELL_ENABLED_EXTENSIONS_KEY);
+                var enabled_in_settings = false;
 
-                    break;
+                foreach (var uuid in enabled_extensions)
+                {
+                    if (uuid == this.uuid)
+                    {
+                        enabled_in_settings = true;
+
+                        break;
+                    }
+                }
+
+                /* Try enable extension */
+                if (!enabled_in_settings)
+                {
+                    GLib.debug ("Enabling extension \"%s\" in settings",
+                                this.uuid);
+
+                    enabled_extensions += this.uuid;
+                    gnome_shell_settings.set_strv ("enabled-extensions",
+                                                   enabled_extensions);
+                    gnome_shell_settings.apply ();
+
+                    yield this.wait_enabled ();
                 }
             }
-
-            /* Try enable extension */
-            if (!enabled_in_settings)
-            {
-                GLib.debug ("Enabling extension \"%s\" in settings",
-                            this.uuid);
-
-                enabled_extensions += this.uuid;
-                gnome_shell_settings.set_strv ("enabled-extensions",
-                                               enabled_extensions);
-                gnome_shell_settings.apply ();
-
-                yield this.wait_enabled ();
+            else {
+                GLib.warning ("Schema \"%s\" not installed", Gnome.SHELL_SCHEMA);
+                return;
             }
 
             var info = this.get_info ();
+            if (info == null)
+            {
+                /* broken DBus connection */
+                return;
+            }
+
             var is_boundled = (info.uuid == this.uuid &&
                                info.path == Config.EXTENSION_DIR &&
                                info.version == Config.PACKAGE_VERSION);
 
-            if (info == null || info.state == Gnome.ExtensionState.UNKNOWN)
+            if (info.state == Gnome.ExtensionState.UNKNOWN)
             {
                 this.load ();
                 yield this.wait_enabled ();
@@ -274,6 +297,13 @@ namespace GnomePlugin
             {
                 this.reload ();
                 yield this.wait_enabled ();
+            }
+
+            if (this.enabled) {
+                this.notify_enabled ();
+            }
+            else {
+                this.notify_disabled ();
             }
         }
 
