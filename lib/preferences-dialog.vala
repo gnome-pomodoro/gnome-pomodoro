@@ -538,7 +538,7 @@ namespace Pomodoro
 
             var label = builder.get_object (label_name) as Gtk.Label;
             adjustment.value_changed.connect (() => {
-                label.set_text (format_time ((long) adjustment.value));
+                label.set_text (format_time ((int) adjustment.value));
             });
 
             adjustment.value_changed ();
