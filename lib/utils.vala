@@ -54,7 +54,7 @@ namespace Pomodoro
         return date_string;
     }
 
-    private string format_time (long seconds)
+    private string format_time (int seconds)
     {
         var minutes = (seconds / 60) % 60;
         var hours = (seconds / 3600);
