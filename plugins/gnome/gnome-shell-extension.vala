@@ -38,19 +38,33 @@ namespace GnomePlugin
             construct set;
         }
 
+        public Gnome.ExtensionState state {
+            get {
+                return this._state;
+            }
+            private set {
+                this._state = value;
+
+                var enabled = value == Gnome.ExtensionState.ENABLED;
+                if (this.enabled != enabled) {
+                    this.enabled = enabled;
+                }
+            }
+        }
+
         public bool enabled {
             get;
             private set;
         }
 
-        private Gnome.ExtensionState   state;
+        private Gnome.ExtensionState   _state;
         private Gnome.ShellExtensions? proxy = null;
         private uint                   notify_state_source = 0;
         private GLib.Settings          settings = null;
 
         construct
         {
-            this.state = Gnome.ExtensionState.UNKNOWN;
+            this._state = Gnome.ExtensionState.UNKNOWN;
 
             var settings_schema = GLib.SettingsSchemaSource.get_default ()
                     .lookup (Gnome.SHELL_SCHEMA, false);
@@ -101,10 +115,7 @@ namespace GnomePlugin
                 {
                     GLib.debug ("Extension %s changed state to %s", uuid, info.state.to_string ());
 
-                    // this.path    = info.path;
-                    // this.version = info.version;
-                    this.state   = info.state;
-                    this.enabled = info.state == Gnome.ExtensionState.ENABLED;
+                    this.state = info.state;
                 }
             }
         }
@@ -336,6 +347,9 @@ namespace GnomePlugin
                 {
                     this.reload.begin ();
                 }
+                else {
+                    this.state = info.state;
+                }
             }
             else {
                 /* broken DBus connection? */
@@ -385,8 +399,8 @@ namespace GnomePlugin
 
         private void notify_uninstalled ()
         {
-            GLib.return_if_fail (this.state == Gnome.ExtensionState.UNINSTALLED ||
-                                 this.state == Gnome.ExtensionState.UNKNOWN);
+            GLib.return_if_fail (this._state == Gnome.ExtensionState.UNINSTALLED ||
+                                 this._state == Gnome.ExtensionState.UNKNOWN);
 
             var notification = new GLib.Notification (
                                            _("Failed to enable extension"));
@@ -405,7 +419,7 @@ namespace GnomePlugin
 
         private void notify_out_of_date ()
         {
-            GLib.return_if_fail (this.state == Gnome.ExtensionState.OUT_OF_DATE);
+            GLib.return_if_fail (this._state == Gnome.ExtensionState.OUT_OF_DATE);
 
             var notification = new GLib.Notification (
                                            _("Failed to enable extension"));
@@ -425,7 +439,7 @@ namespace GnomePlugin
 
         private void notify_error ()
         {
-            GLib.return_if_fail (this.state == Gnome.ExtensionState.ERROR);
+            GLib.return_if_fail (this._state == Gnome.ExtensionState.ERROR);
             GLib.return_if_fail (this.proxy != null);
 
             string[] errors = null;
@@ -464,7 +478,7 @@ namespace GnomePlugin
 
         private void notify_disabled ()
         {
-            switch (this.state)
+            switch (this._state)
             {
                 case Gnome.ExtensionState.UNKNOWN:
                 case Gnome.ExtensionState.UNINSTALLED:
