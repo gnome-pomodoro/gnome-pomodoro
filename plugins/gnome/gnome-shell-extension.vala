@@ -28,25 +28,65 @@ namespace GnomePlugin
             construct set;
         }
 
+        public string path {
+            get;
+            construct set;
+        }
+
+        public string version {
+            get;
+            construct set;
+        }
+
         public bool enabled {
             get;
             private set;
         }
 
-        private string                 path;
-        private string                 version;
         private Gnome.ExtensionState   state;
-        private Gnome.ShellExtensions? shell_extensions_proxy = null;
-        private uint                   notify_disabled_source = 0;
+        private Gnome.ShellExtensions? proxy = null;
+        private uint                   notify_state_source = 0;
+        private GLib.Settings          settings = null;
 
         construct
         {
             this.state = Gnome.ExtensionState.UNKNOWN;
+
+            var settings_schema = GLib.SettingsSchemaSource.get_default ()
+                    .lookup (Gnome.SHELL_SCHEMA, false);
+
+            if (settings_schema != null) {
+                this.settings = new GLib.Settings.full (settings_schema, null, null);
+            }
+            else {
+                GLib.critical ("Schema \"%s\" not installed", Gnome.SHELL_SCHEMA);
+                return;
+            }
+
+            try
+            {
+                this.proxy = GLib.Bus.get_proxy_sync<Gnome.ShellExtensions> (
+                                           GLib.BusType.SESSION,
+                                           "org.gnome.Shell",
+                                           "/org/gnome/Shell",
+                                           GLib.DBusProxyFlags.DO_NOT_AUTO_START,
+                                           null);
+                this.proxy.extension_status_changed.connect (this.on_status_changed);
+            }
+            catch (GLib.IOError error)
+            {
+                GLib.critical ("%s", error.message);
+                return;
+            }
         }
 
-        public GnomeShellExtension (string uuid)
+        public GnomeShellExtension (string uuid,
+                                    string path,
+                                    string version)
         {
-            this.uuid = uuid;
+            GLib.Object (uuid: uuid,
+                         path: path,
+                         version: version);
         }
 
         private void on_status_changed (string uuid,
@@ -57,41 +97,86 @@ namespace GnomePlugin
             {
                 var info = this.get_info ();
 
-                GLib.debug ("Extension %s changed state to %s", uuid, info.state.to_string ());
+                if (info != null)
+                {
+                    GLib.debug ("Extension %s changed state to %s", uuid, info.state.to_string ());
 
-                this.state   = info.state;
-                this.path    = info.path;
-                this.version = info.version;
-                this.enabled = info.state == Gnome.ExtensionState.ENABLED;
+                    // this.path    = info.path;
+                    // this.version = info.version;
+                    this.state   = info.state;
+                    this.enabled = info.state == Gnome.ExtensionState.ENABLED;
+                }
+            }
+        }
 
-                if (this.notify_disabled_source != 0) {
-                    GLib.Source.remove (this.notify_disabled_source);
-                    this.notify_disabled_source = 0;
+        /**
+         * Wait until enabled, listening to D-Bus status changes.
+         */
+        private async void ensure_enabled (GLib.Cancellable? cancellable = null)
+        {
+            var cancellable_handler_id = (ulong) 0;
+
+            if (this.enabled)
+            {
+                return;
+            }
+
+            if (cancellable == null || !cancellable.is_cancelled ())
+            {
+                var handler_id = this.notify["enabled"].connect_after (() => {
+                    if (this.enabled) {
+                        this.ensure_enabled.callback ();
+                    }
+                });
+
+                if (cancellable != null) {
+                    cancellable_handler_id = cancellable.cancelled.connect (() => {
+                        this.ensure_enabled.callback ();
+                    });
                 }
 
-                this.notify_disabled_source = GLib.Timeout.add (1000, () => {
-                    this.notify_disabled_source = 0;
+                yield;
 
-                    if (this.enabled) {
-                        this.notify_enabled ();
-                    }
-                    else {
-                        this.notify_disabled ();
-                    }
+                this.disconnect (handler_id);
 
-                    return GLib.Source.REMOVE;
-                });
+                if (cancellable != null) {
+                    /* cancellable.disconnect() causes a deadlock here */
+                    GLib.SignalHandler.disconnect (cancellable, cancellable_handler_id);
+                }
             }
+        }
+
+        private void schedule_notify_state (uint timeout)
+        {
+            if (this.notify_state_source != 0) {
+                GLib.Source.remove (this.notify_state_source);
+                this.notify_state_source = 0;
+            }
+
+            this.notify_state_source = GLib.Timeout.add (timeout, () => {
+                this.notify_state_source = 0;
+
+                if (this.enabled) {
+                    this.notify_enabled ();
+                }
+                else {
+                    this.notify_disabled ();
+                }
+
+                return GLib.Source.REMOVE;
+            });
         }
 
         private Gnome.ExtensionInfo? get_info ()
         {
+            GLib.return_if_fail (this.proxy != null);
+
             var info = Gnome.ExtensionInfo ();
 
             GLib.HashTable<string,GLib.Variant> tmp;
 
             try {
-                this.shell_extensions_proxy.get_extension_info (this.uuid, out tmp);
+                this.proxy.get_extension_info (this.uuid, out tmp);
 
                 info.uuid = tmp.contains ("uuid")
                                 ? tmp.lookup ("uuid").get_string ()
@@ -120,17 +205,24 @@ namespace GnomePlugin
         }
 
         /**
-         * GNOME Shell may not be aware of installed extension. Make GNOME Shell to look
-         * for new extensions.
+         * GNOME Shell may not be aware of freshly installed extension. Load it explicitly.
          */
-        private void load ()
+        private async void load ()
         {
+            GLib.return_if_fail (this.proxy != null);
+
             GLib.debug ("Loading extension...");
+
+            var handler_id = this.proxy.extension_status_changed.connect ((uuid, state, error) => {
+                if (uuid == this.uuid) {
+                    this.load.callback ();
+                }
+            });
 
             try {
                 var script = """
 (function() {
-    let dir = Gio.File.new_for_path('""" + Config.EXTENSION_DIR + """');
+    let dir = Gio.File.new_for_path('""" + this.path + """');
     let uuid = '""" + this.uuid + """';
     let existing = ExtensionUtils.extensions[uuid];
     if (existing) {
@@ -155,193 +247,139 @@ namespace GnomePlugin
                                                                         "/org/gnome/Shell",
                                                                         GLib.DBusProxyFlags.DO_NOT_AUTO_START);
                 shell_proxy.eval (script);
+
+                yield;
             }
             catch (GLib.IOError error) {
                 GLib.warning ("Failed to load extension: %s",
                               error.message);
             }
+
+            this.proxy.disconnect (handler_id);
         }
 
-        private void reload ()
+        private async void reload ()
         {
+            GLib.return_if_fail (this.proxy != null);
+
             GLib.debug ("Reloading extension...");
 
+            var handler_id = this.proxy.extension_status_changed.connect ((uuid, state, error) => {
+                if (uuid == this.uuid) {
+                    this.reload.callback ();
+                }
+            });
+
             try {
-                this.shell_extensions_proxy.reload_extension (this.uuid);
+                this.proxy.reload_extension (this.uuid);
             }
             catch (GLib.IOError error) {
                 GLib.critical ("%s", error.message);
             }
+
+            this.proxy.disconnect (handler_id);
         }
 
-        private async void connect_proxy ()
+        public async void enable (GLib.Cancellable? cancellable = null)
         {
-            if (this.shell_extensions_proxy == null)
+            GLib.return_if_fail (this.settings != null);
+            GLib.return_if_fail (this.proxy != null);
+
+            var enabled_extensions = this.settings.get_strv
+                                           (Gnome.SHELL_ENABLED_EXTENSIONS_KEY);
+            var enabled_in_settings = false;
+
+            foreach (var uuid in enabled_extensions)
             {
-                GLib.Bus.get_proxy.begin<Gnome.ShellExtensions> (GLib.BusType.SESSION,
-                                                                 "org.gnome.Shell",
-                                                                 "/org/gnome/Shell",
-                                                                 GLib.DBusProxyFlags.DO_NOT_AUTO_START,
-                                                                 null,
-                                                                 (obj, res) =>
+                if (uuid == this.uuid)
                 {
-                    try
-                    {
-                        this.shell_extensions_proxy = GLib.Bus.get_proxy.end (res);
-                        this.shell_extensions_proxy.extension_status_changed.connect (this.on_status_changed);
-                    }
-                    catch (GLib.IOError error)
-                    {
-                        GLib.critical ("%s", error.message);
-                    }
-
-                    this.connect_proxy.callback ();
-                });
-
-                yield;
+                    enabled_in_settings = true;
+                    break;
+                }
             }
-        }
 
-        private async void wait_enabled (uint timeout = 2000)
-        {
-            if (!this.enabled && this.shell_extensions_proxy != null)
+            if (!enabled_in_settings)
             {
-                var timeout_source = (uint) 0;
+                GLib.debug ("Enabling extension \"%s\" in settings",
+                            this.uuid);
 
-                var handler_id = this.notify["enabled"].connect_after (() => {
-                    this.wait_enabled.callback ();
-                });
+                enabled_extensions += this.uuid;
+                this.settings.set_strv ("enabled-extensions",
+                                        enabled_extensions);
+                this.settings.apply ();
 
-                timeout_source = GLib.Timeout.add (timeout, () => {
-                    timeout_source = 0;
-                    this.wait_enabled.callback ();
+                enabled_in_settings = true;
+
+                /* GNOME Shell needs a moment to apply change */
+                GLib.Timeout.add (1000, () => {
+                    this.enable.callback ();
 
                     return GLib.Source.REMOVE;
                 });
 
                 yield;
-
-                GLib.SignalHandler.disconnect (this, handler_id);
-
-                if (timeout_source != 0) {
-                    GLib.Source.remove (timeout_source);
-                }
-            }
-        }
-
-        public async void enable ()
-        {
-            if (this.shell_extensions_proxy == null)
-            {
-                /* Wait until connected to shell d-bus */
-                yield this.connect_proxy ();
             }
 
-            /* Enable extension in gnome-shell settings */
-            var gnome_shell_schema = GLib.SettingsSchemaSource.get_default ()
-                    .lookup (Gnome.SHELL_SCHEMA, false);
-
-            if (gnome_shell_schema != null)
-            {
-                var gnome_shell_settings = new GLib.Settings.full (gnome_shell_schema, null, null);
-                var enabled_extensions = gnome_shell_settings.get_strv
-                                               (Gnome.SHELL_ENABLED_EXTENSIONS_KEY);
-                var enabled_in_settings = false;
-
-                foreach (var uuid in enabled_extensions)
-                {
-                    if (uuid == this.uuid)
-                    {
-                        enabled_in_settings = true;
-
-                        break;
-                    }
-                }
-
-                /* Try enable extension */
-                if (!enabled_in_settings)
-                {
-                    GLib.debug ("Enabling extension \"%s\" in settings",
-                                this.uuid);
-
-                    enabled_extensions += this.uuid;
-                    gnome_shell_settings.set_strv ("enabled-extensions",
-                                                   enabled_extensions);
-                    gnome_shell_settings.apply ();
-
-                    yield this.wait_enabled ();
-                }
-            }
-            else {
-                GLib.warning ("Schema \"%s\" not installed", Gnome.SHELL_SCHEMA);
-                return;
-            }
-
+            /* try load extension if not installed */
             var info = this.get_info ();
-            if (info == null)
-            {
-                /* broken DBus connection */
-                return;
-            }
 
-            var is_boundled = (info.uuid == this.uuid &&
-                               info.path == Config.EXTENSION_DIR &&
-                               info.version == Config.PACKAGE_VERSION);
-
-            if (info.state == Gnome.ExtensionState.UNKNOWN)
+            if (info != null)
             {
-                this.load ();
-                yield this.wait_enabled ();
-            }
-            else if (!is_boundled || info.state == Gnome.ExtensionState.ERROR)
-            {
-                this.reload ();
-                yield this.wait_enabled ();
-            }
-
-            if (this.enabled) {
-                this.notify_enabled ();
+                if (info.state == Gnome.ExtensionState.UNKNOWN ||
+                    info.state == Gnome.ExtensionState.UNINSTALLED ||
+                    info.path != this.path)
+                {
+                    this.load.begin ();
+                }
+                else if (info.state == Gnome.ExtensionState.ERROR ||
+                         info.version != this.version)
+                {
+                    this.reload.begin ();
+                }
             }
             else {
-                this.notify_disabled ();
+                /* broken DBus connection? */
             }
+
+            yield this.ensure_enabled (cancellable);
         }
 
 //        private async void disable ()
 //        {
-//            string[] tmp = null;
+//            string[] tmp = {};
 //
-//            /* Disable extension in gnome-shell settings */
-//            var gnome_shell_settings = new GLib.Settings (Gnome.SHELL_SCHEMA);
-//            var enabled_extensions = gnome_shell_settings.get_strv
-//                                           (Gnome.SHELL_ENABLED_EXTENSIONS_KEY);
-//            var enabled_in_settings = false;
-//
-//            foreach (var uuid in enabled_extensions)
+//            if (this.settings != null)
 //            {
-//                if (uuid == this.uuid)
-//                {
-//                    enabled_in_settings = true;
-//
-//                    break;
-//                }
-//            }
-//
-//            if (enabled_in_settings)
-//            {
-//                GLib.debug ("Disabling extension \"%s\" in settings",
-//                            this.uuid);
+//                var enabled_extensions = this.settings.get_strv
+//                                               (Gnome.SHELL_ENABLED_EXTENSIONS_KEY);
+//                var enabled_in_settings = false;
 //
 //                foreach (var uuid in enabled_extensions)
 //                {
 //                    if (uuid == this.uuid)
 //                    {
-//                        tmp += uuid;
+//                        enabled_in_settings = true;
+//
+//                        break;
 //                    }
 //                }
 //
-//                gnome_shell_settings.set_strv ("enabled-extensions", tmp);
-//                gnome_shell_settings.apply ();
+//                if (enabled_in_settings)
+//                {
+//                    GLib.debug ("Disabling extension \"%s\" in settings",
+//                                this.uuid);
+//
+//                    foreach (var uuid in enabled_extensions)
+//                    {
+//                        if (uuid == this.uuid)
+//                        {
+//                            tmp += uuid;
+//                        }
+//                    }
+//
+//                    this.settings.set_strv ("enabled-extensions", tmp);
+//                    this.settings.apply ();
+//                }
 //            }
 //        }
 
@@ -388,12 +426,12 @@ namespace GnomePlugin
         private void notify_error ()
         {
             GLib.return_if_fail (this.state == Gnome.ExtensionState.ERROR);
+            GLib.return_if_fail (this.proxy != null);
 
             string[] errors = null;
 
             try {
-                this.shell_extensions_proxy.get_extension_errors
-                                           (Config.EXTENSION_UUID, out errors);
+                this.proxy.get_extension_errors (this.uuid, out errors);
             }
             catch (GLib.IOError error) {
                 GLib.critical (error.message);
@@ -448,12 +486,12 @@ namespace GnomePlugin
 
         public override void dispose ()
         {
-            if (this.notify_disabled_source != 0) {
-                GLib.Source.remove (this.notify_disabled_source);
-                this.notify_disabled_source = 0;
+            if (this.notify_state_source != 0) {
+                GLib.Source.remove (this.notify_state_source);
+                this.notify_state_source = 0;
             }
 
-            this.shell_extensions_proxy = null;
+            this.proxy = null;
 
             GLib.Application.get_default ()
                             .withdraw_notification ("extension");

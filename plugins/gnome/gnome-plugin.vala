@@ -90,16 +90,18 @@ namespace GnomePlugin
 
             /* GNOME Shell extension */
             if (this.can_enable && this.shell_extension == null) {
-                this.shell_extension = new GnomePlugin.GnomeShellExtension (Config.EXTENSION_UUID);
-                this.shell_extension.notify["enabled"].connect (this.on_shell_extension_enabled_notify);
-
                 this.shell_capabilities = new Pomodoro.CapabilityGroup ("gnome-shell");
 
                 for (var i=0; i < SHELL_CAPABILITIES.length; i++) {
                     this.shell_capabilities.add (new Pomodoro.Capability (SHELL_CAPABILITIES[i]));
                 }
 
-                yield this.shell_extension.enable ();
+                this.shell_extension = new GnomePlugin.GnomeShellExtension (Config.EXTENSION_UUID,
+                                                                            Config.EXTENSION_DIR,
+                                                                            Config.PACKAGE_VERSION);
+                this.shell_extension.notify["enabled"].connect (this.on_shell_extension_enabled_notify);
+
+                yield this.shell_extension.enable (cancellable);
             }
 
             return true;

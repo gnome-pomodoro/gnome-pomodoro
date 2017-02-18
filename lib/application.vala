@@ -29,6 +29,8 @@ namespace Pomodoro
 
     public class Application : Gtk.Application
     {
+        private const uint SETUP_PLUGINS_TIMEOUT = 3000;
+
         public Pomodoro.Service service;
         public Pomodoro.Timer timer;
         public Pomodoro.CapabilityManager capabilities;
@@ -150,21 +152,33 @@ namespace Pomodoro
             var engine = Peas.Engine.get_default ();
             engine.add_search_path (Config.PLUGIN_LIB_DIR, Config.PLUGIN_DATA_DIR);
 
+            var timeout_cancellable = new GLib.Cancellable ();
+            var timeout_source = (uint) 0;
             var wait_count = 0;
+
+            timeout_source = GLib.Timeout.add (SETUP_PLUGINS_TIMEOUT, () => {
+                timeout_source = 0;
+                timeout_cancellable.cancel ();
+
+                return GLib.Source.REMOVE;
+            });
 
             this.extensions = new Peas.ExtensionSet (engine, typeof (Pomodoro.ApplicationExtension));
             this.extensions.extension_added.connect ((extension_set,
                                                       info,
-                                                      extension) => {
-                if (extension is GLib.AsyncInitable) {
-                    var async_initable = extension as GLib.AsyncInitable;
+                                                      extension_object) => {
+                var extension = extension_object as GLib.AsyncInitable;
 
-                    async_initable.init_async.begin (GLib.Priority.DEFAULT, null, (obj, res) => {
+                if (extension != null)
+                {
+                    extension.init_async.begin (GLib.Priority.DEFAULT, timeout_cancellable, (obj, res) => {
                         try {
-                            async_initable.init_async.end (res);
+                            extension.init_async.end (res);
                         }
                         catch (GLib.Error error) {
-                            GLib.warning ("Error while initializing extension %s: %s", info.get_module_name (), error.message);
+                            GLib.warning ("Error while initializing extension %s: %s",
+                                          info.get_module_name (),
+                                          error.message);
                         }
 
                         wait_count--;
@@ -174,12 +188,18 @@ namespace Pomodoro
 
                     wait_count++;
                 }
-		    });
+            });
 
             this.load_plugins ();
 
             while (wait_count > 0) {
                 yield;
+            }
+
+            timeout_cancellable = null;
+
+            if (timeout_source != 0) {
+                GLib.Source.remove (timeout_source);
             }
         }
 
