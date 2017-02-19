@@ -40,7 +40,8 @@ libgnome_pomodoro_la_CPPFLAGS = \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
 libgnome_pomodoro_la_CFLAGS = \
-	$(GNOME_POMODORO_CFLAGS)
+	$(GNOME_POMODORO_CFLAGS) \
+	-w
 
 libgnome_pomodoro_la_LIBADD = \
 	$(GNOME_POMODORO_LIBS)

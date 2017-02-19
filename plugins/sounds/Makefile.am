@@ -30,7 +30,8 @@ libsounds_la_CPPFLAGS = \
 
 libsounds_la_CFLAGS = \
 	$(PLUGIN_CFLAGS) \
-	$(SOUNDS_PLUGIN_CFLAGS)
+	$(SOUNDS_PLUGIN_CFLAGS) \
+	-w
 
 libsounds_la_LDFLAGS = \
 	$(PLUGIN_LDFLAGS)

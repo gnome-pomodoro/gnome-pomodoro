@@ -20,7 +20,8 @@ libdark_theme_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS)
 
 libdark_theme_la_CFLAGS = \
-	$(PLUGIN_CFLAGS)
+	$(PLUGIN_CFLAGS) \
+	-w
 
 libdark_theme_la_LDFLAGS = \
 	$(PLUGIN_LDFLAGS)

@@ -27,7 +27,8 @@ libindicator_la_CPPFLAGS = \
 
 libindicator_la_CFLAGS = \
 	$(PLUGIN_CFLAGS) \
-	$(INDICATOR_PLUGIN_CFLAGS)
+	$(INDICATOR_PLUGIN_CFLAGS) \
+	-w
 
 libindicator_la_LDFLAGS = \
 	$(PLUGIN_LDFLAGS)

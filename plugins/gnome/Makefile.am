@@ -31,7 +31,8 @@ libgnome_la_CPPFLAGS = \
 
 libgnome_la_CFLAGS = \
 	$(PLUGIN_CFLAGS) \
-	$(GNOME_PLUGIN_CFLAGS)
+	$(GNOME_PLUGIN_CFLAGS) \
+	-w
 
 libgnome_la_LDFLAGS = \
 	$(PLUGIN_LDFLAGS)

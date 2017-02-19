@@ -30,7 +30,8 @@ libactions_la_CPPFLAGS = \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
 libactions_la_CFLAGS = \
-	$(PLUGIN_CFLAGS)
+	$(PLUGIN_CFLAGS) \
+	-w
 
 libactions_la_LDFLAGS = \
 	$(PLUGIN_LDFLAGS)
