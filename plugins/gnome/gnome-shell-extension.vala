@@ -116,6 +116,10 @@ namespace GnomePlugin
                     GLib.debug ("Extension %s changed state to %s", uuid, info.state.to_string ());
 
                     this.state = info.state;
+
+                    if (this.enabled) {
+                        this.notify_enabled ();
+                    }
                 }
             }
         }
@@ -157,27 +161,6 @@ namespace GnomePlugin
             }
         }
 
-        private void schedule_notify_state (uint timeout)
-        {
-            if (this.notify_state_source != 0) {
-                GLib.Source.remove (this.notify_state_source);
-                this.notify_state_source = 0;
-            }
-
-            this.notify_state_source = GLib.Timeout.add (timeout, () => {
-                this.notify_state_source = 0;
-
-                if (this.enabled) {
-                    this.notify_enabled ();
-                }
-                else {
-                    this.notify_disabled ();
-                }
-
-                return GLib.Source.REMOVE;
-            });
-        }
-
         private Gnome.ExtensionInfo? get_info ()
         {
             GLib.return_if_fail (this.proxy != null);
@@ -203,11 +186,6 @@ namespace GnomePlugin
                                 : "";
             }
             catch (GLib.IOError error) {
-                GLib.critical ("%s", error.message);
-                return null;
-            }
-            catch (GLib.DBusError error)
-            {
                 GLib.critical ("%s", error.message);
                 return null;
             }
@@ -336,6 +314,8 @@ namespace GnomePlugin
 
             if (info != null)
             {
+                this.state = info.state;
+
                 if (info.state == Gnome.ExtensionState.UNKNOWN ||
                     info.state == Gnome.ExtensionState.UNINSTALLED ||
                     info.path != this.path)
@@ -347,15 +327,16 @@ namespace GnomePlugin
                 {
                     this.reload.begin ();
                 }
-                else {
-                    this.state = info.state;
-                }
             }
             else {
                 /* broken DBus connection? */
             }
 
             yield this.ensure_enabled (cancellable);
+
+            if (!this.enabled) {
+                this.notify_disabled ();
+            }
         }
 
 //        private async void disable ()

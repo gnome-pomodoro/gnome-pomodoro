@@ -67,7 +67,6 @@ namespace GnomePlugin
     {
         private GLib.Cancellable         cancellable;
         private Meta.IdleMonitor         proxy;
-        private GLib.DBusObjectManager   object_manager;
         private GLib.HashTable<uint,GnomePlugin.IdleMonitorWatch>           watches;
         private GLib.HashTable<uint,unowned GnomePlugin.IdleMonitorWatch>   watches_by_upstream_id;
 
