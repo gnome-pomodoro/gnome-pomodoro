@@ -38,7 +38,7 @@ namespace Pomodoro.Widgets
         {
             GLib.Object (
                 orientation: Gtk.Orientation.HORIZONTAL,
-                digits: 0,
+                digits: -1,
                 draw_value: false,
                 margin_top: 4,
                 halign: Gtk.Align.FILL
