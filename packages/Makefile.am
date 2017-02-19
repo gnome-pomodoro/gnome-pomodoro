@@ -1,5 +1,6 @@
 SUBDIRS = \
 	debian \
+	jhbuild \
 	rpm
 
 -include $(top_srcdir)/git.mk
