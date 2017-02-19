@@ -237,13 +237,20 @@ namespace Pomodoro
 
         private void on_timer_is_paused_notify ()
         {
-            this.withdraw_notifications ();
-
-            if (this.timer.state is Pomodoro.PomodoroState) {
-                this.notify_pomodoro_start ();
+            if (this.timer.is_paused) {
+                this.withdraw_notifications ();
             }
-            else if (this.timer.state is Pomodoro.BreakState) {
-                this.notify_pomodoro_end ();
+            else {
+                GLib.Idle.add (() => {
+                    if (this.timer.state is Pomodoro.PomodoroState) {
+                        this.notify_pomodoro_start ();
+                    }
+                    else if (this.timer.state is Pomodoro.BreakState) {
+                        this.notify_pomodoro_end ();
+                    }
+
+                    return GLib.Source.REMOVE;
+                });
             }
         }
 
