@@ -19,7 +19,7 @@ libsounds_la_VALAFLAGS = \
 	$(PLUGIN_VALAFLAGS) \
 	--pkg gstreamer-1.0 \
 	--pkg libcanberra \
-	--gresources resources/resources.xml
+	--gresources $(srcdir)/resources/resources.xml
 
 libsounds_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS) \
@@ -45,12 +45,12 @@ gsettings_SCHEMAS = \
 @GSETTINGS_RULES@
 
 resources = \
-	resources/resources.xml
+	$(srcdir)/resources/resources.xml
 resources_deps = \
-	$(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir=resources $(resources))
+	$(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir=$(srcdir)/resources $(resources))
 
 resources.c: $(resources) $(resources_deps)
-	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --generate-source --c-name="pomodoro" --sourcedir=resources --target=$@ $<
+	$(AM_V_GEN) $(GLIB_COMPILE_RESOURCES) --generate-source --c-name="pomodoro" --sourcedir=$(srcdir)/resources --target=$@ $<
 
 BUILT_SOURCES = \
 	resources.c
