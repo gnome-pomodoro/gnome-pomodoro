@@ -9,6 +9,9 @@ gnome-pomodoro-jhbuild: gnome-pomodoro-jhbuild.in
 	$(AM_V_GEN) $(SUBST) < $< > $@
 	chmod +x $@
 
+EXTRA_DIST = \
+	gnome-pomodoro-jhbuild.in
+
 CLEANFILES = \
 	gnome-pomodoro-jhbuild
 

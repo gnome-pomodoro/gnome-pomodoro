@@ -53,7 +53,7 @@ deb-src:
 	$(AM_V_GEN) cp $(top_builddir)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz $(gnome_pomodoro_orig_tar_gz);
 	\
 	$(AM_V_GEN) $(SUBST) $(gnome_pomodoro_dsc_in_files) > $(gnome_pomodoro_dsc);
-	echo "Files:" >> $(gnome_pomodoro_dsc); \
+	echo "Files:" >> $(gnome_pomodoro_dsc);
 	for file in $(gnome_pomodoro_dsc_deps); do \
 		file_md5=`md5sum $$file | cut -d " " -f 1`; \
 		file_size=`stat -c%s $$file`; \
