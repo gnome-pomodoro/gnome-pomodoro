@@ -2,7 +2,7 @@
   "uuid": "@EXTENSION_UUID@",
   "name": "Pomodoro",
   "description": "A simple pomodoro timer",
-  "shell-version": ["3.22", "3.20", "3.18", "3.16"],
+  "shell-version": ["3.24", "3.22", "3.20", "3.18", "3.16"],
   "url": "@PACKAGE_URL@",
   "version": "@PACKAGE_VERSION@"
 }
