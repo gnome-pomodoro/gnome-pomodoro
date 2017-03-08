@@ -1,4 +1,5 @@
 SUBDIRS = \
+	vapi \
 	lib \
 	src \
 	plugins \

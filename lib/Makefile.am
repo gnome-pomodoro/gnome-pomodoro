@@ -2,6 +2,8 @@ lib_LTLIBRARIES = \
 	libgnome-pomodoro.la
 
 libgnome_pomodoro_la_VALASOURCES = \
+	models/aggregated-entry.vala \
+	models/entry.vala \
 	about-dialog.vala \
 	accelerator.vala \
 	animation.vala \
@@ -69,6 +71,7 @@ EXTRA_DIST = \
 	$(resources) \
 	$(resources_deps) \
 	gnome-pomodoro.h \
+	gnome-pomodoro.deps \
 	gnome-pomodoro.vapi
 
 -include $(top_srcdir)/git.mk

@@ -29,6 +29,7 @@ namespace Pomodoro
 
     public class Application : Gtk.Application
     {
+        private const uint REPOSITORY_VERSION = 1;
         private const uint SETUP_PLUGINS_TIMEOUT = 3000;
 
         public Pomodoro.Service service;
@@ -40,6 +41,7 @@ namespace Pomodoro
         private Gtk.Window about_dialog;
         private Peas.ExtensionSet extensions;
         private GLib.Settings settings;
+        private Gom.Repository repository;
         private bool was_activated = false;
 
         private enum ExitStatus
@@ -211,6 +213,76 @@ namespace Pomodoro
 
             this.capabilities = new Pomodoro.CapabilityManager ();
             this.capabilities.add_group (default_capabilities, Pomodoro.Priority.LOW);
+        }
+
+        private static bool migrate_repository (Gom.Repository repository,
+                                                Gom.Adapter    adapter,
+                                                uint           version)
+                                                throws GLib.Error
+        {
+            uint8[] file_contents;
+            string error_message;
+
+            GLib.debug ("Migrating database to version %u", version);
+
+            var file = File.new_for_uri ("resource:///org/gnome/pomodoro/database/version-%u.sql".printf (version));
+            file.load_contents (null, out file_contents, null);
+
+            /* Gom.Adapter.execute_sql is limited to single line queries,
+             * so we need to use Sqlite API directly
+             */
+            unowned Sqlite.Database database = adapter.get_handle ();
+
+            if (database.exec ((string) file_contents, null, out error_message) != Sqlite.OK)
+            {
+                throw new Gom.Error.COMMAND_SQLITE (error_message);
+            }
+
+            return true;
+        }
+
+        private void setup_repository ()
+        {
+            this.hold ();
+            this.mark_busy ();
+
+            var path = GLib.Path.build_filename (GLib.Environment.get_user_data_dir (),
+                                                 Config.PACKAGE_NAME,
+                                                 "database.sqlite");
+            var file = GLib.File.new_for_path (path);
+
+            var adapter = new Gom.Adapter ();
+
+            try {
+                /* Open database handle */
+                adapter.open_sync (file.get_uri ());
+
+                /* Migrate database if needed */
+                var repository = new Gom.Repository (adapter);
+                repository.migrate_sync (Pomodoro.Application.REPOSITORY_VERSION,
+                                         Pomodoro.Application.migrate_repository);
+
+                // var object_types = new GLib.List<GLib.Type> ();
+                // object_types.prepend (typeof (Pomodoro.Entry));
+                // object_types.prepend (typeof (Pomodoro.AggregatedEntry));
+                //
+                // repository.automatic_migrate_sync (Pomodoro.Application.REPOSITORY_VERSION,
+                //                                    (owned) object_types);
+
+                this.repository = repository;
+            }
+            catch (GLib.Error error) {
+                GLib.critical ("Failed to migrate database: %s", error.message);
+            }
+
+            try {
+                adapter.close_sync ();
+            }
+            catch (GLib.Error error) {
+            }
+
+            this.unmark_busy ();
+            this.release ();
         }
 
         private void load_plugins ()
@@ -455,6 +527,7 @@ namespace Pomodoro
             this.setup_resources ();
             this.setup_actions ();
             this.setup_menu ();
+            this.setup_repository ();
             this.setup_capabilities ();
             this.setup_plugins.begin ((obj, res) => {
                 this.setup_plugins.end (res);

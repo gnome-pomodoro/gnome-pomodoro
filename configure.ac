@@ -31,6 +31,7 @@ GTK_REQUIRED=3.20.0
 GNOME_REQUIRED=3.16.0
 INTROSPECTION_REQUIRED=0.10.1
 LIBPEAS_REQUIRED=1.5.0
+GOM_REQUIRED=0.3.0
 
 PKG_CHECK_MODULES(GNOME_POMODORO, [
     glib-2.0 >= $GLIB_REQUIRED
@@ -39,6 +40,7 @@ PKG_CHECK_MODULES(GNOME_POMODORO, [
     gsettings-desktop-schemas >= $GTK_REQUIRED
     gobject-introspection-1.0 >= $INTROSPECTION_REQUIRED
     libpeas-1.0 >= $LIBPEAS_REQUIRED
+    gom-1.0 >= $GOM_REQUIRED
 ])
 
 PKG_CHECK_MODULES(PLUGIN, [
@@ -103,11 +105,14 @@ AC_CHECK_FUNCS([atexit floor memchr memset mallopt])
 GNOME_POMODORO_VALAFLAGS=" \
     --target-glib \$(GLIB_REQUIRED) \
     --vapidir=\$(abs_top_srcdir) \
+    --vapidir=\$(abs_top_srcdir)/vapi \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
     --pkg gtk+-3.0 \
-    --pkg libpeas-1.0"
+    --pkg libpeas-1.0 \
+    --pkg gom-1.0 \
+    --pkg sqlite3"
 GNOME_POMODORO_CPPFLAGS="$GNOME_POMODORO_CPPFLAGS \
     -I\$(abs_top_srcdir) \
     -I\$(abs_top_srcdir)/lib"
@@ -116,6 +121,7 @@ GNOME_POMDORO_LIBS="$GNOME_POMDORO_LIBS -lm"
 PLUGIN_VALAFLAGS="$PLUGIN_VALAFLAGS \
     --target-glib \$(GLIB_REQUIRED) \
     --vapidir=\$(abs_top_srcdir) \
+    --vapidir=\$(abs_top_srcdir)/vapi \
     --pkg config \
     --pkg gobject-2.0 \
     --pkg gio-2.0 \
@@ -238,6 +244,7 @@ AC_CONFIG_FILES([
     plugins/indicator/icons/radiance/Makefile
     plugins/sounds/Makefile
     tests/Makefile
+    vapi/Makefile
 ])
 
 AC_OUTPUT

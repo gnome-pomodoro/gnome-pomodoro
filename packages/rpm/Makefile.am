@@ -17,6 +17,7 @@ SUBST=sed \
 	-e "s|@GNOME_REQUIRED[@]|$(GNOME_REQUIRED)|g" \
 	-e "s|@INTROSPECTION_REQUIRED[@]|$(INTROSPECTION_REQUIRED)|g" \
 	-e "s|@LIBPEAS_REQUIRED[@]|$(LIBPEAS_REQUIRED)|g" \
+	-e "s|@GOM_REQUIRED[@]|$(GOM_REQUIRED)|g" \
 	-e "s|@VALA_REQUIRED[@]|$(VALA_REQUIRED)|g" \
 	-e "s|@prefix[@]|$(prefix)|g" \
 	-e "s|@datadir[@]|$(datadir)|g" \
