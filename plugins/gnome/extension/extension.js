@@ -121,9 +121,14 @@ const PomodoroExtension = new Lang.Class({
                 }
             }
 
-            this._enableKeybinding();
-            this._enablePresence();
+            if (this.pluginSettings.get_boolean('hide-system-notifications')) {
+                this._enablePresence();
+            }
+            else {
+                this._disablePresence();
+            }
 
+            this._enableKeybinding();
             this._updateNotifications();
         }
     },
@@ -156,8 +161,11 @@ const PomodoroExtension = new Lang.Class({
                 break;
 
             case 'hide-system-notifications':
-                if (this.presence) {
-                    this.presence.setHideSystemNotifications(settings.get_boolean(key));
+                if (settings.get_boolean(key)) {
+                    this._enablePresence();
+                }
+                else {
+                    this._disablePresence();
                 }
 
                 break;
@@ -291,6 +299,17 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
+    _updatePresence: function() {
+        if (this.presence) {
+            if (this._timerState == Timer.State.NULL) {
+                this.presence.setDefault();
+            }
+            else {
+                this.presence.setBusy(this._timerState == Timer.State.POMODORO);
+            }
+        }
+    },
+
     _update: function() {
         let timerState = this.timer.getState();
         let isPaused = this.timer.isPaused();
@@ -300,14 +319,11 @@ const PomodoroExtension = new Lang.Class({
             this._isPaused = isPaused;
             this._timerState = timerState;
 
-            if (this.presence) {
-                this.presence.setBusy(timerState == Timer.State.POMODORO);
-            }
-
             if (this.reminder && !this.timer.isBreak()) {
                 this.reminder.unschedule();
             }
 
+            this._updatePresence();
             this._updateNotifications();
             this._updateScreenNotifications();
         }
@@ -359,13 +375,11 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _enablePresence: function() {
-        let state = this.timer.getState();
-
         if (!this.presence) {
-            this.presence = new Presence.PresenceManager();
-            this.presence.setHideSystemNotifications(this.pluginSettings.get_boolean('hide-system-notifications'));
-            this.presence.setBusy(this.timer.getState() == Timer.State.POMODORO);
+            this.presence = new Presence.Presence();
         }
+
+        this._updatePresence();
     },
 
     _disablePresence: function() {
