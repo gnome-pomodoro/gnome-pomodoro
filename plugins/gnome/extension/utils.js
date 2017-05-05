@@ -19,6 +19,7 @@
  */
 
 const Lang = imports.lang;
+const Signals = imports.signals;
 
 const Shell = imports.gi.Shell;
 
@@ -31,7 +32,7 @@ const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const VIDEO_PLAYER_CATEGORIES = [
     ['Player', 'Video'],
     ['Player', 'AudioVideo'],
-    ['Game'],
+    ['Game']
 ];
 
 
@@ -74,6 +75,8 @@ const Patch = new Lang.Class({
 
     _init: function() {
         this._hooks = [];
+
+        this.applied = false;
     },
 
     addHooks: function(object, hooks) {
@@ -83,19 +86,30 @@ const Patch = new Lang.Class({
     },
 
     apply: function() {
-        this._hooks.forEach(Lang.bind(this,
-            function(hook) {
-                hook.override();
-            }));
+        if (!this.applied) {
+            this._hooks.forEach(Lang.bind(this,
+                function(hook) {
+                    hook.override();
+                }));
+
+            this.applied = true;
+            this.emit('applied');
+        }
     },
 
     revert: function() {
-        this._hooks.forEach(Lang.bind(this,
-            function(hook) {
-                hook.restore();
-            }));
+        if (this.applied) {
+            this._hooks.forEach(Lang.bind(this,
+                function(hook) {
+                    hook.restore();
+                }));
+
+            this.applied = false;
+            this.emit('reverted');
+        }
     }
 });
+Signals.addSignalMethods(Patch.prototype);
 
 
 function arrayContains(array1, array2) {

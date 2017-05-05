@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 gnome-pomodoro contributors
+ * Copyright (c) 2014,2017 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,20 +22,19 @@ const Lang = imports.lang;
 
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
-const PopupMenu = imports.ui.popupMenu;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Config = Extension.imports.config;
 const Utils = Extension.imports.utils;
 
 
-const PresenceManager = new Lang.Class({
-    Name: 'PomodoroPresenceManager',
+/**
+ * Helps in managing presence for GNOME Shell according to the Pomodoro state.
+ */
+const Presence = new Lang.Class({
+    Name: 'PomodoroPresence',
 
     _init: function() {
-        this._enabled = false;
         this._busy = false;
-        this._setHideSystemNotifications = false;
 
         // Setup a patch for suppressing presence handlers.
         // When applied the main presence controller becomes gnome-pomodoro.
@@ -46,40 +45,41 @@ const PresenceManager = new Lang.Class({
                     this._updateState();
                 }
         });
-    },
-
-    enable: function() {
-        if (!this._enabled) {
-            this._enabled = true;
-
-            this._patch.apply();
-
-            this._onEnabledChanged();
-        }
-    },
-
-    disable: function() {
-        if (this._enabled) {
-            this._enabled = false;
-
-            this._onEnabledChanged();
-
-            this._patch.revert();
-        }
-    },
-
-    setHideSystemNotifications: function(value) {
-        this._setHideSystemNotifications = value;
+        this._patch.connect('applied', Lang.bind(this, this._onPatchApplied));
+        this._patch.connect('reverted', Lang.bind(this, this._onPatchReverted));
     },
 
     setBusy: function(value) {
         this._busy = value;
+
+        if (this._patch.applied) {
+            this._onPatchApplied();
+        }
+        else {
+            this._patch.apply();
+        }
     },
 
-    _onEnabledChanged: function() {
+    setDefault: function() {
+        if (this._patch.applied) {
+            this._patch.revert();
+        }
+    },
+
+    _onPatchApplied: function() {
         try {
-            Main.messageTray._busy = this._enabled;
-            Main.messageTray._updateState();
+            Main.messageTray._busy = this._busy;
+            Main.messageTray._onStatusChanged();
+        }
+        catch (error) {
+            Utils.logWarning(error.message);
+        }
+    },
+
+    _onPatchReverted: function() {
+        try {
+            let status = Main.messageTray._presence.status;
+            Main.messageTray._onStatusChanged(status);
         }
         catch (error) {
             Utils.logWarning(error.message);
@@ -87,8 +87,10 @@ const PresenceManager = new Lang.Class({
     },
 
     destroy: function() {
+        this.setDefault();
+
         if (this._patch) {
-            this._patch.revert();
+            this._patch.disconnectAll();
             this._patch = null;
         }
     }
