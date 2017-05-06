@@ -38,8 +38,7 @@ const Presence = new Lang.Class({
 
         // Setup a patch for suppressing presence handlers.
         // When applied the main presence controller becomes gnome-pomodoro.
-        this._patch = new Utils.Patch();
-        this._patch.addHooks(MessageTray.MessageTray.prototype, {
+        this._patch = new Utils.Patch(MessageTray.MessageTray.prototype, {
             _onStatusChanged:
                 function(status) {
                     this._updateState();
@@ -52,11 +51,11 @@ const Presence = new Lang.Class({
     setBusy: function(value) {
         this._busy = value;
 
-        if (this._patch.applied) {
-            this._onPatchApplied();
+        if (!this._patch.applied) {
+            this._patch.apply();
         }
         else {
-            this._patch.apply();
+            this._onPatchApplied();
         }
     },
 
@@ -87,10 +86,8 @@ const Presence = new Lang.Class({
     },
 
     destroy: function() {
-        this.setDefault();
-
         if (this._patch) {
-            this._patch.disconnectAll();
+            this._patch.destroy();
             this._patch = null;
         }
     }
