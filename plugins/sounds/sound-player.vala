@@ -358,6 +358,11 @@ namespace SoundsPlugin
                 this._file = value != null
                         ? GLib.File.new_for_uri (get_absolute_uri (value.get_uri ()))
                         : null;
+
+                if (this.is_cached) {
+                    /* there is no way to invalidate old value, so at least refresh cache */
+                    this.cache_file ();
+                }
             }
         }
 
@@ -366,11 +371,7 @@ namespace SoundsPlugin
 
         private GLib.File _file;
         private Canberra.Context context;
-
-        private static double amplitude_to_decibels (double amplitude)
-        {
-            return 20.0 * Math.log10 (amplitude);
-        }
+        private bool is_cached = false;
 
         public CanberraPlayer (string? event_id) throws SoundPlayerError
         {
@@ -415,6 +416,11 @@ namespace SoundsPlugin
             }
         }
 
+        private static double amplitude_to_decibels (double amplitude)
+        {
+            return 20.0 * Math.log10 (amplitude);
+        }
+
         public void play ()
                     requires (this.context != null)
         {
@@ -426,16 +432,16 @@ namespace SoundsPlugin
 
                     var status = Canberra.Proplist.create (out properties);
                     properties.sets (Canberra.PROP_MEDIA_ROLE, "alert");
+                    properties.sets (Canberra.PROP_MEDIA_FILENAME, this._file.get_path ());
                     properties.sets (Canberra.PROP_CANBERRA_VOLUME,
                                      ((float) amplitude_to_decibels (this.volume)).to_string ());
 
                     if (this.event_id != null) {
                         properties.sets (Canberra.PROP_EVENT_ID, this.event_id);
-                        properties.sets (Canberra.PROP_CANBERRA_CACHE_CONTROL, "permanent");
-                    }
 
-                    if (this._file != null) {
-                        properties.sets (Canberra.PROP_MEDIA_FILENAME, this._file.get_path ());
+                        if (!this.is_cached) {
+                            this.cache_file ();
+                        }
                     }
 
                     status = this.context.play_full (0,
@@ -469,6 +475,28 @@ namespace SoundsPlugin
             };
 
             return mime_types;
+        }
+
+        private void cache_file ()
+        {
+            Canberra.Proplist properties = null;
+
+            if (this.context != null && this.event_id != null && this._file != null)
+            {
+                var status = Canberra.Proplist.create (out properties);
+                properties.sets (Canberra.PROP_EVENT_ID, this.event_id);
+                properties.sets (Canberra.PROP_MEDIA_FILENAME, this._file.get_path ());
+
+                status = this.context.cache_full (properties);
+
+                if (status != Canberra.SUCCESS) {
+                    GLib.warning ("Couldn't clear libcanberra cache - %s",
+                                  Canberra.strerror (status));
+                }
+                else {
+                    this.is_cached = true;
+                }
+            }
         }
 
         private void on_play_callback (Canberra.Context context,
