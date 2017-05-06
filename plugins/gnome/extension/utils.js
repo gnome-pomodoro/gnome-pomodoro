@@ -36,77 +36,51 @@ const VIDEO_PLAYER_CATEGORIES = [
 ];
 
 
-const Hook = new Lang.Class({
-    Name: 'PomodoroHook',
-
-    _init: function(object, property, func) {
-        this.object = object;
-        this.property = property;
-        this.func = func;
-
-        this.initial = object[property];
-
-        this.check();
-    },
-
-    check: function() {
-        if (this.initial === undefined) {
-            logWarning('Hook "%s" for %s is not defined'.format(this.property, this.object));
-            return;
-        }
-        if (!(this.initial instanceof Function)) {
-            logWarning('Hook "%s" for %s is not callable'.format(this.property, this.object));
-            return;
-        }
-    },
-
-    override: function(func) {
-        this.object[this.property] = func ? func : this.func;
-    },
-
-    restore: function() {
-        this.object[this.property] = this.initial;
-    }
-});
-
-
 const Patch = new Lang.Class({
     Name: 'PomodoroPatch',
 
-    _init: function() {
-        this._hooks = [];
-
+    _init: function(object, overrides) {
+        this.object = object;
+        this.overrides = overrides;
+        this.initial = {};
         this.applied = false;
-    },
 
-    addHooks: function(object, hooks) {
-        for (let name in hooks) {
-            this._hooks.push(new Hook(object, name, hooks[name]));
-        };
+        for (let name in this.overrides) {
+            this.initial[name] = this.object[name];
+
+            if (typeof(this.initial[name]) == 'undefined') {
+                logWarning('Property "%s" for %s is not defined'.format(name, this.object));
+            }
+        }
     },
 
     apply: function() {
         if (!this.applied) {
-            this._hooks.forEach(Lang.bind(this,
-                function(hook) {
-                    hook.override();
-                }));
+            for (let name in this.overrides) {
+                this.object[name] = this.overrides[name];
+            }
 
             this.applied = true;
+
             this.emit('applied');
         }
     },
 
     revert: function() {
         if (this.applied) {
-            this._hooks.forEach(Lang.bind(this,
-                function(hook) {
-                    hook.restore();
-                }));
+            for (let name in this.overrides) {
+                this.object[name] = this.initial[name];
+            }
 
             this.applied = false;
+
             this.emit('reverted');
         }
+    },
+
+    destroy: function() {
+        this.revert();
+        this.disconnectAll();
     }
 });
 Signals.addSignalMethods(Patch.prototype);
