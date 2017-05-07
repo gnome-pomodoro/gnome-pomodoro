@@ -62,7 +62,7 @@ namespace Pomodoro
 
         if (hours > 0) {
             str = ngettext ("%d hour", "%d hours", hours)
-                            .printf (hours);
+                            .printf ((int)hours);
         }
 
         if (minutes > 0 && str != null) {
@@ -71,7 +71,7 @@ namespace Pomodoro
 
         if (minutes > 0) {
             str += ngettext ("%d minute", "%d minutes", minutes)
-                            .printf (minutes);
+                            .printf ((int)minutes);
         }
 
         return str;
