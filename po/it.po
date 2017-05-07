@@ -1,7 +1,7 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Free Software Foundation, Inc.
+# Italian translation for gnome-pomodoro
+# Copyright (c) 2017 gnome-pomodoro contributors
 # This file is distributed under the same license as the gnome-pomodoro package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Giuseppe Pignataro <rogepix@gmail.com>, 2017.
 #
 msgid ""
 msgstr ""
@@ -16,7 +16,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.0.1\n"
 "Last-Translator: Giuseppe Pignataro (Fastbyte01) <rogepix@gmail.com>\n"
-"Language: it_IT\n"
+"Language: it\n"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:7
 #: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:51
