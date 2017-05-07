@@ -536,7 +536,6 @@ namespace Pomodoro
                 this.capabilities.enable ("notifications");
                 this.capabilities.enable ("indicator");
                 this.capabilities.enable ("accelerator");
-                this.capabilities.enable ("reminders");
                 this.capabilities.enable ("hide-system-notifications");
                 this.capabilities.enable ("idle-monitor");
 

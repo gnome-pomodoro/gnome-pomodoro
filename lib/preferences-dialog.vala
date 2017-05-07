@@ -495,8 +495,6 @@ namespace Pomodoro
         [GtkChild]
         private Gtk.ListBoxRow listboxrow_accelerator;
         [GtkChild]
-        private Gtk.ListBoxRow listboxrow_reminders;
-        [GtkChild]
         private Gtk.ListBoxRow listboxrow_idle_monitor;
 
         private GLib.Settings settings;
@@ -608,11 +606,6 @@ namespace Pomodoro
                                 builder.get_object ("screen_notifications_toggle"),
                                 "active",
                                 GLib.SettingsBindFlags.DEFAULT);
-
-            this.settings.bind ("show-reminders",
-                                builder.get_object ("reminders_toggle"),
-                                "active",
-                                GLib.SettingsBindFlags.DEFAULT);
         }
 
         private void setup_other_section (Gtk.Builder builder)
@@ -670,7 +663,6 @@ namespace Pomodoro
             var capabilities = application.capabilities;
 
             this.listboxrow_accelerator.visible = capabilities.has_enabled ("accelerator");
-            this.listboxrow_reminders.visible = capabilities.has_enabled ("reminders");
             this.listboxrow_idle_monitor.visible = capabilities.has_enabled ("idle-monitor");
         }
 

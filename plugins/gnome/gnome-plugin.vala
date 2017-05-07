@@ -36,7 +36,6 @@ namespace GnomePlugin
             "notifications",
             "indicator",
             "accelerator",
-            "reminders",
             "hide-system-notifications"
         };
 

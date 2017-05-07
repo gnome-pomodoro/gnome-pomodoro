@@ -2,7 +2,7 @@
 Loader=C
 Module=notifications
 Name=Notifications
-Description=Pop-Up notifications and reminders
+Description=Pop-Up notifications
 Authors=Kamil Prusko <kamilprusko@gmail.com>
 Copyright=Copyright © 2016 Kamil Prusko
 Website=

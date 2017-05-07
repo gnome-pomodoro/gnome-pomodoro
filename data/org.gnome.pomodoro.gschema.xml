@@ -39,11 +39,6 @@
       <summary>Screen notifications</summary>
       <description>Whether to show a notification dialog when pause starts.</description>
     </key>
-    <key name="show-reminders" type="b">
-      <default>true</default>
-      <summary>Reminders</summary>
-      <description>Whether to remind about ongoing break.</description>
-    </key>
     <key name="pause-when-idle" type="b">
       <default>true</default>
       <summary>Wait after a break</summary>
