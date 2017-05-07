@@ -180,7 +180,6 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _onServiceDisconnected: function() {
-        Utils.disableExtension(Config.EXTENSION_UUID);
     },
 
     _onTimerPaused: function() {
