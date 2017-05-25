@@ -42,11 +42,9 @@ plugins/gnome/extension/dbus.js
 plugins/gnome/extension/dialogs.js
 plugins/gnome/extension/extension.js
 plugins/gnome/extension/indicator.js
-plugins/gnome/extension/metadata.json
 plugins/gnome/extension/notifications.js
 plugins/gnome/extension/presence.js
 plugins/gnome/extension/settings.js
-plugins/gnome/extension/stylesheet.css
 plugins/gnome/extension/timer.js
 plugins/gnome/extension/utils.js
 plugins/gnome/gnome.vala
