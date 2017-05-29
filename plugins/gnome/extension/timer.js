@@ -33,7 +33,23 @@ const State = {
     NULL: 'null',
     POMODORO: 'pomodoro',
     SHORT_BREAK: 'short-break',
-    LONG_BREAK: 'long-break'
+    LONG_BREAK: 'long-break',
+
+    label: function(state) {
+        switch (state) {
+            case State.POMODORO:
+                return _("Pomodoro");
+
+            case State.SHORT_BREAK:
+                return _("Short Break");
+
+            case State.LONG_BREAK:
+                return _("Long Break");
+
+            default:
+                return null;
+        }
+    }
 };
 
 
@@ -44,15 +60,8 @@ const Timer = new Lang.Class({
         this._connected = false;
         this._state = null;
         this._isPaused = null;
+        this._stateDuration = 0;
         this._propertiesChangedId = 0;
-        this._settingsChangedId = 0;
-        this._shortBreakDuration = 0;
-        this._longBreakDuration = 0;
-
-        let settings = Extension.extension.settings;
-        this._settingsChangedId  = settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
-        this._shortBreakDuration = settings.get_double('short-break-duration');
-        this._longBreakDuration  = settings.get_double('long-break-duration');
 
         this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
             if (error) {
@@ -73,18 +82,6 @@ const Timer = new Lang.Class({
                                        Lang.bind(this, this._onNameVanished));
     },
 
-    _onSettingsChanged: function(settings, key) {
-        switch (key) {
-            case 'short-break-duration':
-                this._shortBreakDuration = settings.get_double('short-break-duration');
-                break;
-
-            case 'long-break-duration':
-                this._longBreakDuration = settings.get_double('long-break-duration');
-                break;
-        }
-    },
-
     _onNameAppeared: function() {
         this._connected = true;
 
@@ -101,10 +98,12 @@ const Timer = new Lang.Class({
 
     _onPropertiesChanged: function(proxy, properties) {
         let state = proxy.State;
+        let stateDuration = proxy.StateDuration;
         let isPaused = proxy.IsPaused;
 
-        if (this._state !== state) {
+        if (this._state !== state || this._stateDuration !== stateDuration) {
             this._state = state;
+            this._stateDuration = stateDuration;
             this.emit('state-changed');
         }
 
@@ -127,21 +126,37 @@ const Timer = new Lang.Class({
     },
 
     getState: function() {
-        if (!this._connected || this._proxy.State == null) {
+        if (!this._connected || this._proxy.State === null) {
             return State.NULL;
         }
 
         return this._proxy.State;
     },
 
-    setState: function(state, duration) {
+    setState: function(state, timestamp) {
         this._proxy.SetStateRemote(state,
-                                   duration || 0,
+                                   timestamp || 0,
                                    Lang.bind(this, this._onCallback));
     },
 
     getStateDuration: function() {
         return this._proxy.StateDuration;
+    },
+
+    setStateDuration: function(duration) {
+        this._proxy.SetStateDurationRemote(this._proxy.State,
+                                           duration,
+                                           Lang.bind(this, this._onCallback));
+    },
+
+    get stateDuration() {
+        return this._proxy.StateDuration;
+    },
+
+    set stateDuration(value) {
+        this._proxy.SetStateDurationRemote(this._proxy.State,
+                                           value,
+                                           Lang.bind(this, this._onCallback));
     },
 
     getElapsed: function() {
@@ -151,7 +166,7 @@ const Timer = new Lang.Class({
     getRemaining: function() {
         let state = this.getState();
 
-        if (state == State.NULL) {
+        if (state === State.NULL) {
             return 0.0;
         }
 
@@ -193,7 +208,7 @@ const Timer = new Lang.Class({
     },
 
     toggle: function() {
-        if (this.getState() == State.NULL) {
+        if (this.getState() === State.NULL) {
             this.start();
         }
         else {
@@ -204,24 +219,7 @@ const Timer = new Lang.Class({
     isBreak: function() {
         let state = this.getState();
 
-        return state == State.SHORT_BREAK || state == State.LONG_BREAK;
-    },
-
-    canSwitchBreak: function() {
-        return (this.getElapsed() < this._shortBreakDuration) &&
-               (this._shortBreakDuration < this._longBreakDuration);
-    },
-
-    switchBreak: function() {
-        let state = this.getState();
-
-        if (state == State.SHORT_BREAK) {
-            this.setState(State.LONG_BREAK);
-        }
-
-        if (state == State.LONG_BREAK) {
-            this.setState(State.SHORT_BREAK);
-        }
+        return state === State.SHORT_BREAK || state === State.LONG_BREAK;
     },
 
     showMainWindow: function(timestamp) {
@@ -251,11 +249,6 @@ const Timer = new Lang.Class({
         if (this._nameWatcherId) {
             Gio.DBus.session.unwatch_name(this._nameWatcherId);
             this._nameWatcherId = 0;
-        }
-
-        if (this._settingsChangedId) {
-            Extension.extension.settings.disconnect(this._settingsChangedId);
-            this._settingsChangedId = 0;
         }
     }
 });

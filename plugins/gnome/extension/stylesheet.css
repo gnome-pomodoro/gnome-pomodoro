@@ -106,6 +106,18 @@
     color: white;
 }
 
+.message .extension-pomodoro-message-action {
+    font-size: 10pt;
+    font-weight: bold;
+    padding: 10px 10px 10px 3px;
+    border-radius: 0;
+    background-color: transparent;
+}
+.message .extension-pomodoro-message-action:last-child {
+    border-radius: 0 3px 3px 0;
+    padding-right: 18px;
+}
+
 .summary-notification-stack .extension-pomodoro-notification {
     width: 30em;
 }

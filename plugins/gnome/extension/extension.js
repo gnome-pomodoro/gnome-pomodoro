@@ -1,7 +1,7 @@
 /*
  * A simple pomodoro timer for GNOME Shell
  *
- * Copyright (c) 2011-2014 gnome-pomodoro contributors
+ * Copyright (c) 2011-2017 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,6 +50,10 @@ const ExtensionMode = {
 };
 
 
+// notifications pop up before state changes
+const NOTIFICATIONS_TIME_OFFSET = 10.0;
+
+
 const PomodoroExtension = new Lang.Class({
     Name: 'PomodoroExtension',
 
@@ -82,6 +86,7 @@ const PomodoroExtension = new Lang.Class({
 
             this.timer = new Timer.Timer();
             this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
+            this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
             this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
             this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
             this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
@@ -101,15 +106,15 @@ const PomodoroExtension = new Lang.Class({
         if (this.mode !== mode) {
             this.mode = mode;
 
-            if (mode == ExtensionMode.RESTRICTED) {
+            if (mode === ExtensionMode.RESTRICTED) {
                 this._disableIndicator();
-                this._disableScreenNotifications();
+                this._disableScreenNotification();
             }
             else {
                 this._enableIndicator();
 
                 if (this.settings.get_boolean('show-screen-notifications')) {
-                    this._enableScreenNotifications();
+                    this._enableScreenNotification();
                 }
             }
 
@@ -121,7 +126,7 @@ const PomodoroExtension = new Lang.Class({
             }
 
             this._enableKeybinding();
-            this._updateNotifications();
+            this._updateNotification();
         }
     },
 
@@ -133,11 +138,11 @@ const PomodoroExtension = new Lang.Class({
     _onSettingsChanged: function(settings, key) {
         switch(key) {
             case 'show-screen-notifications':
-                if (settings.get_boolean(key) && this.mode != ExtensionMode.RESTRICTED) {
-                    this._enableScreenNotifications();
+                if (settings.get_boolean(key) && this.mode !== ExtensionMode.RESTRICTED) {
+                    this._enableScreenNotification();
                 }
                 else {
-                    this._disableScreenNotifications();
+                    this._disableScreenNotification();
                 }
 
                 break;
@@ -162,6 +167,14 @@ const PomodoroExtension = new Lang.Class({
     },
 
     _onServiceDisconnected: function() {
+    },
+
+    _onTimerUpdate: function() {
+        let remaining = this.timer.getRemaining();
+
+        if (remaining <= NOTIFICATIONS_TIME_OFFSET && !this.notification) {
+            this._updateNotification();
+        }
     },
 
     _onTimerPaused: function() {
@@ -192,13 +205,20 @@ const PomodoroExtension = new Lang.Class({
         if (this.notification &&
             this.notification instanceof Notifications.PomodoroStartNotification)
         {
-            /* do not renotify */
+            if (this.notification.resident || this.notification.acknowledged) {
+                this.notification.show();
+            }
         }
         else {
             this.notification = new Notifications.PomodoroStartNotification(this.timer);
             this.notification.connect('activated', Lang.bind(this,
                 function(notification) {
-                    this.application.activate();
+                    if (this.timer.isBreak()) {
+                        this.timer.skip();
+                    }
+                    else {
+                        notification.destroy();
+                    }
                 }));
             this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
             this.notification.show();
@@ -211,23 +231,30 @@ const PomodoroExtension = new Lang.Class({
         if (this.notification &&
             this.notification instanceof Notifications.PomodoroEndNotification)
         {
-            /* do not renotify */
+            if (this.dialog && this.timer.isBreak()) {
+                this.dialog.open(true);
+            }
+            else if (this.notification.resident || this.notification.acknowledged) {
+                this.notification.show();
+            }
         }
         else {
             this.notification = new Notifications.PomodoroEndNotification(this.timer);
             this.notification.connect('activated', Lang.bind(this,
                 function(notification) {
-                    if (this.dialog) {
-                        this.dialog.open(true);
-                        this.dialog.pushModal();
+                    if (this.timer.isBreak()) {
+                        if (this.dialog) {
+                            this.dialog.open(true);
+                            this.dialog.pushModal();
+                        }
                     }
                     else {
-                        this.application.activate();
+                        this.timer.skip();
                     }
                 }));
             this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
 
-            if (this.dialog) {
+            if (this.dialog && this.timer.isBreak()) {
                 this.dialog.open(true);
             }
             else {
@@ -238,29 +265,48 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
-    _updateNotifications: function() {
-        if (this.timer.isPaused()) {
-            this._destroyNotifications();
+    _updateNotification: function() {
+        let timerState = this.timer.getState();
+        let isRunning  = !this.timer.isPaused() && timerState !== Timer.State.NULL;
+
+        if (isRunning) {
+            if (this.mode === ExtensionMode.RESTRICTED) {
+                this._destroyNotifications();
+
+                // TODO: As currently notifications on the screenShield can't be updated they are pretty useless
+                // if (!(this.notification &&
+                //       this.notification instanceof Notifications.TimerNotification))
+                // {
+                //     this.notification = new Notifications.TimerNotification(this.timer);
+                //     this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
+                //     this.notification.show();
+                //
+                //     this._destroyPreviousNotifications();
+                // }
+            }
+            else if (this.timer.getRemaining() > NOTIFICATIONS_TIME_OFFSET) {
+                if (timerState === Timer.State.POMODORO) {
+                    this._notifyPomodoroStart();
+                }
+                else {
+                    this._notifyPomodoroEnd();
+                }
+            }
+            else {
+                if (timerState !== Timer.State.POMODORO) {
+                    this._notifyPomodoroStart();
+                }
+                else {
+                    this._notifyPomodoroEnd();
+                }
+            }
         }
         else {
-            switch (this.timer.getState()) {
-                case Timer.State.POMODORO:
-                    this._notifyPomodoroStart();
-                    break;
-
-                case Timer.State.SHORT_BREAK:
-                case Timer.State.LONG_BREAK:
-                    this._notifyPomodoroEnd();
-                    break;
-
-                default:
-                    this._destroyNotifications();
-                    break;
-            }
+            this._destroyNotifications();
         }
     },
 
-    _updateScreenNotifications: function() {
+    _updateScreenNotification: function() {
         if (this.dialog) {
             if (this.timer.isBreak() && !this.timer.isPaused()) {
                 this.dialog.open(false);
@@ -274,11 +320,11 @@ const PomodoroExtension = new Lang.Class({
 
     _updatePresence: function() {
         if (this.presence) {
-            if (this._timerState == Timer.State.NULL) {
+            if (this._timerState === Timer.State.NULL) {
                 this.presence.setDefault();
             }
             else {
-                this.presence.setBusy(this._timerState == Timer.State.POMODORO);
+                this.presence.setBusy(this._timerState === Timer.State.POMODORO);
             }
         }
     },
@@ -286,15 +332,15 @@ const PomodoroExtension = new Lang.Class({
     _update: function() {
         let timerState = this.timer.getState();
         let isPaused = this.timer.isPaused();
-        let isRunning = timerState != Timer.State.NULL && !isPaused;
+        let isRunning = timerState !== Timer.State.NULL && !isPaused;
 
-        if (this._isPaused != isPaused || this._timerState != timerState) {
+        if (this._isPaused !== isPaused || this._timerState !== timerState) {
             this._isPaused = isPaused;
             this._timerState = timerState;
 
             this._updatePresence();
-            this._updateNotifications();
-            this._updateScreenNotifications();
+            this._updateNotification();
+            this._updateScreenNotification();
         }
     },
 
@@ -355,7 +401,7 @@ const PomodoroExtension = new Lang.Class({
         this._destroyPresence();
     },
 
-    _enableScreenNotifications: function() {
+    _enableScreenNotification: function() {
         if (!this.dialog) {
             this.dialog = new Dialogs.PomodoroEndDialog(this.timer);
             this.dialog.connect('opening', Lang.bind(this,
@@ -387,11 +433,11 @@ const PomodoroExtension = new Lang.Class({
                 }));
         }
 
-        this._updateScreenNotifications();
+        this._updateScreenNotification();
     },
 
-    _disableScreenNotifications: function() {
-        this._destroyScreenNotifications();
+    _disableScreenNotification: function() {
+        this._destroyScreenNotification();
     },
 
     _destroyPresence: function() {
@@ -428,7 +474,7 @@ const PomodoroExtension = new Lang.Class({
         }
     },
 
-    _destroyScreenNotifications: function() {
+    _destroyScreenNotification: function() {
         if (this.dialog) {
             this.dialog.destroy();
             this.dialog = null;
@@ -445,7 +491,7 @@ const PomodoroExtension = new Lang.Class({
 
         this._destroyPresence();
         this._destroyIndicator();
-        this._destroyScreenNotifications();
+        this._destroyScreenNotification();
         this._destroyNotifications();
 
         if (this.notificationSource) {

@@ -33,6 +33,10 @@ const PomodoroInterface = '<node> \
         <arg type="s" name="state" direction="in" /> \
         <arg type="d" name="timestamp" direction="in" /> \
     </method> \
+    <method name="SetStateDuration"> \
+        <arg type="s" name="state" direction="in" /> \
+        <arg type="d" name="duration" direction="in" /> \
+    </method> \
     <method name="ShowMainWindow"> \
         <arg type="u" name="timestamp" direction="in" /> \
     </method> \
