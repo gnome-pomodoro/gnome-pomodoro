@@ -177,17 +177,28 @@ const ModalDialog = new Lang.Class({
                                        source: global.stage,
                                        coordinate: Clutter.BindCoordinate.ALL });
 
-        this._layout = new St.BoxLayout({ vertical: true });
-
-        /* Modal dialogs are fixed width and grow vertically; set the request
-         * mode accordingly so wrapped labels are handled correctly during
-         * size requests.
-         */
-        this._layout.request_mode = Clutter.RequestMode.HEIGHT_FOR_WIDTH;
-
         this._backgroundStack = new St.Widget({ layout_manager: new Clutter.BinLayout() });
-        this._backgroundStack.add_actor(this._layout);
 
+        // Clone the group that contains all of UI on the screen.  This is the
+        // chrome, the windows, etc.
+        this._uiGroupClone = new Clutter.Clone({ source: Main.layoutManager.uiGroup,
+                                                 clip_to_allocation: true });
+        this._backgroundStack.add_actor(this._uiGroupClone);
+
+        // Effects
+        this._blurEffect = new Clutter.BlurEffect();
+        this._uiGroupClone.add_effect (this._blurEffect);
+
+        this._brightnessEffect = new Clutter.BrightnessContrastEffect();
+        this._brightnessEffect.set_brightness(-0.5);
+        this._uiGroupClone.add_effect (this._brightnessEffect);
+
+        // Modal dialogs are fixed width and grow vertically; set the request
+        // mode accordingly so wrapped labels are handled correctly during
+        // size requests.
+        this._layout = new St.BoxLayout({ vertical: true });
+        this._layout.request_mode = Clutter.RequestMode.HEIGHT_FOR_WIDTH;
+        this._backgroundStack.add_actor(this._layout);
 
         let backgroundBin = new St.Bin({ child: this._backgroundStack,
                                          x_fill: true,
