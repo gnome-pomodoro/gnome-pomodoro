@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014 gnome-pomodoro contributors
+ * Copyright (c) 2011-2017 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ const Signals = imports.signals;
 const Atk = imports.gi.Atk;
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
+const GObject = imports.gi.GObject;
 const Meta = imports.gi.Meta;
 const St = imports.gi.St;
 const Pango = imports.gi.Pango;
@@ -34,6 +35,8 @@ const Layout = imports.ui.layout;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
+
+const Params = imports.misc.params;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
@@ -60,12 +63,35 @@ const IDLE_TIME_TO_OPEN = 60000;
 const IDLE_TIME_TO_CLOSE = 600;
 const MIN_DISPLAY_TIME = 500;
 
-const FADE_IN_TIME = 180;
-const FADE_IN_OPACITY = 0.55;
+const FADE_IN_TIME = 200;
+const FADE_IN_OPACITY = 0.45;
 
-const FADE_OUT_TIME = 180;
+const FADE_OUT_TIME = 200;
 
 const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
+
+// A single pass blur approximation, with hacky brightness param
+const BLUR_FRAGMENT_SHADER = '\
+uniform sampler2D tex; \
+uniform float x_step, y_step, factor, brightness; \
+\
+const float[7] weights = float[7](0.1452444, 0.1314128, 0.1115940, 0.0831466, 0.0543562,  0.0311780,  0.0156902); \
+const float[7] offsets = float[7](0.0000000, 2.4876390, 4.4711854, 6.4547903, 8.4384988, 10.4223371, 12.4063545); \
+\
+void main () { \
+  vec2 uv = vec2(cogl_tex_coord_in[0].st); \
+  vec2 pixel_size = vec2(x_step * factor, y_step * factor); \
+  vec4 color = vec4(0.0); \
+  color += weights[0] * texture2D(tex, uv); \
+  for (int i=1; i < 7; i++) { \
+    color += \
+      weights[i] * texture2D(tex, uv - pixel_size * offsets[i]) + \
+      weights[i] * texture2D(tex, uv + pixel_size * offsets[i]); \
+  } \
+  color.rgb *= 1.0 - (1.0 - sqrt(brightness)) * factor; \
+  cogl_color_out = color; \
+}';
+
 
 const State = {
     OPENED: 0,
@@ -82,33 +108,35 @@ const MessagesIndicator = new Lang.Class({
         this._count = 0;
         this._sources = [];
 
-        this._container = new St.BoxLayout({ style_class: 'messages-indicator-contents',
-                                             x_expand: true,
-                                             y_expand: true,
-                                             x_align: Clutter.ActorAlign.CENTER });
+        this._contents = new St.BoxLayout({ style_class: 'extension-pomodoro-messages-indicator-contents',
+                                            x_expand: true,
+                                            y_expand: true,
+                                            x_align: Clutter.ActorAlign.CENTER });
 
         this._icon = new St.Icon({ icon_name: 'user-idle-symbolic',
                                    icon_size: 16 });
-        this._container.add_actor(this._icon);
+        this._contents.add_actor(this._icon);
 
         this._label = new St.Label();
-        this._container.add_actor(this._label);
+        this._contents.add_actor(this._label);
 
-        let layout = new Clutter.BinLayout();
-        this.actor = new St.Widget({ layout_manager: layout,
-                                     style_class: 'messages-indicator',
+        this.actor = new St.Widget({ style_class: 'extension-pomodoro-messages-indicator',
+                                     layout_manager: new Clutter.BinLayout(),
                                      y_expand: true,
                                      y_align: Clutter.ActorAlign.END,
                                      visible: false });
-        this.actor.add_actor(this._container);
+        this.actor.add_actor(this._contents);
+        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
 
-        Main.messageTray.connect('source-added', Lang.bind(this, this._onSourceAdded));
-        Main.messageTray.connect('source-removed', Lang.bind(this, this._onSourceRemoved));
+        this._sourceAddedId = Main.messageTray.connect('source-added', Lang.bind(this, this._onSourceAdded));
+        this._sourceRemovedId = Main.messageTray.connect('source-removed', Lang.bind(this, this._onSourceRemoved));
 
-        let sources = Main.messageTray.getSources();
-        sources.forEach(Lang.bind(this, function(source) { this._onSourceAdded(null, source); }));
+        Main.messageTray.getSources().forEach(Lang.bind(this,
+            function(source) {
+                this._onSourceAdded(Main.messageTray, source);
+            }));
 
-        Main.overview.connect('showing', Lang.bind(this, this._updateVisibility));
+        this._updateCount();
     },
 
     _onSourceAdded: function(tray, source) {
@@ -122,16 +150,26 @@ const MessagesIndicator = new Lang.Class({
     },
 
     _onSourceRemoved: function(tray, source) {
-        this._sources.splice(this._sources.indexOf(source), 1);
-        this._updateCount();
+        let index = this._sources.indexOf(source);
+
+        if (index >= 0) {
+            this._sources.splice(index, 1);
+            this._updateCount();
+        }
+    },
+
+    _onActorDestroy: function() {
+        Main.messageTray.disconnect(this._sourceAddedId);
+        Main.messageTray.disconnect(this._sourceRemovedId);
     },
 
     _updateCount: function() {
         let count = 0;
         let hasChats = false;
+
         this._sources.forEach(Lang.bind(this,
             function(source) {
-                count += source.indicatorCount;
+                count += source.unseenCount;
                 hasChats |= source.isChat;
             }));
 
@@ -155,6 +193,165 @@ const MessagesIndicator = new Lang.Class({
 });
 
 
+const BlurEffect = new Lang.Class({
+    Name: 'PmodoroBlurEffect',
+    Extends: Clutter.ShaderEffect,
+
+    _init: function(params) {
+        params = Params.parse(params, { orientation: Clutter.Orientation.HORIZONTAL,
+                                        brightness: 1.0,
+                                        factor: 1.0 });
+
+        this.parent({ shader_type: Clutter.ShaderType.FRAGMENT_SHADER });
+
+        this.orientation = params.orientation;
+        this.brightness = params.brightness;
+        this.factor = params.factor;
+
+        this.set_shader_source(BLUR_FRAGMENT_SHADER);
+    },
+
+    get brightness() {
+        return this._brightness;
+    },
+
+    set brightness(value) {
+        this.set_uniform_value('brightness', GObject.Float(value));
+        this._brightness = value;
+    },
+
+    get factor() {
+        return this._factor;
+    },
+
+    set factor(value) {
+        this.set_uniform_value('factor', GObject.Float(value));
+        this._factor = value;
+    },
+
+    vfunc_pre_paint: function() {
+        let res = this.parent();
+        let [success, width, height] = this.get_target_size();
+
+        if (success) {
+            // Actually we don't blur horizontally / vertically, but diagonally
+            if (this.orientation != Clutter.Orientation.HORIZONTAL) {
+                this.set_uniform_value('x_step', GObject.Float(1.0 / width));
+                this.set_uniform_value('y_step', GObject.Float(1.0 / height));
+            }
+            else {
+                this.set_uniform_value('x_step', - GObject.Float(1.0 / width));
+                this.set_uniform_value('y_step', GObject.Float(1.0 / height));
+            }
+        }
+        else {
+            this.set_uniform_value('x_step', GObject.Float(0.0));
+            this.set_uniform_value('y_step', GObject.Float(0.0));
+        }
+
+        return res;
+    }
+});
+
+
+const BlurredLightbox = new Lang.Class({
+    Name: 'PomodoroBlurredLightbox',
+    Extends: Lightbox.Lightbox,
+
+    _init: function(container, params) {
+        params.radialEffect = false;
+
+        this.parent(container, params);
+
+        if (Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL)) {
+            // TODO: Try consolidate these effects into one
+            this._blurXEffect = new BlurEffect({ orientation: Clutter.Orientation.HORIZONTAL,
+                                                 brightness: this._fadeFactor,
+                                                 factor: 0.0 });
+            this._blurYEffect = new BlurEffect({ orientation: Clutter.Orientation.VERTICAL,
+                                                 brightness: this._fadeFactor,
+                                                 factor: 0.0 });
+
+            // Clone the group that contains all of UI on the screen.  This is the
+            // chrome, the windows, etc.
+            let uiGroupClone = new Clutter.Clone({ source: Main.layoutManager.uiGroup,
+                                                   clip_to_allocation: true });
+            uiGroupClone.add_effect(this._blurXEffect);
+            uiGroupClone.add_effect(this._blurYEffect);
+
+            this.actor.add_actor(uiGroupClone);
+            this.actor.opacity = 255;
+        }
+
+        this.actor.add_style_class_name('extension-pomodoro-lightbox');
+    },
+
+    show: function(fadeInTime) {
+        fadeInTime = fadeInTime || 0;
+
+        if (this._blurXEffect) {
+            Tweener.removeTweens(this._blurXEffect);
+            Tweener.addTween(this._blurXEffect,
+                             { factor: 1.0,
+                               time: fadeInTime,
+                               transition: 'easeOutQuad',
+                               onUpdate: Lang.bind(this, function() {
+                                   this._blurYEffect.factor = this._blurXEffect.factor;
+                               }),
+                               onComplete: Lang.bind(this, function() {
+                                   this.shown = true;
+                                   this.emit('shown');
+                               })
+                             });
+        } else {
+            Tweener.removeTweens(this.actor);
+            Tweener.addTween(this.actor,
+                             { opacity: 255 * this._fadeFactor,
+                               time: fadeInTime,
+                               transition: 'easeOutQuad',
+                               onComplete: Lang.bind(this, function() {
+                                   this.shown = true;
+                                   this.emit('shown');
+                               })
+                             });
+        }
+
+        this.actor.show();
+    },
+
+    hide: function(fadeOutTime) {
+        fadeOutTime = fadeOutTime || 0;
+
+        this.shown = false;
+
+        if (this._blurXEffect) {
+            Tweener.removeTweens(this._blurXEffect);
+            Tweener.addTween(this._blurXEffect,
+                             { factor: 0.0,
+                               time: fadeOutTime,
+                               transition: 'easeOutQuad',
+                               onUpdate: Lang.bind(this, function() {
+                                   this._blurYEffect.factor = this._blurXEffect.factor;
+                               }),
+                               onComplete: Lang.bind(this, function() {
+                                   this.actor.hide();
+                               })
+                             });
+        } else {
+            Tweener.removeTweens(this.actor);
+            Tweener.addTween(this.actor,
+                             { opacity: 0,
+                               time: fadeOutTime,
+                               transition: 'easeOutQuad',
+                               onComplete: Lang.bind(this, function() {
+                                   this.actor.hide();
+                               })
+                             });
+        }
+    }
+});
+
+
 /**
  * ModalDialog class based on ModalDialog from GNOME Shell. We need our own
  * class to have more event signals, different fade in/out times, and different
@@ -173,63 +370,37 @@ const ModalDialog = new Lang.Class({
         this._pushModalTries       = 0;
 
         this._monitorConstraint = new Layout.MonitorConstraint();
-        this._stageConstraint   = new Clutter.BindConstraint({
+        this._stageConstraint = new Clutter.BindConstraint({
                                        source: global.stage,
                                        coordinate: Clutter.BindCoordinate.ALL });
 
-        this._backgroundStack = new St.Widget({ layout_manager: new Clutter.BinLayout() });
-
-        // Clone the group that contains all of UI on the screen.  This is the
-        // chrome, the windows, etc.
-        this._uiGroupClone = new Clutter.Clone({ source: Main.layoutManager.uiGroup,
-                                                 clip_to_allocation: true });
-        this._backgroundStack.add_actor(this._uiGroupClone);
-
-        // Effects
-        this._blurEffect = new Clutter.BlurEffect();
-        this._uiGroupClone.add_effect (this._blurEffect);
-
-        this._brightnessEffect = new Clutter.BrightnessContrastEffect();
-        this._brightnessEffect.set_brightness(-0.5);
-        this._uiGroupClone.add_effect (this._brightnessEffect);
+        this.actor = new St.Widget({ style_class: 'extension-pomodoro-dialog',
+                                     accessible_role: Atk.Role.DIALOG,
+                                     layout_manager: new Clutter.BinLayout(),
+                                     visible: false,
+                                     opacity: 0 });
+        this.actor._delegate = this;
+        this.actor.add_constraint(this._stageConstraint);
+        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
 
         // Modal dialogs are fixed width and grow vertically; set the request
         // mode accordingly so wrapped labels are handled correctly during
         // size requests.
-        this._layout = new St.BoxLayout({ vertical: true });
-        this._layout.request_mode = Clutter.RequestMode.HEIGHT_FOR_WIDTH;
-        this._backgroundStack.add_actor(this._layout);
+        this._layout = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+        this._layout.add_constraint(this._monitorConstraint);
 
-        let backgroundBin = new St.Bin({ child: this._backgroundStack,
-                                         x_fill: true,
-                                         y_fill: true });
-        backgroundBin.add_constraint(this._monitorConstraint);
+        this.actor.add_actor(this._layout);
 
-        this.actor = new St.Widget({ accessible_role: Atk.Role.DIALOG,
-                                     visible: false,
-                                     opacity: 0.0,
-                                     x: 0,
-                                     y: 0 });
-        this.actor._delegate = this;
-        this.actor.add_constraint(this._stageConstraint);
-        this.actor.add_style_class_name('extension-pomodoro-dialog');
-        this.actor.add_actor(backgroundBin);
-        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
-
-        // TODO: Check it it's ok with multi-monitor setup
-        global.stage.add_actor(this.actor);
-        // Main.layoutManager.modalDialogGroup.add_actor(this.actor);
-
-        this._lightbox = new Lightbox.Lightbox(this.actor,
-                                               { fadeFactor: FADE_IN_OPACITY,
-                                                 inhibitEvents: false });
-        this._lightbox.highlight(backgroundBin);
-        this._lightbox.actor.add_style_class_name('extension-pomodoro-lightbox');
-        this._lightbox.show();
+        this._lightbox = new BlurredLightbox(this.actor,
+                                             { fadeFactor: FADE_IN_OPACITY,
+                                               inhibitEvents: false });
+        this._lightbox.highlight(this._layout);
+        this._lightbox.actor.show();
 
         this._grabHelper = new GrabHelper.GrabHelper(this.actor);
         this._grabHelper.addActor(this._lightbox.actor);
 
+        global.stage.add_actor(this.actor);
         global.focus_manager.add_group(this.actor);
     },
 
@@ -258,6 +429,7 @@ const ModalDialog = new Lang.Class({
         Tweener.removeTweens(this.actor);
 
         if (animate) {
+            this._lightbox.show(FADE_IN_TIME / 1000);
             Tweener.addTween(this.actor,
                              { opacity: 255,
                                time: FADE_IN_TIME / 1000,
@@ -273,9 +445,10 @@ const ModalDialog = new Lang.Class({
             this.emit('opening');
         }
         else {
-            this.state = State.OPENED;
-
+            this._lightbox.show();
             this.actor.opacity = 255;
+
+            this.state = State.OPENED;
 
             this.emit('opening');
             this.emit('opened');
@@ -295,6 +468,7 @@ const ModalDialog = new Lang.Class({
         Tweener.removeTweens(this.actor);
 
         if (animate) {
+            this._lightbox.hide(FADE_OUT_TIME / 1000);
             Tweener.addTween(this.actor,
                              { opacity: 0,
                                time: FADE_OUT_TIME / 1000,
@@ -311,10 +485,11 @@ const ModalDialog = new Lang.Class({
             this.emit('closing');
         }
         else {
-            this.state = State.CLOSED;
-
             this.actor.opacity = 0;
             this.actor.hide();
+            this._lightbox.hide();
+
+            this.state = State.CLOSED;
 
             this.emit('closing');
             this.emit('closed');
@@ -498,21 +673,10 @@ const PomodoroEndDialog = new Lang.Class({
         box.add(this._descriptionLabel,
                 { y_fill: false,
                   y_align: St.Align.START });
-        this._layout.add(box,
-                         { expand: true,
-                           x_fill: false,
-                           y_fill: false,
-                           x_align: St.Align.MIDDLE,
-                           y_align: St.Align.MIDDLE });
+        this._layout.add_actor(box);
 
-        let messagesIndicator = new MessagesIndicator();
-        this._backgroundStack.add_actor(messagesIndicator.actor);
-//        this._layout.add(messagesIndicator.actor,
-//                         { expand: false,
-//                           x_fill: false,
-//                           y_fill: false,
-//                           x_align: St.Align.MIDDLE,
-//                           y_align: St.Align.END });
+        this._messagesIndicator = new MessagesIndicator();
+        this._layout.add_actor(this._messagesIndicator.actor);
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
 
