@@ -250,7 +250,7 @@ const ModalDialog = new Lang.Class({
                         Lang.bind(this, this._onPushModalDelayTimeout));
         }
 
-        this._monitorConstraint.index = global.screen.get_current_monitor();
+        this._monitorConstraint.index = global.screen.get_primary_monitor();
 
         this.actor.raise_top();
         this.actor.show();
