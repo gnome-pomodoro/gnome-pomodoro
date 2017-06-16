@@ -101,98 +101,6 @@ const State = {
 };
 
 
-const MessagesIndicator = new Lang.Class({
-    Name: 'PomodoroMessagesIndicator',
-
-    _init: function() {
-        this._count = 0;
-        this._sources = [];
-
-        this._contents = new St.BoxLayout({ style_class: 'extension-pomodoro-messages-indicator-contents',
-                                            x_expand: true,
-                                            y_expand: true,
-                                            x_align: Clutter.ActorAlign.CENTER });
-
-        this._icon = new St.Icon({ icon_name: 'user-idle-symbolic',
-                                   icon_size: 16 });
-        this._contents.add_actor(this._icon);
-
-        this._label = new St.Label();
-        this._contents.add_actor(this._label);
-
-        this.actor = new St.Widget({ style_class: 'extension-pomodoro-messages-indicator',
-                                     layout_manager: new Clutter.BinLayout(),
-                                     y_expand: true,
-                                     y_align: Clutter.ActorAlign.END,
-                                     visible: false });
-        this.actor.add_actor(this._contents);
-        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
-
-        this._sourceAddedId = Main.messageTray.connect('source-added', Lang.bind(this, this._onSourceAdded));
-        this._sourceRemovedId = Main.messageTray.connect('source-removed', Lang.bind(this, this._onSourceRemoved));
-
-        Main.messageTray.getSources().forEach(Lang.bind(this,
-            function(source) {
-                this._onSourceAdded(Main.messageTray, source);
-            }));
-
-        this._updateCount();
-    },
-
-    _onSourceAdded: function(tray, source) {
-        if (source.trayIcon) {
-            return;
-        }
-
-        source.connect('count-updated', Lang.bind(this, this._updateCount));
-        this._sources.push(source);
-        this._updateCount();
-    },
-
-    _onSourceRemoved: function(tray, source) {
-        let index = this._sources.indexOf(source);
-
-        if (index >= 0) {
-            this._sources.splice(index, 1);
-            this._updateCount();
-        }
-    },
-
-    _onActorDestroy: function() {
-        Main.messageTray.disconnect(this._sourceAddedId);
-        Main.messageTray.disconnect(this._sourceRemovedId);
-    },
-
-    _updateCount: function() {
-        let count = 0;
-        let hasChats = false;
-
-        this._sources.forEach(Lang.bind(this,
-            function(source) {
-                count += source.unseenCount;
-                hasChats |= source.isChat;
-            }));
-
-        this._count = count;
-
-        if (this._label.clutter_text) {
-            this._label.clutter_text.set_text(ngettext("%d new message",
-                                                       "%d new messages",
-                                                       count).format(count));
-        }
-
-        this._icon.visible = hasChats;
-        this._updateVisibility();
-    },
-
-    _updateVisibility: function() {
-        let visible = (this._count > 0);
-
-        this.actor.visible = visible;
-    }
-});
-
-
 const BlurEffect = new Lang.Class({
     Name: 'PmodoroBlurEffect',
     Extends: Clutter.ShaderEffect,
@@ -706,9 +614,6 @@ const PomodoroEndDialog = new Lang.Class({
                 { y_fill: false,
                   y_align: St.Align.START });
         this._layout.add_actor(box);
-
-        this._messagesIndicator = new MessagesIndicator();
-        this._layout.add_actor(this._messagesIndicator.actor);
 
         this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
 
