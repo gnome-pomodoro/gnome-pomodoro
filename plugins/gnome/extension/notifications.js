@@ -91,7 +91,7 @@ const Source = new Lang.Class({
                     this.addMessageAtIndex(message, this._nUrgent, this.actor.mapped);
                 }
                 else {
-                    patch.initial._onNotificationAdded(source, notification);
+                    Lang.bind(this, patch.initial._onNotificationAdded)(source, notification);
                 }
             }
         });
