@@ -408,6 +408,31 @@ const ModalDialog = new Lang.Class({
         return this.state == State.OPENED || this.state == State.OPENING;
     },
 
+    _addMessageTray: function() {
+        let messageTray = Main.messageTray;
+
+        messageTray.actor.ref();
+
+        Main.layoutManager.removeChrome(messageTray.actor);
+
+        global.stage.add_child(messageTray.actor);
+
+        messageTray.actor.unref();
+        messageTray.bannerBlocked = false;
+    },
+
+    _removeMessageTray: function() {
+        let messageTray = Main.messageTray;
+
+        messageTray.actor.ref();
+
+        global.stage.remove_child(messageTray.actor);
+
+        Main.layoutManager.addChrome(messageTray.actor, { affectsInputRegion: false });
+
+        messageTray.actor.unref();
+    },
+
     open: function(animate) {
         if (this.state == State.OPENED || this.state == State.OPENING) {
             return;
@@ -427,6 +452,8 @@ const ModalDialog = new Lang.Class({
         this.actor.show();
 
         Tweener.removeTweens(this.actor);
+
+        this._addMessageTray();
 
         if (animate) {
             this._lightbox.show(FADE_IN_TIME / 1000);
@@ -478,6 +505,9 @@ const ModalDialog = new Lang.Class({
                                         if (this.state == State.CLOSING) {
                                             this.state = State.CLOSED;
                                             this.actor.hide();
+
+                                            this._removeMessageTray();
+
                                             this.emit('closed');
                                         }
                                    })
@@ -490,6 +520,8 @@ const ModalDialog = new Lang.Class({
             this._lightbox.hide();
 
             this.state = State.CLOSED;
+
+            this._removeMessageTray();
 
             this.emit('closing');
             this.emit('closed');
