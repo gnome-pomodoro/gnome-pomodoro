@@ -23,7 +23,7 @@ using GLib;
 
 namespace Pomodoro
 {
-    private const double TIMER_RESTORE_TIMEOUT_TO_RESET = 3600.0;
+    private const double TIME_TO_RESET_SCORE = 3600.0;
 
     /**
      * Pomodoro.Timer class.
@@ -209,11 +209,11 @@ namespace Pomodoro
         {
             var previous_state = this._state;
 
+            this.timestamp = timestamp;
+
             this.state_leave (this._state);
 
             this._state = state;
-
-            this.timestamp = timestamp;
             this.update_offset ();
 
             this.state_enter (this._state);
@@ -430,7 +430,7 @@ namespace Pomodoro
                 }
             }
 
-            if (state != null && timestamp - last_timestamp < TIMER_RESTORE_TIMEOUT_TO_RESET)
+            if (state != null && timestamp - last_timestamp < TIME_TO_RESET_SCORE)
             {
                 this.freeze_notify ();
                 this.score = score;

@@ -113,7 +113,17 @@ namespace Pomodoro
         public override TimerState create_next_state (double score,
                                                       double timestamp)
         {
-            return new DisabledState.with_timestamp (timestamp) as TimerState;
+            return new DisabledState.with_timestamp (this.timestamp) as TimerState;
+        }
+
+        public override double calculate_score (double score,
+                                                double timestamp)
+        {
+            var elapsed = timestamp - this.timestamp;
+
+            message ("update_state: %.2f %.2f", score, elapsed);
+
+            return elapsed < TIME_TO_RESET_SCORE ? score : 0.0;
         }
     }
 

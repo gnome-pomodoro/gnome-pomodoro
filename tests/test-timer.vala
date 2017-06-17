@@ -89,6 +89,9 @@ namespace Pomodoro
             this.add_test ("score_3",
                            this.test_score_3);
 
+            this.add_test ("score_4",
+                           this.test_score_4);
+
 //            this.add_test ("state_duration_change",
 //                           this.test_state_duration_change);
 
@@ -515,6 +518,27 @@ namespace Pomodoro
             timer.stop ();
 
             assert (timer.score == 1.0);
+        }
+
+        /**
+         * Timer should reset score after 1h of inactivity.
+         */
+        public void test_score_4 ()
+        {
+            var timer = new Pomodoro.Timer ();
+            timer.state = new Pomodoro.DisabledState.with_timestamp (0.0);
+            timer.score = 1.0;
+
+            timer.state_leave.connect ((old_state) => {
+                message ("*** state_leave %g", old_state.timestamp);
+            });
+            timer.state_enter.connect ((new_state) => {
+                message ("*** state_enter %g", new_state.timestamp);
+            });
+
+            timer.start (timer.state.timestamp + 3600.0);
+
+            assert (timer.score == 0.0);
         }
 
     //     private static void print_timer_state (Pomodoro.Timer timer)
