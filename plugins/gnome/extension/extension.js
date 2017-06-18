@@ -267,9 +267,9 @@ const PomodoroExtension = new Lang.Class({
 
     _updateNotification: function() {
         let timerState = this.timer.getState();
-        let isRunning  = !this.timer.isPaused() && timerState !== Timer.State.NULL;
+        let isPaused   = this.timer.isPaused();
 
-        if (isRunning) {
+        if (timerState != Timer.State.NULL && (!isPaused || this.timer.getElapsed() == 0.0)) {
             if (this.mode === ExtensionMode.RESTRICTED) {
                 this._destroyNotifications();
 
