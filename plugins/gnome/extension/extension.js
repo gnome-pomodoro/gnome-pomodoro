@@ -72,6 +72,7 @@ const PomodoroExtension = new Lang.Class({
         this.keybinding         = false;
         this._isPaused          = false;
         this._timerState        = Timer.State.NULL;
+        this._timerElapsed      = 0.0;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
@@ -331,12 +332,14 @@ const PomodoroExtension = new Lang.Class({
 
     _update: function() {
         let timerState = this.timer.getState();
+        let timerElapsed = this.timer.getElapsed();
         let isPaused = this.timer.isPaused();
         let isRunning = timerState !== Timer.State.NULL && !isPaused;
 
-        if (this._isPaused !== isPaused || this._timerState !== timerState) {
+        if (this._isPaused !== isPaused || this._timerState !== timerState || this._timerElapsed > timerElapsed) {
             this._isPaused = isPaused;
             this._timerState = timerState;
+            this._timerElapsed = timerElapsed;
 
             this._updatePresence();
             this._updateNotification();

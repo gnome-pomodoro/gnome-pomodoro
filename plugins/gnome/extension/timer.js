@@ -62,6 +62,7 @@ const Timer = new Lang.Class({
         this._isPaused = null;
         this._stateDuration = 0;
         this._propertiesChangedId = 0;
+        this._elapsed = 0.0;
 
         this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
             if (error) {
@@ -99,12 +100,17 @@ const Timer = new Lang.Class({
     _onPropertiesChanged: function(proxy, properties) {
         let state = proxy.State;
         let stateDuration = proxy.StateDuration;
+        let elapsed = proxy.Elapsed;
         let isPaused = proxy.IsPaused;
 
-        if (this._state !== state || this._stateDuration !== stateDuration) {
+        if (this._state !== state || this._stateDuration !== stateDuration || this._elapsed > elapsed) {
             this._state = state;
             this._stateDuration = stateDuration;
+            this._elapsed = elapsed
             this.emit('state-changed');
+        }
+        else {
+            this._elapsed = elapsed;
         }
 
         if (this._isPaused !== isPaused) {
