@@ -235,33 +235,42 @@ const PomodoroStartNotification = new Lang.Class({
     _onTimerStateChanged: function() {
         let title,
             message,
-            resident;
+            resident,
+            state = this.timer.getState();
 
-        if (this.timer.getState() === Timer.State.POMODORO) {
-            title = _("Pomodoro");
-            // message = _("Time to work");
-            resident = false;
-        }
-        else if (this.timer.isBreak()) {
-            title = _("Break is about to end");
-            // message = _("Click to start Pomodoro");
-            resident = true;
-        }
-        else {
-            // keep notification as is until destroyed
-            return;
-        }
+        if (this._timerState != state) {
+            this._timerState = state;
 
-        this.title = title;
-        // this.bannerBodyText = message;
-        this.setResident(resident);
-        this.setTransient(!resident);
+            switch (state) {
+                case Timer.State.POMODORO:
+                    title = _("Pomodoro");
+                    // message = _("Time to work");
+                    resident = false;
+                    break;
 
-        if (this.acknowledged) {
-            this.acknowledged = false;
+                case Timer.State.SHORT_BREAK:
+                case Timer.State.LONG_BREAK:
+                    title = _("Break is about to end");
+                    // message = _("Click to start Pomodoro");
+                    resident = true;
+                    break;
+
+                default:
+                    // keep notification as is until destroyed
+                    return;
+            }
+
+            this.title = title;
+            // this.bannerBodyText = message;
+            this.setResident(resident);
+            this.setTransient(!resident);
+
+            if (this.acknowledged) {
+                this.acknowledged = false;
+            }
+
+            this.emit('changed');
         }
-
-        this.emit('changed');
     },
 
     _getBodyText: function() {
@@ -364,34 +373,38 @@ const PomodoroEndNotification = new Lang.Class({
             resident,
             state = this.timer.getState();
 
-        switch (state) {
-            case Timer.State.POMODORO:
-                title = _("Pomodoro is about to end");
-                // message = _("Click to start a break");
-                resident = true;
-                break;
+        if (this._timerState != state) {
+            this._timerState = state;
 
-            case Timer.State.SHORT_BREAK:
-            case Timer.State.LONG_BREAK:
-                title = _("Take a break");
-                resident = true;
-                break;
+            switch (state) {
+                case Timer.State.POMODORO:
+                    title = _("Pomodoro is about to end");
+                    // message = _("Click to start a break");
+                    resident = true;
+                    break;
 
-            default:
-                // keep notification as is until destroyed
-                return;
+                case Timer.State.SHORT_BREAK:
+                case Timer.State.LONG_BREAK:
+                    title = _("Take a break");
+                    resident = true;
+                    break;
+
+                default:
+                    // keep notification as is until destroyed
+                    return;
+            }
+
+            this.title = title;
+            // this.bannerBodyText = message;
+            this.setResident(resident);
+            this.setTransient(!resident);
+
+            if (this.acknowledged) {
+                this.acknowledged = false;
+            }
+
+            this.emit('changed');
         }
-
-        this.title = title;
-        // this.bannerBodyText = message;
-        this.setResident(resident);
-        this.setTransient(!resident);
-
-        if (this.acknowledged) {
-            this.acknowledged = false;
-        }
-
-        this.emit('changed');
     },
 
     _getBodyText: function() {

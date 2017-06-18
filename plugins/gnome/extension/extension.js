@@ -60,19 +60,19 @@ const PomodoroExtension = new Lang.Class({
     _init: function(mode) {
         Extension.extension = this;
 
-        this.settings           = null;
-        this.pluginSettings     = null;
-        this.timer              = null;
-        this.indicator          = null;
-        this.notificationSource = null;
-        this.notification       = null;
-        this.dialog             = null;
-        this.presence           = null;
-        this.mode               = null;
-        this.keybinding         = false;
-        this._isPaused          = false;
-        this._timerState        = Timer.State.NULL;
-        this._timerElapsed      = 0.0;
+        this.settings            = null;
+        this.pluginSettings      = null;
+        this.timer               = null;
+        this.indicator           = null;
+        this.notificationSource  = null;
+        this.notification        = null;
+        this.dialog              = null;
+        this.presence            = null;
+        this.mode                = null;
+        this.keybinding          = false;
+        this._isPaused           = false;
+        this._timerState         = Timer.State.NULL;
+        this._timerStateDuration = 0.0;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
@@ -104,10 +104,10 @@ const PomodoroExtension = new Lang.Class({
     },
 
     setMode: function(mode) {
-        if (this.mode !== mode) {
+        if (this.mode != mode) {
             this.mode = mode;
 
-            if (mode === ExtensionMode.RESTRICTED) {
+            if (mode == ExtensionMode.RESTRICTED) {
                 this._disableIndicator();
                 this._disableScreenNotification();
             }
@@ -139,7 +139,7 @@ const PomodoroExtension = new Lang.Class({
     _onSettingsChanged: function(settings, key) {
         switch(key) {
             case 'show-screen-notifications':
-                if (settings.get_boolean(key) && this.mode !== ExtensionMode.RESTRICTED) {
+                if (settings.get_boolean(key) && this.mode != ExtensionMode.RESTRICTED) {
                     this._enableScreenNotification();
                 }
                 else {
@@ -271,7 +271,7 @@ const PomodoroExtension = new Lang.Class({
         let isPaused   = this.timer.isPaused();
 
         if (timerState != Timer.State.NULL && (!isPaused || this.timer.getElapsed() == 0.0)) {
-            if (this.mode === ExtensionMode.RESTRICTED) {
+            if (this.mode == ExtensionMode.RESTRICTED) {
                 this._destroyNotifications();
 
                 // TODO: As currently notifications on the screenShield can't be updated they are pretty useless
@@ -286,7 +286,7 @@ const PomodoroExtension = new Lang.Class({
                 // }
             }
             else if (this.timer.getRemaining() > NOTIFICATIONS_TIME_OFFSET) {
-                if (timerState === Timer.State.POMODORO) {
+                if (timerState == Timer.State.POMODORO) {
                     this._notifyPomodoroStart();
                 }
                 else {
@@ -294,7 +294,7 @@ const PomodoroExtension = new Lang.Class({
                 }
             }
             else {
-                if (timerState !== Timer.State.POMODORO) {
+                if (timerState != Timer.State.POMODORO) {
                     this._notifyPomodoroStart();
                 }
                 else {
@@ -321,29 +321,34 @@ const PomodoroExtension = new Lang.Class({
 
     _updatePresence: function() {
         if (this.presence) {
-            if (this._timerState === Timer.State.NULL) {
+            if (this._timerState == Timer.State.NULL) {
                 this.presence.setDefault();
             }
             else {
-                this.presence.setBusy(this._timerState === Timer.State.POMODORO);
+                this.presence.setBusy(this._timerState == Timer.State.POMODORO);
             }
         }
     },
 
     _update: function() {
         let timerState = this.timer.getState();
-        let timerElapsed = this.timer.getElapsed();
+        let timerStateDuration = this.timer.getStateDuration();
         let isPaused = this.timer.isPaused();
-        let isRunning = timerState !== Timer.State.NULL && !isPaused;
 
-        if (this._isPaused !== isPaused || this._timerState !== timerState || this._timerElapsed > timerElapsed) {
+        if (this._isPaused != isPaused || this._timerState != timerState) {
             this._isPaused = isPaused;
             this._timerState = timerState;
-            this._timerElapsed = timerElapsed;
+            this._timerStateDuration = timerStateDuration;
 
             this._updatePresence();
             this._updateNotification();
             this._updateScreenNotification();
+        }
+        else if (this._timerStateDuration == timerStateDuration) {
+            this._updateScreenNotification();
+        }
+        else {
+            this._timerStateDuration = timerStateDuration;
         }
     },
 

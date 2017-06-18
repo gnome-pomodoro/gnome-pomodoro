@@ -103,10 +103,11 @@ const Timer = new Lang.Class({
         let elapsed = proxy.Elapsed;
         let isPaused = proxy.IsPaused;
 
-        if (this._state !== state || this._stateDuration !== stateDuration || this._elapsed > elapsed) {
+        if (this._state != state || this._stateDuration != stateDuration || this._elapsed > elapsed) {
             this._state = state;
             this._stateDuration = stateDuration;
             this._elapsed = elapsed
+
             this.emit('state-changed');
         }
         else {
