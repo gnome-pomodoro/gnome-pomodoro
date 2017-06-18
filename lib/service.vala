@@ -85,19 +85,12 @@ namespace Pomodoro
         public void set_state_duration (string name,
                                         double duration)
         {
-            var state = this.timer.state;
-
-            if (state.name != name) {
-                state = Pomodoro.TimerState.lookup (name);
+            if (this.timer.state.name == name) {
+                this.timer.state_duration = double.max (duration, this.timer.elapsed);
             }
-
-            state.duration = duration;
-
-            if (state != null) {
-                this.timer.state = state;
+            else {
+                // XXX: not shure what to do here
             }
-
-            this.timer.update ();  // TODO: perhaps timer should have "changed" signal
         }
 
         public void show_main_window (uint32 timestamp)
