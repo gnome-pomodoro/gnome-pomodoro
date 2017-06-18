@@ -77,11 +77,7 @@ const IndicatorMenu = new Lang.Class({
 
         this.indicator = indicator;
 
-        this._createTimerMenuItem();
-
-        this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.addAction(_("Preferences"), Lang.bind(this, this._activatePreferences));
-        this.addAction(_("Quit"), Lang.bind(this, this._activateQuit));
+        this._populate();
     },
 
     _createActionButton: function(iconName, accessibleName) {
@@ -89,7 +85,7 @@ const IndicatorMenu = new Lang.Class({
                                      can_focus: true,
                                      track_hover: true,
                                      accessible_name: accessibleName,
-                                     style_class: 'system-menu-action extension-pomodoro-menu-action' });
+                                     style_class: 'system-menu-action extension-pomodoro-indicator-menu-action' });
         button.child = new St.Icon({ icon_name: iconName });
         return button;
     },
@@ -126,52 +122,62 @@ const IndicatorMenu = new Lang.Class({
         }
     },
 
-    _createTimerMenuItem: function() {
-        let item;
-        let hbox;
+    _populate: function() {
+        let toggleItem = new PopupMenu.PopupMenuItem(_("Pomodoro Timer"),
+                                           { style_class: 'extension-pomodoro-indicator-menu-toggle',
+                                             reactive: false,
+                                             can_focus: false });
+        toggleItem.label.y_align = Clutter.ActorAlign.CENTER;
+        this.addMenuItem(toggleItem);
 
-        item = new PopupMenu.PopupMenuItem(_("Pomodoro Timer"),
-                                           { style_class: 'extension-pomodoro-menu-timer',
-                                            reactive: false,
-                                            can_focus: false });
-        item.label.y_align = Clutter.ActorAlign.CENTER;
+        let startAction = this._createActionButton('media-playback-start-symbolic', _("Start Timer"));
+        startAction.add_style_class_name('extension-pomodoro-indicator-menu-action-border');
+        startAction.connect('clicked', Lang.bind(this, this._onStartClicked));
+        toggleItem.actor.add(startAction);
 
-        this._timerMenuItem = item;
-        this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-menu-timer-label',
-                                          y_align: Clutter.ActorAlign.CENTER });
-        this._timerLabelButton = new St.Button({ reactive: false,
-                                                 can_focus: false,
-                                                 track_hover: false,
-                                                 style_class: 'extension-pomodoro-menu-timer-label-button' });
-        this._timerLabelButton.child = this._timerLabel;
-        this._timerLabelButton.connect('clicked', Lang.bind(this, this._onTimerClicked));
+        let timerItem = new PopupMenu.PopupMenuItem("",
+                                           { style_class: 'extension-pomodoro-indicator-menu-timer',
+                                             reactive: false,
+                                             can_focus: false });
+        timerItem.label.visible = false;
+        this.addMenuItem(timerItem);
 
-        hbox = new St.BoxLayout();
+        let timerLabel = new St.Label({ style_class: 'extension-pomodoro-indicator-menu-timer-label',
+                                        y_align: Clutter.ActorAlign.CENTER });
+        let timerLabelButton = new St.Button({ reactive: false,
+                                               can_focus: false,
+                                               track_hover: false,
+                                               style_class: 'extension-pomodoro-indicator-menu-timer-label-button' });
+        timerLabelButton.child = timerLabel;
+        timerLabelButton.connect('clicked', Lang.bind(this, this._onTimerClicked));
+        timerItem.actor.add(timerLabelButton, { expand: true });
 
-        this._startAction = this._createActionButton('media-playback-start-symbolic', _("Start Timer"));
-        this._startAction.add_style_class_name('extension-pomodoro-menu-action-border');
-        this._startAction.connect('clicked', Lang.bind(this, this._onStartClicked));
-        hbox.add_actor(this._startAction);
+        let hbox = new St.BoxLayout();
+        timerItem.actor.add(hbox);
 
-        this._pauseAction = this._createActionButton('media-playback-pause-symbolic', _("Pause Timer"));
-        this._pauseAction.connect('clicked', Lang.bind(this, this._onPauseClicked));
-        hbox.add_actor(this._pauseAction);
+        let pauseAction = this._createActionButton('media-playback-pause-symbolic', _("Pause Timer"));
+        pauseAction.connect('clicked', Lang.bind(this, this._onPauseClicked));
+        hbox.add_actor(pauseAction);
 
-        this._stopAction = this._createActionButton('media-playback-stop-symbolic', _("Stop Timer"));
-        this._stopAction.connect('clicked', Lang.bind(this, this._onStopClicked));
-        hbox.add_actor(this._stopAction);
+        let stopAction = this._createActionButton('media-playback-stop-symbolic', _("Stop Timer"));
+        stopAction.connect('clicked', Lang.bind(this, this._onStopClicked));
+        hbox.add_actor(stopAction);
 
-        item.actor.add(this._timerLabelButton, { expand: true });
-        item.actor.add(hbox);
+        this._toggleMenuItem = toggleItem;
+        this._timerMenuItem = timerItem;
+        this._timerLabelButton = timerLabelButton;
 
-        this.addMenuItem(item);
-
-        this.timerLabel = this._timerLabel;
-        this.pauseAction = this._pauseAction;
+        this.timerLabel = timerLabel;
+        this.pauseAction = pauseAction;
 
         this.addStateMenuItem('pomodoro', _("Pomodoro"));
         this.addStateMenuItem('short-break', _("Short Break"));
         this.addStateMenuItem('long-break', _("Long Break"));
+
+        this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        this.addAction(_("Preferences"), Lang.bind(this, this._activatePreferences));
+        this.addAction(_("Quit"), Lang.bind(this, this._activateQuit));
     },
 
     addStateMenuItem: function(name, label) {
@@ -207,36 +213,25 @@ const IndicatorMenu = new Lang.Class({
         let timer = this.indicator.timer;
         let timerState = timer.getState();
         let remaining = timer.getRemaining();
-        let isRunning = timerState != Timer.State.NULL;
         let isPaused = timer.isPaused();
+        let isRunning = timerState != Timer.State.NULL;
 
-        if (this._isRunning !== isRunning ||
-            this._isPaused !== isPaused ||
-            this._timerState !== timerState)
+        if (this._isPaused != isPaused ||
+            this._timerState != timerState)
         {
-            this._isRunning = isRunning;
             this._isPaused = isPaused;
             this._timerState = timerState;
 
-            this._timerMenuItem.label.visible = !isRunning;
-            this._timerLabel.visible = isRunning;
-            this._timerLabelButton.reactive = isRunning && !isPaused && timerState != Timer.State.POMODORO;
-            this._startAction.visible = !isRunning;
-            this._stopAction.visible = isRunning;
-            this._pauseAction.visible = isRunning;
-            this._pauseAction.child.icon_name = isPaused
-                                                ? 'media-playback-start-symbolic'
-                                                : 'media-playback-pause-symbolic';
-            this._pauseAction.accessible_name = isPaused
-                                                ? _("Resume Timer")
-                                                : _("Pause Timer");
+            this._toggleMenuItem.actor.visible = !isRunning;
+            this._timerMenuItem.actor.visible = isRunning;
 
-            if (isRunning) {
-                this._timerMenuItem.actor.add_style_class_name('extension-pomodoro-menu-timer-running');
-            }
-            else {
-                this._timerMenuItem.actor.remove_style_class_name('extension-pomodoro-menu-timer-running');
-            }
+            this._timerLabelButton.reactive = isRunning && !isPaused && timerState != Timer.State.POMODORO;
+            this.pauseAction.child.icon_name = isPaused
+                                               ? 'media-playback-start-symbolic'
+                                               : 'media-playback-pause-symbolic';
+            this.pauseAction.accessible_name = isPaused
+                                               ? _("Resume Timer")
+                                               : _("Pause Timer");
 
             for (let key in this._stateItems) {
                 let stateItem = this._stateItems[key];
