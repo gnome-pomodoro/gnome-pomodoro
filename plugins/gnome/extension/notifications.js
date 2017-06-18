@@ -373,7 +373,7 @@ const PomodoroEndNotification = new Lang.Class({
 
             case Timer.State.SHORT_BREAK:
             case Timer.State.LONG_BREAK:
-                title = Timer.State.label(state);
+                title = _("Take a break");
                 resident = true;
                 break;
 
@@ -412,6 +412,10 @@ const PomodoroEndNotification = new Lang.Class({
         banner.canClose = function() {
             return false;
         };
+
+        if (this.timer.getElapsed() > 15.0) {
+            banner.setTitle(Timer.State.label(this.timer.getState()));
+        }
 
         let skipButton = banner.addAction(_("Skip Break"), Lang.bind(this,
             function() {
