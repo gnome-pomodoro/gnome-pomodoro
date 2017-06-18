@@ -281,17 +281,13 @@ const PomodoroStartNotification = new Lang.Class({
      * Banners in calendar menu or the lock screen are made by GNOME Shell.
      */
     createBanner: function() {
-        let banner = this.parent();
+        let banner,
+            extendButton;
 
+        banner = this.parent();
         banner.canClose = function() {
             return false;
         };
-
-        // It's easier to modify buttons of a banner than notification actions
-        let extendButton = banner.addAction(_("+1 Minute"), Lang.bind(this,
-            function() {
-                this.timer.stateDuration += 60.0;
-            }));
 
         let onTimerUpdate = Lang.bind(this, function() {
             if (banner.bodyLabel && banner.bodyLabel.actor.clutter_text) {
@@ -306,10 +302,13 @@ const PomodoroStartNotification = new Lang.Class({
         let onChanged = Lang.bind(this,
             function() {
                 if (this.timer.isBreak()) {
-                    extendButton.show();
+                    extendButton = banner.addAction(_("+1 Minute"), Lang.bind(this,
+                        function() {
+                            this.timer.stateDuration += 60.0;
+                        }));
                 }
-                else {
-                    extendButton.hide();
+                else if (extendButton) {
+                    extendButton.destroy();
                 }
             });
         let onDestroy = Lang.bind(this,
