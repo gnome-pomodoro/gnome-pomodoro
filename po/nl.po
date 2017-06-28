@@ -47,7 +47,7 @@ msgstr ""
 #: data/org.gnome.Pomodoro.appdata.xml.in:19
 #: data/resources/preferences-main-page.ui:45
 msgid "Timer"
-msgstr "Timer\t"
+msgstr "Timer"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:23 lib/preferences-dialog.vala:805
 #: plugins/gnome/extension/indicator.js:83
