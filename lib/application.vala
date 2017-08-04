@@ -27,6 +27,13 @@ namespace Pomodoro
     {
     }
 
+    internal Gom.Repository get_repository ()
+    {
+        var application = Pomodoro.Application.get_default ();  // TODO: move repository out of Pomodoro.Application
+
+        return (Gom.Repository) application.get_repository ();
+    }
+
     public class Application : Gtk.Application
     {
         private const uint REPOSITORY_VERSION = 1;
@@ -36,12 +43,19 @@ namespace Pomodoro
         public Pomodoro.Timer timer;
         public Pomodoro.CapabilityManager capabilities;
 
+        private Gom.Repository repository;
+        private Gom.Adapter adapter;
+
+        public GLib.Object get_repository ()
+        {
+            return (GLib.Object) this.repository;
+        }
+
         private Pomodoro.PreferencesDialog preferences_dialog;
         private Pomodoro.Window window;
         private Gtk.Window about_dialog;
         private Peas.ExtensionSet extensions;
         private GLib.Settings settings;
-        private Gom.Repository repository;
         private bool was_activated = false;
 
         private enum ExitStatus
@@ -256,18 +270,19 @@ namespace Pomodoro
             try {
                 /* Open database handle */
                 adapter.open_sync (file.get_uri ());
+                this.adapter = adapter;
 
                 /* Migrate database if needed */
                 var repository = new Gom.Repository (adapter);
                 repository.migrate_sync (Pomodoro.Application.REPOSITORY_VERSION,
                                          Pomodoro.Application.migrate_repository);
 
-                // var object_types = new GLib.List<GLib.Type> ();
-                // object_types.prepend (typeof (Pomodoro.Entry));
-                // object_types.prepend (typeof (Pomodoro.AggregatedEntry));
-                //
-                // repository.automatic_migrate_sync (Pomodoro.Application.REPOSITORY_VERSION,
-                //                                    (owned) object_types);
+//                 var object_types = new GLib.List<GLib.Type> ();
+//                 object_types.prepend (typeof (Pomodoro.Entry));
+//                 object_types.prepend (typeof (Pomodoro.AggregatedEntry));
+//                
+//                 repository.automatic_migrate_sync (Pomodoro.Application.REPOSITORY_VERSION,
+//                                                    (owned) object_types);
 
                 this.repository = repository;
             }
@@ -275,11 +290,11 @@ namespace Pomodoro
                 GLib.critical ("Failed to migrate database: %s", error.message);
             }
 
-            try {
-                adapter.close_sync ();
-            }
-            catch (GLib.Error error) {
-            }
+//            try {
+//                adapter.close_sync ();
+//            }
+//            catch (GLib.Error error) {
+//            }
 
             this.unmark_busy ();
             this.release ();
@@ -307,7 +322,8 @@ namespace Pomodoro
             }
         }
 
-        public void show_window (uint32 timestamp = 0)
+        public void show_window (string mode,
+                                 uint32 timestamp = 0)
         {
             if (this.window == null) {
                 this.window = new Pomodoro.Window ();
@@ -319,6 +335,9 @@ namespace Pomodoro
 
                 this.add_window (this.window);
             }
+
+            this.window.mode = mode != null && mode != "default"
+                ? mode : this.window.default_mode;
 
             if (timestamp > 0) {
                 this.window.present_with_time (timestamp);
@@ -352,7 +371,13 @@ namespace Pomodoro
         private void activate_timer (GLib.SimpleAction action,
                                      GLib.Variant?     parameter)
         {
-            this.show_window ();
+            this.show_window ("timer");
+        }
+
+        private void activate_stats (GLib.SimpleAction action,
+                                     GLib.Variant?     parameter)
+        {
+            this.show_window ("stats");
         }
 
         private void activate_preferences (GLib.SimpleAction action,
@@ -455,6 +480,10 @@ namespace Pomodoro
             action.activate.connect (this.activate_timer);
             this.add_action (action);
 
+            action = new GLib.SimpleAction ("stats", null);
+            action.activate.connect (this.activate_stats);
+            this.add_action (action);
+
             action = new GLib.SimpleAction ("preferences", null);
             action.activate.connect (this.activate_preferences);
             this.add_action (action);
@@ -486,6 +515,9 @@ namespace Pomodoro
             action = new GLib.SimpleAction ("timer-switch-state", GLib.VariantType.STRING);
             action.activate.connect (this.activate_timer_switch_state);
             this.add_action (action);
+
+            this.set_accels_for_action ("stats.previous", {"<Alt>Left", "Back"});
+            this.set_accels_for_action ("stats.next", {"<Alt>Right", "Forward"});
         }
 
         private void setup_menu ()
@@ -643,6 +675,14 @@ namespace Pomodoro
                 engine.try_unload_plugin (plugin_info);
             }
 
+            try {
+                if (this.adapter != null) {
+                    this.adapter.close_sync ();
+                }
+            }
+            catch (GLib.Error error) {
+            }
+
             base.shutdown ();
 
             this.release ();
@@ -697,7 +737,7 @@ namespace Pomodoro
                     this.show_preferences ();
                 }
                 else if (!Options.no_default_window) {
-                    this.show_window ();
+                    this.show_window ("default");
                 }
 
                 Options.reset ();
@@ -829,10 +869,28 @@ namespace Pomodoro
                                              Pomodoro.TimerState state,
                                              Pomodoro.TimerState previous_state)
         {
+            this.hold ();
             this.save_timer ();
 
-            if (this.timer.is_paused) {
+            if (this.timer.is_paused)
+            {
                 this.timer.resume ();
+            }
+
+            if (!(previous_state is Pomodoro.DisabledState))
+            {
+                var entry = new Pomodoro.Entry.from_state (previous_state);
+                entry.repository = this.repository;
+                entry.save_async.begin ((obj, res) => {
+                    try {
+                        entry.save_async.end (res);
+                    }
+                    catch (GLib.Error error) {
+                        GLib.warning ("Error while saving entry: %s", error.message);
+                    }
+
+                    this.release ();
+                });
             }
         }
     }

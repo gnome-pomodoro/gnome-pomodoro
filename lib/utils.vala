@@ -77,6 +77,9 @@ namespace Pomodoro
         return str;
     }
 
+    /**
+     * Returns the number of seconds since January 1, 1970 UTC.
+     */
     public double get_current_time ()
     {
         return (double) GLib.get_real_time () / 1000000.0;

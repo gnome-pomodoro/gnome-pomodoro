@@ -46,10 +46,27 @@ namespace Pomodoro
             { "long-break", N_("Long Break") }
         };
 
+        public string mode {
+            get {
+                return this.stack.visible_child_name;
+            }
+            set {
+                this.stack.visible_child_name = value;
+            }
+        }
+
+        public string default_mode {
+            get {
+                return this.default_page;
+            }
+        }
+
         private unowned Pomodoro.Timer timer;
 
         [GtkChild]
         private Gtk.Stack stack;
+        [GtkChild]
+        private Gtk.Stack timer_stack;
         [GtkChild]
         private Gtk.ToggleButton state_togglebutton;
         [GtkChild]
@@ -64,6 +81,7 @@ namespace Pomodoro
         private Gtk.Image pause_button_image;
 
         private Pomodoro.Animation blink_animation;
+        private string default_page;
 
         construct
         {
@@ -74,6 +92,24 @@ namespace Pomodoro
                 max_height = -1
             };
             this.set_geometry_hints (this, geometry, Gdk.WindowHints.MIN_SIZE);
+
+            // this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
+            this.stack.add_titled (new Pomodoro.StatsView (), "stats", _("Stats"));
+
+            // TODO: this.default_page should be set from application.vala
+            var application = Pomodoro.Application.get_default ();
+
+            // if (application.capabilities.has_enabled ("task-list")) {  // TODO
+            //     this.default_page = "task-list";
+            // }
+            if (application.capabilities.has_capability ("indicator")) {
+                this.default_page = "stats";
+            }
+            else {
+                this.default_page = "timer";
+            }
+
+            this.stack.visible_child_name = this.default_page;
 
             this.on_timer_state_notify ();
             this.on_timer_elapsed_notify ();
@@ -107,7 +143,7 @@ namespace Pomodoro
 
         private void on_timer_state_notify ()
         {
-            this.stack.visible_child_name = 
+            this.timer_stack.visible_child_name = 
                     (this.timer.state is Pomodoro.DisabledState) ? "disabled" : "enabled";
 
             foreach (var mapping in state_names)

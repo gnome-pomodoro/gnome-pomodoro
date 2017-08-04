@@ -245,6 +245,6 @@ public void peas_register_types (GLib.TypeModule module)
     object_module.register_extension_type (typeof (Pomodoro.ApplicationExtension),
                                            typeof (GnomePlugin.ApplicationExtension));
 
-   object_module.register_extension_type (typeof (Pomodoro.PreferencesDialogExtension),
-                                          typeof (GnomePlugin.PreferencesDialogExtension));
+    object_module.register_extension_type (typeof (Pomodoro.PreferencesDialogExtension),
+                                           typeof (GnomePlugin.PreferencesDialogExtension));
 }

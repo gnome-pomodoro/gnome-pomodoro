@@ -7,6 +7,12 @@
         <attribute name="action">app.timer</attribute>
       </item>
       <item>
+        <attribute name="label" translatable="yes">_Stats</attribute>
+        <attribute name="action">app.stats</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
         <attribute name="label" translatable="yes">_Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
       </item>

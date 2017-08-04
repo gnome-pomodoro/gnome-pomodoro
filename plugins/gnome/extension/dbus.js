@@ -38,6 +38,7 @@ const PomodoroInterface = '<node> \
         <arg type="d" name="duration" direction="in" /> \
     </method> \
     <method name="ShowMainWindow"> \
+        <arg type="s" name="mode" direction="in" /> \
         <arg type="u" name="timestamp" direction="in" /> \
     </method> \
     <method name="ShowPreferences"> \

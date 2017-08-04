@@ -19,7 +19,7 @@ namespace Gom {
 	public class Command : GLib.Object {
 		[CCode (has_construct_function = false)]
 		protected Command ();
-		public bool execute (Gom.Cursor cursor) throws GLib.Error;
+		public bool execute (out unowned Gom.Cursor cursor) throws GLib.Error;
 		public int get_param_index (string param_name);
 		public void reset ();
 		public void set_param (uint param, GLib.Value value);
@@ -125,10 +125,11 @@ namespace Gom {
 		public Repository (Gom.Adapter adapter);
 		public async bool automatic_migrate_async (uint version, owned GLib.List<weak GLib.Type?> object_types) throws GLib.Error;
 		public bool automatic_migrate_sync (uint version, owned GLib.List<weak GLib.Type?> object_types) throws GLib.Error;
-		public async Gom.ResourceGroup find_async (GLib.Type resource_type, Gom.Filter filter) throws GLib.Error;
-		public async Gom.Resource find_one_async (GLib.Type resource_type, Gom.Filter filter) throws GLib.Error;
+		public async Gom.ResourceGroup find_async (GLib.Type resource_type, Gom.Filter? filter) throws GLib.Error;
+		public async Gom.Resource find_one_async (GLib.Type resource_type, Gom.Filter? filter) throws GLib.Error;
 		public Gom.Resource find_one_sync (GLib.Type resource_type, Gom.Filter? filter) throws GLib.Error;
-		public async void find_sorted_async (GLib.Type resource_type, Gom.Filter filter, Gom.Sorting sorting);
+		[CCode (finish_name = "gom_repository_find_finish")]
+		public async Gom.ResourceGroup find_sorted_async (GLib.Type resource_type, Gom.Filter? filter, Gom.Sorting? sorting) throws GLib.Error;
 		public Gom.ResourceGroup find_sorted_sync (GLib.Type resource_type, Gom.Filter? filter, Gom.Sorting? sorting) throws GLib.Error;
 		public Gom.ResourceGroup find_sync (GLib.Type resource_type, Gom.Filter? filter) throws GLib.Error;
 		public unowned Gom.Adapter get_adapter ();

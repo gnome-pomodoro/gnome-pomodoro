@@ -121,8 +121,6 @@ namespace Pomodoro
         {
             var elapsed = timestamp - this.timestamp;
 
-            message ("update_state: %.2f %.2f", score, elapsed);
-
             return elapsed < TIME_TO_RESET_SCORE ? score : 0.0;
         }
     }

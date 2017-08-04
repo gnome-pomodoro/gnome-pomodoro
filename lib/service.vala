@@ -93,10 +93,11 @@ namespace Pomodoro
             }
         }
 
-        public void show_main_window (uint32 timestamp)
+        public void show_main_window (string mode,
+                                      uint32 timestamp)
         {
             var application = Pomodoro.Application.get_default ();
-            application.show_window (timestamp);
+            application.show_window (mode, timestamp);
         }
 
         public void show_preferences (uint32 timestamp)

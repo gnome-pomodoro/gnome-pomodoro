@@ -177,6 +177,7 @@ const IndicatorMenu = new Lang.Class({
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
         this.addAction(_("Preferences"), Lang.bind(this, this._activatePreferences));
+        this.addAction(_("Stats"), Lang.bind(this, this._activateStats));
         this.addAction(_("Quit"), Lang.bind(this, this._activateQuit));
     },
 
@@ -261,6 +262,12 @@ const IndicatorMenu = new Lang.Class({
         let seconds = Math.floor(remaining % 60);
 
         return '%02d:%02d'.format(minutes, seconds);
+    },
+
+    _activateStats: function() {
+        let timestamp = global.get_current_time();
+
+        this.indicator.timer.showMainWindow('stats', timestamp);
     },
 
     _activatePreferences: function() {

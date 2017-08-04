@@ -2,15 +2,15 @@ lib_LTLIBRARIES = \
 	libgnome-pomodoro.la
 
 libgnome_pomodoro_la_VALASOURCES = \
-	models/aggregated-entry.vala \
-	models/entry.vala \
 	about-dialog.vala \
 	accelerator.vala \
+	aggregated-entry.vala \
 	animation.vala \
 	application.vala \
 	capability-group.vala \
 	capability-manager.vala \
 	capability.vala \
+	entry.vala \
 	log-scale.vala \
 	notifications-capability.vala \
 	preferences-dialog.vala \
@@ -18,6 +18,11 @@ libgnome_pomodoro_la_VALASOURCES = \
 	screen-notification.vala \
 	service.vala \
 	settings.vala \
+	stats-page.vala \
+	stats-view.vala \
+	stats-day-page.vala \
+	stats-week-page.vala \
+	stats-month-page.vala \
 	timer.vala \
 	timer-action-group.vala \
 	timer-state.vala \
