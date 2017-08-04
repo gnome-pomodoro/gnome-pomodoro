@@ -1,0 +1,97 @@
+{
+    "app-id": "org.gnome.Pomodoro",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "3.24",
+    "sdk": "org.gnome.Sdk",
+    "command": "gnome-pomodoro",
+    "copy-icon": true,
+    "rename-icon": "gnome-pomodoro",
+    "finish-args": [
+        /* X11 + XShm access */
+        "--share=ipc",
+        "--socket=x11",
+
+        /* Wayland access */
+        "--socket=wayland",
+
+        /* Shell detection and extension management */
+        "--talk-name=org.gnome.Shell",
+
+        /* PulseAudio access */
+        "--device=dri", "--socket=pulseaudio",
+
+        /* gnome-session access */
+        "--socket=session-bus",
+
+        /* FIXME: Why we need this? */
+        "--filesystem=host",
+
+        /* dconf */
+        "--filesystem=/usr/share/glib-2.0/schemas:ro",
+        "--filesystem=xdg-run/dconf", "--filesystem=~/.config/dconf:rw",
+        "--talk-name=ca.desrt.dconf", "--env=DCONF_USER_CONFIG_DIR=.config/dconf"
+    ],
+    "build-options" : {
+        "cflags": "-O2 -g",
+        "cxxflags": "-O2 -g"
+    },
+    "cleanup": [
+        "/include",
+        "/lib/girepository-1.0",
+        "/lib/pkgconfig",
+        "/man",
+        "/share/aclocal",
+        "/share/doc",
+        "/share/gir-1.0",
+        "/share/gtk-doc",
+        "/share/pkgconfig",
+        "/share/man",
+        "/share/vala",
+        "*.la",
+        "*.a"
+    ],
+    "modules": [
+        {
+            "name": "gnome-pomodoro",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/codito/gnome-pomodoro.git"
+                }
+            ],
+            "modules": [
+                {
+                    "name": "libpeas",
+                    "config-opts": ["--disable-gtk-doc", "--disable-python2", "--disable-python3"],
+                    "cleanup": [
+                        "/bin/*",
+                        "/lib/peas-demo",
+                        "/include",
+                        "/lib/girepository-1.0",
+                        "/lib/*.la",
+                        "/lib/pkgconfig",
+                        "/share/gir-1.0",
+                        "/share/gtk-doc"
+                    ],
+                    "sources": [
+                        {
+                            "type": "git",
+                            "url": "git://git.gnome.org/libpeas"
+                        }
+                    ]
+                },
+                {
+                    "name": "gom",
+                    "buildsystem": "meson",
+                    "config-opts": ["--libdir=/app/lib"],
+                    "sources": [
+                        {
+                            "type": "git",
+                            "url": "git://git.gnome.org/gom"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
