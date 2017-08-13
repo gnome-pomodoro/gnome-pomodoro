@@ -18,7 +18,9 @@ Build-Depends: autoconf-archive,
                libgtk-3-dev (>= @GTK_REQUIRED@),
                libcanberra-dev (>= 0.30),
                libpeas-dev (>= @LIBPEAS_REQUIRED@),
-               libappindicator3-dev
+               libappindicator3-dev,
+               xauth,
+               xvfb
 Standards-Version: 3.9.6
 Homepage: @PACKAGE_URL@
 

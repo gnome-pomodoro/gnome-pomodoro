@@ -10,6 +10,8 @@ override_dh_autoreconf:
 	dh_autoreconf ./autogen.sh -- --prefix=@prefix@ --datadir=@datadir@
 
 override_dh_auto_test:
+	# tests require an X server
+	xvfb-run -a dh_auto_test
 
 
 postinst:
