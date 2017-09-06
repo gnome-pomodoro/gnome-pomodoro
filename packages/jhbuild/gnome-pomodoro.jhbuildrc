@@ -24,7 +24,7 @@ modules = [
 # A string or list of strings specifying the name(s) of the module set(s) to use. This can either be the filename of a moduleset included with JHBuild (excluding the path and extension), or a full HTTP URL to an externally managed moduleset.
 moduleset = [
     os.path.join (os.path.dirname(__file__), 'gnome-pomodoro.modules'),
-    'gnome-suites-core-3.24',
+    'gnome-suites-core-3.26',
 ]
 
 # Use modulesets that were checked out along the JHBuild source code
