@@ -41,17 +41,17 @@ const Timer = Extension.imports.timer;
 const Utils = Extension.imports.utils;
 
 
+// notifications pop up before state changes
+const NOTIFICATIONS_TIME_OFFSET = 10.0;
+
+
 var extension = null;
 
 
-const ExtensionMode = {
+var ExtensionMode = {
     DEFAULT: 0,
     RESTRICTED: 1
 };
-
-
-// notifications pop up before state changes
-const NOTIFICATIONS_TIME_OFFSET = 10.0;
 
 
 var PomodoroExtension = new Lang.Class({

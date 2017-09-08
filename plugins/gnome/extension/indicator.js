@@ -55,7 +55,8 @@ const FADE_OUT_OPACITY = 0.38;
 
 const STEPS = 120;
 
-const IndicatorType = {
+
+var IndicatorType = {
     TEXT: 'text',
     SHORT_TEXT: 'short-text',
     ICON: 'icon'

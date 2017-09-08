@@ -43,9 +43,6 @@ const _ = Gettext.gettext;
 const ngettext = Gettext.ngettext;
 
 
-const NOTIFICATIONS_TIME_OFFSET = 10.0;
-
-
 function getDefaultSource() {
     let extension = Extension.extension;
     let source = extension.notificationSource;

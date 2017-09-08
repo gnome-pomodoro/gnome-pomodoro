@@ -93,7 +93,7 @@ void main () { \
 }';
 
 
-const State = {
+var State = {
     OPENED: 0,
     CLOSED: 1,
     OPENING: 2,

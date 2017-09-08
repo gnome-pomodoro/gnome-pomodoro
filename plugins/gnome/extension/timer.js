@@ -29,7 +29,7 @@ const DBus = Extension.imports.dbus;
 const Utils = Extension.imports.utils;
 
 
-const State = {
+var State = {
     NULL: 'null',
     POMODORO: 'pomodoro',
     SHORT_BREAK: 'short-break',
