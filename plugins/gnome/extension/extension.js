@@ -41,7 +41,7 @@ const Timer = Extension.imports.timer;
 const Utils = Extension.imports.utils;
 
 
-let extension = null;
+var extension = null;
 
 
 const ExtensionMode = {
