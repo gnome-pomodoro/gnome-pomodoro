@@ -54,7 +54,7 @@ const ExtensionMode = {
 const NOTIFICATIONS_TIME_OFFSET = 10.0;
 
 
-const PomodoroExtension = new Lang.Class({
+var PomodoroExtension = new Lang.Class({
     Name: 'PomodoroExtension',
 
     _init: function(mode) {

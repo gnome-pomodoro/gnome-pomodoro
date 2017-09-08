@@ -53,7 +53,7 @@ const State = {
 };
 
 
-const Timer = new Lang.Class({
+var Timer = new Lang.Class({
     Name: 'PomodoroTimer',
 
     _init: function() {

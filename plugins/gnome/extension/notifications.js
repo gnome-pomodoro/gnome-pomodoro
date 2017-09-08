@@ -68,7 +68,7 @@ function getDefaultSource() {
 }
 
 
-const Source = new Lang.Class({
+var Source = new Lang.Class({
     Name: 'PomodoroNotificationSource',
     Extends: MessageTray.Source,
 
@@ -158,7 +158,7 @@ const Source = new Lang.Class({
 });
 
 
-const Notification = new Lang.Class({
+var Notification = new Lang.Class({
     Name: 'PomodoroNotification',
     Extends: MessageTray.Notification,
 
@@ -209,7 +209,7 @@ const Notification = new Lang.Class({
 });
 
 
-const PomodoroStartNotification = new Lang.Class({
+var PomodoroStartNotification = new Lang.Class({
     Name: 'PomodoroStartNotification',
     Extends: Notification,
 
@@ -348,7 +348,7 @@ const PomodoroStartNotification = new Lang.Class({
 });
 
 
-const PomodoroEndNotification = new Lang.Class({
+var PomodoroEndNotification = new Lang.Class({
     Name: 'PomodoroEndNotification',
     Extends: Notification,
 
@@ -477,7 +477,7 @@ const PomodoroEndNotification = new Lang.Class({
 });
 
 
-const IssueNotification = new Lang.Class({
+var IssueNotification = new Lang.Class({
     Name: 'PomodoroIssueNotification',
 
     /* Use base class instead of PomodoroNotification, in case
@@ -514,7 +514,7 @@ const IssueNotification = new Lang.Class({
 
 // A notification meant only for the lockscreen
 //
-const TimerNotification = new Lang.Class({
+var TimerNotification = new Lang.Class({
     Name: 'PomodoroTimerNotification',
     Extends: Notification,
 
@@ -599,7 +599,7 @@ const TimerNotification = new Lang.Class({
 });
 
 
-const TimerBanner = new Lang.Class({
+var TimerBanner = new Lang.Class({
     Name: 'PomodoroTimerNotificationBanner',
     Extends: Calendar.NotificationMessage,
 

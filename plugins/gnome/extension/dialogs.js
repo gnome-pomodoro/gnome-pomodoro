@@ -101,7 +101,7 @@ const State = {
 };
 
 
-const BlurEffect = new Lang.Class({
+var BlurEffect = new Lang.Class({
     Name: 'PmodoroBlurEffect',
     Extends: Clutter.ShaderEffect,
 
@@ -162,7 +162,7 @@ const BlurEffect = new Lang.Class({
 });
 
 
-const BlurredLightbox = new Lang.Class({
+var BlurredLightbox = new Lang.Class({
     Name: 'PomodoroBlurredLightbox',
     Extends: Lightbox.Lightbox,
 
@@ -265,7 +265,7 @@ const BlurredLightbox = new Lang.Class({
  * class to have more event signals, different fade in/out times, and different
  * event blocking behavior.
  */
-const ModalDialog = new Lang.Class({
+var ModalDialog = new Lang.Class({
     Name: 'PomodoroModalDialog',
 
     _init: function() {
@@ -580,7 +580,7 @@ const ModalDialog = new Lang.Class({
 Signals.addSignalMethods(ModalDialog.prototype);
 
 
-const PomodoroEndDialog = new Lang.Class({
+var PomodoroEndDialog = new Lang.Class({
     Name: 'PomodoroEndDialog',
     Extends: ModalDialog,
 

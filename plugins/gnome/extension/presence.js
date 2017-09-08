@@ -30,7 +30,7 @@ const Utils = Extension.imports.utils;
 /**
  * Helps in managing presence for GNOME Shell according to the Pomodoro state.
  */
-const Presence = new Lang.Class({
+var Presence = new Lang.Class({
     Name: 'PomodoroPresence',
 
     _init: function() {

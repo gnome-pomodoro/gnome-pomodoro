@@ -62,7 +62,7 @@ const IndicatorType = {
 };
 
 
-const IndicatorMenu = new Lang.Class({
+var IndicatorMenu = new Lang.Class({
     Name: 'PomodoroIndicatorMenu',
     Extends: PopupMenu.PopupMenu,
 
@@ -302,7 +302,7 @@ const IndicatorMenu = new Lang.Class({
 });
 
 
-const TextIndicator = new Lang.Class({
+var TextIndicator = new Lang.Class({
     Name: 'PomodoroTextIndicator',
 
     _init : function(timer) {
@@ -484,7 +484,7 @@ const TextIndicator = new Lang.Class({
 Signals.addSignalMethods(TextIndicator.prototype);
 
 
-const ShortTextIndicator = new Lang.Class({
+var ShortTextIndicator = new Lang.Class({
     Name: 'PomodoroShortTextIndicator',
     Extends: TextIndicator,
 
@@ -518,7 +518,7 @@ const ShortTextIndicator = new Lang.Class({
 });
 
 
-const IconIndicator = new Lang.Class({
+var IconIndicator = new Lang.Class({
     Name: 'PomodoroIconIndicator',
 
     _init : function(timer) {
@@ -724,7 +724,7 @@ const IconIndicator = new Lang.Class({
 Signals.addSignalMethods(IconIndicator.prototype);
 
 
-const Indicator = new Lang.Class({
+var Indicator = new Lang.Class({
     Name: 'PomodoroIndicator',
     Extends: PanelMenu.Button,
 

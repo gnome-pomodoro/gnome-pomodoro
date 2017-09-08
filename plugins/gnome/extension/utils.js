@@ -36,7 +36,7 @@ const VIDEO_PLAYER_CATEGORIES = [
 ];
 
 
-const Patch = new Lang.Class({
+var Patch = new Lang.Class({
     Name: 'PomodoroPatch',
 
     _init: function(object, overrides) {

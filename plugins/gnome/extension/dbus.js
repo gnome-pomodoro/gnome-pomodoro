@@ -55,7 +55,7 @@ const PomodoroInterface = '<node> \
 </node>';
 
 
-const PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
+var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
 function Pomodoro(callback, cancellable) {
     return new PomodoroProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', callback, cancellable);
 }
