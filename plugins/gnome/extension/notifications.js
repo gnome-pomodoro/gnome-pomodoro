@@ -224,6 +224,7 @@ var PomodoroStartNotification = new Lang.Class({
         this.setUrgency(MessageTray.Urgency.HIGH);
 
         this.timer = timer;
+        this._timerState = null;
         this._timerStateChangedId = this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
 
         this._onTimerStateChanged();
@@ -359,6 +360,7 @@ var PomodoroEndNotification = new Lang.Class({
         this.setUrgency(MessageTray.Urgency.HIGH);
 
         this.timer = timer;
+        this._timerState = null;
         this._timerStateChangedId = this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
 
         this._onTimerStateChanged();
@@ -527,6 +529,8 @@ var TimerNotification = new Lang.Class({
 
         this.timer = timer;
 
+        this._isPaused = null;
+        this._timerState = null;
         this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
 
         this._onTimerUpdate();
@@ -607,6 +611,8 @@ var TimerBanner = new Lang.Class({
 
         this.setUseBodyMarkup(false);
 
+        this._isPaused = null;
+        this._timerState = null;
         this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
         this._onTimerUpdate();
 
