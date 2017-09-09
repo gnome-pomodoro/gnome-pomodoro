@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013 gnome-pomodoro contributors
+ * Copyright (c) 2012-2017 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,11 @@
  */
 
 const Lang = imports.lang;
+const Signals = imports.signals;
 const Gio = imports.gi.Gio;
+
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const Capabilities = Extension.imports.capabilities;
 
 
 const PomodoroInterface = '<node> \
@@ -54,8 +58,59 @@ const PomodoroInterface = '<node> \
 </interface> \
 </node>';
 
+const PomodoroExtensionInterface = '<node> \
+<interface name="org.gnome.Pomodoro.Extension"> \
+    <property name="PluginName" type="s" access="read"/> \
+    <property name="Capabilities" type="as" access="read"/> \
+</interface> \
+</node>';
+
 
 var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
 function Pomodoro(callback, cancellable) {
     return new PomodoroProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', callback, cancellable);
 }
+
+
+var PomodoroExtension = new Lang.Class({
+    Name: 'PomodoroExtensionDBus',
+
+    _init: function() {
+        this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(PomodoroExtensionInterface, this);
+        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Pomodoro/Extension');
+
+        this.initialized = false;
+
+        this._dbusId = Gio.DBus.session.own_name('org.gnome.Pomodoro.Extension',
+                                                 Gio.BusNameOwnerFlags.REPLACE,
+                                                 Lang.bind(this, this._onNameAcquired),
+                                                 Lang.bind(this, this._onNameLost));
+    },
+
+    PluginName: "gnome",
+
+    Capabilities: Capabilities.capabilities,
+
+    _onNameAcquired: function(name) {
+        this.initialized = true;
+
+        this.emit('name-acquired');
+    },
+
+    _onNameLost: function(name) {
+        this.initialized = false;
+
+        this.emit('name-lost');
+    },
+
+    destroy: function() {
+        this.disconnectAll();
+
+        Gio.DBus.session.unown_name(this._dbusId);
+
+        this._dbusImpl.unexport();
+
+        this.emit('destroy');
+    }
+});
+Signals.addSignalMethods(PomodoroExtension.prototype);

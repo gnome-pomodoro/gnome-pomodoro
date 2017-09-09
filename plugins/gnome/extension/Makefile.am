@@ -1,5 +1,6 @@
 extensiondir = $(EXTENSION_DIR)
 dist_extension_DATA = \
+	capabilities.js \
 	dbus.js \
 	dialogs.js \
 	extension.js \

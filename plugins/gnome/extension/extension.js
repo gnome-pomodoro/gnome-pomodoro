@@ -32,6 +32,7 @@ const ExtensionSystem = imports.ui.extensionSystem;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
+const DBus = Extension.imports.dbus;
 const Indicator = Extension.imports.indicator;
 const Notifications = Extension.imports.notifications;
 const Dialogs = Extension.imports.dialogs;
@@ -45,9 +46,6 @@ const Utils = Extension.imports.utils;
 const NOTIFICATIONS_TIME_OFFSET = 10.0;
 
 
-var extension = null;
-
-
 var ExtensionMode = {
     DEFAULT: 0,
     RESTRICTED: 1
@@ -58,8 +56,6 @@ var PomodoroExtension = new Lang.Class({
     Name: 'PomodoroExtension',
 
     _init: function(mode) {
-        Extension.extension = this;
-
         this.settings            = null;
         this.pluginSettings      = null;
         this.timer               = null;
@@ -69,7 +65,9 @@ var PomodoroExtension = new Lang.Class({
         this.dialog              = null;
         this.presence            = null;
         this.mode                = null;
+        this.service             = null;
         this.keybinding          = false;
+        this._pendingMode        = false;
         this._isPaused           = false;
         this._timerState         = Timer.State.NULL;
         this._timerStateDuration = 0.0;
@@ -86,11 +84,15 @@ var PomodoroExtension = new Lang.Class({
                                         Lang.bind(this, this._onSettingsChanged));
 
             this.timer = new Timer.Timer();
-            this.timer.connect('service-disconnected', Lang.bind(this, this._onServiceDisconnected));
+            this.timer.connect('service-disconnected', Lang.bind(this, this._onTimerServiceDisconnected));
             this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
             this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
             this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
             this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
+
+            this.service = new DBus.PomodoroExtension();
+            this.service.connect('name-acquired', Lang.bind(this, this._onServiceNameAcquired));
+            this.service.connect('name-lost', Lang.bind(this, this._onServiceNameLost));
 
             this.setMode(mode);
         }
@@ -104,8 +106,16 @@ var PomodoroExtension = new Lang.Class({
     },
 
     setMode: function(mode) {
-        if (this.mode != mode) {
+        if (!this.service.initialized) {
             this.mode = mode;
+            this._isModePending = true;
+
+            return;  /* wait until service name is acquired */
+        }
+
+        if (this.mode != mode || this._isModePending) {
+            this.mode = mode;
+            this._isModePending = false;
 
             if (mode == ExtensionMode.RESTRICTED) {
                 this._disableIndicator();
@@ -167,7 +177,18 @@ var PomodoroExtension = new Lang.Class({
         }
     },
 
-    _onServiceDisconnected: function() {
+    _onServiceNameAcquired: function() {
+        this.setMode(this.mode);
+    },
+
+    _onServiceNameLost: function() {
+        /* make sure old copy of the extension is destoyed, just in case */
+        if (Extension.extension !== this) {
+            this.destroy();
+        }
+    },
+
+    _onTimerServiceDisconnected: function() {
     },
 
     _onTimerUpdate: function() {
@@ -507,7 +528,7 @@ var PomodoroExtension = new Lang.Class({
         }
 
         this.timer.destroy();
-
+        this.service.destroy();
         this.settings.run_dispose();
 
         this.emit('destroy');
@@ -523,6 +544,7 @@ function init(metadata) {
 
 
 function enable() {
+    let extension = Extension.extension;
     let sessionModeUpdatedId;
 
     if (!extension) {
@@ -530,7 +552,9 @@ function enable() {
                                           ? ExtensionMode.RESTRICTED : ExtensionMode.DEFAULT);
         extension.connect('destroy',
             function() {
-                extension = null;
+                if (Extension.extension === extension) {
+                    Extension.extension = null;
+                }
 
                 if (sessionModeUpdatedId != 0) {
                     Main.sessionMode.disconnect(sessionModeUpdatedId);
@@ -547,11 +571,15 @@ function enable() {
                     extension.setMode(ExtensionMode.DEFAULT);
                 }
             });
+
+        Extension.extension = extension;
     }
 }
 
 
 function disable() {
+    let extension = Extension.extension;
+
     if (extension) {
         if (Main.sessionMode.isLocked) {
             extension.setMode(ExtensionMode.RESTRICTED);
