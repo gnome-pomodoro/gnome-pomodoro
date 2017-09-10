@@ -53,6 +53,7 @@ namespace Pomodoro
 
         private Pomodoro.PreferencesDialog preferences_dialog;
         private Pomodoro.Window window;
+        private Pomodoro.DesktopExtension desktop_extension;
         private Gtk.Window about_dialog;
         private Peas.ExtensionSet extensions;
         private GLib.Settings settings;
@@ -161,6 +162,19 @@ namespace Pomodoro
                                          Gdk.Screen.get_default (),
                                          css_provider,
                                          Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        }
+
+        private void setup_desktop_extension ()
+        {
+            try {
+                this.desktop_extension = new Pomodoro.DesktopExtension ();
+
+                this.capabilities.add_group (this.desktop_extension.capabilities, Pomodoro.Priority.HIGH);
+            }
+            catch (GLib.Error error) {
+                GLib.warning ("Error while initializing desktop extension: %s",
+                              error.message);
+            }
         }
 
         private async void setup_plugins ()
@@ -561,6 +575,7 @@ namespace Pomodoro
             this.setup_menu ();
             this.setup_repository ();
             this.setup_capabilities ();
+            this.setup_desktop_extension ();
             this.setup_plugins.begin ((obj, res) => {
                 this.setup_plugins.end (res);
 

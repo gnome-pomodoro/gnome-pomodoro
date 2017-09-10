@@ -108,6 +108,13 @@ namespace Pomodoro
             }
         }
 
+        public void remove_all ()
+        {
+            foreach (var capability_name in this.capabilities.get_keys ()) {
+                this.remove (capability_name);
+            }
+        }
+
         public signal void capability_added (Pomodoro.Capability capability);
 
         public signal void capability_removed (Pomodoro.Capability capability);

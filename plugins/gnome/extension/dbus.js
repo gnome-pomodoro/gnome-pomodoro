@@ -60,7 +60,6 @@ const PomodoroInterface = '<node> \
 
 const PomodoroExtensionInterface = '<node> \
 <interface name="org.gnome.Pomodoro.Extension"> \
-    <property name="PluginName" type="s" access="read"/> \
     <property name="Capabilities" type="as" access="read"/> \
 </interface> \
 </node>';
@@ -86,8 +85,6 @@ var PomodoroExtension = new Lang.Class({
                                                  Lang.bind(this, this._onNameAcquired),
                                                  Lang.bind(this, this._onNameLost));
     },
-
-    PluginName: "gnome",
 
     Capabilities: Capabilities.capabilities,
 

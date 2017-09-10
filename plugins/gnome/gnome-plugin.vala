@@ -32,17 +32,9 @@ namespace GnomePlugin
 
     public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension, GLib.AsyncInitable
     {
-        private const string[] SHELL_CAPABILITIES = {
-            "notifications",
-            "indicator",
-            "accelerator",
-            "hide-system-notifications"
-        };
-
         private Pomodoro.Timer                  timer;
         private GLib.Settings                   settings;
         private Pomodoro.CapabilityGroup        capabilities;
-        private Pomodoro.CapabilityGroup        shell_capabilities;
         private GnomePlugin.GnomeShellExtension shell_extension;
         private GnomePlugin.IdleMonitor         idle_monitor;
         private uint                            become_active_id = 0;
@@ -89,16 +81,9 @@ namespace GnomePlugin
 
             /* GNOME Shell extension */
             if (this.can_enable && this.shell_extension == null) {
-                this.shell_capabilities = new Pomodoro.CapabilityGroup ("gnome-shell");
-
-                for (var i=0; i < SHELL_CAPABILITIES.length; i++) {
-                    this.shell_capabilities.add (new Pomodoro.Capability (SHELL_CAPABILITIES[i]));
-                }
-
                 this.shell_extension = new GnomePlugin.GnomeShellExtension (Config.EXTENSION_UUID,
                                                                             Config.EXTENSION_DIR,
                                                                             Config.PACKAGE_VERSION);
-                this.shell_extension.notify["enabled"].connect (this.on_shell_extension_enabled_notify);
 
                 yield this.shell_extension.enable (cancellable);
             }
@@ -113,18 +98,6 @@ namespace GnomePlugin
             if (this.become_active_id != 0) {
                 this.idle_monitor.remove_watch (this.become_active_id);
                 this.become_active_id = 0;
-            }
-        }
-
-        private void on_shell_extension_enabled_notify ()
-        {
-            var application = Pomodoro.Application.get_default ();
-
-            if (this.shell_extension.enabled) {
-                application.capabilities.add_group (this.shell_capabilities, Pomodoro.Priority.HIGH);
-            }
-            else {
-                application.capabilities.remove_group (this.shell_capabilities);
             }
         }
 

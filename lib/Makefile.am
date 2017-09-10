@@ -10,6 +10,7 @@ libgnome_pomodoro_la_VALASOURCES = \
 	capability-group.vala \
 	capability-manager.vala \
 	capability.vala \
+	desktop-extension.vala \
 	entry.vala \
 	log-scale.vala \
 	notifications-capability.vala \
