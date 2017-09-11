@@ -415,7 +415,7 @@ namespace Pomodoro
                                           null);
             }
             catch (GLib.SpawnError error) {
-                GLib.warning ("Failed to spawn proccess: %s", error.message);
+                GLib.warning ("Failed to spawn process: %s", error.message);
             }
         }
 
@@ -434,7 +434,7 @@ namespace Pomodoro
                                           null);
             }
             catch (GLib.SpawnError error) {
-                GLib.warning ("Failed to spawn proccess: %s", error.message);
+                GLib.warning ("Failed to spawn process: %s", error.message);
             }
         }
 
