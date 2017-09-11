@@ -19,7 +19,7 @@ BuildRequires: pkgconfig(gtk+-3.0) >= @GTK_REQUIRED@
 BuildRequires: pkgconfig(gsettings-desktop-schemas) >= @GNOME_REQUIRED@
 BuildRequires: pkgconfig(gobject-introspection-1.0) >= @INTROSPECTION_REQUIRED@
 BuildRequires: pkgconfig(libpeas-1.0) >= @LIBPEAS_REQUIRED@
-BuildRequires: pkgconfig(gom-devel) >= @GOM_REQUIRED@
+BuildRequires: pkgconfig(gom-1.0) >= @GOM_REQUIRED@
 BuildRequires: pkgconfig(gstreamer-1.0) >= 1.0.10
 BuildRequires: pkgconfig(libcanberra) >= 0.30
 BuildRequires: pkgconfig(appindicator3-0.1)
