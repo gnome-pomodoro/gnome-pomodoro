@@ -28,9 +28,10 @@ const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
+const ExtensionUtils = imports.misc.extensionUtils;
 const ExtensionSystem = imports.ui.extensionSystem;
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const Extension = ExtensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
 const DBus = Extension.imports.dbus;
 const Indicator = Extension.imports.indicator;
@@ -178,14 +179,13 @@ var PomodoroExtension = new Lang.Class({
     },
 
     _onServiceNameAcquired: function() {
+        this.emit('service-name-acquired');
+
         this.setMode(this.mode);
     },
 
     _onServiceNameLost: function() {
-        /* make sure old copy of the extension is destoyed, just in case */
-        if (Extension.extension !== this) {
-            this.destroy();
-        }
+        this.emit('service-name-lost');
     },
 
     _onTimerServiceDisconnected: function() {
@@ -561,15 +561,22 @@ function enable() {
                     sessionModeUpdatedId = 0;
                 }
             });
+        extension.connect('service-name-lost',
+            function() {
+                let metadata = ExtensionUtils.extensions[Config.EXTENSION_UUID];
+
+                if (metadata && metadata.extension === extension) {
+                    ExtensionSystem.disableExtension(Config.EXTENSION_UUID);
+                }
+                else {
+                    extension.destroy();
+                }
+            });
 
         sessionModeUpdatedId = Main.sessionMode.connect('updated',
             function() {
-                if (Main.sessionMode.isLocked) {
-                    ExtensionSystem.enableExtension(Config.EXTENSION_UUID);
-                }
-                else {
-                    extension.setMode(ExtensionMode.DEFAULT);
-                }
+                extension.setMode(Main.sessionMode.isLocked
+                                  ? ExtensionMode.RESTRICTED : ExtensionMode.DEFAULT);
             });
 
         Extension.extension = extension;
