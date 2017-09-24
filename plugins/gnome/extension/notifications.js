@@ -76,12 +76,12 @@ var Source = new Lang.Class({
 
         this._idleId = 0;
 
-        /* Take advantagoe of the fact that we create only single source at a time,
+        /* Take advantage of the fact that we create only single source at a time,
            so to monkey patch notification list. */
         let patch = new Utils.Patch(Calendar.NotificationSection.prototype, {
             _onNotificationAdded: function(source, notification) {
-                if ((notification instanceof PomodoroEndNotification) ||
-                    (notification instanceof PomodoroStartNotification))
+                if (notification instanceof PomodoroEndNotification ||
+                    notification instanceof PomodoroStartNotification)
                 {
                     let message = new TimerBanner(notification);
 
@@ -476,49 +476,15 @@ var PomodoroEndNotification = new Lang.Class({
 });
 
 
-var IssueNotification = new Lang.Class({
-    Name: 'PomodoroIssueNotification',
-
-    /* Use base class instead of PomodoroNotification, in case
-     * issue is caused by our implementation.
-     */
-    Extends: MessageTray.Notification,
-
-    _init: function(message) {
-        let source = getDefaultSource();
-        let title  = _("Pomodoro Timer");
-        let url    = Config.PACKAGE_BUGREPORT;
-
-        this.parent(source, title, message, { bannerMarkup: true });
-
-        this.setTransient(true);
-        this.setUrgency(MessageTray.Urgency.HIGH);
-
-        this.addAction(_("Report issue"), Lang.bind(this,
-            function() {
-                Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
-                this.destroy();
-            }));
-    },
-
-    show: function() {
-        if (!Main.messageTray.contains(this.source)) {
-            Main.messageTray.add(this.source);
-        }
-
-        this.source.notify(this);
-    }
-});
-
-
-// A notification meant only for the lockscreen
-//
-var TimerNotification = new Lang.Class({
-    Name: 'PomodoroTimerNotification',
+var ScreenShieldNotification = new Lang.Class({
+    Name: 'PomodoroScreenShieldNotification',
     Extends: Notification,
 
     _init: function(timer) {
-        this.parent(null, null, null);
+        this.parent('', null, null);
+
+        this.timer = timer;
+        this.source = getDefaultSource();
 
         this.setTransient(false);
         this.setResident(true);
@@ -527,10 +493,8 @@ var TimerNotification = new Lang.Class({
         // therefore urgency bump.
         this.setUrgency(MessageTray.Urgency.HIGH);
 
-        this.timer = timer;
-
-        this._isPaused = null;
-        this._timerState = null;
+        this._isPaused = false;
+        this._timerState = Timer.State.NULL;
         this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
 
         this._onTimerUpdate();
@@ -540,9 +504,10 @@ var TimerNotification = new Lang.Class({
         let state = this.timer.getState();
         let title = Timer.State.label(state);
 
-        // HACK: To make notifications on screen shield look prettier
-        if (title) {
-            this.source.setTitle(title);
+        // HACK: Use source title as notification title as displayed state name
+        //       may be confused with application name.
+        if (this.source !== null) {
+            this.source.setTitle(title ? title : '');
         }
     },
 
@@ -586,6 +551,11 @@ var TimerNotification = new Lang.Class({
             // "updated" is original MessageTray.Notification signal
             // it indicates that content changed.
             this.emit('changed');
+
+            // HACK: Force screen shield to update notification body
+            if (this.source !== null) {
+                this.source.emit('count-updated');
+            }
         }
     },
 
@@ -596,6 +566,41 @@ var TimerNotification = new Lang.Class({
         }
 
         return this.parent(reason);
+    }
+});
+
+
+var IssueNotification = new Lang.Class({
+    Name: 'PomodoroIssueNotification',
+
+    /* Use base class instead of PomodoroNotification, in case
+     * issue is caused by our implementation.
+     */
+    Extends: MessageTray.Notification,
+
+    _init: function(message) {
+        let source = getDefaultSource();
+        let title  = _("Pomodoro Timer");
+        let url    = Config.PACKAGE_BUGREPORT;
+
+        this.parent(source, title, message, { bannerMarkup: true });
+
+        this.setTransient(true);
+        this.setUrgency(MessageTray.Urgency.HIGH);
+
+        this.addAction(_("Report issue"), Lang.bind(this,
+            function() {
+                Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
+                this.destroy();
+            }));
+    },
+
+    show: function() {
+        if (!Main.messageTray.contains(this.source)) {
+            Main.messageTray.add(this.source);
+        }
+
+        this.source.notify(this);
     }
 });
 

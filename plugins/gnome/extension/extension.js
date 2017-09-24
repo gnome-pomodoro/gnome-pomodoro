@@ -295,16 +295,15 @@ var PomodoroExtension = new Lang.Class({
             if (this.mode == ExtensionMode.RESTRICTED) {
                 this._destroyNotifications();
 
-                // TODO: As currently notifications on the screenShield can't be updated they are pretty useless
-                // if (!(this.notification &&
-                //       this.notification instanceof Notifications.TimerNotification))
-                // {
-                //     this.notification = new Notifications.TimerNotification(this.timer);
-                //     this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
-                //     this.notification.show();
-                //
-                //     this._destroyPreviousNotifications();
-                // }
+                if (!(this.notification &&
+                      this.notification instanceof Notifications.ScreenShieldNotification))
+                {
+                    this.notification = new Notifications.ScreenShieldNotification(this.timer);
+                    this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
+                    this.notification.show();
+
+                    this._destroyPreviousNotifications();
+                }
             }
             else if (this.timer.getRemaining() > NOTIFICATIONS_TIME_OFFSET) {
                 if (timerState == Timer.State.POMODORO) {
@@ -590,6 +589,8 @@ function disable() {
     if (extension) {
         if (Main.sessionMode.isLocked) {
             extension.setMode(ExtensionMode.RESTRICTED);
+
+            // Note that ExtensionSystem.disableExtension() will unload our styleshhet
         }
         else {
             extension.destroy();
