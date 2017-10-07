@@ -4,6 +4,7 @@ SUBDIRS = \
 	32x32 \
 	48x48 \
 	256x256 \
+	512x512 \
 	symbolic
 
 noinst_DATA = \
