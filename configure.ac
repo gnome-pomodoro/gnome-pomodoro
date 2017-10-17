@@ -224,6 +224,7 @@ AC_CONFIG_FILES([
     data/icons/32x32/Makefile
     data/icons/48x48/Makefile
     data/icons/256x256/Makefile
+    data/icons/512x512/Makefile
     data/icons/symbolic/Makefile
     data/sounds/Makefile
     po/Makefile.in
