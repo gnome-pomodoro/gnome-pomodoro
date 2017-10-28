@@ -746,9 +746,7 @@ var Indicator = new Lang.Class({
 
         this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
         this._hbox.pack_start = true;
-        this._hbox.add_child(this._arrow, { expand: false,
-                                            x_fill: false,
-                                            x_align: St.Align.END });
+        this._hbox.add_child(this._arrow);
         this.actor.add_child(this._hbox);
 
         this.setMenu(new IndicatorMenu(this));
@@ -785,9 +783,7 @@ var Indicator = new Lang.Class({
                                         'opacity',
                                         GObject.BindingFlags.SYNC_CREATE);
 
-        this._hbox.add_child(this.widget.actor, { expand: false,
-                                                  x_fill: false,
-                                                  x_align: St.Align.START });
+        this._hbox.add_child(this.widget.actor);
     },
 
     _onBlinked: function() {
