@@ -497,6 +497,15 @@ var ScreenShieldNotification = new Lang.Class({
         this._timerState = Timer.State.NULL;
         this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
 
+        let patch = new Utils.Patch(Main.screenShield, {
+            emit: function(name /* , arg1, arg2 */) {
+                if (name != 'wake-up-screen') {
+                    patch.initial.emit.apply(patch.object, arguments);
+                }
+            }
+        });
+        this._screenShieldPatch = patch;
+
         this._onTimerUpdate();
     },
 
@@ -504,8 +513,8 @@ var ScreenShieldNotification = new Lang.Class({
         let state = this.timer.getState();
         let title = Timer.State.label(state);
 
-        // HACK: Use source title as notification title as displayed state name
-        //       may be confused with application name.
+        // HACK: "Pomodoro" in application name may be confusing with state name,
+        //       so replace application name with current state.
         if (this.source !== null) {
             this.source.setTitle(title ? title : '');
         }
@@ -531,23 +540,24 @@ var ScreenShieldNotification = new Lang.Class({
         let timerState = this.timer.getState(),
             isPaused = this.timer.isPaused(),
             bannerBodyText = this.bannerBodyText,
-            changed = false;
+            stateChanged = false,
+            elapsedChanged = false;
 
         if (this._timerState != timerState || this._isPaused != isPaused) {
             this._timerState = timerState;
             this._isPaused = isPaused;
 
             this._onTimerStateChanged();
-            changed = true;
+            elapsedChanged = stateChanged = true;
         }
 
         this._onTimerElapsedChanged();
 
         if (this.bannerBodyText !== bannerBodyText) {
-            changed = true;
+            elapsedChanged = true;
         }
 
-        if (changed) {
+        if (stateChanged) {
             // "updated" is original MessageTray.Notification signal
             // it indicates that content changed.
             this.emit('changed');
@@ -557,12 +567,26 @@ var ScreenShieldNotification = new Lang.Class({
                 this.source.emit('count-updated');
             }
         }
+        else if (elapsedChanged) {
+            this.emit('changed');
+
+            if (this.source !== null) {
+                this._screenShieldPatch.apply();
+                this.source.emit('count-updated');
+                this._screenShieldPatch.revert();
+            }
+        }
     },
 
     destroy: function(reason) {
         if (this._timerUpdateId != 0) {
             this.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
+        }
+
+        if (this._screenShieldPatch) {
+            this._screenShieldPatch.destroy();
+            this._screenShieldPatch = null;
         }
 
         return this.parent(reason);
