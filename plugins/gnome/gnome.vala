@@ -1,8 +1,5 @@
 namespace Gnome
 {
-    public const string SHELL_SCHEMA = "org.gnome.shell";
-    public const string SHELL_ENABLED_EXTENSIONS_KEY = "enabled-extensions";
-
     public enum ExtensionState
     {
         /* Custom value suggesting there was DBus error */
