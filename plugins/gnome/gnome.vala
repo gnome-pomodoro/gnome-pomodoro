@@ -99,6 +99,14 @@ namespace Gnome
                                        (string uuid)
                                         throws IOError;
 
+        public abstract async string install_remote_extension
+                                       (string uuid)
+                                        throws IOError;
+
+        public abstract bool uninstall_extension
+                                       (string uuid)
+                                        throws IOError;
+
         public signal void extension_status_changed
                                        (string uuid,
                                         int state,

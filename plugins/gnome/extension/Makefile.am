@@ -25,9 +25,6 @@ CLEANFILES = \
 	config.js \
 	metadata.json
 
-uninstall-hook:
-	rm -rf $(extensiondir)
-
 -include $(top_srcdir)/git.mk
 
 # vi:ts=4:noet

@@ -82,8 +82,7 @@ namespace GnomePlugin
             /* GNOME Shell extension */
             if (this.can_enable && this.shell_extension == null) {
                 this.shell_extension = new GnomePlugin.GnomeShellExtension (Config.EXTENSION_UUID,
-                                                                            Config.EXTENSION_DIR,
-                                                                            Config.PACKAGE_VERSION);
+                                                                            Config.EXTENSION_DIR);
 
                 yield this.shell_extension.enable (cancellable);
             }

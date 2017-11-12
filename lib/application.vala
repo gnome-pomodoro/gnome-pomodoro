@@ -187,6 +187,8 @@ namespace Pomodoro
             var wait_count = 0;
 
             timeout_source = GLib.Timeout.add (SETUP_PLUGINS_TIMEOUT, () => {
+                GLib.debug ("Timeout reached while setting up plugins");
+
                 timeout_source = 0;
                 timeout_cancellable.cancel ();
 
@@ -206,7 +208,7 @@ namespace Pomodoro
                             extension.init_async.end (res);
                         }
                         catch (GLib.Error error) {
-                            GLib.warning ("Error while initializing extension %s: %s",
+                            GLib.warning ("Failed to initialize plugin \"%s\": %s",
                                           info.get_module_name (),
                                           error.message);
                         }
@@ -579,14 +581,18 @@ namespace Pomodoro
             this.setup_plugins.begin ((obj, res) => {
                 this.setup_plugins.end (res);
 
-                // FIXME: shouldn't these be enabled by settings?!
-                this.capabilities.enable ("notifications");
-                this.capabilities.enable ("indicator");
-                this.capabilities.enable ("accelerator");
-                this.capabilities.enable ("hide-system-notifications");
-                this.capabilities.enable ("idle-monitor");
+                GLib.Idle.add (() => {
+                    // FIXME: shouldn't these be enabled by settings?!
+                    this.capabilities.enable ("notifications");
+                    this.capabilities.enable ("indicator");
+                    this.capabilities.enable ("accelerator");
+                    this.capabilities.enable ("hide-system-notifications");
+                    this.capabilities.enable ("idle-monitor");
 
-                this.release ();
+                    this.release ();
+
+                    return GLib.Source.REMOVE;
+                });
             });
         }
 

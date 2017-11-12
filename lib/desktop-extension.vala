@@ -28,12 +28,16 @@ namespace Pomodoro
     }
 
 
-    public class DesktopExtension : GLib.Object, GLib.Initable
+    public class DesktopExtension : GLib.Object
     {
+        private static Pomodoro.DesktopExtension? instance = null;
+
         public Pomodoro.CapabilityGroup capabilities { get; construct set; }
 
         /* extension may vanish for a short time, eg when restarting gnome-shell */
-        public uint timeout { get; set; default = 1000; }
+        public uint timeout { get; set; default = 2000; }
+
+        public bool initialized { get; private set; default = false; }
 
         private DesktopExtensionInterface? proxy = null;
         private uint watcher_id = 0;
@@ -41,34 +45,78 @@ namespace Pomodoro
 
         construct
         {
-            this.capabilities = new Pomodoro.CapabilityGroup ("extension");
+            this.capabilities = new Pomodoro.CapabilityGroup ("desktop");
         }
 
-        public DesktopExtension (GLib.Cancellable? cancellable = null) throws GLib.Error
+        public DesktopExtension () throws GLib.Error
         {
-            this.init (cancellable);
-        }
+            this.proxy = GLib.Bus.get_proxy_sync<DesktopExtensionInterface>
+                                   (GLib.BusType.SESSION,
+                                    "org.gnome.Pomodoro.Extension",
+                                    "/org/gnome/Pomodoro/Extension",
+                                    GLib.DBusProxyFlags.NONE);
 
-        public new bool init (GLib.Cancellable? cancellable = null) throws GLib.Error
-        {
-            if (this.proxy == null) {
-                this.proxy = GLib.Bus.get_proxy_sync<DesktopExtensionInterface>
-                                       (GLib.BusType.SESSION,
+            this.watcher_id = GLib.Bus.watch_name (
+                                        GLib.BusType.SESSION,
                                         "org.gnome.Pomodoro.Extension",
-                                        "/org/gnome/Pomodoro/Extension",
-                                        GLib.DBusProxyFlags.NONE);
+                                        GLib.BusNameWatcherFlags.NONE,
+                                        this.on_name_appeared,
+                                        this.on_name_vanished);
+        }
+
+        public static unowned Pomodoro.DesktopExtension get_default ()
+        {
+            if (DesktopExtension.instance == null) {
+                try {
+                    var desktop_extension = new Pomodoro.DesktopExtension ();
+                    desktop_extension.set_default ();
+                }
+                catch (GLib.Error error) {
+                    GLib.critical ("Failed to create proxy org.gnome.Pomodoro.Extension");
+                }
             }
 
-            if (this.watcher_id == 0) {
-                this.watcher_id = GLib.Bus.watch_name (
-                                            GLib.BusType.SESSION,
-                                            "org.gnome.Pomodoro.Extension",
-                                            GLib.BusNameWatcherFlags.NONE,
-                                            this.on_name_appeared,
-                                            this.on_name_vanished);
+            return DesktopExtension.instance;
+        }
+
+        public void set_default ()
+        {
+            DesktopExtension.instance = this;
+        }
+
+        public async bool initialize (GLib.Cancellable? cancellable = null)
+        {
+            var cancellable_handler_id = (ulong) 0;
+
+            if (this.initialized) {
+                return true;
             }
 
-            return true;
+            if (cancellable == null || !cancellable.is_cancelled ())
+            {
+                var handler_id = this.notify["initialized"].connect_after (() => {
+                    if (this.initialized) {
+                        this.initialize.callback ();
+                    }
+                });
+
+                if (cancellable != null) {
+                    cancellable_handler_id = cancellable.cancelled.connect (() => {
+                        this.initialize.callback ();
+                    });
+                }
+
+                yield;
+
+                this.disconnect (handler_id);
+
+                if (cancellable != null) {
+                    /* cancellable.disconnect() causes a deadlock here */
+                    GLib.SignalHandler.disconnect (cancellable, cancellable_handler_id);
+                }
+            }
+
+            return this.initialized;
         }
 
         private void on_name_appeared (GLib.DBusConnection connection,
@@ -76,14 +124,28 @@ namespace Pomodoro
                                        string              name_owner)
                      requires (this.proxy != null)
         {
+            var capabilities_hash = new GLib.HashTable<string, bool> (str_hash, str_equal);
+
             if (this.timeout_id != 0) {
                 GLib.Source.remove (this.timeout_id);
                 this.timeout_id = 0;
             }
 
             foreach (var capability_name in this.proxy.capabilities) {
-                this.capabilities.add (new Pomodoro.Capability (capability_name));
+                capabilities_hash.insert (capability_name, true);
+
+                if (!this.capabilities.contains (capability_name)) {
+                    this.capabilities.add (new Pomodoro.Capability (capability_name));
+                }
             }
+
+            this.capabilities.@foreach ((capability_name, capability) => {
+                if (!capabilities_hash.contains (capability_name)) {
+                    this.capabilities.remove (capability_name);
+                }
+            });
+
+            this.initialized = true;
         }
 
         private void on_name_vanished (GLib.DBusConnection connection,
@@ -98,6 +160,7 @@ namespace Pomodoro
                 this.timeout_id = 0;
 
                 this.capabilities.remove_all ();
+                this.initialized = false;
 
                 return GLib.Source.REMOVE;
             });

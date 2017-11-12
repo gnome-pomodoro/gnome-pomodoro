@@ -100,9 +100,10 @@ namespace Pomodoro
             if (capability != null) {
                 this.capabilities.remove (capability_name);
 
-                if (capability.group == this) {
-                    capability.group = null;
-                }
+                // Group would be overriden when adding same capability to a group again
+                // if (capability.group == this) {
+                //     capability.group = null;
+                // }
 
                 this.capability_removed (capability);
             }
