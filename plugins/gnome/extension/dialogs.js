@@ -144,7 +144,7 @@ const MessagesIndicator = new Lang.Class({
         let hasChats = false;
         this._sources.forEach(Lang.bind(this,
             function(sourceInfo) {
-                count += sourceInfo.source.indicatorCount;
+                count += sourceInfo.source.unseenCount || sourceInfo.source.indicatorCount;
                 hasChats |= sourceInfo.source.isChat;
             }));
 

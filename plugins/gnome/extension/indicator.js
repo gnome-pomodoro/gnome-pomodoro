@@ -70,6 +70,9 @@ const IndicatorMenu = new Lang.Class({
         this.parent(indicator.actor, St.Align.START, St.Side.TOP);
 
         this._timerUpdateId = 0;
+        this._isRunning = false;
+        this._isPaused = false;
+        this._timerState = undefined;
 
         this.actor.add_style_class_name('extension-pomodoro-indicator-menu');
 
