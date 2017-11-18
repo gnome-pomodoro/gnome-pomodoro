@@ -101,9 +101,10 @@ const MessagesIndicator = new Lang.Class({
                                      y_align: Clutter.ActorAlign.END,
                                      visible: false });
         this.actor.add_actor(this._container);
+        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
 
-        Main.messageTray.connect('source-added', Lang.bind(this, this._onSourceAdded));
-        Main.messageTray.connect('source-removed', Lang.bind(this, this._onSourceRemoved));
+        this._onSourceAddedId = Main.messageTray.connect('source-added', Lang.bind(this, this._onSourceAdded));
+        this._onSourceRemovedId = Main.messageTray.connect('source-removed', Lang.bind(this, this._onSourceRemoved));
 
         let sources = Main.messageTray.getSources();
         sources.forEach(Lang.bind(this, function(source) { this._onSourceAdded(null, source); }));
@@ -151,6 +152,25 @@ const MessagesIndicator = new Lang.Class({
         let visible = (this._count > 0);
 
         this.actor.visible = visible;
+    },
+
+    _disconnectSignals: function() {
+        if (this._onSourceAddedId) {
+            Main.messageTray.disconnect(this._onSourceAddedId);
+            this._onSourceAddedId = 0;
+        }
+        if (this._onSourceRemovedId) {
+            Main.messageTray.disconnect(this._onSourceRemovedId);
+            this._onSourceRemovedId = 0;
+        }
+    },
+
+    _onActorDestroy: function() {
+        if (this._destroyed)
+            return;
+        this._destroyed = true;
+        this._disconnectSignals();
+        this.emit('destroy');
     }
 });
 
