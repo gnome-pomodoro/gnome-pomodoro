@@ -27,7 +27,7 @@ appstream_XML = $(appstream_in_files:.xml.in=.xml)
 @APPSTREAM_XML_RULES@
 
 $(appstream_XML): $(appstream_in_files)
-	$(AM_V_GEN) $(MSGFMT) --xml -d $(top_srcdir)/po --template $< -o $@
+	$(AM_V_GEN) cp $< $@
 
 EXTRA_DIST = \
 	$(appstream_in_files) \

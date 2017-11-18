@@ -109,7 +109,7 @@ const MessagesIndicator = new Lang.Class({
         let sources = Main.messageTray.getSources();
         sources.forEach(Lang.bind(this, function(source) { this._onSourceAdded(null, source); }));
 
-        Main.overview.connect('showing', Lang.bind(this, this._updateVisibility));
+        this._overviewShowingId = Main.overview.connect('showing', Lang.bind(this, this._updateVisibility));
     },
 
     _onSourceAdded: function(tray, source) {
@@ -117,23 +117,35 @@ const MessagesIndicator = new Lang.Class({
             return;
         }
 
-        source.connect('count-updated', Lang.bind(this, this._updateCount));
-        this._sources.push(source);
+        let sourceInfo = {
+            source: source,
+            countUpdatedId: source.connect('count-updated', Lang.bind(this, this._updateCount))
+        };
+        this._sources.push(sourceInfo);
         this._updateCount();
     },
 
     _onSourceRemoved: function(tray, source) {
-        this._sources.splice(this._sources.indexOf(source), 1);
-        this._updateCount();
+        let index, sourceInfo;
+
+        for (index=0; index < this._sources.length; index++) {
+            sourceInfo = this._sources[index];
+            if (sourceInfo.source === source) {
+                sourceInfo.source.disconnect(sourceInfo.countUpdatedId);
+                this._sources.splice(index, 1);
+                this._updateCount();
+                break;
+            }
+        }
     },
 
     _updateCount: function() {
         let count = 0;
         let hasChats = false;
         this._sources.forEach(Lang.bind(this,
-            function(source) {
-                count += source.indicatorCount;
-                hasChats |= source.isChat;
+            function(sourceInfo) {
+                count += sourceInfo.source.indicatorCount;
+                hasChats |= sourceInfo.source.isChat;
             }));
 
         this._count = count;
@@ -155,6 +167,8 @@ const MessagesIndicator = new Lang.Class({
     },
 
     _disconnectSignals: function() {
+        let sourceInfo;
+
         if (this._onSourceAddedId) {
             Main.messageTray.disconnect(this._onSourceAddedId);
             this._onSourceAddedId = 0;
@@ -162,6 +176,16 @@ const MessagesIndicator = new Lang.Class({
         if (this._onSourceRemovedId) {
             Main.messageTray.disconnect(this._onSourceRemovedId);
             this._onSourceRemovedId = 0;
+        }
+
+        if (this._overviewShowingId) {
+            Main.overview.disconnect(this._overviewShowingId);
+            this._overviewShowingId = 0;
+        }
+
+        while (this._sources.length > 0) {
+            sourceInfo = this._sources.pop();
+            sourceInfo.source.disconnect(sourceInfo.countUpdatedId);
         }
     },
 
@@ -173,6 +197,7 @@ const MessagesIndicator = new Lang.Class({
         this.emit('destroy');
     }
 });
+Signals.addSignalMethods(MessagesIndicator.prototype);
 
 
 /**
