@@ -656,7 +656,7 @@ var TimerBanner = new Lang.Class({
                 this.timer.stateDuration += 60.0;
             }));
 
-        this.connect('destroy', Lang.bind(this,
+        this.connect('close', Lang.bind(this,
             function() {
                 if (this._timerUpdateId) {
                     this.timer.disconnect(this._timerUpdateId);
