@@ -155,11 +155,9 @@ RECURSIVE_EVAL("$datadir/gnome-pomodoro", [PACKAGE_DATA_DIR])
 RECURSIVE_EVAL("$libdir/gnome-pomodoro", [PACKAGE_LIB_DIR])
 RECURSIVE_EVAL("$datadir/gnome-pomodoro/plugins", [PLUGIN_DATA_DIR])
 RECURSIVE_EVAL("$libdir/gnome-pomodoro/plugins", [PLUGIN_LIB_DIR])
+RECURSIVE_EVAL("$datadir/gnome-shell/extensions/pomodoro@arun.codito.in", [EXTENSION_DIR])
 RECURSIVE_EVAL("$gsettingsschemadir", [GSETTINGS_SCHEMA_DIR])
 
-if [[ $datadir/ = /usr/share/* ]]; then
-    RECURSIVE_EVAL("$datadir/gnome-shell/extensions/pomodoro@arun.codito.in", [EXTENSION_DIR])
-fi
 
 # Some variables to pass to Makefiles
 AC_SUBST([EXTENSION_UUID], [pomodoro@arun.codito.in])
