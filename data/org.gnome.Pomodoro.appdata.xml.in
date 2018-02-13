@@ -6,7 +6,7 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>Pomodoro</name>
-  <summary>Get things done by taking short breaks</summary>
+  <summary>A time management utility for GNOME</summary>
   <description>
     <p>Pomodoro is a GNOME utility that helps managing time according to the Pomodoro Technique.</p>
     <p>The Pomodoro Technique is a time management method which intends to improve focus and quality of work by taking short breaks. Focus on your work for 25 minutes and then have a well deserved break for a few minutes. Clear your mind during the
