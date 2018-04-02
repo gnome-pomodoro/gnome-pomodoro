@@ -83,7 +83,7 @@ msgstr "关于(_A)"
 
 #: data/resources/menus.ui:20 data/resources/menus.ui:76
 msgid "_Quit"
-msgstr "推出(_Q)"
+msgstr "退出(_Q)"
 
 #: data/resources/menus.ui:29 lib/application.vala:71
 #: plugins/actions/resources/action-page.ui:155 plugins/actions/enums.vala:185
