@@ -85,6 +85,7 @@ var PomodoroExtension = new Lang.Class({
                                         this._onSettingsChanged.bind(this));
 
             this.timer = new Timer.Timer();
+            this.timer.connect('service-connected', this._onTimerServiceConnected.bind(this));
             this.timer.connect('service-disconnected', this._onTimerServiceDisconnected.bind(this));
             this.timer.connect('update', this._onTimerUpdate.bind(this));
             this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
@@ -186,9 +187,16 @@ var PomodoroExtension = new Lang.Class({
 
     _onServiceNameLost() {
         this.emit('service-name-lost');
+
+        Utils.logError('Lost service name "org.gnome.Pomodoro.Extension"');
+    },
+
+    _onTimerServiceConnected() {
+        this.service.run();
     },
 
     _onTimerServiceDisconnected() {
+        Utils.logWarning('Lost connection to "org.gnome.Pomodoro"');
     },
 
     _onTimerUpdate() {

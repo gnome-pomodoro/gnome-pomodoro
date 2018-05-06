@@ -77,13 +77,9 @@ var PomodoroExtension = new Lang.Class({
     _init() {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(PomodoroExtensionInterface, this);
         this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Pomodoro/Extension');
+        this._dbusId = 0;
 
         this.initialized = false;
-
-        this._dbusId = Gio.DBus.session.own_name('org.gnome.Pomodoro.Extension',
-                                                 Gio.BusNameOwnerFlags.REPLACE,
-                                                 this._onNameAcquired.bind(this),
-                                                 this._onNameLost.bind(this));
     },
 
     Capabilities: Capabilities.capabilities,
@@ -98,6 +94,15 @@ var PomodoroExtension = new Lang.Class({
         this.initialized = false;
 
         this.emit('name-lost');
+    },
+
+    run() {
+        if (this._dbusId == 0) {
+            this._dbusId = Gio.DBus.session.own_name('org.gnome.Pomodoro.Extension',
+                                                     Gio.BusNameOwnerFlags.REPLACE,
+                                                     this._onNameAcquired.bind(this),
+                                                     this._onNameLost.bind(this));
+        }
     },
 
     destroy() {
