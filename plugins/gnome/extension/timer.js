@@ -35,7 +35,7 @@ var State = {
     SHORT_BREAK: 'short-break',
     LONG_BREAK: 'long-break',
 
-    label: function(state) {
+    label(state) {
         switch (state) {
             case State.POMODORO:
                 return _("Pomodoro");
@@ -56,7 +56,7 @@ var State = {
 var Timer = new Lang.Class({
     Name: 'PomodoroTimer',
 
-    _init: function() {
+    _init() {
         this._connected = false;
         this._state = null;
         this._isPaused = null;
@@ -77,21 +77,21 @@ var Timer = new Lang.Class({
                                        Lang.bind(this, this._onNameVanished));
     },
 
-    _onNameAppeared: function() {
+    _onNameAppeared() {
         this._connected = true;
 
         this.emit('service-connected');
         this.emit('update');
     },
 
-    _onNameVanished: function() {
+    _onNameVanished() {
         this._connected = false;
 
         this.emit('update');
         this.emit('service-disconnected');
     },
 
-    _onPropertiesChanged: function(proxy, properties) {
+    _onPropertiesChanged(proxy, properties) {
         let state = proxy.State;
         let stateDuration = proxy.StateDuration;
         let elapsed = proxy.Elapsed;
@@ -116,14 +116,14 @@ var Timer = new Lang.Class({
         this.emit('update');
     },
 
-    _onInit: function(proxy, error) {
+    _onInit(proxy, error) {
         if (error) {
             Utils.logWarning(error.message);
             this._notifyServiceNotInstalled();
         }
     },
 
-    _onCallback: function(result, error) {
+    _onCallback(result, error) {
         if (error) {
             Utils.logWarning(error.message);
 
@@ -133,7 +133,7 @@ var Timer = new Lang.Class({
         }
     },
 
-    getState: function() {
+    getState() {
         if (!this._connected || this._proxy.State === null) {
             return State.NULL;
         }
@@ -141,17 +141,17 @@ var Timer = new Lang.Class({
         return this._proxy.State;
     },
 
-    setState: function(state, timestamp) {
+    setState(state, timestamp) {
         this._proxy.SetStateRemote(state,
                                    timestamp || 0,
                                    Lang.bind(this, this._onCallback));
     },
 
-    getStateDuration: function() {
+    getStateDuration() {
         return this._proxy.StateDuration;
     },
 
-    setStateDuration: function(duration) {
+    setStateDuration(duration) {
         this._proxy.SetStateDurationRemote(this._proxy.State,
                                            duration,
                                            Lang.bind(this, this._onCallback));
@@ -167,11 +167,11 @@ var Timer = new Lang.Class({
                                            Lang.bind(this, this._onCallback));
     },
 
-    getElapsed: function() {
+    getElapsed() {
         return this._proxy.Elapsed;
     },
 
-    getRemaining: function() {
+    getRemaining() {
         let state = this.getState();
 
         if (state === State.NULL) {
@@ -181,41 +181,41 @@ var Timer = new Lang.Class({
         return Math.ceil(this._proxy.StateDuration - this._proxy.Elapsed);
     },
 
-    getProgress: function() {
+    getProgress() {
         return (this._connected && this._proxy.StateDuration > 0)
                 ? this._proxy.Elapsed / this._proxy.StateDuration
                 : 0.0;
     },
 
-    isPaused: function() {
+    isPaused() {
         return this._connected && this._proxy.IsPaused;
     },
 
-    start: function() {
+    start() {
         this._proxy.StartRemote(Lang.bind(this, this._onCallback));
     },
 
-    stop: function() {
+    stop() {
         this._proxy.StopRemote(Lang.bind(this, this._onCallback));
     },
 
-    pause: function() {
+    pause() {
         this._proxy.PauseRemote(Lang.bind(this, this._onCallback));
     },
 
-    resume: function() {
+    resume() {
         this._proxy.ResumeRemote(Lang.bind(this, this._onCallback));
     },
 
-    skip: function() {
+    skip() {
         this._proxy.SkipRemote(Lang.bind(this, this._onCallback));
     },
 
-    reset: function() {
+    reset() {
         this._proxy.ResetRemote(Lang.bind(this, this._onCallback));
     },
 
-    toggle: function() {
+    toggle() {
         if (this.getState() === State.NULL) {
             this.start();
         }
@@ -224,31 +224,31 @@ var Timer = new Lang.Class({
         }
     },
 
-    isBreak: function() {
+    isBreak() {
         let state = this.getState();
 
         return state === State.SHORT_BREAK || state === State.LONG_BREAK;
     },
 
-    showMainWindow: function(timestamp) {
+    showMainWindow(timestamp) {
         this._proxy.ShowMainWindowRemote(timestamp, Lang.bind(this, this._onCallback));
     },
 
-    showPreferences: function(timestamp) {
+    showPreferences(timestamp) {
         this._proxy.ShowPreferencesRemote(timestamp, Lang.bind(this, this._onCallback));
     },
 
-    quit: function() {
+    quit() {
         this._proxy.QuitRemote((result, error) => {
             Utils.disableExtension(Config.EXTENSION_UUID);
         });
     },
 
-    _notifyServiceNotInstalled: function() {
+    _notifyServiceNotInstalled() {
         Extension.extension.notifyIssue(_("Failed to run <i>%s</i> service").format(Config.PACKAGE_NAME));
     },
 
-    destroy: function() {
+    destroy() {
         if (this._propertiesChangedId != 0) {
             this._proxy.disconnect(this._propertiesChangedId);
             this._propertiesChangedId = 0;

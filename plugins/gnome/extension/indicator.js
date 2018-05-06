@@ -67,7 +67,7 @@ var IndicatorMenu = new Lang.Class({
     Name: 'PomodoroIndicatorMenu',
     Extends: PopupMenu.PopupMenu,
 
-    _init: function(indicator) {
+    _init(indicator) {
         this.parent(indicator.actor, St.Align.START, St.Side.TOP);
 
         this._isPaused = null;
@@ -83,7 +83,7 @@ var IndicatorMenu = new Lang.Class({
         this._populate();
     },
 
-    _createActionButton: function(iconName, accessibleName) {
+    _createActionButton(iconName, accessibleName) {
         let button = new St.Button({ reactive: true,
                                      can_focus: true,
                                      track_hover: true,
@@ -93,7 +93,7 @@ var IndicatorMenu = new Lang.Class({
         return button;
     },
 
-    _onTimerClicked: function() {
+    _onTimerClicked() {
         this.close();
 
         if (Extension.extension && Extension.extension.dialog) {
@@ -102,19 +102,19 @@ var IndicatorMenu = new Lang.Class({
         }
     },
 
-    _onStartClicked: function() {
+    _onStartClicked() {
         this.indicator.timer.start();
 
         this.close();
     },
 
-    _onStopClicked: function() {
+    _onStopClicked() {
         this.indicator.timer.stop();
 
         this.close();
     },
 
-    _onPauseClicked: function() {
+    _onPauseClicked() {
         if (!this.indicator.timer.isPaused ()) {
             this.indicator.timer.pause();
         }
@@ -125,7 +125,7 @@ var IndicatorMenu = new Lang.Class({
         }
     },
 
-    _populate: function() {
+    _populate() {
         let toggleItem = new PopupMenu.PopupMenuItem(_("Pomodoro Timer"),
                                            { style_class: 'extension-pomodoro-indicator-menu-toggle',
                                              reactive: false,
@@ -184,7 +184,7 @@ var IndicatorMenu = new Lang.Class({
         this.addAction(_("Quit"), Lang.bind(this, this._activateQuit));
     },
 
-    addStateMenuItem: function(name, label) {
+    addStateMenuItem(name, label) {
         if (!this._stateItems) {
             this._stateItems = {};
         }
@@ -200,7 +200,7 @@ var IndicatorMenu = new Lang.Class({
         return menuItem;
     },
 
-    _onActorMapped: function(actor) {
+    _onActorMapped(actor) {
         if (actor.mapped && this._timerUpdateId == 0) {
             this._timerUpdateId = this.indicator.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
             this._onTimerUpdate();
@@ -212,7 +212,7 @@ var IndicatorMenu = new Lang.Class({
         }
     },
 
-    _onTimerUpdate: function() {
+    _onTimerUpdate() {
         let timer = this.indicator.timer;
         let timerState = timer.getState();
         let remaining = timer.getRemaining();
@@ -255,7 +255,7 @@ var IndicatorMenu = new Lang.Class({
         this.timerLabel.set_text(this._formatTime(remaining));
     },
 
-    _formatTime: function(remaining) {
+    _formatTime(remaining) {
         if (remaining < 0.0) {
             remaining = 0.0;
         }
@@ -266,27 +266,27 @@ var IndicatorMenu = new Lang.Class({
         return '%02d:%02d'.format(minutes, seconds);
     },
 
-    _activateStats: function() {
+    _activateStats() {
         let timestamp = global.get_current_time();
 
         this.indicator.timer.showMainWindow('stats', timestamp);
     },
 
-    _activatePreferences: function() {
+    _activatePreferences() {
         let timestamp = global.get_current_time();
 
         this.indicator.timer.showPreferences(timestamp);
     },
 
-    _activateQuit: function() {
+    _activateQuit() {
         this.indicator.timer.quit();
     },
 
-    _activateState: function(stateName) {
+    _activateState(stateName) {
         this.indicator.timer.setState(stateName);
     },
 
-    destroy: function() {
+    destroy() {
         if (this._timerUpdateId) {
             this.indicator.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
@@ -307,7 +307,7 @@ var IndicatorMenu = new Lang.Class({
 var TextIndicator = new Lang.Class({
     Name: 'PomodoroTextIndicator',
 
-    _init : function(timer) {
+    _init(timer) {
         this._initialized     = false;
         this._state           = Timer.State.NULL;
         this._minHPadding     = 0;
@@ -356,7 +356,7 @@ var TextIndicator = new Lang.Class({
         }
     },
 
-    _onStyleChanged: function(actor) {
+    _onStyleChanged(actor) {
         let themeNode = actor.get_theme_node();
         let font      = themeNode.get_font();
         let context   = actor.get_pango_context();
@@ -368,11 +368,11 @@ var TextIndicator = new Lang.Class({
         this._charWidth   = metrics.get_approximate_char_width() / Pango.SCALE;
     },
 
-    _getWidth: function() {
+    _getWidth() {
         return Math.ceil(4 * this._digitWidth + 0.5 * this._charWidth);
     },
 
-    _getPreferredWidth: function(actor, forHeight, alloc) {
+    _getPreferredWidth(actor, forHeight, alloc) {
         let child        = actor.get_first_child();
         let minWidth     = this._getWidth();
         let naturalWidth = minWidth;
@@ -396,7 +396,7 @@ var TextIndicator = new Lang.Class({
         }
     },
 
-    _getPreferredHeight: function(actor, forWidth, alloc) {
+    _getPreferredHeight(actor, forWidth, alloc) {
         let child = actor.get_first_child();
 
         if (child) {
@@ -407,7 +407,7 @@ var TextIndicator = new Lang.Class({
         }
     },
 
-    _getText: function(state, remaining) {
+    _getText(state, remaining) {
         if (remaining < 0.0) {
             remaining = 0.0;
         }
@@ -418,7 +418,7 @@ var TextIndicator = new Lang.Class({
         return '%02d:%02d'.format(minutes, seconds);
     },
 
-    _onTimerUpdate: function() {
+    _onTimerUpdate() {
         let state = this.timer.getState();
         let remaining = this.timer.getRemaining();
 
@@ -442,7 +442,7 @@ var TextIndicator = new Lang.Class({
         this.label.set_text(this._getText(state, remaining));
     },
 
-    _allocate: function(actor, box, flags) {
+    _allocate(actor, box, flags) {
         let child = actor.get_first_child();
         if (!child)
             return;
@@ -468,7 +468,7 @@ var TextIndicator = new Lang.Class({
         child.allocate(childBox, flags);
     },
 
-    _onActorDestroy: function() {
+    _onActorDestroy() {
         if (this._onTimerUpdateId) {
             this.timer.disconnect(this._onTimerUpdateId);
             this._onTimerUpdateId = 0;
@@ -479,7 +479,7 @@ var TextIndicator = new Lang.Class({
         this.emit('destroy');
     },
 
-    destroy: function() {
+    destroy() {
         this.actor.destroy();
     }
 });
@@ -490,18 +490,18 @@ var ShortTextIndicator = new Lang.Class({
     Name: 'PomodoroShortTextIndicator',
     Extends: TextIndicator,
 
-    _init: function(timer) {
+    _init(timer) {
         this.parent(timer);
 
         this.label.set_x_align(Clutter.ActorAlign.END);
     },
 
-    _getWidth: function() {
+    _getWidth() {
         return Math.ceil(2 * this._digitWidth +
                          1 * this._charWidth);
     },
 
-    _getText: function(state, remaining) {
+    _getText(state, remaining) {
         if (remaining < 0.0) {
             remaining = 0.0;
         }
@@ -523,7 +523,7 @@ var ShortTextIndicator = new Lang.Class({
 var IconIndicator = new Lang.Class({
     Name: 'PomodoroIconIndicator',
 
-    _init : function(timer) {
+    _init(timer) {
         this._state           = Timer.State.NULL;
         this._progress        = 0.0;
         this._minHPadding     = 0;
@@ -558,7 +558,7 @@ var IconIndicator = new Lang.Class({
         this._state = this.timer.getState();
     },
 
-    _onIconStyleChanged: function(actor) {
+    _onIconStyleChanged(actor) {
         let themeNode = actor.get_theme_node();
         let size = Math.ceil(themeNode.get_length('icon-size'));
 
@@ -568,7 +568,7 @@ var IconIndicator = new Lang.Class({
         this._iconSize = size;
     },
 
-    _onIconRepaint: function(area) {
+    _onIconRepaint(area) {
         let cr = area.get_context();
         let [width, height] = area.get_surface_size();
 
@@ -614,14 +614,14 @@ var IconIndicator = new Lang.Class({
         cr.$dispose();
     },
 
-    _onIconDestroy: function() {
+    _onIconDestroy() {
         if (this._timerUpdateId) {
             this.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
         }
     },
 
-    _onStyleChanged: function(actor) {
+    _onStyleChanged(actor) {
         let themeNode = actor.get_theme_node();
 
         this._minHPadding = themeNode.get_length('-minimum-hpadding');
@@ -639,7 +639,7 @@ var IconIndicator = new Lang.Class({
         });
     },
 
-    _getPreferredWidth: function(actor, forHeight, alloc) {
+    _getPreferredWidth(actor, forHeight, alloc) {
         let child = actor.get_first_child();
 
         if (child) {
@@ -653,7 +653,7 @@ var IconIndicator = new Lang.Class({
         alloc.natural_size += 2 * this._natHPadding;
     },
 
-    _getPreferredHeight: function(actor, forWidth, alloc) {
+    _getPreferredHeight(actor, forWidth, alloc) {
         let child = actor.get_first_child();
 
         if (child) {
@@ -667,7 +667,7 @@ var IconIndicator = new Lang.Class({
         alloc.natural_size += 2 * this._natVPadding;
     },
 
-    _onTimerUpdate: function() {
+    _onTimerUpdate() {
         let state = this.timer.getState();
         let progress = Math.floor(this.timer.getProgress() * STEPS) / STEPS;
 
@@ -678,7 +678,7 @@ var IconIndicator = new Lang.Class({
         }
     },
 
-    _allocate: function(actor, box, flags) {
+    _allocate(actor, box, flags) {
         let child = actor.get_first_child();
         if (!child) {
             return;
@@ -705,7 +705,7 @@ var IconIndicator = new Lang.Class({
         child.allocate(childBox, flags);
     },
 
-    _onActorDestroy: function() {
+    _onActorDestroy() {
         if (this._timerUpdateId) {
             this.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
@@ -719,7 +719,7 @@ var IconIndicator = new Lang.Class({
         this.emit('destroy');
     },
 
-    destroy: function() {
+    destroy() {
         this.actor.destroy();
     }
 });
@@ -730,7 +730,7 @@ var Indicator = new Lang.Class({
     Name: 'PomodoroIndicator',
     Extends: PanelMenu.Button,
 
-    _init: function(timer, type) {
+    _init(timer, type) {
         this.parent(St.Align.START, _("Pomodoro"), true);
 
         this.timer  = timer;
@@ -757,7 +757,7 @@ var Indicator = new Lang.Class({
         this._timerResumedId = this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
     },
 
-    setType: function(type) {
+    setType(type) {
         if (this.widget) {
             this.widget.destroy();
             this.widget = null;
@@ -785,7 +785,7 @@ var Indicator = new Lang.Class({
         this._hbox.add_child(this.widget.actor);
     },
 
-    _onBlinked: function() {
+    _onBlinked() {
         this._blinking = false;
 
         if (this.timer.isPaused()) {
@@ -793,7 +793,7 @@ var Indicator = new Lang.Class({
         }
     },
 
-    _blink: function() {
+    _blink() {
         if (!this._blinking) {
             this._blinking = true;
 
@@ -839,11 +839,11 @@ var Indicator = new Lang.Class({
         }
     },
 
-    _onTimerPaused: function() {
+    _onTimerPaused() {
         this._blink();
     },
 
-    _onTimerResumed: function() {
+    _onTimerResumed() {
         if (this._blinking) {
             let fadeInParams = {
                 time: 200 / 1000,
@@ -867,7 +867,7 @@ var Indicator = new Lang.Class({
         }
     },
 
-    _onActorDestroy: function() {
+    _onActorDestroy() {
         Tweener.removeTweens(this._hbox);
         Tweener.removeTweens(this.menu.timerLabel);
         Tweener.removeTweens(this.menu.pauseAction.child);
@@ -887,7 +887,7 @@ var Indicator = new Lang.Class({
         }
     },
 
-    destroy: function() {
+    destroy() {
         this.parent();
     }
 });

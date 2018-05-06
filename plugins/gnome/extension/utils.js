@@ -39,7 +39,7 @@ const VIDEO_PLAYER_CATEGORIES = [
 var Patch = new Lang.Class({
     Name: 'PomodoroPatch',
 
-    _init: function(object, overrides) {
+    _init(object, overrides) {
         this.object = object;
         this.overrides = overrides;
         this.initial = {};
@@ -54,7 +54,7 @@ var Patch = new Lang.Class({
         }
     },
 
-    apply: function() {
+    apply() {
         if (!this.applied) {
             for (let name in this.overrides) {
                 this.object[name] = this.overrides[name];
@@ -66,7 +66,7 @@ var Patch = new Lang.Class({
         }
     },
 
-    revert: function() {
+    revert() {
         if (this.applied) {
             for (let name in this.overrides) {
                 this.object[name] = this.initial[name];
@@ -78,7 +78,7 @@ var Patch = new Lang.Class({
         }
     },
 
-    destroy: function() {
+    destroy() {
         this.revert();
         this.disconnectAll();
     }

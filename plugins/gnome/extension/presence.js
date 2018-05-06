@@ -33,13 +33,13 @@ const Utils = Extension.imports.utils;
 var Presence = new Lang.Class({
     Name: 'PomodoroPresence',
 
-    _init: function() {
+    _init() {
         this._busy = false;
 
         // Setup a patch for suppressing presence handlers.
         // When applied the main presence controller becomes gnome-pomodoro.
         this._patch = new Utils.Patch(MessageTray.MessageTray.prototype, {
-            _onStatusChanged: function(status) {
+            _onStatusChanged(status) {
                 this._updateState();
             }
         });
@@ -47,7 +47,7 @@ var Presence = new Lang.Class({
         this._patch.connect('reverted', Lang.bind(this, this._onPatchReverted));
     },
 
-    setBusy: function(value) {
+    setBusy(value) {
         this._busy = value;
 
         if (!this._patch.applied) {
@@ -58,13 +58,13 @@ var Presence = new Lang.Class({
         }
     },
 
-    setDefault: function() {
+    setDefault() {
         if (this._patch.applied) {
             this._patch.revert();
         }
     },
 
-    _onPatchApplied: function() {
+    _onPatchApplied() {
         try {
             Main.messageTray._busy = this._busy;
             Main.messageTray._onStatusChanged();
@@ -74,7 +74,7 @@ var Presence = new Lang.Class({
         }
     },
 
-    _onPatchReverted: function() {
+    _onPatchReverted() {
         try {
             let status = Main.messageTray._presence.status;
             Main.messageTray._onStatusChanged(status);
@@ -84,7 +84,7 @@ var Presence = new Lang.Class({
         }
     },
 
-    destroy: function() {
+    destroy() {
         if (this._patch) {
             this._patch.destroy();
             this._patch = null;

@@ -71,7 +71,7 @@ var Source = new Lang.Class({
 
     ICON_NAME: 'gnome-pomodoro',
 
-    _init: function() {
+    _init() {
         this.parent(_("Pomodoro Timer"), this.ICON_NAME);
 
         this._idleId = 0;
@@ -79,7 +79,7 @@ var Source = new Lang.Class({
         /* Take advantage of the fact that we create only single source at a time,
            so to monkey patch notification list. */
         let patch = new Utils.Patch(Calendar.NotificationSection.prototype, {
-            _onNotificationAdded: function(source, notification) {
+            _onNotificationAdded(source, notification) {
                 if (notification instanceof PomodoroEndNotification ||
                     notification instanceof PomodoroStartNotification)
                 {
@@ -97,12 +97,12 @@ var Source = new Lang.Class({
     },
 
     /* override parent method */
-    _createPolicy: function() {
+    _createPolicy() {
         return new MessageTray.NotificationPolicy({ showInLockScreen: true,
                                                     detailsInLockScreen: true });
     },
 
-    _lastNotificationRemoved: function() {
+    _lastNotificationRemoved() {
         this._idleId = Mainloop.idle_add(() => {
             if (!this.count) {
                 this.destroy();
@@ -115,7 +115,7 @@ var Source = new Lang.Class({
     },
 
     /* override parent method */
-    _onNotificationDestroy: function(notification) {
+    _onNotificationDestroy(notification) {
         let index = this.notifications.indexOf(notification);
         if (index < 0) {
             return;
@@ -129,7 +129,7 @@ var Source = new Lang.Class({
         this.countUpdated();
     },
 
-    destroyNotifications: function() {
+    destroyNotifications() {
         let notifications = this.notifications.slice();
 
         notifications.forEach((notification) => {
@@ -137,7 +137,7 @@ var Source = new Lang.Class({
         });
     },
 
-    destroy: function() {
+    destroy() {
         this.parent();
 
         if (this._patch) {
@@ -157,7 +157,7 @@ var Notification = new Lang.Class({
     Name: 'PomodoroNotification',
     Extends: MessageTray.Notification,
 
-    _init: function(title, description, params) {
+    _init(title, description, params) {
         this.parent(null, title, description, params);
 
         this._restoreForFeedback = false;
@@ -167,12 +167,12 @@ var Notification = new Lang.Class({
         this.setUrgency(MessageTray.Urgency.HIGH);
     },
 
-    activate: function() {
+    activate() {
         this.parent();
         Main.panel.closeCalendar();
     },
 
-    show: function() {
+    show() {
         if (this.source && this.source.isPlaceholder) {
             this.source.destroy();
             this.source = null;
@@ -212,7 +212,7 @@ var PomodoroStartNotification = new Lang.Class({
      * Notification pops up a little before Pomodoro starts and changes message once started.
      */
 
-    _init: function(timer) {
+    _init(timer) {
         let title = _("Pomodoro");
 
         this.parent(title, '', null);
@@ -228,7 +228,7 @@ var PomodoroStartNotification = new Lang.Class({
         this._onTimerStateChanged();
     },
 
-    _onTimerStateChanged: function() {
+    _onTimerStateChanged() {
         let title,
             message,
             resident,
@@ -269,7 +269,7 @@ var PomodoroStartNotification = new Lang.Class({
         }
     },
 
-    _getBodyText: function() {
+    _getBodyText() {
         let remaining = Math.max(this.timer.getRemaining(), 0.0);
         let minutes = Math.round(remaining / 60);
         let seconds = Math.round(remaining % 60);
@@ -285,7 +285,7 @@ var PomodoroStartNotification = new Lang.Class({
      * createBanner() is used only to display a notification popup.
      * Banners in calendar menu or the lock screen are made by GNOME Shell.
      */
-    createBanner: function() {
+    createBanner() {
         let banner,
             extendButton;
 
@@ -343,7 +343,7 @@ var PomodoroStartNotification = new Lang.Class({
         return banner;
     },
 
-    destroy: function(reason) {
+    destroy(reason) {
         if (this._timerStateChangedId != 0) {
             this.timer.disconnect(this._timerStateChangedId);
             this._timerStateChangedId = 0;
@@ -358,7 +358,7 @@ var PomodoroEndNotification = new Lang.Class({
     Name: 'PomodoroEndNotification',
     Extends: Notification,
 
-    _init: function(timer) {
+    _init(timer) {
         let title = '';
 
         this.parent(title, null, null);
@@ -374,7 +374,7 @@ var PomodoroEndNotification = new Lang.Class({
         this._onTimerStateChanged();
     },
 
-    _onTimerStateChanged: function() {
+    _onTimerStateChanged() {
         let title,
             message,
             resident,
@@ -414,7 +414,7 @@ var PomodoroEndNotification = new Lang.Class({
         }
     },
 
-    _getBodyText: function() {
+    _getBodyText() {
         let remaining = Math.max(this.timer.getRemaining(), 0.0);
         let minutes = Math.round(remaining / 60);
         let seconds = Math.round(remaining % 60);
@@ -426,7 +426,7 @@ var PomodoroEndNotification = new Lang.Class({
                            "%d seconds remaining", seconds).format(seconds);
     },
 
-    createBanner: function() {
+    createBanner() {
         let banner = this.parent();
 
         banner.canClose = function() {
@@ -478,7 +478,7 @@ var PomodoroEndNotification = new Lang.Class({
         return banner;
     },
 
-    destroy: function(reason) {
+    destroy(reason) {
         if (this._timerStateChangedId != 0) {
             this.timer.disconnect(this._timerStateChangedId);
             this._timerStateChangedId = 0;
@@ -493,7 +493,7 @@ var ScreenShieldNotification = new Lang.Class({
     Name: 'PomodoroScreenShieldNotification',
     Extends: Notification,
 
-    _init: function(timer) {
+    _init(timer) {
         this.parent('', null, null);
 
         this.timer = timer;
@@ -511,7 +511,7 @@ var ScreenShieldNotification = new Lang.Class({
         this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
 
         let patch = new Utils.Patch(Main.screenShield, {
-            emit: function(name /* , arg1, arg2 */) {
+            emit(name /* , arg1, arg2 */) {
                 if (name != 'wake-up-screen') {
                     patch.initial.emit.apply(patch.object, arguments);
                 }
@@ -522,7 +522,7 @@ var ScreenShieldNotification = new Lang.Class({
         this._onTimerUpdate();
     },
 
-    _onTimerStateChanged: function() {
+    _onTimerStateChanged() {
         let state = this.timer.getState();
         let title = Timer.State.label(state);
 
@@ -533,7 +533,7 @@ var ScreenShieldNotification = new Lang.Class({
         }
     },
 
-    _onTimerElapsedChanged: function() {
+    _onTimerElapsedChanged() {
         let remaining = Math.max(this.timer.getRemaining(), 0.0);
         let minutes = Math.round(remaining / 60);
         let seconds = Math.round(remaining % 60);
@@ -549,7 +549,7 @@ var ScreenShieldNotification = new Lang.Class({
                            "%d seconds remaining", seconds).format(seconds);
     },
 
-    _onTimerUpdate: function() {
+    _onTimerUpdate() {
         let timerState = this.timer.getState(),
             isPaused = this.timer.isPaused(),
             bannerBodyText = this.bannerBodyText,
@@ -591,7 +591,7 @@ var ScreenShieldNotification = new Lang.Class({
         }
     },
 
-    destroy: function(reason) {
+    destroy(reason) {
         if (this._timerUpdateId != 0) {
             this.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
@@ -615,7 +615,7 @@ var IssueNotification = new Lang.Class({
      */
     Extends: MessageTray.Notification,
 
-    _init: function(message) {
+    _init(message) {
         let source = getDefaultSource();
         let title  = _("Pomodoro Timer");
         let url    = Config.PACKAGE_BUGREPORT;
@@ -631,7 +631,7 @@ var IssueNotification = new Lang.Class({
             });
     },
 
-    show: function() {
+    show() {
         if (!Main.messageTray.contains(this.source)) {
             Main.messageTray.add(this.source);
         }
@@ -645,7 +645,7 @@ var TimerBanner = new Lang.Class({
     Name: 'PomodoroTimerNotificationBanner',
     Extends: Calendar.NotificationMessage,
 
-    _init: function(notification) {
+    _init(notification) {
         this.parent(notification);
 
         this.timer = notification.timer;
@@ -672,18 +672,18 @@ var TimerBanner = new Lang.Class({
     },
 
     /* override parent method */
-    canClose: function() {
+    canClose() {
         return false;
     },
 
-    addButton: function(button, callback) {
+    addButton(button, callback) {
         button.connect('clicked', callback);
         this._mediaControls.add_actor(button);
 
         return button;
     },
 
-    addAction: function(label, callback) {
+    addAction(label, callback) {
         let button = new St.Button({ style_class: 'extension-pomodoro-message-action',
                                      label: label,
                                      x_expand: true,
@@ -692,7 +692,7 @@ var TimerBanner = new Lang.Class({
         return this.addButton(button, callback);
     },
 
-    _getBodyText: function() {
+    _getBodyText() {
         let remaining = Math.max(this.timer.getRemaining(), 0.0);
         let minutes = Math.round(remaining / 60);
         let seconds = Math.round(remaining % 60);
@@ -704,7 +704,7 @@ var TimerBanner = new Lang.Class({
                            "%d seconds remaining", seconds).format(seconds);
     },
 
-    _onTimerStateChanged: function() {
+    _onTimerStateChanged() {
         let state = this.timer.getState();
         let title;
 
@@ -720,7 +720,7 @@ var TimerBanner = new Lang.Class({
         }
     },
 
-    _onTimerElapsedChanged: function() {
+    _onTimerElapsedChanged() {
         if (this.bodyLabel && this.bodyLabel.actor.clutter_text) {
             let bodyText = this._getBodyText();
 
@@ -731,7 +731,7 @@ var TimerBanner = new Lang.Class({
         }
     },
 
-    _onTimerUpdate: function() {
+    _onTimerUpdate() {
         let timerState = this.timer.getState();
         let isPaused = this.timer.isPaused();
 
@@ -748,17 +748,17 @@ var TimerBanner = new Lang.Class({
     },
 
     /* override parent method */
-    _onUpdated: function(n, clear) {
+    _onUpdated(n, clear) {
     },
 
-    _onClose: function() {
+    _onClose() {
         if (this._timerUpdateId != 0) {
             this.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
         }
     },
 
-    _onActorDestroy: function() {
+    _onActorDestroy() {
         this._onClose();
     }
 });

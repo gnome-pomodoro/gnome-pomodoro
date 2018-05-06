@@ -105,7 +105,7 @@ var BlurEffect = new Lang.Class({
     Name: 'PmodoroBlurEffect',
     Extends: Clutter.ShaderEffect,
 
-    _init: function(params) {
+    _init(params) {
         params = Params.parse(params, { orientation: Clutter.Orientation.HORIZONTAL,
                                         brightness: 1.0,
                                         factor: 1.0 });
@@ -137,7 +137,7 @@ var BlurEffect = new Lang.Class({
         this._factor = value;
     },
 
-    vfunc_pre_paint: function() {
+    vfunc_pre_paint() {
         let res = this.parent();
         let [success, width, height] = this.get_target_size();
 
@@ -166,7 +166,7 @@ var BlurredLightbox = new Lang.Class({
     Name: 'PomodoroBlurredLightbox',
     Extends: Lightbox.Lightbox,
 
-    _init: function(container, params) {
+    _init(container, params) {
         params.radialEffect = false;
 
         this.parent(container, params);
@@ -194,7 +194,7 @@ var BlurredLightbox = new Lang.Class({
         this.actor.add_style_class_name('extension-pomodoro-lightbox');
     },
 
-    show: function(fadeInTime) {
+    show(fadeInTime) {
         fadeInTime = fadeInTime || 0;
 
         if (this._blurXEffect) {
@@ -227,7 +227,7 @@ var BlurredLightbox = new Lang.Class({
         this.actor.show();
     },
 
-    hide: function(fadeOutTime) {
+    hide(fadeOutTime) {
         fadeOutTime = fadeOutTime || 0;
 
         this.shown = false;
@@ -268,7 +268,7 @@ var BlurredLightbox = new Lang.Class({
 var ModalDialog = new Lang.Class({
     Name: 'PomodoroModalDialog',
 
-    _init: function() {
+    _init() {
         this.state = State.CLOSED;
 
         this._idleMonitor          = Meta.IdleMonitor.get_core();
@@ -316,7 +316,7 @@ var ModalDialog = new Lang.Class({
         return this.state == State.OPENED || this.state == State.OPENING;
     },
 
-    _addMessageTray: function() {
+    _addMessageTray() {
         let messageTray = Main.messageTray;
 
         messageTray.actor.ref();
@@ -329,7 +329,7 @@ var ModalDialog = new Lang.Class({
         messageTray.bannerBlocked = false;
     },
 
-    _removeMessageTray: function() {
+    _removeMessageTray() {
         let messageTray = Main.messageTray;
 
         messageTray.actor.ref();
@@ -341,7 +341,7 @@ var ModalDialog = new Lang.Class({
         messageTray.actor.unref();
     },
 
-    open: function(animate) {
+    open(animate) {
         if (this.state == State.OPENED || this.state == State.OPENING) {
             return;
         }
@@ -389,7 +389,7 @@ var ModalDialog = new Lang.Class({
         }
     },
 
-    close: function(animate) {
+    close(animate) {
         this._cancelOpenWhenIdle();
 
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
@@ -434,7 +434,7 @@ var ModalDialog = new Lang.Class({
         }
     },
 
-    _onPushModalDelayTimeout: function() {
+    _onPushModalDelayTimeout() {
         /* Don't become modal and block events just yet,
          * wait until user becomes idle.
          */
@@ -453,7 +453,7 @@ var ModalDialog = new Lang.Class({
         return GLib.SOURCE_REMOVE;
     },
 
-    _pushModal: function() {
+    _pushModal() {
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             return false;
         }
@@ -465,7 +465,7 @@ var ModalDialog = new Lang.Class({
         });
     },
 
-    _onPushModalTimeout: function() {
+    _onPushModalTimeout() {
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             this._pushModalSource = 0;
             return GLib.SOURCE_REMOVE;
@@ -487,7 +487,7 @@ var ModalDialog = new Lang.Class({
         return GLib.SOURCE_CONTINUE;
     },
 
-    pushModal: function() {
+    pushModal() {
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             return;
         }
@@ -520,7 +520,7 @@ var ModalDialog = new Lang.Class({
      * dialog insensitive as well, so it needs to be followed shortly
      * by either a close() or a pushModal()
      */
-    popModal: function() {
+    popModal() {
         try {
             if (this._grabHelper.isActorGrabbed(this._lightbox.actor))
             {
@@ -536,7 +536,7 @@ var ModalDialog = new Lang.Class({
         this._disconnectSignals();
     },
 
-    _disconnectSignals: function() {
+    _disconnectSignals() {
         if (this._pushModalDelaySource) {
             Mainloop.source_remove(this._pushModalDelaySource);
             this._pushModalDelaySource = 0;
@@ -553,11 +553,11 @@ var ModalDialog = new Lang.Class({
         }
     },
 
-    _onUngrab: function() {
+    _onUngrab() {
         this.close(true);
     },
 
-    _onActorDestroy: function() {
+    _onActorDestroy() {
         if (this._destroyed)
             return;
         this._destroyed = true;
@@ -569,7 +569,7 @@ var ModalDialog = new Lang.Class({
         this.emit('destroy');
     },
 
-    destroy: function() {
+    destroy() {
         this.actor.destroy();
     }
 });
@@ -580,7 +580,7 @@ var PomodoroEndDialog = new Lang.Class({
     Name: 'PomodoroEndDialog',
     Extends: ModalDialog,
 
-    _init: function(timer) {
+    _init(timer) {
         this.parent();
 
         this.timer = timer;
@@ -617,7 +617,7 @@ var PomodoroEndDialog = new Lang.Class({
         this.connect('destroy', Lang.bind(this, this._onDestroy));
     },
 
-    _onActorMappedChanged: function(actor) {
+    _onActorMappedChanged(actor) {
         if (actor.mapped) {
             if (!this._timerUpdateId) {
                 this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
@@ -632,7 +632,7 @@ var PomodoroEndDialog = new Lang.Class({
         }
     },
 
-    _onTimerUpdate: function() {
+    _onTimerUpdate() {
         if (this.timer.isBreak()) {
             let remaining = Math.max(this.timer.getRemaining(), 0.0);
             let minutes   = Math.floor(remaining / 60);
@@ -645,7 +645,7 @@ var PomodoroEndDialog = new Lang.Class({
         }
     },
 
-    _onClosing: function() {
+    _onClosing() {
         this._cancelCloseWhenActive();
         this._cancelOpenWhenIdle();
 
@@ -665,7 +665,7 @@ var PomodoroEndDialog = new Lang.Class({
         }
     },
 
-    _onDestroy: function() {
+    _onDestroy() {
         this._onClosing();
 
         if (this._actorMappedId) {
@@ -674,7 +674,7 @@ var PomodoroEndDialog = new Lang.Class({
         }
     },
 
-    _onEvent: function(actor, event) {
+    _onEvent(actor, event) {
         let x, y, dx, dy, distance;
 
         if (!event.get_device ()) {
@@ -733,7 +733,7 @@ var PomodoroEndDialog = new Lang.Class({
     /**
      * Open the dialog and setup closing when user becomes active.
      */
-    open: function(animate) {
+    open(animate) {
         this.parent(animate);
 
         /* Wait until user has a chance of seeing the dialog */
@@ -756,14 +756,14 @@ var PomodoroEndDialog = new Lang.Class({
         }
     },
 
-    _cancelOpenWhenIdle: function() {
+    _cancelOpenWhenIdle() {
         if (this._openWhenIdleWatchId) {
             this._idleMonitor.remove_watch(this._openWhenIdleWatchId);
             this._openWhenIdleWatchId = 0;
         }
     },
 
-    openWhenIdle: function() {
+    openWhenIdle() {
         if (this.state == State.OPEN || this.state == State.OPENING) {
             return;
         }
@@ -790,7 +790,7 @@ var PomodoroEndDialog = new Lang.Class({
         }
     },
 
-    _cancelCloseWhenActive: function() {
+    _cancelCloseWhenActive() {
         if (this._eventId) {
             this._lightbox.actor.disconnect(this._eventId);
             this._eventId = 0;
@@ -798,7 +798,7 @@ var PomodoroEndDialog = new Lang.Class({
     },
 
     // TODO: should be private
-    closeWhenActive: function() {
+    closeWhenActive() {
         if (this.state == State.CLOSED || this.state == State.CLOSING) {
             return;
         }
@@ -810,7 +810,7 @@ var PomodoroEndDialog = new Lang.Class({
         }
     },
 
-    setDescription: function(text) {
+    setDescription(text) {
         this.description = text;
 
         if (this._descriptionLabel.clutter_text) {

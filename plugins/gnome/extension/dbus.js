@@ -74,7 +74,7 @@ function Pomodoro(callback, cancellable) {
 var PomodoroExtension = new Lang.Class({
     Name: 'PomodoroExtensionDBus',
 
-    _init: function() {
+    _init() {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(PomodoroExtensionInterface, this);
         this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Pomodoro/Extension');
 
@@ -88,19 +88,19 @@ var PomodoroExtension = new Lang.Class({
 
     Capabilities: Capabilities.capabilities,
 
-    _onNameAcquired: function(name) {
+    _onNameAcquired(name) {
         this.initialized = true;
 
         this.emit('name-acquired');
     },
 
-    _onNameLost: function(name) {
+    _onNameLost(name) {
         this.initialized = false;
 
         this.emit('name-lost');
     },
 
-    destroy: function() {
+    destroy() {
         this.disconnectAll();
 
         Gio.DBus.session.unown_name(this._dbusId);
