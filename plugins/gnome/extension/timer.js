@@ -64,13 +64,7 @@ var Timer = new Lang.Class({
         this._propertiesChangedId = 0;
         this._elapsed = 0.0;
 
-        this._proxy = DBus.Pomodoro(Lang.bind(this, function(proxy, error) {
-            if (error) {
-                Utils.logWarning(error.message);
-                this._notifyServiceNotInstalled();
-                return;
-            }
-        }));
+        this._proxy = DBus.Pomodoro(Lang.bind(this, this._onInit));
 
         this._propertiesChangedId = this._proxy.connect(
                                        'g-properties-changed',
@@ -120,6 +114,13 @@ var Timer = new Lang.Class({
         }
 
         this.emit('update');
+    },
+
+    _onInit: function(proxy, error) {
+        if (error) {
+            Utils.logWarning(error.message);
+            this._notifyServiceNotInstalled();
+        }
     },
 
     _onCallback: function(result, error) {
@@ -238,9 +239,9 @@ var Timer = new Lang.Class({
     },
 
     quit: function() {
-        this._proxy.QuitRemote(Lang.bind(this, function(result, error) {
+        this._proxy.QuitRemote((result, error) => {
             Utils.disableExtension(Config.EXTENSION_UUID);
-        }));
+        });
     },
 
     _notifyServiceNotInstalled: function() {

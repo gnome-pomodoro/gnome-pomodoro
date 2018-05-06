@@ -49,14 +49,14 @@ function getDefaultSource() {
 
     if (!source) {
         source = new Source();
-        let destroyId = source.connect('destroy', Lang.bind(source,
-            function(source) {
+        let destroyId = source.connect('destroy',
+            (source) => {
                 if (extension.notificationSource === source) {
                     extension.notificationSource = null;
                 }
 
                 source.disconnect(destroyId);
-            }));
+            });
 
         extension.notificationSource = source;
     }
@@ -103,14 +103,13 @@ var Source = new Lang.Class({
     },
 
     _lastNotificationRemoved: function() {
-        this._idleId = Mainloop.idle_add(Lang.bind(this,
-                                         function() {
-                                             if (!this.count) {
-                                                 this.destroy();
-                                             }
+        this._idleId = Mainloop.idle_add(() => {
+            if (!this.count) {
+                this.destroy();
+            }
 
-                                             return GLib.SOURCE_REMOVE;
-                                         }));
+            return GLib.SOURCE_REMOVE;
+        });
         GLib.Source.set_name_by_id(this._idleId,
                                    '[gnome-pomodoro] this._lastNotificationRemoved');
     },
@@ -133,10 +132,9 @@ var Source = new Lang.Class({
     destroyNotifications: function() {
         let notifications = this.notifications.slice();
 
-        notifications.forEach(
-            function(notification) {
-                notification.destroy();
-            });
+        notifications.forEach((notification) => {
+            notification.destroy();
+        });
     },
 
     destroy: function() {
@@ -296,30 +294,27 @@ var PomodoroStartNotification = new Lang.Class({
             return false;
         };
 
-        let onTimerUpdate = Lang.bind(this, function() {
-            if (banner.bodyLabel && banner.bodyLabel.actor.clutter_text) {
-                let bodyText = this._getBodyText();
+        let onTimerUpdate = () => {
+                if (banner.bodyLabel && banner.bodyLabel.actor.clutter_text) {
+                    let bodyText = this._getBodyText();
 
-                if (bodyText !== banner._bodyText) {
-                    banner._bodyText = bodyText;
-                    banner.setBody(bodyText);
+                    if (bodyText !== banner._bodyText) {
+                        banner._bodyText = bodyText;
+                        banner.setBody(bodyText);
+                    }
                 }
-            }
-        });
-        let onNotificationChanged = Lang.bind(this,
-            function() {
+            };
+        let onNotificationChanged = () => {
                 if (this.timer.isBreak()) {
-                    extendButton = banner.addAction(_("+1 Minute"), Lang.bind(this,
-                        function() {
+                    extendButton = banner.addAction(_("+1 Minute"), () => {
                             this.timer.stateDuration += 60.0;
-                        }));
+                        });
                 }
                 else if (extendButton) {
                     extendButton.destroy();
                 }
-            });
-        let onNotificationDestroy = Lang.bind(this,
-            function() {
+            };
+        let onNotificationDestroy = () => {
                 if (timerUpdateId != 0) {
                     this.timer.disconnect(timerUpdateId);
                     timerUpdateId = 0;
@@ -334,7 +329,7 @@ var PomodoroStartNotification = new Lang.Class({
                     this.disconnect(notificationDestroyId);
                     notificationDestroyId = 0;
                 }
-            });
+            };
 
         let timerUpdateId = this.timer.connect('update', onTimerUpdate);
         let notificationChangedId = this.connect('changed', onNotificationChanged);
@@ -442,19 +437,16 @@ var PomodoroEndNotification = new Lang.Class({
             banner.setTitle(Timer.State.label(this.timer.getState()));
         }
 
-        let skipButton = banner.addAction(_("Skip Break"), Lang.bind(this,
-            function() {
+        let skipButton = banner.addAction(_("Skip Break"), () => {
                 this.timer.setState(Timer.State.POMODORO);
 
                 this.destroy();
-            }));
-        let extendButton = banner.addAction(_("+1 Minute"), Lang.bind(this,
-            function() {
+            });
+        let extendButton = banner.addAction(_("+1 Minute"), () => {
                 this.timer.stateDuration += 60.0;
-            }));
+            });
 
-        let onTimerUpdate = Lang.bind(this,
-            function() {
+        let onTimerUpdate = () => {
                 if (banner.bodyLabel && banner.bodyLabel.actor.clutter_text) {
                     let bodyText = this._getBodyText();
 
@@ -463,9 +455,8 @@ var PomodoroEndNotification = new Lang.Class({
                         banner.setBody(bodyText);
                     }
                 }
-            });
-        let onNotificationDestroy = Lang.bind(this,
-            function() {
+            };
+        let onNotificationDestroy = () => {
                 if (timerUpdateId != 0) {
                     this.timer.disconnect(timerUpdateId);
                     timerUpdateId = 0;
@@ -475,7 +466,7 @@ var PomodoroEndNotification = new Lang.Class({
                     this.disconnect(notificationDestroyId);
                     notificationDestroyId = 0;
                 }
-            });
+            };
 
         let timerUpdateId = this.timer.connect('update', onTimerUpdate);
         let notificationDestroyId = this.connect('destroy', onNotificationDestroy);
@@ -634,11 +625,10 @@ var IssueNotification = new Lang.Class({
         this.setTransient(true);
         this.setUrgency(MessageTray.Urgency.HIGH);
 
-        this.addAction(_("Report issue"), Lang.bind(this,
-            function() {
+        this.addAction(_("Report issue"), () => {
                 Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
                 this.destroy();
-            }));
+            });
     },
 
     show: function() {
@@ -667,16 +657,14 @@ var TimerBanner = new Lang.Class({
         this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
         this._onTimerUpdate();
 
-        this.addAction(_("Skip"), Lang.bind(this,
-            function() {
+        this.addAction(_("Skip"), () => {
                 this.timer.skip();
 
                 notification.destroy();
-            }));
-        this.addAction(_("+1 Minute"), Lang.bind(this,
-            function() {
+            });
+        this.addAction(_("+1 Minute"), () => {
                 this.timer.stateDuration += 60.0;
-            }));
+            });
 
         this.connect('close', Lang.bind(this, this._onClose));
 

@@ -189,10 +189,9 @@ var IndicatorMenu = new Lang.Class({
             this._stateItems = {};
         }
 
-        let menuItem = this.addAction(label, Lang.bind(this,
-            function(menuItem, event) {
+        let menuItem = this.addAction(label, (menuItem, event) => {
                 this._activateState(name);
-            }));
+            });
 
         menuItem.actor.add_style_class_name('state-item');
 
@@ -327,13 +326,13 @@ var TextIndicator = new Lang.Class({
                                     y_align: Clutter.ActorAlign.CENTER });
         this.label.clutter_text.line_wrap = false;
         this.label.clutter_text.ellipsize = false;
-        this.label.connect('destroy', Lang.bind(this,
-            function() {
+        this.label.connect('destroy',
+            () => {
                 if (this._onTimerUpdateId) {
                     this.timer.disconnect(this._onTimerUpdateId);
                     this._onTimerUpdateId = 0;
                 }
-            }));
+            });
         this.actor.add_child(this.label);
 
         this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
@@ -822,20 +821,20 @@ var Indicator = new Lang.Class({
             else if (this._blinkTimeoutSource == 0) {
                 Tweener.addTween(this._hbox, fadeOutParams);
 
-                this._blinkTimeoutSource = Mainloop.timeout_add (FADE_OUT_TIME, Lang.bind(this,
-                    function () {
+                this._blinkTimeoutSource = Mainloop.timeout_add(FADE_OUT_TIME,
+                    () => {
                         Tweener.addTween(this._hbox, fadeInParams);
 
-                        this._blinkTimeoutSource = Mainloop.timeout_add (FADE_IN_TIME, Lang.bind(this, function () {
+                        this._blinkTimeoutSource = Mainloop.timeout_add(FADE_IN_TIME, () => {
                             this._blinkTimeoutSource = 0;
 
                             this._onBlinked ();
 
                             return GLib.SOURCE_REMOVE;
-                        }));
+                        });
 
                         return GLib.SOURCE_REMOVE;
-                    }));
+                    });
             }
         }
     },

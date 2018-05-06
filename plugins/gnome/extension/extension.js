@@ -233,15 +233,15 @@ var PomodoroExtension = new Lang.Class({
         }
         else {
             this.notification = new Notifications.PomodoroStartNotification(this.timer);
-            this.notification.connect('activated', Lang.bind(this,
-                function(notification) {
+            this.notification.connect('activated',
+                (notification) => {
                     if (this.timer.isBreak()) {
                         this.timer.skip();
                     }
                     else {
                         notification.destroy();
                     }
-                }));
+                });
             this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
             this.notification.show();
 
@@ -262,8 +262,8 @@ var PomodoroExtension = new Lang.Class({
         }
         else {
             this.notification = new Notifications.PomodoroEndNotification(this.timer);
-            this.notification.connect('activated', Lang.bind(this,
-                function(notification) {
+            this.notification.connect('activated',
+                (notification) => {
                     if (this.timer.isBreak()) {
                         if (this.dialog) {
                             this.dialog.open(true);
@@ -273,7 +273,7 @@ var PomodoroExtension = new Lang.Class({
                     else {
                         this.timer.skip();
                     }
-                }));
+                });
             this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
 
             if (this.dialog && this.timer.isBreak()) {
@@ -376,10 +376,10 @@ var PomodoroExtension = new Lang.Class({
         if (!this.indicator) {
             this.indicator = new Indicator.Indicator(this.timer,
                                                      this.pluginSettings.get_string('indicator-type'));
-            this.indicator.connect('destroy', Lang.bind(this,
-                function() {
+            this.indicator.connect('destroy',
+                () => {
                     this.indicator = null;
-                }));
+                });
 
             try {
                 Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
@@ -432,8 +432,8 @@ var PomodoroExtension = new Lang.Class({
     _enableScreenNotification: function() {
         if (!this.dialog) {
             this.dialog = new Dialogs.PomodoroEndDialog(this.timer);
-            this.dialog.connect('opening', Lang.bind(this,
-                function() {
+            this.dialog.connect('opening', 
+                () => {
                     try {
                         if (Main.messageTray._notification) {
                             Main.messageTray._hideNotification(true);
@@ -442,9 +442,9 @@ var PomodoroExtension = new Lang.Class({
                     catch (error) {
                         Utils.logWarning(error.message);
                     }
-                }));
-            this.dialog.connect('closing', Lang.bind(this,
-                function() {
+                });
+            this.dialog.connect('closing',
+                () => {
                     if (this.timer.isBreak() && !this.timer.isPaused()) {
                         if (this.notification instanceof Notifications.PomodoroEndNotification) {
                             this.notification.show();
@@ -454,11 +454,11 @@ var PomodoroExtension = new Lang.Class({
                             this.dialog.openWhenIdle();
                         }
                     }
-                }));
-            this.dialog.connect('destroy', Lang.bind(this,
-                function() {
+                });
+            this.dialog.connect('destroy',
+                () => {
                     this.dialog = null;
-                }));
+                });
         }
 
         this._updateScreenNotification();
@@ -491,12 +491,12 @@ var PomodoroExtension = new Lang.Class({
     _destroyPreviousNotifications: function() {
         if (this.notificationSource) {
             let notifications = this.notificationSource.notifications.filter(
-                Lang.bind(this, function(notification) {
+                (notification) => {
                     return notification !== this.notification;
-                }));
+                });
 
             notifications.forEach(
-                function(notification) {
+                (notification) => {
                     notification.destroy();
                 });
         }
@@ -550,7 +550,7 @@ function enable() {
         extension = new PomodoroExtension(Main.sessionMode.isLocked
                                           ? ExtensionMode.RESTRICTED : ExtensionMode.DEFAULT);
         extension.connect('destroy',
-            function() {
+            () => {
                 if (Extension.extension === extension) {
                     Extension.extension = null;
                 }
@@ -561,7 +561,7 @@ function enable() {
                 }
             });
         extension.connect('service-name-lost',
-            function() {
+            () => {
                 let metadata = ExtensionUtils.extensions[Config.EXTENSION_UUID];
 
                 if (metadata && metadata.extension === extension) {
@@ -573,7 +573,7 @@ function enable() {
             });
 
         sessionModeUpdatedId = Main.sessionMode.connect('updated',
-            function() {
+            () => {
                 extension.setMode(Main.sessionMode.isLocked
                                   ? ExtensionMode.RESTRICTED : ExtensionMode.DEFAULT);
             });

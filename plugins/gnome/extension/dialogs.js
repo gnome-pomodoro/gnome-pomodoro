@@ -203,13 +203,13 @@ var BlurredLightbox = new Lang.Class({
                              { factor: 1.0,
                                time: fadeInTime,
                                transition: 'easeOutQuad',
-                               onUpdate: Lang.bind(this, function() {
+                               onUpdate: () => {
                                    this._blurYEffect.factor = this._blurXEffect.factor;
-                               }),
-                               onComplete: Lang.bind(this, function() {
+                               },
+                               onComplete: () => {
                                    this.shown = true;
                                    this.emit('shown');
-                               })
+                               }
                              });
         } else {
             Tweener.removeTweens(this.actor);
@@ -217,10 +217,10 @@ var BlurredLightbox = new Lang.Class({
                              { opacity: 255 * this._fadeFactor,
                                time: fadeInTime,
                                transition: 'easeOutQuad',
-                               onComplete: Lang.bind(this, function() {
+                               onComplete: () => {
                                    this.shown = true;
                                    this.emit('shown');
-                               })
+                               }
                              });
         }
 
@@ -238,12 +238,12 @@ var BlurredLightbox = new Lang.Class({
                              { factor: 0.0,
                                time: fadeOutTime,
                                transition: 'easeOutQuad',
-                               onUpdate: Lang.bind(this, function() {
+                               onUpdate: () => {
                                    this._blurYEffect.factor = this._blurXEffect.factor;
-                               }),
-                               onComplete: Lang.bind(this, function() {
+                               },
+                               onComplete: () => {
                                    this.actor.hide();
-                               })
+                               }
                              });
         } else {
             Tweener.removeTweens(this.actor);
@@ -251,9 +251,9 @@ var BlurredLightbox = new Lang.Class({
                              { opacity: 0,
                                time: fadeOutTime,
                                transition: 'easeOutQuad',
-                               onComplete: Lang.bind(this, function() {
+                               onComplete: () => {
                                    this.actor.hide();
-                               })
+                               }
                              });
         }
     }
@@ -369,13 +369,12 @@ var ModalDialog = new Lang.Class({
                              { opacity: 255,
                                time: FADE_IN_TIME / 1000,
                                transition: 'easeOutQuad',
-                               onComplete: Lang.bind(this,
-                                    function() {
-                                        if (this.state == State.OPENING) {
-                                            this.state = State.OPENED;
-                                            this.emit('opened');
-                                        }
-                                    })
+                               onComplete: () => {
+                                   if (this.state == State.OPENING) {
+                                       this.state = State.OPENED;
+                                       this.emit('opened');
+                                   }
+                               }
                              });
             this.emit('opening');
         }
@@ -408,17 +407,16 @@ var ModalDialog = new Lang.Class({
                              { opacity: 0,
                                time: FADE_OUT_TIME / 1000,
                                transition: 'easeOutQuad',
-                               onComplete: Lang.bind(this,
-                                   function() {
-                                        if (this.state == State.CLOSING) {
-                                            this.state = State.CLOSED;
-                                            this.actor.hide();
+                               onComplete: () => {
+                                   if (this.state == State.CLOSING) {
+                                       this.state = State.CLOSED;
+                                       this.actor.hide();
 
-                                            this._removeMessageTray();
+                                       this._removeMessageTray();
 
-                                            this.emit('closed');
-                                        }
-                                   })
+                                       this.emit('closed');
+                                   }
+                               }
                              });
             this.emit('closing');
         }
@@ -441,15 +439,14 @@ var ModalDialog = new Lang.Class({
          * wait until user becomes idle.
          */
         if (this._pushModalWatchId == 0) {
-            this._pushModalWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_PUSH_MODAL, Lang.bind(this,
-                function(monitor) {
+            this._pushModalWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_PUSH_MODAL,
+                (monitor) => {
                     if (this._pushModalWatchId) {
                         this._idleMonitor.remove_watch(this._pushModalWatchId);
                         this._pushModalWatchId = 0;
                     }
                     this.pushModal();
-                }
-            ));
+                });
         }
 
         this._pushModalDelaySource = 0;
@@ -502,8 +499,8 @@ var ModalDialog = new Lang.Class({
         // this._grabHelper.ignoreRelease();
 
         /* delay pushModal to ignore current events */
-        Mainloop.idle_add(Lang.bind(this,
-            function() {
+        Mainloop.idle_add(
+            () => {
                 this._pushModalTries = 1;
 
                 if (this._pushModal()) {
@@ -515,8 +512,7 @@ var ModalDialog = new Lang.Class({
                 }
 
                 return GLib.SOURCE_REMOVE;
-            }
-        ));
+            });
     },
 
     /**
@@ -742,8 +738,8 @@ var PomodoroEndDialog = new Lang.Class({
 
         /* Wait until user has a chance of seeing the dialog */
         if (this._closeWhenActiveDelaySource == 0) {
-            this._closeWhenActiveDelaySource = Mainloop.timeout_add(MIN_DISPLAY_TIME, Lang.bind(this,
-                function() {
+            this._closeWhenActiveDelaySource = Mainloop.timeout_add(MIN_DISPLAY_TIME,
+                () => {
                     if (this._idleMonitor.get_idletime() < IDLE_TIME_TO_CLOSE) {
                         /* Wait until user becomes slightly idle */
                         this._closeWhenActiveIdleWatchId =
@@ -756,7 +752,7 @@ var PomodoroEndDialog = new Lang.Class({
 
                     this._closeWhenActiveDelaySource = 0;
                     return GLib.SOURCE_REMOVE;
-                }));
+                });
         }
     },
 
@@ -773,8 +769,8 @@ var PomodoroEndDialog = new Lang.Class({
         }
 
         if (this._openWhenIdleWatchId == 0) {
-            this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN, Lang.bind(this,
-                function() {
+            this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN,
+                () => {
                     let info = Utils.getFocusedWindowInfo();
 
                     if (info.isPlayer && info.isFullscreen)
@@ -790,8 +786,7 @@ var PomodoroEndDialog = new Lang.Class({
                     }
 
                     this.open(true);
-                }
-            ));
+                });
         }
     },
 
