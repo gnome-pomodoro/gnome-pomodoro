@@ -306,7 +306,7 @@ var PomodoroStartNotification = new Lang.Class({
                 }
             }
         });
-        let onChanged = Lang.bind(this,
+        let onNotificationChanged = Lang.bind(this,
             function() {
                 if (this.timer.isBreak()) {
                     extendButton = banner.addAction(_("+1 Minute"), Lang.bind(this,
@@ -318,18 +318,31 @@ var PomodoroStartNotification = new Lang.Class({
                     extendButton.destroy();
                 }
             });
-        let onDestroy = Lang.bind(this,
+        let onNotificationDestroy = Lang.bind(this,
             function() {
-                this.timer.disconnect(timerUpdateId);
-                this.disconnect(notificationChangedId);
-                this.disconnect(notificationDestroyId);
+                if (timerUpdateId != 0) {
+                    this.timer.disconnect(timerUpdateId);
+                    timerUpdateId = 0;
+                }
+
+                if (notificationChangedId != 0) {
+                    this.disconnect(notificationChangedId);
+                    notificationChangedId = 0;
+                }
+
+                if (notificationDestroyId != 0) {
+                    this.disconnect(notificationDestroyId);
+                    notificationDestroyId = 0;
+                }
             });
 
         let timerUpdateId = this.timer.connect('update', onTimerUpdate);
-        let notificationChangedId = this.connect('changed', onChanged);
-        let notificationDestroyId = this.connect('destroy', onDestroy);
+        let notificationChangedId = this.connect('changed', onNotificationChanged);
+        let notificationDestroyId = this.connect('destroy', onNotificationDestroy);
 
-        onChanged();
+        banner.actor.connect('destroy', onNotificationDestroy);
+
+        onNotificationChanged();
         onTimerUpdate();
 
         return banner;
@@ -451,14 +464,23 @@ var PomodoroEndNotification = new Lang.Class({
                     }
                 }
             });
-        let onDestroy = Lang.bind(this,
+        let onNotificationDestroy = Lang.bind(this,
             function() {
-                this.timer.disconnect(timerUpdateId);
-                this.disconnect(notificationDestroyId);
+                if (timerUpdateId != 0) {
+                    this.timer.disconnect(timerUpdateId);
+                    timerUpdateId = 0;
+                }
+
+                if (notificationDestroyId != 0) {
+                    this.disconnect(notificationDestroyId);
+                    notificationDestroyId = 0;
+                }
             });
 
         let timerUpdateId = this.timer.connect('update', onTimerUpdate);
-        let notificationDestroyId = this.connect('destroy', onDestroy);
+        let notificationDestroyId = this.connect('destroy', onNotificationDestroy);
+
+        banner.actor.connect('destroy', onNotificationDestroy);
 
         onTimerUpdate();
 
@@ -656,13 +678,9 @@ var TimerBanner = new Lang.Class({
                 this.timer.stateDuration += 60.0;
             }));
 
-        this.connect('close', Lang.bind(this,
-            function() {
-                if (this._timerUpdateId) {
-                    this.timer.disconnect(this._timerUpdateId);
-                    this._timerUpdateId = 0;
-                }
-            }));
+        this.connect('close', Lang.bind(this, this._onClose));
+
+        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
     },
 
     /* override parent method */
@@ -743,5 +761,16 @@ var TimerBanner = new Lang.Class({
 
     /* override parent method */
     _onUpdated: function(n, clear) {
+    },
+
+    _onClose: function() {
+        if (this._timerUpdateId != 0) {
+            this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+    },
+
+    _onActorDestroy: function() {
+        this._onClose();
     }
 });
