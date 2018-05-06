@@ -587,7 +587,7 @@ function disable() {
     let extension = Extension.extension;
 
     if (extension) {
-        if (Main.sessionMode.isLocked) {
+        if (Main.sessionMode.isLocked && !Main.sessionMode.isGreeter) {
             extension.setMode(ExtensionMode.RESTRICTED);
 
             // Note that ExtensionSystem.disableExtension() will unload our styleshhet
