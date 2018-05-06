@@ -76,7 +76,7 @@ var IndicatorMenu = new Lang.Class({
 
         this.actor.add_style_class_name('extension-pomodoro-indicator-menu');
 
-        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMapped));
+        this._actorMappedId = this.actor.connect('notify::mapped', this._onActorMapped.bind(this));
 
         this.indicator = indicator;
 
@@ -135,7 +135,7 @@ var IndicatorMenu = new Lang.Class({
 
         let startAction = this._createActionButton('media-playback-start-symbolic', _("Start Timer"));
         startAction.add_style_class_name('extension-pomodoro-indicator-menu-action-border');
-        startAction.connect('clicked', Lang.bind(this, this._onStartClicked));
+        startAction.connect('clicked', this._onStartClicked.bind(this));
         toggleItem.actor.add(startAction);
 
         let timerItem = new PopupMenu.PopupMenuItem("",
@@ -152,18 +152,18 @@ var IndicatorMenu = new Lang.Class({
                                                track_hover: false,
                                                style_class: 'extension-pomodoro-indicator-menu-timer-label-button' });
         timerLabelButton.child = timerLabel;
-        timerLabelButton.connect('clicked', Lang.bind(this, this._onTimerClicked));
+        timerLabelButton.connect('clicked', this._onTimerClicked.bind(this));
         timerItem.actor.add(timerLabelButton, { expand: true });
 
         let hbox = new St.BoxLayout();
         timerItem.actor.add(hbox);
 
         let pauseAction = this._createActionButton('media-playback-pause-symbolic', _("Pause Timer"));
-        pauseAction.connect('clicked', Lang.bind(this, this._onPauseClicked));
+        pauseAction.connect('clicked', this._onPauseClicked.bind(this));
         hbox.add_actor(pauseAction);
 
         let stopAction = this._createActionButton('media-playback-stop-symbolic', _("Stop Timer"));
-        stopAction.connect('clicked', Lang.bind(this, this._onStopClicked));
+        stopAction.connect('clicked', this._onStopClicked.bind(this));
         hbox.add_actor(stopAction);
 
         this._toggleMenuItem = toggleItem;
@@ -179,9 +179,9 @@ var IndicatorMenu = new Lang.Class({
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-        this.addAction(_("Preferences"), Lang.bind(this, this._activatePreferences));
-        this.addAction(_("Stats"), Lang.bind(this, this._activateStats));
-        this.addAction(_("Quit"), Lang.bind(this, this._activateQuit));
+        this.addAction(_("Preferences"), this._activatePreferences.bind(this));
+        this.addAction(_("Stats"), this._activateStats.bind(this));
+        this.addAction(_("Quit"), this._activateQuit.bind(this));
     },
 
     addStateMenuItem(name, label) {
@@ -202,7 +202,7 @@ var IndicatorMenu = new Lang.Class({
 
     _onActorMapped(actor) {
         if (actor.mapped && this._timerUpdateId == 0) {
-            this._timerUpdateId = this.indicator.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+            this._timerUpdateId = this.indicator.timer.connect('update', this._onTimerUpdate.bind(this));
             this._onTimerUpdate();
         }
 
@@ -335,13 +335,13 @@ var TextIndicator = new Lang.Class({
             });
         this.actor.add_child(this.label);
 
-        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
-        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
-        this.actor.connect('allocate', Lang.bind(this, this._allocate));
-        this.actor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
-        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
+        this.actor.connect('get-preferred-width', this._getPreferredWidth.bind(this));
+        this.actor.connect('get-preferred-height', this._getPreferredHeight.bind(this));
+        this.actor.connect('allocate', this._allocate.bind(this));
+        this.actor.connect('style-changed', this._onStyleChanged.bind(this));
+        this.actor.connect('destroy', this._onActorDestroy.bind(this));
 
-        this._onTimerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+        this._onTimerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
 
         this._onTimerUpdate();
 
@@ -540,18 +540,18 @@ var IconIndicator = new Lang.Class({
         this.actor._delegate = this;
 
         this.icon = new St.DrawingArea({ style_class: 'system-status-icon' });
-        this.icon.connect('style-changed', Lang.bind(this, this._onIconStyleChanged));
-        this.icon.connect('repaint', Lang.bind(this, this._onIconRepaint));
-        this.icon.connect('destroy', Lang.bind(this, this._onIconDestroy));
+        this.icon.connect('style-changed', this._onIconStyleChanged.bind(this));
+        this.icon.connect('repaint', this._onIconRepaint.bind(this));
+        this.icon.connect('destroy', this._onIconDestroy.bind(this));
         this.actor.add_child(this.icon);
 
-        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
-        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
-        this.actor.connect('allocate', Lang.bind(this, this._allocate));
-        this.actor.connect('style-changed', Lang.bind(this, this._onStyleChanged));
-        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
+        this.actor.connect('get-preferred-width', this._getPreferredWidth.bind(this));
+        this.actor.connect('get-preferred-height', this._getPreferredHeight.bind(this));
+        this.actor.connect('allocate', this._allocate.bind(this));
+        this.actor.connect('style-changed', this._onStyleChanged.bind(this));
+        this.actor.connect('destroy', this._onActorDestroy.bind(this));
 
-        this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+        this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
 
         this._onTimerUpdate();
 
@@ -737,7 +737,7 @@ var Indicator = new Lang.Class({
         this.widget = null;
 
         this.actor.add_style_class_name('extension-pomodoro-indicator');
-        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
+        this.actor.connect('destroy', this._onActorDestroy.bind(this));
 
         this._arrow = PopupMenu.arrowIcon(St.Side.BOTTOM);
         this._blinking = false;
@@ -753,8 +753,8 @@ var Indicator = new Lang.Class({
 
         this._onBlinked();
 
-        this._timerPausedId = this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
-        this._timerResumedId = this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
+        this._timerPausedId = this.timer.connect('paused', this._onTimerPaused.bind(this));
+        this._timerResumedId = this.timer.connect('resumed', this._onTimerResumed.bind(this));
     },
 
     setType(type) {
@@ -807,7 +807,7 @@ var Indicator = new Lang.Class({
                 transition: 'easeInOutQuad',
                 delay: FADE_OUT_TIME / 1000,
                 opacity: FADE_IN_OPACITY * 255,
-                onComplete: Lang.bind(this, this._onBlinked)
+                onComplete: this._onBlinked.bind(this)
             };
 
             if (Gtk.Settings.get_default().gtk_enable_animations) {
@@ -849,7 +849,7 @@ var Indicator = new Lang.Class({
                 time: 200 / 1000,
                 transition: 'easeOutQuad',
                 opacity: FADE_IN_OPACITY * 255,
-                onComplete: Lang.bind(this, this._onBlinked)
+                onComplete: this._onBlinked.bind(this)
             };
 
             Tweener.removeTweens(this._hbox);

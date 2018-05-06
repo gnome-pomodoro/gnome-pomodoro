@@ -76,24 +76,24 @@ var PomodoroExtension = new Lang.Class({
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
             this.settings.connect('changed::show-screen-notifications',
-                                  Lang.bind(this, this._onSettingsChanged));
+                                  this._onSettingsChanged.bind(this));
 
             this.pluginSettings = Settings.getSettings('org.gnome.pomodoro.plugins.gnome');
             this.pluginSettings.connect('changed::hide-system-notifications',
-                                        Lang.bind(this, this._onSettingsChanged));
+                                        this._onSettingsChanged.bind(this));
             this.pluginSettings.connect('changed::indicator-type',
-                                        Lang.bind(this, this._onSettingsChanged));
+                                        this._onSettingsChanged.bind(this));
 
             this.timer = new Timer.Timer();
-            this.timer.connect('service-disconnected', Lang.bind(this, this._onTimerServiceDisconnected));
-            this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
-            this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
-            this.timer.connect('paused', Lang.bind(this, this._onTimerPaused));
-            this.timer.connect('resumed', Lang.bind(this, this._onTimerResumed));
+            this.timer.connect('service-disconnected', this._onTimerServiceDisconnected.bind(this));
+            this.timer.connect('update', this._onTimerUpdate.bind(this));
+            this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+            this.timer.connect('paused', this._onTimerPaused.bind(this));
+            this.timer.connect('resumed', this._onTimerResumed.bind(this));
 
             this.service = new DBus.PomodoroExtension();
-            this.service.connect('name-acquired', Lang.bind(this, this._onServiceNameAcquired));
-            this.service.connect('name-lost', Lang.bind(this, this._onServiceNameLost));
+            this.service.connect('name-acquired', this._onServiceNameAcquired.bind(this));
+            this.service.connect('name-lost', this._onServiceNameLost.bind(this));
 
             this.setMode(mode);
         }
@@ -242,7 +242,7 @@ var PomodoroExtension = new Lang.Class({
                         notification.destroy();
                     }
                 });
-            this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
+            this.notification.connect('destroy', this._onNotificationDestroy.bind(this));
             this.notification.show();
 
             this._destroyPreviousNotifications();
@@ -274,7 +274,7 @@ var PomodoroExtension = new Lang.Class({
                         this.timer.skip();
                     }
                 });
-            this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
+            this.notification.connect('destroy', this._onNotificationDestroy.bind(this));
 
             if (this.dialog && this.timer.isBreak()) {
                 this.dialog.open(true);
@@ -299,7 +299,7 @@ var PomodoroExtension = new Lang.Class({
                       this.notification instanceof Notifications.ScreenShieldNotification))
                 {
                     this.notification = new Notifications.ScreenShieldNotification(this.timer);
-                    this.notification.connect('destroy', Lang.bind(this, this._onNotificationDestroy));
+                    this.notification.connect('destroy', this._onNotificationDestroy.bind(this));
                     this.notification.show();
 
                     this._destroyPreviousNotifications();
@@ -406,7 +406,7 @@ var PomodoroExtension = new Lang.Class({
                                   this.settings,
                                   Meta.KeyBindingFlags.NONE,
                                   Shell.ActionMode.ALL,
-                                  Lang.bind(this, this._onKeybindingPressed));
+                                  this._onKeybindingPressed.bind(this));
         }
     },
 

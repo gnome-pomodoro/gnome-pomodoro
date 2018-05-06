@@ -64,17 +64,17 @@ var Timer = new Lang.Class({
         this._propertiesChangedId = 0;
         this._elapsed = 0.0;
 
-        this._proxy = DBus.Pomodoro(Lang.bind(this, this._onInit));
+        this._proxy = DBus.Pomodoro(this._onInit.bind(this));
 
         this._propertiesChangedId = this._proxy.connect(
                                        'g-properties-changed',
-                                       Lang.bind(this, this._onPropertiesChanged));
+                                       this._onPropertiesChanged.bind(this));
 
         this._nameWatcherId = Gio.DBus.session.watch_name(
                                        'org.gnome.Pomodoro',
                                        Gio.BusNameWatcherFlags.AUTO_START,
-                                       Lang.bind(this, this._onNameAppeared),
-                                       Lang.bind(this, this._onNameVanished));
+                                       this._onNameAppeared.bind(this),
+                                       this._onNameVanished.bind(this));
     },
 
     _onNameAppeared() {
@@ -144,7 +144,7 @@ var Timer = new Lang.Class({
     setState(state, timestamp) {
         this._proxy.SetStateRemote(state,
                                    timestamp || 0,
-                                   Lang.bind(this, this._onCallback));
+                                   this._onCallback.bind(this));
     },
 
     getStateDuration() {
@@ -154,7 +154,7 @@ var Timer = new Lang.Class({
     setStateDuration(duration) {
         this._proxy.SetStateDurationRemote(this._proxy.State,
                                            duration,
-                                           Lang.bind(this, this._onCallback));
+                                           this._onCallback.bind(this));
     },
 
     get stateDuration() {
@@ -164,7 +164,7 @@ var Timer = new Lang.Class({
     set stateDuration(value) {
         this._proxy.SetStateDurationRemote(this._proxy.State,
                                            value,
-                                           Lang.bind(this, this._onCallback));
+                                           this._onCallback.bind(this));
     },
 
     getElapsed() {
@@ -192,27 +192,27 @@ var Timer = new Lang.Class({
     },
 
     start() {
-        this._proxy.StartRemote(Lang.bind(this, this._onCallback));
+        this._proxy.StartRemote(this._onCallback.bind(this));
     },
 
     stop() {
-        this._proxy.StopRemote(Lang.bind(this, this._onCallback));
+        this._proxy.StopRemote(this._onCallback.bind(this));
     },
 
     pause() {
-        this._proxy.PauseRemote(Lang.bind(this, this._onCallback));
+        this._proxy.PauseRemote(this._onCallback.bind(this));
     },
 
     resume() {
-        this._proxy.ResumeRemote(Lang.bind(this, this._onCallback));
+        this._proxy.ResumeRemote(this._onCallback.bind(this));
     },
 
     skip() {
-        this._proxy.SkipRemote(Lang.bind(this, this._onCallback));
+        this._proxy.SkipRemote(this._onCallback.bind(this));
     },
 
     reset() {
-        this._proxy.ResetRemote(Lang.bind(this, this._onCallback));
+        this._proxy.ResetRemote(this._onCallback.bind(this));
     },
 
     toggle() {
@@ -231,11 +231,11 @@ var Timer = new Lang.Class({
     },
 
     showMainWindow(timestamp) {
-        this._proxy.ShowMainWindowRemote(timestamp, Lang.bind(this, this._onCallback));
+        this._proxy.ShowMainWindowRemote(timestamp, this._onCallback.bind(this));
     },
 
     showPreferences(timestamp) {
-        this._proxy.ShowPreferencesRemote(timestamp, Lang.bind(this, this._onCallback));
+        this._proxy.ShowPreferencesRemote(timestamp, this._onCallback.bind(this));
     },
 
     quit() {

@@ -289,7 +289,7 @@ var ModalDialog = new Lang.Class({
                                      opacity: 0 });
         this.actor._delegate = this;
         this.actor.add_constraint(this._stageConstraint);
-        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
+        this.actor.connect('destroy', this._onActorDestroy.bind(this));
 
         // Modal dialogs are fixed width and grow vertically; set the request
         // mode accordingly so wrapped labels are handled correctly during
@@ -351,7 +351,7 @@ var ModalDialog = new Lang.Class({
         if (this._pushModalDelaySource == 0) {
             this._pushModalDelaySource = Mainloop.timeout_add(
                         Math.max(MIN_DISPLAY_TIME - IDLE_TIME_TO_PUSH_MODAL, 0),
-                        Lang.bind(this, this._onPushModalDelayTimeout));
+                        this._onPushModalDelayTimeout.bind(this));
         }
 
         this._monitorConstraint.index = global.screen.get_primary_monitor();
@@ -461,7 +461,7 @@ var ModalDialog = new Lang.Class({
         return this._grabHelper.grab({
             actor: this._lightbox.actor,
             focus: this._lightbox.actor,
-            onUngrab: Lang.bind(this, this._onUngrab)
+            onUngrab: this._onUngrab.bind(this)
         });
     },
 
@@ -508,7 +508,7 @@ var ModalDialog = new Lang.Class({
                 }
                 else {
                     this._pushModalSource = Mainloop.timeout_add(Math.floor(1000 / PUSH_MODAL_RATE),
-                                                                 Lang.bind(this, this._onPushModalTimeout));
+                                                                 this._onPushModalTimeout.bind(this));
                 }
 
                 return GLib.SOURCE_REMOVE;
@@ -611,16 +611,16 @@ var PomodoroEndDialog = new Lang.Class({
                   y_align: St.Align.START });
         this._layout.add_actor(box);
 
-        this._actorMappedId = this.actor.connect('notify::mapped', Lang.bind(this, this._onActorMappedChanged));
+        this._actorMappedId = this.actor.connect('notify::mapped', this._onActorMappedChanged.bind(this));
 
-        this.connect('closing', Lang.bind(this, this._onClosing));
-        this.connect('destroy', Lang.bind(this, this._onDestroy));
+        this.connect('closing', this._onClosing.bind(this));
+        this.connect('destroy', this._onDestroy.bind(this));
     },
 
     _onActorMappedChanged(actor) {
         if (actor.mapped) {
             if (!this._timerUpdateId) {
-                this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+                this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
                 this._onTimerUpdate();
             }
         }
@@ -744,7 +744,7 @@ var PomodoroEndDialog = new Lang.Class({
                         /* Wait until user becomes slightly idle */
                         this._closeWhenActiveIdleWatchId =
                                 this._idleMonitor.add_idle_watch(IDLE_TIME_TO_CLOSE,
-                                                                 Lang.bind(this, this.closeWhenActive));
+                                                                 this.closeWhenActive.bind(this));
                     }
                     else {
                         this.closeWhenActive();
@@ -806,7 +806,7 @@ var PomodoroEndDialog = new Lang.Class({
         if (this._eventId == 0) {
             this._eventX = -1;
             this._eventY = -1;
-            this._eventId = this._lightbox.actor.connect('event', Lang.bind(this, this._onEvent));
+            this._eventId = this._lightbox.actor.connect('event', this._onEvent.bind(this));
         }
     },
 

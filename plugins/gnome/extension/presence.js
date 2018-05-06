@@ -43,8 +43,8 @@ var Presence = new Lang.Class({
                 this._updateState();
             }
         });
-        this._patch.connect('applied', Lang.bind(this, this._onPatchApplied));
-        this._patch.connect('reverted', Lang.bind(this, this._onPatchReverted));
+        this._patch.connect('applied', this._onPatchApplied.bind(this));
+        this._patch.connect('reverted', this._onPatchReverted.bind(this));
     },
 
     setBusy(value) {

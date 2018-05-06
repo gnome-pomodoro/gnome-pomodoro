@@ -88,7 +88,7 @@ var Source = new Lang.Class({
                     this.addMessageAtIndex(message, this._nUrgent, this.actor.mapped);
                 }
                 else {
-                    Lang.bind(this, patch.initial._onNotificationAdded)(source, notification);
+                    patch.initial._onNotificationAdded.bind(this)(source, notification);
                 }
             }
         });
@@ -223,7 +223,7 @@ var PomodoroStartNotification = new Lang.Class({
 
         this.timer = timer;
         this._timerState = null;
-        this._timerStateChangedId = this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
+        this._timerStateChangedId = this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
 
         this._onTimerStateChanged();
     },
@@ -369,7 +369,7 @@ var PomodoroEndNotification = new Lang.Class({
 
         this.timer = timer;
         this._timerState = null;
-        this._timerStateChangedId = this.timer.connect('state-changed', Lang.bind(this, this._onTimerStateChanged));
+        this._timerStateChangedId = this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
 
         this._onTimerStateChanged();
     },
@@ -508,7 +508,7 @@ var ScreenShieldNotification = new Lang.Class({
 
         this._isPaused = false;
         this._timerState = Timer.State.NULL;
-        this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+        this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
 
         let patch = new Utils.Patch(Main.screenShield, {
             emit(name /* , arg1, arg2 */) {
@@ -654,7 +654,7 @@ var TimerBanner = new Lang.Class({
 
         this._isPaused = null;
         this._timerState = null;
-        this._timerUpdateId = this.timer.connect('update', Lang.bind(this, this._onTimerUpdate));
+        this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
         this._onTimerUpdate();
 
         this.addAction(_("Skip"), () => {
@@ -666,9 +666,9 @@ var TimerBanner = new Lang.Class({
                 this.timer.stateDuration += 60.0;
             });
 
-        this.connect('close', Lang.bind(this, this._onClose));
+        this.connect('close', this._onClose.bind(this));
 
-        this.actor.connect('destroy', Lang.bind(this, this._onActorDestroy));
+        this.actor.connect('destroy', this._onActorDestroy.bind(this));
     },
 
     /* override parent method */

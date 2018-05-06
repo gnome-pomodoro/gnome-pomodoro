@@ -82,8 +82,8 @@ var PomodoroExtension = new Lang.Class({
 
         this._dbusId = Gio.DBus.session.own_name('org.gnome.Pomodoro.Extension',
                                                  Gio.BusNameOwnerFlags.REPLACE,
-                                                 Lang.bind(this, this._onNameAcquired),
-                                                 Lang.bind(this, this._onNameLost));
+                                                 this._onNameAcquired.bind(this),
+                                                 this._onNameLost.bind(this));
     },
 
     Capabilities: Capabilities.capabilities,
