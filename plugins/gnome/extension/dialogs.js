@@ -354,7 +354,10 @@ var ModalDialog = new Lang.Class({
                         this._onPushModalDelayTimeout.bind(this));
         }
 
-        this._monitorConstraint.index = global.screen.get_primary_monitor();
+        if (global.screen)
+            this._monitorConstraint.index = global.screen.get_current_monitor() // mutter < 3.29
+        else
+            this._monitorConstraint.index = global.display.get_current_monitor() // mutter >= 3.29
 
         this.actor.raise_top();
         this.actor.show();
