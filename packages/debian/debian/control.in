@@ -20,7 +20,7 @@ Build-Depends: autoconf-archive,
                libcanberra-dev (>= 0.30),
                libpeas-dev (>= @LIBPEAS_REQUIRED@),
                libgom-1.0-dev,
-               libappindicator3-dev
+               libayatana-appindicator3-dev
 Standards-Version: 3.9.6
 Homepage: @PACKAGE_URL@
 
