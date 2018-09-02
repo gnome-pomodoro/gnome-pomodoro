@@ -19,7 +19,7 @@ libindicator_la_SOURCES = \
 
 libindicator_la_VALAFLAGS = \
 	$(PLUGIN_VALAFLAGS) \
-	--pkg appindicator3-0.1
+	--pkg ayatana-appindicator3-0.1
 
 libindicator_la_CPPFLAGS = \
 	$(PLUGIN_CPPFLAGS) \

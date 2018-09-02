@@ -59,7 +59,7 @@ PKG_CHECK_MODULES(GNOME_PLUGIN, [
 ], [with_gnome_plugin=yes], [with_gnome_plugin=no])
 
 PKG_CHECK_MODULES(INDICATOR_PLUGIN, [
-    appindicator3-0.1
+    ayatana-appindicator3-0.1
 ], [with_indicator_plugin=yes], [with_indicator_plugin=no])
 
 # Checks for programs.
