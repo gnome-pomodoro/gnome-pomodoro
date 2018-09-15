@@ -3,7 +3,7 @@ Maintainer: Kamil Prusko <kamilprusko@gmail.com>
 Section: gnome
 Priority: optional
 Build-Depends: autoconf-archive,
-               debhelper (>= 9.0.0),
+               debhelper (>= 11),
                dh-autoreconf,
                gettext,
                valac (>= @VALA_REQUIRED@),
@@ -20,8 +20,8 @@ Build-Depends: autoconf-archive,
                libcanberra-dev (>= 0.30),
                libpeas-dev (>= @LIBPEAS_REQUIRED@),
                libgom-1.0-dev,
-               libappindicator3-dev
-Standards-Version: 3.9.6
+               libayatana-appindicator3-dev
+Standards-Version: 4.2.1.1
 Homepage: @PACKAGE_URL@
 
 Package: @PACKAGE_NAME@
