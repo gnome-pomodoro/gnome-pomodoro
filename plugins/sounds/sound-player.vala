@@ -119,22 +119,28 @@ namespace SoundsPlugin
 
         public double volume {
             get {
-                return this.pipeline.volume;
+                if (this.pipeline != null && this.pipeline.volume != null) {
+                    return this.pipeline.volume;
+                } else {
+                    return 1.0;
+                }
             }
             set {
                 this.pipeline.volume = value.clamp (0.0, 1.0);
             }
-            default = 1.0;
         }
 
         public double volume_fade {
             get {
-                return this.volume_filter.volume;
+                if (this.volume_filter != null && this.volume_filter.volume != null) {
+                    return this.volume_filter.volume;
+                } else {
+                    return 0.0;
+                }
             }
             set {
                 this.volume_filter.volume = value.clamp (0.0, 1.0);
             }
-            default = 0.0;
         }
 
         public bool repeat { get; set; default = false; }

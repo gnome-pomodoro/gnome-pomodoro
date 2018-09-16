@@ -2,14 +2,15 @@
 # Copyright (c) 2012 gnome-pomodoro contributors
 # This file is distributed under the same license as the gnome-pomodoro package.
 # liberumed <liberumed@gmail.com>, 2013.
+# Max Vetrov 'tigertv' <maxvetrov555@yandex.ru>, 2018
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-29 17:23+0100\n"
-"PO-Revision-Date: 2013-06-03 12:11+0200\n"
-"Last-Translator: Igor Dyatlov <dyatlov.igor@gmail.com>\n"
+"PO-Revision-Date: 2018-06-02 12:11+0200\n"
+"Last-Translator: Max Vetrov <maxvetrov555@yandex.ru>\n"
 "Language-Team: ru <>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -53,11 +54,11 @@ msgstr "Начать новый помодоро"
 
 #: ../extension/notifications.js:652
 msgid "Shorten the break"
-msgstr ""
+msgstr "Сократите перерыв"
 
 #: ../extension/notifications.js:658
 msgid "Lengthen the break"
-msgstr ""
+msgstr "Увеличьте перерыв"
 
 #: ../extension/notifications.js:672
 #, fuzzy, javascript-format
@@ -71,13 +72,13 @@ msgstr[2] "Сделайте перерыв, у Вас %d секунд\n"
 #, fuzzy, javascript-format
 msgid "You have %d minute left"
 msgid_plural "You have %d minutes left"
-msgstr[0] "Сделайте перерыв, у Вас %d минута\n"
-msgstr[1] "Сделайте перерыв, у Вас %d минуты\n"
-msgstr[2] "Сделайте перерыв, у Вас %d минут\n"
+msgstr[0] "Сделайте перерыв, у Вас осталась %d минута\n"
+msgstr[1] "Сделайте перерыв, у Вас осталось %d минуты\n"
+msgstr[2] "Сделайте перерыв, у Вас осталось %d минут\n"
 
 #: ../extension/notifications.js:693
 msgid "Hey, you're missing out on a break"
-msgstr ""
+msgstr "Эй, вы пропускаете перерыв"
 
 #: ../extension/notifications.js:772
 msgid "Could not run pomodoro"
@@ -85,7 +86,7 @@ msgstr "Не удалось запустить Помодоро"
 
 #: ../extension/notifications.js:774
 msgid "Something went badly wrong..."
-msgstr ""
+msgstr "Что-то пошло не так..."
 
 #: ../extension/notifications.js:775
 msgid "Looks like gnome-pomodoro is not installed"
@@ -97,7 +98,7 @@ msgstr "Сообщить о проблеме"
 
 #: ../extension/notifications.js:787
 msgid "Install"
-msgstr ""
+msgstr "Установить"
 
 #: ../src/about-dialog.vala:29
 msgid "About Pomodoro"
@@ -109,7 +110,7 @@ msgstr "Простой инструмент для тайм-менеджмент
 
 #: ../src/about-dialog.vala:39
 msgid "translator-credits"
-msgstr ""
+msgstr "Переводчики"
 
 #: ../src/about-dialog.vala:45
 msgid ""
@@ -142,7 +143,7 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:418
 msgid "Shortcut to toggle the timer"
-msgstr "Комбинации клавишь для переключения таймера"
+msgstr "Комбинации клавиш для переключения таймера"
 
 #: ../src/preferences-dialog.vala:426
 msgid "Notifications"
@@ -162,11 +163,11 @@ msgstr "Звуки"
 
 #: ../src/preferences-dialog.vala:464
 msgid "Clock Ticking"
-msgstr ""
+msgstr "Тиканье часов"
 
 #: ../src/preferences-dialog.vala:468
 msgid "Timer Ticking"
-msgstr ""
+msgstr "Тиканье таймера"
 
 #: ../src/preferences-dialog.vala:472
 msgid "Woodland Birds"
@@ -179,15 +180,15 @@ msgstr "Использовать звуковое уведомление"
 
 #: ../src/preferences-dialog.vala:490
 msgid "Ticking sound"
-msgstr ""
+msgstr "Звук тиканья"
 
 #: ../src/preferences-dialog.vala:510
 msgid "Loud bell"
-msgstr ""
+msgstr "Громкий звонок"
 
 #: ../src/preferences-dialog.vala:514
 msgid "Bell"
-msgstr ""
+msgstr "Звонок"
 
 #: ../src/preferences-dialog.vala:521
 msgid "Select sound for start of break"
@@ -195,7 +196,7 @@ msgstr "Выберите звук для начала перерыва"
 
 #: ../src/preferences-dialog.vala:530
 msgid "Start of break sound"
-msgstr ""
+msgstr "Начало звука перерыва"
 
 #: ../src/preferences-dialog.vala:534
 #, fuzzy
@@ -204,7 +205,7 @@ msgstr "Звуковой файл для проигрывания при ста�
 
 #: ../src/preferences-dialog.vala:543
 msgid "Pomodoro start sound"
-msgstr ""
+msgstr "Помодоро звучит"
 
 #: ../src/preferences-dialog.vala:575
 msgid "Available"
@@ -229,11 +230,11 @@ msgstr ""
 
 #: ../src/preferences-dialog.vala:608
 msgid "Status during pomodoro"
-msgstr ""
+msgstr "Статус во время помодоро"
 
 #: ../src/preferences-dialog.vala:613
 msgid "Status during break"
-msgstr ""
+msgstr "Статус во время перерыва"
 
 #: ../src/preferences-dialog.vala:686
 #, fuzzy
@@ -245,12 +246,12 @@ msgstr "Изменить онлайн статус и отключить уве�
 #, fuzzy
 msgid ""
 "System notifications including chat messages won't show up during break."
-msgstr "Изменить онлайн статус и отключить уведомления, включая сообщения чата"
+msgstr "Системные уведомления, включая сообщения чата не будут показываться втечении перерыва"
 
 #: ../src/preferences-dialog.vala:694
 #, fuzzy
 msgid "System notifications including chat messages won't show up."
-msgstr "Изменить онлайн статус и отключить уведомления, включая сообщения чата"
+msgstr "Системные уведомления, включая сообщения чата не будут показываться"
 
 #: ../src/preferences-dialog.vala:707
 msgid "OK"
@@ -274,7 +275,7 @@ msgstr[2] "%d минут"
 
 #: ../src/widgets.vala:327
 msgid "Disabled"
-msgstr ""
+msgstr "Отключено"
 
 #: ../src/widgets.vala:384
 #, c-format
@@ -283,6 +284,9 @@ msgid ""
 "using this key.\n"
 "Please try with a key such as Control, Alt or Shift at the same time."
 msgstr ""
+"Сочетание клавиш \"%s\" не может быть использовано потому что невозможно напечатать "
+"используя эту клавишу.\n"
+"Пожалуйста попробуйте клавиши такие как CTRL, ALT или SHIFT при нажатии."
 
 #: ../src/widgets.vala:512
 msgid "_No sound"
@@ -314,7 +318,7 @@ msgstr "нет"
 
 #: ../src/widgets.vala:1061 ../src/widgets.vala:1070
 msgid "Supported audio files"
-msgstr ""
+msgstr "Поддерживаются аудио файлы"
 
 #: ../data/gnome-pomodoro.desktop.in.h:2
 msgid "Manage your time and tasks"
