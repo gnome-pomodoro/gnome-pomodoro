@@ -472,20 +472,32 @@ namespace Pomodoro
         private void activate_timer_skip (GLib.SimpleAction action,
                                           GLib.Variant?     parameter)
         {
-            this.service.skip ();
+            try {
+                this.service.skip ();
+            }
+            catch (GLib.Error error) {
+            }
         }
 
         private void activate_timer_set_state (GLib.SimpleAction action,
                                                GLib.Variant?     parameter)
         {
-            this.service.set_state (parameter.get_string (), 0.0);
+            try {
+                this.service.set_state (parameter.get_string (), 0.0);
+            }
+            catch (GLib.Error error) {
+            }
         }
 
         private void activate_timer_switch_state (GLib.SimpleAction action,
                                                   GLib.Variant? parameter)
         {
-            this.service.set_state (parameter.get_string (),
-                                    this.timer.state.timestamp);
+            try {
+                this.service.set_state (parameter.get_string (),
+                                        this.timer.state.timestamp);
+            }
+            catch (GLib.Error error) {
+            }
         }
 
         private void setup_actions ()
@@ -790,12 +802,7 @@ namespace Pomodoro
 
             if (this.service == null) {
                 this.hold ();
-
                 this.service = new Pomodoro.Service (connection, this.timer);
-                this.service.destroy.connect (() => {
-                    this.service = null;
-                    this.release ();
-                });
 
                 try {
                     connection.register_object ("/org/gnome/Pomodoro", this.service);
@@ -820,8 +827,9 @@ namespace Pomodoro
             }
 
             if (this.service != null) {
-                this.service.destroy ();
                 this.service = null;
+
+                this.release ();
             }
         }
 

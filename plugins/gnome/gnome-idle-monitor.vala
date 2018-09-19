@@ -151,7 +151,7 @@ namespace GnomePlugin
 
                 this.watches_by_upstream_id.insert (watch.upstream_id, watch);
             }
-            catch (GLib.IOError error) {
+            catch (GLib.Error error) {
                 GLib.warning ("Failed to add idle watch: %s", error.message);
             }
         }
@@ -164,7 +164,7 @@ namespace GnomePlugin
 
                 this.watches_by_upstream_id.insert (watch.upstream_id, watch);
             }
-            catch (GLib.IOError error) {
+            catch (GLib.Error error) {
                 GLib.warning ("Failed to add user-active watch: %s", error.message);
             }
         }
@@ -270,7 +270,7 @@ namespace GnomePlugin
                 try {
                     this.proxy.remove_watch (watch.upstream_id);
                 }
-                catch (GLib.IOError error) {
+                catch (GLib.Error error) {
                     GLib.warning ("Failed to remove watch: %s", error.message);
                 }
             }
@@ -292,7 +292,7 @@ namespace GnomePlugin
                 try {
                     this.proxy.get_idletime (out value);
                 }
-                catch (GLib.IOError error) {
+                catch (GLib.Error error) {
                     GLib.warning ("Failed to get idletime: %s", error.message);
                 }
             }

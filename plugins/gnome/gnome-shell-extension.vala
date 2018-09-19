@@ -155,7 +155,7 @@ namespace GnomePlugin
                                 ? (Gnome.ExtensionState) tmp.lookup ("state").get_double ()
                                 : Gnome.ExtensionState.UNKNOWN;
             }
-            catch (GLib.IOError error) {
+            catch (GLib.Error error) {
                 GLib.critical ("%s", error.message);
                 return null;
             }
@@ -194,7 +194,7 @@ namespace GnomePlugin
 
                 yield;
             }
-            catch (GLib.IOError error) {
+            catch (GLib.Error error) {
                 GLib.warning ("Failed to eval script: %s",
                               error.message);
             }
@@ -279,7 +279,7 @@ namespace GnomePlugin
 
                     GLib.debug ("Extension install result: %s", result);
                  }
-                 catch (GLib.IOError error) {
+                 catch (GLib.Error error) {
                      GLib.critical ("%s", error.message);
                  }
 
@@ -310,7 +310,7 @@ namespace GnomePlugin
             try {
                 this.proxy.reload_extension (this.uuid);
             }
-            catch (GLib.IOError error) {
+            catch (GLib.Error error) {
                 GLib.critical ("%s", error.message);
             }
 
@@ -395,7 +395,7 @@ namespace GnomePlugin
             try {
                 this.proxy.get_extension_errors (this.uuid, out errors);
             }
-            catch (GLib.IOError error) {
+            catch (GLib.Error error) {
                 GLib.critical (error.message);
             }
 

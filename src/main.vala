@@ -28,8 +28,8 @@ private void on_posix_signal (int signal)
 {
     switch (signal)
     {
-        case Posix.SIGINT:
-        case Posix.SIGTERM:
+        case Posix.Signal.INT:
+        case Posix.Signal.TERM:
             application.quit ();
             break;
 
@@ -53,8 +53,8 @@ public int main (string[] args)
     application = new Pomodoro.Application ();
 
     /* register unix signal handler */
-    Posix.signal (Posix.SIGINT, on_posix_signal);
-    Posix.signal (Posix.SIGTERM, on_posix_signal);
+    Posix.signal (Posix.Signal.INT, on_posix_signal);
+    Posix.signal (Posix.Signal.TERM, on_posix_signal);
 
     exit_status = application.run (args);
     application = null;

@@ -391,7 +391,7 @@ namespace Pomodoro
 
             Cairo.TextExtents label_extents;
             Gdk.RGBA theme_fg_color = style_context.get_color (widget.get_state_flags ());
-            Gdk.RGBA theme_bg_color = style_context.get_background_color (widget.get_state_flags ());
+            Gdk.RGBA theme_bg_color;
             Gdk.RGBA theme_selected_bg_color;
 
             style_context.lookup_color ("theme_selected_bg_color", out theme_selected_bg_color);

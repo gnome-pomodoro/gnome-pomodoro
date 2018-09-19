@@ -27,7 +27,7 @@ namespace Freedesktop
     public interface Notifications : GLib.Object
     {
         public abstract void get_capabilities (out string[] capabilities)
-                                               throws IOError;
+                                               throws Error;
     }
 }
 
@@ -67,7 +67,7 @@ namespace Pomodoro
                     }
                 }
             }
-            catch (GLib.IOError error) {
+            catch (GLib.Error error) {
             }
         }
 

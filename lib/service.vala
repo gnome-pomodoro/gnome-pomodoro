@@ -67,7 +67,7 @@ namespace Pomodoro
         }
 
         public void set_state (string name,
-                               double timestamp)
+                               double timestamp) throws Error
         {
             var state = Pomodoro.TimerState.lookup (name);
 
@@ -83,7 +83,7 @@ namespace Pomodoro
         }
 
         public void set_state_duration (string name,
-                                        double duration)
+                                        double duration) throws Error
         {
             if (this.timer.state.name == name) {
                 this.timer.state_duration = double.max (duration, this.timer.elapsed);
@@ -94,49 +94,49 @@ namespace Pomodoro
         }
 
         public void show_main_window (string mode,
-                                      uint32 timestamp)
+                                      uint32 timestamp) throws Error
         {
             var application = Pomodoro.Application.get_default ();
             application.show_window (mode, timestamp);
         }
 
-        public void show_preferences (uint32 timestamp)
+        public void show_preferences (uint32 timestamp) throws Error
         {
             var application = Pomodoro.Application.get_default ();
             application.show_preferences (timestamp);
         }
 
-        public void start ()
+        public void start () throws Error
         {
             this.timer.start ();
         }
 
-        public void stop ()
+        public void stop () throws Error
         {
             this.timer.stop ();
         }
 
-        public void reset ()
+        public void reset () throws Error
         {
             this.timer.reset ();
         }
 
-        public void pause ()
+        public void pause () throws Error
         {
             this.timer.pause ();
         }
 
-        public void resume ()
+        public void resume () throws Error
         {
             this.timer.resume ();
         }
 
-        public void skip ()
+        public void skip () throws Error
         {
             this.timer.skip ();
         }
 
-        public void quit ()
+        public void quit () throws Error
         {
             this.timer.stop ();
 
@@ -238,11 +238,5 @@ namespace Pomodoro
 
         public signal void state_changed (GLib.HashTable<string, GLib.Variant> state,
                                           GLib.HashTable<string, GLib.Variant> previous_state);
-
-        [DBus (visible = false)]
-        public virtual signal void destroy ()
-        {
-            this.dispose ();
-        }
     }
 }

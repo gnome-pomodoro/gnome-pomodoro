@@ -63,18 +63,18 @@ namespace Gnome
     public interface Shell : GLib.Object
     {
         public abstract bool eval (string script)
-                                   throws IOError;
+                                   throws Error;
 
         public abstract bool grab_accelerator
                                        (string accelerator,
                                         uint32 flags,
                                         out uint action)
-                                        throws IOError;
+                                        throws Error;
 
         public abstract bool ungrab_accelerator
                                        (uint32 action,
                                         out bool success)
-                                        throws IOError;
+                                        throws Error;
 
         public signal void accelerator_activated
                                        (uint32 action,
@@ -88,24 +88,24 @@ namespace Gnome
         public abstract void get_extension_info
                                        (string uuid,
                                         out HashTable<string,Variant> info)
-                                        throws IOError;
+                                        throws Error;
 
         public abstract void get_extension_errors
                                        (string uuid,
                                         out string[] errors)
-                                        throws IOError;
+                                        throws Error;
 
         public abstract void reload_extension
                                        (string uuid)
-                                        throws IOError;
+                                        throws Error;
 
         public abstract async string install_remote_extension
                                        (string uuid)
-                                        throws IOError;
+                                        throws Error;
 
         public abstract bool uninstall_extension
                                        (string uuid)
-                                        throws IOError;
+                                        throws Error;
 
         public signal void extension_status_changed
                                        (string uuid,
@@ -123,19 +123,19 @@ namespace Meta
     {
         public abstract void get_idletime
                                        (out uint64 idletime)
-                                        throws IOError;
+                                        throws Error;
 
         public abstract void add_idle_watch
                                        (uint64   interval,
                                         out uint id)
-                                        throws IOError;
+                                        throws Error;
 
         public abstract void add_user_active_watch (out uint id)
-                                        throws IOError;
+                                        throws Error;
 
         public abstract void remove_watch
                                        (uint id)
-                                        throws IOError;
+                                        throws Error;
 
         public signal void watch_fired (uint id);
     }
