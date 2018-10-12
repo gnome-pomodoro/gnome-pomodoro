@@ -1,27 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2014 Kamil Prusko <kamilprusko@gmail.com> -->
 <component type="desktop">
-  <id>org.gnomepomodoro.Pomodoro</id>
-  ​<launchable type="desktop-id">Pomodoro.desktop</launchable>
+  <id>org.gnome.Pomodoro</id>
+  ​<launchable type="desktop-id">org.gnome.Pomodoro.desktop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>Pomodoro</name>
   <summary>A time management utility for GNOME</summary>
   <description>
-    <p>Pomodoro is a GNOME utility that helps managing time according to the Pomodoro Technique.</p>
-    <p>The Pomodoro Technique is a time management method which intends to improve focus and quality of work by taking short breaks. Focus on your work for 25 minutes and then have a well deserved break for a few minutes. Clear your mind during the
-      break. When this cycle repeats for the fourth time you should take a longer break (have a walk or something).</p>
-    <p>This workflow can improve focus, physical health and mental agility depending on how you spend your breaks and how strictly you follow the routine.</p>
-    <p>Features:</p>
-    <ul>
-      <li>Customizability</li>
-      <li>Reminders</li>
-      <li>Keyboard shortcut</li>
-      <li>Desktop integration (currently for GNOME Shell only)</li>
-      <li>Indicator</li>
-      <li>Fullscreen notifications</li>
-      <li>Presence awareness</li>
-    </ul>
+    <p>
+    A GNOME utility that helps managing time according to Pomodoro Technique.
+    It intends to improve productivity and focus by taking short breaks after
+    every 25 minutes of work.
+    </p>
   </description>
   <categories>
     <category>Utility</category>
