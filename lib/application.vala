@@ -284,6 +284,8 @@ namespace Pomodoro
             var adapter = new Gom.Adapter ();
 
             try {
+                file.get_parent ().make_directory_with_parents ();
+
                 /* Open database handle */
                 adapter.open_sync (file.get_uri ());
                 this.adapter = adapter;
