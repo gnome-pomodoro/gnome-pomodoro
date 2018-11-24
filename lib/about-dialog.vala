@@ -39,7 +39,7 @@ namespace Pomodoro
                 "Kamil Prusko <kamilprusko@gmail.com>"
             };
             this.translator_credits = _("translator-credits");
-            this.copyright = "Copyright \xc2\xa9 2011-2017 Arun Mahapatra, Kamil Prusko";
+            this.copyright = "Copyright \xc2\xa9 2011-2018 Arun Mahapatra, Kamil Prusko";
             this.license_type = Gtk.License.GPL_3_0;
 
             this.destroy_with_parent = true;

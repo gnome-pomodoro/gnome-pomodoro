@@ -1,3 +1,12 @@
+2018-11-24  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.14.0:
+
+	* Support for GNOME Shell 3.28 and 3.30 (@thanks aerostitch)
+	* Stats
+	* Background blur under the dialog during breaks
+	* Updated German translation (thanks @tsabsch)
+	* Updated Russian translation (thanks @tigertv)
+
 2017-11-20  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.13.4:
 
