@@ -260,7 +260,7 @@ namespace Pomodoro
         private void start_timeout ()
         {
             if (this.timeout_source == 0) {
-                this.timeout_source = GLib.Timeout.add (1000, this.on_timeout);
+                this.timeout_source = GLib.Timeout.add_seconds (1, this.on_timeout);
             }
         }
 
