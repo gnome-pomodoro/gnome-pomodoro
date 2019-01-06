@@ -87,24 +87,7 @@ namespace Pomodoro
 
             this.target.get_property (this.property_name, ref begin_value);
 
-            this.value_from = begin_value.get_double ();
-            this.func       = Animation.get_func (mode);
-            this.timestamp  = GLib.get_real_time () / 1000;
-
-            if (this.timeout_id != 0) {
-                GLib.Source.remove (this.timeout_id);
-                this.timeout_id = 0;
-            }
-
-            if (this.duration > 0 && this.value_from != this.value_to) {
-                this.timeout_id = GLib.Timeout.add (
-                                    uint.min (1000 / this.frames_per_second, this.duration),
-                                    (GLib.SourceFunc) this.on_timeout);
-                this.progress   = 0.0;
-            }
-            else {
-                this.progress   = 1.0;
-            }
+            this.start_with_value (begin_value.get_double ());
         }
 
         // TODO: it's so hackish...
@@ -112,7 +95,7 @@ namespace Pomodoro
         {
             this.value_from = value_from;
             this.func       = Animation.get_func (mode);
-            this.timestamp  = GLib.get_real_time () / 1000;
+            this.timestamp  = GLib.get_monotonic_time () / 1000;
 
             if (this.timeout_id != 0) {
                 GLib.Source.remove (this.timeout_id);
@@ -147,7 +130,7 @@ namespace Pomodoro
 
         private bool on_timeout ()
         {
-            var current_timestamp = GLib.get_real_time () / 1000;
+            var current_timestamp = GLib.get_monotonic_time () / 1000;
 
             this.progress  = (this.duration > 0)
                 ? ((double)(current_timestamp - this.timestamp) / this.duration).clamp (0.0, 1.0)
