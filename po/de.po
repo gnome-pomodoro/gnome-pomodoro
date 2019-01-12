@@ -193,7 +193,7 @@ msgstr "Zurück"
 #: data/resources/screen-notification.ui:89
 #: plugins/gnome/extension/dialogs.js:591
 msgid "It's time to take a break"
-msgstr "Es ist Zeit eine Pause einzulegen"
+msgstr "Es ist Zeit, eine Pause einzulegen"
 
 #: data/resources/stats-view.ui:28
 msgid "Nothing to see yet"
@@ -561,11 +561,11 @@ msgstr "Lautstärke:"
 
 #: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:403
 msgid "Clock Ticking"
-msgstr "Uhr ticken"
+msgstr "Uhrticken"
 
 #: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:404
 msgid "Timer Ticking"
-msgstr "Stoppuhr ticken"
+msgstr "Stoppuhrticken"
 
 #: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:405
 msgid "Woodland Birds"
