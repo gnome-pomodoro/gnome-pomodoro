@@ -284,7 +284,12 @@ namespace Pomodoro
             var adapter = new Gom.Adapter ();
 
             try {
-                file.get_parent ().make_directory_with_parents ();
+                try {
+                    file.get_parent ().make_directory_with_parents ();
+                }
+                catch (GLib.Error error) {
+                    GLib.debug ("Failed to create directory: %s", error.message);
+                }
 
                 /* Open database handle */
                 adapter.open_sync (file.get_uri ());
@@ -298,7 +303,7 @@ namespace Pomodoro
 //                 var object_types = new GLib.List<GLib.Type> ();
 //                 object_types.prepend (typeof (Pomodoro.Entry));
 //                 object_types.prepend (typeof (Pomodoro.AggregatedEntry));
-//                
+//
 //                 repository.automatic_migrate_sync (Pomodoro.Application.REPOSITORY_VERSION,
 //                                                    (owned) object_types);
 
