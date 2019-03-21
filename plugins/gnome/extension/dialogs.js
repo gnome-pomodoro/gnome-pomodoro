@@ -162,14 +162,12 @@ var BlurEffect = new Lang.Class({
 });
 
 
-var BlurredLightbox = new Lang.Class({
-    Name: 'PomodoroBlurredLightbox',
-    Extends: Lightbox.Lightbox,
+var BlurredLightbox = class extends Lightbox.Lightbox {
 
-    _init(container, params) {
+    constructor(container, params) {
         params.radialEffect = false;
 
-        this.parent(container, params);
+        super(container, params);
 
         if (Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL)) {
             // TODO: Try consolidate these effects into one
@@ -192,7 +190,7 @@ var BlurredLightbox = new Lang.Class({
         }
 
         this.actor.add_style_class_name('extension-pomodoro-lightbox');
-    },
+    }
 
     show(fadeInTime) {
         fadeInTime = fadeInTime || 0;
@@ -225,7 +223,7 @@ var BlurredLightbox = new Lang.Class({
         }
 
         this.actor.show();
-    },
+    }
 
     hide(fadeOutTime) {
         fadeOutTime = fadeOutTime || 0;
@@ -257,7 +255,7 @@ var BlurredLightbox = new Lang.Class({
                              });
         }
     }
-});
+};
 
 
 /**
