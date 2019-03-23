@@ -63,12 +63,10 @@ var IndicatorType = {
 };
 
 
-var IndicatorMenu = new Lang.Class({
-    Name: 'PomodoroIndicatorMenu',
-    Extends: PopupMenu.PopupMenu,
+var IndicatorMenu = class extends PopupMenu.PopupMenu {
 
-    _init(indicator) {
-        this.parent(indicator.actor, St.Align.START, St.Side.TOP);
+    constructor(indicator) {
+        super(indicator.actor, St.Align.START, St.Side.TOP);
 
         this._isPaused = null;
         this._timerState = null;
@@ -81,7 +79,7 @@ var IndicatorMenu = new Lang.Class({
         this.indicator = indicator;
 
         this._populate();
-    },
+    }
 
     _createActionButton(iconName, accessibleName) {
         let button = new St.Button({ reactive: true,
@@ -91,7 +89,7 @@ var IndicatorMenu = new Lang.Class({
                                      style_class: 'system-menu-action extension-pomodoro-indicator-menu-action' });
         button.child = new St.Icon({ icon_name: iconName });
         return button;
-    },
+    }
 
     _onTimerClicked() {
         this.close();
@@ -100,19 +98,19 @@ var IndicatorMenu = new Lang.Class({
             Extension.extension.dialog.open(true);
             Extension.extension.dialog.pushModal();
         }
-    },
+    }
 
     _onStartClicked() {
         this.indicator.timer.start();
 
         this.close();
-    },
+    }
 
     _onStopClicked() {
         this.indicator.timer.stop();
 
         this.close();
-    },
+    }
 
     _onPauseClicked() {
         if (!this.indicator.timer.isPaused ()) {
@@ -123,7 +121,7 @@ var IndicatorMenu = new Lang.Class({
 
             this.close();
         }
-    },
+    }
 
     _populate() {
         let toggleItem = new PopupMenu.PopupMenuItem(_("Pomodoro Timer"),
@@ -182,7 +180,7 @@ var IndicatorMenu = new Lang.Class({
         this.addAction(_("Preferences"), this._activatePreferences.bind(this));
         this.addAction(_("Stats"), this._activateStats.bind(this));
         this.addAction(_("Quit"), this._activateQuit.bind(this));
-    },
+    }
 
     addStateMenuItem(name, label) {
         if (!this._stateItems) {
@@ -198,7 +196,7 @@ var IndicatorMenu = new Lang.Class({
         this._stateItems[name] = menuItem;
 
         return menuItem;
-    },
+    }
 
     _onActorMapped(actor) {
         if (actor.mapped && this._timerUpdateId == 0) {
@@ -210,7 +208,7 @@ var IndicatorMenu = new Lang.Class({
             this.indicator.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
         }
-    },
+    }
 
     _onTimerUpdate() {
         let timer = this.indicator.timer;
@@ -253,7 +251,7 @@ var IndicatorMenu = new Lang.Class({
         }
 
         this.timerLabel.set_text(this._formatTime(remaining));
-    },
+    }
 
     _formatTime(remaining) {
         if (remaining < 0.0) {
@@ -264,27 +262,27 @@ var IndicatorMenu = new Lang.Class({
         let seconds = Math.floor(remaining % 60);
 
         return '%02d:%02d'.format(minutes, seconds);
-    },
+    }
 
     _activateStats() {
         let timestamp = global.get_current_time();
 
         this.indicator.timer.showMainWindow('stats', timestamp);
-    },
+    }
 
     _activatePreferences() {
         let timestamp = global.get_current_time();
 
         this.indicator.timer.showPreferences(timestamp);
-    },
+    }
 
     _activateQuit() {
         this.indicator.timer.quit();
-    },
+    }
 
     _activateState(stateName) {
         this.indicator.timer.setState(stateName);
-    },
+    }
 
     destroy() {
         if (this._timerUpdateId) {
@@ -299,9 +297,9 @@ var IndicatorMenu = new Lang.Class({
 
         this.indicator = null;
 
-        this.parent();
+        super.destroy();
     }
-});
+};
 
 
 var TextIndicator = new Lang.Class({
@@ -536,7 +534,7 @@ var IconIndicator = new Lang.Class({
 
         this.timer = timer;
 
-        this.actor = new Shell.GenericContainer({ reactive: true });
+        this.actor = new St.Widget({ reactive: true });
         this.actor._delegate = this;
 
         this.icon = new St.DrawingArea({ style_class: 'system-status-icon' });
@@ -545,9 +543,6 @@ var IconIndicator = new Lang.Class({
         this.icon.connect('destroy', this._onIconDestroy.bind(this));
         this.actor.add_child(this.icon);
 
-        this.actor.connect('get-preferred-width', this._getPreferredWidth.bind(this));
-        this.actor.connect('get-preferred-height', this._getPreferredHeight.bind(this));
-        this.actor.connect('allocate', this._allocate.bind(this));
         this.actor.connect('style-changed', this._onStyleChanged.bind(this));
         this.actor.connect('destroy', this._onActorDestroy.bind(this));
 
@@ -629,7 +624,7 @@ var IconIndicator = new Lang.Class({
         this._minVPadding = themeNode.get_length('-minimum-vpadding');
         this._natVPadding = themeNode.get_length('-natural-vpadding');
 
-        let color = themeNode.get_foreground_color()
+        let color = themeNode.get_foreground_color();
         this._primaryColor = color;
         this._secondaryColor = new Clutter.Color({
             red: color.red,
@@ -745,6 +740,7 @@ var Indicator = new Lang.Class({
 
         this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
         this._hbox.pack_start = true;
+        this._hbox.set_y_align(Clutter.ActorAlign.CENTER);
         this._hbox.add_child(this._arrow);
         this.actor.add_child(this._hbox);
 
