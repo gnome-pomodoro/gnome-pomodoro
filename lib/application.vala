@@ -66,7 +66,7 @@ namespace Pomodoro
             FAILURE   =  1
         }
 
-        private struct Options
+        private class Options
         {
             public static bool no_default_window = false;
             public static bool preferences = false;
@@ -146,7 +146,7 @@ namespace Pomodoro
 
         public unowned Gtk.Window get_last_focused_window ()
         {
-            unowned List<weak Gtk.Window> windows = this.get_windows ();
+            unowned List<Gtk.Window> windows = this.get_windows ();
 
             return windows != null
                     ? windows.first ().data
