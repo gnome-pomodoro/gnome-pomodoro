@@ -302,10 +302,12 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
 };
 
 
-var TextIndicator = new Lang.Class({
-    Name: 'PomodoroTextIndicator',
+var TextIndicator = GObject.registerClass(
+class PomodoroTextIndicator extends GObject.Object {
 
     _init(timer) {
+        super._init();
+
         this._initialized     = false;
         this._state           = Timer.State.NULL;
         this._minHPadding     = 0;
@@ -316,7 +318,7 @@ var TextIndicator = new Lang.Class({
 
         this.timer = timer;
 
-        this.actor = new Shell.GenericContainer({ reactive: true });
+        this.actor = new St.Widget({ reactive: true });
         this.actor._delegate = this;
 
         this.label = new St.Label({ style_class: 'system-status-label',
@@ -333,9 +335,6 @@ var TextIndicator = new Lang.Class({
             });
         this.actor.add_child(this.label);
 
-        this.actor.connect('get-preferred-width', this._getPreferredWidth.bind(this));
-        this.actor.connect('get-preferred-height', this._getPreferredHeight.bind(this));
-        this.actor.connect('allocate', this._allocate.bind(this));
         this.actor.connect('style-changed', this._onStyleChanged.bind(this));
         this.actor.connect('destroy', this._onActorDestroy.bind(this));
 
@@ -352,7 +351,7 @@ var TextIndicator = new Lang.Class({
         else {
             this.actor.set_opacity(FADE_OUT_OPACITY * 255);
         }
-    },
+    }
 
     _onStyleChanged(actor) {
         let themeNode = actor.get_theme_node();
@@ -364,46 +363,12 @@ var TextIndicator = new Lang.Class({
         this._natHPadding = themeNode.get_length('-natural-hpadding');
         this._digitWidth  = metrics.get_approximate_digit_width() / Pango.SCALE;
         this._charWidth   = metrics.get_approximate_char_width() / Pango.SCALE;
-    },
+    }
 
     _getWidth() {
         return Math.ceil(4 * this._digitWidth + 0.5 * this._charWidth);
-    },
+    }
 
-    _getPreferredWidth(actor, forHeight, alloc) {
-        let child        = actor.get_first_child();
-        let minWidth     = this._getWidth();
-        let naturalWidth = minWidth;
-
-        minWidth     += 2 * this._minHPadding;
-        naturalWidth += 2 * this._natHPadding;
-
-        if (child) {
-            [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
-        }
-        else {
-            alloc.min_size = alloc.natural_size = 0;
-        }
-
-        if (alloc.min_size < minWidth) {
-            alloc.min_size = minWidth;
-        }
-
-        if (alloc.natural_size < naturalWidth) {
-            alloc.natural_size = naturalWidth;
-        }
-    },
-
-    _getPreferredHeight(actor, forWidth, alloc) {
-        let child = actor.get_first_child();
-
-        if (child) {
-            [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
-        }
-        else {
-            alloc.min_size = alloc.natural_size = 0;
-        }
-    },
 
     _getText(state, remaining) {
         if (remaining < 0.0) {
@@ -414,7 +379,7 @@ var TextIndicator = new Lang.Class({
         let seconds = Math.floor(remaining % 60);
 
         return '%02d:%02d'.format(minutes, seconds);
-    },
+    }
 
     _onTimerUpdate() {
         let state = this.timer.getState();
@@ -437,34 +402,10 @@ var TextIndicator = new Lang.Class({
             }
         }
 
+        //log("Label value = " + this._getText(state, remaining));
         this.label.set_text(this._getText(state, remaining));
-    },
+    }
 
-    _allocate(actor, box, flags) {
-        let child = actor.get_first_child();
-        if (!child)
-            return;
-
-        let [minWidth, natWidth] = child.get_preferred_width(-1);
-
-        let availWidth  = box.x2 - box.x1;
-        let availHeight = box.y2 - box.y1;
-
-        let childBox = new Clutter.ActorBox();
-        childBox.y1 = 0;
-        childBox.y2 = availHeight;
-
-        if (natWidth + 2 * this._natHPadding <= availWidth) {
-            childBox.x1 = this._natHPadding;
-            childBox.x2 = availWidth - this._natHPadding;
-        }
-        else {
-            childBox.x1 = this._minHPadding;
-            childBox.x2 = availWidth - this._minHPadding;
-        }
-
-        child.allocate(childBox, flags);
-    },
 
     _onActorDestroy() {
         if (this._onTimerUpdateId) {
@@ -475,7 +416,7 @@ var TextIndicator = new Lang.Class({
         this.actor._delegate = null;
 
         this.emit('destroy');
-    },
+    }
 
     destroy() {
         this.actor.destroy();
@@ -484,20 +425,19 @@ var TextIndicator = new Lang.Class({
 Signals.addSignalMethods(TextIndicator.prototype);
 
 
-var ShortTextIndicator = new Lang.Class({
-    Name: 'PomodoroShortTextIndicator',
-    Extends: TextIndicator,
+var ShortTextIndicator = GObject.registerClass(
+class PomodoroShortTextIndicator extends TextIndicator {
 
     _init(timer) {
-        this.parent(timer);
+        super._init(timer);
 
         this.label.set_x_align(Clutter.ActorAlign.END);
-    },
+    }
 
     _getWidth() {
         return Math.ceil(2 * this._digitWidth +
                          1 * this._charWidth);
-    },
+    }
 
     _getText(state, remaining) {
         if (remaining < 0.0) {
@@ -517,11 +457,12 @@ var ShortTextIndicator = new Lang.Class({
     }
 });
 
-
-var IconIndicator = new Lang.Class({
-    Name: 'PomodoroIconIndicator',
+var IconIndicator = GObject.registerClass(
+class PomodoroIconIndicator extends GObject.Object {
 
     _init(timer) {
+        super._init();
+
         this._state           = Timer.State.NULL;
         this._progress        = 0.0;
         this._minHPadding     = 0;
@@ -551,7 +492,7 @@ var IconIndicator = new Lang.Class({
         this._onTimerUpdate();
 
         this._state = this.timer.getState();
-    },
+    }
 
     _onIconStyleChanged(actor) {
         let themeNode = actor.get_theme_node();
@@ -561,7 +502,7 @@ var IconIndicator = new Lang.Class({
         [actor.min_height, actor.natural_height] = themeNode.adjust_preferred_height(size, size);
 
         this._iconSize = size;
-    },
+    }
 
     _onIconRepaint(area) {
         let cr = area.get_context();
@@ -607,14 +548,14 @@ var IconIndicator = new Lang.Class({
         }
 
         cr.$dispose();
-    },
+    }
 
     _onIconDestroy() {
         if (this._timerUpdateId) {
             this.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
         }
-    },
+    }
 
     _onStyleChanged(actor) {
         let themeNode = actor.get_theme_node();
@@ -632,35 +573,8 @@ var IconIndicator = new Lang.Class({
             blue: color.blue,
             alpha: color.alpha * FADE_OUT_OPACITY
         });
-    },
+    }
 
-    _getPreferredWidth(actor, forHeight, alloc) {
-        let child = actor.get_first_child();
-
-        if (child) {
-            [alloc.min_size, alloc.natural_size] = child.get_preferred_width(-1);
-        }
-        else {
-            alloc.min_size = alloc.natural_size = 0;
-        }
-
-        alloc.min_size += 2 * this._minHPadding;
-        alloc.natural_size += 2 * this._natHPadding;
-    },
-
-    _getPreferredHeight(actor, forWidth, alloc) {
-        let child = actor.get_first_child();
-
-        if (child) {
-            [alloc.min_size, alloc.natural_size] = child.get_preferred_height(-1);
-        }
-        else {
-            alloc.min_size = alloc.natural_size = 0;
-        }
-
-        alloc.min_size += 2 * this._minVPadding;
-        alloc.natural_size += 2 * this._natVPadding;
-    },
 
     _onTimerUpdate() {
         let state = this.timer.getState();
@@ -671,34 +585,8 @@ var IconIndicator = new Lang.Class({
             this._progress = progress;
             this.icon.queue_repaint();
         }
-    },
+    }
 
-    _allocate(actor, box, flags) {
-        let child = actor.get_first_child();
-        if (!child) {
-            return;
-        }
-
-        let availWidth  = box.x2 - box.x1;
-        let availHeight = box.y2 - box.y1;
-
-        let [minWidth, natWidth] = child.get_preferred_width(availHeight);
-
-        let childBox = new Clutter.ActorBox();
-        childBox.y1 = 0;
-        childBox.y2 = availHeight;
-
-        if (natWidth + 2 * this._natHPadding <= availWidth) {
-            childBox.x1 = this._natHPadding;
-            childBox.x2 = availWidth - this._natHPadding;
-        }
-        else {
-            childBox.x1 = this._minHPadding;
-            childBox.x2 = availWidth - this._minHPadding;
-        }
-
-        child.allocate(childBox, flags);
-    },
 
     _onActorDestroy() {
         if (this._timerUpdateId) {
@@ -712,7 +600,7 @@ var IconIndicator = new Lang.Class({
         this.actor._delegate = null;
 
         this.emit('destroy');
-    },
+    }
 
     destroy() {
         this.actor.destroy();
@@ -721,12 +609,11 @@ var IconIndicator = new Lang.Class({
 Signals.addSignalMethods(IconIndicator.prototype);
 
 
-var Indicator = new Lang.Class({
-    Name: 'PomodoroIndicator',
-    Extends: PanelMenu.Button,
+var Indicator = GObject.registerClass(
+class Indicator extends PanelMenu.Button {
 
     _init(timer, type) {
-        this.parent(St.Align.START, _("Pomodoro"), true);
+        super._init(St.Align.START, _("Pomodoro"), true);
 
         this.timer  = timer;
         this.widget = null;
@@ -751,7 +638,7 @@ var Indicator = new Lang.Class({
 
         this._timerPausedId = this.timer.connect('paused', this._onTimerPaused.bind(this));
         this._timerResumedId = this.timer.connect('resumed', this._onTimerResumed.bind(this));
-    },
+    }
 
     setType(type) {
         if (this.widget) {
@@ -779,7 +666,7 @@ var Indicator = new Lang.Class({
                                         GObject.BindingFlags.SYNC_CREATE);
 
         this._hbox.add_child(this.widget.actor);
-    },
+    }
 
     _onBlinked() {
         this._blinking = false;
@@ -787,7 +674,7 @@ var Indicator = new Lang.Class({
         if (this.timer.isPaused()) {
             this._blink();
         }
-    },
+    }
 
     _blink() {
         if (!this._blinking) {
@@ -833,11 +720,11 @@ var Indicator = new Lang.Class({
                     });
             }
         }
-    },
+    }
 
     _onTimerPaused() {
         this._blink();
-    },
+    }
 
     _onTimerResumed() {
         if (this._blinking) {
@@ -861,7 +748,7 @@ var Indicator = new Lang.Class({
                 this._blinkTimeoutSource = 0;
             }
         }
-    },
+    }
 
     _onActorDestroy() {
         Tweener.removeTweens(this._hbox);
@@ -881,9 +768,9 @@ var Indicator = new Lang.Class({
             this.icon.destroy();
             this.icon = null;
         }
-    },
+    }
 
     destroy() {
-        this.parent();
+        super.destroy();
     }
 });
