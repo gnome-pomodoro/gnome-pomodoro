@@ -1,4 +1,9 @@
 2019-04-07  Arun Mahapatra <pratikarun@gmail.com>
+        Release version 0.15.1:
+
+        * Minor code cleanups
+
+2019-04-07  Arun Mahapatra <pratikarun@gmail.com>
         Release version 0.15.0:
 
         * Minor code cleanups to support ES6 syntax
