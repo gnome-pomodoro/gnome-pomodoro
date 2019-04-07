@@ -749,8 +749,8 @@ namespace Pomodoro
     [GtkTemplate (ui = "/org/gnome/pomodoro/preferences.ui")]
     public class PreferencesDialog : Gtk.ApplicationWindow, Gtk.Buildable
     {
-        private const int FIXED_WIDTH = 600;
-        private const int FIXED_HEIGHT = 720;
+        private const int DEFAULT_WIDTH = 600;
+        private const int DEFAULT_HEIGHT = 720;
 
         private const GLib.ActionEntry[] ACTION_ENTRIES = {
             { "back", on_back_activate }
@@ -781,16 +781,14 @@ namespace Pomodoro
             PreferencesDialog.instance = this;
 
             var geometry = Gdk.Geometry () {
-                min_width = FIXED_WIDTH,
-                max_width = FIXED_WIDTH,
+                min_width = DEFAULT_WIDTH,
+                max_width = -1,
                 min_height = 300,
-                max_height = 1500
+                max_height = -1
             };
-            var geometry_hints = Gdk.WindowHints.MAX_SIZE |
-                                 Gdk.WindowHints.MIN_SIZE;
             this.set_geometry_hints (this,
                                      geometry,
-                                     geometry_hints);
+                                     Gdk.WindowHints.MIN_SIZE);
 
             this.pages = new GLib.HashTable<string, PageMeta?> (str_hash, str_equal);
 
@@ -861,29 +859,32 @@ namespace Pomodoro
 
         private void on_visible_child_notify ()
         {
-            var page_height = 0;
+            var window_width = 0;
+            var window_height = 0;
             var header_bar_height = 0;
-
+            var page_height = 0;
             var page = this.stack.visible_child as Pomodoro.PreferencesPage;
 
             this.on_page_notify (page);
+
+            this.get_size (out window_width, out window_height);
 
             /* calculate window size */
             this.header_bar.get_preferred_height (null,
                                                   out header_bar_height);
 
-            page.get_preferred_height_for_width (FIXED_WIDTH,
+            page.get_preferred_height_for_width (window_width,
                                                  null,
                                                  out page_height);
 
             if (page is Gtk.ScrolledWindow) {
                 var scrolled_window = page as Gtk.ScrolledWindow;
-                scrolled_window.set_min_content_height (int.min (page_height, FIXED_HEIGHT));
+                scrolled_window.set_min_content_height (int.min (page_height, DEFAULT_HEIGHT));
 
-                this.resize (FIXED_WIDTH, header_bar_height + FIXED_HEIGHT);
+                this.resize (window_width, header_bar_height + DEFAULT_HEIGHT);
             }
             else {
-                this.resize (FIXED_WIDTH, header_bar_height + page_height);
+                this.resize (window_width, header_bar_height + page_height);
             }
         }
 
