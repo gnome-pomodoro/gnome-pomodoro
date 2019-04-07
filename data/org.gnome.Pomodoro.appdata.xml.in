@@ -19,15 +19,15 @@
   </categories>
   <screenshots>
     <screenshot type="default">
-      <image>http://gnomepomodoro.org/release/0.12/window.png</image>
+      <image>http://gnomepomodoro.org/release/0.14/window.png</image>
       <caption>Timer window</caption>
     </screenshot>
     <screenshot>
-      <image>http://gnomepomodoro.org/release/0.12/preferences.png</image>
+      <image>http://gnomepomodoro.org/release/0.14/preferences.png</image>
       <caption>Preferences</caption>
     </screenshot>
     <screenshot>
-      <image>http://gnomepomodoro.org/release/0.12/indicator.png</image>
+      <image>http://gnomepomodoro.org/release/0.14/indicator.png</image>
       <caption>Indicator for GNOME Shell</caption>
     </screenshot>
   </screenshots>
