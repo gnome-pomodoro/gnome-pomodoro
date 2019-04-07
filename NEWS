@@ -1,3 +1,12 @@
+2019-04-07  Arun Mahapatra <pratikarun@gmail.com>
+        Release version 0.15.0:
+
+        * Minor code cleanups to support ES6 syntax
+        * Support for GNOME Shell 3.32 (thanks @demokritos)
+        * Fix for build with vala 0.44.1 (thanks @snizovtsev)
+        * Updated German translation (thanks @c7hm4r)
+        * Fix for handle error recreating existing folder (thanks @Rj7)
+
 2018-11-24  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.14.0:
 

@@ -1,6 +1,6 @@
 AC_PREREQ([2.69])
 AC_INIT([gnome-pomodoro],
-        [0.14.1],
+        [0.15.0],
         [https://github.com/codito/gnome-pomodoro/issues],
         [gnome-pomodoro],
         [http://gnomepomodoro.org])
