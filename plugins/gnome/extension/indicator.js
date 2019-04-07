@@ -402,7 +402,6 @@ class PomodoroTextIndicator extends GObject.Object {
             }
         }
 
-        //log("Label value = " + this._getText(state, remaining));
         this.label.set_text(this._getText(state, remaining));
     }
 
@@ -610,7 +609,7 @@ Signals.addSignalMethods(IconIndicator.prototype);
 
 
 var Indicator = GObject.registerClass(
-class Indicator extends PanelMenu.Button {
+class PomodoroIndicator extends PanelMenu.Button {
 
     _init(timer, type) {
         super._init(St.Align.START, _("Pomodoro"), true);
