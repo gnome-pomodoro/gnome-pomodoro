@@ -94,7 +94,7 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_bindir}/gnome-pomodoro
 %{_libdir}/gnome-pomodoro
 %{_libdir}/libgnome-pomodoro.so*
-%{_datadir}/appdata/org.gnome.Pomodoro.appdata.xml
+%{_datadir}/metainfo/org.gnome.Pomodoro.appdata.xml
 %{_datadir}/applications/org.gnome.Pomodoro.desktop
 %{_datadir}/dbus-1/services/org.gnome.Pomodoro.service
 %{_datadir}/glib-2.0/schemas/org.gnome.pomodoro.*

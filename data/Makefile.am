@@ -41,7 +41,7 @@ CLEANFILES = \
 	$(service_DATA)
 
 AM_DISTCHECK_CONFIGURE_FLAGS = \
-	--enable-appdata-check
+	--enable-appstream-util
 
 check-local: $(desktop_DATA)
 	$(DESKTOP_FILE_VALIDATE) $(desktop_DATA)
