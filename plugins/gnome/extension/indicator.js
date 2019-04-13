@@ -18,7 +18,6 @@
  *          Kamil Prusko <kamilprusko@gmail.com>
  */
 
-const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 const Cairo = imports.cairo;
 const Signals = imports.signals;
@@ -64,7 +63,6 @@ var IndicatorType = {
 
 
 var IndicatorMenu = class extends PopupMenu.PopupMenu {
-
     constructor(indicator) {
         super(indicator.actor, St.Align.START, St.Side.TOP);
 
@@ -302,12 +300,8 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
 };
 
 
-var TextIndicator = GObject.registerClass(
-class PomodoroTextIndicator extends GObject.Object {
-
-    _init(timer) {
-        super._init();
-
+var TextIndicator = class {
+    constructor(timer) {
         this._initialized     = false;
         this._state           = Timer.State.NULL;
         this._minHPadding     = 0;
@@ -369,7 +363,6 @@ class PomodoroTextIndicator extends GObject.Object {
         return Math.ceil(4 * this._digitWidth + 0.5 * this._charWidth);
     }
 
-
     _getText(state, remaining) {
         if (remaining < 0.0) {
             remaining = 0.0;
@@ -405,7 +398,6 @@ class PomodoroTextIndicator extends GObject.Object {
         this.label.set_text(this._getText(state, remaining));
     }
 
-
     _onActorDestroy() {
         if (this._onTimerUpdateId) {
             this.timer.disconnect(this._onTimerUpdateId);
@@ -420,15 +412,13 @@ class PomodoroTextIndicator extends GObject.Object {
     destroy() {
         this.actor.destroy();
     }
-});
+};
 Signals.addSignalMethods(TextIndicator.prototype);
 
 
-var ShortTextIndicator = GObject.registerClass(
-class PomodoroShortTextIndicator extends TextIndicator {
-
-    _init(timer) {
-        super._init(timer);
+var ShortTextIndicator = class extends TextIndicator {
+    constructor(timer) {
+        super(timer);
 
         this.label.set_x_align(Clutter.ActorAlign.END);
     }
@@ -454,14 +444,10 @@ class PomodoroShortTextIndicator extends TextIndicator {
                 ? "%d′".format(minutes, remaining)
                 : "%d″".format(seconds, remaining);
     }
-});
+};
 
-var IconIndicator = GObject.registerClass(
-class PomodoroIconIndicator extends GObject.Object {
-
-    _init(timer) {
-        super._init();
-
+var IconIndicator = class {
+    constructor(timer) {
         this._state           = Timer.State.NULL;
         this._progress        = 0.0;
         this._minHPadding     = 0;
@@ -604,15 +590,13 @@ class PomodoroIconIndicator extends GObject.Object {
     destroy() {
         this.actor.destroy();
     }
-});
+};
 Signals.addSignalMethods(IconIndicator.prototype);
 
 
-var Indicator = GObject.registerClass(
-class PomodoroIndicator extends PanelMenu.Button {
-
-    _init(timer, type) {
-        super._init(St.Align.START, _("Pomodoro"), true);
+var Indicator = class extends PanelMenu.Button {
+    constructor(timer, type) {
+        super(St.Align.START, _("Pomodoro"), true);
 
         this.timer  = timer;
         this.widget = null;
@@ -772,4 +756,4 @@ class PomodoroIndicator extends PanelMenu.Button {
     destroy() {
         super.destroy();
     }
-});
+};

@@ -18,7 +18,6 @@
  *
  */
 
-const Lang = imports.lang;
 const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 
@@ -66,7 +65,6 @@ function getDefaultSource() {
 
 
 var Source = class extends MessageTray.Source {
-
     constructor() {
         let icon_name = 'gnome-pomodoro';
 
@@ -154,7 +152,6 @@ var Source = class extends MessageTray.Source {
 
 
 var Notification = class extends MessageTray.Notification {
-
     constructor(title, description, params) {
         super(null, title, description, params);
 
@@ -203,7 +200,6 @@ var Notification = class extends MessageTray.Notification {
 
 
 var PomodoroStartNotification = class extends Notification {
-
     /**
      * Notification pops up a little before Pomodoro starts and changes message once started.
      */
@@ -351,7 +347,6 @@ var PomodoroStartNotification = class extends Notification {
 
 
 var PomodoroEndNotification = class extends Notification {
-
     constructor(timer) {
         let title = '';
 
@@ -484,7 +479,6 @@ var PomodoroEndNotification = class extends Notification {
 
 
 var ScreenShieldNotification = class extends Notification {
-
     constructor(timer) {
         super('', null, null);
 
@@ -600,7 +594,6 @@ var ScreenShieldNotification = class extends Notification {
 
 
 var IssueNotification = class extends MessageTray.Notification {
-
     /* Use base class instead of PomodoroNotification, in case
      * issue is caused by our implementation.
      */
@@ -632,7 +625,6 @@ var IssueNotification = class extends MessageTray.Notification {
 
 
 var TimerBanner = class extends Calendar.NotificationMessage {
-
     constructor(notification) {
         super(notification);
 

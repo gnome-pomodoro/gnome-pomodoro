@@ -17,7 +17,6 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-const Lang = imports.lang;
 const Signals = imports.signals;
 
 const Gio = imports.gi.Gio;
@@ -53,10 +52,8 @@ var State = {
 };
 
 
-var Timer = new Lang.Class({
-    Name: 'PomodoroTimer',
-
-    _init() {
+var Timer = class {
+    constructor() {
         this._connected = false;
         this._state = null;
         this._isPaused = null;
@@ -75,21 +72,21 @@ var Timer = new Lang.Class({
                                        Gio.BusNameWatcherFlags.AUTO_START,
                                        this._onNameAppeared.bind(this),
                                        this._onNameVanished.bind(this));
-    },
+    }
 
     _onNameAppeared() {
         this._connected = true;
 
         this.emit('service-connected');
         this.emit('update');
-    },
+    }
 
     _onNameVanished() {
         this._connected = false;
 
         this.emit('update');
         this.emit('service-disconnected');
-    },
+    }
 
     _onPropertiesChanged(proxy, properties) {
         let state = proxy.State;
@@ -114,14 +111,14 @@ var Timer = new Lang.Class({
         }
 
         this.emit('update');
-    },
+    }
 
     _onInit(proxy, error) {
         if (error) {
             Utils.logWarning(error.message);
             this._notifyServiceNotInstalled();
         }
-    },
+    }
 
     _onCallback(result, error) {
         if (error) {
@@ -131,7 +128,7 @@ var Timer = new Lang.Class({
                 this._notifyServiceNotInstalled();
             }
         }
-    },
+    }
 
     getState() {
         if (!this._connected || this._proxy.State === null) {
@@ -139,37 +136,37 @@ var Timer = new Lang.Class({
         }
 
         return this._proxy.State;
-    },
+    }
 
     setState(state, timestamp) {
         this._proxy.SetStateRemote(state,
                                    timestamp || 0,
                                    this._onCallback.bind(this));
-    },
+    }
 
     getStateDuration() {
         return this._proxy.StateDuration;
-    },
+    }
 
     setStateDuration(duration) {
         this._proxy.SetStateDurationRemote(this._proxy.State,
                                            duration,
                                            this._onCallback.bind(this));
-    },
+    }
 
     get stateDuration() {
         return this._proxy.StateDuration;
-    },
+    }
 
     set stateDuration(value) {
         this._proxy.SetStateDurationRemote(this._proxy.State,
                                            value,
                                            this._onCallback.bind(this));
-    },
+    }
 
     getElapsed() {
         return this._proxy.Elapsed;
-    },
+    }
 
     getRemaining() {
         let state = this.getState();
@@ -179,41 +176,41 @@ var Timer = new Lang.Class({
         }
 
         return Math.ceil(this._proxy.StateDuration - this._proxy.Elapsed);
-    },
+    }
 
     getProgress() {
         return (this._connected && this._proxy.StateDuration > 0)
                 ? this._proxy.Elapsed / this._proxy.StateDuration
                 : 0.0;
-    },
+    }
 
     isPaused() {
         return this._connected && this._proxy.IsPaused;
-    },
+    }
 
     start() {
         this._proxy.StartRemote(this._onCallback.bind(this));
-    },
+    }
 
     stop() {
         this._proxy.StopRemote(this._onCallback.bind(this));
-    },
+    }
 
     pause() {
         this._proxy.PauseRemote(this._onCallback.bind(this));
-    },
+    }
 
     resume() {
         this._proxy.ResumeRemote(this._onCallback.bind(this));
-    },
+    }
 
     skip() {
         this._proxy.SkipRemote(this._onCallback.bind(this));
-    },
+    }
 
     reset() {
         this._proxy.ResetRemote(this._onCallback.bind(this));
-    },
+    }
 
     toggle() {
         if (this.getState() === State.NULL) {
@@ -222,31 +219,31 @@ var Timer = new Lang.Class({
         else {
             this.stop();
         }
-    },
+    }
 
     isBreak() {
         let state = this.getState();
 
         return state === State.SHORT_BREAK || state === State.LONG_BREAK;
-    },
+    }
 
     showMainWindow(timestamp) {
         this._proxy.ShowMainWindowRemote(timestamp, this._onCallback.bind(this));
-    },
+    }
 
     showPreferences(timestamp) {
         this._proxy.ShowPreferencesRemote(timestamp, this._onCallback.bind(this));
-    },
+    }
 
     quit() {
         this._proxy.QuitRemote((result, error) => {
             Utils.disableExtension(Config.EXTENSION_UUID);
         });
-    },
+    }
 
     _notifyServiceNotInstalled() {
         Extension.extension.notifyIssue(_("Failed to run <i>%s</i> service").format(Config.PACKAGE_NAME));
-    },
+    }
 
     destroy() {
         if (this._propertiesChangedId != 0) {
@@ -259,5 +256,5 @@ var Timer = new Lang.Class({
             this._nameWatcherId = 0;
         }
     }
-});
+};
 Signals.addSignalMethods(Timer.prototype);

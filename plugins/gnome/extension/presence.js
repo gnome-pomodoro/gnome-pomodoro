@@ -18,8 +18,6 @@
  *
  */
 
-const Lang = imports.lang;
-
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 
@@ -30,10 +28,8 @@ const Utils = Extension.imports.utils;
 /**
  * Helps in managing presence for GNOME Shell according to the Pomodoro state.
  */
-var Presence = new Lang.Class({
-    Name: 'PomodoroPresence',
-
-    _init() {
+var Presence = class {
+    constructor() {
         this._busy = false;
 
         // Setup a patch for suppressing presence handlers.
@@ -45,7 +41,7 @@ var Presence = new Lang.Class({
         });
         this._patch.connect('applied', this._onPatchApplied.bind(this));
         this._patch.connect('reverted', this._onPatchReverted.bind(this));
-    },
+    }
 
     setBusy(value) {
         this._busy = value;
@@ -56,13 +52,13 @@ var Presence = new Lang.Class({
         else {
             this._onPatchApplied();
         }
-    },
+    }
 
     setDefault() {
         if (this._patch.applied) {
             this._patch.revert();
         }
-    },
+    }
 
     _onPatchApplied() {
         try {
@@ -72,7 +68,7 @@ var Presence = new Lang.Class({
         catch (error) {
             Utils.logWarning(error.message);
         }
-    },
+    }
 
     _onPatchReverted() {
         try {
@@ -82,7 +78,7 @@ var Presence = new Lang.Class({
         catch (error) {
             Utils.logWarning(error.message);
         }
-    },
+    }
 
     destroy() {
         if (this._patch) {
@@ -90,4 +86,4 @@ var Presence = new Lang.Class({
             this._patch = null;
         }
     }
-});
+};

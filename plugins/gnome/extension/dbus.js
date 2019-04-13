@@ -18,7 +18,6 @@
  *
  */
 
-const Lang = imports.lang;
 const Signals = imports.signals;
 const Gio = imports.gi.Gio;
 
@@ -71,30 +70,28 @@ function Pomodoro(callback, cancellable) {
 }
 
 
-var PomodoroExtension = new Lang.Class({
-    Name: 'PomodoroExtensionDBus',
+var PomodoroExtension = class {
+    constructor() {
+        this.Capabilities = Capabilities.capabilities;
 
-    _init() {
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(PomodoroExtensionInterface, this);
         this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Pomodoro/Extension');
         this._dbusId = 0;
 
         this.initialized = false;
-    },
-
-    Capabilities: Capabilities.capabilities,
+    }
 
     _onNameAcquired(name) {
         this.initialized = true;
 
         this.emit('name-acquired');
-    },
+    }
 
     _onNameLost(name) {
         this.initialized = false;
 
         this.emit('name-lost');
-    },
+    }
 
     run() {
         if (this._dbusId == 0) {
@@ -103,7 +100,7 @@ var PomodoroExtension = new Lang.Class({
                                                      this._onNameAcquired.bind(this),
                                                      this._onNameLost.bind(this));
         }
-    },
+    }
 
     destroy() {
         this.disconnectAll();
@@ -114,5 +111,5 @@ var PomodoroExtension = new Lang.Class({
 
         this.emit('destroy');
     }
-});
+};
 Signals.addSignalMethods(PomodoroExtension.prototype);

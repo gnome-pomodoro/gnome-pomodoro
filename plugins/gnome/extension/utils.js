@@ -18,7 +18,6 @@
  *
  */
 
-const Lang = imports.lang;
 const Signals = imports.signals;
 
 const Shell = imports.gi.Shell;
@@ -36,10 +35,8 @@ const VIDEO_PLAYER_CATEGORIES = [
 ];
 
 
-var Patch = new Lang.Class({
-    Name: 'PomodoroPatch',
-
-    _init(object, overrides) {
+var Patch = class {
+    constructor(object, overrides) {
         this.object = object;
         this.overrides = overrides;
         this.initial = {};
@@ -52,7 +49,7 @@ var Patch = new Lang.Class({
                 logWarning('Property "%s" for %s is not defined'.format(name, this.object));
             }
         }
-    },
+    }
 
     apply() {
         if (!this.applied) {
@@ -64,7 +61,7 @@ var Patch = new Lang.Class({
 
             this.emit('applied');
         }
-    },
+    }
 
     revert() {
         if (this.applied) {
@@ -76,13 +73,13 @@ var Patch = new Lang.Class({
 
             this.emit('reverted');
         }
-    },
+    }
 
     destroy() {
         this.revert();
         this.disconnectAll();
     }
-});
+};
 Signals.addSignalMethods(Patch.prototype);
 
 
@@ -155,6 +152,7 @@ function versionCheck(required) {
 
     return false;
 }
+
 
 function disableExtension(uuid) {
     let enabledExtensions = global.settings.get_strv(ExtensionSystem.ENABLED_EXTENSIONS_KEY);
