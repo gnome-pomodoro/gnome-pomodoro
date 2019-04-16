@@ -594,9 +594,10 @@ var IconIndicator = class {
 Signals.addSignalMethods(IconIndicator.prototype);
 
 
-var Indicator = class extends PanelMenu.Button {
-    constructor(timer, type) {
-        super(St.Align.START, _("Pomodoro"), true);
+var Indicator = GObject.registerClass(
+class PomodoroIndicator extends PanelMenu.Button {
+    _init(timer, type) {
+        super._init(St.Align.START, _("Pomodoro"), true);
 
         this.timer  = timer;
         this.widget = null;
@@ -756,4 +757,4 @@ var Indicator = class extends PanelMenu.Button {
     destroy() {
         super.destroy();
     }
-};
+});
