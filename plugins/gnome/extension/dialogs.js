@@ -174,6 +174,9 @@ var BlurredLightbox = class extends Lightbox.Lightbox {
                                                  brightness: this._fadeFactor,
                                                  factor: 0.0 });
 
+            this._blurXEffect.set_enabled(false);
+            this._blurYEffect.set_enabled(false);
+
             // Clone the group that contains all of UI on the screen.  This is the
             // chrome, the windows, etc.
             let uiGroupClone = new Clutter.Clone({ source: Main.uiGroup,
@@ -205,6 +208,8 @@ var BlurredLightbox = class extends Lightbox.Lightbox {
                                    this.emit('shown');
                                }
                              });
+            this._blurXEffect.set_enabled(true);
+            this._blurYEffect.set_enabled(true);
         } else {
             Tweener.removeTweens(this.actor);
             Tweener.addTween(this.actor,
@@ -236,6 +241,9 @@ var BlurredLightbox = class extends Lightbox.Lightbox {
                                    this._blurYEffect.factor = this._blurXEffect.factor;
                                },
                                onComplete: () => {
+                                   this._blurXEffect.set_enabled(false);
+                                   this._blurYEffect.set_enabled(false);
+
                                    this.actor.hide();
                                }
                              });
