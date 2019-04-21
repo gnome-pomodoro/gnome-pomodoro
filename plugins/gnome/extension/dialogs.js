@@ -100,13 +100,14 @@ var State = {
 };
 
 
-var BlurEffect = class extends Clutter.ShaderEffect {
-    constructor(params) {
+var BlurEffect = GObject.registerClass(
+class PomodoroBlurEffect extends Clutter.ShaderEffect {
+    _init(params) {
         params = Params.parse(params, { orientation: Clutter.Orientation.HORIZONTAL,
                                         brightness: 1.0,
                                         factor: 1.0 });
 
-        super({ shader_type: Clutter.ShaderType.FRAGMENT_SHADER });
+        super._init({ shader_type: Clutter.ShaderType.FRAGMENT_SHADER });
 
         this.orientation = params.orientation;
         this.brightness = params.brightness;
@@ -144,7 +145,7 @@ var BlurEffect = class extends Clutter.ShaderEffect {
                 this.set_uniform_value('y_step', GObject.Float(1.0 / height));
             }
             else {
-                this.set_uniform_value('x_step', - GObject.Float(1.0 / width));
+                this.set_uniform_value('x_step', GObject.Float(-1.0 / width));
                 this.set_uniform_value('y_step', GObject.Float(1.0 / height));
             }
         }
@@ -155,7 +156,7 @@ var BlurEffect = class extends Clutter.ShaderEffect {
 
         return res;
     }
-};
+});
 
 
 var BlurredLightbox = class extends Lightbox.Lightbox {
@@ -175,7 +176,7 @@ var BlurredLightbox = class extends Lightbox.Lightbox {
 
             // Clone the group that contains all of UI on the screen.  This is the
             // chrome, the windows, etc.
-            let uiGroupClone = new Clutter.Clone({ source: Main.layoutManager.uiGroup,
+            let uiGroupClone = new Clutter.Clone({ source: Main.uiGroup,
                                                    clip_to_allocation: true });
             uiGroupClone.add_effect(this._blurXEffect);
             uiGroupClone.add_effect(this._blurYEffect);
