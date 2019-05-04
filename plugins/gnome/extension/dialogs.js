@@ -591,8 +591,16 @@ var PomodoroEndDialog = class extends ModalDialog {
         this._actorMappedId              = 0;
         this._timerUpdateId              = 0;
         this._eventId                    = 0;
+        this._styleChangedId             = 0;
 
-        this._timerLabel = new St.Label({ style_class: 'extension-pomodoro-dialog-timer' });
+        this._minutesLabel = new St.Label();
+        this._separatorLabel = new St.Label({ text: ":" });
+        this._secondsLabel = new St.Label();
+
+        let hbox = new St.BoxLayout({ vertical: false, style_class: 'extension-pomodoro-dialog-timer' });
+        hbox.add(this._minutesLabel);
+        hbox.add(this._separatorLabel);
+        hbox.add(this._secondsLabel);
 
         this._descriptionLabel = new St.Label({
                                        style_class: 'extension-pomodoro-dialog-description',
@@ -602,12 +610,12 @@ var PomodoroEndDialog = class extends ModalDialog {
 
         let box = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-box',
                                      vertical: true });
-        box.add(this._timerLabel,
-                { y_fill: false,
-                  y_align: St.Align.START });
+        box.add(hbox,
+                { x_fill: false,
+                  x_align: St.Align.MIDDLE });
         box.add(this._descriptionLabel,
-                { y_fill: false,
-                  y_align: St.Align.START });
+                { x_fill: false,
+                  x_align: St.Align.MIDDLE });
         this._layout.add_actor(box);
 
         this._actorMappedId = this.actor.connect('notify::mapped', this._onActorMappedChanged.bind(this));
@@ -618,6 +626,10 @@ var PomodoroEndDialog = class extends ModalDialog {
 
     _onActorMappedChanged(actor) {
         if (actor.mapped) {
+            if (!this._styleChangedId) {
+                this._styleChangedId = this._secondsLabel.connect('style-changed', this._onStyleChanged.bind(this));
+                this._onStyleChanged(this._secondsLabel);
+            }
             if (!this._timerUpdateId) {
                 this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
                 this._onTimerUpdate();
@@ -631,6 +643,16 @@ var PomodoroEndDialog = class extends ModalDialog {
         }
     }
 
+    _onStyleChanged(actor) {
+        let themeNode = actor.get_theme_node();
+        let font      = themeNode.get_font();
+        let context   = actor.get_pango_context();
+        let metrics   = context.get_metrics(font, context.get_language());
+        let digitWidth = metrics.get_approximate_digit_width() / Pango.SCALE;
+
+        this._secondsLabel.natural_width = 2 * digitWidth;
+    }
+
     _onTimerUpdate() {
         if (this.timer.isBreak()) {
             let remaining = Math.max(this.timer.getRemaining(), 0.0);
@@ -638,8 +660,11 @@ var PomodoroEndDialog = class extends ModalDialog {
             let seconds   = Math.floor(remaining % 60);
 
             /* method may be called while label actor got destroyed */
-            if (this._timerLabel.clutter_text) {
-                this._timerLabel.clutter_text.set_text('%02d:%02d'.format(minutes, seconds));
+            if (this._minutesLabel.clutter_text) {
+                this._minutesLabel.clutter_text.set_text('%d'.format(minutes));
+            }
+            if (this._secondsLabel.clutter_text) {
+                this._secondsLabel.clutter_text.set_text('%02d'.format(seconds));
             }
         }
     }
@@ -661,6 +686,11 @@ var PomodoroEndDialog = class extends ModalDialog {
         if (this._timerUpdateId) {
             this.timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
+        }
+
+        if (this._styleChangedId) {
+            this._secondsLabel.disconnect(this._styleChangedId);
+            this._styleChangedId = 0;
         }
     }
 

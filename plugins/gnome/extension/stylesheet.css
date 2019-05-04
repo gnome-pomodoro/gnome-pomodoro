@@ -104,6 +104,7 @@
 .extension-pomodoro-dialog .extension-pomodoro-dialog-box {
     spacing: 5px;
     padding-bottom: 15px;
+    width: 250pt;
 }
 
 .extension-pomodoro-dialog .extension-pomodoro-dialog-timer {
@@ -113,9 +114,16 @@
     color: white;
 }
 
+.extension-pomodoro-dialog .extension-pomodoro-dialog-timer > StLabel:first-child {
+    text-align: right;
+}
+
+.extension-pomodoro-dialog .extension-pomodoro-dialog-timer > StLabel:last-child {
+    text-align: left;
+}
+
 .extension-pomodoro-dialog .extension-pomodoro-dialog-description {
     font-size: 13pt;
     font-weight: normal;
-    text-align: center;
     color: white;
 }
