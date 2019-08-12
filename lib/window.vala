@@ -39,7 +39,7 @@ namespace Pomodoro
             public string display_name;
         }
 
-        private const Name[] state_names = {
+        private const Name[] STATE_NAMES = {
             { "null", "" },
             { "pomodoro", N_("Pomodoro") },
             { "short-break", N_("Short Break") },
@@ -146,9 +146,9 @@ namespace Pomodoro
             this.timer_stack.visible_child_name = 
                     (this.timer.state is Pomodoro.DisabledState) ? "disabled" : "enabled";
 
-            foreach (var mapping in state_names)
+            foreach (var mapping in STATE_NAMES)
             {
-                if (mapping.name == this.timer.state.name) {
+                if (mapping.name == this.timer.state.name && mapping.display_name != "") {
                     this.state_togglebutton.label = mapping.display_name;
                     break;
                 }
