@@ -200,7 +200,7 @@ namespace SoundsPlugin
         {
             foreach (var preset in presets) {
                 var row = this.create_row (preset.value,
-                                           preset.name,
+                                           _(preset.name),
                                            true);
 
                 this.chooser_listbox.insert (row, -1);
@@ -329,9 +329,9 @@ namespace SoundsPlugin
             var file_chooser = new Gtk.FileChooserDialog (_("Select Custom Sound"),
                                                           this.get_toplevel () as Gtk.Window,
                                                           Gtk.FileChooserAction.OPEN,
-                                                          "_Cancel",
+                                                          _("_Cancel"),
                                                           Gtk.ResponseType.CANCEL,
-                                                          "_Select",
+                                                          _("_Select"),
                                                           Gtk.ResponseType.OK);
             file_chooser.local_only = true;
             file_chooser.filter = file_filter;
@@ -601,7 +601,7 @@ namespace SoundsPlugin
 
                 foreach (var preset in SOUND_PRESTES) {
                     if (preset.value == uri) {
-                        label = preset.name;
+                        label = _(preset.name);
                         break;
                     }
                 }
