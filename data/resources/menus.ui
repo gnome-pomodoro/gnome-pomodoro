@@ -1,34 +1,5 @@
 <?xml version="1.0"?>
 <interface>
-  <menu id="app-menu">
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">_Timer</attribute>
-        <attribute name="action">app.timer</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">_Stats</attribute>
-        <attribute name="action">app.stats</attribute>
-      </item>
-    </section>
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">_Preferences</attribute>
-        <attribute name="action">app.preferences</attribute>
-      </item>
-    </section>
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">_About</attribute>
-        <attribute name="action">app.about</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">_Quit</attribute>
-        <attribute name="action">app.quit</attribute>
-        <attribute name="accel"><![CDATA[<Primary>Q]]></attribute>
-      </item>
-    </section>
-  </menu>
   <menu id="indicator">
     <section>
       <item>

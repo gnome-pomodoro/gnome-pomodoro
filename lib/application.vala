@@ -555,20 +555,6 @@ namespace Pomodoro
             this.set_accels_for_action ("stats.next", {"<Alt>Right", "Forward"});
         }
 
-        private void setup_menu ()
-        {
-            var builder = new Gtk.Builder ();
-            try {
-                builder.add_from_resource ("/org/gnome/pomodoro/menus.ui");
-
-                var menu = builder.get_object ("app-menu") as GLib.MenuModel;
-                this.set_app_menu (menu);
-            }
-            catch (GLib.Error error) {
-                GLib.warning (error.message);
-            }
-        }
-
         private static bool command_line_version_callback ()
         {
             stdout.printf ("%s %s\n",
@@ -593,7 +579,6 @@ namespace Pomodoro
 
             this.setup_resources ();
             this.setup_actions ();
-            this.setup_menu ();
             this.setup_repository ();
             this.setup_capabilities ();
             this.setup_desktop_extension ();
