@@ -29,7 +29,7 @@ namespace Pomodoro
 
     internal Gom.Repository get_repository ()
     {
-        var application = Pomodoro.Application.get_default ();  // TODO: move repository out of Pomodoro.Application
+        var application = Pomodoro.Application.get_default ();
 
         return (Gom.Repository) application.get_repository ();
     }
@@ -281,17 +281,16 @@ namespace Pomodoro
                                                  "database.sqlite");
             var file = GLib.File.new_for_path (path);
 
-            var adapter = new Gom.Adapter ();
+            try {
+                file.get_parent ().make_directory_with_parents ();
+            }
+            catch (GLib.Error error) {
+                GLib.warning ("Failed to create directory: %s", error.message);
+            }
 
             try {
-                try {
-                    file.get_parent ().make_directory_with_parents ();
-                }
-                catch (GLib.Error error) {
-                    GLib.debug ("Failed to create directory: %s", error.message);
-                }
-
                 /* Open database handle */
+                var adapter = new Gom.Adapter ();
                 adapter.open_sync (file.get_uri ());
                 this.adapter = adapter;
 
@@ -300,24 +299,11 @@ namespace Pomodoro
                 repository.migrate_sync (Pomodoro.Application.REPOSITORY_VERSION,
                                          Pomodoro.Application.migrate_repository);
 
-//                 var object_types = new GLib.List<GLib.Type> ();
-//                 object_types.prepend (typeof (Pomodoro.Entry));
-//                 object_types.prepend (typeof (Pomodoro.AggregatedEntry));
-//
-//                 repository.automatic_migrate_sync (Pomodoro.Application.REPOSITORY_VERSION,
-//                                                    (owned) object_types);
-
                 this.repository = repository;
             }
             catch (GLib.Error error) {
                 GLib.critical ("Failed to migrate database: %s", error.message);
             }
-
-//            try {
-//                adapter.close_sync ();
-//            }
-//            catch (GLib.Error error) {
-//            }
 
             this.unmark_busy ();
             this.release ();
@@ -586,7 +572,7 @@ namespace Pomodoro
                 this.setup_plugins.end (res);
 
                 GLib.Idle.add (() => {
-                    // FIXME: shouldn't these be enabled by settings?!
+                    // TODO: shouldn't these be enabled by settings?!
                     this.capabilities.enable ("notifications");
                     this.capabilities.enable ("indicator");
                     this.capabilities.enable ("accelerator");
