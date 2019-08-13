@@ -70,9 +70,8 @@ namespace Pomodoro
         private GLib.TestSuite g_test_suite;
         private TestSuiteAdaptor[] adaptors = new TestSuiteAdaptor[0];
 
-        public TestSuite () {
-            var name = this.get_name ();
-            this.g_test_suite = new GLib.TestSuite (name);
+        construct {
+            this.g_test_suite = new GLib.TestSuite (this.get_name ());
         }
 
         public string get_name () {
