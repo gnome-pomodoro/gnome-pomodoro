@@ -280,12 +280,15 @@ namespace Pomodoro
                                                  Config.PACKAGE_NAME,
                                                  "database.sqlite");
             var file = GLib.File.new_for_path (path);
+            var directory = file.get_parent ();
 
-            try {
-                file.get_parent ().make_directory_with_parents ();
-            }
-            catch (GLib.Error error) {
-                GLib.warning ("Failed to create directory: %s", error.message);
+            if (!directory.query_exists ()) {
+                try {
+                    directory.make_directory_with_parents ();
+                }
+                catch (GLib.Error error) {
+                    GLib.warning ("Failed to create directory: %s", error.message);
+                }
             }
 
             try {
