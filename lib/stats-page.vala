@@ -103,7 +103,7 @@ namespace Pomodoro
 
         private static string format_day_of_week (GLib.DateTime date)
         {
-            return date.format ("%A")[0].to_string ();  // first letter of localized day-of-week name
+            return date.format ("%A").get_char(0).to_string ();  // first letter of localized day-of-week name
         }
 
         /**
@@ -330,38 +330,6 @@ namespace Pomodoro
             }
         }
 
-        /**
-         * Method for drawing values as linear chart.
-         */
-        // private static void draw_linear_chart (Cairo.Context context,
-        //                                        double[]      values,
-        //                                        double        x,
-        //                                        double        y,
-        //                                        double        width,
-        //                                        double        height)
-        // {
-        //     var segment_width = width / (double)(values.length - 1);
-        //     var x0 = x;
-        //     var y0 = y + height;
-        //     var x3 = x0;
-        //     var y3 = y0;
-        //
-        //     context.move_to (x0, y0);
-        //     context.new_path ();
-        //
-        //     for (var index=0; index < values.length; index++)
-        //     {
-        //         x3 = x + segment_width * (double) (index + 1);
-        //         y3 = y + height - values[index] * height;
-        //
-        //         context.line_to (x3, y3);
-        //     }
-        //
-        //     context.line_to (x3, y + height);
-        //
-        //     // leave path unclosed
-        // }
-
         [GtkCallback]
         private bool on_timeline_chart_draw (Gtk.Widget    widget,
                                              Cairo.Context context)
@@ -420,19 +388,20 @@ namespace Pomodoro
                     total_values[index] = 0.0;
                 }
 
-                if (days_count <= 7 || date.get_day_of_week () == 1)
-                {
-                    var label_text = days_count <= 7
-                        ? format_day_of_week (date)
-                        : format_day_of_month (date);
-
-                    label_x = chart_x + label_width * (double) index;
-
-                    context.text_extents (label_text, out label_extents);
-                    context.move_to (label_x + (label_width - label_extents.width) * 0.5 - label_extents.x_bearing,
-                                     label_y + (label_height - label_extents.height) * 0.5 - label_extents.y_bearing);
-                    context.show_text (label_text);
+                if (days_count > 7 && date.get_day_of_week () != 1) {
+                    continue;
                 }
+
+                var label_text = days_count <= 7
+                    ? format_day_of_week (date)
+                    : format_day_of_month (date);
+
+                label_x = chart_x + label_width * (double) index;
+
+                context.text_extents (label_text, out label_extents);
+                context.move_to (label_x + (label_width - label_extents.width) * 0.5 - label_extents.x_bearing,
+                                 label_y + (label_height - label_extents.height) * 0.5 - label_extents.y_bearing);
+                context.show_text (label_text);
             }
 
             /* grid */

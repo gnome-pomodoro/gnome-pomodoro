@@ -37,7 +37,7 @@ namespace Pomodoro
 
         protected override string format_datetime (GLib.DateTime date)
         {
-            return date.format ("%B %Y");
+            return date.format ("%OB %Y");
         }
 
         public override GLib.DateTime get_previous_date ()
