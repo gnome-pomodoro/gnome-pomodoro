@@ -80,6 +80,9 @@ namespace Pomodoro
             this.add_test ("restore_3",
                            this.test_restore_3);
 
+            this.add_test ("restore_4",
+                           this.test_restore_4);
+
             this.add_test ("score_1",
                            this.test_score_1);
 
@@ -401,12 +404,18 @@ namespace Pomodoro
             timer1.save (settings);
 
             assert (settings.get_string ("timer-state") == "pomodoro");
-            assert (settings.get_string ("timer-state-date") == "1970-01-01T00:00:00Z");
             assert (settings.get_double ("timer-state-duration") == 20.0);
             assert (settings.get_double ("timer-elapsed") == 10.0);
             assert (settings.get_double ("timer-score") == 1.0);
-            assert (settings.get_string ("timer-date") == "1970-01-01T00:00:15Z");
             assert (settings.get_boolean ("timer-paused") == true);
+            assert (
+                settings.get_string ("timer-state-date") == "1970-01-01T00:00:00Z" ||
+                settings.get_string ("timer-state-date") == "1970-01-01T00:00:00+0000"
+            );
+            assert (
+                settings.get_string ("timer-date") == "1970-01-01T00:00:15Z" ||
+                settings.get_string ("timer-date") == "1970-01-01T00:00:15+0000"
+            );
 
             var timer2 = new Pomodoro.Timer ();
             timer2.restore (settings, timer1.timestamp);
@@ -479,6 +488,28 @@ namespace Pomodoro
             assert (timer2.timestamp == 3620.0);
             assert (timer2.offset == 0.0);
             assert (timer2.is_paused == false);
+        }
+
+        /**
+         * Test against bad values
+         */
+        public void test_restore_4 ()
+        {
+            var settings = Pomodoro.get_settings ()
+                                   .get_child ("state");
+
+            settings.set_string ("timer-state", "pomodoro");
+            settings.set_double ("timer-state-duration", 10.0);
+            settings.set_double ("timer-elapsed", 1.0);
+            settings.set_double ("timer-score", 1.0);
+            settings.set_boolean ("timer-paused", false);
+            settings.set_string ("timer-state-date", "invalid value");
+            settings.set_string ("timer-date", "invalid value");
+
+            var timer = new Pomodoro.Timer ();
+            timer.restore (settings, 3600.0);
+
+            assert (timer.state is Pomodoro.DisabledState);
         }
 
         /**
