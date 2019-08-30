@@ -44,19 +44,6 @@ namespace Pomodoro
             set_notnull ("date-string");
         }
 
-        /*
-        public GLib.DateTime get_date ()
-        {
-            var timeval = GLib.TimeVal ();
-
-            if (timeval.from_iso8601 (this.date)) {
-                return new GLib.DateTime.from_timeval_local (timeval);
-            }
-
-            return null;
-        }
-        */
-
         private static async int64 get_max_elapsed_sum (string group_by_sql)
         {
             var adapter = get_repository ().get_adapter ();
@@ -112,16 +99,5 @@ SELECT """ + group_by_sql + """ AS "group", SUM("elapsed") AS "elapsed-sum"
         {
             return yield get_max_elapsed_sum ("strftime('%Y-%m', \"date-string\")");
         }
-
-//        public GLib.DateTime? get_datetime_local ()
-//        {
-//            var timeval = GLib.TimeVal ();
-//
-//            if (timeval.from_iso8601 (this.date_string)) {
-//                return new GLib.DateTime.from_timeval_local (timeval);
-//            }
-//
-//            return null;
-//        }
     }
 }

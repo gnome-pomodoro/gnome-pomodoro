@@ -382,13 +382,13 @@ namespace Pomodoro
             settings.set_double ("timer-state-duration",
                                  this.state.duration);
             settings.set_string ("timer-state-date",
-                                 datetime_to_string (state_datetime));
+                                 state_datetime.to_string ());
             settings.set_double ("timer-elapsed",
                                  this.state.elapsed);
             settings.set_double ("timer-score",
                                  this.score);
             settings.set_string ("timer-date",
-                                 datetime_to_string (timer_datetime));
+                                 timer_datetime.to_string ());
             settings.set_boolean ("timer-paused",
                                   this.is_paused);
         }
@@ -413,16 +413,17 @@ namespace Pomodoro
                 state.duration = settings.get_double ("timer-state-duration");
                 state.elapsed  = settings.get_double ("timer-elapsed");
 
-                try {
-                    var state_datetime = Pomodoro.datetime_from_string (
-                                       settings.get_string ("timer-state-date"));
-                    state.timestamp = (double) state_datetime.to_unix ();
+                var state_datetime = new DateTime.from_iso8601 (
+                                   settings.get_string ("timer-state-date"), new TimeZone.local ());
 
-                    var last_datetime = Pomodoro.datetime_from_string (
-                                       settings.get_string ("timer-date"));
+                var last_datetime = new DateTime.from_iso8601 (
+                                   settings.get_string ("timer-date"), new TimeZone.local ());
+
+                if (state_datetime != null && last_datetime != null) {
+                    state.timestamp = (double) state_datetime.to_unix ();
                     last_timestamp = (double) last_datetime.to_unix ();
                 }
-                catch (Pomodoro.DateTimeError error) {
+                else {
                     /* In case there is no valid state-date, elapsed time
                      * will be lost.
                      */
