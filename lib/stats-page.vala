@@ -103,7 +103,7 @@ namespace Pomodoro
 
         private static string format_day_of_week (GLib.DateTime date)
         {
-            return date.format ("%A").get_char(0).to_string ();  // first letter of localized day-of-week name
+            return date.format ("%A").get_char (0).toupper ().to_string ();  // first letter of localized day-of-week name
         }
 
         /**
