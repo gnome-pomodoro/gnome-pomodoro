@@ -394,13 +394,13 @@ var PomodoroExtension = class {
             }
         }
         else {
-            this.indicator.actor.show();
+            this.indicator.show();
         }
     }
 
     _disableIndicator() {
         if (this.indicator) {
-            this.indicator.actor.hide();
+            this.indicator.hide();
         }
     }
 

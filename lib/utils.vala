@@ -22,38 +22,6 @@ using GLib;
 
 namespace Pomodoro
 {
-    private errordomain DateTimeError {
-        PARSE
-    }
-
-    private DateTime datetime_from_string (string date_string)
-                                           throws DateTimeError
-    {
-        var timeval = TimeVal();
-
-        if (!timeval.from_iso8601 (date_string)) {
-            throw new DateTimeError.PARSE ("Could not parse string '%s'",
-                                           date_string);
-        }
-
-        return new DateTime.from_timeval_local (timeval);
-    }
-
-    private string datetime_to_string (DateTime datetime)
-    {
-        var timeval = TimeVal();
-        string date_string;
-
-        if (datetime.to_utc().to_timeval (out timeval)) {
-            date_string = timeval.to_iso8601 ();
-        }
-        else {
-            date_string = null;
-        }
-
-        return date_string;
-    }
-
     private string format_time (int seconds)
     {
         var minutes = (seconds / 60) % 60;

@@ -61,20 +61,6 @@ namespace Pomodoro
             this.set_datetime (datetime);
         }
 
-/*
-        public GLib.DateTime? get_datetime ()
-        {
-            var timeval = GLib.TimeVal ();
-
-            if (!timeval.from_iso8601 (this.datetime_string)) {
-                GLib.debug ("Failed to parse Entry.datetime_string '%s'", this.datetime_string);
-                return null;
-            }
-
-            return new GLib.DateTime.from_timeval_local (timeval);
-        }
-*/
-
         public void set_datetime (GLib.DateTime value)
         {
             this.datetime_string = value.to_string ();
@@ -83,14 +69,7 @@ namespace Pomodoro
 
         public GLib.DateTime? get_datetime_local ()
         {
-            var timeval = GLib.TimeVal ();
-
-            if (!timeval.from_iso8601 (this.datetime_local_string)) {
-                GLib.debug ("Failed to parse Entry.datetime_local_string '%s'", this.datetime_local_string);
-                return null;
-            }
-
-            return new GLib.DateTime.from_timeval_local (timeval);
+            return new GLib.DateTime.from_iso8601 (this.datetime_local_string, new TimeZone.local ());
         }
     }
 }

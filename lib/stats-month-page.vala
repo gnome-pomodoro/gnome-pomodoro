@@ -37,7 +37,12 @@ namespace Pomodoro
 
         protected override string format_datetime (GLib.DateTime date)
         {
-            return date.format ("%B %Y");
+            var heading = date.format ("%OB %Y");
+
+            // ensure months name is title-cased
+            return heading.splice (0,
+                                   heading.index_of_nth_char (1),
+                                   heading.get_char (0).toupper ().to_string ());
         }
 
         public override GLib.DateTime get_previous_date ()

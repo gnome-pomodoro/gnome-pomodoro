@@ -64,7 +64,7 @@ var IndicatorType = {
 
 var IndicatorMenu = class extends PopupMenu.PopupMenu {
     constructor(indicator) {
-        super(indicator.actor, St.Align.START, St.Side.TOP);
+        super(indicator, St.Align.START, St.Side.TOP);
 
         this._isPaused = null;
         this._timerState = null;
@@ -294,6 +294,8 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         }
 
         this.indicator = null;
+        this.timerLabel = null;
+        this.pauseAction = null;
 
         super.destroy();
     }
@@ -602,8 +604,7 @@ class PomodoroIndicator extends PanelMenu.Button {
         this.timer  = timer;
         this.widget = null;
 
-        this.actor.add_style_class_name('extension-pomodoro-indicator');
-        this.actor.connect('destroy', this._onActorDestroy.bind(this));
+        this.add_style_class_name('extension-pomodoro-indicator');
 
         this._arrow = PopupMenu.arrowIcon(St.Side.BOTTOM);
         this._blinking = false;
@@ -613,7 +614,7 @@ class PomodoroIndicator extends PanelMenu.Button {
         this._hbox.pack_start = true;
         this._hbox.set_y_align(Clutter.ActorAlign.CENTER);
         this._hbox.add_child(this._arrow);
-        this.actor.add_child(this._hbox);
+        this.add_child(this._hbox);
 
         this.setMenu(new IndicatorMenu(this));
         this.setType(type);
@@ -622,6 +623,24 @@ class PomodoroIndicator extends PanelMenu.Button {
 
         this._timerPausedId = this.timer.connect('paused', this._onTimerPaused.bind(this));
         this._timerResumedId = this.timer.connect('resumed', this._onTimerResumed.bind(this));
+
+        let destroyId = this.connect('destroy', () => {
+            if (this._blinkTimeoutSource != 0) {
+                Mainloop.source_remove(this._blinkTimeoutSource);
+                this._blinkTimeoutSource = 0;
+            }
+
+            this.timer.disconnect(this._timerPausedId);
+            this.timer.disconnect(this._timerResumedId);
+            this.timer = null;
+
+            if (this.icon) {
+                this.icon.destroy();
+                this.icon = null;
+            }
+
+            this.disconnect(destroyId);
+        })
     }
 
     setType(type) {
@@ -732,29 +751,5 @@ class PomodoroIndicator extends PanelMenu.Button {
                 this._blinkTimeoutSource = 0;
             }
         }
-    }
-
-    _onActorDestroy() {
-        Tweener.removeTweens(this._hbox);
-        Tweener.removeTweens(this.menu.timerLabel);
-        Tweener.removeTweens(this.menu.pauseAction.child);
-
-        if (this._blinkTimeoutSource != 0) {
-            Mainloop.source_remove(this._blinkTimeoutSource);
-            this._blinkTimeoutSource = 0;
-        }
-
-        this.timer.disconnect(this._timerPausedId);
-        this.timer.disconnect(this._timerResumedId);
-        this.timer = null;
-
-        if (this.icon) {
-            this.icon.destroy();
-            this.icon = null;
-        }
-    }
-
-    destroy() {
-        super.destroy();
     }
 });
