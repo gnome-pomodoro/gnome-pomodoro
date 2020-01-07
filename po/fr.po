@@ -42,7 +42,7 @@ msgstr ""
 
 #: ../data/org.gnome.Pomodoro.desktop.in.h:2 ../lib/about-dialog.vala:30
 msgid "A simple time management utility"
-msgstr "Un outils simple de gestion du temps"
+msgstr "Un outil simple de gestion du temps"
 
 #: ../data/org.gnome.Pomodoro.desktop.in.h:3
 msgid "time;timer;tasks;manage;organize;"
@@ -223,7 +223,7 @@ msgid ""
 "using this key.\n"
 "Please try with a key such as Control, Alt or Shift at the same time."
 msgstr ""
-"Le raccourci \"%s\" ne peut as être utilisé parce qu'il deviendrait "
+"Le raccourci \"%s\" ne peut pas être utilisé parce qu'il deviendrait "
 "impossible de taper en utilisant cette touche.\n"
 "Merci d'essayer avec une touche telle que Ctrl, Alt ou Maj en même temps."
 
@@ -553,7 +553,7 @@ msgstr[1] "%d minutes"
 
 #, fuzzy
 #~ msgid "Whether to play a sound to notify of events."
-#~ msgstr "Si il faut jouer un son pour indiquer les notifications."
+#~ msgstr "S'il faut jouer un son pour indiquer les notifications."
 
 #~ msgid "Notification sound file"
 #~ msgstr "Fichier du son de notification"
@@ -564,7 +564,7 @@ msgstr[1] "%d minutes"
 
 #, fuzzy
 #~ msgid "Whether to restore state on startup."
-#~ msgstr "Si il faut restaurer l’état du minuteur au démarrage."
+#~ msgstr "S'il faut restaurer l’état du minuteur au démarrage."
 
 #~ msgid "Number of completed sessions"
 #~ msgstr "Nombre de pomodoro terminés"
