@@ -132,7 +132,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         let startAction = this._createActionButton('media-playback-start-symbolic', _("Start Timer"));
         startAction.add_style_class_name('extension-pomodoro-indicator-menu-action-border');
         startAction.connect('clicked', this._onStartClicked.bind(this));
-        toggleItem.actor.add(startAction);
+        toggleItem.actor.add_child(startAction);
 
         let timerItem = new PopupMenu.PopupMenuItem("",
                                            { style_class: 'extension-pomodoro-indicator-menu-timer',
@@ -149,10 +149,10 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
                                                style_class: 'extension-pomodoro-indicator-menu-timer-label-button' });
         timerLabelButton.child = timerLabel;
         timerLabelButton.connect('clicked', this._onTimerClicked.bind(this));
-        timerItem.actor.add(timerLabelButton, { expand: true });
+        timerItem.actor.add_child(timerLabelButton, { expand: true });
 
         let hbox = new St.BoxLayout();
-        timerItem.actor.add(hbox);
+        timerItem.actor.add_child(hbox);
 
         let pauseAction = this._createActionButton('media-playback-pause-symbolic', _("Pause Timer"));
         pauseAction.connect('clicked', this._onPauseClicked.bind(this));
