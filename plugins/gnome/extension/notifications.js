@@ -190,7 +190,7 @@ var Notification = class extends MessageTray.Notification {
                 Main.messageTray.add(this.source);
             }
 
-            this.source.notify(this);
+            this.source.showNotification(this);
         }
         else {
             Utils.logWarning('Called Notification.show() after destroy()');
@@ -619,7 +619,7 @@ var IssueNotification = class extends MessageTray.Notification {
             Main.messageTray.add(this.source);
         }
 
-        this.source.notify(this);
+        this.source.showNotification(this);
     }
 };
 
