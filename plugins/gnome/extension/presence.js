@@ -18,6 +18,8 @@
  *
  */
 
+const Gio = imports.gi.Gio;
+
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 
@@ -41,6 +43,10 @@ var Presence = class {
         });
         this._patch.connect('applied', this._onPatchApplied.bind(this));
         this._patch.connect('reverted', this._onPatchReverted.bind(this));
+
+        this._settings = new Gio.Settings({
+            schema_id: 'org.gnome.desktop.notifications',
+        });
     }
 
     setBusy(value) {
@@ -52,12 +58,16 @@ var Presence = class {
         else {
             this._onPatchApplied();
         }
+
+        this._settings.set_boolean('show-banners', !value);
     }
 
     setDefault() {
         if (this._patch.applied) {
             this._patch.revert();
         }
+
+        this._settings.set_boolean('show-banners', true);
     }
 
     _onPatchApplied() {
@@ -84,6 +94,11 @@ var Presence = class {
         if (this._patch) {
             this._patch.destroy();
             this._patch = null;
+        }
+
+        if (this._settings) {
+            this._settings.run_dispose();
+            this._settings = null;
         }
     }
 };
