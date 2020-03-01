@@ -132,7 +132,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         let startAction = this._createActionButton('media-playback-start-symbolic', _("Start Timer"));
         startAction.add_style_class_name('extension-pomodoro-indicator-menu-action-border');
         startAction.connect('clicked', this._onStartClicked.bind(this));
-        toggleItem.actor.add_child(startAction);
+        toggleItem.add_child(startAction);
 
         let timerItem = new PopupMenu.PopupMenuItem("",
                                            { style_class: 'extension-pomodoro-indicator-menu-timer',
@@ -149,10 +149,11 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
                                                style_class: 'extension-pomodoro-indicator-menu-timer-label-button' });
         timerLabelButton.child = timerLabel;
         timerLabelButton.connect('clicked', this._onTimerClicked.bind(this));
-        timerItem.actor.add_child(timerLabelButton, { expand: true });
+        timerItem.add_child(timerLabelButton);
 
-        let hbox = new St.BoxLayout();
-        timerItem.actor.add_child(hbox);
+        let hbox = new St.BoxLayout({ x_align: Clutter.ActorAlign.END,
+                                      x_expand: true });
+        timerItem.add_child(hbox);
 
         let pauseAction = this._createActionButton('media-playback-pause-symbolic', _("Pause Timer"));
         pauseAction.connect('clicked', this._onPauseClicked.bind(this));
@@ -189,7 +190,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
                 this._activateState(name);
             });
 
-        menuItem.actor.add_style_class_name('state-item');
+        menuItem.add_style_class_name('state-item');
 
         this._stateItems[name] = menuItem;
 
@@ -221,8 +222,8 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
             this._isPaused = isPaused;
             this._timerState = timerState;
 
-            this._toggleMenuItem.actor.visible = !isRunning;
-            this._timerMenuItem.actor.visible = isRunning;
+            this._toggleMenuItem.visible = !isRunning;
+            this._timerMenuItem.visible = isRunning;
 
             this._timerLabelButton.reactive = isRunning && !isPaused && timerState != Timer.State.POMODORO;
             this.pauseAction.child.icon_name = isPaused
@@ -235,15 +236,15 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
             for (let key in this._stateItems) {
                 let stateItem = this._stateItems[key];
 
-                stateItem.actor.visible = isRunning;
+                stateItem.visible = isRunning;
 
                 if (key == timerState) {
                     stateItem.setOrnament(PopupMenu.Ornament.DOT);
-                    stateItem.actor.add_style_class_name('active');
+                    stateItem.add_style_class_name('active');
                 }
                 else {
                     stateItem.setOrnament(PopupMenu.Ornament.NONE);
-                    stateItem.actor.remove_style_class_name('active');
+                    stateItem.remove_style_class_name('active');
                 }
             }
         }
