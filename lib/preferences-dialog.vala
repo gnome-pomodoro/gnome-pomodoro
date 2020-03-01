@@ -689,7 +689,11 @@ namespace Pomodoro
         private void on_listboxrow_visible_notify (GLib.Object    object,
                                                    GLib.ParamSpec pspec)
         {
-            var widget = (object as Gtk.Widget).parent;
+            var widget = object as Gtk.Widget;
+            if (widget.parent == null) {
+                return;
+            }
+
             var listbox = widget as Gtk.ListBox;
             var visible = false;
 

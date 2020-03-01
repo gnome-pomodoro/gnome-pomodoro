@@ -148,8 +148,8 @@ namespace Pomodoro
             this.initialized = true;
         }
 
-        private void on_name_vanished (GLib.DBusConnection connection,
-                                       string              name)
+        private void on_name_vanished (GLib.DBusConnection? connection,
+                                       string               name)
         {
             if (this.timeout_id != 0) {
                 GLib.Source.remove (this.timeout_id);

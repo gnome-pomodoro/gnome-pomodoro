@@ -309,7 +309,7 @@ namespace SoundsPlugin
         public override void unmap ()
         {
             if (this.player is Fadeable) {
-                (this.player as Fadeable).fade_out (FADE_OUT_MIN_TIME);
+                ((Fadeable) this.player).fade_out (FADE_OUT_MIN_TIME);
             }
             else {
                 this.player.stop ();
@@ -953,10 +953,13 @@ namespace SoundsPlugin
         {
             this.fade_out_timeout_id = 0;
 
+            if (!(this.ticking_sound is Fadeable)) {
+                return false;
+            }
+
             var fade_duration = (uint)(this.timer.state.duration - this.timer.elapsed) * 1000;
 
-            (this.ticking_sound as Fadeable).fade_out (fade_duration.clamp (FADE_OUT_MIN_TIME,
-                                                                            FADE_OUT_MAX_TIME));
+            ((Fadeable) this.ticking_sound).fade_out (fade_duration.clamp (FADE_OUT_MIN_TIME, FADE_OUT_MAX_TIME));
 
             return false;
         }
@@ -969,31 +972,38 @@ namespace SoundsPlugin
         {
             this.unschedule_fade_out ();
 
-            var remaining_time = (uint)(this.timer.state.duration - this.timer.elapsed) * 1000;
+            if (!(this.ticking_sound is Fadeable)) {
+                return;
+            }
 
+            var remaining_time = (uint)(this.timer.state.duration - this.timer.elapsed) * 1000;
             if (remaining_time > FADE_OUT_MAX_TIME) {
-                (this.ticking_sound as Fadeable).fade_in (FADE_IN_TIME);
+                ((Fadeable) this.ticking_sound).fade_in (FADE_IN_TIME);
 
                 this.fade_out_timeout_id = GLib.Timeout.add (remaining_time - FADE_OUT_MAX_TIME,
                                                              this.on_fade_out_timeout);
             }
             else {
-                (this.ticking_sound as Fadeable).fade_out (FADE_OUT_MIN_TIME);
+                ((Fadeable) this.ticking_sound).fade_out (FADE_OUT_MIN_TIME);
             }
         }
 
         private void update_ticking_sound ()
                      requires (this.timer != null)
         {
+            if (!(this.ticking_sound is Fadeable)) {
+                return;
+            }
+
             if (this.timer.state is Pomodoro.PomodoroState && !this.timer.is_paused && !this.ticking_sound_inhibited) {
                 this.schedule_fade_out ();
 
-                (this.ticking_sound as Fadeable).fade_in (FADE_IN_TIME);
+                ((Fadeable) this.ticking_sound).fade_in (FADE_IN_TIME);
             }
             else {
                 this.unschedule_fade_out ();
 
-                (this.ticking_sound as Fadeable).fade_out (FADE_OUT_MIN_TIME);
+                ((Fadeable) this.ticking_sound).fade_out (FADE_OUT_MIN_TIME);
             }
         }
 
