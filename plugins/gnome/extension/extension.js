@@ -243,9 +243,6 @@ var PomodoroExtension = class {
                     if (this.timer.isBreak()) {
                         this.timer.skip();
                     }
-                    else {
-                        notification.destroy();
-                    }
                 });
             this.notification.connect('destroy', this._onNotificationDestroy.bind(this));
             this.notification.show();

@@ -24,6 +24,7 @@ const Signals = imports.signals;
 const Clutter = imports.gi.Clutter;
 const GLib = imports.gi.GLib;
 const Meta = imports.gi.Meta;
+const GObject = imports.gi.GObject;
 const St = imports.gi.St;
 
 const Calendar = imports.ui.calendar;
@@ -64,11 +65,12 @@ function getDefaultSource() {
 }
 
 
-var Source = class extends MessageTray.Source {
-    constructor() {
+var Source = GObject.registerClass(
+class PomodoroSource extends MessageTray.Source {
+    _init() {
         let icon_name = 'gnome-pomodoro';
 
-        super(_("Pomodoro Timer"), icon_name);
+        super._init(_("Pomodoro Timer"), icon_name);
 
         this.ICON_NAME = icon_name;
 
@@ -83,7 +85,7 @@ var Source = class extends MessageTray.Source {
                 {
                     let message = new TimerBanner(notification);
 
-                    this.addMessageAtIndex(message, this._nUrgent, this.actor.mapped);
+                    this.addMessageAtIndex(message, this._nUrgent, this.mapped);
                 }
                 else {
                     patch.initial._onNotificationAdded.bind(this)(source, notification);
@@ -92,6 +94,18 @@ var Source = class extends MessageTray.Source {
         });
         this._patch = patch;
         this._patch.apply();
+
+        this.connect('destroy', () => {
+            if (this._patch) {
+                this._patch.revert();
+                this._patch = null;
+            }
+
+            if (this._idleId) {
+                Mainloop.source_remove(this._idleId);
+                this._idleId = 0;
+            }
+        });
     }
 
     /* override parent method */
@@ -102,7 +116,7 @@ var Source = class extends MessageTray.Source {
 
     _lastNotificationRemoved() {
         this._idleId = Mainloop.idle_add(() => {
-            if (!this.count) {
+            if (this.notifications.length == 0) {
                 this.destroy();
             }
 
@@ -120,11 +134,11 @@ var Source = class extends MessageTray.Source {
         }
 
         this.notifications.splice(index, 1);
+        this.countUpdated();
+
         if (this.notifications.length == 0) {
             this._lastNotificationRemoved();
         }
-
-        this.countUpdated();
     }
 
     destroyNotifications() {
@@ -134,28 +148,16 @@ var Source = class extends MessageTray.Source {
             notification.destroy();
         });
     }
-
-    destroy() {
-        super.destroy();
-
-        if (this._patch) {
-            this._patch.revert();
-            this._patch = null;
-        }
-
-        if (this._idleId) {
-            Mainloop.source_remove(this._idleId);
-            this._idleId = 0;
-        }
-    }
-};
+});
 
 
-var Notification = class extends MessageTray.Notification {
-    constructor(title, description, params) {
-        super(null, title, description, params);
+var Notification = GObject.registerClass(
+class PomodoroNotification extends MessageTray.Notification {
+    _init(title, description, params) {
+        super._init(null, title, description, params);
 
         this._restoreForFeedback = false;
+        this._destroying = false;
 
         // We want notifications to be shown right after the action,
         // therefore urgency bump.
@@ -196,18 +198,36 @@ var Notification = class extends MessageTray.Notification {
             Utils.logWarning('Called Notification.show() after destroy()');
         }
     }
-};
+
+    // FIXME: We shouldn't override `destroy`. There may happen a second call
+    // `.destroy(NotificationDestroyedReason.EXPIRED)`. I'm not sure if this bug is on our side or in MessageTray.
+    destroy(reason) {
+        if (this._destroying) {
+            Utils.logWarning('Already called Notification.destroy()');
+            return;
+        }
+        this._destroying = true;
+
+        super.destroy(reason);
+    }
+});
 
 
-var PomodoroStartNotification = class extends Notification {
+var PomodoroStartNotification = GObject.registerClass({
+    Signals: {
+        'changed': {},
+    },
+}, class PomodoroStartNotification extends Notification {
     /**
      * Notification pops up a little before Pomodoro starts and changes message once started.
      */
 
-    constructor(timer) {
+    _init(timer) {
         let title = _("Pomodoro");
 
-        super(title, '', null);
+        // TODO: try customContent param
+
+        super._init(title, '', null);
 
         this.setResident(true);
         this.setForFeedback(true);
@@ -216,6 +236,13 @@ var PomodoroStartNotification = class extends Notification {
         this.timer = timer;
         this._timerState = null;
         this._timerStateChangedId = this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+
+        this.connect('destroy', () => {
+            if (this._timerStateChangedId != 0) {
+                this.timer.disconnect(this._timerStateChangedId);
+                this._timerStateChangedId = 0;
+            }
+        });
 
         this._onTimerStateChanged();
     }
@@ -287,70 +314,68 @@ var PomodoroStartNotification = class extends Notification {
         };
 
         let onTimerUpdate = () => {
-                if (banner.bodyLabel && banner.bodyLabel.actor.clutter_text) {
-                    let bodyText = this._getBodyText();
+            if (banner.bodyLabel) {
+                let bodyText = this._getBodyText();
 
-                    if (bodyText !== banner._bodyText) {
-                        banner._bodyText = bodyText;
-                        banner.setBody(bodyText);
-                    }
+                if (bodyText !== banner._bodyText) {
+                    banner._bodyText = bodyText;
+                    banner.setBody(bodyText);
                 }
-            };
+            }
+        };
         let onNotificationChanged = () => {
-                if (this.timer.isBreak()) {
-                    extendButton = banner.addAction(_("+1 Minute"), () => {
-                            this.timer.stateDuration += 60.0;
-                        });
-                }
-                else if (extendButton) {
-                    extendButton.destroy();
-                }
-            };
+            if (this.timer.isBreak()) {
+                extendButton = banner.addAction(_("+1 Minute"), () => {
+                    this.timer.stateDuration += 60.0;
+                });
+            }
+            else if (extendButton) {
+                extendButton.destroy();
+                extendButton = null;
+            }
+        };
         let onNotificationDestroy = () => {
-                if (timerUpdateId != 0) {
-                    this.timer.disconnect(timerUpdateId);
-                    timerUpdateId = 0;
-                }
+            if (timerUpdateId != 0) {
+                this.timer.disconnect(timerUpdateId);
+                timerUpdateId = 0;
+            }
 
-                if (notificationChangedId != 0) {
-                    this.disconnect(notificationChangedId);
-                    notificationChangedId = 0;
-                }
+            if (notificationChangedId != 0) {
+                this.disconnect(notificationChangedId);
+                notificationChangedId = 0;
+            }
 
-                if (notificationDestroyId != 0) {
-                    this.disconnect(notificationDestroyId);
-                    notificationDestroyId = 0;
-                }
-            };
+            if (notificationDestroyId != 0) {
+                this.disconnect(notificationDestroyId);
+                notificationDestroyId = 0;
+            }
+        };
 
         let timerUpdateId = this.timer.connect('update', onTimerUpdate);
         let notificationChangedId = this.connect('changed', onNotificationChanged);
         let notificationDestroyId = this.connect('destroy', onNotificationDestroy);
 
-        banner.actor.connect('destroy', onNotificationDestroy);
+        banner.connect('destroy', () => onNotificationDestroy());
 
         onNotificationChanged();
         onTimerUpdate();
 
         return banner;
     }
-
-    destroy(reason) {
-        if (this._timerStateChangedId != 0) {
-            this.timer.disconnect(this._timerStateChangedId);
-            this._timerStateChangedId = 0;
-        }
-
-        return super.destroy(reason);
-    }
-};
+});
 
 
-var PomodoroEndNotification = class extends Notification {
-    constructor(timer) {
+var PomodoroEndNotification = GObject.registerClass({
+    Signals: {
+        'changed': {},
+    },
+}, class PomodoroEndNotification extends Notification {
+    _init(timer) {
         let title = '';
 
-        super(title, null, null);
+        // TODO: try customContent param
+
+        super._init(title, null, null);
 
         this.setResident(true);
         this.setForFeedback(true);
@@ -359,6 +384,13 @@ var PomodoroEndNotification = class extends Notification {
         this.timer = timer;
         this._timerState = null;
         this._timerStateChangedId = this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+
+        this.connect('destroy', () => {
+            if (this._timerStateChangedId != 0) {
+                this.timer.disconnect(this._timerStateChangedId);
+                this._timerStateChangedId = 0;
+            }
+        });
 
         this._onTimerStateChanged();
     }
@@ -416,71 +448,66 @@ var PomodoroEndNotification = class extends Notification {
     }
 
     createBanner() {
-        let banner = super.createBanner();
+        let banner;
 
+        banner = super.createBanner();
         banner.canClose = function() {
             return false;
         };
+        banner.addAction(_("Skip Break"), () => {
+            this.timer.setState(Timer.State.POMODORO);
+
+            this.destroy();
+        });
+        banner.addAction(_("+1 Minute"), () => {
+            this.timer.stateDuration += 60.0;
+        });
 
         if (this.timer.getElapsed() > 15.0) {
             banner.setTitle(Timer.State.label(this.timer.getState()));
         }
 
-        let skipButton = banner.addAction(_("Skip Break"), () => {
-                this.timer.setState(Timer.State.POMODORO);
-
-                this.destroy();
-            });
-        let extendButton = banner.addAction(_("+1 Minute"), () => {
-                this.timer.stateDuration += 60.0;
-            });
-
         let onTimerUpdate = () => {
-                if (banner.bodyLabel && banner.bodyLabel.actor.clutter_text) {
-                    let bodyText = this._getBodyText();
+            if (banner.bodyLabel) {
+                let bodyText = this._getBodyText();
 
-                    if (bodyText !== banner._bodyText) {
-                        banner._bodyText = bodyText;
-                        banner.setBody(bodyText);
-                    }
+                if (bodyText !== banner._bodyText) {
+                    banner._bodyText = bodyText;
+                    banner.setBody(bodyText);
                 }
-            };
+            }
+        };
         let onNotificationDestroy = () => {
-                if (timerUpdateId != 0) {
-                    this.timer.disconnect(timerUpdateId);
-                    timerUpdateId = 0;
-                }
+            if (timerUpdateId != 0) {
+                this.timer.disconnect(timerUpdateId);
+                timerUpdateId = 0;
+            }
 
-                if (notificationDestroyId != 0) {
-                    this.disconnect(notificationDestroyId);
-                    notificationDestroyId = 0;
-                }
-            };
+            if (notificationDestroyId != 0) {
+                this.disconnect(notificationDestroyId);
+                notificationDestroyId = 0;
+            }
+        };
 
         let timerUpdateId = this.timer.connect('update', onTimerUpdate);
         let notificationDestroyId = this.connect('destroy', onNotificationDestroy);
 
-        banner.actor.connect('destroy', onNotificationDestroy);
+        banner.connect('destroy', () => onNotificationDestroy());
 
         onTimerUpdate();
 
         return banner;
     }
-
-    destroy(reason) {
-        if (this._timerStateChangedId != 0) {
-            this.timer.disconnect(this._timerStateChangedId);
-            this._timerStateChangedId = 0;
-        }
-
-        return super.destroy(reason);
-    }
-};
+});
 
 
-var ScreenShieldNotification = class extends Notification {
-    constructor(timer) {
-        super('', null, null);
+var ScreenShieldNotification = GObject.registerClass({
+    Signals: {
+        'changed': {},
+    },
+}, class PomodoroScreenShieldNotification extends Notification {
+    _init(timer) {
+        super._init('', null, null);
 
         this.timer = timer;
         this.source = getDefaultSource();
@@ -504,6 +531,18 @@ var ScreenShieldNotification = class extends Notification {
             }
         });
         this._screenShieldPatch = patch;
+
+        this.connect('destroy', () => {
+            if (this._timerUpdateId != 0) {
+                this.timer.disconnect(this._timerUpdateId);
+                this._timerUpdateId = 0;
+            }
+
+            if (this._screenShieldPatch) {
+                this._screenShieldPatch.destroy();
+                this._screenShieldPatch = null;
+            }
+        });
 
         this._onTimerUpdate();
     }
@@ -576,34 +615,21 @@ var ScreenShieldNotification = class extends Notification {
             }
         }
     }
-
-    destroy(reason) {
-        if (this._timerUpdateId != 0) {
-            this.timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
-        }
-
-        if (this._screenShieldPatch) {
-            this._screenShieldPatch.destroy();
-            this._screenShieldPatch = null;
-        }
-
-        return super.destroy(reason);
-    }
-};
+});
 
 
-var IssueNotification = class extends MessageTray.Notification {
+var IssueNotification = GObject.registerClass(
+class PomodoroIssueNotification extends MessageTray.Notification {
     /* Use base class instead of PomodoroNotification, in case
      * issue is caused by our implementation.
      */
 
-    constructor(message) {
+    _init(message) {
         let source = getDefaultSource();
         let title  = _("Pomodoro Timer");
         let url    = Config.PACKAGE_BUGREPORT;
 
-        super(source, title, message, { bannerMarkup: true });
+        super._init(source, title, message, { bannerMarkup: true });
 
         this.setTransient(true);
         this.setUrgency(MessageTray.Urgency.HIGH);
@@ -621,12 +647,13 @@ var IssueNotification = class extends MessageTray.Notification {
 
         this.source.showNotification(this);
     }
-};
+});
 
 
-var TimerBanner = class extends Calendar.NotificationMessage {
-    constructor(notification) {
-        super(notification);
+var TimerBanner = GObject.registerClass(
+class PomodoroTimerBanner extends Calendar.NotificationMessage {
+    _init(notification) {
+        super._init(notification);
 
         this.timer = notification.timer;
 
@@ -647,8 +674,6 @@ var TimerBanner = class extends Calendar.NotificationMessage {
             });
 
         this.connect('close', this._onClose.bind(this));
-
-        this.actor.connect('destroy', this._onActorDestroy.bind(this));
     }
 
     /* override parent method */
@@ -695,13 +720,13 @@ var TimerBanner = class extends Calendar.NotificationMessage {
             title = Timer.State.label(state);
         }
 
-        if (title && this.titleLabel && this.titleLabel.clutter_text) {
+        if (title && this.titleLabel) {
             this.setTitle(title);
         }
     }
 
     _onTimerElapsedChanged() {
-        if (this.bodyLabel && this.bodyLabel.actor.clutter_text) {
+        if (this.bodyLabel) {
             let bodyText = this._getBodyText();
 
             if (bodyText !== this._bodyText) {
@@ -738,7 +763,9 @@ var TimerBanner = class extends Calendar.NotificationMessage {
         }
     }
 
-    _onActorDestroy() {
+    _onDestroy() {
         this._onClose();
+
+        super._onDestroy();
     }
-};
+});
