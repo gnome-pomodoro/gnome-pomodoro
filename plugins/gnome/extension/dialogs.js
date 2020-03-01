@@ -100,20 +100,43 @@ var State = {
 };
 
 
-var BlurEffect = GObject.registerClass(
-class PomodoroBlurEffect extends Clutter.ShaderEffect {
+var BlurEffect = GObject.registerClass({
+    Properties: {
+        'orientation': GObject.ParamSpec.enum(
+            'orientation', 'orientation', 'orientation',
+            GObject.ParamFlags.READWRITE,
+            Clutter.Orientation, Clutter.Orientation.HORIZONTAL
+        ),
+        'brightness': GObject.ParamSpec.float(
+            'brightness', 'brightness', 'brightness',
+            GObject.ParamFlags.READWRITE,
+            0, 1, 1
+        ),
+        'factor': GObject.ParamSpec.float(
+            'factor', 'factor', 'factor',
+            GObject.ParamFlags.READWRITE,
+            0, 1, 0
+        ),
+    },
+}, class PomodoroBlurEffect extends Clutter.ShaderEffect {
     _init(params) {
-        params = Params.parse(params, { orientation: Clutter.Orientation.HORIZONTAL,
-                                        brightness: 1.0,
-                                        factor: 1.0 });
+        params = Params.parse(params, {
+            orientation: Clutter.Orientation.HORIZONTAL,
+            brightness: 1.0,
+            factor: 0.0,
+        });
+
+        this._orientation = undefined;
+        this._brightness = undefined;
+        this._factor = undefined;
 
         super._init({ shader_type: Clutter.ShaderType.FRAGMENT_SHADER });
+
+        this.set_shader_source(BLUR_FRAGMENT_SHADER);
 
         this.orientation = params.orientation;
         this.brightness = params.brightness;
         this.factor = params.factor;
-
-        this.set_shader_source(BLUR_FRAGMENT_SHADER);
     }
 
     get brightness() {
@@ -121,8 +144,11 @@ class PomodoroBlurEffect extends Clutter.ShaderEffect {
     }
 
     set brightness(value) {
-        this.set_uniform_value('brightness', GObject.Float(value));
+        if (this._brightness == value)
+            return;
         this._brightness = value;
+        this.set_uniform_value('brightness', GObject.Float(this._brightness));
+        this.notify('brightness');
     }
 
     get factor() {
@@ -130,12 +156,26 @@ class PomodoroBlurEffect extends Clutter.ShaderEffect {
     }
 
     set factor(value) {
-        this.set_uniform_value('factor', GObject.Float(value));
+        if (this._factor == value)
+            return;
         this._factor = value;
+        this.set_uniform_value('factor', GObject.Float(this._factor));
+        this.notify('factor');
     }
 
-    vfunc_pre_paint() {
-        let res = super.vfunc_pre_paint();
+    get orientation() {
+        return this._orientation;
+    }
+
+    set orientation(value) {
+        if (this._orientation == value)
+            return;
+        this._orientation = value;
+        this.notify('orientation');
+    }
+
+    vfunc_pre_paint(context) {
+        let res = super.vfunc_pre_paint(context);
         let [success, width, height] = this.get_target_size();
 
         if (success) {
@@ -159,107 +199,99 @@ class PomodoroBlurEffect extends Clutter.ShaderEffect {
 });
 
 
-var BlurredLightbox = class extends Lightbox.Lightbox {
-    constructor(container, params) {
+var BlurredLightbox = GObject.registerClass(
+class extends Lightbox.Lightbox {
+    _init(container, params) {
         params.radialEffect = false;
 
-        super(container, params);
+        super._init(container, params);
 
         if (Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL)) {
-            // TODO: Try consolidate these effects into one
-            this._blurXEffect = new BlurEffect({ orientation: Clutter.Orientation.HORIZONTAL,
-                                                 brightness: this._fadeFactor,
-                                                 factor: 0.0 });
-            this._blurYEffect = new BlurEffect({ orientation: Clutter.Orientation.VERTICAL,
-                                                 brightness: this._fadeFactor,
-                                                 factor: 0.0 });
-
-            this._blurXEffect.set_enabled(false);
-            this._blurYEffect.set_enabled(false);
-
             // Clone the group that contains all of UI on the screen.  This is the
             // chrome, the windows, etc.
             let uiGroupClone = new Clutter.Clone({ source: Main.uiGroup,
                                                    clip_to_allocation: true });
-            uiGroupClone.add_effect(this._blurXEffect);
-            uiGroupClone.add_effect(this._blurYEffect);
+            uiGroupClone.add_effect_with_name('blur1',
+                new BlurEffect({
+                    orientation: Clutter.Orientation.HORIZONTAL,
+                    brightness: this._fadeFactor,
+                    factor: 0.0,
+                }));
+            uiGroupClone.add_effect_with_name('blur2',
+                new BlurEffect({
+                    orientation: Clutter.Orientation.VERTICAL,
+                    brightness: this._fadeFactor,
+                    factor: 0.0,
+                }));
 
-            this.actor.add_actor(uiGroupClone);
-            this.actor.opacity = 255;
+            this.set_child(uiGroupClone);
+
+            this._uiGroup = uiGroupClone;
+
+            this.set({ opacity: 255 });
+        }
+        else {
+            this._uiGroup = null;
         }
 
-        this.actor.add_style_class_name('extension-pomodoro-lightbox');
+        this.add_style_class_name('extension-pomodoro-lightbox');
     }
 
-    show(fadeInTime) {
-        fadeInTime = fadeInTime || 0;
+    lightOn(fadeInTime) {
+        this.remove_all_transitions();
 
-        if (this._blurXEffect) {
-            Tweener.removeTweens(this._blurXEffect);
-            Tweener.addTween(this._blurXEffect,
-                             { factor: 1.0,
-                               time: fadeInTime,
-                               transition: 'easeOutQuad',
-                               onUpdate: () => {
-                                   this._blurYEffect.factor = this._blurXEffect.factor;
-                               },
-                               onComplete: () => {
-                                   this.shown = true;
-                                   this.emit('shown');
-                               }
-                             });
-            this._blurXEffect.set_enabled(true);
-            this._blurYEffect.set_enabled(true);
+        let easeProps = {
+            duration: 0,  // fadeInTime || 0,  // FIXME: since 3.36 only one effect is being animated
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        };
+
+        let onComplete = () => {
+            this._active = true;
+            this.notify('active');
+        };
+
+        this.show();
+
+        if (this._uiGroup) {
+            this._uiGroup.remove_all_transitions();
+
+            this._uiGroup.ease_property(
+                '@effects.blur1.factor', 1.0, easeProps);
+            this._uiGroup.ease_property(
+                '@effects.blur2.factor', 1.0, Object.assign({ onComplete }, easeProps));
         } else {
-            Tweener.removeTweens(this.actor);
-            Tweener.addTween(this.actor,
-                             { opacity: 255 * this._fadeFactor,
-                               time: fadeInTime,
-                               transition: 'easeOutQuad',
-                               onComplete: () => {
-                                   this.shown = true;
-                                   this.emit('shown');
-                               }
-                             });
+            this.ease(Object.assign(easeProps, {
+                opacity: 255 * this._fadeFactor,
+                onComplete,
+            }));
         }
-
-        this.actor.show();
     }
 
-    hide(fadeOutTime) {
-        fadeOutTime = fadeOutTime || 0;
+    lightOff(fadeOutTime) {
+        this.remove_all_transitions();
 
-        this.shown = false;
+        this._active = false;
+        this.notify('active');
 
-        if (this._blurXEffect) {
-            Tweener.removeTweens(this._blurXEffect);
-            Tweener.addTween(this._blurXEffect,
-                             { factor: 0.0,
-                               time: fadeOutTime,
-                               transition: 'easeOutQuad',
-                               onUpdate: () => {
-                                   this._blurYEffect.factor = this._blurXEffect.factor;
-                               },
-                               onComplete: () => {
-                                   this._blurXEffect.set_enabled(false);
-                                   this._blurYEffect.set_enabled(false);
+        let easeProps = {
+            duration: 0,  // fadeOutTime || 0, // FIXME: since 3.36 only one effect is being animated
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        };
 
-                                   this.actor.hide();
-                               }
-                             });
+        let onComplete = () => this.hide();
+
+        if (this._uiGroup) {
+            this._uiGroup.remove_all_transitions();
+
+            this._uiGroup.ease_property(
+                '@effects.blur1.factor', 0.0, easeProps);
+            this._uiGroup.ease_property(
+                '@effects.blur2.factor', 0.0, Object.assign({ onComplete }, easeProps));
         } else {
-            Tweener.removeTweens(this.actor);
-            Tweener.addTween(this.actor,
-                             { opacity: 0,
-                               time: fadeOutTime,
-                               transition: 'easeOutQuad',
-                               onComplete: () => {
-                                   this.actor.hide();
-                               }
-                             });
+            this.ease(Object.assign(easeProps, { opacity: 0, onComplete }));
         }
     }
-};
+});
 
 
 /**
@@ -303,10 +335,9 @@ var ModalDialog = class {
                                              { fadeFactor: FADE_IN_OPACITY,
                                                inhibitEvents: false });
         this._lightbox.highlight(this._layout);
-        this._lightbox.actor.show();
 
         this._grabHelper = new GrabHelper.GrabHelper(this.actor);
-        this._grabHelper.addActor(this._lightbox.actor);
+        this._grabHelper.addActor(this._lightbox);
 
         global.stage.add_actor(this.actor);
         global.focus_manager.add_group(this.actor);
@@ -366,7 +397,7 @@ var ModalDialog = class {
         this._addMessageTray();
 
         if (animate) {
-            this._lightbox.show(FADE_IN_TIME / 1000);
+            this._lightbox.lightOn(FADE_IN_TIME);
             Tweener.addTween(this.actor,
                              { opacity: 255,
                                time: FADE_IN_TIME / 1000,
@@ -381,7 +412,7 @@ var ModalDialog = class {
             this.emit('opening');
         }
         else {
-            this._lightbox.show();
+            this._lightbox.lightOn();
             this.actor.opacity = 255;
 
             this.state = State.OPENED;
@@ -404,7 +435,7 @@ var ModalDialog = class {
         Tweener.removeTweens(this.actor);
 
         if (animate) {
-            this._lightbox.hide(FADE_OUT_TIME / 1000);
+            this._lightbox.lightOff(FADE_OUT_TIME);
             Tweener.addTween(this.actor,
                              { opacity: 0,
                                time: FADE_OUT_TIME / 1000,
@@ -425,7 +456,7 @@ var ModalDialog = class {
         else {
             this.actor.opacity = 0;
             this.actor.hide();
-            this._lightbox.hide();
+            this._lightbox.lightOff();
 
             this.state = State.CLOSED;
 
@@ -461,8 +492,8 @@ var ModalDialog = class {
         }
 
         return this._grabHelper.grab({
-            actor: this._lightbox.actor,
-            focus: this._lightbox.actor,
+            actor: this._lightbox,
+            focus: this._lightbox,
             onUngrab: this._onUngrab.bind(this)
         });
     }
@@ -496,7 +527,7 @@ var ModalDialog = class {
 
         this._disconnectSignals();
 
-        this._lightbox.actor.reactive = true;
+        this._lightbox.reactive = true;
 
         // this._grabHelper.ignoreRelease();
 
@@ -524,10 +555,9 @@ var ModalDialog = class {
      */
     popModal() {
         try {
-            if (this._grabHelper.isActorGrabbed(this._lightbox.actor))
-            {
+            if (this._grabHelper.isActorGrabbed(this._lightbox)) {
                 this._grabHelper.ungrab({
-                    actor: this._lightbox.actor
+                    actor: this._lightbox
                 });
             }
         }
@@ -821,7 +851,7 @@ var PomodoroEndDialog = class extends ModalDialog {
 
     _cancelCloseWhenActive() {
         if (this._eventId) {
-            this._lightbox.actor.disconnect(this._eventId);
+            this._lightbox.disconnect(this._eventId);
             this._eventId = 0;
         }
     }
@@ -835,7 +865,7 @@ var PomodoroEndDialog = class extends ModalDialog {
         if (this._eventId == 0) {
             this._eventX = -1;
             this._eventY = -1;
-            this._eventId = this._lightbox.actor.connect('event', this._onEvent.bind(this));
+            this._eventId = this._lightbox.connect('event', this._onEvent.bind(this));
         }
     }
 
