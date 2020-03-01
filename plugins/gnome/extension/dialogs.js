@@ -350,26 +350,26 @@ var ModalDialog = class {
     _addMessageTray() {
         let messageTray = Main.messageTray;
 
-        messageTray.actor.ref();
+        messageTray.ref();
 
-        Main.layoutManager.removeChrome(messageTray.actor);
+        Main.layoutManager.removeChrome(messageTray);
 
-        global.stage.add_child(messageTray.actor);
+        global.stage.add_child(messageTray);
 
-        messageTray.actor.unref();
+        messageTray.unref();
         messageTray.bannerBlocked = false;
     }
 
     _removeMessageTray() {
         let messageTray = Main.messageTray;
 
-        messageTray.actor.ref();
+        messageTray.ref();
 
-        global.stage.remove_child(messageTray.actor);
+        global.stage.remove_child(messageTray);
 
-        Main.layoutManager.addChrome(messageTray.actor, { affectsInputRegion: false });
+        Main.layoutManager.addChrome(messageTray, { affectsInputRegion: false });
 
-        messageTray.actor.unref();
+        messageTray.unref();
     }
 
     open(animate) {
@@ -389,7 +389,7 @@ var ModalDialog = class {
         this._monitorConstraint.index = typeof(global.display) === 'object' && typeof(global.display.get_current_monitor) !== 'undefined'
             ? global.display.get_current_monitor() : global.screen.get_current_monitor();
 
-        this.actor.raise_top();
+        global.stage.set_child_above_sibling(this.actor, null);
         this.actor.show();
 
         Tweener.removeTweens(this.actor);
@@ -623,29 +623,35 @@ var PomodoroEndDialog = class extends ModalDialog {
         this._eventId                    = 0;
         this._styleChangedId             = 0;
 
-        this._minutesLabel = new St.Label();
-        this._separatorLabel = new St.Label({ text: ":" });
-        this._secondsLabel = new St.Label();
+        this._minutesLabel = new St.Label({
+            x_expand: true,
+            x_align: Clutter.ActorAlign.END,
+        });
+        this._separatorLabel = new St.Label({
+            text: ":",
+        });
+        this._secondsLabel = new St.Label({
+            x_expand: true,
+            x_align: Clutter.ActorAlign.START,
+        });
 
         let hbox = new St.BoxLayout({ vertical: false, style_class: 'extension-pomodoro-dialog-timer' });
-        hbox.add(this._minutesLabel);
-        hbox.add(this._separatorLabel);
-        hbox.add(this._secondsLabel);
+        hbox.add_actor(this._minutesLabel);
+        hbox.add_actor(this._separatorLabel);
+        hbox.add_actor(this._secondsLabel);
 
         this._descriptionLabel = new St.Label({
-                                       style_class: 'extension-pomodoro-dialog-description',
-                                       text: this.description });
+            style_class: 'extension-pomodoro-dialog-description',
+            text: this.description,
+            x_align: Clutter.ActorAlign.CENTER,
+        });
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
 
         let box = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-box',
                                      vertical: true });
-        box.add(hbox,
-                { x_fill: false,
-                  x_align: St.Align.MIDDLE });
-        box.add(this._descriptionLabel,
-                { x_fill: false,
-                  x_align: St.Align.MIDDLE });
+        box.add_actor(hbox);
+        box.add_actor(this._descriptionLabel);
         this._layout.add_actor(box);
 
         this._actorMappedId = this.actor.connect('notify::mapped', this._onActorMappedChanged.bind(this));
