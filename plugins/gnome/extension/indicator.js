@@ -18,7 +18,6 @@
  *          Kamil Prusko <kamilprusko@gmail.com>
  */
 
-const Mainloop = imports.mainloop;
 const Cairo = imports.cairo;
 const Signals = imports.signals;
 
@@ -627,7 +626,7 @@ class PomodoroIndicator extends PanelMenu.Button {
 
         let destroyId = this.connect('destroy', () => {
             if (this._blinkTimeoutSource != 0) {
-                Mainloop.source_remove(this._blinkTimeoutSource);
+                GLib.source_remove(this._blinkTimeoutSource);
                 this._blinkTimeoutSource = 0;
             }
 
@@ -708,11 +707,11 @@ class PomodoroIndicator extends PanelMenu.Button {
             else if (this._blinkTimeoutSource == 0) {
                 Tweener.addTween(this._hbox, fadeOutParams);
 
-                this._blinkTimeoutSource = Mainloop.timeout_add(FADE_OUT_TIME,
+                this._blinkTimeoutSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, FADE_OUT_TIME,
                     () => {
                         Tweener.addTween(this._hbox, fadeInParams);
 
-                        this._blinkTimeoutSource = Mainloop.timeout_add(FADE_IN_TIME, () => {
+                        this._blinkTimeoutSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, FADE_IN_TIME, () => {
                             this._blinkTimeoutSource = 0;
 
                             this._onBlinked ();
@@ -748,7 +747,7 @@ class PomodoroIndicator extends PanelMenu.Button {
             Tweener.addTween(this.menu.pauseAction.child, fadeInParams);
 
             if (this._blinkTimeoutSource != 0) {
-                Mainloop.source_remove(this._blinkTimeoutSource);
+                GLib.source_remove(this._blinkTimeoutSource);
                 this._blinkTimeoutSource = 0;
             }
         }

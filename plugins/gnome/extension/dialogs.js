@@ -18,7 +18,6 @@
  *
  */
 
-const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 
 const Atk = imports.gi.Atk;
@@ -380,7 +379,8 @@ var ModalDialog = class {
         this.state = State.OPENING;
 
         if (this._pushModalDelaySource == 0) {
-            this._pushModalDelaySource = Mainloop.timeout_add(
+            this._pushModalDelaySource = GLib.timeout_add(
+                        GLib.PRIORITY_DEFAULT,
                         Math.max(MIN_DISPLAY_TIME - IDLE_TIME_TO_PUSH_MODAL, 0),
                         this._onPushModalDelayTimeout.bind(this));
         }
@@ -532,7 +532,8 @@ var ModalDialog = class {
         // this._grabHelper.ignoreRelease();
 
         /* delay pushModal to ignore current events */
-        Mainloop.idle_add(
+        GLib.idle_add(
+            GLib.PRIORITY_DEFAULT,
             () => {
                 this._pushModalTries = 1;
 
@@ -540,8 +541,9 @@ var ModalDialog = class {
                     /* dialog became modal */
                 }
                 else {
-                    this._pushModalSource = Mainloop.timeout_add(Math.floor(1000 / PUSH_MODAL_RATE),
-                                                                 this._onPushModalTimeout.bind(this));
+                    this._pushModalSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT,
+                                                             Math.floor(1000 / PUSH_MODAL_RATE),
+                                                             this._onPushModalTimeout.bind(this));
                 }
 
                 return GLib.SOURCE_REMOVE;
@@ -570,12 +572,12 @@ var ModalDialog = class {
 
     _disconnectSignals() {
         if (this._pushModalDelaySource) {
-            Mainloop.source_remove(this._pushModalDelaySource);
+            GLib.source_remove(this._pushModalDelaySource);
             this._pushModalDelaySource = 0;
         }
 
         if (this._pushModalSource) {
-            Mainloop.source_remove(this._pushModalSource);
+            GLib.source_remove(this._pushModalSource);
             this._pushModalSource = 0;
         }
 
@@ -710,7 +712,7 @@ var PomodoroEndDialog = class extends ModalDialog {
         this._cancelOpenWhenIdle();
 
         if (this._closeWhenActiveDelaySource) {
-            Mainloop.source_remove(this._closeWhenActiveDelaySource);
+            GLib.source_remove(this._closeWhenActiveDelaySource);
             this._closeWhenActiveDelaySource = 0;
         }
 
@@ -803,7 +805,9 @@ var PomodoroEndDialog = class extends ModalDialog {
 
         /* Wait until user has a chance of seeing the dialog */
         if (this._closeWhenActiveDelaySource == 0) {
-            this._closeWhenActiveDelaySource = Mainloop.timeout_add(MIN_DISPLAY_TIME,
+            this._closeWhenActiveDelaySource = GLib.timeout_add(
+                GLib.PRIORITY_DEFAULT,
+                MIN_DISPLAY_TIME,
                 () => {
                     if (this._idleMonitor.get_idletime() < IDLE_TIME_TO_CLOSE) {
                         /* Wait until user becomes slightly idle */

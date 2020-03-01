@@ -18,7 +18,6 @@
  *
  */
 
-const Mainloop = imports.mainloop;
 const Signals = imports.signals;
 
 const Clutter = imports.gi.Clutter;
@@ -102,7 +101,7 @@ class PomodoroSource extends MessageTray.Source {
             }
 
             if (this._idleId) {
-                Mainloop.source_remove(this._idleId);
+                GLib.source_remove(this._idleId);
                 this._idleId = 0;
             }
         });
@@ -115,7 +114,7 @@ class PomodoroSource extends MessageTray.Source {
     }
 
     _lastNotificationRemoved() {
-        this._idleId = Mainloop.idle_add(() => {
+        this._idleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
             if (this.notifications.length == 0) {
                 this.destroy();
             }
