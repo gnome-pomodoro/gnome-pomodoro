@@ -4,7 +4,7 @@
 
 .keybinding .key {
     font-weight: bold;
-    background: @theme_base_color;
+    background-color: @theme_base_color;
     padding: 8px 16px;
     border: 1px solid alpha(@borders, 0.4);
     border-radius: 5px;
@@ -40,9 +40,7 @@
     outline: 0;
     border: 0;
     padding: 25px;
-    -gtk-icon-shadow: none;
     border-radius: 50%;
-    -gtk-outline-radius: 50%;
     box-shadow: none;
 }
 

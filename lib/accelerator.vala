@@ -30,6 +30,9 @@
  * For now gnome-shell extension is responsible for setting it.
  */
 
+using GLib;
+
+
 namespace Pomodoro
 {
     private errordomain AcceleratorError
