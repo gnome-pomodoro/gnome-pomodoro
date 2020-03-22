@@ -900,13 +900,15 @@ namespace Pomodoro
 
         public unowned Pomodoro.PreferencesPage? get_page (string name)
         {
-            var page_widget = this.stack.get_child_by_name (name);
+            if (this.stack != null) {
+                var page_widget = this.stack.get_child_by_name (name);
 
-            if (page_widget != null) {
-                return page_widget as Pomodoro.PreferencesPage;
+                if (page_widget != null) {
+                    return page_widget as Pomodoro.PreferencesPage;
+                }
             }
 
-            if (this.pages.contains (name)) {
+            if (this.pages != null && this.pages.contains (name)) {
                 var meta = this.pages.lookup (name);
                 var page = GLib.Object.new (meta.type) as Pomodoro.PreferencesPage;
 

@@ -511,4 +511,28 @@ namespace SoundsPlugin
         {
         }
     }
+
+    private class DummyPlayer : GLib.Object, SoundPlayer
+    {
+        public GLib.File? file {
+            get {
+                return this._file;
+            }
+            set {
+                this._file = value != null
+                        ? GLib.File.new_for_uri (get_absolute_uri (value.get_uri ()))
+                        : null;
+            }
+        }
+
+        public double volume { get; set; default = 1.0; }
+
+        private GLib.File _file;
+
+        public void play () {
+        }
+
+        public void stop () {
+        }
+    }
 }

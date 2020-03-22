@@ -71,7 +71,9 @@ namespace SoundsPlugin
                     this.uri = this.get_selected_uri ();
                 }
                 else {
-                    this.player.stop ();
+                    if (this.player != null) {
+                        this.player.stop ();
+                    }
 
                     this.uri = "";
                 }
@@ -308,11 +310,14 @@ namespace SoundsPlugin
 
         public override void unmap ()
         {
-            if (this.player is Fadeable) {
-                ((Fadeable) this.player).fade_out (FADE_OUT_MIN_TIME);
-            }
-            else {
-                this.player.stop ();
+            if (this.player.stop != null)
+            {
+                if (this.player is Fadeable) {
+                    ((Fadeable) this.player).fade_out (FADE_OUT_MIN_TIME);
+                }
+                else {
+                    this.player.stop ();
+                }
             }
 
             base.unmap ();
@@ -390,6 +395,8 @@ namespace SoundsPlugin
             }
             catch (SoundsPlugin.SoundPlayerError error) {
                 GLib.critical ("Failed to setup sound player");
+
+                this.player = new SoundsPlugin.DummyPlayer ();
             }
         }
     }
@@ -889,6 +896,8 @@ namespace SoundsPlugin
             }
             catch (SoundsPlugin.SoundPlayerError error) {
                 GLib.critical ("Failed to setup player for \"timer-ticking\" sound");
+
+                this.ticking_sound = new SoundsPlugin.DummyPlayer ();
             }
         }
 
