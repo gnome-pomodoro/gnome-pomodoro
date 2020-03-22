@@ -1,3 +1,9 @@
+2020-03-22  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.17.0:
+
+	* Support for GNOME Shell 3.36
+	* Updated Catalan translation (thanks @antoniofsm)
+
 2019-10-01  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.16.0:
 
