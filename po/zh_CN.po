@@ -73,6 +73,10 @@ msgstr "gnome-pomodoro"
 msgid "_Timer"
 msgstr "计时器(_T)"
 
+#: data/resources/menus.ui:10
+msgid "_Stats"
+msgstr "统计(_S)"
+
 #: data/resources/menus.ui:10 data/resources/menus.ui:72
 msgid "_Preferences"
 msgstr "首选项(_P)"
