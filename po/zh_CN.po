@@ -1,5 +1,5 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Free Software Foundation, Inc.
+# Chinese (simplified) translation for gnome-pomodoro
+# Copyright (c) 2020 gnome-pomodoro contributors
 # This file is distributed under the same license as the gnome-pomodoro package.
 # Meng Zhuo <mengzhuo1203@gmail.com>, 2012.
 #
