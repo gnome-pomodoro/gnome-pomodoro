@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the gnome-pomodoro package.
 # liberumed <liberumed@gmail.com>, 2013.
 # Max Vetrov 'tigertv' <maxvetrov555@yandex.ru>, 2018
+# Vladislav Kucheriavykh 'precondition' <pruesce@tutanota.com>, 2020
 #
 msgid ""
 msgstr ""
@@ -10,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-29 17:23+0100\n"
 "PO-Revision-Date: 2018-06-02 12:11+0200\n"
-"Last-Translator: Max Vetrov <maxvetrov555@yandex.ru>\n"
+"Last-Translator: Vladislav Kucheriavykh <pruesce@tutanota.com>\n"
 "Language-Team: ru <>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -119,6 +120,10 @@ msgid ""
 "Software Foundation; either version 3 of the License, or (at your option) "
 "any later version."
 msgstr ""
+"Эта программа свободный софт: вы можете распространять ее и/или изменять"
+"на условиях Универсальной Общественной Лицензии GNU, "
+"опубликованной Фондом Свободного Программного Обеспечения; либо версии 3 Лицензии, "
+"либо (по вашему выбору) любой более поздней версии."
 
 #: ../src/preferences-dialog.vala:329
 msgid "Timer"
@@ -139,7 +144,7 @@ msgstr "Продолжительность длительного перерыв
 #. @translators: You can refer it to number of pomodoros in a cycle
 #: ../src/preferences-dialog.vala:411
 msgid "Pomodoros to a long break"
-msgstr ""
+msgstr "Число Помодоры до длительного перерыва"
 
 #: ../src/preferences-dialog.vala:418
 msgid "Shortcut to toggle the timer"
@@ -171,7 +176,7 @@ msgstr "Тиканье таймера"
 
 #: ../src/preferences-dialog.vala:472
 msgid "Woodland Birds"
-msgstr ""
+msgstr "Лесные птицы"
 
 #: ../src/preferences-dialog.vala:479
 #, fuzzy
@@ -226,7 +231,7 @@ msgstr "Наличие"
 
 #: ../src/preferences-dialog.vala:603
 msgid "Postpone pomodoro when idle"
-msgstr ""
+msgstr "Отложить помодоро во время отсутствия активности на компьюторе"
 
 #: ../src/preferences-dialog.vala:608
 msgid "Status during pomodoro"
@@ -255,7 +260,7 @@ msgstr "Системные уведомления, включая сообщен
 
 #: ../src/preferences-dialog.vala:707
 msgid "OK"
-msgstr ""
+msgstr "ОК"
 
 #: ../src/utils.vala:92
 #, c-format
@@ -326,7 +331,7 @@ msgstr "Управление временем и задачами"
 
 #: ../data/gnome-pomodoro.desktop.in.h:3
 msgid "time;timer;tasks;manage;organize;"
-msgstr ""
+msgstr "время;таймер;задачи;управлять;организовать;"
 
 #~ msgid "Options"
 #~ msgstr "Параметры"
@@ -410,7 +415,7 @@ msgstr ""
 #~ msgstr "Следует ли проигрывать звук для уведомлений и событий."
 
 #~ msgid "Notification sound file"
-#~ msgstr "Файл звукового уведоления"
+#~ msgstr "Файл звукового уведомления"
 
 #~ msgid "Restore timer state"
 #~ msgstr "Востанавливать состояние таймера"
