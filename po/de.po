@@ -475,7 +475,7 @@ msgstr "Timer anhalten"
 
 #: plugins/gnome/extension/indicator.js:184
 msgid "Quit"
-msgstr "_Beenden"
+msgstr "Beenden"
 
 #: plugins/gnome/extension/indicator.js:237
 msgid "Resume Timer"
