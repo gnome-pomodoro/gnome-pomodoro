@@ -32,7 +32,6 @@ const GrabHelper = imports.ui.grabHelper;
 const Layout = imports.ui.layout;
 const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
-const Tweener = imports.ui.tweener;
 
 const Params = imports.misc.params;
 
@@ -392,23 +391,23 @@ var ModalDialog = class {
         global.stage.set_child_above_sibling(this.actor, null);
         this.actor.show();
 
-        Tweener.removeTweens(this.actor);
+        this.actor.remove_all_transitions();
 
         this._addMessageTray();
 
         if (animate) {
             this._lightbox.lightOn(FADE_IN_TIME);
-            Tweener.addTween(this.actor,
-                             { opacity: 255,
-                               time: FADE_IN_TIME / 1000,
-                               transition: 'easeOutQuad',
-                               onComplete: () => {
-                                   if (this.state == State.OPENING) {
-                                       this.state = State.OPENED;
-                                       this.emit('opened');
-                                   }
-                               }
-                             });
+            this.actor.ease({
+                opacity: 255,
+                duration: FADE_IN_TIME,
+                mode: Clutter.Animation.EASE_OUT_QUAD,
+                onComplete: () => {
+                    if (this.state == State.OPENING) {
+                        this.state = State.OPENED;
+                        this.emit('opened');
+		    }
+                }
+            });
             this.emit('opening');
         }
         else {
@@ -432,25 +431,25 @@ var ModalDialog = class {
         this.state = State.CLOSING;
         this.popModal();
 
-        Tweener.removeTweens(this.actor);
+        this.actor.remove_all_transitions();
 
         if (animate) {
             this._lightbox.lightOff(FADE_OUT_TIME);
-            Tweener.addTween(this.actor,
-                             { opacity: 0,
-                               time: FADE_OUT_TIME / 1000,
-                               transition: 'easeOutQuad',
-                               onComplete: () => {
-                                   if (this.state == State.CLOSING) {
-                                       this.state = State.CLOSED;
-                                       this.actor.hide();
+            this.actor.ease({
+                opacity: 0,
+                duration: FADE_OUT_TIME,
+                mode: Clutter.Animation.EASE_OUT_QUAD,
+                onComplete: () => {
+                    if (this.state == State.CLOSING) {
+                        this.state = State.CLOSED;
+                        this.actor.hide();
 
-                                       this._removeMessageTray();
+                        this._removeMessageTray();
 
-                                       this.emit('closed');
-                                   }
-                               }
-                             });
+                        this.emit('closed');
+		    }
+                }
+            });
             this.emit('closing');
         }
         else {
