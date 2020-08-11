@@ -36,7 +36,6 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
-const Tweener = imports.ui.tweener;
 
 const Config = Extension.imports.config;
 const Timer = Extension.imports.timer;
@@ -384,16 +383,18 @@ var TextIndicator = class {
             this._state = state;
 
             if (state == Timer.State.POMODORO) {
-                Tweener.addTween(this.actor,
-                                 { opacity: FADE_IN_OPACITY * 255,
-                                   time: FADE_IN_TIME / 1000,
-                                   transition: 'easeOutQuad' });
+                this.actor.ease({
+                    opacity: FADE_IN_OPACITY * 255,
+                    duration: FADE_IN_TIME,
+                    mode: Clutter.AnimationMode.EASE_OUT_QUAD
+                });
             }
             else {
-                Tweener.addTween(this.actor,
-                                 { opacity: FADE_OUT_OPACITY * 255,
-                                   time: FADE_OUT_TIME / 1000,
-                                   transition: 'easeOutQuad' });
+               this.actor.ease({
+                    opacity: FADE_OUT_OPACITY * 255,
+                    duration: FADE_OUT_TIME,
+                    mode: Clutter.AnimationMode.EASE_OUT_QUAD
+               });
             }
         }
 
@@ -684,32 +685,32 @@ class PomodoroIndicator extends PanelMenu.Button {
             this._blinking = true;
 
             let fadeOutParams = {
-                time: FADE_OUT_TIME / 1000,
-                transition: 'easeInOutQuad',
+                duration: FADE_OUT_TIME,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 opacity: FADE_OUT_OPACITY * 255
             };
             let fadeInParams = {
-                time: FADE_IN_TIME / 1000,
-                transition: 'easeInOutQuad',
-                delay: FADE_OUT_TIME / 1000,
+                duration: FADE_IN_TIME,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                delay: FADE_OUT_TIME,
                 opacity: FADE_IN_OPACITY * 255,
                 onComplete: this._onBlinked.bind(this)
             };
 
             if (Gtk.Settings.get_default().gtk_enable_animations) {
-                Tweener.addTween(this._hbox, fadeOutParams);
-                Tweener.addTween(this._hbox, fadeInParams);
-                Tweener.addTween(this.menu.timerLabel, fadeOutParams);
-                Tweener.addTween(this.menu.timerLabel, fadeInParams);
-                Tweener.addTween(this.menu.pauseAction.child, fadeOutParams);
-                Tweener.addTween(this.menu.pauseAction.child, fadeInParams);
+                this._hbox.ease(fadeOutParams);
+                this._hbox.ease(fadeInParams);
+                this.menu.timerLabel.ease(fadeOutParams);
+                this.menu.timerLabel.ease(fadeInParams);
+                this.menu.pauseAction.child.ease(fadeOutParams);
+                this.menu.pauseAction.child.ease(fadeInParams);
             }
             else if (this._blinkTimeoutSource == 0) {
-                Tweener.addTween(this._hbox, fadeOutParams);
+                this._hbox.ease(fadeOutParams);
 
                 this._blinkTimeoutSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, FADE_OUT_TIME,
                     () => {
-                        Tweener.addTween(this._hbox, fadeInParams);
+                        this._hbox.ease(fadeInParams);
 
                         this._blinkTimeoutSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, FADE_IN_TIME, () => {
                             this._blinkTimeoutSource = 0;
@@ -732,19 +733,19 @@ class PomodoroIndicator extends PanelMenu.Button {
     _onTimerResumed() {
         if (this._blinking) {
             let fadeInParams = {
-                time: 200 / 1000,
-                transition: 'easeOutQuad',
+                duration: 200,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 opacity: FADE_IN_OPACITY * 255,
                 onComplete: this._onBlinked.bind(this)
             };
 
-            Tweener.removeTweens(this._hbox);
-            Tweener.removeTweens(this.menu.timerLabel);
-            Tweener.removeTweens(this.menu.pauseAction.child);
+            this._hbox.remove_all_transitions();
+            this.menu.timerLabel.remove_all_transitions();
+            this.menu.pauseAction.child.remove_all_transitions();
 
-            Tweener.addTween(this._hbox, fadeInParams);
-            Tweener.addTween(this.menu.timerLabel, fadeInParams);
-            Tweener.addTween(this.menu.pauseAction.child, fadeInParams);
+            this._hbox.ease(fadeInParams);
+            this.menu.timerLabel.ease(fadeInParams);
+            this.menu.pauseAction.child.ease(fadeInParams);
 
             if (this._blinkTimeoutSource != 0) {
                 GLib.source_remove(this._blinkTimeoutSource);
