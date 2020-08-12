@@ -1,0 +1,605 @@
+# Finnish translation for gnome-pomodoro
+# Copyright (c) 2020 gnome-pomodoro contributors
+# This file is distributed under the same license as the gnome-pomodoro package.
+# Tuomas Jaakola <tuomas.jaakola@iki.fi>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-pomodoro 0.14.0\n"
+"Report-Msgid-Bugs-To: https://github.com/codito/gnome-pomodoro/issues\n"
+"POT-Creation-Date: 2017-09-22 20:00+0200\n"
+"PO-Revision-Date: 2020-08-13 01:45+0300\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.3\n"
+"Last-Translator: Tuomas Jaakola <tuomas.jaakola@iki.fi>\n"
+"Language: fi\n"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:7
+#: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:57
+#: data/resources/window.ui:287 lib/about-dialog.vala:31
+#: lib/notifications-capability.vala:129 lib/stats-page.vala:558
+#: lib/window.vala:44 plugins/actions/enums.vala:91
+#: plugins/gnome/extension/indicator.js:176
+#: plugins/gnome/extension/indicator.js:735
+#: plugins/gnome/extension/notifications.js:218
+#: plugins/gnome/extension/notifications.js:244
+#: plugins/gnome/extension/timer.js:41 src/main.vala:50
+msgid "Pomodoro"
+msgstr "Pomodoro"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:8
+msgid "A time management utility for GNOME"
+msgstr "Ajanhallintatyökalu GNOMElle"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:10
+msgid ""
+"A GNOME utility that helps managing time according to Pomodoro Technique. It "
+"intends to improve productivity and focus by taking short breaks after every "
+"25 minutes of work."
+msgstr ""
+"GNOME-työkalu, joka käyttää Pomodoro-tekniikkaa ajanhallintaan. Se tähtää "
+"tuottavuuden ja keskittymisen parantamiseen pitämällä pieniä taukoja 25 "
+"minuutin työjaksojen jälkeen."
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:19
+msgid "Timer window"
+msgstr "Ajastinikkuna"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:23 lib/preferences-dialog.vala:798
+#: plugins/gnome/extension/indicator.js:182
+msgid "Preferences"
+msgstr "Ominaisuudet"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:27
+msgid "Indicator for GNOME Shell"
+msgstr "GNOME Shellin indikaattori"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:32
+msgid "Kamil Prusko"
+msgstr "Kamil Prusko"
+
+#: data/org.gnome.Pomodoro.desktop.in:4 lib/about-dialog.vala:32
+msgid "A simple time management utility"
+msgstr "Yksinkertainen ajanhallintatyökalu"
+
+#: data/org.gnome.Pomodoro.desktop.in:5
+msgid "timer;"
+msgstr "timer;"
+
+#: data/org.gnome.Pomodoro.desktop.in:7
+msgid "gnome-pomodoro"
+msgstr "gnome-pomodoro"
+
+#: data/resources/menus.ui:6 data/resources/menus.ui:74
+msgid "_Timer"
+msgstr "_Ajastin"
+
+#: data/resources/menus.ui:10
+msgid "_Stats"
+msgstr "_Tilastot"
+
+#: data/resources/menus.ui:16 data/resources/menus.ui:78
+msgid "_Preferences"
+msgstr "_Ominaisuudet"
+
+#: data/resources/menus.ui:22
+msgid "_About"
+msgstr "T_ietoa"
+
+#: data/resources/menus.ui:26 data/resources/menus.ui:82
+msgid "_Quit"
+msgstr "_Lopeta"
+
+#: data/resources/menus.ui:35 lib/application.vala:88
+#: plugins/actions/enums.vala:185 plugins/actions/resources/action-page.ui:155
+msgid "Start"
+msgstr "Aloita"
+
+#: data/resources/menus.ui:40 data/resources/window.ui:178
+#: lib/application.vala:97 lib/window.vala:197 plugins/actions/enums.vala:194
+#: plugins/actions/resources/action-page.ui:200
+msgid "Pause"
+msgstr "Keskeytä"
+
+#: data/resources/menus.ui:45 lib/application.vala:100 lib/window.vala:183
+#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:215
+msgid "Resume"
+msgstr "Jatka"
+
+#: data/resources/menus.ui:50 data/resources/window.ui:205
+#: lib/application.vala:91
+msgid "Stop"
+msgstr "Pysäytä"
+
+#: data/resources/menus.ui:62 data/resources/window.ui:303 lib/window.vala:45
+#: plugins/actions/enums.vala:94 plugins/gnome/extension/indicator.js:177
+#: plugins/gnome/extension/timer.js:44
+msgid "Short Break"
+msgstr "Lyhyt tauko"
+
+#: data/resources/menus.ui:67 data/resources/window.ui:319 lib/window.vala:46
+#: plugins/actions/enums.vala:97 plugins/gnome/extension/indicator.js:178
+#: plugins/gnome/extension/timer.js:47
+msgid "Long Break"
+msgstr "Pitkä tauko"
+
+#: data/resources/preferences-keyboard-shortcut-page.ui:29
+msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
+msgstr "Pikanäppäin ajastimen käyttöön. Vaihda painamalla näppäintä."
+
+#: data/resources/preferences-keyboard-shortcut-page.ui:83
+#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:245
+msgid "Disable"
+msgstr "Pois käytöstä"
+
+#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:245
+msgid "Timer"
+msgstr "Ajastin"
+
+#: data/resources/preferences-main-page.ui:108
+msgid "Pomodoro duration"
+msgstr "Pomodoron kesto"
+
+#: data/resources/preferences-main-page.ui:160
+msgid "Break duration"
+msgstr "Tauon kesto"
+
+#: data/resources/preferences-main-page.ui:213
+msgid "Long break duration"
+msgstr "Pitkän tauon kesto"
+
+#: data/resources/preferences-main-page.ui:245
+msgid "Pomodoros before a long break"
+msgstr "Pomodoro-jaksoja ennen pitkää taukoa"
+
+#: data/resources/preferences-main-page.ui:294
+msgid "Keyboard shortcut"
+msgstr "Pikanäppäin"
+
+#: data/resources/preferences-main-page.ui:357
+msgid "Notifications"
+msgstr "Ilmoitukset"
+
+#: data/resources/preferences-main-page.ui:400
+msgid "Screen notifications"
+msgstr "Näytön ilmoitukset"
+
+#: data/resources/preferences-main-page.ui:460
+msgid "Desktop"
+msgstr "Työpöytä"
+
+#: data/resources/preferences-main-page.ui:509
+msgid "Wait for activity after a break"
+msgstr "Odota tapahtumia tauon jälkeen"
+
+#: data/resources/preferences-main-page.ui:573
+msgid "Plugins…"
+msgstr "Liitännäiset…"
+
+#: data/resources/preferences.ui:8 lib/preferences-dialog.vala:802
+msgid "Plugins"
+msgstr "Liitännäiset"
+
+#: data/resources/preferences.ui:47
+msgid "Back"
+msgstr "Takaisin"
+
+#: data/resources/screen-notification.ui:89
+#: plugins/gnome/extension/dialogs.js:591
+msgid "It's time to take a break"
+msgstr "On aika pitää taukoa"
+
+#: data/resources/stats-view.ui:28
+msgid "Nothing to see yet"
+msgstr "Ei nähtävää vielä"
+
+#: data/resources/stats-view.ui:45
+msgid "Complete a few sessions"
+msgstr "Vie loppuun muutama jakso"
+
+#: data/resources/stats-view.ui:86 data/resources/stats-view.ui:344
+msgid "Day"
+msgstr "Päivä"
+
+#: data/resources/stats-view.ui:109 data/resources/stats-view.ui:357
+msgid "Week"
+msgstr "Viikko"
+
+#: data/resources/stats-view.ui:133 data/resources/stats-view.ui:370
+msgid "Month"
+msgstr "Kuukausi"
+
+#: data/resources/stats-view.ui:161
+msgid "Previous (Alt+Left)"
+msgstr "Edellinen (Alt+Vasen)"
+
+#: data/resources/stats-view.ui:188
+msgid "Next (Alt+Right)"
+msgstr "Seuraava (Alt+Oikea)"
+
+#: data/resources/stats-view.ui:216 data/resources/stats-view.ui:320
+#: lib/stats-day-page.vala:62
+msgid "Today"
+msgstr "Tänään"
+
+#: data/resources/window.ui:36
+msgid "Start Pomodoro"
+msgstr "Aloita Pomodoro"
+
+#: lib/about-dialog.vala:30
+msgid "About Pomodoro"
+msgstr "Tietoa Pomodorosta"
+
+#: lib/about-dialog.vala:41
+msgid "translator-credits"
+msgstr "translator-credits"
+
+#: lib/application.vala:85
+msgid "Start/Stop"
+msgstr "Aloita/Pysäytä"
+
+#: lib/application.vala:94
+msgid "Pause/Resume"
+msgstr "Keskeytä/Jatka"
+
+#: lib/application.vala:103
+msgid "Run as background service"
+msgstr "Suorita taustapalveluna"
+
+#: lib/application.vala:106
+msgid "Show preferences"
+msgstr "Näytä ominaisuudet"
+
+#: lib/application.vala:109
+msgid "Quit application"
+msgstr "Lopeta sovellus"
+
+#: lib/application.vala:112
+msgid "Print version information and exit"
+msgstr "Näytä versiotiedot ja lopeta"
+
+#: lib/notifications-capability.vala:130
+msgid "Focus on your task."
+msgstr "Keskity tehtävääsi."
+
+#: lib/notifications-capability.vala:141 lib/notifications-capability.vala:162
+#: plugins/gnome/extension/notifications.js:387
+msgid "Take a break"
+msgstr "Pidä tauko"
+
+#: lib/notifications-capability.vala:156
+#, c-format
+msgid "You have %d minute"
+msgid_plural "You have %d minutes"
+msgstr[0] "Sinulla on %d minuutti"
+msgstr[1] "Sinulla on %d minuuttia"
+
+#: lib/notifications-capability.vala:158
+#, c-format
+msgid "You have %d second"
+msgid_plural "You have %d seconds"
+msgstr[0] "Sinulla on %d sekunti"
+msgstr[1] "Sinulla on %d sekuntia"
+
+#: lib/notifications-capability.vala:163
+msgid "Take a longer break"
+msgstr "Pidä pitkä tauko"
+
+#: lib/notifications-capability.vala:179
+msgid "Lengthen it"
+msgstr "Pidennä sitä"
+
+#: lib/notifications-capability.vala:184
+msgid "Shorten it"
+msgstr "Lyhennä sitä"
+
+#: lib/notifications-capability.vala:189
+msgid "Start pomodoro"
+msgstr "Aloita pomodoro"
+
+#: lib/preferences-dialog.vala:158
+#, c-format
+msgid ""
+"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
+"such as Control, Alt or Shift."
+msgstr ""
+"Näppäimen \"%s\" käyttö häiritsee kirjoittamista. Käytä jotain toista "
+"näppäintä, esimerkiksi Control, Alt tai Shift."
+
+#: lib/preferences-dialog.vala:590 plugins/sounds/sounds-plugin.vala:597
+msgid "Off"
+msgstr "Pois"
+
+#: lib/preferences-dialog.vala:806
+msgid "Keyboard Shortcut"
+msgstr "Pikanäppäin"
+
+#: lib/presence.vala:78
+msgid "Available"
+msgstr "Saatavilla"
+
+#: lib/presence.vala:81
+msgid "Busy"
+msgstr "Varattu"
+
+#: lib/presence.vala:84
+msgid "Idle"
+msgstr "Jouten"
+
+#: lib/presence.vala:87
+msgid "Invisible"
+msgstr "Näkymätön"
+
+#: lib/stats-day-page.vala:66
+msgid "Yesterday"
+msgstr "Eilen"
+
+#: lib/stats-page.vala:87
+#, c-format
+msgid "%d m"
+msgstr "%d m"
+
+#: lib/stats-page.vala:93
+#, c-format
+msgid "%.0f h"
+msgstr "%.0f h"
+
+#: lib/stats-page.vala:96
+#, c-format
+msgid "%.1f h"
+msgstr "%.1f h"
+
+#: lib/stats-page.vala:604
+msgid "Break"
+msgstr "Tauko"
+
+#: lib/stats-week-page.vala:58
+msgid "This week"
+msgstr "Tällä viikolla"
+
+#: lib/utils.vala:64
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d tunti"
+msgstr[1] "%d tuntia"
+
+#: lib/utils.vala:73
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minuutti"
+msgstr[1] "%d minuuttia"
+
+#: lib/window.vala:97 plugins/gnome/extension/indicator.js:183
+msgid "Stats"
+msgstr "Tilastot"
+
+#: plugins/actions/actions.vala:423
+msgid "Actions"
+msgstr "Toiminnot"
+
+#: plugins/actions/actions.vala:427
+msgid "Action"
+msgstr "Toiminto"
+
+#: plugins/actions/actions.vala:452
+msgid "Custom actions…"
+msgstr "Muokatut toiminnot…"
+
+#: plugins/actions/enums.vala:188 plugins/actions/resources/action-page.ui:170
+msgid "Complete"
+msgstr "Valmis"
+
+#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:185
+#: plugins/gnome/extension/notifications.js:619
+msgid "Skip"
+msgstr "Ohita"
+
+#: plugins/actions/enums.vala:200 plugins/actions/resources/action-page.ui:230
+msgid "Enable"
+msgstr "Ota käyttöön"
+
+#: plugins/actions/resources/action-page.ui:28
+msgid "Command"
+msgstr "Komento"
+
+#: plugins/actions/resources/action-page.ui:41
+#: plugins/actions/resources/menus.ui:29
+msgid "Triggers"
+msgstr "Liipaisimet"
+
+#: plugins/actions/resources/action-page.ui:54
+msgid "Name"
+msgstr "Nimi"
+
+#: plugins/actions/resources/action-page.ui:88
+msgid "_Pomodoro"
+msgstr "_Pomodoro"
+
+#: plugins/actions/resources/action-page.ui:102
+msgid "_Short Break"
+msgstr "_Lyhyt tauko"
+
+#: plugins/actions/resources/action-page.ui:116
+msgid "_Long Break"
+msgstr "Pitkä _tauko"
+
+#: plugins/actions/resources/action-page.ui:299
+msgid "Add"
+msgstr "Lisää"
+
+#: plugins/actions/resources/menus.ui:6
+msgid "Remove"
+msgstr "Poista"
+
+#: plugins/actions/resources/menus.ui:14
+msgid "State"
+msgstr "Tila"
+
+#: plugins/actions/resources/menus.ui:19
+msgid "State Duration"
+msgstr "Tilan kesto"
+
+#: plugins/actions/resources/menus.ui:24
+msgid "Elapsed Time"
+msgstr "Kulunut aika"
+
+#: plugins/gnome/extension/indicator.js:129
+#: plugins/gnome/extension/notifications.js:75
+#: plugins/gnome/extension/notifications.js:489
+msgid "Pomodoro Timer"
+msgstr "Pomodoro-ajastin"
+
+#: plugins/gnome/extension/indicator.js:136
+msgid "Start Timer"
+msgstr "Käynnistä ajastin"
+
+#: plugins/gnome/extension/indicator.js:161
+#: plugins/gnome/extension/indicator.js:238
+msgid "Pause Timer"
+msgstr "Keskeytä ajastin"
+
+#: plugins/gnome/extension/indicator.js:165
+msgid "Stop Timer"
+msgstr "Lopeta ajastin"
+
+#: plugins/gnome/extension/indicator.js:184
+msgid "Quit"
+msgstr "Lopeta"
+
+#: plugins/gnome/extension/indicator.js:237
+msgid "Resume Timer"
+msgstr "Jatka ajastinta"
+
+#: plugins/gnome/extension/notifications.js:251
+msgid "Break is about to end"
+msgstr "Tauko on päättymässä"
+
+#: plugins/gnome/extension/notifications.js:280
+#: plugins/gnome/extension/notifications.js:415
+#: plugins/gnome/extension/notifications.js:559
+#: plugins/gnome/extension/notifications.js:666
+#, javascript-format
+msgid "%d minute remaining"
+msgid_plural "%d minutes remaining"
+msgstr[0] "%d minuutti jäljellä"
+msgstr[1] "%d minuuttia jäljellä"
+
+#: plugins/gnome/extension/notifications.js:282
+#: plugins/gnome/extension/notifications.js:417
+#: plugins/gnome/extension/notifications.js:561
+#: plugins/gnome/extension/notifications.js:668
+#, javascript-format
+msgid "%d second remaining"
+msgid_plural "%d seconds remaining"
+msgstr[0] "%d sekunti jäljellä"
+msgstr[1] "%d sekuntia jäljellä"
+
+#: plugins/gnome/extension/notifications.js:312
+#: plugins/gnome/extension/notifications.js:438
+#: plugins/gnome/extension/notifications.js:625
+msgid "+1 Minute"
+msgstr "+1 minuutti"
+
+#: plugins/gnome/extension/notifications.js:380
+msgid "Pomodoro is about to end"
+msgstr "Pomodoro on päättymässä"
+
+#: plugins/gnome/extension/notifications.js:432
+msgid "Skip Break"
+msgstr "Ohita tauko"
+
+#: plugins/gnome/extension/notifications.js:497
+#: plugins/gnome/gnome-shell-extension.vala:441
+msgid "Report issue"
+msgstr "Ilmoita ongelmasta"
+
+#: plugins/gnome/extension/notifications.js:677
+msgid "Paused"
+msgstr "Keskeytetty"
+
+#: plugins/gnome/extension/timer.js:247
+#, javascript-format
+msgid "Failed to run <i>%s</i> service"
+msgstr "Palvelua <i>%s</i> ei voitu suorittaa"
+
+#: plugins/gnome/gnome-plugin.vala:168
+msgid "Hide other notifications"
+msgstr "Piilota muut ilmoitukset"
+
+#: plugins/gnome/gnome-shell-extension.vala:387
+#: plugins/gnome/gnome-shell-extension.vala:406
+#: plugins/gnome/gnome-shell-extension.vala:439
+msgid "Failed to enable extension"
+msgstr "Liitännäistä ei voitu ottaa käyttöön"
+
+#: plugins/gnome/gnome-shell-extension.vala:388
+msgid "It seems to be uninstalled"
+msgstr "Ilmeisesti se on poistettu"
+
+#: plugins/gnome/gnome-shell-extension.vala:407
+msgid "Extension is out of date"
+msgstr "Liitännäinen on vanhentunut"
+
+#: plugins/gnome/gnome-shell-extension.vala:408
+msgid "Upgrade"
+msgstr "Päivitä"
+
+#: plugins/sounds/resources/preferences-sound-page.ui:33
+msgid "Volume:"
+msgstr "Äänenvoimakkuus:"
+
+#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:403
+msgid "Clock Ticking"
+msgstr "Kellon tikitys"
+
+#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:404
+msgid "Timer Ticking"
+msgstr "Ajastimen tikitys"
+
+#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:405
+msgid "Woodland Birds"
+msgstr "Metsän linnut"
+
+#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:465
+#: plugins/sounds/sounds-plugin.vala:504
+msgid "Bell"
+msgstr "Kello"
+
+#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:466
+#: plugins/sounds/sounds-plugin.vala:505
+msgid "Loud Bell"
+msgstr "Iso kello"
+
+#: plugins/sounds/sounds-plugin.vala:329
+msgid "Select Custom Sound"
+msgstr "Valitse oma ääni"
+
+#: plugins/sounds/sounds-plugin.vala:561
+msgid "Ticking Sound"
+msgstr "Tikitysääni"
+
+#: plugins/sounds/sounds-plugin.vala:565
+msgid "End of Break Sound"
+msgstr "Tauon päättymisääni"
+
+#: plugins/sounds/sounds-plugin.vala:569
+msgid "Start of Break Sound"
+msgstr "Tauon aloitusääni"
+
+#: plugins/sounds/sounds-plugin.vala:737
+msgid "Ticking sound"
+msgstr "Tikitysääni"
+
+#: plugins/sounds/sounds-plugin.vala:742
+msgid "Start of break sound"
+msgstr "Tauon aloitusääni"
+
+#: plugins/sounds/sounds-plugin.vala:747
+msgid "End of break sound"
+msgstr "Tauon päättymisääni"
