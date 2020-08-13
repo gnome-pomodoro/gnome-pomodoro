@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: gnome-pomodoro 0.14.0\n"
 "Report-Msgid-Bugs-To: https://github.com/codito/gnome-pomodoro/issues\n"
 "POT-Creation-Date: 2017-09-22 20:00+0200\n"
-"PO-Revision-Date: 2020-08-13 01:45+0300\n"
+"PO-Revision-Date: 2020-08-13 11:39+0300\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -47,7 +47,7 @@ msgstr ""
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:19
 msgid "Timer window"
-msgstr "Ajastinikkuna"
+msgstr "Ajastimen ikkuna"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:23 lib/preferences-dialog.vala:798
 #: plugins/gnome/extension/indicator.js:182
@@ -97,7 +97,7 @@ msgstr "_Lopeta"
 #: data/resources/menus.ui:35 lib/application.vala:88
 #: plugins/actions/enums.vala:185 plugins/actions/resources/action-page.ui:155
 msgid "Start"
-msgstr "Aloita"
+msgstr "Käynnistä"
 
 #: data/resources/menus.ui:40 data/resources/window.ui:178
 #: lib/application.vala:97 lib/window.vala:197 plugins/actions/enums.vala:194
@@ -154,7 +154,7 @@ msgstr "Pitkän tauon kesto"
 
 #: data/resources/preferences-main-page.ui:245
 msgid "Pomodoros before a long break"
-msgstr "Pomodoro-jaksoja ennen pitkää taukoa"
+msgstr "Pomodoroja ennen pitkää taukoa"
 
 #: data/resources/preferences-main-page.ui:294
 msgid "Keyboard shortcut"
@@ -174,7 +174,7 @@ msgstr "Työpöytä"
 
 #: data/resources/preferences-main-page.ui:509
 msgid "Wait for activity after a break"
-msgstr "Odota tapahtumia tauon jälkeen"
+msgstr "Odota aktiviteettia tauon jälkeen"
 
 #: data/resources/preferences-main-page.ui:573
 msgid "Plugins…"
@@ -195,7 +195,7 @@ msgstr "On aika pitää taukoa"
 
 #: data/resources/stats-view.ui:28
 msgid "Nothing to see yet"
-msgstr "Ei nähtävää vielä"
+msgstr "Ei vielä nähtävää"
 
 #: data/resources/stats-view.ui:45
 msgid "Complete a few sessions"
@@ -228,7 +228,7 @@ msgstr "Tänään"
 
 #: data/resources/window.ui:36
 msgid "Start Pomodoro"
-msgstr "Aloita Pomodoro"
+msgstr "Käynnistä Pomodoro"
 
 #: lib/about-dialog.vala:30
 msgid "About Pomodoro"
@@ -240,7 +240,7 @@ msgstr "translator-credits"
 
 #: lib/application.vala:85
 msgid "Start/Stop"
-msgstr "Aloita/Pysäytä"
+msgstr "Käynnistä/Pysäytä"
 
 #: lib/application.vala:94
 msgid "Pause/Resume"
@@ -299,7 +299,7 @@ msgstr "Lyhennä sitä"
 
 #: lib/notifications-capability.vala:189
 msgid "Start pomodoro"
-msgstr "Aloita pomodoro"
+msgstr "Käynnistä pomodoro"
 
 #: lib/preferences-dialog.vala:158
 #, c-format
