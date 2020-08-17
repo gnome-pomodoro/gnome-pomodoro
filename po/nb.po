@@ -1,7 +1,7 @@
-# Finnish translation for gnome-pomodoro
+# Norwegian translation for gnome-pomodoro
 # Copyright (c) 2020 gnome-pomodoro contributors
 # This file is distributed under the same license as the gnome-pomodoro package.
-# Tuomas Jaakola <tuomas.jaakola@iki.fi>, 2020.
+# Arno Teigseth <arnotixe@gmail.com>, 2020.
 #
 msgid ""
 msgstr ""
