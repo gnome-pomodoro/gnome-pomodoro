@@ -63,6 +63,14 @@ function getDefaultSource() {
     return source;
 }
 
+const PomodoroNotificationPolicy = GObject.registerClass(class PomodoroNotificationPolicy extends MessageTray.NotificationPolicy {
+    get showInLockScreen() {
+        return true;
+    }
+    get detailsInLockScreen() {
+        return true;
+    }
+});
 
 var Source = GObject.registerClass(
 class PomodoroSource extends MessageTray.Source {
@@ -107,10 +115,8 @@ class PomodoroSource extends MessageTray.Source {
         });
     }
 
-    /* override parent method */
     _createPolicy() {
-        return new MessageTray.NotificationPolicy({ showInLockScreen: true,
-                                                    detailsInLockScreen: true });
+        return new PomodoroNotificationPolicy();
     }
 
     _lastNotificationRemoved() {
