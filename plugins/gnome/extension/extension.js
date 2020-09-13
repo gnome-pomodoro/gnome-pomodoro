@@ -23,10 +23,9 @@
 const Gettext = imports.gettext;
 const Signals = imports.signals;
 
-const Gio = imports.gi.Gio;
+const { Gio, Meta, Shell } = imports.gi;
+
 const Main = imports.ui.main;
-const Meta = imports.gi.Meta;
-const Shell = imports.gi.Shell;
 const ExtensionUtils = imports.misc.extensionUtils;
 const ExtensionSystem = imports.ui.extensionSystem;
 

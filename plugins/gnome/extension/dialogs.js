@@ -20,13 +20,7 @@
 
 const Signals = imports.signals;
 
-const Atk = imports.gi.Atk;
-const Clutter = imports.gi.Clutter;
-const GLib = imports.gi.GLib;
-const GObject = imports.gi.GObject;
-const Meta = imports.gi.Meta;
-const St = imports.gi.St;
-const Pango = imports.gi.Pango;
+const { Atk, Clutter, GLib, GObject, Meta, St, Pango } = imports.gi;
 
 const GrabHelper = imports.ui.grabHelper;
 const Layout = imports.ui.layout;

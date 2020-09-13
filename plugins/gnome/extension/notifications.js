@@ -20,11 +20,7 @@
 
 const Signals = imports.signals;
 
-const Clutter = imports.gi.Clutter;
-const GLib = imports.gi.GLib;
-const Meta = imports.gi.Meta;
-const GObject = imports.gi.GObject;
-const St = imports.gi.St;
+const { Clutter, GLib, GObject, Meta, St } = imports.gi;
 
 const Calendar = imports.ui.calendar;
 const Main = imports.ui.main;

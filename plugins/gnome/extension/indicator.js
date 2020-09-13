@@ -21,15 +21,7 @@
 const Cairo = imports.cairo;
 const Signals = imports.signals;
 
-const Clutter = imports.gi.Clutter;
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
-const GObject = imports.gi.GObject;
-const Gtk = imports.gi.Gtk;
-const Meta = imports.gi.Meta;
-const Pango = imports.gi.Pango;
-const Shell = imports.gi.Shell;
-const St = imports.gi.St;
+const { Clutter, Gio, GLib, GObject, Gtk, Meta, Pango, Shell, St } = imports.gi;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Main = imports.ui.main;
