@@ -84,6 +84,77 @@ var Patch = class {
 Signals.addSignalMethods(Patch.prototype);
 
 
+var TransitionGroup = class {
+
+    /* Helper class to share property transition between multiple actors */
+
+    constructor() {
+        this._actors = [];
+        this._transitions = {};  // by name, containing {'target': ..., 'params': ...}
+        this._transitionStoppedId = 0;
+        this._referenceActor = null;
+    }
+
+    _setReferenceActor(actor) {
+        this._referenceActor = actor;
+    }
+
+    addActor(actor) {
+        let index = this._actors.indexOf(actor);
+
+        if (!actor || index >= 0) {
+            return;
+        }
+
+        this._actors.push(actor);
+
+        if (!this._referenceActor) {
+            this._setReferenceActor(actor);
+        }
+    }
+
+    removeActor(actor) {
+        let index = this._actors.indexOf(actor);
+        if (index >= 0) {
+            this._actors.splice(index, 1);
+
+            for (let name in this._transitions) {
+                actor.remove_transition(name);
+            }
+        }
+
+        if (this._referenceActor === actor) {
+            this._setReferenceActor(this._actors.length > 0 ? this._actors[0] : null);
+        }
+    }
+
+    easeProperty(name, target, params) {
+        let onStopped = params.onStopped;
+        let onComplete = params.onComplete;
+
+        params = Object.assign({
+            onStopped: (isFinished) => {
+                if (onStopped)
+                    onStopped(isFinished);
+
+                if (onComplete && isFinished)
+                    onComplete();
+            }
+        }, params);
+
+        this._actors.forEach((actor) => {
+            actor.ease_property(name, target, params);
+        });
+    }
+
+    destroy() {
+        this._actors.forEach((actor) => {
+            this.removeActor(actor);
+        });
+    }
+}
+
+
 function arrayContains(array1, array2) {
     for (let i = 0; i < array2.length; i++) {
         if (array1.indexOf(array2[i]) < 0) {

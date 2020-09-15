@@ -233,7 +233,7 @@ class extends Lightbox.Lightbox {
         this.remove_all_transitions();
 
         let easeProps = {
-            duration: 0,  // fadeInTime || 0,  // FIXME: since 3.36 only one effect is being animated
+            duration: fadeInTime || 0,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         };
 
@@ -266,7 +266,7 @@ class extends Lightbox.Lightbox {
         this.notify('active');
 
         let easeProps = {
-            duration: 0,  // fadeOutTime || 0, // FIXME: since 3.36 only one effect is being animated
+            duration: fadeOutTime || 0,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         };
 
@@ -394,12 +394,12 @@ var ModalDialog = class {
             this.actor.ease({
                 opacity: 255,
                 duration: FADE_IN_TIME,
-                mode: Clutter.Animation.EASE_OUT_QUAD,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 onComplete: () => {
                     if (this.state == State.OPENING) {
                         this.state = State.OPENED;
                         this.emit('opened');
-		    }
+                    }
                 }
             });
             this.emit('opening');
@@ -432,7 +432,7 @@ var ModalDialog = class {
             this.actor.ease({
                 opacity: 0,
                 duration: FADE_OUT_TIME,
-                mode: Clutter.Animation.EASE_OUT_QUAD,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 onComplete: () => {
                     if (this.state == State.CLOSING) {
                         this.state = State.CLOSED;
@@ -441,7 +441,7 @@ var ModalDialog = class {
                         this._removeMessageTray();
 
                         this.emit('closed');
-		    }
+                    }
                 }
             });
             this.emit('closing');

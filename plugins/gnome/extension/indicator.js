@@ -31,6 +31,7 @@ const PopupMenu = imports.ui.popupMenu;
 
 const Config = Extension.imports.config;
 const Timer = Extension.imports.timer;
+const Utils = Extension.imports.utils;
 
 const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
 const _ = Gettext.gettext;
@@ -601,7 +602,7 @@ class PomodoroIndicator extends PanelMenu.Button {
 
         this._arrow = PopupMenu.arrowIcon(St.Side.BOTTOM);
         this._blinking = false;
-        this._blinkTimeoutSource = 0;
+        this._blinkingGroup = new Utils.TransitionGroup();
 
         this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
         this._hbox.pack_start = true;
@@ -613,20 +614,19 @@ class PomodoroIndicator extends PanelMenu.Button {
         this.setMenu(new IndicatorMenu(this));
         this.setType(type);
 
+        this._blinkingGroup.addActor(this._hbox);
+        this._blinkingGroup.addActor(this.menu.timerLabel);
+        this._blinkingGroup.addActor(this.menu.pauseAction.child);
         this._onBlinked();
 
         this._timerPausedId = this.timer.connect('paused', this._onTimerPaused.bind(this));
         this._timerResumedId = this.timer.connect('resumed', this._onTimerResumed.bind(this));
 
         let destroyId = this.connect('destroy', () => {
-            if (this._blinkTimeoutSource != 0) {
-                GLib.source_remove(this._blinkTimeoutSource);
-                this._blinkTimeoutSource = 0;
-            }
-
             this.timer.disconnect(this._timerPausedId);
             this.timer.disconnect(this._timerResumedId);
             this.timer = null;
+            this._blinkingGroup.destroy();
 
             if (this.icon) {
                 this.icon.destroy();
@@ -675,46 +675,38 @@ class PomodoroIndicator extends PanelMenu.Button {
 
     _blink() {
         if (!this._blinking) {
-            this._blinking = true;
-
-            let fadeOutParams = {
-                duration: FADE_OUT_TIME,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                opacity: FADE_OUT_OPACITY * 255
-            };
-            let fadeInParams = {
-                duration: FADE_IN_TIME,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                delay: FADE_OUT_TIME,
-                opacity: FADE_IN_OPACITY * 255,
-                onComplete: this._onBlinked.bind(this)
-            };
-
-            if (Gtk.Settings.get_default().gtk_enable_animations) {
-                this._hbox.ease(fadeOutParams);
-                this._hbox.ease(fadeInParams);
-                this.menu.timerLabel.ease(fadeOutParams);
-                this.menu.timerLabel.ease(fadeInParams);
-                this.menu.pauseAction.child.ease(fadeOutParams);
-                this.menu.pauseAction.child.ease(fadeInParams);
-            }
-            else if (this._blinkTimeoutSource == 0) {
-                this._hbox.ease(fadeOutParams);
-
-                this._blinkTimeoutSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, FADE_OUT_TIME,
-                    () => {
-                        this._hbox.ease(fadeInParams);
-
-                        this._blinkTimeoutSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, FADE_IN_TIME, () => {
-                            this._blinkTimeoutSource = 0;
-
-                            this._onBlinked ();
-
-                            return GLib.SOURCE_REMOVE;
-                        });
-
-                        return GLib.SOURCE_REMOVE;
+            let fadeIn = () => {
+                if (this._blinking) {
+                    this._blinkingGroup.easeProperty('opacity', FADE_IN_OPACITY * 255, {
+                        duration: 1750,
+                        mode: Clutter.AnimationMode.EASE_IN_OUT_CUBIC,
+                        onComplete: fadeOut,
                     });
+                }
+                else {
+                    this._onBlinked();
+                }
+            };
+            let fadeOut = () => {
+                if (this._blinking) {
+                    this._blinkingGroup.easeProperty('opacity', FADE_OUT_OPACITY * 255, {
+                        duration: 1750,
+                        mode: Clutter.AnimationMode.EASE_IN_OUT_CUBIC,
+                        onComplete: fadeIn,
+                    });
+                }
+                else {
+                    this._onBlinked();
+                }
+            };
+
+            if (St.Settings.get().enable_animations) {
+                this._blinking = true;
+                this._blinkingGroup.easeProperty('opacity', FADE_OUT_OPACITY * 255, {
+                    duration: FADE_OUT_TIME,
+                    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                    onComplete: fadeIn,
+                });
             }
         }
     }
@@ -725,25 +717,11 @@ class PomodoroIndicator extends PanelMenu.Button {
 
     _onTimerResumed() {
         if (this._blinking) {
-            let fadeInParams = {
+            this._blinkingGroup.easeProperty('opacity', FADE_IN_OPACITY * 255, {
                 duration: 200,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                opacity: FADE_IN_OPACITY * 255,
                 onComplete: this._onBlinked.bind(this)
-            };
-
-            this._hbox.remove_all_transitions();
-            this.menu.timerLabel.remove_all_transitions();
-            this.menu.pauseAction.child.remove_all_transitions();
-
-            this._hbox.ease(fadeInParams);
-            this.menu.timerLabel.ease(fadeInParams);
-            this.menu.pauseAction.child.ease(fadeInParams);
-
-            if (this._blinkTimeoutSource != 0) {
-                GLib.source_remove(this._blinkTimeoutSource);
-                this._blinkTimeoutSource = 0;
-            }
+            });
         }
     }
 });
