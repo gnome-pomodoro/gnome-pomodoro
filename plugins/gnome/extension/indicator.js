@@ -612,6 +612,7 @@ class PomodoroIndicator extends PanelMenu.Button {
 
         this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
         this._hbox.pack_start = true;
+        this._hbox.set_x_align(Clutter.ActorAlign.CENTER);
         this._hbox.set_y_align(Clutter.ActorAlign.CENTER);
         this._hbox.add_child(this._arrow);
         this.add_child(this._hbox);
