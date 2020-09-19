@@ -59,10 +59,20 @@ function getDefaultSource() {
     return source;
 }
 
-const PomodoroNotificationPolicy = GObject.registerClass(class PomodoroNotificationPolicy extends MessageTray.NotificationPolicy {
+var NotificationPolicy = GObject.registerClass({
+    Properties: {
+        'show-in-lock-screen': GObject.ParamSpec.boolean(
+            'show-in-lock-screen', 'show-in-lock-screen', 'show-in-lock-screen',
+            GObject.ParamFlags.READABLE, true),
+        'details-in-lock-screen': GObject.ParamSpec.boolean(
+            'details-in-lock-screen', 'details-in-lock-screen', 'details-in-lock-screen',
+            GObject.ParamFlags.READABLE, true),
+    },
+}, class PomodoroNotificationPolicy extends MessageTray.NotificationPolicy {
     get showInLockScreen() {
         return true;
     }
+
     get detailsInLockScreen() {
         return true;
     }
@@ -108,11 +118,14 @@ class PomodoroSource extends MessageTray.Source {
                 GLib.source_remove(this._idleId);
                 this._idleId = 0;
             }
+
+            this.destroyNotifications();
         });
     }
 
+    /* override parent method */
     _createPolicy() {
-        return new PomodoroNotificationPolicy();
+        return new NotificationPolicy();
     }
 
     _lastNotificationRemoved() {
@@ -603,7 +616,7 @@ var ScreenShieldNotification = GObject.registerClass({
 
             // HACK: Force screen shield to update notification body
             if (this.source !== null) {
-                this.source.emit('count-updated');
+                this.source.notify('count');
             }
         }
         else if (elapsedChanged) {
@@ -611,7 +624,7 @@ var ScreenShieldNotification = GObject.registerClass({
 
             if (this.source !== null) {
                 this._screenShieldPatch.apply();
-                this.source.emit('count-updated');
+                this.source.notify('count');
                 this._screenShieldPatch.revert();
             }
         }
