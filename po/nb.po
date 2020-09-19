@@ -16,7 +16,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.0.6\n"
 "Last-Translator: Arno Teigseth <arnotixe@gmail.com>\n"
-"Language: no\n"
+"Language: nb\n"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:7
 #: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:57
