@@ -1,3 +1,15 @@
+2020-10-04  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.18.0:
+
+	* Support for GNOME Shell 3.38 (thanks @ignapk and @szpak)
+	* Removed ayatana-appindicator3 support
+	* Added Norwegian translation (thanks @arnotixe)
+	* Added Finnish translation (thanks @iqqmuT)
+	* Updated Indonesian translation (thanks @atriwidada)
+	* Updated Chinese translation (thanks @wffger)
+	* Updated Russian translation (thanks @rkaverin)
+	* Updated French translation (thanks @precondition)
+
 2020-03-22  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.17.0:
 

@@ -44,6 +44,21 @@
   <translation type="gettext">gnome-pomodoro</translation>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="0.18.0" date="2020-10-04">
+      <description>
+        <p>Overview of changes in gnome-pomodoro 0.18.0</p>
+        <ul>
+          <li>Support for GNOME Shell 3.38 (@ignapk and @szpak)</li>
+          <li>Removed ayatana-appindicator3 support</li>
+          <li>Added Norwegian translation (@arnotixe)</li>
+          <li>Added Finnish translation (@iqqmuT)</li>
+          <li>Updated Indonesian translation (@atriwidada)</li>
+          <li>Updated Chinese translation (@wffger)</li>
+          <li>Updated Russian translation (@rkaverin)</li>
+          <li>Updated French translation (@precondition)</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.17.0" date="2020-03-22">
       <description>
         <p>Overview of changes in gnome-pomodoro 0.17.0</p>
