@@ -1,3 +1,0 @@
-#!/bin/sh
-
-jhbuild --file=@abs_srcdir@/gnome-pomodoro.jhbuildrc --moduleset=@abs_srcdir@/gnome-pomodoro.modules --exit-on-error $@
