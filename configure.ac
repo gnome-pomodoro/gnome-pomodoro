@@ -59,10 +59,6 @@ PKG_CHECK_MODULES(GNOME_PLUGIN, [
     gio-2.0 >= $GLIB_REQUIRED
 ], [with_gnome_plugin=yes], [with_gnome_plugin=no])
 
-PKG_CHECK_MODULES(INDICATOR_PLUGIN, [
-    ayatana-appindicator3-0.1
-], [with_indicator_plugin=yes], [with_indicator_plugin=no])
-
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
@@ -190,7 +186,6 @@ AC_SUBST([PLUGIN_LIBS])
 AC_SUBST([PLUGIN_LDFLAGS])
 
 AM_CONDITIONAL([WITH_GNOME_PLUGIN], [test "$with_gnome_plugin" = yes])
-AM_CONDITIONAL([WITH_INDICATOR_PLUGIN], [test "$with_indicator_plugin" = yes])
 
 
 # Some constants to pass to config.h
@@ -240,11 +235,6 @@ AC_CONFIG_FILES([
     plugins/gnome/extension/config.js
     plugins/gnome/extension/metadata.json
     plugins/gnome/extension/Makefile
-    plugins/indicator/Makefile
-    plugins/indicator/icons/Makefile
-    plugins/indicator/icons/ambiance/Makefile
-    plugins/indicator/icons/arc/Makefile
-    plugins/indicator/icons/radiance/Makefile
     plugins/sounds/Makefile
     tests/Makefile
     vapi/Makefile
@@ -265,5 +255,4 @@ gnome-pomodoro ${VERSION}:
 
 plugins:
     gnome:                  ${with_gnome_plugin}
-    indicator:              ${with_indicator_plugin}
 "

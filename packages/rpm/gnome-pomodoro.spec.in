@@ -22,7 +22,6 @@ BuildRequires: pkgconfig(libpeas-1.0) >= @LIBPEAS_REQUIRED@
 BuildRequires: pkgconfig(gom-1.0) >= @GOM_REQUIRED@
 BuildRequires: pkgconfig(gstreamer-1.0) >= 1.0.10
 BuildRequires: pkgconfig(libcanberra) >= 0.30
-BuildRequires: pkgconfig(appindicator3-0.1)
 BuildRequires: pkgconfig(appstream-glib)
 
 %if %{defined fedora}
