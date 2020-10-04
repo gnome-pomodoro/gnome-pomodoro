@@ -226,7 +226,6 @@ AC_CONFIG_FILES([
     po/Makefile.in
     packages/Makefile
     packages/debian/Makefile
-    packages/jhbuild/Makefile
     packages/rpm/Makefile
     plugins/Makefile
     plugins/actions/Makefile
