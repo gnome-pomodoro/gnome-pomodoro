@@ -1,5 +1,5 @@
 # Korean translations for gnome-pomodoro package.
-# Copyright (C) 2020 Free Software Foundation, Inc.
+# Copyright (c) 2020 gnome-pomodoro contributors
 # This file is distributed under the same license as the gnome-pomodoro package.
 # root <dayeon.dev@gmail.com>, 2020.
 #
