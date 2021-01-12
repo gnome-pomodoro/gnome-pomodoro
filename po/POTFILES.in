@@ -60,8 +60,6 @@ plugins/gnome/gnome-idle-monitor.vala
 plugins/gnome/gnome-plugin.vala
 plugins/gnome/gnome-shell-extension.vala
 plugins/gnome/gnome.vala
-plugins/indicator/indicator-capability.vala
-plugins/indicator/indicator-plugin.vala
 plugins/sounds/resources/preferences-sound-page.ui
 plugins/sounds/sound-player.vala
 plugins/sounds/sounds-plugin.vala

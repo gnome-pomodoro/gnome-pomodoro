@@ -46,8 +46,6 @@ plugins/gnome/gnome.c
 plugins/gnome/gnome-idle-monitor.c
 plugins/gnome/gnome-plugin.c
 plugins/gnome/gnome-shell-extension.c
-plugins/indicator/indicator-capability.c
-plugins/indicator/indicator-plugin.c
 plugins/sounds/sound-player.c
 plugins/sounds/sounds-plugin.c
 src/main.c
