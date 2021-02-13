@@ -1,4 +1,4 @@
-icondir = $(datadir)/icons/hicolor/scalable/apps
+icondir = $(datadir)/icons/hicolor/symbolic/apps
 icon_DATA = gnome-pomodoro-symbolic.svg
 
 EXTRA_DIST = \
