@@ -166,8 +166,8 @@ var BlurEffect = GObject.registerClass({
         this.notify('orientation');
     }
 
-    vfunc_pre_paint(context) {
-        let res = super.vfunc_pre_paint(context);
+    vfunc_pre_paint(node, context) {
+        let res = super.vfunc_pre_paint(node, context);
         let [success, width, height] = this.get_target_size();
 
         if (success) {
