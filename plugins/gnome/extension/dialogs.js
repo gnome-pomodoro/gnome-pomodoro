@@ -58,7 +58,7 @@ const FADE_IN_TIME = 300;
 const FADE_OUT_TIME = 300;
 
 const BLUR_BRIGHTNESS = 0.4;
-const BLUR_SIGMA = 5.0;
+const BLUR_SIGMA = 20.0;
 
 const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
 
@@ -120,7 +120,46 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
                     brightness: BLUR_BRIGHTNESS,
                     sigma: BLUR_SIGMA * themeContext.scale_factor,
                 });
+                effect.queue_repaint();
             }
+        }
+    }
+
+    lightOn(fadeInTime) {
+        super.lightOn(fadeInTime);
+
+        if (this._uiGroup) {
+            let effect = this._uiGroup.get_effect('blur');
+            if (effect) {
+                effect.set({
+                    brightness: BLUR_BRIGHTNESS * 0.99,
+                });
+            }
+
+            // HACK: force effect to be repaint itself during fading-in
+            // in theory effect.queue_repaint(); should be enough
+            this._uiGroup.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS, {
+                duration: fadeInTime || 0,
+            });
+        }
+    }
+
+    lightOff(fadeOutTime) {
+        super.lightOff(fadeOutTime);
+
+        if (this._uiGroup) {
+            let effect = this._uiGroup.get_effect('blur');
+            if (effect) {
+                effect.set({
+                    brightness: BLUR_BRIGHTNESS * 0.99,
+                });
+            }
+
+            // HACK: force effect to be repaint itself during fading-in
+            // in theory effect.queue_repaint(); should be enough
+            this._uiGroup.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS, {
+                duration: fadeOutTime || 0,
+            });
         }
     }
 });
