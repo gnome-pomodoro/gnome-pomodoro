@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017 gnome-pomodoro contributors
+ * Copyright (c) 2011-2021 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 const Signals = imports.signals;
 
-const { Atk, Clutter, GLib, GObject, Meta, St, Pango } = imports.gi;
+const { Atk, Clutter, GLib, GObject, Meta, Shell, St, Pango } = imports.gi;
 
 const GrabHelper = imports.ui.grabHelper;
 const Layout = imports.ui.layout;
@@ -54,34 +54,13 @@ const IDLE_TIME_TO_OPEN = 60000;
 const IDLE_TIME_TO_CLOSE = 600;
 const MIN_DISPLAY_TIME = 500;
 
-const FADE_IN_TIME = 200;
-const FADE_IN_OPACITY = 0.45;
+const FADE_IN_TIME = 300;
+const FADE_OUT_TIME = 300;
 
-const FADE_OUT_TIME = 200;
+const BLUR_BRIGHTNESS = 0.4;
+const BLUR_SIGMA = 5.0;
 
 const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
-
-// A single pass blur approximation, with hacky brightness param
-const BLUR_FRAGMENT_SHADER = '\
-uniform sampler2D tex; \
-uniform float x_step, y_step, factor, brightness; \
-\
-const float[7] weights = float[7](0.1452444, 0.1314128, 0.1115940, 0.0831466, 0.0543562,  0.0311780,  0.0156902); \
-const float[7] offsets = float[7](0.0000000, 2.4876390, 4.4711854, 6.4547903, 8.4384988, 10.4223371, 12.4063545); \
-\
-void main () { \
-  vec2 uv = vec2(cogl_tex_coord_in[0].st); \
-  vec2 pixel_size = vec2(x_step * factor, y_step * factor); \
-  vec4 color = vec4(0.0); \
-  color += weights[0] * texture2D(tex, uv); \
-  for (int i=1; i < 7; i++) { \
-    color += \
-      weights[i] * texture2D(tex, uv - pixel_size * offsets[i]) + \
-      weights[i] * texture2D(tex, uv + pixel_size * offsets[i]); \
-  } \
-  color.rgb *= 1.0 - (1.0 - sqrt(brightness)) * factor; \
-  cogl_color_out = color; \
-}';
 
 
 var State = {
@@ -92,195 +71,56 @@ var State = {
 };
 
 
-var BlurEffect = GObject.registerClass({
-    Properties: {
-        'orientation': GObject.ParamSpec.enum(
-            'orientation', 'orientation', 'orientation',
-            GObject.ParamFlags.READWRITE,
-            Clutter.Orientation, Clutter.Orientation.HORIZONTAL
-        ),
-        'brightness': GObject.ParamSpec.float(
-            'brightness', 'brightness', 'brightness',
-            GObject.ParamFlags.READWRITE,
-            0, 1, 1
-        ),
-        'factor': GObject.ParamSpec.float(
-            'factor', 'factor', 'factor',
-            GObject.ParamFlags.READWRITE,
-            0, 1, 0
-        ),
-    },
-}, class PomodoroBlurEffect extends Clutter.ShaderEffect {
-    _init(params) {
+var BlurredLightbox = GObject.registerClass(
+class PomodoroBlurredLightbox extends Lightbox.Lightbox {
+    _init(container, params) {
         params = Params.parse(params, {
-            orientation: Clutter.Orientation.HORIZONTAL,
-            brightness: 1.0,
-            factor: 0.0,
+            inhibitEvents: false,
+            width: null,
+            height: null,
         });
 
-        this._orientation = undefined;
-        this._brightness = undefined;
-        this._factor = undefined;
-
-        super._init({ shader_type: Clutter.ShaderType.FRAGMENT_SHADER });
-
-        this.set_shader_source(BLUR_FRAGMENT_SHADER);
-
-        this.orientation = params.orientation;
-        this.brightness = params.brightness;
-        this.factor = params.factor;
-    }
-
-    get brightness() {
-        return this._brightness;
-    }
-
-    set brightness(value) {
-        if (this._brightness == value)
-            return;
-        this._brightness = value;
-        this.set_uniform_value('brightness', GObject.Float(this._brightness));
-        this.notify('brightness');
-    }
-
-    get factor() {
-        return this._factor;
-    }
-
-    set factor(value) {
-        if (this._factor == value)
-            return;
-        this._factor = value;
-        this.set_uniform_value('factor', GObject.Float(this._factor));
-        this.notify('factor');
-    }
-
-    get orientation() {
-        return this._orientation;
-    }
-
-    set orientation(value) {
-        if (this._orientation == value)
-            return;
-        this._orientation = value;
-        this.notify('orientation');
-    }
-
-    vfunc_pre_paint(node, context) {
-        let res = super.vfunc_pre_paint(node, context);
-        let [success, width, height] = this.get_target_size();
-
-        if (success) {
-            // Actually we don't blur horizontally / vertically, but diagonally
-            if (this.orientation != Clutter.Orientation.HORIZONTAL) {
-                this.set_uniform_value('x_step', GObject.Float(1.0 / width));
-                this.set_uniform_value('y_step', GObject.Float(1.0 / height));
-            }
-            else {
-                this.set_uniform_value('x_step', GObject.Float(-1.0 / width));
-                this.set_uniform_value('y_step', GObject.Float(1.0 / height));
-            }
-        }
-        else {
-            this.set_uniform_value('x_step', GObject.Float(0.0));
-            this.set_uniform_value('y_step', GObject.Float(0.0));
-        }
-
-        return res;
-    }
-});
-
-
-var BlurredLightbox = GObject.registerClass(
-class extends Lightbox.Lightbox {
-    _init(container, params) {
-        params.radialEffect = false;
-
-        super._init(container, params);
+        super._init(container, {
+            inhibitEvents: params.inhibitEvents,
+            width: params.width,
+            height: params.height,
+            fadeFactor: 1.0,
+            radialEffect: false,
+        });
 
         if (Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL)) {
-            // Clone the group that contains all of UI on the screen.  This is the
+            // Clone the group that contains all of UI on the screen. This is the
             // chrome, the windows, etc.
-            let uiGroupClone = new Clutter.Clone({ source: Main.uiGroup,
-                                                   clip_to_allocation: true });
-            uiGroupClone.add_effect_with_name('blur1',
-                new BlurEffect({
-                    orientation: Clutter.Orientation.HORIZONTAL,
-                    brightness: this._fadeFactor,
-                    factor: 0.0,
-                }));
-            uiGroupClone.add_effect_with_name('blur2',
-                new BlurEffect({
-                    orientation: Clutter.Orientation.VERTICAL,
-                    brightness: this._fadeFactor,
-                    factor: 0.0,
-                }));
+            this._uiGroup = new Clutter.Clone({ source: Main.uiGroup, clip_to_allocation: true });
+            this._uiGroup.add_effect_with_name('blur', new Shell.BlurEffect());
+            this.set_child(this._uiGroup);
 
-            this.set_child(uiGroupClone);
-
-            this._uiGroup = uiGroupClone;
-
-            this.set({ opacity: 255 });
+            this.set({ opacity: 0, style_class: 'extension-pomodoro-lightbox-blurred' });
         }
         else {
             this._uiGroup = null;
+
+            this.set({ opacity: 0, style_class: 'extension-pomodoro-lightbox' });
         }
 
-        this.add_style_class_name('extension-pomodoro-lightbox');
+        const themeContext = St.ThemeContext.get_for_stage(global.stage);
+        this._scaleChangedId = themeContext.connect('notify::scale-factor', this._updateEffects.bind(this));
+        this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', this._updateEffects.bind(this));
+
+        this._updateEffects();
     }
 
-    lightOn(fadeInTime) {
-        this.remove_all_transitions();
-
-        let easeProps = {
-            duration: fadeInTime || 0,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-        };
-
-        let onComplete = () => {
-            this._active = true;
-            this.notify('active');
-        };
-
-        this.show();
-
+    _updateEffects() {
         if (this._uiGroup) {
-            this._uiGroup.remove_all_transitions();
+            const themeContext = St.ThemeContext.get_for_stage(global.stage);
+            let effect = this._uiGroup.get_effect('blur');
 
-            this._uiGroup.ease_property(
-                '@effects.blur1.factor', 1.0, easeProps);
-            this._uiGroup.ease_property(
-                '@effects.blur2.factor', 1.0, Object.assign({ onComplete }, easeProps));
-        } else {
-            this.ease(Object.assign(easeProps, {
-                opacity: 255 * this._fadeFactor,
-                onComplete,
-            }));
-        }
-    }
-
-    lightOff(fadeOutTime) {
-        this.remove_all_transitions();
-
-        this._active = false;
-        this.notify('active');
-
-        let easeProps = {
-            duration: fadeOutTime || 0,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-        };
-
-        let onComplete = () => this.hide();
-
-        if (this._uiGroup) {
-            this._uiGroup.remove_all_transitions();
-
-            this._uiGroup.ease_property(
-                '@effects.blur1.factor', 0.0, easeProps);
-            this._uiGroup.ease_property(
-                '@effects.blur2.factor', 0.0, Object.assign({ onComplete }, easeProps));
-        } else {
-            this.ease(Object.assign(easeProps, { opacity: 0, onComplete }));
+            if (effect) {
+                effect.set({
+                    brightness: BLUR_BRIGHTNESS,
+                    sigma: BLUR_SIGMA * themeContext.scale_factor,
+                });
+            }
         }
     }
 });
@@ -324,8 +164,7 @@ var ModalDialog = class {
         this.actor.add_actor(this._layout);
 
         this._lightbox = new BlurredLightbox(this.actor,
-                                             { fadeFactor: FADE_IN_OPACITY,
-                                               inhibitEvents: false });
+                                             { inhibitEvents: false });
         this._lightbox.highlight(this._layout);
 
         this._grabHelper = new GrabHelper.GrabHelper(this.actor);

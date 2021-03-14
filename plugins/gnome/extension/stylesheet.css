@@ -98,7 +98,10 @@
 }
 
 .extension-pomodoro-lightbox {
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+.extension-pomodoro-lightbox-blurred {
+    background-color: transparent;
 }
 
 .extension-pomodoro-dialog .extension-pomodoro-dialog-box {
