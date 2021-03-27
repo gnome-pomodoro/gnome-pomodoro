@@ -81,9 +81,9 @@ namespace SoundsPlugin
         }
 
         [GtkChild]
-        private Gtk.Adjustment volume_adjustment;
+        private unowned Gtk.Adjustment volume_adjustment;
         [GtkChild]
-        private Gtk.ListBox chooser_listbox;
+        private unowned Gtk.ListBox chooser_listbox;
 
         protected SoundPlayer player;
 

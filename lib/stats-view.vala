@@ -49,13 +49,13 @@ namespace Pomodoro
         }
 
         [GtkChild]
-        private Gtk.Notebook notebook;
+        private unowned Gtk.Notebook notebook;
         [GtkChild]
-        private Gtk.Label title;
+        private unowned Gtk.Label title;
         [GtkChild]
-        private Gtk.Stack stack;
+        private unowned Gtk.Stack stack;
         [GtkChild]
-        private Gtk.Stack pages;
+        private unowned Gtk.Stack pages;
 
         private Gom.Repository repository;
         private GLib.DateTime? min_datetime;

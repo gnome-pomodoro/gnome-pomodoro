@@ -45,9 +45,10 @@ namespace Pomodoro
 
                 case INVISIBLE:
                     return "invisible";
-            }
 
-            return "";
+                default:
+                    return "";
+            }
         }
 
         public static PresenceStatus from_string (string? presence_status)
@@ -65,9 +66,10 @@ namespace Pomodoro
 
                 case "invisible":
                     return PresenceStatus.INVISIBLE;
-            }
 
-            return PresenceStatus.DEFAULT;
+                default:
+                    return PresenceStatus.DEFAULT;
+            }
         }
 
         public string get_label ()
@@ -85,9 +87,10 @@ namespace Pomodoro
 
                 case INVISIBLE:
                     return _("Invisible");
-            }
 
-            return "";
+                default:
+                    return "";
+           }
         }
     }
 }

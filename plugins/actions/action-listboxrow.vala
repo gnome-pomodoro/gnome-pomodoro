@@ -28,11 +28,11 @@ namespace Actions
         public int position { get; set; default = -1; }
 
         [GtkChild]
-        private Gtk.Label name_label;
+        private unowned Gtk.Label name_label;
         [GtkChild]
-        private Gtk.FlowBox keywords_flowbox;
+        private unowned Gtk.FlowBox keywords_flowbox;
         [GtkChild]
-        private Gtk.MenuButton options_button;
+        private unowned Gtk.MenuButton options_button;
 
         public ActionListBoxRow (Actions.Action action)
         {

@@ -40,7 +40,7 @@ namespace Actions
     public class PreferencesPage : Gtk.Box, Pomodoro.PreferencesPage
     {
         [GtkChild]
-        private Gtk.ListBox actions_listbox;
+        private unowned Gtk.ListBox actions_listbox;
 
         private Actions.ActionManager actions_manager;
         private GLib.HashTable<string, unowned Actions.ActionListBoxRow> rows_hash;

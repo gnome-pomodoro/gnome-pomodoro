@@ -109,11 +109,11 @@ namespace Pomodoro
         private Pomodoro.Accelerator accelerator { get; set; }
 
         [GtkChild]
-        private Gtk.Box preview_box;
+        private unowned Gtk.Box preview_box;
         [GtkChild]
-        private Gtk.Button disable_button;
+        private unowned Gtk.Button disable_button;
         [GtkChild]
-        private Gtk.Label error_label;
+        private unowned Gtk.Label error_label;
 
         private GLib.Settings settings;
         private ulong key_press_event_id = 0;
@@ -326,7 +326,7 @@ namespace Pomodoro
     public class PreferencesPluginsPage : Gtk.ScrolledWindow, Gtk.Buildable, Pomodoro.PreferencesPage
     {
         [GtkChild]
-        private Gtk.ListBox plugins_listbox;
+        private unowned Gtk.ListBox plugins_listbox;
 
         private GLib.Settings settings;
         private Peas.Engine engine;
@@ -480,22 +480,22 @@ namespace Pomodoro
     public class PreferencesMainPage : Gtk.ScrolledWindow, Gtk.Buildable, Pomodoro.PreferencesPage
     {
         [GtkChild]
-        public Gtk.Box box;
+        public unowned Gtk.Box box;
         [GtkChild]
-        public Gtk.ListBox timer_listbox;
+        public unowned Gtk.ListBox timer_listbox;
         [GtkChild]
-        public Gtk.ListBox notifications_listbox;
+        public unowned Gtk.ListBox notifications_listbox;
         [GtkChild]
-        public Gtk.ListBox desktop_listbox;
+        public unowned Gtk.ListBox desktop_listbox;
         [GtkChild]
-        public Gtk.ListBox plugins_listbox;
+        public unowned Gtk.ListBox plugins_listbox;
         [GtkChild]
-        public Gtk.SizeGroup lisboxrow_sizegroup;
+        public unowned Gtk.SizeGroup lisboxrow_sizegroup;
 
         [GtkChild]
-        private Gtk.ListBoxRow listboxrow_accelerator;
+        private unowned Gtk.ListBoxRow listboxrow_accelerator;
         [GtkChild]
-        private Gtk.ListBoxRow listboxrow_idle_monitor;
+        private unowned Gtk.ListBoxRow listboxrow_idle_monitor;
 
         private GLib.Settings settings;
         private Pomodoro.Accelerator accelerator;
@@ -763,11 +763,11 @@ namespace Pomodoro
         private static unowned Pomodoro.PreferencesDialog instance;
 
         [GtkChild]
-        private Gtk.HeaderBar header_bar;
+        private unowned Gtk.HeaderBar header_bar;
         [GtkChild]
-        private Gtk.Stack stack;
+        private unowned Gtk.Stack stack;
         [GtkChild]
-        private Gtk.Button back_button;
+        private unowned Gtk.Button back_button;
 
         private GLib.HashTable<string, PageMeta?> pages;
         private GLib.List<string>                 history;

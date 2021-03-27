@@ -61,9 +61,10 @@ namespace Actions
 
                 case Actions.State.LONG_BREAK:
                     return "long-break";
-            }
 
-            return "";
+                default:
+                    return "";
+            }
         }
 
         public static State from_timer_state (Pomodoro.TimerState timer_state)
@@ -95,9 +96,10 @@ namespace Actions
 
                 case Actions.State.LONG_BREAK:
                     return _("Long Break");
-            }
 
-            return "";
+                default:
+                    return "";
+            }
         }
     }
 
@@ -172,9 +174,10 @@ namespace Actions
 
                 case DISABLE:
                     return "disable";
-            }
 
-            return "";
+                default:
+                    return "";
+            }
         }
 
         public string get_label ()
@@ -201,9 +204,10 @@ namespace Actions
 
                 case DISABLE:
                     return _("Disable");
-            }
 
-            return "";
+                default:
+                    return "";
+            }
         }
     }
 }

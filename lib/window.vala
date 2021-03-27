@@ -64,21 +64,21 @@ namespace Pomodoro
         private unowned Pomodoro.Timer timer;
 
         [GtkChild]
-        private Gtk.Stack stack;
+        private unowned Gtk.Stack stack;
         [GtkChild]
-        private Gtk.Stack timer_stack;
+        private unowned Gtk.Stack timer_stack;
         [GtkChild]
-        private Gtk.ToggleButton state_togglebutton;
+        private unowned Gtk.ToggleButton state_togglebutton;
         [GtkChild]
-        private Gtk.Label minutes_label;
+        private unowned Gtk.Label minutes_label;
         [GtkChild]
-        private Gtk.Label seconds_label;
+        private unowned Gtk.Label seconds_label;
         [GtkChild]
-        private Gtk.Widget timer_box;
+        private unowned Gtk.Widget timer_box;
         [GtkChild]
-        private Gtk.Button pause_button;
+        private unowned Gtk.Button pause_button;
         [GtkChild]
-        private Gtk.Image pause_button_image;
+        private unowned Gtk.Image pause_button_image;
 
         private Pomodoro.Animation blink_animation;
         private string default_page;

@@ -64,11 +64,11 @@ namespace Pomodoro
         public string title { get; set; }
 
         [GtkChild]
-        public Gtk.Spinner spinner;
+        public unowned Gtk.Spinner spinner;
         [GtkChild]
-        public Gtk.DrawingArea timeline_chart;
+        public unowned Gtk.DrawingArea timeline_chart;
         [GtkChild]
-        public Gtk.DrawingArea totals_chart;
+        public unowned Gtk.DrawingArea totals_chart;
 
         protected GLib.DateTime _date;
         protected Gom.Repository repository;

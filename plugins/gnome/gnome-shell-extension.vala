@@ -333,6 +333,8 @@ namespace GnomePlugin
             switch (this.state)
             {
                 case Gnome.ExtensionState.ENABLED:
+                case Gnome.ExtensionState.DOWNLOADING:
+                case Gnome.ExtensionState.OUT_OF_DATE:
                     // nothing to do
                     break;
 

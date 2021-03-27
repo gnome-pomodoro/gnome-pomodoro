@@ -25,31 +25,31 @@ namespace Actions
     public class ActionPage : Gtk.Box, Pomodoro.PreferencesPage
     {
         [GtkChild]
-        private Gtk.Entry name_entry;
+        private unowned Gtk.Entry name_entry;
         [GtkChild]
-        private Gtk.Entry command_entry;
+        private unowned Gtk.Entry command_entry;
         [GtkChild]
-        private Gtk.ToggleButton pomodoro_state_togglebutton;
+        private unowned Gtk.ToggleButton pomodoro_state_togglebutton;
         [GtkChild]
-        private Gtk.ToggleButton short_break_state_togglebutton;
+        private unowned Gtk.ToggleButton short_break_state_togglebutton;
         [GtkChild]
-        private Gtk.ToggleButton long_break_state_togglebutton;
+        private unowned Gtk.ToggleButton long_break_state_togglebutton;
         [GtkChild]
-        private Gtk.CheckButton start_trigger_checkbutton;
+        private unowned Gtk.CheckButton start_trigger_checkbutton;
         [GtkChild]
-        private Gtk.CheckButton complete_trigger_checkbutton;
+        private unowned Gtk.CheckButton complete_trigger_checkbutton;
         [GtkChild]
-        private Gtk.CheckButton skip_trigger_checkbutton;
+        private unowned Gtk.CheckButton skip_trigger_checkbutton;
         [GtkChild]
-        private Gtk.CheckButton pause_trigger_checkbutton;
+        private unowned Gtk.CheckButton pause_trigger_checkbutton;
         [GtkChild]
-        private Gtk.CheckButton resume_trigger_checkbutton;
+        private unowned Gtk.CheckButton resume_trigger_checkbutton;
         [GtkChild]
-        private Gtk.CheckButton enable_trigger_checkbutton;
+        private unowned Gtk.CheckButton enable_trigger_checkbutton;
         [GtkChild]
-        private Gtk.CheckButton disable_trigger_checkbutton;
+        private unowned Gtk.CheckButton disable_trigger_checkbutton;
         [GtkChild]
-        private Gtk.MenuButton add_variable_button;
+        private unowned Gtk.MenuButton add_variable_button;
 
         private Actions.Action action;
         private GLib.List<GLib.Binding> bindings;

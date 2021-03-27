@@ -58,9 +58,9 @@ namespace Pomodoro
         private bool close_on_activity { get; set; default = false; }
 
         [GtkChild]
-        private Gtk.Label minutes_label;
+        private unowned Gtk.Label minutes_label;
         [GtkChild]
-        private Gtk.Label seconds_label;
+        private unowned Gtk.Label seconds_label;
 
         private uint                   fade_in_timeout_id   = 0;
         private uint                   fade_out_timeout_id  = 0;
