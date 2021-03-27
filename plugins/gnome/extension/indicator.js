@@ -24,6 +24,7 @@ const Signals = imports.signals;
 const { Clutter, Gio, GLib, GObject, Gtk, Meta, Pango, Shell, St } = imports.gi;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const BoxPointer = imports.ui.boxpointer;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const PanelMenu = imports.ui.panelMenu;
@@ -81,27 +82,37 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _onTimerClicked() {
-        this.close();
-
         if (this._isPaused) {
+            this.itemActivated(BoxPointer.PopupAnimation.NONE);
             this.indicator.timer.resume();
+            return;
         }
-        else if (Extension.extension && Extension.extension.dialog) {
+
+        if (this._timerState != Timer.State.POMODORO && Extension.extension && Extension.extension.dialog) {
+            this.itemActivated(BoxPointer.PopupAnimation.NONE);
             Extension.extension.dialog.open(true);
             Extension.extension.dialog.pushModal();
+            return;
         }
     }
 
     _onStartClicked() {
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
         this.indicator.timer.start();
-
-        this.close();
     }
 
     _onStopClicked() {
-        this.indicator.timer.stop();
+        let id = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+            this.indicator.timer.stop();
+            return GLib.SOURCE_REMOVE;
+        });
+        GLib.Source.set_name_by_id(id, '[gnome-pomodoro] this.indicator.timer.stop()');
 
-        this.close();
+        // Closing menu leads to GrabHelper complaing about accessing deallocated St.Button,
+        // while doing savedFocus.grab_key_focus().
+        // As a walkaround we call timer.stop() with delay. Seems that these calls interfere
+        // with each other.
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
     }
 
     _onPauseClicked() {
@@ -109,9 +120,8 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
             this.indicator.timer.pause();
         }
         else {
+            this.itemActivated(BoxPointer.PopupAnimation.NONE);
             this.indicator.timer.resume();
-
-            this.close();
         }
     }
 
@@ -124,7 +134,6 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         this.addMenuItem(toggleItem);
 
         let startAction = this._createActionButton('media-playback-start-symbolic', _("Start Timer"));
-        startAction.add_style_class_name('extension-pomodoro-indicator-menu-action-border');
         startAction.connect('clicked', this._onStartClicked.bind(this));
         toggleItem.add_child(startAction);
 
@@ -260,12 +269,14 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     _activateStats() {
         let timestamp = global.get_current_time();
 
+        Main.overview.hide();
         this.indicator.timer.showMainWindow('stats', timestamp);
     }
 
     _activatePreferences() {
         let timestamp = global.get_current_time();
 
+        Main.overview.hide();
         this.indicator.timer.showPreferences(timestamp);
     }
 
@@ -274,7 +285,17 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _activateState(stateName) {
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
         this.indicator.timer.setState(stateName);
+    }
+
+    close(animate) {
+        if (this._timerUpdateId) {
+            this.indicator.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+
+        super.close(animate);
     }
 
     destroy() {

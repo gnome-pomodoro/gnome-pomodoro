@@ -61,27 +61,24 @@
     background: none;
 }
 
-.extension-pomodoro-indicator-menu-action,
-.extension-pomodoro-indicator-menu-action:hover,
-.extension-pomodoro-indicator-menu-action:focus,
-.extension-pomodoro-indicator-menu-action:active {
+.extension-pomodoro-indicator-menu-action {
     padding: 10px;
-    border-width: 0px;
+    border: 0px;
+    border-radius: 18px;
+    background-color: transparent;
 }
 
 .extension-pomodoro-indicator-menu-action > StIcon {
     icon-size: 16px;
 }
 
-.extension-pomodoro-indicator-menu-action-border {
-    padding: 9px;
-    border-width: 1px;
+.extension-pomodoro-indicator-menu-action:hover,
+.extension-pomodoro-indicator-menu-action:focus {
+    background-color: #4e4e4e;
 }
-.extension-pomodoro-indicator-menu-action-border:hover,
-.extension-pomodoro-indicator-menu-action-border:focus,
-.extension-pomodoro-indicator-menu-action-border:active {
-    padding: 10px;
-    border-width: 0px;
+
+.extension-pomodoro-indicator-menu-action:active {
+    background-color: #1e1e1e;
 }
 
 .message .extension-pomodoro-message-action {
