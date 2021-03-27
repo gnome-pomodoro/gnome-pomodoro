@@ -83,7 +83,10 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     _onTimerClicked() {
         this.close();
 
-        if (Extension.extension && Extension.extension.dialog) {
+        if (this._isPaused) {
+            this.indicator.timer.resume();
+        }
+        else if (Extension.extension && Extension.extension.dialog) {
             Extension.extension.dialog.open(true);
             Extension.extension.dialog.pushModal();
         }
@@ -216,7 +219,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
             this._toggleMenuItem.visible = !isRunning;
             this._timerMenuItem.visible = isRunning;
 
-            this._timerLabelButton.reactive = isRunning && !isPaused && timerState != Timer.State.POMODORO;
+            this._timerLabelButton.reactive = isPaused || isRunning && timerState != Timer.State.POMODORO;
             this.pauseAction.child.icon_name = isPaused
                                                ? 'media-playback-start-symbolic'
                                                : 'media-playback-pause-symbolic';
