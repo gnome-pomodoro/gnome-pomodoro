@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro 0.13.0\n"
-"Report-Msgid-Bugs-To: https://github.com/codito/gnome-pomodoro/issues\n"
+"Report-Msgid-Bugs-To: https://github.com/gnome-pomodoro/gnome-pomodoro/issues\n"
 "POT-Creation-Date: 2016-12-10 14:29+0100\n"
 "PO-Revision-Date: 2016-12-13 21:32+0100\n"
 "Last-Translator: Paulius Šukys <paul.sukys@gmail.com>\n"

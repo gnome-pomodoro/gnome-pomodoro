@@ -19,20 +19,20 @@
   </categories>
   <screenshots>
     <screenshot type="default">
-      <image>http://gnomepomodoro.org/release/0.14/window.png</image>
+      <image>https://gnomepomodoro.org/release/0.14/window.png</image>
       <caption>Timer window</caption>
     </screenshot>
     <screenshot>
-      <image>http://gnomepomodoro.org/release/0.14/preferences.png</image>
+      <image>https://gnomepomodoro.org/release/0.14/preferences.png</image>
       <caption>Preferences</caption>
     </screenshot>
     <screenshot>
-      <image>http://gnomepomodoro.org/release/0.14/indicator.png</image>
+      <image>https://gnomepomodoro.org/release/0.14/indicator.png</image>
       <caption>Indicator for GNOME Shell</caption>
     </screenshot>
   </screenshots>
-  <url type="homepage">http://gnomepomodoro.org</url>
-  <url type="bugtracker">https://github.com/codito/gnome-pomodoro</url>
+  <url type="homepage">https://gnomepomodoro.org</url>
+  <url type="bugtracker">https://github.com/gnome-pomodoro/gnome-pomodoro</url>
   <developer_name>Kamil Prusko</developer_name>
   <update_contact>kamilprusko@gmail.com</update_contact>
   <kudos>

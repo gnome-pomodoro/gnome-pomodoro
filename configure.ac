@@ -1,9 +1,9 @@
 AC_PREREQ([2.69])
 AC_INIT([gnome-pomodoro],
         [0.18.1],
-        [https://github.com/codito/gnome-pomodoro/issues],
+        [https://github.com/gnome-pomodoro/gnome-pomodoro/issues],
         [gnome-pomodoro],
-        [http://gnomepomodoro.org])
+        [https://gnomepomodoro.org])
 
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([config.h])

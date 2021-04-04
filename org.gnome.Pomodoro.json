@@ -94,7 +94,7 @@
                 {
                     "type": "git",
                     "branch": "master",
-                    "url": "https://github.com/codito/gnome-pomodoro.git"
+                    "url": "https://github.com/gnome-pomodoro/gnome-pomodoro.git"
                 }
             ]
         }
