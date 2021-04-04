@@ -44,6 +44,18 @@
   <translation type="gettext">gnome-pomodoro</translation>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="0.19.0" date="2021-04-04">
+      <description>
+        <p>Overview of changes in gnome-pomodoro 0.19.0</p>
+        <ul>
+          <li>Support for GNOME Shell 4.0</li>
+          <li>Added support for meson (@Cogitri)</li>
+          <li>Changed blur effect during break</li>
+          <li>Added Korean translation (@dayeondev)</li>
+          <li>Updated Brazilian translation (@alexandreafa)</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.18.0" date="2020-10-04">
       <description>
         <p>Overview of changes in gnome-pomodoro 0.18.0</p>
