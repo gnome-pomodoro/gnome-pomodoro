@@ -126,10 +126,9 @@ configure_file(
 incs = include_directories('.')
 
 subdir('data')
-subdir('lib')
+subdir('src')
 subdir('plugins')
 subdir('po')
-subdir('src')
 subdir('tests')
 
 meson.add_install_script(
