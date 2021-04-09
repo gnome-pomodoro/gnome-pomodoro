@@ -1,3 +1,8 @@
+2021-04-09  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.19.1:
+
+	* Support GNOME Shell 40.0, not 4.0
+
 2021-04-04  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.19.0:
 
