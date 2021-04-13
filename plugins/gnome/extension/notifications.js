@@ -184,11 +184,6 @@ class PomodoroNotification extends MessageTray.Notification {
     }
 
     show() {
-        if (this.source && this.source.isPlaceholder) {
-            this.source.destroy();
-            this.source = null;
-        }
-
         if (!this.source) {
             this.source = getDefaultSource();
         }
@@ -215,7 +210,7 @@ class PomodoroNotification extends MessageTray.Notification {
 
     // FIXME: We shouldn't override `destroy`. There may happen a second call
     // `.destroy(NotificationDestroyedReason.EXPIRED)`. I'm not sure if this bug is on our side or in MessageTray.
-    destroy(reason) {
+    destroy(reason = MessageTray.NotificationDestroyedReason.DISMISSED) {
         if (this._destroying) {
             Utils.logWarning('Already called Notification.destroy()');
             return;

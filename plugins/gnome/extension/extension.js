@@ -296,6 +296,7 @@ var PomodoroExtension = class {
             if (this.mode == ExtensionMode.RESTRICTED) {
                 this._destroyNotifications();
 
+                /*  FIXME: causes errror on ScreenShield
                 if (!(this.notification &&
                       this.notification instanceof Notifications.ScreenShieldNotification))
                 {
@@ -305,6 +306,7 @@ var PomodoroExtension = class {
 
                     this._destroyPreviousNotifications();
                 }
+                */
             }
             else if (this.timer.getRemaining() > NOTIFICATIONS_TIME_OFFSET) {
                 if (timerState == Timer.State.POMODORO) {
@@ -591,7 +593,7 @@ function disable() {
         if (Main.sessionMode.isLocked && !Main.sessionMode.isGreeter) {
             extension.setMode(ExtensionMode.RESTRICTED);
 
-            // Note that ExtensionSystem.disableExtension() will unload our styleshhet
+            // Note that ExtensionSystem.disableExtension() will unload our stylesheet
         }
         else {
             extension.destroy();
