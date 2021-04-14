@@ -374,7 +374,7 @@ var ModalDialog = class {
                     });
                 }
 
-                focus.disconnect(destroyId);
+                focus.disconnect(focusDestroyId);
                 focus = null;
                 focusDestroyId = 0;
             });
@@ -384,8 +384,9 @@ var ModalDialog = class {
             actor: this._lightbox,
             focus: this._lightbox,
             onUngrab: () => {
-                if (focus) {
+                if (focus && focusDestroyId != 0) {
                     focus.disconnect(focusDestroyId);
+                    focusDestroyId = 0;
                 }
 
                 this.close(true);
