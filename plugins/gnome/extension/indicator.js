@@ -624,7 +624,6 @@ class PomodoroIndicator extends PanelMenu.Button {
 
         this.add_style_class_name('extension-pomodoro-indicator');
 
-        this._arrow = PopupMenu.arrowIcon(St.Side.BOTTOM);
         this._blinking = false;
         this._blinkingGroup = new Utils.TransitionGroup();
 
@@ -632,7 +631,6 @@ class PomodoroIndicator extends PanelMenu.Button {
         this._hbox.pack_start = true;
         this._hbox.set_x_align(Clutter.ActorAlign.CENTER);
         this._hbox.set_y_align(Clutter.ActorAlign.CENTER);
-        this._hbox.add_child(this._arrow);
         this.add_child(this._hbox);
 
         this.setMenu(new IndicatorMenu(this));
@@ -680,11 +678,6 @@ class PomodoroIndicator extends PanelMenu.Button {
                 this.widget = new IconIndicator(this.timer);
                 break;
         }
-
-        this.widget.actor.bind_property('opacity',
-                                        this._arrow,
-                                        'opacity',
-                                        GObject.BindingFlags.SYNC_CREATE);
 
         this._hbox.add_child(this.widget.actor);
     }
