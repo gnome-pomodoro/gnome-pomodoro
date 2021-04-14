@@ -81,7 +81,7 @@ var NotificationPolicy = GObject.registerClass({
 var Source = GObject.registerClass(
 class PomodoroSource extends MessageTray.Source {
     _init() {
-        let icon_name = 'gnome-pomodoro';
+        let icon_name = 'gnome-pomodoro-symbolic';
 
         super._init(_("Pomodoro Timer"), icon_name);
 
