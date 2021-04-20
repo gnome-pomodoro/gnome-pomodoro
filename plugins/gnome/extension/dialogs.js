@@ -370,33 +370,10 @@ var ModalDialog = class {
             return false;
         }
 
-        let focus = global.stage.key_focus;
-        let focusDestroyId = 0;
-        if (focus) {
-            focusDestroyId = focus.connect('destroy', () => {
-                if (this._grabHelper.grabStack) {
-                    this._grabHelper.grabStack.forEach(grab => {
-                        if (grab.savedFocus === focus) {
-                            grab.savedFocus = null;
-                        }
-                    });
-                }
-
-                focus.disconnect(focusDestroyId);
-                focus = null;
-                focusDestroyId = 0;
-            });
-        }
-
         return this._grabHelper.grab({
             actor: this._lightbox,
             focus: this._lightbox,
             onUngrab: () => {
-                if (focus && focusDestroyId != 0) {
-                    focus.disconnect(focusDestroyId);
-                    focusDestroyId = 0;
-                }
-
                 this.close(true);
             }
         });
