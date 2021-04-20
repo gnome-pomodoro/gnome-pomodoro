@@ -103,7 +103,7 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
             this.set({ opacity: 0, style_class: 'extension-pomodoro-lightbox' });
         }
 
-        const themeContext = St.ThemeContext.get_for_stage(global.stage);
+        let themeContext = St.ThemeContext.get_for_stage(global.stage);
         this._scaleChangedId = themeContext.connect('notify::scale-factor', this._updateEffects.bind(this));
         this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', this._updateEffects.bind(this));
 
@@ -155,6 +155,22 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
                 });
             }
         }
+    }
+
+    /* override parent method */
+    _onDestroy() {
+        if (this._monitorsChangedId) {
+            Main.layoutManager.disconnect(this._monitorsChangedId);
+            delete this._monitorsChangedId;
+        }
+
+        let themeContext = St.ThemeContext.get_for_stage(global.stage);
+        if (this._scaleChangedId) {
+            themeContext.disconnect(this._scaleChangedId);
+            delete this._scaleChangedId;
+        }
+
+        super._onDestroy();
     }
 });
 
