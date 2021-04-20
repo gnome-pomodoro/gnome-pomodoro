@@ -266,9 +266,7 @@ var ModalDialog = class {
                         this._onPushModalDelayTimeout.bind(this));
         }
 
-        // fallback to global.screen.get_current_monitor() for mutter < 3.29
-        this._monitorConstraint.index = typeof(global.display) === 'object' && typeof(global.display.get_current_monitor) !== 'undefined'
-            ? global.display.get_current_monitor() : global.screen.get_current_monitor();
+        this._monitorConstraint.index = global.display.get_current_monitor();
 
         global.stage.set_child_above_sibling(this.actor, null);
         this.actor.show();
