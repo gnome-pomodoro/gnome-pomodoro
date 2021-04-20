@@ -154,12 +154,6 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
                     brightness: BLUR_BRIGHTNESS * 0.99,
                 });
             }
-
-            // HACK: force effect to be repaint itself during fading-in
-            // in theory effect.queue_repaint(); should be enough
-            this._uiGroup.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS, {
-                duration: fadeOutTime || 0,
-            });
         }
     }
 });
