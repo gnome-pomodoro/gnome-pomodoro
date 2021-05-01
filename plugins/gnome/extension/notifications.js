@@ -518,19 +518,12 @@ var ScreenShieldNotification = GObject.registerClass({
     _init(timer) {
         super._init('', null, null);
 
-        this.timer = timer;
-        this.source = getDefaultSource();
-
         this.setTransient(false);
         this.setResident(true);
 
         // We want notifications to be shown right after the action,
         // therefore urgency bump.
         this.setUrgency(MessageTray.Urgency.HIGH);
-
-        this._isPaused = false;
-        this._timerState = Timer.State.NULL;
-        this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
 
         let patch = new Utils.Patch(Main.screenShield, {
             emit(name /* , arg1, arg2 */) {
@@ -540,6 +533,13 @@ var ScreenShieldNotification = GObject.registerClass({
             }
         });
         this._screenShieldPatch = patch;
+
+        this.timer = timer;
+        this.source = getDefaultSource();
+
+        this._isPaused = false;
+        this._timerState = Timer.State.NULL;
+        this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
 
         this.connect('destroy', () => {
             if (this._timerUpdateId != 0) {
@@ -623,6 +623,13 @@ var ScreenShieldNotification = GObject.registerClass({
                 this._screenShieldPatch.revert();
             }
         }
+    }
+
+    show() {
+        // No reason for .show() to wake up the screen
+        this._screenShieldPatch.apply();
+        super.show();
+        this._screenShieldPatch.revert();
     }
 });
 
