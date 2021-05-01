@@ -62,6 +62,7 @@ const BLUR_SIGMA = 20.0;
 
 const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
 
+const DEFAULT_BACKGROUND_COLOR = Clutter.Color.from_pixel(0x000000ff);
 
 var State = {
     OPENED: 0,
@@ -92,6 +93,7 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
             // Clone the group that contains all of UI on the screen. This is the
             // chrome, the windows, etc.
             this._uiGroup = new Clutter.Clone({ source: Main.uiGroup, clip_to_allocation: true });
+            this._uiGroup.set_background_color(DEFAULT_BACKGROUND_COLOR);
             this._uiGroup.add_effect_with_name('blur', new Shell.BlurEffect());
             this.set_child(this._uiGroup);
 
