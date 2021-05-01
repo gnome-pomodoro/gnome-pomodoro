@@ -130,7 +130,7 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
     lightOn(fadeInTime) {
         super.lightOn(fadeInTime);
 
-        if (this._uiGroup) {
+        if (this._uiGroup && !Utils.versionCheck('40.0')) {  // TODO remove compatibility for 3.38
             let effect = this._uiGroup.get_effect('blur');
             if (effect) {
                 effect.set({
@@ -149,11 +149,13 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
     lightOff(fadeOutTime) {
         super.lightOff(fadeOutTime);
 
-        if (this._uiGroup) {
+        if (this._uiGroup && !Utils.versionCheck('40.0')) {  // TODO remove compatibility for 3.38
             let effect = this._uiGroup.get_effect('blur');
             if (effect) {
-                effect.set({
-                    brightness: BLUR_BRIGHTNESS * 0.99,
+                // HACK: force effect to be repaint itself during fading-out
+                // in theory effect.queue_repaint(); should be enough
+                this._uiGroup.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS * 0.99, {
+                    duration: fadeOutTime || 0,
                 });
             }
         }
