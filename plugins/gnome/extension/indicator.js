@@ -624,9 +624,6 @@ class PomodoroIndicator extends PanelMenu.Button {
 
         this.add_style_class_name('extension-pomodoro-indicator');
 
-        this._blinking = false;
-        this._blinkingGroup = new Utils.TransitionGroup();
-
         this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
         this._hbox.pack_start = true;
         this._hbox.set_x_align(Clutter.ActorAlign.CENTER);
@@ -636,27 +633,69 @@ class PomodoroIndicator extends PanelMenu.Button {
         this.setMenu(new IndicatorMenu(this));
         this.setType(type);
 
+        this._blinking = false;
+        this._blinkingGroup = new Utils.TransitionGroup();
         this._blinkingGroup.addActor(this._hbox);
         this._blinkingGroup.addActor(this.menu.timerLabel);
         this._blinkingGroup.addActor(this.menu.pauseAction.child);
-        this._onBlinked();
 
-        this._timerPausedId = this.timer.connect('paused', this._onTimerPaused.bind(this));
-        this._timerResumedId = this.timer.connect('resumed', this._onTimerResumed.bind(this));
+        this._mappedId = this.connect('notify::mapped', this._onMappedChanged.bind(this));
 
-        let destroyId = this.connect('destroy', () => {
-            this.timer.disconnect(this._timerPausedId);
-            this.timer.disconnect(this._timerResumedId);
-            this.timer = null;
-            this._blinkingGroup.destroy();
+        this.connect('destroy', () => {
+            if (this._timerPausedId) {
+                this.timer.disconnect(this._timerPausedId);
+                this._timerPausedId = 0;
+            }
+
+            if (this._timerResumedId) {
+                this.timer.disconnect(this._timerResumedId);
+                this._timerResumedId = 0;
+            }
+
+            if (this._blinkingGroup) {
+                this._blinkingGroup.destroy();
+                this._blinkingGroup = null;
+            }
 
             if (this.icon) {
                 this.icon.destroy();
                 this.icon = null;
             }
 
-            this.disconnect(destroyId);
-        })
+            if (this._mappedId) {
+                this.disconnect(this._mappedId);
+                this._mappedId = 0;
+            }
+
+            this.timer = null;
+        });
+    }
+
+    _onMappedChanged() {
+        if (this.mapped) {
+            if (!this._timerPausedId) {
+                this._timerPausedId = this.timer.connect('paused', this._onTimerPaused.bind(this));
+            }
+
+            if (!this._timerResumedId) {
+                this._timerResumedId = this.timer.connect('resumed', this._onTimerResumed.bind(this));
+            }
+
+            this._onBlinked();
+        }
+        else {
+            if (this._timerPausedId) {
+                this.timer.disconnect(this._timerPausedId);
+                this._timerPausedId = 0;
+            }
+
+            if (this._timerResumedId) {
+                this.timer.disconnect(this._timerResumedId);
+                this._timerResumedId = 0;
+            }
+
+            this._blinkingGroup.removeAllTransitions();
+        }
     }
 
     setType(type) {
@@ -691,13 +730,31 @@ class PomodoroIndicator extends PanelMenu.Button {
     }
 
     _blink() {
+        if (!this.mapped) {
+            return;
+        }
+
         if (!this._blinking) {
+            let ignoreSignals = false;
             let fadeIn = () => {
                 if (this._blinking) {
                     this._blinkingGroup.easeProperty('opacity', FADE_IN_OPACITY * 255, {
                         duration: 1750,
                         mode: Clutter.AnimationMode.EASE_IN_OUT_CUBIC,
-                        onComplete: fadeOut,
+                        onComplete: () => {
+                            if (!this.mapped) {
+                                return;
+                            }
+
+                            if (!ignoreSignals) {
+                                ignoreSignals = true;
+                                fadeOut()
+                                ignoreSignals = false;
+                            }
+                            else {
+                                // stop recursion
+                            }
+                        },
                     });
                 }
                 else {
@@ -709,7 +766,16 @@ class PomodoroIndicator extends PanelMenu.Button {
                     this._blinkingGroup.easeProperty('opacity', FADE_OUT_OPACITY * 255, {
                         duration: 1750,
                         mode: Clutter.AnimationMode.EASE_IN_OUT_CUBIC,
-                        onComplete: fadeIn,
+                        onComplete: () => {
+                            if (!ignoreSignals) {
+                                ignoreSignals = true;
+                                fadeIn();
+                                ignoreSignals = false;
+                            }
+                            else {
+                                // stop recursion
+                            }
+                        }
                     });
                 }
                 else {
