@@ -640,35 +640,6 @@ class PomodoroIndicator extends PanelMenu.Button {
         this._blinkingGroup.addActor(this.menu.pauseAction.child);
 
         this._mappedId = this.connect('notify::mapped', this._onMappedChanged.bind(this));
-
-        this.connect('destroy', () => {
-            if (this._timerPausedId) {
-                this.timer.disconnect(this._timerPausedId);
-                this._timerPausedId = 0;
-            }
-
-            if (this._timerResumedId) {
-                this.timer.disconnect(this._timerResumedId);
-                this._timerResumedId = 0;
-            }
-
-            if (this._blinkingGroup) {
-                this._blinkingGroup.destroy();
-                this._blinkingGroup = null;
-            }
-
-            if (this.icon) {
-                this.icon.destroy();
-                this.icon = null;
-            }
-
-            if (this._mappedId) {
-                this.disconnect(this._mappedId);
-                this._mappedId = 0;
-            }
-
-            this.timer = null;
-        });
     }
 
     _onMappedChanged() {
@@ -809,5 +780,43 @@ class PomodoroIndicator extends PanelMenu.Button {
                 onComplete: this._onBlinked.bind(this)
             });
         }
+    }
+
+    // FIXME: Attempting to call back into JSAPI during the sweeping phase of GC.
+    //        This is most likely caused by not destroying a Clutter actor or Gtk+ widget with ::destroy
+    //        signals connected, but can also be caused by using the destroy(), dispose(), or remove()
+    //        vfuncs. Because it would crash the application, it has been blocked and the JS callback
+    //        not invoked.
+    // override parent method
+    _onDestroy() {
+        if (this._timerPausedId) {
+            this.timer.disconnect(this._timerPausedId);
+            this._timerPausedId = 0;
+        }
+
+        if (this._timerResumedId) {
+            this.timer.disconnect(this._timerResumedId);
+            this._timerResumedId = 0;
+        }
+
+        if (this._blinkingGroup) {
+            this._blinkingGroup.removeAllTransitions();
+            this._blinkingGroup.destroy();
+            this._blinkingGroup = null;
+        }
+
+        if (this.icon) {
+            this.icon.destroy();
+            this.icon = null;
+        }
+
+        if (this._mappedId) {
+            this.disconnect(this._mappedId);
+            this._mappedId = 0;
+        }
+
+        this.timer = null;
+
+        super._onDestroy();
     }
 });
