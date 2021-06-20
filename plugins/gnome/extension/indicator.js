@@ -680,8 +680,6 @@ class PomodoroIndicator extends PanelMenu.Button {
             if (!this._timerResumedId) {
                 this._timerResumedId = this.timer.connect('resumed', this._onTimerResumed.bind(this));
             }
-
-            this._onBlinked();
         }
         else {
             if (this._timerPausedId) {
@@ -693,9 +691,9 @@ class PomodoroIndicator extends PanelMenu.Button {
                 this.timer.disconnect(this._timerResumedId);
                 this._timerResumedId = 0;
             }
-
-            this._blinkingGroup.removeAllTransitions();
         }
+
+        this._onBlinked();
     }
 
     setType(type) {
@@ -723,6 +721,11 @@ class PomodoroIndicator extends PanelMenu.Button {
 
     _onBlinked() {
         this._blinking = false;
+
+        if (!this.mapped) {
+            this._blinkingGroup.removeAllTransitions();
+            this._blinkingGroup.setProperty('opacity', 255);
+        }
 
         if (this.timer.isPaused()) {
             this._blink();

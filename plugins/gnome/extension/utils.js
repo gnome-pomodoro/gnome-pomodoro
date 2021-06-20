@@ -159,6 +159,15 @@ var TransitionGroup = class {
         });
     }
 
+    setProperty(name, target) {
+        let properties = {};
+        properties[name] = target
+
+        this._actors.forEach((meta) => {
+            meta.actor.set(properties);
+        });
+    }
+
     removeAllTransitions() {
         this._actors.forEach((meta) => {
             meta.actor.remove_all_transitions();
