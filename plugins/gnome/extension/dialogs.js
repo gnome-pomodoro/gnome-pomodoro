@@ -91,7 +91,7 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
         if (Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL)) {
             // Clone the group that contains all of UI on the screen. This is the
             // chrome, the windows, etc.
-            this._uiGroup = new Clutter.Clone({ source: Main.layoutManager.uiGroup, clip_to_allocation: true });
+            this._uiGroup = new Clutter.Clone({ source: Main.uiGroup, clip_to_allocation: true });
             this._uiGroup.set_background_color(DEFAULT_BACKGROUND_COLOR);
             this._uiGroup.add_effect_with_name('blur', new Shell.BlurEffect());
             this.set_child(this._uiGroup);
@@ -228,7 +228,7 @@ var ModalDialog = GObject.registerClass({
                                              { inhibitEvents: false });
         this._lightbox.highlight(this._layout);
 
-        global.stage.insert_child_above(this, Main.layoutManager.uiGroup);
+        global.stage.add_actor(this);
         global.focus_manager.add_group(this._lightbox);
     }
 
@@ -246,38 +246,29 @@ var ModalDialog = GObject.registerClass({
     }
 
     // Move messageTray above ModalDialog while it's open
-    _raiseChrome() {
+    _raiseMessageTray() {
         let messageTray = Main.messageTray;
-        let screenShieldGroup = Main.layoutManager.screenShieldGroup;
 
         messageTray.ref();
-        screenShieldGroup.ref();
 
-        Main.layoutManager.uiGroup.remove_actor(messageTray);
-        global.stage.add_actor(messageTray);
+        Main.layoutManager.removeChrome(messageTray);
 
-        Main.layoutManager.uiGroup.remove_actor(screenShieldGroup);
-        global.stage.add_actor(screenShieldGroup);
+        global.stage.add_child(messageTray);
 
         messageTray.unref();
-        screenShieldGroup.unref();
+        messageTray.bannerBlocked = false;
     }
 
-    _lowerChrome() {
+    _lowerMessageTray() {
         let messageTray = Main.messageTray;
-        let screenShieldGroup = Main.layoutManager.screenShieldGroup;
 
         messageTray.ref();
-        screenShieldGroup.ref();
 
         global.stage.remove_child(messageTray);
-        Main.layoutManager.uiGroup.insert_child_below(messageTray, Main.panel);
 
-        global.stage.remove_child(screenShieldGroup);
-        Main.layoutManager.uiGroup.insert_child_above(screenShieldGroup, Main.layoutManager.overviewGroup);
+        Main.layoutManager.addChrome(messageTray, { affectsInputRegion: false });
 
         messageTray.unref();
-        screenShieldGroup.unref();
     }
 
     _onOpenComplete() {
@@ -348,11 +339,9 @@ var ModalDialog = GObject.registerClass({
 
         this.remove_all_transitions();
         this.show();
-        this._raiseChrome();
+        this._raiseMessageTray();
         this._setState(State.OPENING);
         this.emit('opening');
-
-        Main.messageTray.bannerBlocked = false;
 
         if (animate) {
             this._lightbox.lightOn(FADE_IN_TIME);
@@ -373,7 +362,7 @@ var ModalDialog = GObject.registerClass({
 
     _onCloseComplete() {
         this.hide();
-        this._lowerChrome();
+        this._lowerMessageTray();
         this._setState(State.CLOSED);
         this.emit('closed');
     }
