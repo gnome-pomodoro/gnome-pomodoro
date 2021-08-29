@@ -207,6 +207,7 @@ var ModalDialog = GObject.registerClass({
         this._pushModalDelaySource = 0;
         this._pushModalWatchId = 0;
         this._pushModalSource = 0;
+        this._keyFocusOutId = 0;
         this._monitorConstraint = new Layout.MonitorConstraint();
         this._monitorConstraint.primary = true;
         this._stageConstraint = new Clutter.BindConstraint({
@@ -245,7 +246,6 @@ var ModalDialog = GObject.registerClass({
         this.notify('state');
     }
 
-    // Move messageTray above ModalDialog while it's open
     _raiseMessageTray() {
         let messageTray = Main.messageTray;
 
@@ -255,8 +255,8 @@ var ModalDialog = GObject.registerClass({
 
         global.stage.add_child(messageTray);
 
-        messageTray.unref();
         messageTray.bannerBlocked = false;
+        messageTray.unref();
     }
 
     _lowerMessageTray() {
@@ -269,6 +269,14 @@ var ModalDialog = GObject.registerClass({
         Main.layoutManager.addChrome(messageTray, { affectsInputRegion: false });
 
         messageTray.unref();
+    }
+
+    _onKeyFocusOut() {
+        let focus = global.stage.key_focus;
+
+        if (focus === null || !this._lightbox.contains(focus)) {
+            this.close(true);
+        }
     }
 
     _onOpenComplete() {
@@ -285,7 +293,7 @@ var ModalDialog = GObject.registerClass({
             this._pushModalWatchId = 0;
         }
 
-       if (this.pushModal(timestamp)) {
+        if (this.pushModal(timestamp)) {
             return GLib.SOURCE_REMOVE;
         }
 
@@ -416,6 +424,11 @@ var ModalDialog = GObject.registerClass({
     popModal(timestamp) {
         this._disconnectPushModalSignals();
 
+        if (this._keyFocusOutId) {
+            this._lightbox.disconnect(this._keyFocusOutId);
+            this._keyFocusOutId = 0;
+        }
+
         if (!this._hasModal) {
             return;
         }
@@ -448,6 +461,10 @@ var ModalDialog = GObject.registerClass({
         this._lightbox.reactive = true;
 
         global.stage.set_key_focus(this._lightbox);
+
+        if (!this._keyFocusOutId) {
+            this._keyFocusOutId = this._lightbox.connect('key-focus-out', this._onKeyFocusOut.bind(this));
+        }
 
         Main.layoutManager.emit('system-modal-opened');
     }
@@ -527,6 +544,10 @@ class PomodoroEndDialog extends ModalDialog {
             }
         }
         else {
+            if (this._styleChangedId) {
+                this._secondsLabel.disconnect(this._styleChangedId);
+                this._styleChangedId = 0;
+            }
             if (this._timerUpdateId) {
                 this.timer.disconnect(this._timerUpdateId);
                 this._timerUpdateId = 0;
