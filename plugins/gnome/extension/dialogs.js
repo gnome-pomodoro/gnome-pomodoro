@@ -649,8 +649,24 @@ class PomodoroEndDialog extends ModalDialog {
             case Clutter.EventType.KEY_PRESS:
                 switch (event.get_key_symbol())
                 {
+                    case Clutter.KEY_AudioCycleTrack:
+                    case Clutter.KEY_AudioForward:
                     case Clutter.KEY_AudioLowerVolume:
+                    case Clutter.KEY_AudioNext:
+                    case Clutter.KEY_AudioPause:
+                    case Clutter.KEY_AudioPlay:
+                    case Clutter.KEY_AudioPrev:
                     case Clutter.KEY_AudioRaiseVolume:
+                    case Clutter.KEY_AudioRandomPlay:
+                    case Clutter.KEY_AudioRecord:
+                    case Clutter.KEY_AudioRepeat:
+                    case Clutter.KEY_AudioRewind:
+                    case Clutter.KEY_AudioStop:
+                    case Clutter.KEY_AudioMicMute:
+                    case Clutter.KEY_AudioMute:
+                    case Clutter.KEY_MonBrightnessDown:
+                    case Clutter.KEY_MonBrightnessUp:
+                    case Clutter.KEY_Display:
                         return Clutter.EVENT_PROPAGATE;
 
                     default:
