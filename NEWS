@@ -1,3 +1,11 @@
+2021-09-19  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.19.2:
+
+	* Fixed GNOME Shell freezing the lockscreen
+	* Fixed unresponsive modal dialog
+	* Updated Russian translation (thanks @prokoudine)
+	* Updated Dutch translation (thanks @Vistaus)
+
 2021-04-09  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.19.1:
 
