@@ -23,7 +23,7 @@
 const Gettext = imports.gettext;
 const Signals = imports.signals;
 
-const { Gio, Meta, Shell } = imports.gi;
+const { GLib, Gio, Meta, Shell } = imports.gi;
 
 const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -296,15 +296,13 @@ var PomodoroExtension = class {
             if (this.mode == ExtensionMode.RESTRICTED) {
                 this._destroyNotifications();
 
-                if (!(this.notification &&
-                      this.notification instanceof Notifications.ScreenShieldNotification))
-                {
-                    this.notification = new Notifications.ScreenShieldNotification(this.timer);
-                    this.notification.connect('destroy', this._onNotificationDestroy.bind(this));
-                    this.notification.show();
+                let idleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                    this._updateScreenShieldNotification();
 
-                    this._destroyPreviousNotifications();
-                }
+                    return GLib.SOURCE_REMOVE;
+                });
+                GLib.Source.set_name_by_id(idleId,
+                                           '[gnome-pomodoro] this._updateScreenShieldNotification');
             }
             else if (this.timer.getRemaining() > NOTIFICATIONS_TIME_OFFSET) {
                 if (timerState == Timer.State.POMODORO) {
@@ -336,6 +334,25 @@ var PomodoroExtension = class {
             }
             else {
                 this.dialog.close(false);
+            }
+        }
+    }
+
+    _updateScreenShieldNotification() {
+        if (this.mode == ExtensionMode.RESTRICTED) {
+            if (!(this.notification &&
+                  this.notification instanceof Notifications.ScreenShieldNotification))
+            {
+                this.notification = new Notifications.ScreenShieldNotification(this.timer);
+                this.notification.connect('destroy', this._onNotificationDestroy.bind(this));
+                this.notification.show();
+
+                this._destroyPreviousNotifications();
+            }
+        }
+        else {
+            if (this.notification && this.notification instanceof Notifications.ScreenShieldNotification) {
+                this.notification.destroy();
             }
         }
     }
@@ -591,7 +608,7 @@ function disable() {
         if (Main.sessionMode.isLocked && !Main.sessionMode.isGreeter) {
             extension.setMode(ExtensionMode.RESTRICTED);
 
-            // Note that ExtensionSystem.disableExtension() will unload our styleshhet
+            // Note that ExtensionSystem.disableExtension() will unload our stylesheet
         }
         else {
             extension.destroy();

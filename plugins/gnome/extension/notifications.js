@@ -81,7 +81,7 @@ var NotificationPolicy = GObject.registerClass({
 var Source = GObject.registerClass(
 class PomodoroSource extends MessageTray.Source {
     _init() {
-        let icon_name = 'gnome-pomodoro';
+        let icon_name = 'gnome-pomodoro-symbolic';
 
         super._init(_("Pomodoro Timer"), icon_name);
 
@@ -184,11 +184,6 @@ class PomodoroNotification extends MessageTray.Notification {
     }
 
     show() {
-        if (this.source && this.source.isPlaceholder) {
-            this.source.destroy();
-            this.source = null;
-        }
-
         if (!this.source) {
             this.source = getDefaultSource();
         }
@@ -215,7 +210,7 @@ class PomodoroNotification extends MessageTray.Notification {
 
     // FIXME: We shouldn't override `destroy`. There may happen a second call
     // `.destroy(NotificationDestroyedReason.EXPIRED)`. I'm not sure if this bug is on our side or in MessageTray.
-    destroy(reason) {
+    destroy(reason = MessageTray.NotificationDestroyedReason.DISMISSED) {
         if (this._destroying) {
             Utils.logWarning('Already called Notification.destroy()');
             return;
@@ -523,19 +518,12 @@ var ScreenShieldNotification = GObject.registerClass({
     _init(timer) {
         super._init('', null, null);
 
-        this.timer = timer;
-        this.source = getDefaultSource();
-
         this.setTransient(false);
         this.setResident(true);
 
         // We want notifications to be shown right after the action,
         // therefore urgency bump.
         this.setUrgency(MessageTray.Urgency.HIGH);
-
-        this._isPaused = false;
-        this._timerState = Timer.State.NULL;
-        this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
 
         let patch = new Utils.Patch(Main.screenShield, {
             emit(name /* , arg1, arg2 */) {
@@ -545,6 +533,13 @@ var ScreenShieldNotification = GObject.registerClass({
             }
         });
         this._screenShieldPatch = patch;
+
+        this.timer = timer;
+        this.source = getDefaultSource();
+
+        this._isPaused = false;
+        this._timerState = Timer.State.NULL;
+        this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
 
         this.connect('destroy', () => {
             if (this._timerUpdateId != 0) {
@@ -628,6 +623,13 @@ var ScreenShieldNotification = GObject.registerClass({
                 this._screenShieldPatch.revert();
             }
         }
+    }
+
+    show() {
+        // No reason for .show() to wake up the screen
+        this._screenShieldPatch.apply();
+        super.show();
+        this._screenShieldPatch.revert();
     }
 });
 

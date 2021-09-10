@@ -90,8 +90,6 @@ var TransitionGroup = class {
 
     constructor() {
         this._actors = [];
-        this._transitions = {};  // by name, containing {'target': ..., 'params': ...}
-        this._transitionStoppedId = 0;
         this._referenceActor = null;
     }
 
@@ -99,14 +97,29 @@ var TransitionGroup = class {
         this._referenceActor = actor;
     }
 
+    _findActor(actor) {
+        for (var index = 0; index < this._actors.length; index++) {
+            if (this._actors[index].actor === actor) {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
     addActor(actor) {
-        let index = this._actors.indexOf(actor);
+        let index = this._findActor(actor);
 
         if (!actor || index >= 0) {
             return;
         }
 
-        this._actors.push(actor);
+        this._actors.push({
+            actor: actor,
+            destroyId: actor.connect('destroy', () => {
+                this.removeActor(actor);
+            })
+        });
 
         if (!this._referenceActor) {
             this._setReferenceActor(actor);
@@ -114,17 +127,15 @@ var TransitionGroup = class {
     }
 
     removeActor(actor) {
-        let index = this._actors.indexOf(actor);
+        let index = this._findActor(actor);
         if (index >= 0) {
-            this._actors.splice(index, 1);
+            let meta = this._actors.splice(index, 1);
 
-            for (let name in this._transitions) {
-                actor.remove_transition(name);
-            }
+            actor.disconnect(meta.destroyId);
         }
 
         if (this._referenceActor === actor) {
-            this._setReferenceActor(this._actors.length > 0 ? this._actors[0] : null);
+            this._setReferenceActor(this._actors.length > 0 ? this._actors[0].actor : null);
         }
     }
 
@@ -132,24 +143,40 @@ var TransitionGroup = class {
         let onStopped = params.onStopped;
         let onComplete = params.onComplete;
 
-        params = Object.assign({
-            onStopped: (isFinished) => {
-                if (onStopped)
-                    onStopped(isFinished);
+        this._actors.forEach((meta) => {
+            let localParams = Object.assign({
+                onStopped: (isFinished) => {
+                    if (onStopped && meta.actor === this._referenceActor)
+                        onStopped(isFinished);
+                },
+                onComplete: () => {
+                     if (onComplete && meta.actor === this._referenceActor)
+                         onComplete();
+                }
+            }, params);
 
-                if (onComplete && isFinished)
-                    onComplete();
-            }
-        }, params);
+            meta.actor.ease_property(name, target, localParams);
+        });
+    }
 
-        this._actors.forEach((actor) => {
-            actor.ease_property(name, target, params);
+    setProperty(name, target) {
+        let properties = {};
+        properties[name] = target
+
+        this._actors.forEach((meta) => {
+            meta.actor.set(properties);
+        });
+    }
+
+    removeAllTransitions() {
+        this._actors.forEach((meta) => {
+            meta.actor.remove_all_transitions();
         });
     }
 
     destroy() {
-        this._actors.forEach((actor) => {
-            this.removeActor(actor);
+        this._actors.slice().forEach((meta) => {
+            this.removeActor(meta.actor);
         });
     }
 }
