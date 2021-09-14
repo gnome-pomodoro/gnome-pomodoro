@@ -22,8 +22,8 @@
           <object class="GtkBox" id="box">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">30</property>
-            <property name="margin_right">30</property>
+            <property name="margin_start">30</property>
+            <property name="margin_end">30</property>
             <property name="margin_top">12</property>
             <property name="margin_bottom">12</property>
             <property name="border_width">12</property>
@@ -39,8 +39,8 @@
                   <object class="GtkLabel" id="timer_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">6</property>
-                    <property name="margin_right">6</property>
+                    <property name="margin_start">6</property>
+                    <property name="margin_end">6</property>
                     <property name="margin_bottom">6</property>
                     <property name="label" translatable="yes">Timer</property>
                     <property name="xalign">0</property>
@@ -86,7 +86,7 @@
                                     <property name="can_focus">False</property>
                                     <property name="halign">end</property>
                                     <property name="valign">baseline</property>
-                                    <property name="margin_right">5</property>
+                                    <property name="margin_end">5</property>
                                     <property name="label">25 minutes</property>
                                     <style>
                                       <class name="dim-label"/>
@@ -103,7 +103,7 @@
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="valign">baseline</property>
-                                    <property name="margin_left">5</property>
+                                    <property name="margin_start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">Pomodoro duration</property>
                                   </object>
@@ -138,7 +138,7 @@
                                     <property name="can_focus">False</property>
                                     <property name="halign">end</property>
                                     <property name="valign">baseline</property>
-                                    <property name="margin_right">5</property>
+                                    <property name="margin_end">5</property>
                                     <property name="label">5 minutes</property>
                                     <style>
                                       <class name="dim-label"/>
@@ -155,7 +155,7 @@
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="valign">baseline</property>
-                                    <property name="margin_left">5</property>
+                                    <property name="margin_start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">Break duration</property>
                                   </object>
@@ -191,7 +191,7 @@
                                     <property name="can_focus">False</property>
                                     <property name="halign">end</property>
                                     <property name="valign">baseline</property>
-                                    <property name="margin_right">5</property>
+                                    <property name="margin_end">5</property>
                                     <property name="label">15 minutes</property>
                                     <style>
                                       <class name="dim-label"/>
@@ -208,7 +208,7 @@
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="valign">baseline</property>
-                                    <property name="margin_left">5</property>
+                                    <property name="margin_start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">Long break duration</property>
                                   </object>
@@ -351,8 +351,8 @@
                   <object class="GtkLabel" id="notifications_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">6</property>
-                    <property name="margin_right">6</property>
+                    <property name="margin_start">6</property>
+                    <property name="margin_end">6</property>
                     <property name="margin_bottom">6</property>
                     <property name="label" translatable="yes">Notifications</property>
                     <property name="xalign">0</property>
@@ -454,8 +454,8 @@
                   <object class="GtkLabel" id="desktop_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">6</property>
-                    <property name="margin_right">6</property>
+                    <property name="margin_start">6</property>
+                    <property name="margin_end">6</property>
                     <property name="margin_bottom">6</property>
                     <property name="label" translatable="yes">Desktop</property>
                     <property name="xalign">0</property>

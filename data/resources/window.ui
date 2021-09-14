@@ -59,8 +59,8 @@
               <object class="GtkStack" id="timer_stack">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_left">20</property>
-                <property name="margin_right">20</property>
+                <property name="margin_start">20</property>
+                <property name="margin_end">20</property>
                 <property name="margin_top">50</property>
                 <property name="margin_bottom">50</property>
                 <property name="transition_type">crossfade</property>
@@ -80,8 +80,8 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="margin_left">50</property>
-                        <property name="margin_right">50</property>
+                        <property name="margin_start">50</property>
+                        <property name="margin_end">50</property>
                         <property name="margin_top">50</property>
                         <property name="margin_bottom">50</property>
                         <property name="pixel_size">64</property>
@@ -293,8 +293,8 @@
       <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="margin_left">10</property>
-        <property name="margin_right">10</property>
+        <property name="margin_start">10</property>
+        <property name="margin_end">10</property>
         <property name="margin_top">10</property>
         <property name="margin_bottom">10</property>
         <property name="orientation">vertical</property>
@@ -364,8 +364,8 @@
       <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="margin_left">10</property>
-        <property name="margin_right">10</property>
+        <property name="margin_start">10</property>
+        <property name="margin_end">10</property>
         <property name="margin_top">10</property>
         <property name="margin_bottom">10</property>
         <property name="orientation">vertical</property>

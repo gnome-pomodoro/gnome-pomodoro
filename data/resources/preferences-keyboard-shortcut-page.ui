@@ -5,8 +5,8 @@
   <template class="PomodoroPreferencesKeyboardShortcutPage" parent="GtkBox">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="margin_left">30</property>
-    <property name="margin_right">30</property>
+    <property name="margin_start">30</property>
+    <property name="margin_end">30</property>
     <property name="margin_top">12</property>
     <property name="margin_bottom">12</property>
     <property name="border_width">12</property>
@@ -16,8 +16,8 @@
       <object class="GtkBox" id="chooser_box">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="margin_left">12</property>
-        <property name="margin_right">12</property>
+        <property name="margin_start">12</property>
+        <property name="margin_end">12</property>
         <property name="margin_top">12</property>
         <property name="margin_bottom">12</property>
         <property name="orientation">vertical</property>
