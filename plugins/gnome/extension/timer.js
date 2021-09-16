@@ -227,8 +227,8 @@ var Timer = class {
         return state === State.SHORT_BREAK || state === State.LONG_BREAK;
     }
 
-    showMainWindow(timestamp) {
-        this._proxy.ShowMainWindowRemote(timestamp, this._onCallback.bind(this));
+    showMainWindow(mode, timestamp) {
+        this._proxy.ShowMainWindowRemote(mode, timestamp, this._onCallback.bind(this));
     }
 
     showPreferences(timestamp) {
