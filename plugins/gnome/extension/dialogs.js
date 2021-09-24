@@ -203,7 +203,6 @@ var ModalDialog = GObject.registerClass({
 
         this._state = State.CLOSED;
         this._hasModal = false;
-        this._idleMonitor = Meta.IdleMonitor.get_core();
         this._pushModalDelaySource = 0;
         this._pushModalWatchId = 0;
         this._pushModalSource = 0;
@@ -214,6 +213,13 @@ var ModalDialog = GObject.registerClass({
                                        source: global.stage,
                                        coordinate: Clutter.BindCoordinate.ALL });
         this.add_constraint(this._stageConstraint);
+
+        if (global.backend.get_core_idle_monitor !== undefined) {
+            this._idleMonitor = global.backend.get_core_idle_monitor();
+        }
+        else {
+            this._idleMonitor = Meta.IdleMonitor.get_core();  // TODO: remove along support for gnome-shell 40
+        }
 
         this.connect('destroy', this._onDestroy.bind(this));
 
