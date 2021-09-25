@@ -1,3 +1,8 @@
+2021-09-25  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.20.0:
+
+	* Support for GNOME Shell 41 (thanks @mbooth101)
+
 2021-09-19  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.19.2:
 

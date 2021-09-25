@@ -44,6 +44,14 @@
   <translation type="gettext">gnome-pomodoro</translation>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="0.20.0" date="2021-09-25">
+      <description>
+        <p>Overview of changes in gnome-pomodoro 0.20.0</p>
+        <ul>
+          <li>Support for GNOME Shell 41 (@mbooth101)</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.19.2" date="2021-09-19">
       <description>
         <p>Overview of changes in gnome-pomodoro 0.19.2</p>
