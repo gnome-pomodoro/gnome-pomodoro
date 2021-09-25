@@ -61,6 +61,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         this._isPaused = null;
         this._timerState = null;
         this._timerUpdateId = 0;
+        this._icons = {};
 
         this.actor.add_style_class_name('extension-pomodoro-indicator-menu');
 
@@ -71,13 +72,27 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         this._populate();
     }
 
+    _loadIcon(iconName) {
+        let icon = this._icons[iconName];
+
+        if (!icon) {
+            let iconFile = Gio.File.new_for_uri('%s/icons/hicolor/scalable/actions/%s.svg'.format(Extension.dir.get_uri(), iconName));
+            icon = new Gio.FileIcon({ file: iconFile });
+
+            this._icons[iconName] = icon;
+        }
+
+        return icon;
+    }
+
     _createActionButton(iconName, accessibleName) {
         let button = new St.Button({ reactive: true,
                                      can_focus: true,
                                      track_hover: true,
                                      accessible_name: accessibleName,
-                                     style_class: 'system-menu-action extension-pomodoro-indicator-menu-action' });
-        button.child = new St.Icon({ icon_name: iconName });
+                                     style_class: 'extension-pomodoro-indicator-menu-action' });
+        button.child = new St.Icon({ gicon: this._loadIcon(iconName), style_class: 'popup-menu-icon' });
+
         return button;
     }
 
@@ -133,7 +148,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         toggleItem.label.y_align = Clutter.ActorAlign.CENTER;
         this.addMenuItem(toggleItem);
 
-        let startAction = this._createActionButton('media-playback-start-symbolic', _("Start Timer"));
+        let startAction = this._createActionButton('gnome-pomodoro-start-symbolic', _("Start Timer"));
         startAction.connect('clicked', this._onStartClicked.bind(this));
         toggleItem.add_child(startAction);
 
@@ -158,11 +173,11 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
                                       x_expand: true });
         timerItem.add_child(hbox);
 
-        let pauseAction = this._createActionButton('media-playback-pause-symbolic', _("Pause Timer"));
+        let pauseAction = this._createActionButton('gnome-pomodoro-pause-symbolic', _("Pause Timer"));
         pauseAction.connect('clicked', this._onPauseClicked.bind(this));
         hbox.add_actor(pauseAction);
 
-        let stopAction = this._createActionButton('media-playback-stop-symbolic', _("Stop Timer"));
+        let stopAction = this._createActionButton('gnome-pomodoro-stop-symbolic', _("Stop Timer"));
         stopAction.connect('clicked', this._onStopClicked.bind(this));
         hbox.add_actor(stopAction);
 
@@ -229,9 +244,9 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
             this._timerMenuItem.visible = isRunning;
 
             this._timerLabelButton.reactive = isPaused || isRunning && timerState != Timer.State.POMODORO;
-            this.pauseAction.child.icon_name = isPaused
-                                               ? 'media-playback-start-symbolic'
-                                               : 'media-playback-pause-symbolic';
+            this.pauseAction.child.gicon = isPaused
+                                               ? this._loadIcon('gnome-pomodoro-start-symbolic')
+                                               : this._loadIcon('gnome-pomodoro-pause-symbolic');
             this.pauseAction.accessible_name = isPaused
                                                ? _("Resume Timer")
                                                : _("Pause Timer");
@@ -312,6 +327,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         this.indicator = null;
         this.timerLabel = null;
         this.pauseAction = null;
+        this._icons = null;
 
         super.destroy();
     }
@@ -322,8 +338,6 @@ var TextIndicator = class {
     constructor(timer) {
         this._initialized     = false;
         this._state           = Timer.State.NULL;
-        this._minHPadding     = 0;
-        this._natHPadding     = 0;
         this._digitWidth      = 0;
         this._charWidth       = 0;
         this._onTimerUpdateId = 0;
@@ -366,13 +380,12 @@ var TextIndicator = class {
     }
 
     _onStyleChanged(actor) {
-        let themeNode = actor.get_theme_node();
-        let font      = themeNode.get_font();
-        let context   = actor.get_pango_context();
-        let metrics   = context.get_metrics(font, context.get_language());
+        let themeNode    = actor.get_theme_node();
+        let themeContext = St.ThemeContext.get_for_stage(global.stage);
+        let font         = themeNode.get_font();
+        let context      = actor.get_pango_context();
+        let metrics      = context.get_metrics(font, context.get_language());
 
-        this._minHPadding = themeNode.get_length('-minimum-hpadding');
-        this._natHPadding = themeNode.get_length('-natural-hpadding');
         this._digitWidth  = metrics.get_approximate_digit_width() / Pango.SCALE;
         this._charWidth   = metrics.get_approximate_char_width() / Pango.SCALE;
     }
@@ -470,10 +483,6 @@ var IconIndicator = class {
     constructor(timer) {
         this._state           = Timer.State.NULL;
         this._progress        = 0.0;
-        this._minHPadding     = 0;
-        this._natHPadding     = 0;
-        this._minVPadding     = 0;
-        this._natVPadding     = 0;
         this._primaryColor    = null;
         this._secondaryColor  = null;
         this._timerUpdateId = 0;
@@ -501,7 +510,10 @@ var IconIndicator = class {
 
     _onIconStyleChanged(actor) {
         let themeNode = actor.get_theme_node();
-        let size = Math.ceil(themeNode.get_length('icon-size'));
+        let [found, size] = themeNode.lookup_length('icon-size', false);
+
+        if (!found)
+            return;
 
         [actor.min_width, actor.natural_width] = themeNode.adjust_preferred_width(size, size);
         [actor.min_height, actor.natural_height] = themeNode.adjust_preferred_height(size, size);
@@ -564,11 +576,6 @@ var IconIndicator = class {
 
     _onStyleChanged(actor) {
         let themeNode = actor.get_theme_node();
-
-        this._minHPadding = themeNode.get_length('-minimum-hpadding');
-        this._natHPadding = themeNode.get_length('-natural-hpadding');
-        this._minVPadding = themeNode.get_length('-minimum-vpadding');
-        this._natVPadding = themeNode.get_length('-natural-vpadding');
 
         let color = themeNode.get_foreground_color();
         this._primaryColor = color;

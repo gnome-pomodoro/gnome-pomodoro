@@ -17,6 +17,11 @@ install_data(
   install_dir: extension_dir,
 )
 
+install_subdir(
+  'icons',
+  install_dir: extension_dir,
+)
+
 js_conf = configuration_data()
 
 js_conf.set(

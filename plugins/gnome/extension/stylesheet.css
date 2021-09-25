@@ -67,9 +67,11 @@
     border-radius: 18px;
     background-color: transparent;
 }
-
-.extension-pomodoro-indicator-menu-action > StIcon {
-    icon-size: 16px;
+.extension-pomodoro-indicator-menu-action:hover,
+.extension-pomodoro-indicator-menu-action:focus,
+.extension-pomodoro-indicator-menu-action:active {
+    padding: 10px;
+    border: 0px;
 }
 
 .extension-pomodoro-indicator-menu-action:hover,
