@@ -77,6 +77,8 @@ namespace Pomodoro
             public static bool pause_resume = false;
             public static bool pause = false;
             public static bool resume = false;
+            public static bool skip = false;
+            public static bool extend = false;
 
             public static ExitStatus exit_status = ExitStatus.UNDEFINED;
 
@@ -98,6 +100,12 @@ namespace Pomodoro
 
                 { "resume", 0, 0, GLib.OptionArg.NONE,
                   ref resume, N_("Resume"), null },
+
+                { "skip", 0, 0, GLib.OptionArg.NONE,
+                  ref skip, N_("Skip to a pomodoro or to a break"), null },
+
+                { "extend", 0, 0, GLib.OptionArg.NONE,
+                  ref extend, N_("Extend current pomodoro or break"), null },
 
                 { "no-default-window", 0, 0, GLib.OptionArg.NONE,
                   ref no_default_window, N_("Run as background service"), null },
@@ -125,6 +133,20 @@ namespace Pomodoro
                 Options.pause_resume = false;
                 Options.pause = false;
                 Options.resume = false;
+                Options.skip = false;
+                Options.extend = false;
+            }
+
+            public static bool has_timer_option ()
+            {
+                return Options.start_stop |
+                       Options.start |
+                       Options.stop |
+                       Options.pause_resume |
+                       Options.pause |
+                       Options.resume |
+                       Options.skip |
+                       Options.extend;
             }
         }
 
@@ -711,12 +733,7 @@ namespace Pomodoro
             this.hold ();
 
             if (this.was_activated) {
-                Options.no_default_window |= Options.start_stop |
-                                             Options.start |
-                                             Options.stop |
-                                             Options.pause_resume |
-                                             Options.pause |
-                                             Options.resume;
+                Options.no_default_window |= Options.has_timer_option ();
             }
 
             if (Options.quit) {
@@ -731,6 +748,13 @@ namespace Pomodoro
                 }
                 else if (Options.stop) {
                     this.timer.stop ();
+                }
+
+                if (Options.skip) {
+                    this.timer.skip ();
+                }
+                else if (Options.extend && this.timer.state.duration > 0.0) {
+                    this.timer.state.duration += 60.0;
                 }
 
                 if (Options.pause_resume) {
