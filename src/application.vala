@@ -57,7 +57,6 @@ namespace Pomodoro
         private Gtk.Window about_dialog;
         private Peas.ExtensionSet extensions;
         private GLib.Settings settings;
-        private bool was_activated = false;
 
         private enum ExitStatus
         {
@@ -732,9 +731,7 @@ namespace Pomodoro
         {
             this.hold ();
 
-            if (this.was_activated) {
-                Options.no_default_window |= Options.has_timer_option ();
-            }
+            Options.no_default_window |= Options.has_timer_option ();
 
             if (Options.quit) {
                 this.quit ();
@@ -781,8 +778,6 @@ namespace Pomodoro
 
                 Options.reset ();
             }
-
-            this.was_activated = true;
 
             this.release ();
         }
