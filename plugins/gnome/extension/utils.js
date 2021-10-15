@@ -23,7 +23,6 @@ const Signals = imports.signals;
 const Shell = imports.gi.Shell;
 
 const Main = imports.ui.main;
-const ExtensionSystem = imports.ui.extensionSystem;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 
@@ -227,8 +226,8 @@ function getFocusedWindowInfo() {
 }
 
 
-function logError(message) {
-    ExtensionSystem.logExtensionError(Extension.metadata.uuid, message);
+function logError(error) {
+    Main.extensionManager.logExtensionError(Extension.metadata.uuid, error);
 }
 
 
