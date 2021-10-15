@@ -95,7 +95,7 @@ var PomodoroExtension = class {
             this.setMode(mode);
         }
         catch (error) {
-            Utils.logError(error.message);
+            Utils.logError(error);
         }
     }
 
@@ -184,7 +184,7 @@ var PomodoroExtension = class {
     _onServiceNameLost() {
         this.emit('service-name-lost');
 
-        Utils.logError('Lost service name "org.gnome.Pomodoro.Extension"');
+        Utils.logError(new Errror('Lost service name "org.gnome.Pomodoro.Extension"'));
     }
 
     _onTimerServiceConnected() {
@@ -403,7 +403,7 @@ var PomodoroExtension = class {
                 Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
             }
             catch (error) {
-                Utils.logError(error.message);
+                Utils.logError(error);
             }
         }
         else {
