@@ -131,7 +131,7 @@ incs = include_directories('.')
 subdir('po')
 subdir('data')
 subdir('src')
-subdir('plugins')
+# subdir('plugins')
 subdir('tests')
 
 gnome.post_install(
