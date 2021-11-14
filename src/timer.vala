@@ -408,6 +408,8 @@ namespace Pomodoro
         public virtual signal void state_changed (TimerState state,
                                                   TimerState previous_state)
         {
+            Pomodoro.sync_monotonic_time ();
+
             /* Run the timer */
             this.update_timeout ();
 
