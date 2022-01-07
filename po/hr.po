@@ -1,0 +1,728 @@
+# Croatian translation for gnome-pomodoro
+# Copyright (c) 2012 gnome-pomodoro contributors
+# This file is distributed under the same license as the gnome-pomodoro package.
+# Milo Ivir <mail@milotype.de>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-pomodoro\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-12 07:47+0530\n"
+"PO-Revision-Date: 2022-01-07 19:36+0100\n"
+"Last-Translator: Milo Ivir <mail@milotype.de>\n"
+"Language-Team: \n"
+"Language: hr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:8
+#: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:28
+#: data/resources/window.ui:379 lib/about-dialog.vala:31
+#: lib/notifications-capability.vala:129 lib/stats-page.vala:527
+#: lib/window.vala:44 plugins/actions/enums.vala:91
+#: plugins/gnome/extension/indicator.js:164
+#: plugins/gnome/extension/indicator.js:596
+#: plugins/gnome/extension/notifications.js:240
+#: plugins/gnome/extension/notifications.js:275
+#: plugins/gnome/extension/timer.js:40 src/main.vala:50
+msgid "Pomodoro"
+msgstr "Pomodoro"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:9
+msgid "A time management utility for GNOME"
+msgstr "Alat upravljanja vremenom za GNOME"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:11
+msgid ""
+"A GNOME utility that helps managing time according to Pomodoro Technique. It "
+"intends to improve productivity and focus by taking short breaks after every "
+"25 minutes of work."
+msgstr ""
+"Uslužni program za GNOME koji pomaže upravljati vremenom pomoću Pomodoro "
+"tehnike. Namjera programa je poboljšanje produktivnosti i usredotočenosti na "
+"zadatak pomoću kratkih pauza nakon svakih 25 minuta rada."
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:23
+msgid "Timer window"
+msgstr "Prozor taimera"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:27 lib/preferences-dialog.vala:800
+#: plugins/gnome/extension/indicator.js:170
+msgid "Preferences"
+msgstr "Postavke"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:31
+msgid "Indicator for GNOME Shell"
+msgstr "Idnikator za GNOME ljusku"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:36
+msgid "Kamil Prusko"
+msgstr "Kamil Prusko"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:49
+msgid "Overview of changes in gnome-pomodoro 0.18.0"
+msgstr "Pregled promjena za gnome-pomodoro 0.18.0"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:51
+msgid "Support for GNOME Shell 3.38 (@ignapk and @szpak)"
+msgstr "Podrška za GNOME ljusku 3.38 (@ignapk i @szpak)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:52
+msgid "Removed ayatana-appindicator3 support"
+msgstr "Uklonjena podrška za ayatana-appindicator3"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:53
+msgid "Added Norwegian translation (@arnotixe)"
+msgstr "Dodan prijevod za norveški (@arnotixe)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:54
+msgid "Added Finnish translation (@iqqmuT)"
+msgstr "Dodan prijevod za finski (@iqqmuT)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:55
+msgid "Updated Indonesian translation (@atriwidada)"
+msgstr "Aktualiziran prijevod za indonezijski (@atriwidada)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:56
+msgid "Updated Chinese translation (@wffger)"
+msgstr "Aktualiziran prijevod za kinseski (@wffger)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:57
+msgid "Updated Russian translation (@rkaverin)"
+msgstr "Aktualiziran prijevod za ruski (@rkaverin)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:58
+msgid "Updated French translation (@precondition)"
+msgstr "Aktualiziran prijevod za frankcuski (@precondition)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:64
+msgid "Overview of changes in gnome-pomodoro 0.17.0"
+msgstr "Pregled promjena za gnome-pomodoro 0.17.0"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:66
+msgid "Support for GNOME Shell 3.36"
+msgstr "Podrška za GNOME ljusku 3.36"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:67
+msgid "Updated Catalan translation (@antoniofsm)"
+msgstr "Aktualiziran prijevod za katalanski (@antoniofsm)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:73
+msgid "Overview of changes in gnome-pomodoro 0.16.0"
+msgstr "Pregled promjena za gnome-pomodoro 0.16.0"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:75
+msgid "Support for GNOME Shell 3.34 only"
+msgstr "Podrška samo za GNOME ljusku 3.34"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:76
+msgid "Added esperanto translation (@SeZuo)"
+msgstr "Dodan prijevod za esperanto (@SeZuo)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:77
+msgid "Moved app-menu to main window"
+msgstr "Izbornik programa premješten je u glavni prozor"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:83
+msgid "Overview of changes in gnome-pomodoro 0.15.1"
+msgstr "Pregled promjena za gnome-pomodoro 0.15.1"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:85
+msgid "Minor code cleanups"
+msgstr "Neki ispravci u programskom kodu"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:91
+msgid "Overview of changes in gnome-pomodoro 0.15.0"
+msgstr "Pregled promjena za gnome-pomodoro 0.15.0"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:93
+msgid "Minor code cleanups to support ES6 syntax"
+msgstr "Neki ispravci u programskom kodu za podršku ES6 sintakse"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:94
+msgid "Support for GNOME Shell 3.32 (@demokritos)"
+msgstr "Podrška za GNOME ljusku 3.32 (@demokritos)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:95
+msgid "Fix for build with vala 0.44.1 (@snizovtsev)"
+msgstr "Ispravak za gradnju pomoću vala 0.44.1 (@snizovtsev)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:96
+msgid "Updated German translation (@c7hm4r)"
+msgstr "Aktualiziran prijevod za njemački (@c7hm4r)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:97
+msgid "Fix for handle error recreating existing folder (@Rj7)"
+msgstr "Ispravak greške za ponovnu izradu postojeće mape (@Rj7)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:103
+msgid "Overview of changes in gnome-pomodoro 0.14.0"
+msgstr "Pregled promjena za gnome-pomodoro 0.14.0"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:105
+msgid "Support for GNOME Shell 3.28 and 3.30 (@aerostitch)"
+msgstr "Podrška za GNOME ljusku 3.28 i 3.30 (@aerostitch)"
+
+#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
+#: data/org.gnome.Pomodoro.appdata.xml.in:106 lib/window.vala:97
+#: plugins/gnome/extension/indicator.js:171
+msgid "Stats"
+msgstr "Statistika"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:107
+msgid "Background blur under the dialog during breaks"
+msgstr "Zamućena pozadina ispod dijaloškog prozora tijekom pauza"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:108
+msgid "Updated German translation (@tsabsch)"
+msgstr "Aktualiziran prijevod za njemački (@tsabsch)"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:109
+msgid "Updated Russian translation (@tigertv)"
+msgstr "Aktualiziran prijevod za ruski (@tigertv)"
+
+#: data/org.gnome.Pomodoro.desktop.in:4 lib/about-dialog.vala:32
+msgid "A simple time management utility"
+msgstr "Jednostavan uslužni program za upravljanja vremenom"
+
+#: data/org.gnome.Pomodoro.desktop.in:5
+msgid "timer;"
+msgstr "timer;"
+
+#: data/resources/menus.ui:6 lib/application.vala:88
+#: plugins/actions/enums.vala:185 plugins/actions/resources/action-page.ui:155
+msgid "Start"
+msgstr "Pokreni"
+
+#: data/resources/menus.ui:11 data/resources/window.ui:216
+#: lib/application.vala:97 lib/window.vala:197 plugins/actions/enums.vala:194
+#: plugins/actions/resources/action-page.ui:200
+msgid "Pause"
+msgstr "Zaustavi"
+
+#: data/resources/menus.ui:16 lib/application.vala:100 lib/window.vala:183
+#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:215
+msgid "Resume"
+msgstr "Nastavi"
+
+#: data/resources/menus.ui:21 data/resources/window.ui:243
+#: lib/application.vala:91
+msgid "Stop"
+msgstr "Prekini"
+
+#: data/resources/menus.ui:33 data/resources/window.ui:395 lib/window.vala:45
+#: plugins/actions/enums.vala:94 plugins/gnome/extension/indicator.js:165
+#: plugins/gnome/extension/timer.js:43
+msgid "Short Break"
+msgstr "Kratka pauza"
+
+#: data/resources/menus.ui:38 data/resources/window.ui:411 lib/window.vala:46
+#: plugins/actions/enums.vala:97 plugins/gnome/extension/indicator.js:166
+#: plugins/gnome/extension/timer.js:46
+msgid "Long Break"
+msgstr "Duga pauza"
+
+#: data/resources/menus.ui:45
+msgid "_Timer"
+msgstr "_Timer"
+
+#: data/resources/menus.ui:49 data/resources/window.ui:307
+msgid "_Preferences"
+msgstr "_Postavke"
+
+#: data/resources/menus.ui:53 data/resources/window.ui:346
+msgid "_Quit"
+msgstr "_Zatvori program"
+
+#: data/resources/preferences-keyboard-shortcut-page.ui:29
+msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
+msgstr ""
+"Tipkovni prečac za uključivanje/isključivanje timera. Promijeni prečac "
+"upisom novog prečaca."
+
+#: data/resources/preferences-keyboard-shortcut-page.ui:83
+#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:245
+msgid "Disable"
+msgstr "Deaktiviraj"
+
+#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:283
+msgid "Timer"
+msgstr "Timer"
+
+#: data/resources/preferences-main-page.ui:108
+msgid "Pomodoro duration"
+msgstr "Trajanje Pomodoroa"
+
+#: data/resources/preferences-main-page.ui:160
+msgid "Break duration"
+msgstr "Trajanje pauze"
+
+#: data/resources/preferences-main-page.ui:213
+msgid "Long break duration"
+msgstr "Trajanje duge pauze"
+
+#: data/resources/preferences-main-page.ui:245
+msgid "Pomodoros before a long break"
+msgstr "Pomodori prije duge pauze"
+
+#: data/resources/preferences-main-page.ui:294
+msgid "Keyboard shortcut"
+msgstr "Tipkovni prečaci"
+
+#: data/resources/preferences-main-page.ui:357
+msgid "Notifications"
+msgstr "Obavijesti"
+
+#: data/resources/preferences-main-page.ui:400
+msgid "Screen notifications"
+msgstr "Ekranske obavijesti"
+
+#: data/resources/preferences-main-page.ui:460
+msgid "Desktop"
+msgstr "Radna površina"
+
+#: data/resources/preferences-main-page.ui:509
+msgid "Wait for activity after a break"
+msgstr "Čekaj na aktivnost nakon pauze"
+
+#: data/resources/preferences-main-page.ui:573
+msgid "Plugins…"
+msgstr "Dodaci …"
+
+#: data/resources/preferences.ui:8 lib/preferences-dialog.vala:804
+msgid "Plugins"
+msgstr "Dodaci"
+
+#: data/resources/preferences.ui:47
+msgid "Back"
+msgstr "Natrag"
+
+#: data/resources/screen-notification.ui:89
+#: plugins/gnome/extension/dialogs.js:611
+msgid "It's time to take a break"
+msgstr "Vrijeme je za pauzu"
+
+#: data/resources/stats-view.ui:28
+msgid "Nothing to see yet"
+msgstr "Još se nema što vidjeti"
+
+#: data/resources/stats-view.ui:45
+msgid "Complete a few sessions"
+msgstr "Završi par sesija"
+
+#: data/resources/stats-view.ui:86 data/resources/stats-view.ui:343
+msgid "Day"
+msgstr "Dan"
+
+#: data/resources/stats-view.ui:109 data/resources/stats-view.ui:356
+msgid "Week"
+msgstr "Tjedan"
+
+#: data/resources/stats-view.ui:133 data/resources/stats-view.ui:369
+msgid "Month"
+msgstr "Mjesec"
+
+#: data/resources/stats-view.ui:161
+msgid "Previous (Alt+Left)"
+msgstr "Prethodni (Alt+Lijevo)"
+
+#: data/resources/stats-view.ui:188
+msgid "Next (Alt+Right)"
+msgstr "Sljedeći (Alt+Desno)"
+
+#: data/resources/stats-view.ui:216 data/resources/stats-view.ui:319
+#: lib/stats-day-page.vala:62
+msgid "Today"
+msgstr "Danas"
+
+#: data/resources/window.ui:74
+msgid "Start Pomodoro"
+msgstr "Pokreni Pomodoro"
+
+#: data/resources/window.ui:321
+msgid "_About"
+msgstr "O programu"
+
+#: lib/about-dialog.vala:30
+msgid "About Pomodoro"
+msgstr "O programu Pomodoro"
+
+#: lib/about-dialog.vala:41
+msgid "translator-credits"
+msgstr "Milo Ivir <mail@milotype.de>"
+
+#: lib/application.vala:85
+msgid "Start/Stop"
+msgstr "Pokreni/Prekini"
+
+#: lib/application.vala:94
+msgid "Pause/Resume"
+msgstr "Zaustavi/Nastavi"
+
+#: lib/application.vala:103
+msgid "Run as background service"
+msgstr "Pokreni kao uslugu u pozadini"
+
+#: lib/application.vala:106
+msgid "Show preferences"
+msgstr "Prikaži postavke"
+
+#: lib/application.vala:109
+msgid "Quit application"
+msgstr "Zatvori program"
+
+#: lib/application.vala:112
+msgid "Print version information and exit"
+msgstr "Ispiši informacije o verziji i izađi"
+
+#: lib/notifications-capability.vala:130
+msgid "Focus on your task."
+msgstr "Usredotoči se na zadatak."
+
+#: lib/notifications-capability.vala:141 lib/notifications-capability.vala:162
+#: plugins/gnome/extension/notifications.js:430
+msgid "Take a break"
+msgstr "Započni pauzu"
+
+#: lib/notifications-capability.vala:156
+#, c-format
+msgid "You have %d minute"
+msgid_plural "You have %d minutes"
+msgstr[0] "Imaš %d minutu"
+msgstr[1] "Imaš %d minute"
+msgstr[2] "Imaš %d minuta"
+
+#: lib/notifications-capability.vala:158
+#, c-format
+msgid "You have %d second"
+msgid_plural "You have %d seconds"
+msgstr[0] "Imaš %d sekundu"
+msgstr[1] "Imaš %d sekunde"
+msgstr[2] "Imaš %d sekunda"
+
+#: lib/notifications-capability.vala:163
+msgid "Take a longer break"
+msgstr "Započni dužu pauzu"
+
+#: lib/notifications-capability.vala:179
+msgid "Lengthen it"
+msgstr "Produži"
+
+#: lib/notifications-capability.vala:184
+msgid "Shorten it"
+msgstr "Skrati"
+
+#: lib/notifications-capability.vala:189
+msgid "Start pomodoro"
+msgstr "Pokreni Pomodoro"
+
+#: lib/preferences-dialog.vala:158
+#, c-format
+msgid ""
+"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
+"such as Control, Alt or Shift."
+msgstr ""
+"Korištenje tipke „%s” kao prečaca ometat će tipkanje. Pokušaj dodati jednu "
+"drugu tipku, kao što su Control, Alt ili Shift."
+
+#: lib/preferences-dialog.vala:590 plugins/sounds/sounds-plugin.vala:604
+msgid "Off"
+msgstr "Isključeno"
+
+#: lib/preferences-dialog.vala:808
+msgid "Keyboard Shortcut"
+msgstr "Tipkovni prečaci"
+
+#: lib/presence.vala:78
+msgid "Available"
+msgstr "Dostupno"
+
+#: lib/presence.vala:81
+msgid "Busy"
+msgstr "Zauzeto"
+
+#: lib/presence.vala:84
+msgid "Idle"
+msgstr "Bez aktivnosti"
+
+#: lib/presence.vala:87
+msgid "Invisible"
+msgstr "Nevidljivo"
+
+#: lib/stats-day-page.vala:66
+msgid "Yesterday"
+msgstr "Jučer"
+
+#: lib/stats-page.vala:87
+#, c-format
+msgid "%d m"
+msgstr "%d min"
+
+#: lib/stats-page.vala:93
+#, c-format
+msgid "%.0f h"
+msgstr "%.0f h"
+
+#: lib/stats-page.vala:96
+#, c-format
+msgid "%.1f h"
+msgstr "%.1f h"
+
+#: lib/stats-page.vala:573
+msgid "Break"
+msgstr "Pauza"
+
+#: lib/stats-week-page.vala:58
+msgid "This week"
+msgstr "Ovaj tjedan"
+
+#: lib/utils.vala:32
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d sat"
+msgstr[1] "%d sata"
+msgstr[2] "%d sati"
+
+#: lib/utils.vala:41
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minuta"
+msgstr[1] "%d minute"
+msgstr[2] "%d minuta"
+
+#: plugins/actions/actions.vala:423
+msgid "Actions"
+msgstr "Radnje"
+
+#: plugins/actions/actions.vala:427
+msgid "Action"
+msgstr "Radnja"
+
+#: plugins/actions/actions.vala:452
+msgid "Custom actions…"
+msgstr "Prilagođene radnje …"
+
+#: plugins/actions/enums.vala:188 plugins/actions/resources/action-page.ui:170
+msgid "Complete"
+msgstr "Završeno"
+
+#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:185
+#: plugins/gnome/extension/notifications.js:681
+msgid "Skip"
+msgstr "Preskoči"
+
+#: plugins/actions/enums.vala:200 plugins/actions/resources/action-page.ui:230
+msgid "Enable"
+msgstr "Aktiviraj"
+
+#: plugins/actions/resources/action-page.ui:28
+msgid "Command"
+msgstr "Naredba"
+
+#: plugins/actions/resources/action-page.ui:41
+#: plugins/actions/resources/menus.ui:29
+msgid "Triggers"
+msgstr "Okidači"
+
+#: plugins/actions/resources/action-page.ui:54
+msgid "Name"
+msgstr "Ime"
+
+#: plugins/actions/resources/action-page.ui:88
+msgid "_Pomodoro"
+msgstr "_Pomodoro"
+
+#: plugins/actions/resources/action-page.ui:102
+msgid "_Short Break"
+msgstr "_Kratka pauza"
+
+#: plugins/actions/resources/action-page.ui:116
+msgid "_Long Break"
+msgstr "_Duga pauza"
+
+#: plugins/actions/resources/action-page.ui:299
+msgid "Add"
+msgstr "Dodaj"
+
+#: plugins/actions/resources/menus.ui:6
+msgid "Remove"
+msgstr "Ukloni"
+
+#: plugins/actions/resources/menus.ui:14
+msgid "State"
+msgstr "Stanje"
+
+#: plugins/actions/resources/menus.ui:19
+msgid "State Duration"
+msgstr "Trajanje stanja"
+
+#: plugins/actions/resources/menus.ui:24
+msgid "Elapsed Time"
+msgstr "Proteklo vrijeme"
+
+#: plugins/gnome/extension/indicator.js:116
+#: plugins/gnome/extension/notifications.js:86
+#: plugins/gnome/extension/notifications.js:643
+msgid "Pomodoro Timer"
+msgstr "Pomodoro timer"
+
+#: plugins/gnome/extension/indicator.js:123
+msgid "Start Timer"
+msgstr "Pokreni timer"
+
+#: plugins/gnome/extension/indicator.js:149
+#: plugins/gnome/extension/indicator.js:225
+msgid "Pause Timer"
+msgstr "Zaustavi timer"
+
+#: plugins/gnome/extension/indicator.js:153
+msgid "Stop Timer"
+msgstr "Prekini timer"
+
+#: plugins/gnome/extension/indicator.js:172
+msgid "Quit"
+msgstr "Zatvori program"
+
+#: plugins/gnome/extension/indicator.js:224
+msgid "Resume Timer"
+msgstr "Nastavi timer"
+
+#: plugins/gnome/extension/notifications.js:282
+msgid "Break is about to end"
+msgstr "Pauza će uskoro završiti"
+
+#: plugins/gnome/extension/notifications.js:311
+#: plugins/gnome/extension/notifications.js:458
+#: plugins/gnome/extension/notifications.js:585
+#: plugins/gnome/extension/notifications.js:720
+#, javascript-format
+msgid "%d minute remaining"
+msgid_plural "%d minutes remaining"
+msgstr[0] "još %d minuta"
+msgstr[1] "još %d minute"
+msgstr[2] "još %d minuta"
+
+#: plugins/gnome/extension/notifications.js:313
+#: plugins/gnome/extension/notifications.js:460
+#: plugins/gnome/extension/notifications.js:587
+#: plugins/gnome/extension/notifications.js:722
+#, javascript-format
+msgid "%d second remaining"
+msgid_plural "%d seconds remaining"
+msgstr[0] "još %d sekunda"
+msgstr[1] "još %d sekunde"
+msgstr[2] "još %d sekundi"
+
+#: plugins/gnome/extension/notifications.js:342
+#: plugins/gnome/extension/notifications.js:476
+#: plugins/gnome/extension/notifications.js:686
+msgid "+1 Minute"
+msgstr "+1 minuta"
+
+#: plugins/gnome/extension/notifications.js:423
+msgid "Pomodoro is about to end"
+msgstr "Pomodoro će uskoro završiti"
+
+#: plugins/gnome/extension/notifications.js:471
+msgid "Skip Break"
+msgstr "Preskoči pauzu"
+
+#: plugins/gnome/extension/notifications.js:651
+#: plugins/gnome/gnome-shell-extension.vala:408
+msgid "Report issue"
+msgstr "Prijavi problem"
+
+#: plugins/gnome/extension/notifications.js:731
+msgid "Paused"
+msgstr "Zaustavljeno"
+
+#: plugins/gnome/extension/timer.js:245
+#, javascript-format
+msgid "Failed to run <i>%s</i> service"
+msgstr "Neuspjelo pokretanje usluge <i>%s</i>"
+
+#: plugins/gnome/gnome-plugin.vala:167
+msgid "Hide other notifications"
+msgstr "Sakrij druge obavijesti"
+
+#: plugins/gnome/gnome-shell-extension.vala:373
+#: plugins/gnome/gnome-shell-extension.vala:406
+msgid "Failed to enable extension"
+msgstr "Neuspjelo aktiviranje proširenja"
+
+#: plugins/gnome/gnome-shell-extension.vala:374
+msgid "Extension is out of date"
+msgstr "Proširenje je zastarjelo"
+
+#: plugins/gnome/gnome-shell-extension.vala:375
+msgid "Upgrade"
+msgstr "Nadogradi"
+
+#: plugins/sounds/resources/preferences-sound-page.ui:33
+msgid "Volume:"
+msgstr "Glasnoća:"
+
+#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:410
+msgid "Clock Ticking"
+msgstr "Otkucavanje sata"
+
+#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:411
+msgid "Timer Ticking"
+msgstr "Otkucavanje timera"
+
+#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:412
+msgid "Woodland Birds"
+msgstr "Šumske ptice"
+
+#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:472
+#: plugins/sounds/sounds-plugin.vala:511
+msgid "Bell"
+msgstr "Zvono"
+
+#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:473
+#: plugins/sounds/sounds-plugin.vala:512
+msgid "Loud Bell"
+msgstr "Glasno zvono"
+
+#: plugins/sounds/sounds-plugin.vala:334
+msgid "Select Custom Sound"
+msgstr "Odaberi prilagođeni zvuk"
+
+#: plugins/sounds/sounds-plugin.vala:337
+msgid "_Cancel"
+msgstr "_Odustani"
+
+#: plugins/sounds/sounds-plugin.vala:339
+msgid "_Select"
+msgstr "Oda_beri"
+
+#: plugins/sounds/sounds-plugin.vala:568
+msgid "Ticking Sound"
+msgstr "Zvuk otkucavanja"
+
+#: plugins/sounds/sounds-plugin.vala:572
+msgid "End of Break Sound"
+msgstr "Zvuk kraja pauze"
+
+#: plugins/sounds/sounds-plugin.vala:576
+msgid "Start of Break Sound"
+msgstr "Zvuk početka pauze"
+
+#: plugins/sounds/sounds-plugin.vala:744
+msgid "Ticking sound"
+msgstr "Zvuk otkucavanja"
+
+#: plugins/sounds/sounds-plugin.vala:749
+msgid "Start of break sound"
+msgstr "Zvuk početka pauze"
+
+#: plugins/sounds/sounds-plugin.vala:754
+msgid "End of break sound"
+msgstr "Zvuk kraja pauze"
