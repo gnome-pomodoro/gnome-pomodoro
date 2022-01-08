@@ -35,7 +35,7 @@ msgstr "Pomodoro"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:9
 msgid "A time management utility for GNOME"
-msgstr "Alat upravljanja vremenom za GNOME"
+msgstr "Uslužni program za upravljanje vremenom za GNOME"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:11
 msgid ""
@@ -49,7 +49,7 @@ msgstr ""
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:23
 msgid "Timer window"
-msgstr "Prozor taimera"
+msgstr "Prozor timera"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:27 lib/preferences-dialog.vala:800
 #: plugins/gnome/extension/indicator.js:170
@@ -58,7 +58,7 @@ msgstr "Postavke"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:31
 msgid "Indicator for GNOME Shell"
-msgstr "Idnikator za GNOME ljusku"
+msgstr "Indikator za GNOME ljusku"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:36
 msgid "Kamil Prusko"
@@ -256,7 +256,7 @@ msgstr "Timer"
 
 #: data/resources/preferences-main-page.ui:108
 msgid "Pomodoro duration"
-msgstr "Trajanje Pomodoroa"
+msgstr "Trajanje Pomodora"
 
 #: data/resources/preferences-main-page.ui:160
 msgid "Break duration"
@@ -268,7 +268,7 @@ msgstr "Trajanje duge pauze"
 
 #: data/resources/preferences-main-page.ui:245
 msgid "Pomodoros before a long break"
-msgstr "Pomodori prije duge pauze"
+msgstr "Broj Pomodora prije duge pauze"
 
 #: data/resources/preferences-main-page.ui:294
 msgid "Keyboard shortcut"
@@ -346,7 +346,7 @@ msgstr "Pokreni Pomodoro"
 
 #: data/resources/window.ui:321
 msgid "_About"
-msgstr "O programu"
+msgstr "_Informacije"
 
 #: lib/about-dialog.vala:30
 msgid "About Pomodoro"
@@ -387,7 +387,7 @@ msgstr "Usredotoči se na zadatak."
 #: lib/notifications-capability.vala:141 lib/notifications-capability.vala:162
 #: plugins/gnome/extension/notifications.js:430
 msgid "Take a break"
-msgstr "Započni pauzu"
+msgstr "Odmori se"
 
 #: lib/notifications-capability.vala:156
 #, c-format
