@@ -46,7 +46,7 @@ const ngettext = Gettext.ngettext;
  */
 const IDLE_TIME_TO_PUSH_MODAL = 600;
 const PUSH_MODAL_TIME_LIMIT = 1000;
-const PUSH_MODAL_RATE = Clutter.get_default_frame_rate();
+const PUSH_MODAL_RATE = 60;
 const MOTION_DISTANCE_TO_CLOSE = 20;
 
 const IDLE_TIME_TO_OPEN = 60000;
