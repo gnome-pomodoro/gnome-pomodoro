@@ -150,6 +150,7 @@ namespace SoundsPlugin
         private dynamic Gst.Element volume_filter;
         private Pomodoro.Animation volume_animation;
         private bool is_about_to_finish = false;
+        private bool retry_on_error = true;
 
         [Flags]
         private enum GstPlayFlags {
@@ -237,6 +238,8 @@ namespace SoundsPlugin
             var uri = get_absolute_uri (this._file != null ? this._file.get_uri () : "");
 
             if (uri != "") {
+                this.retry_on_error = true;
+
                 this.pipeline.uri = uri;
                 this.pipeline.set_state (Gst.State.PLAYING);
             }
@@ -319,14 +322,25 @@ namespace SoundsPlugin
 
                     this.pipeline.set_state (Gst.State.NULL);
 
-                    this.finished ();
+                    if (this.retry_on_error) {
+                        this.retry_on_error = false;
+                        this.pipeline.set_state (Gst.State.PLAYING);
+                    }
+                    else {
+                        this.finished ();
+                    }
+
+                    break;
+
+                case Gst.MessageType.SEGMENT_DONE:
+                    this.retry_on_error = true;
                     break;
 
                 default:
                     break;
             }
 
-            return true;
+            return GLib.Source.CONTINUE;
         }
 
         /**
