@@ -631,18 +631,15 @@ class PomodoroIndicator extends PanelMenu.Button {
 
         this.add_style_class_name('extension-pomodoro-indicator');
 
-        this._hbox = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
-        this._hbox.pack_start = true;
-        this._hbox.set_x_align(Clutter.ActorAlign.CENTER);
-        this._hbox.set_y_align(Clutter.ActorAlign.CENTER);
-        this.add_child(this._hbox);
+        this._bin = new St.Bin({ x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER });
+        this.add_child(this._bin);
 
         this.setMenu(new IndicatorMenu(this));
         this.setType(type);
 
         this._blinking = false;
         this._blinkingGroup = new Utils.TransitionGroup();
-        this._blinkingGroup.addActor(this._hbox);
+        this._blinkingGroup.addActor(this._bin);
         this._blinkingGroup.addActor(this.menu.timerLabel);
         this._blinkingGroup.addActor(this.menu.pauseAction.child);
 
@@ -723,7 +720,7 @@ class PomodoroIndicator extends PanelMenu.Button {
                 break;
         }
 
-        this._hbox.add_child(this.widget.actor);
+        this._bin.set_child(this.widget.actor);
     }
 
     _onBlinked() {
