@@ -139,7 +139,8 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label">00</property>
-                                <property name="justify">center</property>
+                                <property name="justify">fill</property>
+                                <property name="xalign">1.0</property>
                                 <property name="width_chars">2</property>
                                 <style>
                                   <class name="pomodoro-timer-label"/>
@@ -173,7 +174,8 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label">00</property>
-                                <property name="justify">center</property>
+                                <property name="justify">fill</property>
+                                <property name="xalign">0.0</property>
                                 <property name="width_chars">2</property>
                                 <style>
                                   <class name="pomodoro-timer-label"/>
