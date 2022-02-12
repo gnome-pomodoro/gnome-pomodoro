@@ -184,7 +184,7 @@ namespace Pomodoro
 
                 this.blink_animation = new Pomodoro.Animation (Pomodoro.AnimationMode.BLINK,
                                                                2500,
-                                                               5);
+                                                               25);
                 this.blink_animation.add_property (this.timer_box,
                                                    "opacity",
                                                    FADED_OUT);
