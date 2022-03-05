@@ -54,6 +54,7 @@ gnome_pomodoro_lib_dep = declare_dependency(
     gobject_dep,
     peas_dep,
     gtk_dep,
+    cairo_dep,
   ],
   include_directories: [
     # Include gnome-pomodoro.h
