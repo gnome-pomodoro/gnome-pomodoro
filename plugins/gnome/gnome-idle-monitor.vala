@@ -44,9 +44,9 @@ namespace GnomePlugin
             this.id = this.get_next_id ();
         }
 
-        public IdleMonitorWatch (GnomePlugin.IdleMonitor monitor,
-                                 uint64	                         timeout_msec,
-                                 owned IdleMonitorWatchFunc?     callback)
+        public IdleMonitorWatch (GnomePlugin.IdleMonitor     monitor,
+                                 uint64                      timeout_msec,
+                                 owned IdleMonitorWatchFunc? callback)
         {
             this.monitor = monitor;
             this.timeout_msec = timeout_msec;
@@ -201,7 +201,7 @@ namespace GnomePlugin
          * when the user has become active, use
          * gnome_idle_monitor_add_user_active_watch().
          */
-        public uint add_idle_watch (uint64	                    interval_msec,
+        public uint add_idle_watch (uint64                      interval_msec,
                                     owned IdleMonitorWatchFunc? callback)
                                     requires (interval_msec > 0)
         {

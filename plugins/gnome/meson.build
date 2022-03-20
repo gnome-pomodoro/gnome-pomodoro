@@ -8,7 +8,10 @@ libgnome_vala_sources = [
 shared_library(
   'gnome',
   libgnome_vala_sources,
-  dependencies: gnome_pomodoro_lib_dep,
+  dependencies: [
+    gnome_pomodoro_lib_dep,
+    json_dep,
+  ],
   install: true,
   install_dir: plugin_libdir,
 )

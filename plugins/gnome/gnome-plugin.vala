@@ -23,7 +23,7 @@ using GLib;
 
 namespace GnomePlugin
 {
-    /* Leas amount of time in seconds between detected events
+    /* Least amount of time in seconds between detected events
      * to say that user become active
      */
     private const double IDLE_MONITOR_MIN_IDLE_TIME = 0.5;
@@ -36,56 +36,179 @@ namespace GnomePlugin
         private GLib.Settings                   settings;
         private Pomodoro.CapabilityGroup        capabilities;
         private GnomePlugin.GnomeShellExtension shell_extension;
+        private string                          shell_extension_expected_path;
+        private string                          shell_extension_expected_version;
         private GnomePlugin.IdleMonitor         idle_monitor;
         private uint                            become_active_id = 0;
-        private bool                            can_enable = false;
+        private bool                            is_gnome = false;
         private double                          last_activity_time = 0.0;
+        private Gnome.Shell?                    shell_proxy = null;
+        private Gnome.ShellExtensions?          shell_extensions_proxy = null;
 
-        construct
+        /**
+         * Method for enabling extension after install
+         */
+        private async void enable_extension (GLib.Cancellable? cancellable = null) throws GLib.Error
         {
-            this.settings = Pomodoro.get_settings ().get_child ("preferences");
-            this.can_enable = GLib.Environment.get_variable (CURRENT_DESKTOP_VARIABLE) == "GNOME";
+            if (this.shell_extension.path != shell_extension_expected_path ||
+                this.shell_extension.path != shell_extension_expected_version)
+            {
+                yield this.shell_extension.reload ();
+            }
 
-            // try {
-            //     this.init_async.begin (GLib.Priority.DEFAULT, null);
-            // }
-            // catch (GLib.Error error) {
-            //     warning ("Failed to initialize ApplicationExtension");
-            // }
+            yield this.shell_extension.enable ();
+        }
+
+        /**
+         * Read extension version from metadata.json
+         */
+        private string get_extension_version (string extension_path)
+        {
+            var metadata_path = GLib.Path.build_filename (extension_path, "metadata.json");
+            var parser = new Json.Parser ();
+
+            try {
+                parser.load_from_file (metadata_path);
+
+                var data = parser.get_root ().get_object ();
+
+                if (data != null) {
+                    return data.get_string_member_with_default ("version", "");
+                }
+            }
+            catch (GLib.FileError.NOENT error) {
+                // ignore when file does not exist
+            }
+            catch (GLib.Error error) {
+                warning ("Error while parsing file %s: %s\n", extension_path, error.message);
+            }
+
+            return "";
+        }
+
+        public async void init_shell_extension (GLib.Cancellable? cancellable = null)
+        {
+            var expected_version = Config.PACKAGE_VERSION;
+            var expected_path = Config.EXTENSION_DIR;
+            var should_enable = true;
+
+            if (this.shell_extension == null) {
+                this.shell_extension = new GnomePlugin.GnomeShellExtension (
+                            this.shell_proxy,
+                            this.shell_extensions_proxy,
+                            Config.EXTENSION_UUID);
+
+                try {
+                    // fetch extension state
+                    yield this.shell_extension.init_async (GLib.Priority.DEFAULT, cancellable);
+                }
+                catch (GLib.Error error) {
+                    GLib.warning ("Error while initializing extension: %s", error.message);
+                    return;
+                }
+            }
+
+            this.shell_extension_expected_path = expected_path;
+            this.shell_extension_expected_version = expected_version;
+
+            GLib.info ("Extension state=\"%s\" version=\"%s\" path=\"%s\"",
+                       this.shell_extension.state.to_string (), this.shell_extension.version, this.shell_extension.path);
+
+            // reload extension if it's not up-to-date,
+            // allow extension to be installed in other place than `expected_path`
+            if (
+                    this.shell_extension.path != expected_path ||
+                    this.shell_extension.version != expected_version
+            ) {
+                try {
+                    yield this.shell_extension.reload ();
+                }
+                catch (GLib.Error error) {
+                    GLib.warning ("Error while reloading extension: %s", error.message);
+                }
+            }
+
+            // notify if extension is outdated
+                // TODO: notify if extension is outdated, ask whether to enable it, disable it
+                // offer to uninstall it if it's not from expected_path
+
+            // notify if extension does not support gnome-shell version
+            if (this.shell_extension.state != Gnome.ExtensionState.OUT_OF_DATE) {
+                // TODO: notify if extension is outdated, ask whether to enable it, disable it
+            }
+
+            if (should_enable && this.shell_extension.state != Gnome.ExtensionState.ENABLED) {
+                yield this.shell_extension.enable (cancellable);
+            }
+            else if (!should_enable && this.shell_extension.state == Gnome.ExtensionState.ENABLED) {
+                yield this.shell_extension.disable (cancellable);
+            }
+
+            // TODO: wait until extension initializes its client, registers its capabilities?
+            // TODO: monitor gnome-shell mode?
+            // TODO: monitor extension state?
         }
 
         public async bool init_async (int               io_priority = GLib.Priority.DEFAULT,
                                       GLib.Cancellable? cancellable = null)
                                       throws GLib.Error
         {
-            var application = Pomodoro.Application.get_default ();
+            this.is_gnome = GLib.Environment.get_variable (CURRENT_DESKTOP_VARIABLE) == "GNOME";
+            this.settings = Pomodoro.get_settings ().get_child ("preferences");
+            this.capabilities = new Pomodoro.CapabilityGroup ("gnome");
+
+            if (!this.is_gnome) {
+                return false;
+            }
 
             /* Mutter IdleMonitor */
             if (this.idle_monitor == null) {
-                this.capabilities = new Pomodoro.CapabilityGroup ("gnome");
-
                 try {
+                    // TODO: idle-monitor should be initialized as async
                     this.idle_monitor = new GnomePlugin.IdleMonitor ();
 
                     this.timer = Pomodoro.Timer.get_default ();
                     this.timer.state_changed.connect_after (this.on_timer_state_changed);
 
                     this.capabilities.add (new Pomodoro.Capability ("idle-monitor"));
-
-                    application.capabilities.add_group (this.capabilities, Pomodoro.Priority.HIGH);
                 }
                 catch (GLib.Error error) {
-                    // Gnome.IdleMonitor not available
+                    GLib.debug ("Gnome.IdleMonitor is not available");
                 }
+            }
+
+            var application = Pomodoro.Application.get_default ();
+            application.capabilities.add_group (this.capabilities, Pomodoro.Priority.HIGH);
+
+            // TODO: don't use yield, these can be initialized in parallel
+            try {
+                this.shell_proxy = yield GLib.Bus.get_proxy<Gnome.Shell> (
+                        GLib.BusType.SESSION,
+                        "org.gnome.Shell",
+                        "/org/gnome/Shell",
+                        GLib.DBusProxyFlags.DO_NOT_AUTO_START,
+                        cancellable);
+            }
+            catch (GLib.Error error) {
+                GLib.warning ("Failed to connect to org.gnome.Shell: %s", error.message);
+                throw error;
+            }
+
+            try {
+                this.shell_extensions_proxy = yield GLib.Bus.get_proxy<Gnome.ShellExtensions> (
+                        GLib.BusType.SESSION,
+                        "org.gnome.Shell",
+                        "/org/gnome/Shell",
+                        GLib.DBusProxyFlags.DO_NOT_AUTO_START,
+                        cancellable);
+            }
+            catch (GLib.Error error) {
+                GLib.warning ("Failed to connect to org.gnome.Shell.Extensions: %s", error.message);
+                throw error;
             }
 
             /* GNOME Shell extension */
-            if (this.can_enable && this.shell_extension == null) {
-                this.shell_extension = new GnomePlugin.GnomeShellExtension (Config.EXTENSION_UUID,
-                                                                            Config.EXTENSION_DIR);
-
-                yield this.shell_extension.enable (cancellable);
-            }
+            yield this.init_shell_extension (cancellable);
 
             return true;
         }
