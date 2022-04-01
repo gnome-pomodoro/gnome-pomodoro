@@ -1,3 +1,11 @@
+2022-04-01  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.21.0:
+
+	* Support for GNOME Shell 42 (thanks @milotype and @kappa)
+	* Fixed app hanging at startup
+	* Added Croatian translation (thanks @dayeondev)
+	* Added json-glib and cairo as dependencies
+
 2021-09-25  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.20.0:
 
