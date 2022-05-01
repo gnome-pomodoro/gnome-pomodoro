@@ -202,7 +202,7 @@ var ModalDialog = GObject.registerClass({
                       opacity: 0 });
 
         this._state = State.CLOSED;
-        this._hasModal = false;
+        this._modal = undefined;
         this._pushModalDelaySource = 0;
         this._pushModalWatchId = 0;
         this._pushModalSource = 0;
@@ -435,17 +435,17 @@ var ModalDialog = GObject.registerClass({
             this._keyFocusOutId = 0;
         }
 
-        if (!this._hasModal) {
+        if (!this._modal) {
             return;
         }
 
-        Main.popModal(this, timestamp);
-        this._hasModal = false;
+        Main.popModal(this._modal, timestamp);
+        this._modal = undefined;
         this._lightbox.reactive = false;
     }
 
     pushModal(timestamp) {
-        if (this._hasModal) {
+        if (this._modal) {
             return true;
         }
 
@@ -458,12 +458,8 @@ var ModalDialog = GObject.registerClass({
             params['timestamp'] = timestamp;
         }
 
-        if (!Main.pushModal(this, params)) {
-            return;
-        }
-
+        this._modal = Main.pushModal(this, params);
         this._disconnectPushModalSignals();
-        this._hasModal = true;
         this._lightbox.reactive = true;
 
         global.stage.set_key_focus(this._lightbox);
