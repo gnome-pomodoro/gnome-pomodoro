@@ -1,4 +1,9 @@
 2022-04-01  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.21.1:
+
+	* Fixed break overlay geting stuck at 0:01 on GNOME 42 (thanks @upsuper)
+
+2022-04-01  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.21.0:
 
 	* Support for GNOME Shell 42 (thanks @milotype and @kappa)
