@@ -202,7 +202,8 @@ var ModalDialog = GObject.registerClass({
                       opacity: 0 });
 
         this._state = State.CLOSED;
-        this._modal = undefined;
+        this._hasModal = false;
+        this._grab = null;
         this._pushModalDelaySource = 0;
         this._pushModalWatchId = 0;
         this._pushModalSource = 0;
@@ -435,17 +436,25 @@ var ModalDialog = GObject.registerClass({
             this._keyFocusOutId = 0;
         }
 
-        if (!this._modal) {
+        if (!this._hasModal) {
             return;
         }
 
-        Main.popModal(this._modal, timestamp);
-        this._modal = undefined;
+        if (this._grab.get_seat_state !== undefined) {
+            // gnome-shell 42 and newer
+            Main.popModal(this._grab, timestamp);
+        }
+        else {
+            Main.popModal(this, timestamp);
+        }
+        this._grab = null;
+        this._hasModal = false;
+
         this._lightbox.reactive = false;
     }
 
     pushModal(timestamp) {
-        if (this._modal) {
+        if (this._hasModal) {
             return true;
         }
 
@@ -458,17 +467,30 @@ var ModalDialog = GObject.registerClass({
             params['timestamp'] = timestamp;
         }
 
-        this._modal = Main.pushModal(this, params);
+        let grab = Main.pushModal(this, params);
+        if (grab.get_seat_state !== undefined) {
+            // gnome-shell 42 and newer
+            if (grab.get_seat_state() === Clutter.GrabState.NONE) {
+                Main.popModal(grab);
+                return false;
+            }
+        }
+
+        this._grab = grab;
+        Main.layoutManager.emit('system-modal-opened');
+
+        this._hasModal = true;
         this._disconnectPushModalSignals();
         this._lightbox.reactive = true;
 
-        global.stage.set_key_focus(this._lightbox);
+        // global.stage.set_key_focus(this._lightbox);
+        this._lightbox.grab_key_focus();
 
         if (!this._keyFocusOutId) {
             this._keyFocusOutId = this._lightbox.connect('key-focus-out', this._onKeyFocusOut.bind(this));
         }
 
-        Main.layoutManager.emit('system-modal-opened');
+        return true;
     }
 
     _onDestroy() {
