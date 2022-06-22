@@ -153,7 +153,7 @@ namespace GnomePlugin
                                       GLib.Cancellable? cancellable = null)
                                       throws GLib.Error
         {
-            this.is_gnome = GLib.Environment.get_variable (CURRENT_DESKTOP_VARIABLE) == "GNOME";
+            this.is_gnome = GLib.Environment.get_variable (CURRENT_DESKTOP_VARIABLE).has_suffix ("GNOME");
             this.settings = Pomodoro.get_settings ().get_child ("preferences");
             this.capabilities = new Pomodoro.CapabilityGroup ("gnome");
 
