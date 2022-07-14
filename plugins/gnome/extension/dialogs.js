@@ -474,6 +474,10 @@ var ModalDialog = GObject.registerClass({
                 Main.popModal(grab);
                 return false;
             }
+        } else {
+            if (!grab) {
+                return false;
+            }
         }
 
         this._grab = grab;
