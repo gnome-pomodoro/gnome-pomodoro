@@ -141,7 +141,7 @@ msgstr "计时器"
 
 #: data/resources/preferences-main-page.ui:108
 msgid "Pomodoro duration"
-msgstr "番茄时间时长"
+msgstr "番茄钟时长"
 
 #: data/resources/preferences-main-page.ui:160
 msgid "Break duration"
@@ -153,7 +153,7 @@ msgstr "长休息时长"
 
 #: data/resources/preferences-main-page.ui:245
 msgid "Pomodoros before a long break"
-msgstr "进入长休息前的番茄时间数目"
+msgstr "进入长休息前的番茄钟数目"
 
 #: data/resources/preferences-main-page.ui:294
 msgid "Keyboard shortcut"
@@ -194,11 +194,11 @@ msgstr "是时候休息一下了"
 
 #: data/resources/stats-view.ui:28
 msgid "Nothing to see yet"
-msgstr "还没看到东西"
+msgstr "还没有统计信息"
 
 #: data/resources/stats-view.ui:45
 msgid "Complete a few sessions"
-msgstr "完成完成一些会话"
+msgstr "请先完成一些番茄钟"
 
 #: data/resources/stats-view.ui:86 data/resources/stats-view.ui:344
 msgid "Day"
@@ -250,7 +250,7 @@ msgstr "暂停/继续"
 
 #: lib/application.vala:103
 msgid "Run as background service"
-msgstr "作为一个后台服务运行"
+msgstr "作为后台服务运行"
 
 #: lib/application.vala:106
 msgid "Show preferences"
@@ -299,7 +299,7 @@ msgstr "缩短"
 
 #: lib/notifications-capability.vala:189
 msgid "Start pomodoro"
-msgstr "开始番茄时间"
+msgstr "开始新番茄钟"
 
 #: lib/preferences-dialog.vala:158
 #, c-format
@@ -374,7 +374,7 @@ msgstr[0] "%d 分钟"
 
 #: lib/window.vala:97 plugins/gnome/extension/indicator.js:183
 msgid "Stats"
-msgstr "统计统计"
+msgstr "统计"
 
 #: plugins/actions/actions.vala:423
 msgid "Actions"
@@ -484,7 +484,7 @@ msgstr "休息即将结束"
 #, javascript-format
 msgid "%d minute remaining"
 msgid_plural "%d minutes remaining"
-msgstr[0] "%d 分钟剩余"
+msgstr[0] "剩余 %d 分钟"
 
 #: plugins/gnome/extension/notifications.js:282
 #: plugins/gnome/extension/notifications.js:417
@@ -493,7 +493,7 @@ msgstr[0] "%d 分钟剩余"
 #, javascript-format
 msgid "%d second remaining"
 msgid_plural "%d seconds remaining"
-msgstr[0] "%d 秒剩余"
+msgstr[0] "剩余 %d 秒"
 
 #: plugins/gnome/extension/notifications.js:312
 #: plugins/gnome/extension/notifications.js:438
@@ -503,7 +503,7 @@ msgstr "+1 分钟"
 
 #: plugins/gnome/extension/notifications.js:380
 msgid "Pomodoro is about to end"
-msgstr "番茄时间即将结束"
+msgstr "番茄钟即将结束"
 
 #: plugins/gnome/extension/notifications.js:432
 msgid "Skip Break"
@@ -539,7 +539,7 @@ msgstr "似乎已卸载"
 
 #: plugins/gnome/gnome-shell-extension.vala:407
 msgid "Extension is out of date"
-msgstr "扩展过期"
+msgstr "扩展已过期"
 
 #: plugins/gnome/gnome-shell-extension.vala:408
 msgid "Upgrade"
