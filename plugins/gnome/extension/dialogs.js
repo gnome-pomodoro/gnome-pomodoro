@@ -293,6 +293,7 @@ var ModalDialog = GObject.registerClass({
 
     _onIdleMonitorBecameIdle(monitor) {
         let pushModalTries = 0;
+        let pushModalInterval = Math.floor(1000 / PUSH_MODAL_RATE);
         let timestamp = global.get_current_time();
 
         if (this._pushModalWatchId) {
@@ -306,7 +307,7 @@ var ModalDialog = GObject.registerClass({
 
         this._pushModalSource = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT,
-            Math.floor(1000 / PUSH_MODAL_RATE),
+            pushModalInterval,
             () => {
                 pushModalTries += 1;
 
@@ -315,7 +316,8 @@ var ModalDialog = GObject.registerClass({
                     return GLib.SOURCE_REMOVE;  // success
                 }
 
-                if (pushModalTries > PUSH_MODAL_TIME_LIMIT * PUSH_MODAL_RATE) {
+                if (pushModalTries * pushModalInterval >= PUSH_MODAL_TIME_LIMIT) {
+                    Utils.logWarning('Unable to push modal. Closing the modal dialog...');
                     this.close(true);
                     this._pushModalSource = 0;
                     return GLib.SOURCE_REMOVE;  // failure
