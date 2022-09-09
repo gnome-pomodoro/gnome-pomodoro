@@ -524,6 +524,7 @@ var IconIndicator = class {
     _onIconRepaint(area) {
         let cr = area.get_context();
         let [width, height] = area.get_surface_size();
+        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
 
         let radius    = 0.5 * this._iconSize - 2.0;
         let progress  = this._progress;
@@ -542,24 +543,24 @@ var IconIndicator = class {
         if (isBreak || !isRunning) {
             Clutter.cairo_set_source_color(cr, this._secondaryColor);
             cr.arcNegative(0, 0, radius, angle1, angle2);
-            cr.setLineWidth(2.2);
+            cr.setLineWidth(2.2 * scaleFactor);
             cr.stroke();
         }
         else {
             Clutter.cairo_set_source_color(cr, this._secondaryColor);
             cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
-            cr.setLineWidth(2.2);
+            cr.setLineWidth(2.2 * scaleFactor);
             cr.stroke();
 
             if (angle2 > angle1) {
                 Clutter.cairo_set_source_color(cr, this._primaryColor);
                 cr.arcNegative(0, 0, radius, angle1, angle2);
                 cr.setOperator(Cairo.Operator.CLEAR);
-                cr.setLineWidth(3.5);
+                cr.setLineWidth(3.5 * scaleFactor);
                 cr.strokePreserve();
 
                 cr.setOperator(Cairo.Operator.SOURCE);
-                cr.setLineWidth(2.2);
+                cr.setLineWidth(2.2 * scaleFactor);
                 cr.stroke();
             }
         }
