@@ -88,7 +88,7 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
             radialEffect: false,
         });
 
-        if (Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL)) {
+        if (Utils.versionCheck('42.0') || Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL)) {  // TODO there is no such feature flag since 42
             // Clone the group that contains all of UI on the screen. This is the
             // chrome, the windows, etc.
             this._uiGroup = new Clutter.Clone({ source: Main.uiGroup, clip_to_allocation: true });
