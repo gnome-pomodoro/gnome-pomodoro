@@ -1,3 +1,15 @@
+2022-10-02  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.22.0:
+
+	* Marked extension as compatible with GNOME Shell 43 (thanks @jbicha)
+	* Fixed blur effect in GNOME Shell 42 and later
+	* Fixed GNOME detection on Ubuntu (thanks @real-or-random)
+	* Fixed break overlay geting stuck at 0:01 on GNOME 3.38, 40 and 41 (thanks @prahal)
+	* Improved indicator rendering on HiDPI screens
+	* Updated Brazilian translation (thanks @costaronaldo)
+	* Updated Russian translation (thanks @ViktorOn)
+	* Updated Chinese translation (thanks @HaorongX)
+
 2022-04-01  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.21.1:
 
