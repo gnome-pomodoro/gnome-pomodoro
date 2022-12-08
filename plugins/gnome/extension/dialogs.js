@@ -53,8 +53,8 @@ const IDLE_TIME_TO_OPEN = 60000;
 const IDLE_TIME_TO_CLOSE = 600;
 const MIN_DISPLAY_TIME = 500;
 
-const FADE_IN_TIME = 300;
-const FADE_OUT_TIME = 300;
+const FADE_IN_TIME = 500;
+const FADE_OUT_TIME = 500;
 
 const BLUR_BRIGHTNESS = 0.4;
 const BLUR_SIGMA = 20.0;
@@ -62,6 +62,7 @@ const BLUR_SIGMA = 20.0;
 const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
 
 const DEFAULT_BACKGROUND_COLOR = Clutter.Color.from_pixel(0x000000ff);
+const HAVE_SHADERS_GLSL = Utils.versionCheck('42.0') || Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL);  // TODO there is no such feature flag since 42
 
 var State = {
     OPENED: 0,
@@ -86,35 +87,41 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
             height: params.height,
             fadeFactor: 1.0,
             radialEffect: false,
+            opacity: 0,
+            style_class: HAVE_SHADERS_GLSL ? 'extension-pomodoro-lightbox-blurred' : 'extension-pomodoro-lightbox',
         });
 
-        if (Utils.versionCheck('42.0') || Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL)) {  // TODO there is no such feature flag since 42
-            // Clone the group that contains all of UI on the screen. This is the
-            // chrome, the windows, etc.
-            this._uiGroup = new Clutter.Clone({ source: Main.uiGroup, clip_to_allocation: true });
-            this._uiGroup.set_background_color(DEFAULT_BACKGROUND_COLOR);
-            this._uiGroup.add_effect_with_name('blur', new Shell.BlurEffect());
-            this.set_child(this._uiGroup);
-
-            this.set({ opacity: 0, style_class: 'extension-pomodoro-lightbox-blurred' });
-        }
-        else {
-            this._uiGroup = null;
-
-            this.set({ opacity: 0, style_class: 'extension-pomodoro-lightbox' });
-        }
+        this._background = null;
 
         let themeContext = St.ThemeContext.get_for_stage(global.stage);
         this._scaleChangedId = themeContext.connect('notify::scale-factor', this._updateEffects.bind(this));
         this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', this._updateEffects.bind(this));
+    }
+
+    _createBackground() {
+        if (!this._background && HAVE_SHADERS_GLSL) {
+            // Clone the group that contains all of UI on the screen. This is the
+            // chrome, the windows, etc.
+            this._background = new Clutter.Clone({ source: Main.uiGroup, clip_to_allocation: true });
+            this._background.set_background_color(DEFAULT_BACKGROUND_COLOR);
+            this._background.add_effect_with_name('blur', new Shell.BlurEffect());
+            this.set_child(this._background);
+        }
 
         this._updateEffects();
     }
 
+    _destroyBackground() {
+        if (this._background) {
+            this._background.destroy();
+            this._background = null;
+        }
+    }
+
     _updateEffects() {
-        if (this._uiGroup) {
+        if (this._background) {
             const themeContext = St.ThemeContext.get_for_stage(global.stage);
-            let effect = this._uiGroup.get_effect('blur');
+            let effect = this._background.get_effect('blur');
 
             if (effect) {
                 effect.set({
@@ -129,8 +136,8 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
     lightOn(fadeInTime) {
         super.lightOn(fadeInTime);
 
-        if (this._uiGroup && !Utils.versionCheck('40.0')) {  // TODO remove compatibility for 3.38
-            let effect = this._uiGroup.get_effect('blur');
+        if (this._background && !Utils.versionCheck('40.0')) {  // TODO remove compatibility for 3.38
+            let effect = this._background.get_effect('blur');
             if (effect) {
                 effect.set({
                     brightness: BLUR_BRIGHTNESS * 0.99,
@@ -139,7 +146,7 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
 
             // HACK: force effect to be repaint itself during fading-in
             // in theory effect.queue_repaint(); should be enough
-            this._uiGroup.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS, {
+            this._background.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS, {
                 duration: fadeInTime || 0,
             });
         }
@@ -148,16 +155,28 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
     lightOff(fadeOutTime) {
         super.lightOff(fadeOutTime);
 
-        if (this._uiGroup && !Utils.versionCheck('40.0')) {  // TODO remove compatibility for 3.38
-            let effect = this._uiGroup.get_effect('blur');
+        if (this._background && !Utils.versionCheck('40.0')) {  // TODO remove compatibility for 3.38
+            let effect = this._background.get_effect('blur');
             if (effect) {
                 // HACK: force effect to be repaint itself during fading-out
                 // in theory effect.queue_repaint(); should be enough
-                this._uiGroup.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS * 0.99, {
+                this._background.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS * 0.99, {
                     duration: fadeOutTime || 0,
                 });
             }
         }
+    }
+
+    vfunc_map() {
+        this._createBackground();
+
+        super.vfunc_map();
+    }
+
+    vfunc_unmap() {
+        super.vfunc_unmap();
+
+        this._destroyBackground();
     }
 
     /* override parent method */
@@ -172,6 +191,8 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
             themeContext.disconnect(this._scaleChangedId);
             delete this._scaleChangedId;
         }
+
+        this._destroyBackground();
 
         super._onDestroy();
     }
