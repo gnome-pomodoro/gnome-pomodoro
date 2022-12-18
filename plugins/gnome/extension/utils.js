@@ -261,3 +261,22 @@ function disableExtension(uuid) {
         global.settings.set_strv(ENABLED_EXTENSIONS_KEY, enabledExtensions);
     }
 }
+
+
+// Authorize client to use full Shell D-Bus API.
+// This is required in order for the app to have access to `Eval()` method.
+function allowDBusSender(name) {
+    try {
+        const oldSenderChecker = Main.shellDBusService._senderChecker;
+        const allowlistSet = new Set([name]);
+        oldSenderChecker._uninitializedNames.forEach(_name => allowlistSet.add(_name));
+        oldSenderChecker._allowlistMap.forEach((_name, owner) => allowlistSet.add(_name));
+
+        const newSenderChecker = new DBusSenderChecker(allowlistSet);
+        Main.shellDBusService._senderChecker = newSenderChecker;
+        oldSenderChecker.destroy();
+    }
+    catch (error) {
+        logWarning(`Unable to patch shellDBusService: ${error}`);
+    }
+}
