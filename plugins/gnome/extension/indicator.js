@@ -103,7 +103,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
             return;
         }
 
-        if (this._timerState != Timer.State.POMODORO && Extension.extension && Extension.extension.dialog) {
+        if (this._timerState !== Timer.State.POMODORO && Extension.extension && Extension.extension.dialog) {
             this.itemActivated(BoxPointer.PopupAnimation.NONE);
             Extension.extension.dialog.open(true);
             Extension.extension.dialog.pushModal();

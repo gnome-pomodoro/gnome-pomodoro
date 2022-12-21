@@ -50,11 +50,11 @@ const PUSH_MODAL_RATE = 60;
 const MOTION_DISTANCE_TO_CLOSE = 20;
 
 const IDLE_TIME_TO_OPEN = 60000;
-const IDLE_TIME_TO_CLOSE = 600;
+const IDLE_TIME_TO_ACKNOWLEDGE = 600;
 const MIN_DISPLAY_TIME = 500;
 
 const FADE_IN_TIME = 500;
-const FADE_OUT_TIME = 500;
+const FADE_OUT_TIME = 350;
 
 const BLUR_BRIGHTNESS = 0.4;
 const BLUR_SIGMA = 20.0;
@@ -87,10 +87,12 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
             height: params.height,
             fadeFactor: 1.0,
             radialEffect: false,
+        });
+
+        this.set({
             opacity: 0,
             style_class: HAVE_SHADERS_GLSL ? 'extension-pomodoro-lightbox-blurred' : 'extension-pomodoro-lightbox',
         });
-
         this._background = null;
 
         let themeContext = St.ThemeContext.get_for_stage(global.stage);
@@ -223,12 +225,21 @@ var ModalDialog = GObject.registerClass({
                       opacity: 0 });
 
         this._state = State.CLOSED;
+        this._acknowledged = false;
         this._hasModal = false;
         this._grab = null;
-        this._pushModalDelaySource = 0;
+        this._destroyed = false;
+        this._pushModalTimeoutId = 0;
         this._pushModalWatchId = 0;
         this._pushModalSource = 0;
+        this._openWhenIdleWatchId = 0;
+        this._acknowledgeTimeoutId = 0;
+        this._acknowledgeIdleWatchId = 0;
         this._keyFocusOutId = 0;
+        this._eventId = 0;
+        this._lastActiveTime = -1;
+        this._lastEventX = -1;
+        this._lastEventY = -1;
         this._monitorConstraint = new Layout.MonitorConstraint();
         this._monitorConstraint.primary = true;
         this._stageConstraint = new Clutter.BindConstraint({
@@ -266,7 +277,7 @@ var ModalDialog = GObject.registerClass({
     }
 
     _setState(state) {
-        if (this._state == state) {
+        if (this._state === state) {
             return;
         }
 
@@ -299,6 +310,21 @@ var ModalDialog = GObject.registerClass({
         messageTray.unref();
     }
 
+    _getIdleTime(event) {
+        const eventTime = event ? event.get_time() : GLib.get_monotonic_time() / 1000;
+        const idleTime = this._lastActiveTime > 0 ? Math.max(eventTime - this._lastActiveTime, 0) : 0;
+
+        return Math.max(this._idleMonitor.get_idletime(), idleTime);
+    }
+
+    acknowledge() {
+        if (this.state === State.CLOSED || this.state === State.CLOSING) {
+            return;
+        }
+
+        this._acknowledged = true;
+    }
+
     _onKeyFocusOut() {
         let focus = global.stage.key_focus;
 
@@ -309,6 +335,28 @@ var ModalDialog = GObject.registerClass({
 
     _onOpenComplete() {
         this._setState(State.OPENED);
+
+        if (!this._acknowledgeTimeoutId) {
+            this._acknowledgeTimeoutId = GLib.timeout_add(
+                GLib.PRIORITY_DEFAULT,
+                MIN_DISPLAY_TIME,
+                () => {
+                    if (this._getIdleTime() >= IDLE_TIME_TO_ACKNOWLEDGE) {
+                        this.acknowledge();
+                    }
+                    else {
+                        this._acknowledgeIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_ACKNOWLEDGE,
+                            (monitor) => this.acknowledge()
+                        );
+                    }
+
+                    this._acknowledgeTimeoutId = 0;
+                    return GLib.SOURCE_REMOVE;
+                });
+            GLib.Source.set_name_by_id(this._acknowledgeTimeoutId,
+                                       '[gnome-pomodoro] this._acknowledgeTimeoutId');
+        }
+
         this.emit('opened');
     }
 
@@ -350,28 +398,34 @@ var ModalDialog = GObject.registerClass({
                                    '[gnome-pomodoro] this._pushModalSource');
     }
 
-    // Gradually open the dialog. Try to make it modal once user had chance to see it.
+    // Gradually open the dialog. Try to make it modal once user had chance to see it
+    // and schedule to close it once user becomes active.
     open(animate) {
-        if (this.state == State.OPENED || this.state == State.OPENING) {
+        if (this.state === State.OPENED || this.state === State.OPENING || this._destroyed) {
             return;
         }
 
-        this._pushModalDelaySource = GLib.timeout_add(
+        if (this._pushModalTimeoutId) {
+            GLib.source_remove(this._pushModalTimeoutId);
+            this._pushModalTimeoutId = 0;
+        }
+
+        this._pushModalTimeoutId = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT,
             Math.max(MIN_DISPLAY_TIME - IDLE_TIME_TO_PUSH_MODAL, 0),
             () => {
-                if (this._pushModalWatchId == 0) {
+                if (!this._pushModalWatchId) {
                     this._pushModalWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_PUSH_MODAL,
                                                                               this._onIdleMonitorBecameIdle.bind(this));
                 }
 
-                this._pushModalDelaySource = 0;
+                this._pushModalTimeoutId = 0;
 
                 return GLib.SOURCE_REMOVE;
             }
         );
-        GLib.Source.set_name_by_id(this._pushModalDelaySource,
-                                   '[gnome-pomodoro] this._pushModalDelaySource');
+        GLib.Source.set_name_by_id(this._pushModalTimeoutId,
+                                   '[gnome-pomodoro] this._pushModalTimeoutId');
 
         global.stage.set_child_above_sibling(this, null);
 
@@ -379,6 +433,7 @@ var ModalDialog = GObject.registerClass({
         this.show();
         this._raiseMessageTray();
         this._setState(State.OPENING);
+        this._acknowledged = false;
         this.emit('opening');
 
         if (animate) {
@@ -398,15 +453,56 @@ var ModalDialog = GObject.registerClass({
         }
     }
 
+    async canOpenAsync() {
+        if (!this.timer.isBreak() ||
+            this.timer.isPaused() ||
+            this.timer.getRemaining() < OPEN_WHEN_IDLE_MIN_REMAINING_TIME)
+        {
+            return false;
+        }
+
+        if (Utils.isVideoPlayerOpen()) {
+            return false;
+        }
+
+        if (this._destroyed) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // Schedule to open when user becomes idle
+    openWhenIdle() {
+        if (this.state === State.OPENED || this.state === State.OPENING || this._destroyed) {
+            return;
+        }
+
+        if (!this._openWhenIdleWatchId) {
+            this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN,
+                async (monitor) => {
+                    try {
+                        if (await this.canOpenAsync()) {
+                            this.open(true);
+                        }
+                    }
+                    catch (error) {
+                        Utils.logError(error);
+                    }
+                });
+        }
+    }
+
     _onCloseComplete() {
         this.hide();
         this._lowerMessageTray();
         this._setState(State.CLOSED);
+
         this.emit('closed');
     }
 
     close(animate) {
-        if (this.state == State.CLOSED || this.state == State.CLOSING) {
+        if (this.state === State.CLOSED || this.state === State.CLOSING) {
             return;
         }
 
@@ -432,9 +528,9 @@ var ModalDialog = GObject.registerClass({
     }
 
     _disconnectPushModalSignals() {
-        if (this._pushModalDelaySource) {
-            GLib.source_remove(this._pushModalDelaySource);
-            this._pushModalDelaySource = 0;
+        if (this._pushModalTimeoutId) {
+            GLib.source_remove(this._pushModalTimeoutId);
+            this._pushModalTimeoutId = 0;
         }
 
         if (this._pushModalSource) {
@@ -459,11 +555,16 @@ var ModalDialog = GObject.registerClass({
             this._keyFocusOutId = 0;
         }
 
+        if (this._eventId) {
+            this._lightbox.disconnect(this._eventId);
+            this._eventId = 0;
+        }
+
         if (!this._hasModal) {
             return;
         }
 
-        if (this._grab.get_seat_state !== undefined) {
+        if (this._grab && this._grab.get_seat_state !== undefined) {
             // gnome-shell 42 and newer
             Main.popModal(this._grab, timestamp);
         }
@@ -481,7 +582,7 @@ var ModalDialog = GObject.registerClass({
             return true;
         }
 
-        if (this.state == State.CLOSED || this.state == State.CLOSING) {
+        if (this.state === State.CLOSED || this.state === State.CLOSING || this._destroyed) {
             return false;
         }
 
@@ -491,9 +592,10 @@ var ModalDialog = GObject.registerClass({
         }
 
         let grab = Main.pushModal(this, params);
-        if (grab.get_seat_state !== undefined) {
+        if (grab && grab.get_seat_state !== undefined) {
             // gnome-shell 42 and newer
-            if (grab.get_seat_state() === Clutter.GrabState.NONE) {
+            if (grab.get_seat_state() !== Clutter.GrabState.ALL) {
+                Utils.logWarning('Unable become fully modal');
                 Main.popModal(grab);
                 return false;
             }
@@ -504,173 +606,41 @@ var ModalDialog = GObject.registerClass({
         }
 
         this._grab = grab;
-        Main.layoutManager.emit('system-modal-opened');
-
         this._hasModal = true;
         this._disconnectPushModalSignals();
-        this._lightbox.reactive = true;
 
-        // global.stage.set_key_focus(this._lightbox);
+        this._lightbox.reactive = true;
         this._lightbox.grab_key_focus();
+        this._lastActiveTime = GLib.get_monotonic_time() / 1000;
+        this._lastEventX = -1;
+        this._lastEventY = -1;
 
         if (!this._keyFocusOutId) {
             this._keyFocusOutId = this._lightbox.connect('key-focus-out', this._onKeyFocusOut.bind(this));
         }
 
+        if (!this._eventId) {
+            this._eventId = this._lightbox.connect('event', this._onEvent.bind(this));
+        }
+
+        Main.layoutManager.emit('system-modal-opened');
+
         return true;
     }
 
-    _onDestroy() {
-        this.popModal();
-
-        if (this._lightbox) {
-            this._lightbox.destroy();
-            this._lightbox = null;
-        }
-    }
-});
-
-
-var PomodoroEndDialog = GObject.registerClass(
-class PomodoroEndDialog extends ModalDialog {
-    _init(timer) {
-        super._init();
-
-        this.timer = timer;
-        this.description = _("It's time to take a break");
-
-        this._openWhenIdleWatchId        = 0;
-        this._closeWhenActiveDelaySource = 0;
-        this._closeWhenActiveIdleWatchId = 0;
-        this._mappedId                   = 0;
-        this._timerUpdateId              = 0;
-        this._eventId                    = 0;
-        this._styleChangedId             = 0;
-        this._closingId                  = 0;
-
-        this._minutesLabel = new St.Label({
-            x_expand: true,
-            x_align: Clutter.ActorAlign.END,
-        });
-        this._separatorLabel = new St.Label({
-            text: ":",
-        });
-        this._secondsLabel = new St.Label({
-            x_expand: true,
-            x_align: Clutter.ActorAlign.START,
-        });
-
-        let hbox = new St.BoxLayout({ vertical: false, style_class: 'extension-pomodoro-dialog-timer' });
-        hbox.add_actor(this._minutesLabel);
-        hbox.add_actor(this._separatorLabel);
-        hbox.add_actor(this._secondsLabel);
-
-        this._descriptionLabel = new St.Label({
-            style_class: 'extension-pomodoro-dialog-description',
-            text: this.description,
-            x_align: Clutter.ActorAlign.CENTER,
-        });
-        this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._descriptionLabel.clutter_text.line_wrap = true;
-
-        let box = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-box',
-                                     vertical: true });
-        box.add_actor(hbox);
-        box.add_actor(this._descriptionLabel);
-        this._layout.add_actor(box);
-
-        this._mappedId = this.connect('notify::mapped', this._onMappedChanged.bind(this));
-        this._closingId = this.connect('closing', this._onClosing.bind(this));
-    }
-
-    _onMappedChanged() {
-        if (this.mapped) {
-            if (!this._styleChangedId) {
-                this._styleChangedId = this._secondsLabel.connect('style-changed', this._onStyleChanged.bind(this));
-                this._onStyleChanged(this._secondsLabel);
-            }
-            if (!this._timerUpdateId) {
-                this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
-                this._onTimerUpdate();
-            }
-        }
-        else {
-            if (this._styleChangedId) {
-                this._secondsLabel.disconnect(this._styleChangedId);
-                this._styleChangedId = 0;
-            }
-            if (this._timerUpdateId) {
-                this.timer.disconnect(this._timerUpdateId);
-                this._timerUpdateId = 0;
-            }
-        }
-    }
-
-    _onStyleChanged(actor) {
-        let themeNode = actor.get_theme_node();
-        let font      = themeNode.get_font();
-        let context   = actor.get_pango_context();
-        let metrics   = context.get_metrics(font, context.get_language());
-        let digitWidth = metrics.get_approximate_digit_width() / Pango.SCALE;
-
-        this._secondsLabel.natural_width = 2 * digitWidth;
-    }
-
-    _onTimerUpdate() {
-        if (this.timer.isBreak()) {
-            let remaining = Math.max(this.timer.getRemaining(), 0.0);
-            let minutes   = Math.floor(remaining / 60);
-            let seconds   = Math.floor(remaining % 60);
-
-            // method may be called while label actor got destroyed
-            if (this._minutesLabel.clutter_text) {
-                this._minutesLabel.clutter_text.set_text('%d'.format(minutes));
-            }
-            if (this._secondsLabel.clutter_text) {
-                this._secondsLabel.clutter_text.set_text('%02d'.format(seconds));
-            }
-        }
-    }
-
-    // disconecct signals that are no longer neeeded after dialog closes
-    _disconnectSignals() {
-        if (this._openWhenIdleWatchId) {
-            this._idleMonitor.remove_watch(this._openWhenIdleWatchId);
-            this._openWhenIdleWatchId = 0;
-        }
-
-        if (this._eventId) {
-            this._lightbox.disconnect(this._eventId);
-            this._eventId = 0;
-        }
-
-        if (this._closeWhenActiveDelaySource) {
-            GLib.source_remove(this._closeWhenActiveDelaySource);
-            this._closeWhenActiveDelaySource = 0;
-        }
-
-        if (this._closeWhenActiveIdleWatchId) {
-            this._idleMonitor.remove_watch(this._closeWhenActiveIdleWatchId);
-            this._closeWhenActiveIdleWatchId = 0;
-        }
-
-        if (this._timerUpdateId) {
-            this.timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
-        }
-
-        if (this._styleChangedId) {
-            this._secondsLabel.disconnect(this._styleChangedId);
-            this._styleChangedId = 0;
-        }
-    }
-
+    // Main event handler once dialog becomes modal and reactive.
+    // There are two stages on how events are blocked:
+    //   1. Once the dialog becomes modal initially all inputs are ignored. This is to not let accidentally dismiss
+    //      the dialog. It's still possible to dismiss the dialog with Esc key.
+    //   2. After the dialog gets acknowledged (when user becomes slightly idle), the dialog becomes trully reactive
+    //      and any event should dismiss the dialog.
     _onEvent(actor, event) {
-        let x, y, dx, dy, distance;
-
         if (!event.get_device()) {
-            return Clutter.EVENT_STOP;
+            return Clutter.EVENT_PROPAGATE;
         }
+
+        let x, y, dx, dy, distance;
+        let isUserActive = false;
 
         switch (event.type())
         {
@@ -684,15 +654,15 @@ class PomodoroEndDialog extends ModalDialog {
 
             case Clutter.EventType.MOTION:
                 [x, y]   = event.get_coords();
-                dx       = this._eventX >= 0 ? x - this._eventX : 0;
-                dy       = this._eventY >= 0 ? y - this._eventY : 0;
+                dx       = this._lastEventX >= 0 ? x - this._lastEventX : 0;
+                dy       = this._lastEventY >= 0 ? y - this._lastEventY : 0;
                 distance = dx * dx + dy * dy;
 
-                this._eventX = x;
-                this._eventY = y;
+                this._lastEventX = x;
+                this._lastEventY = y;
 
                 if (distance > MOTION_DISTANCE_TO_CLOSE * MOTION_DISTANCE_TO_CLOSE) {
-                    this.close(true);
+                    isUserActive = true;
                 }
 
                 break;
@@ -720,8 +690,13 @@ class PomodoroEndDialog extends ModalDialog {
                     case Clutter.KEY_Display:
                         return Clutter.EVENT_PROPAGATE;
 
+                    case Clutter.KEY_Escape:
+                        this.acknowledge();
+                        isUserActive = true;
+                        break;
+
                     default:
-                        this.close(true);
+                        isUserActive = true;
                         break;
                 }
 
@@ -729,105 +704,149 @@ class PomodoroEndDialog extends ModalDialog {
 
             case Clutter.EventType.BUTTON_PRESS:
             case Clutter.EventType.TOUCH_BEGIN:
-                this.close(true);
+                isUserActive = true;
                 break;
+        }
+
+        if (isUserActive)
+        {
+            if (this._getIdleTime(event) >= IDLE_TIME_TO_ACKNOWLEDGE) {
+                this._acknowledged = true;
+            }
+
+            this._lastActiveTime = event.get_time();
+        }
+
+        if (this._acknowledged && isUserActive) {
+            this.close(true);
         }
 
         return Clutter.EVENT_STOP;
     }
 
-    _onClosing() {
-        this._disconnectSignals();
-    }
-
     _onDestroy() {
-        this._disconnectSignals()
+        this.popModal();
 
-        if (this._closingId) {
-            this.disconnect(this._closingId);
-            this._closingId = 0;
+        this._destroyed = true;
+
+        if (this._lightbox) {
+            this._lightbox.destroy();
+            this._lightbox = null;
         }
+    }
+});
 
-        if (this._actorMappedId) {
-            this.disconnect(this._actorMappedId);
-            this._actorMappedId = 0;
-        }
 
-        super._onDestroy();
+var PomodoroEndDialog = GObject.registerClass(
+class PomodoroEndDialog extends ModalDialog {
+    _init(timer) {
+        super._init();
+
+        this.timer = timer;
+        this._timerUpdateId = 0;
+        this._styleChangedId = 0;
+        this._minutesLabel = new St.Label({
+            text: "0",
+            x_expand: true,
+            x_align: Clutter.ActorAlign.END,
+        });
+        this._separatorLabel = new St.Label({
+            text: ":",
+        });
+        this._secondsLabel = new St.Label({
+            text: "00",
+            x_expand: true,
+            x_align: Clutter.ActorAlign.START,
+        });
+
+        let hbox = new St.BoxLayout({ vertical: false, style_class: 'extension-pomodoro-dialog-timer' });
+        hbox.add_actor(this._minutesLabel);
+        hbox.add_actor(this._separatorLabel);
+        hbox.add_actor(this._secondsLabel);
+
+        this._descriptionLabel = new St.Label({
+            style_class: 'extension-pomodoro-dialog-description',
+            text: _("It's time to take a break"),
+            x_align: Clutter.ActorAlign.CENTER,
+        });
+        this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._descriptionLabel.clutter_text.line_wrap = true;
+
+        let box = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-box',
+                                     vertical: true });
+        box.add_actor(hbox);
+        box.add_actor(this._descriptionLabel);
+        this._layout.add_actor(box);
     }
 
-    _closeWhenActive() {
-        if (this.state == State.CLOSED || this.state == State.CLOSING) {
+    get description() {
+        return this._descriptionLabel.clutter_text.get_text();
+    }
+
+    set description(value) {
+        this._descriptionLabel.clutter_text.set_text(value);
+    }
+
+    _onStyleChanged(actor) {
+        let themeNode = actor.get_theme_node();
+        let font      = themeNode.get_font();
+        let context   = actor.get_pango_context();
+        let metrics   = context.get_metrics(font, context.get_language());
+        let digitWidth = metrics.get_approximate_digit_width() / Pango.SCALE;
+
+        this._secondsLabel.natural_width = 2 * digitWidth;
+    }
+
+    _updateLabels() {
+        if (this._destroyed) {
             return;
         }
 
-        if (this._eventId == 0) {
-            this._eventX = -1;
-            this._eventY = -1;
-            this._eventId = this._lightbox.connect('event', this._onEvent.bind(this));
+        const remaining = this.timer.isBreak() ? Math.max(this.timer.getRemaining(), 0.0) : 0.0;
+        const minutes   = Math.floor(remaining / 60);
+        const seconds   = Math.floor(remaining % 60);
+
+        if (this._minutesLabel.clutter_text) {
+            this._minutesLabel.clutter_text.set_text('%d'.format(minutes));
+        }
+
+        if (this._secondsLabel.clutter_text) {
+            this._secondsLabel.clutter_text.set_text('%02d'.format(seconds));
         }
     }
 
-    // Open the dialog. Wait until user had chance of seeing the dialog
-    // and schedule to close it once user becomes active.
-    open(animate) {
-        super.open(animate);
-
-        if (this._closeWhenActiveDelaySource == 0) {
-            this._closeWhenActiveDelaySource = GLib.timeout_add(
-                GLib.PRIORITY_DEFAULT,
-                MIN_DISPLAY_TIME,
-                () => {
-                    if (this._idleMonitor.get_idletime() < IDLE_TIME_TO_CLOSE) {
-                        this._closeWhenActiveIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_CLOSE,
-                            (monitor) => this._closeWhenActive()
-                        );
-                    }
-                    else {
-                        this._closeWhenActive();
-                    }
-
-                    this._closeWhenActiveDelaySource = 0;
-                    return GLib.SOURCE_REMOVE;
-                });
-            GLib.Source.set_name_by_id(this._closeWhenActiveDelaySource,
-                                       '[gnome-pomodoro] this._closeWhenActiveDelaySource');
+    _onTimerUpdate() {
+        if (this.state === State.OPENED || this.state === State.OPENING) {
+            this._updateLabels();
         }
     }
 
-    // Schedule dialog to open when idle
-    openWhenIdle() {
-        if (this.state == State.OPEN || this.state == State.OPENING) {
-            return;
+    vfunc_map() {
+        if (!this._styleChangedId) {
+            this._styleChangedId = this._secondsLabel.connect('style-changed', this._onStyleChanged.bind(this));
+            this._onStyleChanged(this._secondsLabel);
         }
 
-        if (this._openWhenIdleWatchId == 0) {
-            this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN,
-                (monitor) => {
-                    let info = Utils.getFocusedWindowInfo();
-
-                    if (info.isPlayer && info.isFullscreen)
-                    {
-                        // dont reopen if playing a video
-                        return;
-                    }
-
-                    if (!this.timer.isBreak() ||
-                        this.timer.getRemaining() < OPEN_WHEN_IDLE_MIN_REMAINING_TIME)
-                    {
-                        return;
-                    }
-
-                    this.open(true);
-                });
+        if (!this._timerUpdateId) {
+            this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
         }
+
+        this._updateLabels();
+
+        super.vfunc_map();
     }
 
-    setDescription(text) {
-        this.description = text;
-
-        if (this._descriptionLabel.clutter_text) {
-            this._descriptionLabel.clutter_text.set_text(this.description);
+    vfunc_unmap() {
+        if (this._styleChangedId && !this._destroyed) {
+            this._secondsLabel.disconnect(this._styleChangedId);
+            this._styleChangedId = 0;
         }
+
+        if (this._timerUpdateId) {
+            this.timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+
+        super.vfunc_unmap();
     }
 });

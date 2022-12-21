@@ -20,7 +20,7 @@
 
 const Signals = imports.signals;
 
-const Shell = imports.gi.Shell;
+const { Gio, Meta, Shell } = imports.gi;
 
 const Main = imports.ui.main;
 
@@ -31,7 +31,9 @@ const ENABLED_EXTENSIONS_KEY = 'enabled-extensions';
 const VIDEO_PLAYER_CATEGORIES = [
     ['Player', 'Video'],
     ['Player', 'AudioVideo'],
-    ['Game']
+    ['VideoConference'],
+    ['Telephony'],
+    ['Game'],
 ];
 
 
@@ -181,9 +183,9 @@ var TransitionGroup = class {
 }
 
 
-function arrayContains(array1, array2) {
-    for (let i = 0; i < array2.length; i++) {
-        if (array1.indexOf(array2[i]) < 0) {
+function isSubset(subset, set) {
+    for (let value of subset) {
+        if (set.indexOf(value) < 0) {
             return false;
         }
     }
@@ -192,37 +194,45 @@ function arrayContains(array1, array2) {
 }
 
 
-function getFocusedWindowInfo() {
-    let app = Shell.WindowTracker.get_default().focus_app;
-    let appInfo = app ? app.get_app_info() : null;
-    let window = global.display.focus_window;
+function _isVideoPlayer(app) {
+    const appInfo       = app.get_app_info();
+    const categoriesStr = appInfo.get_categories();
+    const categories    = categoriesStr ? categoriesStr.split(';') : [];
 
-    let result = {
-        app: app,
-        window: window,
-        isPlayer: false,
-        isFullscreen: false
-    };
+    if (!categories.length) {
+        return false;
+    }
 
-    if (appInfo) {
-        let categoriesStr = appInfo.get_categories();
-        let categories    = categoriesStr ? categoriesStr.split(';') : [];
+    for (let videoPlayerCategories of VIDEO_PLAYER_CATEGORIES) {
+        if (isSubset(videoPlayerCategories, categories)) {
+            return true;
+        }
+    }
 
-        for (let i = 0; i < VIDEO_PLAYER_CATEGORIES.length; i++) {
-            if (arrayContains(categories, VIDEO_PLAYER_CATEGORIES[i])) {
-                result.isPlayer = true;
-                break;
+    return false;
+}
+
+
+function isVideoPlayerOpen() {
+    const apps = Shell.AppSystem.get_default().get_running();
+
+    for (let app of apps) {
+        if (!_isVideoPlayer(app)) {
+            continue;
+        }
+
+        for (let window of app.get_windows()) {
+            if (window.window_type !== Meta.WindowType.NORMAL || window.is_hidden()) {
+                continue;
+            }
+
+            if (window.fullscreen) {
+                return true;
             }
         }
     }
 
-    if (window) {
-        let monitor = Main.layoutManager.monitors[window.get_monitor()];
-
-        result.isFullscreen = monitor.inFullscreen;
-    }
-
-    return result;
+    return false;
 }
 
 

@@ -250,18 +250,18 @@ var PomodoroExtension = class {
         }
     }
 
-    _notifyPomodoroEnd() {
-        if (this.notification &&
-            this.notification instanceof Notifications.PomodoroEndNotification)
-        {
-            if (this.dialog && this.timer.isBreak()) {
-                this.dialog.open(true);
-            }
-            else if (this.notification.resident || this.notification.acknowledged) {
-                this.notification.show();
-            }
+    async _notifyPomodoroEndAsync() {
+        let canOpenDialog;
+        try {
+            canOpenDialog = this.dialog && await this.dialog.canOpenAsync();
         }
-        else {
+        catch (error) {
+            canOpenDialog = false;
+        }
+
+        if (!this.notification ||
+            !(this.notification instanceof Notifications.PomodoroEndNotification))
+        {
             this.notification = new Notifications.PomodoroEndNotification(this.timer);
             this.notification.connect('activated',
                 (notification) => {
@@ -277,23 +277,27 @@ var PomodoroExtension = class {
                 });
             this.notification.connect('destroy', this._onNotificationDestroy.bind(this));
 
-            if (this.dialog && this.timer.isBreak()) {
-                this.dialog.open(true);
-            }
-            else {
-                this.notification.show();
-            }
-
             this._destroyPreviousNotifications();
         }
+
+        if (canOpenDialog) {
+            this.dialog.open(true);
+        }
+        else {
+            this.notification.show();
+        }
+    }
+
+    _notifyPomodoroEnd() {
+        this._notifyPomodoroEndAsync();
     }
 
     _updateNotification() {
         let timerState = this.timer.getState();
         let isPaused   = this.timer.isPaused();
 
-        if (timerState != Timer.State.NULL && (!isPaused || this.timer.getElapsed() == 0.0)) {
-            if (this.mode == ExtensionMode.RESTRICTED) {
+        if (timerState !== Timer.State.NULL && (!isPaused || this.timer.getElapsed() == 0.0)) {
+            if (this.mode === ExtensionMode.RESTRICTED) {
                 this._destroyNotifications();
 
                 let idleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
@@ -305,7 +309,7 @@ var PomodoroExtension = class {
                                            '[gnome-pomodoro] this._updateScreenShieldNotification');
             }
             else if (this.timer.getRemaining() > NOTIFICATIONS_TIME_OFFSET) {
-                if (timerState == Timer.State.POMODORO) {
+                if (timerState === Timer.State.POMODORO) {
                     this._notifyPomodoroStart();
                 }
                 else {
@@ -313,7 +317,7 @@ var PomodoroExtension = class {
                 }
             }
             else {
-                if (timerState != Timer.State.POMODORO) {
+                if (timerState !== Timer.State.POMODORO) {
                     this._notifyPomodoroStart();
                 }
                 else {
@@ -326,9 +330,17 @@ var PomodoroExtension = class {
         }
     }
 
-    _updateScreenNotification() {
+    async _updateScreenNotificationAsync() {
         if (this.dialog) {
-            if (this.timer.isBreak() && !this.timer.isPaused()) {
+            let canOpenDialog;
+            try {
+                canOpenDialog = this.dialog && await this.dialog.canOpenAsync();
+            }
+            catch (error) {
+                canOpenDialog = false;
+            }
+
+            if (this.timer.isBreak() && !this.timer.isPaused() && canOpenDialog) {
                 this.dialog.open(false);
                 this.dialog.pushModal();
             }
@@ -336,6 +348,10 @@ var PomodoroExtension = class {
                 this.dialog.close(false);
             }
         }
+    }
+
+    _updateScreenNotification() {
+        this._updateScreenNotificationAsync();
     }
 
     _updateScreenShieldNotification() {
@@ -373,7 +389,7 @@ var PomodoroExtension = class {
         let timerStateDuration = this.timer.getStateDuration();
         let isPaused = this.timer.isPaused();
 
-        if (this._isPaused != isPaused || this._timerState != timerState) {
+        if (this._isPaused !== isPaused || this._timerState !== timerState) {
             this._isPaused = isPaused;
             this._timerState = timerState;
             this._timerStateDuration = timerStateDuration;
@@ -382,7 +398,7 @@ var PomodoroExtension = class {
             this._updateNotification();
             this._updateScreenNotification();
         }
-        else if (this._timerStateDuration == timerStateDuration) {
+        else if (this._timerStateDuration === timerStateDuration) {
             this._updateScreenNotification();
         }
         else {
