@@ -557,8 +557,6 @@ Signals.addSignalMethods(PomodoroExtension.prototype);
 function init(metadata) {
     Gettext.bindtextdomain(Config.GETTEXT_PACKAGE,
                            Config.PACKAGE_LOCALE_DIR);
-
-    Utils.allowDBusSender('org.gnome.Pomodoro');
 }
 
 

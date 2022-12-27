@@ -23,8 +23,6 @@ namespace GnomePlugin
 {
     private const string SCRIPT_WRAPPER = """
 (function() {
-    'use strict';
-
     ${SCRIPT}
 
     return null;
