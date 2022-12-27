@@ -194,6 +194,37 @@ function isSubset(subset, set) {
 }
 
 
+async function isCameraActive() {
+    // Check whether "uvcvideo" module is used
+    const file = Gio.File.new_for_path('/proc/modules');
+
+    try {
+        const [, contents, etag] = await new Promise((resolve, reject) => {
+            file.load_contents_async(
+                null,
+                (file_, result) => {
+                    try {
+                        resolve(file.load_contents_finish(result));
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+            );
+        });
+        const decoder = new TextDecoder('utf-8');
+        const moduleRegex = /^uvcvideo\s+\d+\s+(\d+)\b/m;
+        const match = moduleRegex.exec(decoder.decode(contents));
+
+        return match ? parseInt(match[1]) > 0 : false;
+    }
+    catch (error) {
+        logWarning(`Error while checking camera module: ${error}`);
+    }
+
+    return false;
+}
+
+
 function _isVideoPlayer(app) {
     const appInfo       = app.get_app_info();
     const categoriesStr = appInfo.get_categories();

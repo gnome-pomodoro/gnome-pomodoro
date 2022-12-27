@@ -513,6 +513,15 @@ var ModalDialog = GObject.registerClass({
             return false;
         }
 
+        try {
+            if (await Utils.isCameraActive()) {
+                return false;
+            }
+        }
+        catch (error) {
+            Utils.logWarning(`Error while checking camera: ${error}`);
+        }
+
         if (this._destroyed) {
             return false;
         }
