@@ -28,6 +28,7 @@ const { GLib, Gio, Meta, Shell } = imports.gi;
 const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
 const ExtensionSystem = imports.ui.extensionSystem;
+const UnlockDialog = imports.ui.unlockDialog;
 
 const Extension = ExtensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
@@ -68,6 +69,7 @@ var PomodoroExtension = class {
         this._isPaused           = false;
         this._timerState         = Timer.State.NULL;
         this._timerStateDuration = 0.0;
+        this._notificationsBoxPatch = null;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
@@ -106,12 +108,12 @@ var PomodoroExtension = class {
     setMode(mode) {
         if (!this.service.initialized) {
             this.mode = mode;
-            this._isModePending = true;
+            this._isModePending = true;  // TODO: make setMode async instead of using _isModePending
 
             return;  /* wait until service name is acquired */
         }
 
-        if (this.mode != mode || this._isModePending) {
+        if (this.mode !== mode || this._isModePending) {
             this.mode = mode;
             this._isModePending = false;
 
@@ -135,6 +137,7 @@ var PomodoroExtension = class {
             }
 
             this._enableKeybinding();
+            this._enableScreenShieldWidget();
             this._updateNotification();
         }
     }
@@ -502,6 +505,29 @@ var PomodoroExtension = class {
         this._destroyScreenNotification();
     }
 
+    _enableScreenShieldWidget() {
+        if (!this._notificationsBoxPatch) {
+            const extension = this;
+            const patch = new Utils.Patch(UnlockDialog.NotificationsBox.prototype, {
+                _wakeUpScreenForSource(source) {
+                    if (source !== extension.notificationSource) {
+                        return patch.initial._wakeUpScreenForSource.bind(this)(source, notification);
+                    }
+                }
+            });
+
+            this._notificationsBoxPatch = patch;
+            this._notificationsBoxPatch.apply();
+        }
+    }
+
+    _disableScreenShieldWidget() {
+        if (this._notificationsBoxPatch) {
+            this._notificationsBoxPatch.revert();
+            this._notificationsBoxPatch = null;
+        }
+    }
+
     _destroyPresence() {
         if (this.presence) {
             this.presence.destroy();
@@ -550,6 +576,7 @@ var PomodoroExtension = class {
         this._destroying = true;
 
         this._disableKeybinding();
+        this._disableScreenShieldWidget();
 
         this._destroyPresence();
         this._destroyIndicator();
