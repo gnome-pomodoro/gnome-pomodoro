@@ -71,6 +71,8 @@ var State = {
     CLOSING: 3
 };
 
+var overlayManager = null;
+
 
 var BlurredLightbox = GObject.registerClass(
 class PomodoroBlurredLightbox extends Lightbox.Lightbox {
@@ -202,6 +204,189 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
 
 
 /**
+ * Helper class for raising actors above `Main.layoutManager.uiGroup`
+ */
+class OverlayManager {
+    constructor() {
+        this._raised = false;
+        this._overlayActors = [];
+        this._chromeActors = [];
+
+        this._overlayGroup = new St.Widget({
+            name: 'overlayGroup',
+        });
+        global.stage.add_actor(this._overlayGroup);
+
+        // LayoutManager tracks region changes, so create a mock member resembling overlayGroup.
+        this._overlayGroupConstraint = new Clutter.BindConstraint({
+                                       source: this._overlayGroup,
+                                       coordinate: Clutter.BindCoordinate.ALL });
+        this._dummyChrome = new St.Widget({
+            name: 'overlayGroup',
+        });
+        this._dummyChrome.add_constraint(this._overlayGroupConstraint);
+        Main.layoutManager.addTopChrome(this._dummyChrome);
+
+        for (let chrome of [Main.messageTray,
+                            Main.screenShield._shortLightbox,
+                            Main.screenShield._longLightbox])
+        {
+            try {
+                this.addChrome(chrome);
+            }
+            catch (error) {
+                Utils.logWarning(error);
+            }
+        }
+    }
+
+    static getDefault() {
+        if (!overlayManager) {
+            overlayManager = new OverlayManager();
+        }
+
+        return overlayManager;
+    }
+
+    _raiseChromeInternal(chromeData) {
+        if (chromeData.actor instanceof Lightbox.Lightbox) {
+            chromeData.notifyOpacityId = chromeData.actor.connect('notify::opacity', () => {
+                this._updateOpacity();
+            });
+        }
+        else {
+            chromeData.actor.ref();
+            try {
+                Main.layoutManager.uiGroup.remove_actor(chromeData.actor);
+                global.stage.add_actor(chromeData.actor);
+            }
+            finally {
+                chromeData.actor.unref();
+            }
+        }
+    }
+
+    _raiseChrome() {
+        if (!this._raised) {
+            global.stage.set_child_above_sibling(this._overlayGroup, null);
+
+            for (let chromeData of this._chromeActors) {
+                this._raiseChromeInternal(chromeData);
+            }
+
+            this._raised = true;
+        }
+    }
+
+    _lowerChromeInternal(chromeData) {
+        if (chromeData.actor instanceof Lightbox.Lightbox) {
+            chromeData.actor.disconnect(chromeData.notifyOpacityId);
+        }
+        else {
+            chromeData.actor.ref();
+            try {
+                global.stage.remove_actor(chromeData.actor);
+                Main.layoutManager.uiGroup.add_actor(chromeData.actor);
+            }
+            finally {
+                chromeData.actor.unref();
+            }
+        }
+    }
+
+    _lowerChrome() {
+        if (this._raised) {
+            for (let chromeData of this._chromeActors) {
+                this._lowerChromeInternal(chromeData);
+            }
+
+            this._raised = false;
+        }
+    }
+
+    _updateOpacity() {
+        let maxOpacity = 0;
+        for (let chromeData of this._chromeActors) {
+            if (chromeData.actor instanceof Lightbox.Lightbox) {
+                maxOpacity = Math.max(maxOpacity, chromeData.actor.opacity);
+            }
+        }
+
+        for (let overlayData of this._overlayActors) {
+            overlayData.actor._layout.opacity = 255 - maxOpacity;
+        }
+    }
+
+    _onOverlayNotifyMapped() {
+        let mappedCount = 0;
+
+        for (let overlayData of this._overlayActors) {
+            if (overlayData.actor.mapped && !(overlayData.actor instanceof Lightbox.Lightbox)) {
+                mappedCount++;
+            }
+        }
+
+        if (mappedCount > 0) {
+            this._raiseChrome();
+        }
+        else {
+            this._lowerChrome();
+        }
+    }
+
+    _onOverlayDestroy(actor) {
+        let index = -1;
+
+        for (let overlayData of this._overlayActors) {
+            index++;
+
+            if (overlayData.actor === actor) {
+                this._overlayActors.pop(index);
+                break;
+            }
+        }
+    }
+
+    add(actor) {
+        this._overlayGroup.add_actor(actor);
+
+        this._overlayActors.push({
+            actor: actor,
+            notifyMappedId: actor.connect('notify::mapped', this._onOverlayNotifyMapped.bind(this)),
+            destroyId: actor.connect('destroy', this._onOverlayDestroy.bind(this)),
+        });
+    }
+
+    addChrome(actor) {
+        if (actor.get_parent() !== Main.layoutManager.uiGroup) {
+            throw new Error('Passed actor is not a direct child of Main.layoutManager.uiGroup');
+        }
+
+        const chromeData = {
+            actor: actor,
+            notifyOpacityId: 0,
+        };
+        this._chromeActors.push(chromeData);
+
+        if (this._raised) {
+            this._raiseChromeInternal(chromeData);
+        }
+    }
+
+    destroy() {
+        this._lowerChrome();
+        global.stage.remove_actor(this._overlayGroup);
+        Main.layoutManager.removeChrome(this._dummyChrome);
+
+        this._overlayActors = [];
+        this._chromeActors = [];
+        this._overlayGroup = null;
+        this._overlayGroupConstraint = null;
+    }
+}
+
+
+/**
  * ModalDialog class based on ModalDialog from GNOME Shell. We need our own
  * class to have more event signals, different fade in/out times, and different
  * event blocking behavior.
@@ -270,8 +455,9 @@ var ModalDialog = GObject.registerClass({
                                              { inhibitEvents: false });
         this._lightbox.highlight(this._layout);
 
-        global.stage.add_actor(this);
         global.focus_manager.add_group(this._lightbox);
+
+        OverlayManager.getDefault().add(this);
     }
 
     get state() {
@@ -285,31 +471,6 @@ var ModalDialog = GObject.registerClass({
 
         this._state = state;
         this.notify('state');
-    }
-
-    _raiseMessageTray() {
-        let messageTray = Main.messageTray;
-
-        messageTray.ref();
-
-        Main.layoutManager.removeChrome(messageTray);
-
-        global.stage.add_child(messageTray);
-
-        messageTray.bannerBlocked = false;
-        messageTray.unref();
-    }
-
-    _lowerMessageTray() {
-        let messageTray = Main.messageTray;
-
-        messageTray.ref();
-
-        global.stage.remove_child(messageTray);
-
-        Main.layoutManager.addChrome(messageTray, { affectsInputRegion: false });
-
-        messageTray.unref();
     }
 
     _onAcceleratorActivated(display, action, device, timestamp) {
@@ -475,11 +636,8 @@ var ModalDialog = GObject.registerClass({
         GLib.Source.set_name_by_id(this._pushModalTimeoutId,
                                    '[gnome-pomodoro] this._pushModalTimeoutId');
 
-        global.stage.set_child_above_sibling(this, null);
-
         this.remove_all_transitions();
         this.show();
-        this._raiseMessageTray();
         this._setState(State.OPENING);
         this._acknowledged = false;
         this.emit('opening');
@@ -552,7 +710,6 @@ var ModalDialog = GObject.registerClass({
 
     _onCloseComplete() {
         this.hide();
-        this._lowerMessageTray();
         this._setState(State.CLOSED);
 
         this.emit('closed');
