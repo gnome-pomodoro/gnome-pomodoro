@@ -509,7 +509,7 @@ var PomodoroExtension = class {
         if (!this._notificationsBoxPatch) {
             const extension = this;
             const patch = new Utils.Patch(UnlockDialog.NotificationsBox.prototype, {
-                _wakeUpScreenForSource(source) {
+                _wakeUpScreenForSource(source, notification) {
                     if (source !== extension.notificationSource) {
                         return patch.initial._wakeUpScreenForSource.bind(this)(source, notification);
                     }
