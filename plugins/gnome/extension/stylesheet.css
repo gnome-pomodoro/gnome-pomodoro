@@ -35,12 +35,9 @@
     padding-bottom: 0;
 }
 
-.extension-pomodoro-indicator-menu-toggle .extension-pomodoro-indicator-menu-action {
-    margin-left: 10px;
-}
-
 .extension-pomodoro-indicator-menu-timer {
-    margin-bottom: 8px;
+    margin-top: 5px;
+    margin-bottom: 2px;
     spacing: 0;
 }
 
@@ -49,10 +46,16 @@
     spacing: 4px;
 }
 
+.extension-pomodoro-indicator-menu-toggle .extension-pomodoro-indicator-menu-action {
+    margin-left: 5px;
+}
+
 .extension-pomodoro-indicator-menu-timer-label {
     color: inherit;
-    font-size: 1.5em;
+    font-size: 1.6em;
+    font-weight: 500;
     text-align: left;
+    margin-left: 5px;
 }
 
 .extension-pomodoro-indicator-menu-timer-label-button {
@@ -63,11 +66,10 @@
 }
 
 .extension-pomodoro-indicator-menu-action {
-    padding: 10px;
-    border: 0px;
     border-radius: 18px;
     background-color: transparent;
 }
+.extension-pomodoro-indicator-menu-action,
 .extension-pomodoro-indicator-menu-action:hover,
 .extension-pomodoro-indicator-menu-action:focus,
 .extension-pomodoro-indicator-menu-action:active {
