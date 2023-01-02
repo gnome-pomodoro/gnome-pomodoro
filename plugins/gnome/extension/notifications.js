@@ -525,15 +525,6 @@ var ScreenShieldNotification = GObject.registerClass({
         // therefore urgency bump.
         this.setUrgency(MessageTray.Urgency.HIGH);
 
-        let patch = new Utils.Patch(Main.screenShield, {
-            emit(name /* , arg1, arg2 */) {
-                if (name != 'wake-up-screen') {
-                    patch.initial.emit.apply(patch.object, arguments);
-                }
-            }
-        });
-        this._screenShieldPatch = patch;
-
         this.timer = timer;
         this.source = getDefaultSource();
 
@@ -545,11 +536,6 @@ var ScreenShieldNotification = GObject.registerClass({
             if (this._timerUpdateId != 0) {
                 this.timer.disconnect(this._timerUpdateId);
                 this._timerUpdateId = 0;
-            }
-
-            if (this._screenShieldPatch) {
-                this._screenShieldPatch.destroy();
-                this._screenShieldPatch = null;
             }
         });
 
@@ -565,6 +551,8 @@ var ScreenShieldNotification = GObject.registerClass({
         if (this.source !== null) {
             this.source.setTitle(title ? title : '');
         }
+
+        Utils.wakeUpScreen();
     }
 
     _onTimerElapsedChanged() {
@@ -618,18 +606,9 @@ var ScreenShieldNotification = GObject.registerClass({
             this.emit('changed');
 
             if (this.source !== null) {
-                this._screenShieldPatch.apply();
                 this.source.notify('count');
-                this._screenShieldPatch.revert();
             }
         }
-    }
-
-    show() {
-        // No reason for .show() to wake up the screen
-        this._screenShieldPatch.apply();
-        super.show();
-        this._screenShieldPatch.revert();
     }
 });
 

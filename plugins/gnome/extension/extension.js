@@ -251,6 +251,8 @@ var PomodoroExtension = class {
 
             this._destroyPreviousNotifications();
         }
+
+        Utils.wakeUpScreen();
     }
 
     async _notifyPomodoroEndAsync() {
@@ -289,6 +291,8 @@ var PomodoroExtension = class {
         else {
             this.notification.show();
         }
+
+        Utils.wakeUpScreen();
     }
 
     _notifyPomodoroEnd() {

@@ -302,3 +302,18 @@ function disableExtension(uuid) {
         global.settings.set_strv(ENABLED_EXTENSIONS_KEY, enabledExtensions);
     }
 }
+
+
+function wakeUpScreen() {
+    if (Main.screenShield._dialog) {
+        Main.screenShield._dialog.emit('wake-up-screen');
+    }
+    else {
+        try {
+            Main.screenShield._wakeUpScreen();
+        }
+        catch (error) {
+            logWarning(`Error while waking up the screen: ${error}`);
+        }
+    }
+}
