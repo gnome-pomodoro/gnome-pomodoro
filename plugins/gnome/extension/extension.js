@@ -117,7 +117,7 @@ var PomodoroExtension = class {
             this.mode = mode;
             this._isModePending = false;
 
-            if (mode == ExtensionMode.RESTRICTED) {
+            if (mode === ExtensionMode.RESTRICTED) {
                 this._disableIndicator();
                 this._disableScreenNotification();
             }
@@ -137,9 +137,14 @@ var PomodoroExtension = class {
             }
 
             this._enableKeybinding();
+            this._enableNotificationManager();
             this._enableScreenShieldWidget();
             this._updateNotification();
         }
+    }
+
+    ensureNotificationManager() {
+        this._enableNotificationManager();
     }
 
     notifyIssue(message) {
@@ -473,6 +478,12 @@ var PomodoroExtension = class {
         this._destroyPresence();
     }
 
+    _enableNotificationManager() {
+        if (!this._notificationManager) {
+            this._notificationManager = new Notifications.NotificationManager(this.timer);
+        }
+    }
+
     _enableScreenNotification() {
         let animate;
 
@@ -600,6 +611,8 @@ var PomodoroExtension = class {
         if (this.notificationSource) {
             this.notificationSource.destroy();
         }
+
+        this._destroyNotificationManager();
 
         this.timer.destroy();
         this.service.destroy();

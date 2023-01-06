@@ -78,6 +78,89 @@ var NotificationPolicy = GObject.registerClass({
     }
 });
 
+
+var NotificationManager = class {
+    constructor(timer) {
+        this.timer = timer;
+        this._timerStateChangedId = this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+        this._active = false;
+
+        this._messagesIndicatorPatch = new Utils.Patch(Main.panel.statusArea.dateMenu._indicator, {
+            _sync() {
+                this.icon_name = 'message-indicator-symbolic';
+                this.visible = this._count > 0;
+            }
+        });
+        this._messagesIndicatorPatch.connect('applied', () => {
+            Main.panel.statusArea.dateMenu._indicator._sync();
+        });
+        this._messagesIndicatorPatch.connect('reverted', () => {
+            Main.panel.statusArea.dateMenu._indicator._sync();
+        });
+
+        this._onTimerStateChanged();
+    }
+
+    _showDoNotDisturbButton() {
+        const dndButton = Main.panel.statusArea.dateMenu._messageList._dndButton;
+        dndButton.show();
+
+        for (const sibling of [dndButton.get_previous_sibling(), dndButton.get_next_sibling()]) {
+            if (sibling instanceof St.Label) {
+                sibling.show();
+            }
+        }
+    }
+
+    _hideDoNotDisturbButton() {
+        const dndButton = Main.panel.statusArea.dateMenu._messageList._dndButton;
+        dndButton.hide();
+
+        for (const sibling of [dndButton.get_previous_sibling(), dndButton.get_next_sibling()]) {
+            if (sibling instanceof St.Label) {
+                sibling.hide();
+            }
+        }
+    }
+
+    _onTimerStateChanged() {
+        if (this.timer.getState() !== Timer.State.NULL) {
+            this.activate();
+        }
+        else {
+            this.deactivate();
+        }
+    }
+
+    activate() {
+        if (!this._active) {
+            this._active = true;
+            this._messagesIndicatorPatch.apply();
+            this._hideDoNotDisturbButton();
+        }
+    }
+
+    deactivate() {
+        if (this._active) {
+            this._active = false;
+            this._messagesIndicatorPatch.revert();
+            this._showDoNotDisturbButton();
+        }
+    }
+
+    destroy() {
+        this.deactivate();
+
+        if (this._timerStateChangedId) {
+            this.timer.disconnect(this._timerStateChangedId);
+            this._timerStateChangedId = 0;
+        }
+
+        this._messagesIndicatorPatch.destroy();
+    }
+};
+
+
 var Source = GObject.registerClass(
 class PomodoroSource extends MessageTray.Source {
     _init() {
@@ -153,6 +236,13 @@ class PomodoroSource extends MessageTray.Source {
         if (this.notifications.length == 0) {
             this._lastNotificationRemoved();
         }
+    }
+
+    /* override parent method */
+    showNotification(notification) {
+        Extension.extension.ensureNotificationManager();
+
+        super.showNotification(notification);
     }
 
     destroyNotifications() {
