@@ -235,7 +235,7 @@ class OverlayManager {
                 this.addChrome(chrome);
             }
             catch (error) {
-                Utils.logWarning(error);
+                Utils.logError(error);
             }
         }
     }
@@ -486,7 +486,7 @@ var ModalDialog = GObject.registerClass({
             const bindingName = Meta.external_binding_name_for_action(bindingAction);
 
             if (bindingAction === Meta.KeyBindingAction.NONE) {
-                Utils.logWarning('ModalDialog: Failed to grab accelerator.');
+                Utils.logWarning('Failed to grab accelerator for the dialog.');
                 return;
             }
 
@@ -509,7 +509,7 @@ var ModalDialog = GObject.registerClass({
                 this._bindingAction = null;
             }
             else {
-                Utils.logWarning('ModalDialog: Failed to ungrab accelerator.');
+                Utils.logWarning('Failed to ungrab accelerator for the dialog.');
             }
         }
 
@@ -668,11 +668,13 @@ var ModalDialog = GObject.registerClass({
         }
 
         if (Utils.isVideoPlayerOpen()) {
+            Utils.logWarning('Can\'t open dialog. A video player is running.');
             return false;
         }
 
         try {
             if (await Utils.isCameraActive()) {
+                Utils.logWarning('Can\'t open dialog. The webcam is active.');
                 return false;
             }
         }
@@ -681,6 +683,7 @@ var ModalDialog = GObject.registerClass({
         }
 
         if (this._destroyed) {
+            Utils.logWarning('Can\'t open dialog. Dialog should be destroyed.');
             return false;
         }
 

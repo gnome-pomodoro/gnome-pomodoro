@@ -48,7 +48,7 @@ var Patch = class {
             this.initial[name] = this.object[name];
 
             if (typeof(this.initial[name]) == 'undefined') {
-                logWarning('Property "%s" for %s is not defined'.format(name, this.object));
+                logWarning(`Property "${name}" for ${this.object} is not defined`);
             }
         }
     }
@@ -273,7 +273,7 @@ function logError(error) {
 
 
 function logWarning(message) {
-    log(message);
+    console.warn(`Pomodoro: ${message}`);
 }
 
 
