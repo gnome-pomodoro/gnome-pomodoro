@@ -28,6 +28,7 @@ const { GLib, Gio, Meta, Shell } = imports.gi;
 const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
 const ExtensionSystem = imports.ui.extensionSystem;
+const MessageTray = imports.ui.messageTray;
 const UnlockDialog = imports.ui.unlockDialog;
 
 const Extension = ExtensionUtils.getCurrentExtension();
@@ -40,10 +41,6 @@ const Presence = Extension.imports.presence;
 const Settings = Extension.imports.settings;
 const Timer = Extension.imports.timer;
 const Utils = Extension.imports.utils;
-
-
-// notifications pop up before state changes
-const NOTIFICATIONS_TIME_OFFSET = 10.0;
 
 
 var ExtensionMode = {
@@ -206,9 +203,7 @@ var PomodoroExtension = class {
     }
 
     _onTimerUpdate() {
-        let remaining = this.timer.getRemaining();
-
-        if (remaining <= NOTIFICATIONS_TIME_OFFSET && !this.notification) {
+        if (this.timer.getRemaining() <= Notifications.PRE_ANNOUCEMENT_TIME) {
             this._updateNotification();
         }
     }
@@ -307,10 +302,11 @@ var PomodoroExtension = class {
     }
 
     _updateNotification() {
-        let timerState = this.timer.getState();
-        let isPaused   = this.timer.isPaused();
+        const timerState = this.timer.getState();
+        const isPaused = this.timer.isPaused();
+        const currentNotification = Notifications.getCurrentNotification();
 
-        if (timerState !== Timer.State.NULL && (!isPaused || this.timer.getElapsed() == 0.0)) {
+        if (timerState !== Timer.State.NULL && (!isPaused || this.timer.getElapsed() === 0.0)) {
             if (this.mode === ExtensionMode.RESTRICTED) {
                 this._destroyNotifications();
 
@@ -322,7 +318,10 @@ var PomodoroExtension = class {
                 GLib.Source.set_name_by_id(idleId,
                                            '[gnome-pomodoro] this._updateScreenShieldNotification');
             }
-            else if (this.timer.getRemaining() > NOTIFICATIONS_TIME_OFFSET) {
+            else if (currentNotification && currentNotification.urgency === MessageTray.Urgency.CRITICAL) {
+                // Don't dismiss notification after clicking "+1 minute".
+            }
+            else if (this.timer.getRemaining() > Notifications.PRE_ANNOUCEMENT_TIME) {
                 if (timerState === Timer.State.POMODORO) {
                     this._notifyPomodoroStart();
                 }
