@@ -139,6 +139,8 @@ var PomodoroExtension = class {
             this._enableKeybinding();
             this._enableNotificationManager();
             this._enableScreenShieldWidget();
+
+            this._updatePresence();
             this._updateNotification();
         }
     }
@@ -390,11 +392,11 @@ var PomodoroExtension = class {
 
     _updatePresence() {
         if (this.presence) {
-            if (this._timerState == Timer.State.NULL) {
+            if (this._timerState === Timer.State.NULL) {
                 this.presence.setDefault();
             }
             else {
-                this.presence.setBusy(this._timerState == Timer.State.POMODORO);
+                this.presence.setBusy(this._timerState === Timer.State.POMODORO);
             }
         }
     }
