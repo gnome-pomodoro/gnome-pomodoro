@@ -337,28 +337,31 @@ var PomodoroExtension = class {
         }
     }
 
-    async _updateScreenNotificationAsync() {
+    async _updateScreenNotificationAsync(animate) {
         if (this.dialog) {
-            let canOpenDialog;
-            try {
-                canOpenDialog = this.dialog && await this.dialog.canOpenAsync();
-            }
-            catch (error) {
-                canOpenDialog = false;
+            let canOpenDialog = true;
+
+            if (animate) {
+                try {
+                    canOpenDialog = await this.dialog.canOpenAsync();
+                }
+                catch (error) {
+                    canOpenDialog = false;
+                }
             }
 
             if (this.timer.isBreak() && !this.timer.isPaused() && canOpenDialog) {
-                this.dialog.open(false);
+                this.dialog.open(animate);
                 this.dialog.pushModal();
             }
             else {
-                this.dialog.close(false);
+                this.dialog.close(animate);
             }
         }
     }
 
-    _updateScreenNotification() {
-        this._updateScreenNotificationAsync();
+    _updateScreenNotification(animate) {
+        this._updateScreenNotificationAsync(animate);
     }
 
     _updateScreenShieldNotification() {
@@ -403,10 +406,10 @@ var PomodoroExtension = class {
 
             this._updatePresence();
             this._updateNotification();
-            this._updateScreenNotification();
+            this._updateScreenNotification(true);
         }
         else if (this._timerStateDuration === timerStateDuration) {
-            this._updateScreenNotification();
+            this._updateScreenNotification(true);
         }
         else {
             this._timerStateDuration = timerStateDuration;
@@ -471,9 +474,11 @@ var PomodoroExtension = class {
     }
 
     _enableScreenNotification() {
+        let animate;
+
         if (!this.dialog) {
             this.dialog = new Dialogs.PomodoroEndDialog(this.timer);
-            this.dialog.connect('opening', 
+            this.dialog.connect('opening',
                 () => {
                     try {
                         if (Main.messageTray._notification) {
@@ -500,9 +505,14 @@ var PomodoroExtension = class {
                 () => {
                     this.dialog = null;
                 });
+
+            animate = false;
+        }
+        else {
+            animate = true;
         }
 
-        this._updateScreenNotification();
+        this._updateScreenNotification(animate);
     }
 
     _disableScreenNotification() {
