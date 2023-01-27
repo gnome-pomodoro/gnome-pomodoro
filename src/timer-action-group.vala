@@ -30,6 +30,7 @@ namespace Pomodoro
         private GLib.SimpleAction stop_action;
         private GLib.SimpleAction pause_action;
         private GLib.SimpleAction resume_action;
+        private GLib.SimpleAction skip_action;
         private GLib.SimpleAction state_action;
 
         public TimerActionGroup (Pomodoro.Timer timer)
@@ -53,6 +54,10 @@ namespace Pomodoro
             this.resume_action = new GLib.SimpleAction ("resume", null);
             this.resume_action.activate.connect (this.activate_resume);
             this.add_action (this.resume_action);
+
+            this.skip_action = new GLib.SimpleAction ("skip", null);
+            this.skip_action.activate.connect (this.activate_skip);
+            this.add_action (this.skip_action);
 
             this.state_action = new GLib.SimpleAction.stateful ("state",
                                                                 GLib.VariantType.STRING,
@@ -87,6 +92,7 @@ namespace Pomodoro
             this.stop_action.set_enabled (!is_disabled);
             this.pause_action.set_enabled (!is_disabled && !is_paused);
             this.resume_action.set_enabled (!is_disabled && is_paused);
+            this.skip_action.set_enabled (!is_disabled);
             this.state_action.set_state (new GLib.Variant.string (this.timer.state.name));
         }
 
@@ -127,6 +133,12 @@ namespace Pomodoro
                                       GLib.Variant?     parameter)
         {
             this.timer.resume ();
+        }
+
+        private void activate_skip (GLib.SimpleAction action,
+            GLib.Variant?     parameter)
+        {
+            this.timer.skip ();
         }
 
         private void activate_state (GLib.SimpleAction action,

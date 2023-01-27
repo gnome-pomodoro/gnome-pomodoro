@@ -495,6 +495,8 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.ListBoxRow listboxrow_accelerator;
         [GtkChild]
+        private unowned Gtk.ListBoxRow listboxrow_showskip;
+        [GtkChild]
         private unowned Gtk.ListBoxRow listboxrow_idle_monitor;
 
         private GLib.Settings settings;
@@ -583,7 +585,10 @@ namespace Pomodoro
                                 long_break_interval_spinbutton.adjustment,
                                 "value",
                                 GLib.SettingsBindFlags.DEFAULT);
-
+            this.settings.bind ("show-skip-button",
+                                builder.get_object ("showskip_toggle"),
+                                "active",
+                                GLib.SettingsBindFlags.DEFAULT);
             this.accelerator = new Pomodoro.Accelerator ();
             this.accelerator.changed.connect(() => {
                 accelerator_label.label = this.accelerator.display_name != ""
