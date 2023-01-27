@@ -33,6 +33,8 @@ namespace Pomodoro
         private const double TIMER_LINE_WIDTH = 6.0;
         private const double TIMER_RADIUS = 165.0;
 
+        private GLib.Settings               settings;
+
         private struct Name
         {
             public string name;
@@ -79,6 +81,8 @@ namespace Pomodoro
         private unowned Gtk.Button pause_button;
         [GtkChild]
         private unowned Gtk.Image pause_button_image;
+        [GtkChild]
+        private unowned Gtk.Button skip_button;
 
         private Pomodoro.Animation blink_animation;
         private string default_page;
@@ -114,6 +118,11 @@ namespace Pomodoro
             this.on_timer_state_notify ();
             this.on_timer_elapsed_notify ();
             this.on_timer_is_paused_notify ();
+
+            this.settings = Pomodoro.get_settings ().get_child ("preferences");
+            this.settings.changed.connect (this.on_settings_changed);
+
+            this.skip_button.visible = this.settings.get_boolean("show-skip-button");         
         }
 
         public void parser_finished (Gtk.Builder builder)
@@ -132,6 +141,17 @@ namespace Pomodoro
             this.timer.notify["state"].connect_after (this.on_timer_state_notify);
             this.timer.notify["elapsed"].connect_after (this.on_timer_elapsed_notify);
             this.timer.notify["is-paused"].connect_after (this.on_timer_is_paused_notify);
+        }
+
+        private void on_settings_changed (GLib.Settings settings,
+                                          string        key)
+        {
+            switch (key)
+            {   
+                case "show-skip-button":
+                    this.skip_button.visible = this.settings.get_boolean("show-skip-button");
+                break;
+            }
         }
 
         private void on_blink_animation_complete ()
