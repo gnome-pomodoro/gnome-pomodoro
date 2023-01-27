@@ -495,8 +495,6 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.ListBoxRow listboxrow_accelerator;
         [GtkChild]
-        private unowned Gtk.ListBoxRow listboxrow_showskip;
-        [GtkChild]
         private unowned Gtk.ListBoxRow listboxrow_idle_monitor;
 
         private GLib.Settings settings;
