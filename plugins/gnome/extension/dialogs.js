@@ -672,16 +672,6 @@ var ModalDialog = GObject.registerClass({
             return false;
         }
 
-        try {
-            if (await Utils.isCameraActive()) {
-                Utils.logWarning('Can\'t open dialog. The webcam is active.');
-                return false;
-            }
-        }
-        catch (error) {
-            Utils.logWarning(`Error while checking camera: ${error}`);
-        }
-
         if (this._destroyed) {
             Utils.logWarning('Can\'t open dialog. Dialog should be destroyed.');
             return false;
