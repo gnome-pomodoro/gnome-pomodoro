@@ -78,6 +78,10 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Widget timer_box;
         [GtkChild]
+        private unowned Gtk.Box button_box;
+        [GtkChild]
+        private unowned Gtk.Button stop_button;
+        [GtkChild]
         private unowned Gtk.Button pause_button;
         [GtkChild]
         private unowned Gtk.Image pause_button_image;
@@ -122,7 +126,7 @@ namespace Pomodoro
             this.settings = Pomodoro.get_settings ().get_child ("preferences");
             this.settings.changed.connect (this.on_settings_changed);
 
-            this.skip_button.visible = this.settings.get_boolean("show-skip-button");         
+            this.setup_buttons();
         }
 
         public void parser_finished (Gtk.Builder builder)
@@ -143,13 +147,64 @@ namespace Pomodoro
             this.timer.notify["is-paused"].connect_after (this.on_timer_is_paused_notify);
         }
 
+        private void setup_buttons()
+        {
+            if (this.settings.get_boolean("show-skip-button")) {
+                this.skip_button.visible = true;
+                this.button_box.reorder_child(this.pause_button, 1);
+                this.button_box.reorder_child(this.stop_button, 0);
+            }
+            else {
+                this.skip_button.visible = false;
+                this.button_box.reorder_child(this.pause_button, 0);
+                this.button_box.reorder_child(this.stop_button, 1);
+            }
+
+            if (this.timer.is_paused) {
+                this.pause_button_image.icon_name = "media-playback-start-symbolic";
+                this.pause_button.action_name     = "timer.resume";
+            }
+            else {
+                this.pause_button_image.icon_name = "media-playback-pause-symbolic";
+                this.pause_button.action_name     = "timer.pause";
+            }
+
+            switch(this.timer.state.name)
+            {
+                case "pomodoro":
+                    this.skip_button.tooltip_text = _("Take a break");
+                    if (this.timer.is_paused) {
+                        this.pause_button.tooltip_text    = _("Resume Pomodoro");
+                    }
+                    else {
+                        this.pause_button.tooltip_text    = _("Pause Pomodoro");
+                    }
+
+                    break;
+
+                case "short-break":
+                case "long-break":
+                    this.skip_button.tooltip_text = _("Start Pomodoro");
+                    if (this.timer.is_paused) {
+                        this.pause_button.tooltip_text    = _("Resume break");
+                    }
+                    else {
+                        this.pause_button.tooltip_text    = _("Pause break");
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
         private void on_settings_changed (GLib.Settings settings,
                                           string        key)
         {
             switch (key)
             {   
                 case "show-skip-button":
-                    this.skip_button.visible = this.settings.get_boolean("show-skip-button");
+                    this.setup_buttons();
                 break;
             }
         }
@@ -165,6 +220,8 @@ namespace Pomodoro
         {
             this.timer_stack.visible_child_name = 
                     (this.timer.state is Pomodoro.DisabledState) ? "disabled" : "enabled";
+
+            this.setup_buttons();
 
             foreach (var mapping in STATE_NAMES)
             {
@@ -197,11 +254,9 @@ namespace Pomodoro
                 this.blink_animation = null;
             }
 
-            if (this.timer.is_paused) {
-                this.pause_button_image.icon_name = "media-playback-start-symbolic";
-                this.pause_button.action_name     = "timer.resume";
-                this.pause_button.tooltip_text    = _("Resume");
+            this.setup_buttons();
 
+            if (this.timer.is_paused) {
                 this.blink_animation = new Pomodoro.Animation (Pomodoro.AnimationMode.BLINK,
                                                                2500,
                                                                25);
@@ -212,10 +267,6 @@ namespace Pomodoro
                 this.blink_animation.start_with_value (1.0);
             }
             else {
-                this.pause_button_image.icon_name = "media-playback-pause-symbolic";
-                this.pause_button.action_name     = "timer.pause";
-                this.pause_button.tooltip_text    = _("Pause");
-
                 this.blink_animation = new Pomodoro.Animation (Pomodoro.AnimationMode.EASE_OUT,
                                                                200,
                                                                50);
