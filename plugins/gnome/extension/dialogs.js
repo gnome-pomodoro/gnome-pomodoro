@@ -977,6 +977,9 @@ class PomodoroEndDialog extends ModalDialog {
             x_expand: true,
             x_align: Clutter.ActorAlign.START,
         });
+        this._minutesLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._separatorLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this._secondsLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
 
         let hbox = new St.BoxLayout({ vertical: false, style_class: 'extension-pomodoro-dialog-timer' });
         hbox.add_actor(this._minutesLabel);
