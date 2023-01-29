@@ -78,6 +78,7 @@ namespace Pomodoro
             public static bool resume = false;
             public static bool skip = false;
             public static bool extend = false;
+            public static bool reset = false;
 
             public static ExitStatus exit_status = ExitStatus.UNDEFINED;
 
@@ -106,6 +107,9 @@ namespace Pomodoro
                 { "extend", 0, 0, GLib.OptionArg.NONE,
                   ref extend, N_("Extend current pomodoro or break"), null },
 
+                { "reset", 0, 0, GLib.OptionArg.NONE,
+                  ref reset, N_("Reset current session"), null },
+
                 { "no-default-window", 0, 0, GLib.OptionArg.NONE,
                   ref no_default_window, N_("Run as background service"), null },
 
@@ -121,7 +125,7 @@ namespace Pomodoro
                 { null }
             };
 
-            public static void reset ()
+            public static void set_defaults ()
             {
                 Options.no_default_window = false;
                 Options.preferences = false;
@@ -134,6 +138,7 @@ namespace Pomodoro
                 Options.resume = false;
                 Options.skip = false;
                 Options.extend = false;
+                Options.reset = false;
             }
 
             public static bool has_timer_option ()
@@ -145,7 +150,8 @@ namespace Pomodoro
                        Options.pause |
                        Options.resume |
                        Options.skip |
-                       Options.extend;
+                       Options.extend |
+                       Options.reset;
             }
         }
 
@@ -737,6 +743,10 @@ namespace Pomodoro
                 this.quit ();
             }
             else {
+                if (Options.reset) {
+                    this.timer.reset ();
+                }
+
                 if (Options.start_stop) {
                     this.timer.toggle ();
                 }
@@ -776,7 +786,7 @@ namespace Pomodoro
                     this.show_window ("default");
                 }
 
-                Options.reset ();
+                Options.set_defaults ();
             }
 
             this.release ();
