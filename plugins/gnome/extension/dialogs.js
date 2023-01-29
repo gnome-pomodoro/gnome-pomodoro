@@ -623,7 +623,7 @@ var ModalDialog = GObject.registerClass({
             () => {
                 pushModalTries += 1;
 
-                if (this.pushModal(timestamp)) {
+                if (this.pushModal()) {
                     this._pushModalSource = 0;
                     return GLib.SOURCE_REMOVE;  // success
                 }
