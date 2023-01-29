@@ -1012,8 +1012,9 @@ class PomodoroEndDialog extends ModalDialog {
         let context   = actor.get_pango_context();
         let metrics   = context.get_metrics(font, context.get_language());
         let digitWidth = metrics.get_approximate_digit_width() / Pango.SCALE;
+        const [, naturalWidth] = actor.get_preferred_width(-1);
 
-        this._secondsLabel.natural_width = 2 * digitWidth;
+        this._secondsLabel.natural_width = Math.max(2 * digitWidth, naturalWidth);
     }
 
     _updateLabels() {
