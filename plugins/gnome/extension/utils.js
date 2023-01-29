@@ -195,7 +195,11 @@ function isSubset(subset, set) {
 
 
 function _isVideoPlayer(app) {
-    const appInfo       = app.get_app_info();
+    const appInfo = app.get_app_info();
+    if (!appInfo) {
+        return false;
+    }
+
     const categoriesStr = appInfo.get_categories();
     const categories    = categoriesStr ? categoriesStr.split(';') : [];
 
