@@ -618,7 +618,6 @@
       <widget name="listboxrow2"/>
       <widget name="listboxrow_accelerator"/>
       <widget name="listboxrow9"/>
-      <widget name="listboxrow_showskip"/>
     </widgets>
   </object>
 </interface>
