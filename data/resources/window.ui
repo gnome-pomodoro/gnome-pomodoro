@@ -209,7 +209,7 @@
                         <property name="margin_bottom">24</property>
                         <property name="spacing">24</property>
                         <child>
-                          <object class="GtkButton" id="pause_button">
+                          <object class="GtkButton" id="pause_resume_button">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="can_default">True</property>
@@ -219,7 +219,7 @@
                             <property name="action_name">timer.pause</property>
                             <property name="use_underline">True</property>
                             <child>
-                              <object class="GtkImage" id="pause_button_image">
+                              <object class="GtkImage" id="pause_resume_image">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="pixel_size">32</property>
@@ -238,7 +238,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="stop_button">
+                          <object class="GtkButton" id="skip_stop_button">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
@@ -246,7 +246,7 @@
                             <property name="action_name">timer.stop</property>
                             <property name="use_underline">True</property>
                             <child>
-                              <object class="GtkImage">
+                              <object class="GtkImage" id="skip_stop_image">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="pixel_size">32</property>
@@ -262,33 +262,6 @@
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkButton" id="skip_button">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="tooltip_text" translatable="yes">Next</property>
-                            <property name="action_name">timer.skip</property>
-                            <property name="use_underline">True</property>
-                            <child>
-                              <object class="GtkImage">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="pixel_size">32</property>
-                                <property name="icon_name">media-skip-forward-symbolic</property>
-                              </object>
-                            </child>
-                            <style>
-                              <class name="flat"/>
-                              <class name="pomodoro-symbolic-button"/>
-                            </style>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>
