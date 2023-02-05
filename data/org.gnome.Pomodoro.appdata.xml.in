@@ -44,6 +44,18 @@
   <translation type="gettext">gnome-pomodoro</translation>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="0.22.1" date="2023-02-05">
+      <description>
+        <p>Overview of changes in gnome-pomodoro 0.22.1</p>
+        <ul>
+          <li>Close screen overlay by hitting Esc key - a failsafe method</li>
+          <li>Don't open screen overlay while a video call app is fullscreen</li>
+          <li>Fixed screen overlays timer label getting ellipsized</li>
+          <li>Fixed screen overlay being over screensaver animation</li>
+          <li>Add --reset commandline option</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.22.0" date="2022-10-02">
       <description>
         <p>Overview of changes in gnome-pomodoro 0.22.0</p>
