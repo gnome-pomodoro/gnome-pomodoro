@@ -1,91 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <!-- interface-css-provider-path style.css -->
   <template class="PomodoroWindow" parent="GtkApplicationWindow">
-    <property name="can_focus">False</property>
-    <property name="icon_name">gnome-pomodoro</property>
-    <child type="titlebar">
-      <object class="GtkHeaderBar" id="header_bar">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="show_close_button">True</property>
-        <child type="title">
-          <object class="GtkStackSwitcher" id="stack_switcher">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="stack">stack</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkMenuButton" id="menu_button">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="popover">menu_popover</property>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="icon_name">open-menu-symbolic</property>
-              </object>
-            </child>
-            <style>
-              <class name="image-button"/>
-            </style>
-          </object>
-          <packing>
-            <property name="pack_type">end</property>
-          </packing>
-        </child>
-        <style>
-          <class name="titlebar"/>
-        </style>
-      </object>
-    </child>
+    <property name="can-focus">False</property>
+    <property name="icon-name">gnome-pomodoro</property>
     <child>
       <object class="GtkStack" id="stack">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
         <child>
           <object class="GtkEventBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="events">GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK</property>
-            <property name="visible_window">False</property>
+            <property name="visible-window">False</property>
             <signal name="button-press-event" handler="on_button_press" after="yes" swapped="no"/>
             <child>
               <object class="GtkStack" id="timer_stack">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="margin_start">20</property>
-                <property name="margin_end">20</property>
-                <property name="margin_top">50</property>
-                <property name="margin_bottom">50</property>
-                <property name="transition_type">crossfade</property>
+                <property name="can-focus">False</property>
+                <property name="margin-start">20</property>
+                <property name="margin-end">20</property>
+                <property name="margin-top">50</property>
+                <property name="margin-bottom">50</property>
+                <property name="transition-type">crossfade</property>
                 <child>
                   <object class="GtkButton" id="start_button">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="can_default">True</property>
-                    <property name="has_default">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Start Pomodoro</property>
+                    <property name="can-focus">True</property>
+                    <property name="can-default">True</property>
+                    <property name="has-default">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="tooltip-text" translatable="yes">Start Pomodoro</property>
                     <property name="halign">center</property>
                     <property name="valign">center</property>
-                    <property name="action_name">timer.start</property>
-                    <property name="use_underline">True</property>
+                    <property name="action-name">timer.start</property>
+                    <property name="use-underline">True</property>
                     <child>
                       <object class="GtkImage">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="margin_start">50</property>
-                        <property name="margin_end">50</property>
-                        <property name="margin_top">50</property>
-                        <property name="margin_bottom">50</property>
-                        <property name="pixel_size">64</property>
-                        <property name="icon_name">media-playback-start-symbolic</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-start">50</property>
+                        <property name="margin-end">50</property>
+                        <property name="margin-top">50</property>
+                        <property name="margin-bottom">50</property>
+                        <property name="pixel-size">64</property>
+                        <property name="icon-name">media-playback-start-symbolic</property>
                       </object>
                     </child>
                     <style>
@@ -100,48 +62,30 @@
                 <child>
                   <object class="GtkBox" id="box4">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="valign">center</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkBox" id="timer_box">
-                        <property name="height_request">400</property>
+                        <property name="height-request">400</property>
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <signal name="draw" handler="on_timer_box_draw" swapped="no"/>
-                        <child>
-                          <object class="GtkToggleButton" id="state_togglebutton">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">False</property>
-                            <property name="halign">center</property>
-                            <property name="margin_top">90</property>
-                            <property name="relief">none</property>
-                            <style>
-                              <class name="pomodoro-button"/>
-                            </style>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
                         <child type="center">
                           <object class="GtkBox">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can-focus">False</property>
                             <property name="halign">center</property>
                             <property name="valign">center</property>
                             <child>
                               <object class="GtkLabel" id="minutes_label">
                                 <property name="visible">True</property>
-                                <property name="can_focus">False</property>
+                                <property name="can-focus">False</property>
                                 <property name="label">00</property>
                                 <property name="justify">fill</property>
-                                <property name="xalign">1.0</property>
-                                <property name="width_chars">2</property>
+                                <property name="width-chars">2</property>
+                                <property name="xalign">1</property>
                                 <style>
                                   <class name="pomodoro-timer-label"/>
                                 </style>
@@ -155,8 +99,8 @@
                             <child>
                               <object class="GtkLabel" id="separator_label">
                                 <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="margin_bottom">12</property>
+                                <property name="can-focus">False</property>
+                                <property name="margin-bottom">12</property>
                                 <property name="label">:</property>
                                 <style>
                                   <class name="pomodoro-timer-label"/>
@@ -172,11 +116,11 @@
                             <child>
                               <object class="GtkLabel" id="seconds_label">
                                 <property name="visible">True</property>
-                                <property name="can_focus">False</property>
+                                <property name="can-focus">False</property>
                                 <property name="label">00</property>
                                 <property name="justify">fill</property>
-                                <property name="xalign">0.0</property>
-                                <property name="width_chars">2</property>
+                                <property name="width-chars">2</property>
+                                <property name="xalign">0</property>
                                 <style>
                                   <class name="pomodoro-timer-label"/>
                                 </style>
@@ -194,6 +138,24 @@
                             <property name="position">2</property>
                           </packing>
                         </child>
+                        <child>
+                          <object class="GtkToggleButton" id="state_togglebutton">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="receives-default">False</property>
+                            <property name="halign">center</property>
+                            <property name="margin-top">90</property>
+                            <property name="relief">none</property>
+                            <style>
+                              <class name="pomodoro-state-button"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -204,26 +166,26 @@
                     <child>
                       <object class="GtkBox" id="button_box">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="halign">center</property>
-                        <property name="margin_bottom">24</property>
+                        <property name="margin-bottom">24</property>
                         <property name="spacing">24</property>
                         <child>
                           <object class="GtkButton" id="pause_resume_button">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="can_default">True</property>
-                            <property name="has_default">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="tooltip_text" translatable="yes">Pause</property>
-                            <property name="action_name">timer.pause</property>
-                            <property name="use_underline">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="can-default">True</property>
+                            <property name="has-default">True</property>
+                            <property name="receives-default">True</property>
+                            <property name="tooltip-text" translatable="yes">Pause</property>
+                            <property name="action-name">timer.pause</property>
+                            <property name="use-underline">True</property>
                             <child>
                               <object class="GtkImage" id="pause_resume_image">
                                 <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="pixel_size">32</property>
-                                <property name="icon_name">media-playback-pause-symbolic</property>
+                                <property name="can-focus">False</property>
+                                <property name="pixel-size">32</property>
+                                <property name="icon-name">media-playback-pause-symbolic</property>
                               </object>
                             </child>
                             <style>
@@ -240,17 +202,17 @@
                         <child>
                           <object class="GtkButton" id="skip_stop_button">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="tooltip_text" translatable="yes">Stop</property>
-                            <property name="action_name">timer.stop</property>
-                            <property name="use_underline">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="receives-default">True</property>
+                            <property name="tooltip-text" translatable="yes">Stop</property>
+                            <property name="action-name">timer.stop</property>
+                            <property name="use-underline">True</property>
                             <child>
                               <object class="GtkImage" id="skip_stop_image">
                                 <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="pixel_size">32</property>
-                                <property name="icon_name">media-playback-stop-symbolic</property>
+                                <property name="can-focus">False</property>
+                                <property name="pixel-size">32</property>
+                                <property name="icon-name">media-playback-stop-symbolic</property>
                               </object>
                             </child>
                             <style>
@@ -287,25 +249,63 @@
         </child>
       </object>
     </child>
+    <child type="titlebar">
+      <object class="GtkHeaderBar" id="header_bar">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="show-close-button">True</property>
+        <child type="title">
+          <object class="GtkStackSwitcher" id="stack_switcher">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="stack">stack</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkMenuButton" id="menu_button">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="popover">menu_popover</property>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="icon-name">open-menu-symbolic</property>
+              </object>
+            </child>
+            <style>
+              <class name="image-button"/>
+            </style>
+          </object>
+          <packing>
+            <property name="pack-type">end</property>
+          </packing>
+        </child>
+        <style>
+          <class name="titlebar"/>
+        </style>
+      </object>
+    </child>
   </template>
   <object class="GtkPopoverMenu" id="menu_popover">
-    <property name="can_focus">False</property>
-    <property name="relative_to">menu_button</property>
+    <property name="can-focus">False</property>
+    <property name="relative-to">menu_button</property>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="margin_start">10</property>
-        <property name="margin_end">10</property>
-        <property name="margin_top">10</property>
-        <property name="margin_bottom">10</property>
+        <property name="can-focus">False</property>
+        <property name="margin-start">10</property>
+        <property name="margin-end">10</property>
+        <property name="margin-top">10</property>
+        <property name="margin-bottom">10</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkModelButton">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="action_name">app.preferences</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="action-name">app.preferences</property>
             <property name="text" translatable="yes">_Preferences</property>
           </object>
           <packing>
@@ -317,9 +317,9 @@
         <child>
           <object class="GtkModelButton">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="action_name">app.about</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="action-name">app.about</property>
             <property name="text" translatable="yes">_About</property>
           </object>
           <packing>
@@ -331,7 +331,7 @@
         <child>
           <object class="GtkSeparator">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -342,9 +342,9 @@
         <child>
           <object class="GtkModelButton">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="action_name">app.quit</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="action-name">app.quit</property>
             <property name="text" translatable="yes">_Quit</property>
           </object>
           <packing>
@@ -356,28 +356,29 @@
       </object>
       <packing>
         <property name="submenu">main</property>
+        <property name="position">1</property>
       </packing>
     </child>
   </object>
   <object class="GtkPopoverMenu" id="state_popover">
-    <property name="can_focus">False</property>
-    <property name="relative_to">state_togglebutton</property>
+    <property name="can-focus">False</property>
+    <property name="relative-to">state_togglebutton</property>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="margin_start">10</property>
-        <property name="margin_end">10</property>
-        <property name="margin_top">10</property>
-        <property name="margin_bottom">10</property>
+        <property name="can-focus">False</property>
+        <property name="margin-start">10</property>
+        <property name="margin-end">10</property>
+        <property name="margin-top">10</property>
+        <property name="margin-bottom">10</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkModelButton">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="action_name">app.timer-set-state</property>
-            <property name="action_target">"pomodoro"</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">False</property>
+            <property name="action-name">app.timer-set-state</property>
+            <property name="action-target">'pomodoro'</property>
             <property name="text" translatable="yes">Pomodoro</property>
             <property name="centered">True</property>
           </object>
@@ -390,10 +391,10 @@
         <child>
           <object class="GtkModelButton">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="action_name">app.timer-set-state</property>
-            <property name="action_target">"short-break"</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">False</property>
+            <property name="action-name">app.timer-set-state</property>
+            <property name="action-target">'short-break'</property>
             <property name="text" translatable="yes">Short Break</property>
             <property name="centered">True</property>
           </object>
@@ -406,10 +407,10 @@
         <child>
           <object class="GtkModelButton">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="action_name">app.timer-set-state</property>
-            <property name="action_target">"long-break"</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">False</property>
+            <property name="action-name">app.timer-set-state</property>
+            <property name="action-target">'long-break'</property>
             <property name="text" translatable="yes">Long Break</property>
             <property name="centered">True</property>
           </object>

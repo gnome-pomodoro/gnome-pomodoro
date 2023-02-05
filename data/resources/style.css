@@ -31,9 +31,11 @@
     font-size: small;
 }
 
-.pomodoro-button {
+.pomodoro-state-button {
     padding-top: 5px;
     padding-bottom: 6px;
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 .pomodoro-symbolic-button {
