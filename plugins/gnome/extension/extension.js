@@ -309,14 +309,6 @@ var PomodoroExtension = class {
         if (timerState !== Timer.State.NULL && (!isPaused || this.timer.getElapsed() === 0.0)) {
             if (this.mode === ExtensionMode.RESTRICTED) {
                 this._destroyNotifications();
-
-                let idleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-                    this._updateScreenShieldNotification();
-
-                    return GLib.SOURCE_REMOVE;
-                });
-                GLib.Source.set_name_by_id(idleId,
-                                           '[gnome-pomodoro] this._updateScreenShieldNotification');
             }
             else if (currentNotification && currentNotification.urgency === MessageTray.Urgency.CRITICAL) {
                 // Don't dismiss notification after clicking "+1 minute".
@@ -368,25 +360,6 @@ var PomodoroExtension = class {
 
     _updateScreenNotification(animate) {
         this._updateScreenNotificationAsync(animate);
-    }
-
-    _updateScreenShieldNotification() {
-        if (this.mode == ExtensionMode.RESTRICTED) {
-            if (!(this.notification &&
-                  this.notification instanceof Notifications.ScreenShieldNotification))
-            {
-                this.notification = new Notifications.ScreenShieldNotification(this.timer);
-                this.notification.connect('destroy', this._onNotificationDestroy.bind(this));
-                this.notification.show();
-
-                this._destroyPreviousNotifications();
-            }
-        }
-        else {
-            if (this.notification && this.notification instanceof Notifications.ScreenShieldNotification) {
-                this.notification.destroy();
-            }
-        }
     }
 
     _updatePresence() {

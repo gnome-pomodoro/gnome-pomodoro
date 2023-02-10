@@ -79,22 +79,10 @@ function getCurrentNotification(notification) {
 }
 
 
-var NotificationPolicy = GObject.registerClass({
-    Properties: {
-        'show-in-lock-screen': GObject.ParamSpec.boolean(
-            'show-in-lock-screen', 'show-in-lock-screen', 'show-in-lock-screen',
-            GObject.ParamFlags.READABLE, true),
-        'details-in-lock-screen': GObject.ParamSpec.boolean(
-            'details-in-lock-screen', 'details-in-lock-screen', 'details-in-lock-screen',
-            GObject.ParamFlags.READABLE, true),
-    },
-}, class PomodoroNotificationPolicy extends MessageTray.NotificationPolicy {
+var NotificationPolicy = GObject.registerClass(
+class PomodoroNotificationPolicy extends MessageTray.NotificationPolicy {
     get showInLockScreen() {
-        return true;
-    }
-
-    get detailsInLockScreen() {
-        return true;
+        return false;
     }
 });
 
@@ -660,109 +648,6 @@ var PomodoroEndNotification = GObject.registerClass({
         onTimerUpdate();
 
         return banner;
-    }
-});
-
-
-var ScreenShieldNotification = GObject.registerClass({
-    Signals: {
-        'changed': {},
-    },
-}, class PomodoroScreenShieldNotification extends Notification {
-    _init(timer) {
-        super._init('', null, null);
-
-        this.setTransient(false);
-        this.setResident(true);
-
-        // We want notifications to be shown right after the action,
-        // therefore urgency bump.
-        this.setUrgency(MessageTray.Urgency.HIGH);
-
-        this.timer = timer;
-        this.source = getDefaultSource();
-
-        this._isPaused = false;
-        this._timerState = Timer.State.NULL;
-        this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
-
-        this.connect('destroy', () => {
-            if (this._timerUpdateId != 0) {
-                this.timer.disconnect(this._timerUpdateId);
-                this._timerUpdateId = 0;
-            }
-        });
-
-        this._onTimerUpdate();
-    }
-
-    _onTimerStateChanged() {
-        let state = this.timer.getState();
-        let title = Timer.State.label(state);
-
-        // HACK: "Pomodoro" in application name may be confusing with state name,
-        //       so replace application name with current state.
-        if (this.source !== null) {
-            this.source.setTitle(title ? title : '');
-        }
-
-        Utils.wakeUpScreen();
-    }
-
-    _onTimerElapsedChanged() {
-        let remaining = Math.max(this.timer.getRemaining(), 0.0);
-        let minutes = Math.round(remaining / 60);
-        let seconds = Math.round(remaining % 60);
-
-        if (remaining > 15) {
-            seconds = Math.ceil(seconds / 15) * 15;
-        }
-
-        this.bannerBodyText = (remaining > 45)
-                ? ngettext("%d minute remaining",
-                           "%d minutes remaining", minutes).format(minutes)
-                : ngettext("%d second remaining",
-                           "%d seconds remaining", seconds).format(seconds);
-    }
-
-    _onTimerUpdate() {
-        let timerState = this.timer.getState(),
-            isPaused = this.timer.isPaused(),
-            bannerBodyText = this.bannerBodyText,
-            stateChanged = false,
-            elapsedChanged = false;
-
-        if (this._timerState !== timerState || this._isPaused !== isPaused) {
-            this._timerState = timerState;
-            this._isPaused = isPaused;
-
-            this._onTimerStateChanged();
-            elapsedChanged = stateChanged = true;
-        }
-
-        this._onTimerElapsedChanged();
-
-        if (this.bannerBodyText !== bannerBodyText) {
-            elapsedChanged = true;
-        }
-
-        if (stateChanged) {
-            // "updated" is original MessageTray.Notification signal
-            // it indicates that content changed.
-            this.emit('changed');
-
-            // HACK: Force screen shield to update notification body
-            if (this.source !== null) {
-                this.source.notify('count');
-            }
-        }
-        else if (elapsedChanged) {
-            this.emit('changed');
-
-            if (this.source !== null) {
-                this.source.notify('count');
-            }
-        }
     }
 });
 
