@@ -41,6 +41,8 @@ const ngettext = Gettext.ngettext;
 // Time to annouce next timer state.
 const PRE_ANNOUCEMENT_TIME = 10.0;
 
+const ICON_NAME = 'gnome-pomodoro-symbolic';
+
 
 function getDefaultSource() {
     let extension = Extension.extension;
@@ -103,16 +105,16 @@ var NotificationManager = class {
         this._timerStateChangedId = this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
         this._active = false;
 
-        this._messagesIndicatorPatch = new Utils.Patch(Main.panel.statusArea.dateMenu._indicator, {
+        const messagesIndicatorPatch = new Utils.Patch(Main.panel.statusArea.dateMenu._indicator, {
             _sync() {
                 this.icon_name = 'message-indicator-symbolic';
                 this.visible = this._count > 0;
             }
         });
-        this._messagesIndicatorPatch.connect('applied', () => {
+        messagesIndicatorPatch.connect('applied', () => {
             Main.panel.statusArea.dateMenu._indicator._sync();
         });
-        this._messagesIndicatorPatch.connect('reverted', () => {
+        messagesIndicatorPatch.connect('reverted', () => {
             Main.panel.statusArea.dateMenu._indicator._sync();
         });
 
@@ -126,7 +128,25 @@ var NotificationManager = class {
                 messageTrayPatch.initial._expandBanner.bind(this)(autoExpanding);
             }
         });
+
+        const notificationSectionPatch = new Utils.Patch(Calendar.NotificationSection.prototype, {
+            _onNotificationAdded(source, notification) {
+                if (notification instanceof PomodoroEndNotification ||
+                    notification instanceof PomodoroStartNotification)
+                {
+                    const message = new CalendarBanner(notification);
+
+                    this.addMessageAtIndex(message, this._nUrgent, this.mapped);
+                }
+                else {
+                    patch.initial._onNotificationAdded.bind(this)(source, notification);
+                }
+            }
+        });
+
+        this._messagesIndicatorPatch = messagesIndicatorPatch;
         this._messageTrayPatch = messageTrayPatch;
+        this._notificationSectionPatch = notificationSectionPatch;
 
         this._onTimerStateChanged();
     }
@@ -167,6 +187,7 @@ var NotificationManager = class {
             this._active = true;
             this._messageTrayPatch.apply();
             this._messagesIndicatorPatch.apply();
+            this._notificationSectionPatch.apply();
             this._hideDoNotDisturbButton();
         }
     }
@@ -176,6 +197,7 @@ var NotificationManager = class {
             this._active = false;
             this._messageTrayPatch.revert();
             this._messagesIndicatorPatch.revert();
+            this._notificationSectionPatch.revert();
             this._showDoNotDisturbButton();
         }
     }
@@ -190,6 +212,7 @@ var NotificationManager = class {
 
         this._messageTrayPatch.destroy();
         this._messagesIndicatorPatch.destroy();
+        this._notificationSectionPatch.destroy();
     }
 };
 
@@ -197,39 +220,11 @@ var NotificationManager = class {
 var Source = GObject.registerClass(
 class PomodoroSource extends MessageTray.Source {
     _init() {
-        let icon_name = 'gnome-pomodoro-symbolic';
-
-        super._init(_("Pomodoro Timer"), icon_name);
-
-        this.ICON_NAME = icon_name;
+        super._init(_("Pomodoro Timer"), ICON_NAME);
 
         this._idleId = 0;
 
-        /* Take advantage of the fact that we create only single source at a time,
-           so to monkey patch notification list. */
-        let patch = new Utils.Patch(Calendar.NotificationSection.prototype, {
-            _onNotificationAdded(source, notification) {
-                if (notification instanceof PomodoroEndNotification ||
-                    notification instanceof PomodoroStartNotification)
-                {
-                    let message = new TimerBanner(notification);
-
-                    this.addMessageAtIndex(message, this._nUrgent, this.mapped);
-                }
-                else {
-                    patch.initial._onNotificationAdded.bind(this)(source, notification);
-                }
-            }
-        });
-        this._patch = patch;
-        this._patch.apply();
-
         this.connect('destroy', () => {
-            if (this._patch) {
-                this._patch.revert();
-                this._patch = null;
-            }
-
             if (this._idleId) {
                 GLib.source_remove(this._idleId);
                 this._idleId = 0;
