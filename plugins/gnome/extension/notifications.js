@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017 gnome-pomodoro contributors
+ * Copyright (c) 2011-2023 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +18,18 @@
  *
  */
 
-const Signals = imports.signals;
-
 const { Clutter, GLib, GObject, Meta, St } = imports.gi;
 
 const Calendar = imports.ui.calendar;
 const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const Params = imports.misc.params;
+const Signals = imports.misc.signals;
 const Util = imports.misc.util;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
+const Dialogs = Extension.imports.dialogs;
 const Timer = Extension.imports.timer;
 const Utils = Extension.imports.utils;
 
@@ -38,35 +38,35 @@ const _ = Gettext.gettext;
 const ngettext = Gettext.ngettext;
 
 
-// Time to annouce next timer state.
-const PRE_ANNOUCEMENT_TIME = 10.0;
+// Time in seconds to annouce next timer state.
+const ANNOUCEMENT_TIME = 10.0;
 
+// Min display time in milliseconds after content changes.
+const MIN_DISPLAY_TIME = 3000;
+
+// Use symbolic icon instead of hi-res as in the app.
 const ICON_NAME = 'gnome-pomodoro-symbolic';
 
 
-function getDefaultSource() {
-    let extension = Extension.extension;
-    let source = extension.notificationSource;
+var source = null;
 
+
+function getDefaultSource() {
     if (!source) {
         source = new Source();
-        let destroyId = source.connect('destroy',
-            (source) => {
-                if (extension.notificationSource === source) {
-                    extension.notificationSource = null;
+        source.connect('destroy',
+            (_source) => {
+                if (_source === source) {
+                    source = null;
                 }
-
-                source.disconnect(destroyId);
             });
-
-        extension.notificationSource = source;
     }
 
     return source;
 }
 
 
-function getCurrentNotification(notification) {
+function getCurrentNotification() {
     if (Main.messageTray._notificationState === MessageTray.State.HIDDEN) {
         return null;
     }
@@ -79,130 +79,42 @@ function getCurrentNotification(notification) {
 }
 
 
+function formatRemainingTime(remaining) {
+    remaining = remaining > 15.0
+        ? Math.round(remaining / 15.0) * 15
+        : Math.round(Math.max(remaining, 0.0));
+
+    const minutes = Math.floor(remaining / 60.0);
+    const seconds = remaining - minutes * 60.0;
+
+    return remaining > 45.0
+        ? ngettext("%d minute remaining",
+                   "%d minutes remaining", minutes).format(minutes)
+        : ngettext("%d second remaining",
+                   "%d seconds remaining", seconds).format(seconds);
+}
+
+
+var NotificationView = {
+    NULL: 0,
+    POMODORO: 1,
+    POMODORO_ABOUT_TO_END: 2,
+    BREAK: 3,
+    BREAK_ABOUT_TO_END: 4,
+    BREAK_ENDED: 5,
+};
+
+
 var NotificationPolicy = GObject.registerClass(
 class PomodoroNotificationPolicy extends MessageTray.NotificationPolicy {
+    get showBanners() {
+        return true;
+    }
+
     get showInLockScreen() {
         return false;
     }
 });
-
-
-var NotificationManager = class {
-    constructor(timer) {
-        this.timer = timer;
-        this._timerStateChangedId = this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
-        this._active = false;
-
-        const messagesIndicatorPatch = new Utils.Patch(Main.panel.statusArea.dateMenu._indicator, {
-            _sync() {
-                this.icon_name = 'message-indicator-symbolic';
-                this.visible = this._count > 0;
-            }
-        });
-        messagesIndicatorPatch.connect('applied', () => {
-            Main.panel.statusArea.dateMenu._indicator._sync();
-        });
-        messagesIndicatorPatch.connect('reverted', () => {
-            Main.panel.statusArea.dateMenu._indicator._sync();
-        });
-
-        const messageTrayPatch = new Utils.Patch(Main.messageTray, {
-            _expandBanner(autoExpanding) {
-                // Don't auto expand pomodoro notifications, despite Urgency.CRITICAL.
-                if (autoExpanding && this._notification instanceof Notification) {
-                    return;
-                }
-
-                messageTrayPatch.initial._expandBanner.bind(this)(autoExpanding);
-            }
-        });
-
-        const notificationSectionPatch = new Utils.Patch(Calendar.NotificationSection.prototype, {
-            _onNotificationAdded(source, notification) {
-                if (notification instanceof PomodoroEndNotification ||
-                    notification instanceof PomodoroStartNotification)
-                {
-                    const message = new CalendarBanner(notification);
-
-                    this.addMessageAtIndex(message, this._nUrgent, this.mapped);
-                }
-                else {
-                    patch.initial._onNotificationAdded.bind(this)(source, notification);
-                }
-            }
-        });
-
-        this._messagesIndicatorPatch = messagesIndicatorPatch;
-        this._messageTrayPatch = messageTrayPatch;
-        this._notificationSectionPatch = notificationSectionPatch;
-
-        this._onTimerStateChanged();
-    }
-
-    _showDoNotDisturbButton() {
-        const dndButton = Main.panel.statusArea.dateMenu._messageList._dndButton;
-        dndButton.show();
-
-        for (const sibling of [dndButton.get_previous_sibling(), dndButton.get_next_sibling()]) {
-            if (sibling instanceof St.Label) {
-                sibling.show();
-            }
-        }
-    }
-
-    _hideDoNotDisturbButton() {
-        const dndButton = Main.panel.statusArea.dateMenu._messageList._dndButton;
-        dndButton.hide();
-
-        for (const sibling of [dndButton.get_previous_sibling(), dndButton.get_next_sibling()]) {
-            if (sibling instanceof St.Label) {
-                sibling.hide();
-            }
-        }
-    }
-
-    _onTimerStateChanged() {
-        if (this.timer.getState() !== Timer.State.NULL) {
-            this.activate();
-        }
-        else {
-            this.deactivate();
-        }
-    }
-
-    activate() {
-        if (!this._active) {
-            this._active = true;
-            this._messageTrayPatch.apply();
-            this._messagesIndicatorPatch.apply();
-            this._notificationSectionPatch.apply();
-            this._hideDoNotDisturbButton();
-        }
-    }
-
-    deactivate() {
-        if (this._active) {
-            this._active = false;
-            this._messageTrayPatch.revert();
-            this._messagesIndicatorPatch.revert();
-            this._notificationSectionPatch.revert();
-            this._showDoNotDisturbButton();
-        }
-    }
-
-    destroy() {
-        this.deactivate();
-
-        if (this._timerStateChangedId) {
-            this.timer.disconnect(this._timerStateChangedId);
-            this._timerStateChangedId = 0;
-        }
-
-        this._messageTrayPatch.destroy();
-        this._messagesIndicatorPatch.destroy();
-        this._notificationSectionPatch.destroy();
-    }
-};
 
 
 var Source = GObject.registerClass(
@@ -254,13 +166,6 @@ class PomodoroSource extends MessageTray.Source {
         }
     }
 
-    /* override parent method */
-    showNotification(notification) {
-        Extension.extension.ensureNotificationManager();
-
-        super.showNotification(notification);
-    }
-
     destroyNotifications() {
         let notifications = this.notifications.slice();
 
@@ -271,24 +176,56 @@ class PomodoroSource extends MessageTray.Source {
 });
 
 
-var Notification = GObject.registerClass(
+var Notification = GObject.registerClass({
+    Properties: {
+        // TODO: timer should be a property
+        'view': GObject.ParamSpec.int('view', 'view', 'view',
+                                      GObject.ParamFlags.READWRITE,
+                                      Math.min(...Object.values(NotificationView)),
+                                      Math.max(...Object.values(NotificationView)),
+                                      NotificationView.NULL),
+    },
+},
 class PomodoroNotification extends MessageTray.Notification {
-    _init(title, description, params) {
-        super._init(null, title, description, params);
+    _init(timer) {
+        super._init(null, '', null, null);
+
+        // Notification will update its contents.
+        this.setResident(true);
+
+        // Notification should not expire while the timer is running.
+        this.setTransient(false);
 
         // Show notification regardless of session busy status.
         this.setForFeedback(true);
 
-        this._destroying = false;
-
         // We want notifications to be shown right after the action,
         // therefore urgency bump.
         this.setUrgency(MessageTray.Urgency.HIGH);
+
+        this._timer = timer;
     }
 
-    activate() {
-        super.activate();
-        Main.panel.closeCalendar();
+    get timer() {
+        return this._timer;
+    }
+
+    // `createBanner()` is used only to display a notification popup.
+    // Banners in calendar menu or the lock screen are made by GNOME Shell.
+    createBanner() {
+        const banner = new NotificationBanner(this);
+
+        // We keep notification as resident to keep banner visible.
+        // TODO: this should be monitored by NotificationManager
+        banner.connect('notify::mapped', () => {
+            if (!banner.mapped) {
+                if (this.resident && Extension.extension.notificationManager) {
+                    Extension.extension.notificationManager._updateNotification();
+                }
+            }
+        });
+
+        return banner;
     }
 
     show() {
@@ -309,355 +246,324 @@ class PomodoroNotification extends MessageTray.Notification {
             Utils.logWarning('Called Notification.show() after destroy()');
         }
     }
+});
 
-    _preventDestroy() {
-        if (!this.resident && !this._destroying) {
-            this.resident = true;
 
-            GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-                this.resident = false;
+var NotificationBanner = GObject.registerClass(
+class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
+    _init(notification) {
+        super._init(notification);
+
+        this._timer = notification.timer;
+        this._view = NotificationView.NULL;
+        this._timerState = null;
+        this._skipBreakButton = null;
+        this._extendButton = null;
+        this._updateActionsBlocked = false;
+        this._timerUpdateId = 0;
+
+        this._notificationUpdatedId = this.notification.connect('updated', this._onNotificationUpdated.bind(this));
+
+        this.notification.connectObject(
+            'destroy', () => {
+                if (this._notificationUpdatedId) {
+                    notification.disconnect(this._notificationUpdatedId);
+                    this._notificationUpdatedId = 0;
+                }
+
+                if (this._timerUpdateId) {
+                    this._timer.disconnect(this._timerUpdateId);
+                    this._timerUpdateId = 0;
+                }
+            }
+        );
+
+        this._onNotificationUpdated();
+    }
+
+    get timer() {
+        return this._timer;
+    }
+
+    /* override parent method */
+    canClose() {
+        return false;
+    }
+
+    _blockUpdateActions() {
+        if (!this._updateActionsBlocked) {
+            this._updateActionsBlocked = true;
+        }
+    }
+
+    _updateTitle() {
+        let title;
+        const isStarting = this._timer.getElapsed() < ANNOUCEMENT_TIME;
+
+        switch (this._view) {
+            case NotificationView.POMODORO:
+                if (isStarting) {
+                    title = _("Pomodoro");
+                }
+                else {
+                    title = Timer.State.label(this._timerState);
+                }
+                break;
+
+            case NotificationView.POMODORO_ABOUT_TO_END:
+                title = _("Pomodoro is about to end");
+                break;
+
+            case NotificationView.BREAK:
+                if (isStarting) {
+                    title = this._timerState === Timer.State.LONG_BREAK
+                        ? _("Take a long break")
+                        : _("Take a short break");
+                }
+                else {
+                    title = Timer.State.label(this._timerState);
+                }
+                break;
+
+            case NotificationView.BREAK_ABOUT_TO_END:
+                title = _("Break is about to end");
+                break;
+
+            case NotificationView.BREAK_ENDED:
+                title = _("Break is over");
+                break;
+
+            default:
+                title = Timer.State.label(this._timerState);
+                break;
+        }
+
+        this.setTitle(title);
+    }
+
+    _updateBody() {
+        let body;
+
+        if (this._timer.getState() !== this._timerState) {
+            return;
+        }
+
+        switch (this._view) {
+            case NotificationView.POMODORO:
+            case NotificationView.POMODORO_ABOUT_TO_END:
+            case NotificationView.BREAK:
+            case NotificationView.BREAK_ABOUT_TO_END:
+                body = formatRemainingTime(this._timer.getRemaining());
+                break;
+
+            case NotificationView.BREAK_ENDED:
+                // body = _("Get ready for Pomodoro");
+                body = _("Get ready…");
+                break;
+
+            default:
+                body = '';
+                break;
+        }
+
+        this.setBody(body);
+    }
+
+    _updateActions() {
+        if (this._skipBreakButton) {
+            this._skipBreakButton.destroy();
+            this._skipBreakButton = null;
+        }
+
+        if (this._extendButton) {
+            this._extendButton.destroy();
+            this._extendButton = null;
+        }
+
+        if (this._view === NotificationView.POMODORO_ABOUT_TO_END ||
+            this._view === NotificationView.BREAK ||
+            this._view === NotificationView.BREAK_ABOUT_TO_END)
+        {
+            this._skipBreakButton = this.addAction(_("Skip Break"), () => {
+                this._timer.setState(Timer.State.POMODORO);
+            });
+        }
+
+        if (this._view === NotificationView.POMODORO_ABOUT_TO_END ||
+            this._view === NotificationView.BREAK ||
+            this._view === NotificationView.BREAK_ABOUT_TO_END)
+        {
+            this._extendButton = this.addAction(_("+1 Minute"), () => {
+                this._blockUpdateActions();
+                this._timer.stateDuration += 60.0;
             });
         }
     }
 
-    // FIXME: We shouldn't override `destroy`. There may happen a second call
-    // `.destroy(NotificationDestroyedReason.EXPIRED)`. I'm not sure if this bug is on our side or in MessageTray.
-    destroy(reason = MessageTray.NotificationDestroyedReason.DISMISSED) {
-        if (this._destroying) {
-            Utils.logWarning('Already called Notification.destroy()');
+    _onNotificationUpdated() {
+        const timerState = this._timer.getState();
+        const view = this.notification.view;
+
+        let updateActions = !this._updateActionsBlocked;
+
+        if (timerState === Timer.State.NULL || !view) {
             return;
         }
-        this._destroying = true;
 
-        super.destroy(reason);
+        if (this._timerState !== timerState) {
+            this._timerState = timerState;
+            updateActions = true;
+        }
+
+        if (this._view !== view) {
+            this._view = view;
+        }
+
+        this._updateTitle();
+        this._updateBody();
+
+        if (updateActions) {
+            this.unexpand();
+            this._updateActions();
+        }
+
+        this._updateActionsBlocked = false;
+    }
+
+    _onTimerUpdate() {
+        this._updateBody();
+    }
+
+    vfunc_map() {
+        if (!this._timerUpdateId) {
+            this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
+        }
+
+        this._onTimerUpdate();
+
+        super.vfunc_map();
+    }
+
+    vfunc_unmap() {
+        if (this._timerUpdateId) {
+            this._timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+
+        super.vfunc_unmap();
+    }
+
+    _onDestroy() {
+        if (this.notification && this._notificationUpdatedId) {
+            this.notification.disconnect(this._notificationUpdatedId);
+            this._notificationUpdatedId = 0;
+        }
+
+        if (this._timerUpdateId) {
+            this._timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+
+        super._onDestroy();
     }
 });
 
 
-var PomodoroStartNotification = GObject.registerClass({
-    Signals: {
-        'changed': {},
-    },
-}, class PomodoroStartNotification extends Notification {
-    /**
-     * Notification pops up a little before Pomodoro starts and changes message once started.
-     */
+var NotificationMessage = GObject.registerClass(
+class PomodoroNotificationMessage extends Calendar.NotificationMessage {
+    _init(notification) {
+        super._init(notification);
 
-    _init(timer) {
-        super._init('', null, null);
-
-        this.timer = timer;
+        this._timer = notification.timer;
         this._timerState = null;
-        this._timerStateChangedId = this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+        this._isPaused = false;
 
-        this.connect('destroy', () => {
-            if (this._timerStateChangedId != 0) {
-                this.timer.disconnect(this._timerStateChangedId);
-                this._timerStateChangedId = 0;
+        this.setUseBodyMarkup(false);
+
+        // Reclaim space used by unused elements.
+        this._secondaryBin.hide();
+        this._closeButton.hide();
+
+        this.notification.connectObject(
+            'updated', this._onNotificationUpdated.bind(this),
+            'destroy', () => {
+                if (this._timerUpdateId) {
+                    this._timer.disconnect(this._timerUpdateId);
+                    this._timerUpdateId = 0;
+                }
             }
-        });
+        );
 
-        this._onTimerStateChanged();
+        this._onNotificationUpdated();
     }
 
-    _onTimerStateChanged() {
-        let title,
-            message,
-            resident,
-            urgent,
-            state = this.timer.getState();
+    /* override parent method */
+    canClose() {
+        return false;
+    }
 
-        if (this._timerState !== state) {
-            this._timerState = state;
+    _updateTitle() {
+        this.setTitle(Timer.State.label(this._timerState));
+    }
 
-            switch (state) {
-                case Timer.State.SHORT_BREAK:
-                case Timer.State.LONG_BREAK:
-                    title = _("Break is about to end");
-                    resident = false;
-                    urgent = true;
-                    break;
-
-                case Timer.State.POMODORO:
-                    title = _("Pomodoro");
-                    resident = false;
-                    urgent = false;
-                    break;
-
-                default:
-                    // keep notification as is until destroyed
-                    return;
-            }
-
-            this.title = title;
-            this.setResident(resident);
-            this.setTransient(!resident);
-
-            // Bump to Urgency.CRITICAL so that notification has higher priority and that it would stay open.
-            // It's abusive, but only for 10s.
-            this.setUrgency(urgent ? MessageTray.Urgency.CRITICAL : MessageTray.Urgency.HIGH);
-
-            if (Main.messageTray._notification === this) {
-                Main.messageTray._updateNotificationTimeout(2000);
-            }
-
-            Main.messageTray._updateState();
-
-            this.emit('changed');
+    _updateBody() {
+        if (this._timer.getState() === this._timerState) {
+            this.setBody(formatRemainingTime(this._timer.getRemaining()));
         }
     }
 
-    _getBodyText() {
-        let remaining = Math.max(this.timer.getRemaining(), 0.0);
-        let minutes = Math.round(remaining / 60);
-        let seconds = Math.round(remaining % 60);
+    _onNotificationUpdated() {
+        const timerState = this._timer.getState();
+        const isPaused = this._timer.isPaused();
 
-        return remaining > 45
-                ? ngettext("%d minute remaining",
-                           "%d minutes remaining", minutes).format(minutes)
-                : ngettext("%d second remaining",
-                           "%d seconds remaining", seconds).format(seconds);
-    }
-
-    /**
-     * createBanner() is used only to display a notification popup.
-     * Banners in calendar menu or the lock screen are made by GNOME Shell.
-     */
-    createBanner() {
-        let banner,
-            extendButton;
-
-        banner = super.createBanner();
-        banner.canClose = function() {
-            return false;
-        };
-
-        let onTimerUpdate = () => {
-            if (banner.bodyLabel) {
-                let bodyText = this._getBodyText();
-
-                if (bodyText !== banner._bodyText) {
-                    banner._bodyText = bodyText;
-                    banner.setBody(bodyText);
-                }
-            }
-
-            // TODO: move this to notification, shouldn't handled by banner
-            if (this.urgency === MessageTray.Urgency.CRITICAL && this.timer.getRemaining() > PRE_ANNOUCEMENT_TIME) {
-                this.setUrgency(MessageTray.Urgency.HIGH);
-            }
-        };
-        let onNotificationChanged = () => {
-            banner.setTitle(this.title);
-            banner.unexpand();
-
-            if (this.timer.isBreak() && !extendButton) {
-                extendButton = banner.addAction(_("+1 Minute"), () => {
-                    this.timer.stateDuration += 60.0;
-                    this._preventDestroy();
-                });
-            }
-            else if (extendButton) {
-                extendButton.destroy();
-                extendButton = null;
-            }
-        };
-        let onNotificationDestroy = () => {
-            if (timerUpdateId != 0) {
-                this.timer.disconnect(timerUpdateId);
-                timerUpdateId = 0;
-            }
-
-            if (notificationChangedId != 0) {
-                this.disconnect(notificationChangedId);
-                notificationChangedId = 0;
-            }
-
-            if (notificationDestroyId != 0) {
-                this.disconnect(notificationDestroyId);
-                notificationDestroyId = 0;
-            }
-        };
-
-        let timerUpdateId = this.timer.connect('update', onTimerUpdate);
-        let notificationChangedId = this.connect('changed', onNotificationChanged);
-        let notificationDestroyId = this.connect('destroy', onNotificationDestroy);
-
-        banner.connect('destroy', () => onNotificationDestroy());
-
-        onNotificationChanged();
-        onTimerUpdate();
-
-        return banner;
-    }
-});
-
-
-var PomodoroEndNotification = GObject.registerClass({
-    Signals: {
-        'changed': {},
-    },
-}, class PomodoroEndNotification extends Notification {
-    _init(timer) {
-        super._init('', null, null);
-
-        this.timer = timer;
-        this._timerState = null;
-        this._timerStateChangedId = this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
-
-        this.connect('destroy', () => {
-            if (this._timerStateChangedId != 0) {
-                this.timer.disconnect(this._timerStateChangedId);
-                this._timerStateChangedId = 0;
-            }
-        });
-
-        this._onTimerStateChanged();
-    }
-
-    _onTimerStateChanged() {
-        let title,
-            message,
-            resident,
-            urgent,
-            state = this.timer.getState();
-
-        if (this._timerState !== state) {
-            this._timerState = state;
-
-            switch (state) {
-                case Timer.State.POMODORO:
-                    title = _("Pomodoro is about to end");
-                    resident = false;
-                    urgent = true;
-                    break;
-
-                case Timer.State.SHORT_BREAK:
-                case Timer.State.LONG_BREAK:
-                    title = _("Take a break");
-                    resident = true;
-                    urgent = false;
-                    break;
-
-                default:
-                    // keep notification as is until destroyed
-                    return;
-            }
-
-            this.title = title;
-            this.setResident(resident);
-            this.setTransient(!resident);
-
-            // Bump to Urgency.CRITICAL so that notification has higher priority and that it would stay open.
-            // It's abusive, but only for 10s.
-            this.setUrgency(urgent ? MessageTray.Urgency.CRITICAL : MessageTray.Urgency.HIGH);
-
-            if (Main.messageTray._notification === this) {
-                Main.messageTray._updateNotificationTimeout(2000);
-            }
-
-            Main.messageTray._updateState();
-
-            this.emit('changed');
+        if (timerState === Timer.State.NULL) {
+            return;
         }
+
+        this._timerState = timerState;
+        this._isPaused = isPaused;
+
+        this._updateTitle();
+        this._updateBody();
     }
 
-    _getBodyText() {
-        let remaining = Math.max(this.timer.getRemaining(), 0.0);
-        let minutes = Math.round(remaining / 60);
-        let seconds = Math.round(remaining % 60);
-
-        return remaining > 45
-                ? ngettext("%d minute remaining",
-                           "%d minutes remaining", minutes).format(minutes)
-                : ngettext("%d second remaining",
-                           "%d seconds remaining", seconds).format(seconds);
+    _onTimerUpdate() {
+        this._updateBody();
     }
 
-    createBanner() {
-        const initialState = this.timer.getState();
+    /* override parent method */
+    _onUpdated(n, clear) {
+    }
 
-        const banner = super.createBanner();
-        banner.canClose = function() {
-            return false;
-        };
-        banner.addAction(_("Skip Break"), () => {
-            banner.close();
+    vfunc_clicked() {
+        super.vfunc_clicked();
 
-            this.timer.setState(Timer.State.POMODORO);
-        });
-        banner.addAction(_("+1 Minute"), () => {
-            this.timer.stateDuration += 60.0;
-            this._preventDestroy();
-        });
+        Main.panel.closeCalendar();
+    }
 
-        let onTimerUpdate = () => {
-            const updatesBlocked = banner.mapped && this.timer.getState() !== initialState;
-            if (banner.bodyLabel && !updatesBlocked) {
-                let bodyText = this._getBodyText();
+    vfunc_map() {
+        if (!this._timerUpdateId) {
+            this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
+        }
 
-                if (bodyText !== banner._bodyText) {
-                    banner._bodyText = bodyText;
-                    banner.setBody(bodyText);
-                }
-            }
+        this._onTimerUpdate();
 
-            // TODO: move this to notification, shouldn't handled by banner
-            if (this.urgency === MessageTray.Urgency.CRITICAL && this.timer.getRemaining() > PRE_ANNOUCEMENT_TIME) {
-                this.setUrgency(MessageTray.Urgency.HIGH);
-            }
-        };
-        let onNotificationChanged = () => {
-            const state = this.timer.getState();
-            const updatesBlocked = banner.mapped && state !== initialState;
-            if (!updatesBlocked) {
-                if (state === Timer.State.SHORT_BREAK || state === Timer.State.LONG_BREAK) {
-                    banner.setTitle(Timer.State.label(state));
-                }
-                else {
-                    banner.setTitle(this.title);
-                }
+        super.vfunc_map();
+    }
 
-                banner.unexpand();
-            }
-        };
-        let onNotificationDestroy = () => {
-            if (timerUpdateId != 0) {
-                this.timer.disconnect(timerUpdateId);
-                timerUpdateId = 0;
-            }
+    vfunc_unmap() {
+        if (this._timerUpdateId) {
+            this._timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
 
-            if (notificationChangedId != 0) {
-                this.disconnect(notificationChangedId);
-                notificationChangedId = 0;
-            }
-
-            if (notificationDestroyId != 0) {
-                this.disconnect(notificationDestroyId);
-                notificationDestroyId = 0;
-            }
-        };
-
-        let timerUpdateId = this.timer.connect('update', onTimerUpdate);
-        let notificationChangedId = this.connect('changed', onNotificationChanged);
-        let notificationDestroyId = this.connect('destroy', onNotificationDestroy);
-
-        banner.connect('destroy', () => onNotificationDestroy());
-
-        onNotificationChanged();
-        onTimerUpdate();
-
-        return banner;
+        super.vfunc_unmap();
     }
 });
 
 
 var IssueNotification = GObject.registerClass(
 class PomodoroIssueNotification extends MessageTray.Notification {
-    /* Use base class instead of PomodoroNotification, in case
-     * issue is caused by our implementation.
-     */
-
     _init(message) {
         let source = getDefaultSource();
         let title  = _("Pomodoro Timer");
@@ -684,122 +590,518 @@ class PomodoroIssueNotification extends MessageTray.Notification {
 });
 
 
-var TimerBanner = GObject.registerClass(
-class PomodoroTimerBanner extends Calendar.NotificationMessage {
-    _init(notification) {
-        super._init(notification);
+var NotificationManager = class extends Signals.EventEmitter {
+    constructor(timer) {
+        super();
 
-        this.timer = notification.timer;
+        this._timer = timer;
+        this._timerState = Timer.State.NULL;
+        this._notification = null;
+        this._dialog = null;
+        this._useDialog = true;
+        this._view = NotificationView.NULL;
+        this._previousView = NotificationView.NULL;
+        this._previousTimerState = Timer.State.NULL;
+        this._patches = this._createPatches();
+        this._destroying = false;
 
-        this.setUseBodyMarkup(false);
+        this._annoucementTimeoutId = 0;
+        this._timerStateChangedId = this._timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+        this._timerPausedId = this._timer.connect('paused', this._onTimerPaused.bind(this));
+        this._timerResumedId = this._timer.connect('resumed', this._onTimerResumed.bind(this));
 
-        this._isPaused = null;
-        this._timerState = null;
-        this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
-        this._onTimerUpdate();
+        this._onTimerStateChanged();
+    }
 
-        this.addAction(_("Skip"), () => {
-                this.timer.skip();
+    get timer() {
+        return this._timer;
+    }
 
-                notification.destroy();
+    get notification() {
+        if (this._view !== NotificationView.NULL) {
+            this._ensureNotification();
+        }
+
+        return this._notification;
+    }
+
+    get dialog() {
+        if (this._view !== NotificationView.NULL) {
+            this._ensureDialog();
+        }
+
+        return this._dialog;
+    }
+
+    get useDialog() {
+        return this._useDialog;
+    }
+
+    set useDialog(value) {
+        this._useDialog = value;
+    }
+
+    _createPatches() {
+        const messagesIndicatorPatch = new Utils.Patch(Main.panel.statusArea.dateMenu._indicator, {
+            _sync() {
+                this.icon_name = 'message-indicator-symbolic';
+                this.visible = this._count > 0;
+            }
+        });
+        messagesIndicatorPatch.connect('applied', () => {
+            Main.panel.statusArea.dateMenu._indicator._sync();
+        });
+        messagesIndicatorPatch.connect('reverted', () => {
+            Main.panel.statusArea.dateMenu._indicator._sync();
+        });
+
+        const messageTrayPatch = new Utils.Patch(Main.messageTray, {
+            _expandBanner(autoExpanding) {
+                // Don't auto expand pomodoro notifications, despite Urgency.CRITICAL.
+                if (autoExpanding && this._notification instanceof Notification) {
+                    return;
+                }
+
+                messageTrayPatch.initial._expandBanner.bind(this)(autoExpanding);
+            }
+        });
+
+        const notificationSectionPatch = new Utils.Patch(Calendar.NotificationSection.prototype, {
+            _onNotificationAdded(source, notification) {
+                if (notification instanceof Notification) {
+                    const message = new NotificationMessage(notification);
+
+                    this.addMessageAtIndex(message, this._nUrgent, this.mapped);
+                }
+                else {
+                    patch.initial._onNotificationAdded.bind(this)(source, notification);
+                }
+            }
+        });
+
+        return [
+            messagesIndicatorPatch,
+            messageTrayPatch,
+            notificationSectionPatch,
+        ];
+    }
+
+    _createNotification() {
+        const notification = new Notification(this._timer);
+        notification.view = this._view;
+        notification.connect('activated',
+            () => {
+                switch (notification.view) {
+                    case NotificationView.POMODORO:
+                        break;
+
+                    case NotificationView.POMODORO_ABOUT_TO_END:
+                        this._timer.skip();
+                        this.openDialog();
+                        break;
+
+                    case NotificationView.BREAK:
+                        this.openDialog();
+                        break;
+                }
             });
-        this.addAction(_("+1 Minute"), () => {
-                this.timer.stateDuration += 60.0;
+        notification.connect('destroy',
+            () => {
+                if (this._notification === notification) {
+                    this._notification = null;
+                }
             });
 
-        this.connect('close', this._onClose.bind(this));
+        return notification;
     }
 
-    /* override parent method */
-    canClose() {
-        return false;
+    _createDialog() {
+        const dialog = new Dialogs.PomodoroEndDialog(this._timer);
+        dialog.connect('opening',
+            () => {
+                try {
+                    if (Main.messageTray._notification instanceof Notification &&
+                        Main.messageTray._notificationState === MessageTray.State.SHOWN ||
+                        Main.messageTray._notificationState === MessageTray.State.SHOWING)
+                    {
+                        Main.messageTray._hideNotification(true);
+                    }
+                }
+                catch (error) {
+                    Utils.logWarning(error.message);
+                }
+           });
+        dialog.connect('closing',
+            () => {
+                if (this._view !== NotificationView.NULL) {
+                    this._ensureNotification();
+                    this._notification.show();
+                }
+
+                if (this._view === NotificationView.BREAK) {
+                    dialog.openWhenIdle();
+                }
+            });
+        dialog.connect('destroy',
+            () => {
+                if (this._dialog === dialog) {
+                    this._dialog = null;
+                }
+            });
+
+        return dialog;
     }
 
-    addButton(button, callback) {
-        button.connect('clicked', callback);
-        this._mediaControls.add_actor(button);
-
-        return button;
-    }
-
-    addAction(label, callback) {
-        let button = new St.Button({ style_class: 'extension-pomodoro-message-action',
-                                     label: label,
-                                     x_expand: true,
-                                     can_focus: true });
-
-        return this.addButton(button, callback);
-    }
-
-    _getBodyText() {
-        let remaining = Math.max(this.timer.getRemaining(), 0.0);
-        let minutes = Math.round(remaining / 60);
-        let seconds = Math.round(remaining % 60);
-
-        return remaining > 45
-                ? ngettext("%d minute remaining",
-                           "%d minutes remaining", minutes).format(minutes)
-                : ngettext("%d second remaining",
-                           "%d seconds remaining", seconds).format(seconds);
-    }
-
-    _onTimerStateChanged() {
-        let state = this.timer.getState();
-        let title;
-
-        if (this.timer.isPaused()) {
-            title = _("Paused");
-        }
-        else {
-            title = Timer.State.label(state);
-        }
-
-        if (title && this.titleLabel) {
-            this.setTitle(title);
+    _ensureNotification() {
+        if (!this._notification) {
+            this._notification = this._createNotification();
         }
     }
 
-    _onTimerElapsedChanged() {
-        if (this.bodyLabel) {
-            let bodyText = this._getBodyText();
+    _ensureDialog() {
+        if (!this._dialog) {
+            this._dialog = this._createDialog();
+        }
+    }
 
-            if (bodyText !== this._bodyText) {
-                this._bodyText = bodyText;
-                this.setBody(bodyText);
+    openDialog(animate = true) {
+        this._ensureDialog();
+        this._dialog.open(animate);
+        this._dialog.pushModal();
+    }
+
+    _showDoNotDisturbButton() {
+        const dndButton = Main.panel.statusArea.dateMenu._messageList._dndButton;
+        dndButton.show();
+
+        for (const sibling of [dndButton.get_previous_sibling(), dndButton.get_next_sibling()]) {
+            if (sibling instanceof St.Label) {
+                sibling.show();
             }
         }
     }
 
-    _onTimerUpdate() {
-        let timerState = this.timer.getState();
-        let isPaused = this.timer.isPaused();
+    _hideDoNotDisturbButton() {
+        const dndButton = Main.panel.statusArea.dateMenu._messageList._dndButton;
+        dndButton.hide();
 
-        if (this._timerState != timerState || this._isPaused != isPaused) {
-            this._timerState = timerState;
-            this._isPaused = isPaused;
-
-            this._onTimerStateChanged();
-        }
-
-        if (this._timerState != Timer.State.NULL) {
-            this._onTimerElapsedChanged();
+        for (const sibling of [dndButton.get_previous_sibling(), dndButton.get_next_sibling()]) {
+            if (sibling instanceof St.Label) {
+                sibling.hide();
+            }
         }
     }
 
-    /* override parent method */
-    _onUpdated(n, clear) {
-    }
+    _applyPatches() {
+        this._hideDoNotDisturbButton();
 
-    _onClose() {
-        if (this._timerUpdateId != 0) {
-            this.timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
+        for (const patch of this._patches) {
+            patch.apply();
         }
     }
 
-    _onDestroy() {
-        this._onClose();
+    _revertPatches() {
+        this._showDoNotDisturbButton();
 
-        super._onDestroy();
+        for (const patch of this._patches) {
+            patch.revert();
+        }
     }
-});
+
+    _resolveView(timerState, isPaused, isStarting, isEnding) {
+        if (isPaused) {
+            return timerState === Timer.State.POMODORO && isStarting
+                ? NotificationView.BREAK_ENDED
+                : NotificationView.NULL;
+        }
+
+        switch (timerState) {
+            case Timer.State.POMODORO:
+                if (isEnding) {
+                    return NotificationView.POMODORO_ABOUT_TO_END;
+                }
+
+                return NotificationView.POMODORO;
+
+            case Timer.State.SHORT_BREAK:
+            case Timer.State.LONG_BREAK:
+                if (isEnding) {
+                    return NotificationView.BREAK_ABOUT_TO_END;
+                }
+
+                return NotificationView.BREAK;
+        }
+
+        return NotificationView.NULL;
+    }
+
+    _updateNotification() {
+        const notification = this._notification;
+        const view = this._view;
+        const timerState = this._timer.getState();
+
+        let changed = false;
+
+        if (!notification || this._destroying) {
+            return;
+        }
+
+        const isUrgent = (
+            view === NotificationView.POMODORO_ABOUT_TO_END ||
+            view === NotificationView.BREAK_ABOUT_TO_END ||
+            view === NotificationView.BREAK_ENDED
+        );
+        // Use Urgency.CRITICAL to force notification banner to stay open.
+        const urgency = isUrgent ? MessageTray.Urgency.CRITICAL : MessageTray.Urgency.HIGH;
+        if (notification.urgency !== urgency) {
+            notification.setUrgency(urgency);
+            changed = true;
+        }
+
+        const isTransient = (
+            view === NotificationView.POMODORO ||
+            view === NotificationView.NULL
+        );
+        if (notification.isTransient !== isTransient) {
+            notification.setTransient(isTransient);
+            changed = true;
+        }
+
+        const forceResident = (
+            view === NotificationView.POMODORO_ABOUT_TO_END ||
+            view === NotificationView.BREAK_ABOUT_TO_END ||
+            view === NotificationView.BREAK_ENDED
+        );
+        const isResident = (!isTransient || forceResident) && view !== NotificationView.NULL;
+        if (notification.resident !== isResident) {
+            notification.setResident(isResident);
+            changed = true;
+        }
+
+        if (notification.view !== view) {
+            notification.view = view;
+            changed = true;
+        }
+
+        const title = Timer.State.label(timerState);
+        if (notification.title !== title) {
+            changed = true;
+        }
+
+        if (changed) {
+            notification.update(title, '', {});
+
+            if (Main.messageTray._notification === notification && isTransient) {
+                Main.messageTray._updateNotificationTimeout(MIN_DISPLAY_TIME);
+            }
+
+            Main.messageTray._updateState();
+        }
+    }
+
+    _shouldNotify(timerState, view) {
+        if (view === NotificationView.NULL || timerState === Timer.State.NULL) {
+            return false;
+        }
+
+        // Pomodoro has been extended.
+        if (this._previousView === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.POMODORO) {
+            return false;
+        }
+
+        // Break has been extended.
+        if (this._previousView === NotificationView.BREAK_ABOUT_TO_END && view === NotificationView.BREAK) {
+            return false;
+        }
+
+        // Dialog is already open.
+        if ((timerState === Timer.State.SHORT_BREAK || timerState === Timer.State.LONG_BREAK) &&
+            (this._dialog?.state === Dialogs.State.OPENED || this._dialog?.state === Dialogs.State.OPENING))
+        {
+            return false;
+        }
+
+        return timerState !== this._previousTimerState || view !== this._previousView;
+    }
+
+    _doNotify() {
+        const animate = true;  // TODO: coming from lock-screen, we don't want animation
+
+        this._ensureNotification();
+        this._updateNotification();
+
+        if (this._useDialog) {
+            this._ensureDialog();  // TODO: can be done afer `.canOpen()`
+        }
+
+        if (this._useDialog && this._view === NotificationView.BREAK && this._dialog.canOpen()) {
+            this._dialog.open(animate);
+        }
+        else {
+            if (this._dialog) {
+                this._dialog.close(true);
+            }
+
+            this._notification.show();
+        }
+    }
+
+    notify() {
+        const timerState = this._timer.getState();
+        const view = this._view;
+
+        let notified = false;
+
+        if (view !== NotificationView.NULL) {
+            if (this._shouldNotify(timerState, view)) {
+                this._doNotify();
+
+                notified = true;
+            }
+            else {
+                this._updateNotification();
+            }
+        }
+        else {
+            if (this._dialog) {
+                this._dialog.close(true);
+            }
+
+            if (this._notification) {
+                this._notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
+            }
+        }
+
+        return notified;
+    }
+
+    _change(timerState, view) {
+        if (this._timerState === timerState && this._view === view) {
+            return;
+        }
+
+        this._previousTimerState = this._timerState;
+        this._previousView = this._view;
+        this._timerState = timerState;
+        this._view = view;
+
+        this.notify();
+    }
+
+    _onAnnoucementTimeout() {
+        this._annoucementTimeoutId = 0;
+
+        this._change(this._timerState, this._resolveView(this._timerState, false, false, true));
+
+        return GLib.SOURCE_REMOVE;
+    }
+
+    _scheduleAnnoucement() {
+        const timeout = Math.round(this._timer.getRemaining() - ANNOUCEMENT_TIME);
+
+        this._unscheduleAnnoucement();
+
+        if (timeout <= 0) {
+            this._onAnnoucementTimeout();
+            return;
+        }
+
+        this._annoucementTimeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT,
+                                                              timeout,
+                                                              this._onAnnoucementTimeout.bind(this));
+        GLib.Source.set_name_by_id(this._annoucementTimeoutId,
+                                   '[gnome-pomodoro] NotificationManager._annoucementTimeoutId');
+
+    }
+
+    _unscheduleAnnoucement() {
+        if (this._annoucementTimeoutId) {
+            GLib.source_remove(this._annoucementTimeoutId);
+            this._annoucementTimeoutId = 0;
+        }
+    }
+
+    _onTimerStateChanged() {
+        const timerState = this._timer.getState();
+        const isPaused = this._timer.isPaused();
+        const isEnding = this._timer.getRemaining() <= ANNOUCEMENT_TIME;
+        const isStarting = this._timer.getElapsed() === 0.0;
+
+        const view = this._resolveView(timerState, isPaused, isStarting, isEnding);
+
+        if (timerState !== this._timerState || this._view !== view)
+        {
+            this._change(timerState, view);
+        }
+        else if (timerState !== Timer.State.NULL &&
+                 timerState === this._timerState &&
+                 this._timer.getElapsed() < 0.1)
+        {
+            // Show notification when starting same state from start.
+            this.notify();
+        }
+
+        // Change of state duration may not trigger "changed" signal, so (re)schedule annoucement here.
+        if (view === NotificationView.POMODORO ||
+            view === NotificationView.BREAK)
+        {
+            this._scheduleAnnoucement();
+        }
+        else {
+            this._unscheduleAnnoucement();
+        }
+
+        if (timerState !== Timer.State.NULL) {
+            this._applyPatches();
+        }
+        else {
+            this._revertPatches();
+        }
+    }
+
+    _onTimerPaused() {
+        this._onTimerStateChanged();
+    }
+
+    _onTimerResumed() {
+        this._onTimerStateChanged();
+    }
+
+    destroy() {
+        this._destroying = true;
+        this._view = NotificationView.NULL;
+        this._unscheduleAnnoucement();
+
+        if (this._dialog) {
+            this._dialog.destroy();
+            this._dialog = null;
+        }
+
+        if (this._notification) {
+            this._notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
+            this._notification = null;
+        }
+
+        if (this._timerStateChangedId) {
+            this._timer.disconnect(this._timerStateChangedId);
+            this._timerStateChangedId = 0;
+        }
+
+        if (this._timerPausedId) {
+            this._timer.disconnect(this._timerPausedId);
+            this._timerPausedId = 0;
+        }
+
+        if (this._timerResumedId) {
+            this._timer.disconnect(this._timerResumedId);
+            this._timerResumedId = 0;
+        }
+
+        for (const patch of this._patches) {
+            patch.destroy();
+        }
+
+        this.emit('destroy');
+    }
+};
+

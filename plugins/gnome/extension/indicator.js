@@ -19,7 +19,6 @@
  */
 
 const Cairo = imports.cairo;
-const Signals = imports.signals;
 
 const { Clutter, Gio, GLib, GObject, Gtk, Meta, Pango, Shell, St } = imports.gi;
 
@@ -29,6 +28,7 @@ const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+const Signals = imports.misc.signals;
 
 const Config = Extension.imports.config;
 const Timer = Extension.imports.timer;
@@ -97,16 +97,17 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _onTimerClicked() {
+        const notificationManager = Extension.extension.notificationManager;
+
         if (this._isPaused) {
             this.itemActivated(BoxPointer.PopupAnimation.NONE);
             this.indicator.timer.resume();
             return;
         }
 
-        if (this._timerState !== Timer.State.POMODORO && Extension.extension && Extension.extension.dialog) {
+        if (this._timerState !== Timer.State.POMODORO && notificationManager) {
             this.itemActivated(BoxPointer.PopupAnimation.NONE);
-            Extension.extension.dialog.open(true);
-            Extension.extension.dialog.pushModal();
+            notificationManager.openDialog();
             return;
         }
     }
@@ -334,8 +335,10 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
 };
 
 
-var TextIndicator = class {
+var TextIndicator = class extends Signals.EventEmitter {
     constructor(timer) {
+        super();
+
         this._initialized     = false;
         this._state           = Timer.State.NULL;
         this._digitWidth      = 0;
@@ -446,7 +449,6 @@ var TextIndicator = class {
         this.actor.destroy();
     }
 };
-Signals.addSignalMethods(TextIndicator.prototype);
 
 
 var ShortTextIndicator = class extends TextIndicator {
@@ -479,8 +481,11 @@ var ShortTextIndicator = class extends TextIndicator {
     }
 };
 
-var IconIndicator = class {
+
+var IconIndicator = class extends Signals.EventEmitter {
     constructor(timer) {
+        super();
+
         this._state           = Timer.State.NULL;
         this._progress        = 0.0;
         this._primaryColor    = null;
@@ -619,7 +624,6 @@ var IconIndicator = class {
         this.actor.destroy();
     }
 };
-Signals.addSignalMethods(IconIndicator.prototype);
 
 
 var Indicator = GObject.registerClass(

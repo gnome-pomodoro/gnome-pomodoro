@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2021 gnome-pomodoro contributors
+ * Copyright (c) 2011-2023 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  *
  */
-
-const Signals = imports.signals;
 
 const { Atk, Clutter, GLib, GObject, Meta, Shell, St, Pango } = imports.gi;
 
@@ -693,7 +691,7 @@ var ModalDialog = GObject.registerClass({
         }
     }
 
-    async canOpenAsync() {
+    canOpen() {
         if (!this.timer.isBreak() ||
             this.timer.isPaused() ||
             this.timer.getRemaining() < OPEN_WHEN_IDLE_MIN_REMAINING_TIME)
@@ -722,9 +720,9 @@ var ModalDialog = GObject.registerClass({
 
         if (!this._openWhenIdleWatchId) {
             this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN,
-                async (monitor) => {
+                (monitor) => {
                     try {
-                        if (await this.canOpenAsync()) {
+                        if (this.canOpen()) {
                             this.open(true);
                         }
                     }

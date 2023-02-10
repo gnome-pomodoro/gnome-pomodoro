@@ -1,7 +1,7 @@
 /*
  * A simple pomodoro timer for GNOME Shell
  *
- * Copyright (c) 2011-2017 gnome-pomodoro contributors
+ * Copyright (c) 2011-2023 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
  */
 
 const Gettext = imports.gettext;
-const Signals = imports.signals;
 
 const { GLib, Gio, Meta, Shell } = imports.gi;
 
@@ -29,6 +28,7 @@ const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
 const ExtensionSystem = imports.ui.extensionSystem;
 const MessageTray = imports.ui.messageTray;
+const Signals = imports.misc.signals;
 const UnlockDialog = imports.ui.unlockDialog;
 
 const Extension = ExtensionUtils.getCurrentExtension();
@@ -36,7 +36,6 @@ const Config = Extension.imports.config;
 const DBus = Extension.imports.dbus;
 const Indicator = Extension.imports.indicator;
 const Notifications = Extension.imports.notifications;
-const Dialogs = Extension.imports.dialogs;
 const Presence = Extension.imports.presence;
 const Settings = Extension.imports.settings;
 const Timer = Extension.imports.timer;
@@ -49,24 +48,20 @@ var ExtensionMode = {
 };
 
 
-var PomodoroExtension = class {
+var PomodoroExtension = class extends Signals.EventEmitter {
     constructor(mode) {
+        super();
+
         this.settings            = null;
         this.pluginSettings      = null;
         this.timer               = null;
         this.indicator           = null;
-        this.notificationSource  = null;
-        this.notification        = null;
-        this.dialog              = null;
+        this._notificationManager = null;
         this.presence            = null;
         this.mode                = null;
         this.service             = null;
         this.keybinding          = false;
         this._pendingMode        = false;
-        this._isPaused           = false;
-        this._timerState         = Timer.State.NULL;
-        this._timerStateDuration = 0.0;
-        this._notificationsBoxPatch = null;
 
         try {
             this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
@@ -82,10 +77,7 @@ var PomodoroExtension = class {
             this.timer = new Timer.Timer();
             this.timer.connect('service-connected', this._onTimerServiceConnected.bind(this));
             this.timer.connect('service-disconnected', this._onTimerServiceDisconnected.bind(this));
-            this.timer.connect('update', this._onTimerUpdate.bind(this));
             this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
-            this.timer.connect('paused', this._onTimerPaused.bind(this));
-            this.timer.connect('resumed', this._onTimerResumed.bind(this));
 
             this.service = new DBus.PomodoroExtension();
             this.service.connect('name-acquired', this._onServiceNameAcquired.bind(this));
@@ -100,6 +92,10 @@ var PomodoroExtension = class {
 
     get application() {
         return Shell.AppSystem.get_default().lookup_app('org.gnome.Pomodoro.desktop');
+    }
+    
+    get notificationManager() {
+        return this._notificationManager;
     }
 
     setMode(mode) {
@@ -116,14 +112,13 @@ var PomodoroExtension = class {
 
             if (mode === ExtensionMode.RESTRICTED) {
                 this._disableIndicator();
-                this._disableScreenNotification();
+                this._disableNotificationManager();
+                this._enableScreenShieldWidget();
             }
             else {
                 this._enableIndicator();
-
-                if (this.settings.get_boolean('show-screen-notifications')) {
-                    this._enableScreenNotification();
-                }
+                this._enableNotificationManager();
+                this._disableScreenShieldWidget();
             }
 
             if (this.pluginSettings.get_boolean('hide-system-notifications')) {
@@ -134,31 +129,21 @@ var PomodoroExtension = class {
             }
 
             this._enableKeybinding();
-            this._enableNotificationManager();
-            this._enableScreenShieldWidget();
 
             this._updatePresence();
-            this._updateNotification();
         }
     }
 
-    ensureNotificationManager() {
-        this._enableNotificationManager();
-    }
-
     notifyIssue(message) {
-        let notification = new Notifications.IssueNotification(message);
+        const notification = new Notifications.IssueNotification(message);
         notification.show();
     }
 
     _onSettingsChanged(settings, key) {
         switch(key) {
             case 'show-screen-notifications':
-                if (settings.get_boolean(key) && this.mode != ExtensionMode.RESTRICTED) {
-                    this._enableScreenNotification();
-                }
-                else {
-                    this._disableScreenNotification();
+                if (this._notificationManager) {
+                    this._notificationManager.useDialog = settings.get_boolean(key);
                 }
 
                 break;
@@ -202,22 +187,8 @@ var PomodoroExtension = class {
         Utils.logWarning('Lost connection to "org.gnome.Pomodoro"');
     }
 
-    _onTimerUpdate() {
-        if (this.timer.getRemaining() <= Notifications.PRE_ANNOUCEMENT_TIME) {
-            this._updateNotification();
-        }
-    }
-
-    _onTimerPaused() {
-        this._update();
-    }
-
-    _onTimerResumed() {
-        this._update();
-    }
-
     _onTimerStateChanged() {
-        this._update();
+        this._updatePresence();
     }
 
     _onKeybindingPressed() {
@@ -226,172 +197,16 @@ var PomodoroExtension = class {
         }
     }
 
-    _onNotificationDestroy(notification) {
-        if (this.notification === notification) {
-            this.notification = null;
-        }
-    }
-
-    _notifyPomodoroStart() {
-        if (this.notification &&
-            this.notification instanceof Notifications.PomodoroStartNotification)
-        {
-            if (this.notification.resident || this.notification.acknowledged) {
-                this.notification.show();
-            }
-        }
-        else {
-            this.notification = new Notifications.PomodoroStartNotification(this.timer);
-            this.notification.connect('activated',
-                (notification) => {
-                    if (this.timer.isBreak()) {
-                        this.timer.skip();
-                    }
-                });
-            this.notification.connect('destroy', this._onNotificationDestroy.bind(this));
-            this.notification.show();
-
-            this._destroyPreviousNotifications();
-        }
-
-        Utils.wakeUpScreen();
-    }
-
-    async _notifyPomodoroEndAsync() {
-        let canOpenDialog;
-        try {
-            canOpenDialog = this.dialog && await this.dialog.canOpenAsync();
-        }
-        catch (error) {
-            canOpenDialog = false;
-        }
-
-        if (!this.notification ||
-            !(this.notification instanceof Notifications.PomodoroEndNotification))
-        {
-            this.notification = new Notifications.PomodoroEndNotification(this.timer);
-            this.notification.connect('activated',
-                (notification) => {
-                    if (this.timer.isBreak()) {
-                        if (this.dialog) {
-                            this.dialog.open(true);
-                            this.dialog.pushModal();
-                        }
-                    }
-                    else {
-                        this.timer.skip();
-                    }
-                });
-            this.notification.connect('destroy', this._onNotificationDestroy.bind(this));
-
-            this._destroyPreviousNotifications();
-        }
-
-        if (canOpenDialog) {
-            this.dialog.open(true);
-        }
-        else {
-            this.notification.show();
-        }
-
-        Utils.wakeUpScreen();
-    }
-
-    _notifyPomodoroEnd() {
-        this._notifyPomodoroEndAsync();
-    }
-
-    _updateNotification() {
-        const timerState = this.timer.getState();
-        const isPaused = this.timer.isPaused();
-        const currentNotification = Notifications.getCurrentNotification();
-
-        if (timerState !== Timer.State.NULL && (!isPaused || this.timer.getElapsed() === 0.0)) {
-            if (this.mode === ExtensionMode.RESTRICTED) {
-                this._destroyNotifications();
-            }
-            else if (currentNotification && currentNotification.urgency === MessageTray.Urgency.CRITICAL) {
-                // Don't dismiss notification after clicking "+1 minute".
-            }
-            else if (this.timer.getRemaining() > Notifications.PRE_ANNOUCEMENT_TIME) {
-                if (timerState === Timer.State.POMODORO) {
-                    this._notifyPomodoroStart();
-                }
-                else {
-                    this._notifyPomodoroEnd();
-                }
-            }
-            else {
-                if (timerState !== Timer.State.POMODORO) {
-                    this._notifyPomodoroStart();
-                }
-                else {
-                    this._notifyPomodoroEnd();
-                }
-            }
-        }
-        else {
-            this._destroyNotifications();
-        }
-    }
-
-    async _updateScreenNotificationAsync(animate) {
-        if (this.dialog) {
-            let canOpenDialog = true;
-
-            if (animate) {
-                try {
-                    canOpenDialog = await this.dialog.canOpenAsync();
-                }
-                catch (error) {
-                    canOpenDialog = false;
-                }
-            }
-
-            if (this.timer.isBreak() && !this.timer.isPaused() && canOpenDialog) {
-                this.dialog.open(animate);
-                this.dialog.pushModal();
-            }
-            else {
-                this.dialog.close(animate);
-            }
-        }
-    }
-
-    _updateScreenNotification(animate) {
-        this._updateScreenNotificationAsync(animate);
-    }
-
     _updatePresence() {
         if (this.presence) {
-            if (this._timerState === Timer.State.NULL) {
+            const timerState = this.timer.getState();
+
+            if (timerState === Timer.State.NULL) {
                 this.presence.setDefault();
             }
             else {
-                this.presence.setBusy(this._timerState === Timer.State.POMODORO);
+                this.presence.setBusy(timerState === Timer.State.POMODORO);
             }
-        }
-    }
-
-    _update() {
-        let timerState = this.timer.getState();
-        let timerStateDuration = this.timer.getStateDuration();
-        let isPaused = this.timer.isPaused();
-
-        if (this._isPaused !== isPaused || this._timerState !== timerState) {
-            this._isPaused = isPaused;
-            this._timerState = timerState;
-            this._timerStateDuration = timerStateDuration;
-
-            this._updatePresence();
-            this._updateNotification();
-            this._updateScreenNotification(true);
-        }
-        else if (this._timerStateDuration === timerStateDuration) {
-            this._updateScreenNotification(true);
-        }
-        else {
-            this._timerStateDuration = timerStateDuration;
         }
     }
 
@@ -455,76 +270,23 @@ var PomodoroExtension = class {
     _enableNotificationManager() {
         if (!this._notificationManager) {
             this._notificationManager = new Notifications.NotificationManager(this.timer);
+            this._notificationManager.useDialog = this.settings.get_boolean('show-screen-notifications');
         }
     }
 
-    _enableScreenNotification() {
-        let animate;
-
-        if (!this.dialog) {
-            this.dialog = new Dialogs.PomodoroEndDialog(this.timer);
-            this.dialog.connect('opening',
-                () => {
-                    try {
-                        if (Main.messageTray._notification) {
-                            Main.messageTray._hideNotification(true);
-                        }
-                    }
-                    catch (error) {
-                        Utils.logWarning(error.message);
-                    }
-                });
-            this.dialog.connect('closing',
-                () => {
-                    if (this.timer.isBreak() && !this.timer.isPaused()) {
-                        if (this.notification instanceof Notifications.PomodoroEndNotification) {
-                            this.notification.show();
-                        }
-
-                        if (this.dialog) {
-                            this.dialog.openWhenIdle();
-                        }
-                    }
-                });
-            this.dialog.connect('destroy',
-                () => {
-                    this.dialog = null;
-                });
-
-            animate = false;
+    _disableNotificationManager() {
+        if (this._notificationManager) {
+            this._notificationManager.destroy();
+            this._notificationManager = null;
         }
-        else {
-            animate = true;
-        }
-
-        this._updateScreenNotification(animate);
-    }
-
-    _disableScreenNotification() {
-        this._destroyScreenNotification();
     }
 
     _enableScreenShieldWidget() {
-        if (!this._notificationsBoxPatch) {
-            const extension = this;
-            const patch = new Utils.Patch(UnlockDialog.NotificationsBox.prototype, {
-                _wakeUpScreenForSource(source, notification) {
-                    if (source !== extension.notificationSource) {
-                        return patch.initial._wakeUpScreenForSource.bind(this)(source, notification);
-                    }
-                }
-            });
-
-            this._notificationsBoxPatch = patch;
-            this._notificationsBoxPatch.apply();
-        }
+        // TODO
     }
 
     _disableScreenShieldWidget() {
-        if (this._notificationsBoxPatch) {
-            this._notificationsBoxPatch.revert();
-            this._notificationsBoxPatch = null;
-        }
+        // TODO
     }
 
     _destroyPresence() {
@@ -541,33 +303,6 @@ var PomodoroExtension = class {
         }
     }
 
-    _destroyNotifications() {
-        if (this.notificationSource) {
-            this.notificationSource.destroyNotifications();
-        }
-    }
-
-    _destroyPreviousNotifications() {
-        if (this.notificationSource) {
-            let notifications = this.notificationSource.notifications.filter(
-                (notification) => {
-                    return notification !== this.notification;
-                });
-
-            notifications.forEach(
-                (notification) => {
-                    notification.destroy();
-                });
-        }
-    }
-
-    _destroyScreenNotification() {
-        if (this.dialog) {
-            this.dialog.destroy();
-            this.dialog = null;
-        }
-    }
-
     destroy() {
         if (this._destroying) {
             return;
@@ -576,17 +311,10 @@ var PomodoroExtension = class {
 
         this._disableKeybinding();
         this._disableScreenShieldWidget();
+        this._disableNotificationManager();
 
         this._destroyPresence();
         this._destroyIndicator();
-        this._destroyScreenNotification();
-        this._destroyNotifications();
-
-        if (this.notificationSource) {
-            this.notificationSource.destroy();
-        }
-
-        this._destroyNotificationManager();
 
         this.timer.destroy();
         this.service.destroy();
@@ -595,7 +323,6 @@ var PomodoroExtension = class {
         this.emit('destroy');
     }
 };
-Signals.addSignalMethods(PomodoroExtension.prototype);
 
 
 function init(metadata) {
@@ -659,3 +386,175 @@ function disable() {
         }
     }
 }
+
+
+
+
+//    _notifyPomodoroStart() {  // TODO: move to notification manager
+//        this._ensureNotification();
+//        this.notification.show();
+
+//        Utils.wakeUpScreen();
+//    }
+
+//    async _notifyPomodoroEndAsync() {  // TODO: move to notification manager
+//        let canOpenDialog;
+//        try {
+//            canOpenDialog = this.dialog && await this.dialog.canOpenAsync();
+//        }
+//        catch (error) {
+//            canOpenDialog = false;
+//        }
+
+//        this._ensureNotification();
+//        this._destroyPreviousNotifications();
+
+//        if (canOpenDialog) {
+//            this.dialog.open(true);
+//        }
+//        else {
+//            this.notification.show();
+//        }
+
+//        Utils.wakeUpScreen();
+//    }
+
+//    _notifyPomodoroEnd() {  // TODO: move to notification manager
+//        this._notifyPomodoroEndAsync();
+//    }
+
+//    _updateNotification() {  // TODO: move to notification manager
+//        const timerState = this.timer.getState();
+//        const currentNotification = Notifications.getCurrentNotification();
+
+//        if (timerState !== Timer.State.NULL && this.mode !== ExtensionMode.RESTRICTED) {
+////            else if (currentNotification && currentNotification.urgency === MessageTray.Urgency.CRITICAL) {
+////                // Don't dismiss notification after clicking "+1 minute".
+////            }
+//            if (timerState !== Timer.State.POMODORO) {
+//                this._notifyPomodoroStart();
+//            }
+//            else {
+//                this._notifyPomodoroEnd();
+//            }
+//        }
+//        else {
+//            this._destroyNotifications();
+//        }
+//    }
+
+//    async _updateScreenNotificationAsync(animate) {  // TODO: move to notification manager
+//        if (this.dialog) {
+//            let canOpenDialog = true;
+
+//            if (animate) {
+//                try {
+//                    canOpenDialog = await this.dialog.canOpenAsync();
+//                }
+//                catch (error) {
+//                    canOpenDialog = false;
+//                }
+//            }
+
+//            if (this.timer.isBreak() && !this.timer.isPaused() && canOpenDialog) {
+//                this.dialog.open(animate);
+//                this.dialog.pushModal();
+//            }
+//            else {
+//                this.dialog.close(animate);
+//            }
+//        }
+//    }
+
+//    _updateScreenNotification(animate) {  // TODO: move to notification manager
+//        this._updateScreenNotificationAsync(animate);
+//    }
+
+//    _update() {
+//        let timerState = this.timer.getState();
+//        let timerStateDuration = this.timer.getStateDuration();
+//        let isPaused = this.timer.isPaused();
+
+//        if (this._isPaused !== isPaused || this._timerState !== timerState) {
+//            this._isPaused = isPaused;
+//            this._timerState = timerState;
+//            this._timerStateDuration = timerStateDuration;
+
+//            this._updatePresence();
+////            this._updateNotification();
+////            this._updateScreenNotification(true);
+//        }
+//        else if (this._timerStateDuration === timerStateDuration) {
+//            this._updateScreenNotification(true);
+//        }
+//        else {
+//            this._timerStateDuration = timerStateDuration;
+//        }
+//    }
+
+//    _enableScreenNotification() {
+//        let animate;
+
+//        if (!this.dialog) {
+//            this.dialog = new Dialogs.PomodoroEndDialog(this.timer);
+//            this.dialog.connect('opening',
+//                () => {
+//                    try {
+//                        if (Main.messageTray._notification) {
+//                            Main.messageTray._hideNotification(true);
+//                        }
+//                    }
+//                    catch (error) {
+//                        Utils.logWarning(error.message);
+//                    }
+//                });
+//            this.dialog.connect('closing',
+//                () => {
+//                    if (this.timer.isBreak() && !this.timer.isPaused()) {
+//                        if (this.notification) {
+//                            this.notification.show();
+//                        }
+
+//                        if (this.dialog) {
+//                            this.dialog.openWhenIdle();
+//                        }
+//                    }
+//                });
+//            this.dialog.connect('destroy',
+//                () => {
+//                    this.dialog = null;
+//                });
+
+//            animate = false;
+//        }
+//        else {
+//            animate = true;
+//        }
+
+//        this._updateScreenNotification(animate);
+//    }
+
+//    _disableScreenNotification() {
+//        this._destroyScreenNotification();
+//    }
+
+//    _destroyNotifications() {
+//        if (this.notificationSource) {
+//            this.notificationSource.destroyNotifications();
+//        }
+//    }
+
+//    _destroyPreviousNotifications() {
+//        if (this.notificationSource) {
+//            let notifications = this.notificationSource.notifications.filter(
+//                (notification) => {
+//                    return notification !== this.notification;
+//                });
+//
+//            notifications.forEach(
+//                (notification) => {
+//                    notification.destroy();
+//                });
+//        }
+//    }
+

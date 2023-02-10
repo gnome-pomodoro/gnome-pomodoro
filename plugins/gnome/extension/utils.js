@@ -18,11 +18,10 @@
  *
  */
 
-const Signals = imports.signals;
-
 const { Gio, Meta, Shell } = imports.gi;
 
 const Main = imports.ui.main;
+const Signals = imports.misc.signals;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 
@@ -37,8 +36,10 @@ const VIDEO_PLAYER_CATEGORIES = [
 ];
 
 
-var Patch = class {
+var Patch = class extends Signals.EventEmitter {
     constructor(object, overrides) {
+        super();
+
         this.object = object;
         this.overrides = overrides;
         this.initial = {};
@@ -82,7 +83,6 @@ var Patch = class {
         this.disconnectAll();
     }
 };
-Signals.addSignalMethods(Patch.prototype);
 
 
 var TransitionGroup = class {

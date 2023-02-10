@@ -17,10 +17,9 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-const Signals = imports.signals;
-
 const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
+const Signals = imports.misc.signals;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
@@ -52,8 +51,10 @@ var State = {
 };
 
 
-var Timer = class {
+var Timer = class extends Signals.EventEmitter {
     constructor() {
+        super();
+
         this._connected = false;
         this._state = null;
         this._isPaused = null;
@@ -89,12 +90,12 @@ var Timer = class {
     }
 
     _onPropertiesChanged(proxy, properties) {
-        let state = proxy.State;
-        let stateDuration = proxy.StateDuration;
-        let elapsed = proxy.Elapsed;
-        let isPaused = proxy.IsPaused;
+        const state = proxy.State;
+        const stateDuration = proxy.StateDuration;
+        const elapsed = proxy.Elapsed;
+        const isPaused = proxy.IsPaused;
 
-        if (this._state != state || this._stateDuration != stateDuration || this._elapsed > elapsed) {
+        if (this._state !== state || this._stateDuration !== stateDuration || this._elapsed > elapsed) {
             this._state = state;
             this._stateDuration = stateDuration;
             this._elapsed = elapsed
@@ -257,4 +258,3 @@ var Timer = class {
         }
     }
 };
-Signals.addSignalMethods(Timer.prototype);
