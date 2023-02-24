@@ -402,33 +402,34 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
     }
 
     _updateActions() {
-        if (this._skipBreakButton) {
-            this._skipBreakButton.destroy();
-            this._skipBreakButton = null;
-        }
+        // Currently we display only one variant of buttons across all notification views.
 
-        if (this._extendButton) {
-            this._extendButton.destroy();
-            this._extendButton = null;
-        }
-
-        if (this._view === NotificationView.POMODORO_ABOUT_TO_END ||
+        const hasButtons = this._skipBreakButton !== null && this._extendButton !== null;
+        const showButtons = (
+            this._view === NotificationView.POMODORO_ABOUT_TO_END ||
             this._view === NotificationView.BREAK ||
-            this._view === NotificationView.BREAK_ABOUT_TO_END)
-        {
+            this._view === NotificationView.BREAK_ABOUT_TO_END
+        );
+
+        if (hasButtons === showButtons) {
+            return;
+        }
+
+        if (showButtons) {
             this._skipBreakButton = this.addAction(_("Skip Break"), () => {
                 this._timer.setState(Timer.State.POMODORO);
             });
-        }
-
-        if (this._view === NotificationView.POMODORO_ABOUT_TO_END ||
-            this._view === NotificationView.BREAK ||
-            this._view === NotificationView.BREAK_ABOUT_TO_END)
-        {
             this._extendButton = this.addAction(_("+1 Minute"), () => {
                 this._blockUpdateActions();
                 this._timer.stateDuration += 60.0;
             });
+        }
+        else {
+            this._skipBreakButton.destroy();
+            this._extendButton.destroy();
+
+            this._skipBreakButton = null;
+            this._extendButton = null;
         }
     }
 
@@ -436,6 +437,7 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
         const timerState = this._timer.getState();
         const view = this.notification.view;
 
+        // Don't update actions when "+1 Minute" was clicked
         let updateActions = !this._updateActionsBlocked;
 
         if (timerState === Timer.State.NULL || !view) {
@@ -455,7 +457,10 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
         this._updateBody();
 
         if (updateActions) {
-            this.unexpand();
+            if (this.expanded && !this.hover) {
+                this.unexpand();
+            }
+
             this._updateActions();
         }
 
