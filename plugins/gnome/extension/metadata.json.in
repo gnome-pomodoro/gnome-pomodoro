@@ -2,7 +2,7 @@
   "uuid": "@EXTENSION_UUID@",
   "name": "Pomodoro",
   "description": "Desktop integration for Pomodoro application.",
-  "shell-version": ["3.38", "40", "41", "42", "43"],
+  "shell-version": ["3.38", "40", "41", "42", "43", "44"],
   "url": "@PACKAGE_URL@",
   "version": "@PACKAGE_VERSION@"
 }
