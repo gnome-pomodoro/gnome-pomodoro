@@ -16,8 +16,8 @@
  */
 
 .extension-pomodoro-indicator .system-status-icon {
-    padding: 0;
-    margin: 0;
+    padding: 0;  /* default theme enlarges allocation by padding, which doesn't play nice with the DrawingArea */
+    margin: 0 5px;
 }
 
 .extension-pomodoro-indicator-menu {
