@@ -228,12 +228,12 @@ class PomodoroNotification extends MessageTray.Notification {
 
             if (!banner.mapped) {
                 idleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                    idleId = 0;
+
                     // TODO: this should be handled by NotificationManager
                     if (this.resident && Extension.extension.notificationManager) {
                         Extension.extension.notificationManager._updateNotification();
                     }
-
-                    idleId = 0;
 
                     return GLib.SOURCE_REMOVE;
                 });
@@ -756,6 +756,8 @@ var NotificationManager = class extends Signals.EventEmitter {
     }
 
     _createDialog() {
+        let idleId = 0;
+
         const dialog = new Dialogs.PomodoroEndDialog(this._timer);
         dialog.connect('opening',
             () => {
@@ -1096,6 +1098,16 @@ var NotificationManager = class extends Signals.EventEmitter {
         }
         else {
             this._revertPatches();
+
+            if (this._notification) {
+                this._notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
+                this._notification = null;
+            }
+
+            if (this._dialog) {
+                this._dialog.destroy();
+                this._dialog = null;
+            }
         }
     }
 
