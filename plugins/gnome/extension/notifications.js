@@ -213,15 +213,31 @@ class PomodoroNotification extends MessageTray.Notification {
     // `createBanner()` is used only to display a notification popup.
     // Banners in calendar menu or the lock screen are made by GNOME Shell.
     createBanner() {
+        let idleId = 0
+
         const banner = new NotificationBanner(this);
 
-        // We keep notification as resident to keep banner visible.
-        // TODO: this should be monitored by NotificationManager
+        // We keep notification as resident to keep banner visible. Once we want to hide the banner
+        // we need to update the notification.
+        // Note that `notify::mapped` will be triggered when we're moving MessageTray above the dialog.
         banner.connect('notify::mapped', () => {
+            if (idleId) {
+                GLib.source_remove(idleId);
+                idleId = 0;
+            }
+
             if (!banner.mapped) {
-                if (this.resident && Extension.extension.notificationManager) {
-                    Extension.extension.notificationManager._updateNotification();
-                }
+                idleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                    // TODO: this should be handled by NotificationManager
+                    if (this.resident && Extension.extension.notificationManager) {
+                        Extension.extension.notificationManager._updateNotification();
+                    }
+
+                    idleId = 0;
+
+                    return GLib.SOURCE_REMOVE;
+                });
+                GLib.Source.set_name_by_id(idleId, '[gnome-shell] banner._onNotifyMapped()');
             }
         });
 
@@ -244,6 +260,22 @@ class PomodoroNotification extends MessageTray.Notification {
         }
         else {
             Utils.logWarning('Called Notification.show() after destroy()');
+        }
+    }
+
+    hide() {
+        this.acknowledged = true;
+
+        if (this.urgency === MessageTray.Urgency.CRITICAL) {
+            this.setUrgency(MessageTray.Urgency.HIGH);
+        }
+
+        if (Main.messageTray._notification === this && (
+            Main.messageTray._notificationState === MessageTray.State.SHOWN ||
+            Main.messageTray._notificationState === MessageTray.State.SHOWING))
+        {
+            Main.messageTray._updateNotificationTimeout(0);
+            Main.messageTray._updateState();
         }
     }
 });
@@ -720,11 +752,8 @@ var NotificationManager = class extends Signals.EventEmitter {
         dialog.connect('opening',
             () => {
                 try {
-                    if (Main.messageTray._notification instanceof Notification &&
-                        Main.messageTray._notificationState === MessageTray.State.SHOWN ||
-                        Main.messageTray._notificationState === MessageTray.State.SHOWING)
-                    {
-                        Main.messageTray._hideNotification(true);
+                    if (this._notification) {
+                        this._notification.hide();
                     }
                 }
                 catch (error) {
@@ -756,6 +785,8 @@ var NotificationManager = class extends Signals.EventEmitter {
         if (!this._notification) {
             this._notification = this._createNotification();
         }
+
+        this._updateNotification();
     }
 
     _ensureDialog() {
@@ -927,9 +958,6 @@ var NotificationManager = class extends Signals.EventEmitter {
     _doNotify() {
         const animate = true;  // TODO: coming from lock-screen, we don't want animation
 
-        this._ensureNotification();
-        this._updateNotification();
-
         if (this._useDialog) {
             this._ensureDialog();  // TODO: can be done afer `.canOpen()`
         }
@@ -938,6 +966,8 @@ var NotificationManager = class extends Signals.EventEmitter {
             this._dialog.open(animate);
         }
         else {
+            this._ensureNotification();
+
             if (this._dialog) {
                 this._dialog.close(true);
             }
