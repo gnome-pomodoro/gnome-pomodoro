@@ -297,7 +297,7 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
         this._notificationUpdatedId = this.notification.connect('updated', this._onNotificationUpdated.bind(this));
 
         this.notification.connectObject(
-            'destroy', () => {
+            'destroy', (reason) => {
                 if (this._notificationUpdatedId) {
                     notification.disconnect(this._notificationUpdatedId);
                     this._notificationUpdatedId = 0;
@@ -437,7 +437,7 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
         const timerState = this._timer.getState();
         const view = this.notification.view;
 
-        // Don't update actions when "+1 Minute" was clicked
+        // Don't update actions when "+1 Minute" was clicked.
         let updateActions = !this._updateActionsBlocked;
 
         if (timerState === Timer.State.NULL || !view) {
@@ -971,6 +971,19 @@ var NotificationManager = class extends Signals.EventEmitter {
     }
 
     _doNotify() {
+        // We want extra notification banner animation between states. Easiest way to force it is destroying
+        // existing notification.
+        const recreate = (
+            this._previousView === NotificationView.BREAK_ENDED && this._view === NotificationView.POMODORO ||
+            this._previousState === Timer.State.POMODORO && this._state === Timer.State.SHORT_BREAK ||
+            this._previousState === Timer.State.POMODORO && this._state === Timer.State.LONG_BREAK
+        );
+
+        if (this._notification && recreate) {
+            this._notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
+            this._notification = null;
+        }
+
         if (this._useDialog) {
             this._ensureDialog();  // TODO: can be done afer `.canOpen()`
         }
@@ -983,12 +996,11 @@ var NotificationManager = class extends Signals.EventEmitter {
             }
         }
         else {
-            this._ensureNotification();
-
             if (this._dialog) {
                 this._dialog.close(true);
             }
 
+            this._ensureNotification();
             this._notification.show();
         }
     }
