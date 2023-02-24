@@ -623,18 +623,24 @@ class PomodoroIssueNotification extends MessageTray.Notification {
 
 
 var NotificationManager = class extends Signals.EventEmitter {
-    constructor(timer) {
+    constructor(timer, params) {
+        params = Params.parse(params, {
+            useDialog: true,
+            animate: true,
+        });
+
         super();
 
         this._timer = timer;
         this._timerState = Timer.State.NULL;
         this._notification = null;
         this._dialog = null;
-        this._useDialog = true;
+        this._useDialog = params.useDialog;
         this._view = NotificationView.NULL;
         this._previousView = NotificationView.NULL;
         this._previousTimerState = Timer.State.NULL;
         this._patches = this._createPatches();
+        this._animate = params.animate;
         this._destroying = false;
 
         this._annoucementTimeoutId = 0;
@@ -643,6 +649,8 @@ var NotificationManager = class extends Signals.EventEmitter {
         this._timerResumedId = this._timer.connect('resumed', this._onTimerResumed.bind(this));
 
         this._onTimerStateChanged();
+
+        this._animate = true;
     }
 
     get timer() {
@@ -956,14 +964,16 @@ var NotificationManager = class extends Signals.EventEmitter {
     }
 
     _doNotify() {
-        const animate = true;  // TODO: coming from lock-screen, we don't want animation
-
         if (this._useDialog) {
             this._ensureDialog();  // TODO: can be done afer `.canOpen()`
         }
 
         if (this._useDialog && this._view === NotificationView.BREAK && this._dialog.canOpen()) {
-            this._dialog.open(animate);
+            this._dialog.open(this._animate);
+
+            if (!this._animate) {
+                this._dialog.pushModal();
+            }
         }
         else {
             this._ensureNotification();

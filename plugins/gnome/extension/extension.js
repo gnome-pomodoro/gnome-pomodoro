@@ -99,6 +99,8 @@ var PomodoroExtension = class extends Signals.EventEmitter {
     }
 
     setMode(mode) {
+        const previousMode = this.mode;
+
         if (!this.service.initialized) {
             this.mode = mode;
             this._isModePending = true;  // TODO: make setMode async instead of using _isModePending
@@ -117,7 +119,7 @@ var PomodoroExtension = class extends Signals.EventEmitter {
             }
             else {
                 this._enableIndicator();
-                this._enableNotificationManager();
+                this._enableNotificationManager(previousMode !== ExtensionMode.RESTRICTED);
                 this._disableScreenShieldWidget();
             }
 
@@ -267,10 +269,13 @@ var PomodoroExtension = class extends Signals.EventEmitter {
         this._destroyPresence();
     }
 
-    _enableNotificationManager() {
+    _enableNotificationManager(animate) {
         if (!this._notificationManager) {
-            this._notificationManager = new Notifications.NotificationManager(this.timer);
-            this._notificationManager.useDialog = this.settings.get_boolean('show-screen-notifications');
+            const params = {
+                useDialog: this.settings.get_boolean('show-screen-notifications'),
+                animate: animate,
+            };
+            this._notificationManager = new Notifications.NotificationManager(this.timer, params);
         }
     }
 
