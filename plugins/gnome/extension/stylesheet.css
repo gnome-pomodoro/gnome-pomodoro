@@ -28,62 +28,57 @@
     font-weight: bold;
 }
 
-.extension-pomodoro-indicator-menu-toggle,
-.extension-pomodoro-indicator-menu-timer {
+.extension-pomodoro-indicator-menu .button:insensitive {
+    background-color: transparent;
+}
+
+.extension-pomodoro-indicator-menu .icon-button {
+    padding: 0;
+    width: 36px;
+    height: 36px;
+}
+
+.extension-pomodoro-toggle-menu-item {
     color: inherit;
+    margin-top: 5px;
+    margin-bottom: 5px;
     padding-top: 0;
     padding-bottom: 0;
 }
 
-.extension-pomodoro-indicator-menu-timer {
+.extension-pomodoro-toggle-menu-item .icon-button {
+    margin-left: 5px;
+}
+
+.extension-pomodoro-timer-menu-item {
+    color: inherit;
     margin-top: 5px;
     margin-bottom: 2px;
+    padding: 0;
+    padding-right: 5px;
     spacing: 0;
 }
 
-.extension-pomodoro-indicator-menu-timer > StBoxLayout {
+.extension-pomodoro-timer-menu-item .extension-pomodoro-timer-button {
+    color: inherit !important;
+    padding: 0 5px;
+    border-radius: 15px;
+}
+
+.extension-pomodoro-timer-menu-item .extension-pomodoro-timer-label {
+    font-size: 1.6em;
+    font-weight: 500;
+    margin-left: 5px;
+}
+
+.extension-pomodoro-timer-menu-item .extension-pomodoro-timer-buttons-box {
     margin-left: 10px;
     spacing: 4px;
 }
 
-.extension-pomodoro-indicator-menu-toggle .extension-pomodoro-indicator-menu-action {
-    margin-left: 5px;
-}
-
-.extension-pomodoro-indicator-menu-timer-label {
-    color: inherit;
-    font-size: 1.6em;
-    font-weight: 500;
-    text-align: left;
-    margin-left: 5px;
-}
-
-.extension-pomodoro-indicator-menu-timer-label-button {
-    padding: 0;
+.extension-pomodoro-timer-label {
     margin: 0;
-    border: 0;
-    background: none;
-}
-
-.extension-pomodoro-indicator-menu-action {
-    border-radius: 18px;
-    background-color: transparent;
-}
-.extension-pomodoro-indicator-menu-action,
-.extension-pomodoro-indicator-menu-action:hover,
-.extension-pomodoro-indicator-menu-action:focus,
-.extension-pomodoro-indicator-menu-action:active {
-    padding: 10px;
-    border: 0px;
-}
-
-.extension-pomodoro-indicator-menu-action:hover,
-.extension-pomodoro-indicator-menu-action:focus {
-    background-color: #4e4e4e;
-}
-
-.extension-pomodoro-indicator-menu-action:active {
-    background-color: #1e1e1e;
+    padding: 0;
 }
 
 .message .extension-pomodoro-message-action {

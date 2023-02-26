@@ -58,136 +58,21 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     constructor(indicator) {
         super(indicator, St.Align.START, St.Side.TOP);
 
+        this._indicator = indicator;
+        this._timer = indicator.timer;
         this._isPaused = null;
         this._timerState = null;
-        this._timerUpdateId = 0;
+        this._timerStateChangedId = 0;
+        this._timerPausedId = 0;
+        this._timerResumedId = 0;
         this._icons = {};
 
         this.actor.add_style_class_name('extension-pomodoro-indicator-menu');
 
-        this._actorMappedId = this.actor.connect('notify::mapped', this._onActorMapped.bind(this));
+        this._actorMappedId = this.actor.connect('notify::mapped', this._onNotifyMapped.bind(this));
 
-        this.indicator = indicator;
-
-        this._populate();
-    }
-
-    _loadIcon(iconName) {
-        let icon = this._icons[iconName];
-
-        if (!icon) {
-            let iconFile = Gio.File.new_for_uri('%s/icons/hicolor/scalable/actions/%s.svg'.format(Extension.dir.get_uri(), iconName));
-            icon = new Gio.FileIcon({ file: iconFile });
-
-            this._icons[iconName] = icon;
-        }
-
-        return icon;
-    }
-
-    _createActionButton(iconName, accessibleName) {
-        let button = new St.Button({ reactive: true,
-                                     can_focus: true,
-                                     track_hover: true,
-                                     accessible_name: accessibleName,
-                                     style_class: 'extension-pomodoro-indicator-menu-action' });
-        button.child = new St.Icon({ gicon: this._loadIcon(iconName), style_class: 'popup-menu-icon' });
-
-        return button;
-    }
-
-    _onTimerClicked() {
-        const notificationManager = Extension.extension.notificationManager;
-
-        if (this._isPaused) {
-            this.itemActivated(BoxPointer.PopupAnimation.NONE);
-            this.indicator.timer.resume();
-            return;
-        }
-
-        if (this._timerState !== Timer.State.POMODORO && notificationManager) {
-            this.itemActivated(BoxPointer.PopupAnimation.NONE);
-            notificationManager.openDialog();
-            return;
-        }
-    }
-
-    _onStartClicked() {
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
-        this.indicator.timer.start();
-    }
-
-    _onStopClicked() {
-        let id = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-            this.indicator.timer.stop();
-            return GLib.SOURCE_REMOVE;
-        });
-        GLib.Source.set_name_by_id(id, '[gnome-pomodoro] this.indicator.timer.stop()');
-
-        // Closing menu leads to GrabHelper complaing about accessing deallocated St.Button,
-        // while doing savedFocus.grab_key_focus().
-        // As a walkaround we call timer.stop() with delay. Seems that these calls interfere
-        // with each other.
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
-    }
-
-    _onPauseClicked() {
-        if (!this.indicator.timer.isPaused ()) {
-            this.indicator.timer.pause();
-        }
-        else {
-            this.itemActivated(BoxPointer.PopupAnimation.NONE);
-            this.indicator.timer.resume();
-        }
-    }
-
-    _populate() {
-        let toggleItem = new PopupMenu.PopupMenuItem(_("Pomodoro Timer"),
-                                           { style_class: 'extension-pomodoro-indicator-menu-toggle',
-                                             reactive: false,
-                                             can_focus: false });
-        toggleItem.label.y_align = Clutter.ActorAlign.CENTER;
-        this.addMenuItem(toggleItem);
-
-        let startAction = this._createActionButton('gnome-pomodoro-start-symbolic', _("Start Timer"));
-        startAction.connect('clicked', this._onStartClicked.bind(this));
-        toggleItem.add_child(startAction);
-
-        let timerItem = new PopupMenu.PopupMenuItem("",
-                                           { style_class: 'extension-pomodoro-indicator-menu-timer',
-                                             reactive: false,
-                                             can_focus: false });
-        timerItem.label.visible = false;
-        this.addMenuItem(timerItem);
-
-        let timerLabel = new St.Label({ style_class: 'extension-pomodoro-indicator-menu-timer-label',
-                                        y_align: Clutter.ActorAlign.CENTER });
-        let timerLabelButton = new St.Button({ reactive: false,
-                                               can_focus: false,
-                                               track_hover: false,
-                                               style_class: 'extension-pomodoro-indicator-menu-timer-label-button' });
-        timerLabelButton.child = timerLabel;
-        timerLabelButton.connect('clicked', this._onTimerClicked.bind(this));
-        timerItem.add_child(timerLabelButton);
-
-        let hbox = new St.BoxLayout({ x_align: Clutter.ActorAlign.END,
-                                      x_expand: true });
-        timerItem.add_child(hbox);
-
-        let pauseAction = this._createActionButton('gnome-pomodoro-pause-symbolic', _("Pause Timer"));
-        pauseAction.connect('clicked', this._onPauseClicked.bind(this));
-        hbox.add_actor(pauseAction);
-
-        let stopAction = this._createActionButton('gnome-pomodoro-stop-symbolic', _("Stop Timer"));
-        stopAction.connect('clicked', this._onStopClicked.bind(this));
-        hbox.add_actor(stopAction);
-
-        this._toggleMenuItem = toggleItem;
-        this._timerMenuItem = timerItem;
-        this._timerLabelButton = timerLabelButton;
-
-        this.timerLabel = timerLabel;
-        this.pauseAction = pauseAction;
+        this.addMenuItem(this._createToggleMenuItem());
+        this.addMenuItem(this._createTimerMenuItem());
 
         this.addStateMenuItem('pomodoro', _("Pomodoro"));
         this.addStateMenuItem('short-break', _("Short Break"));
@@ -198,6 +83,253 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         this.addAction(_("Preferences"), this._activatePreferences.bind(this));
         this.addAction(_("Stats"), this._activateStats.bind(this));
         this.addAction(_("Quit"), this._activateQuit.bind(this));
+    }
+
+    get indicator() {
+        return this._indicator;
+    }
+
+    _loadIcon(iconName) {
+        let icon = this._icons[iconName];
+
+        if (!icon) {
+            const iconUri = '%s/icons/hicolor/scalable/actions/%s.svg'.format(Extension.dir.get_uri(), iconName);
+            icon = new Gio.FileIcon({
+                file: Gio.File.new_for_uri(iconUri)
+            });
+
+            this._icons[iconName] = icon;
+        }
+
+        return icon;
+    }
+
+    _createIconButton(iconName, accessibleName) {
+        const icon = new St.Icon({ gicon: this._loadIcon(iconName),
+                                   style_class: 'popup-menu-icon' });
+        const iconButton = new St.Button({ reactive: true,
+                                           can_focus: true,
+                                           track_hover: true,
+                                           accessible_name: accessibleName,
+                                           style_class: 'icon-button' });
+        iconButton.add_style_class_name('flat');
+        iconButton.set_child(icon);
+
+        return iconButton;
+    }
+
+    _createToggleMenuItem() {
+        const menuItem = new PopupMenu.PopupMenuItem(_("Pomodoro Timer"),
+                                           { style_class: 'extension-pomodoro-toggle-menu-item',
+                                             reactive: false,
+                                             can_focus: false });
+        menuItem.label.y_align = Clutter.ActorAlign.CENTER;
+
+        const startButton = this._createIconButton('gnome-pomodoro-start-symbolic', _("Start Timer"));
+        startButton.connect('clicked', this._onStartClicked.bind(this));
+        menuItem.add_child(startButton);
+
+        this._toggleMenuItem = menuItem;
+
+        return menuItem;
+    }
+
+    _createTimerMenuItem() {
+        const menuItem = new PopupMenu.PopupMenuItem("",
+                                           { style_class: 'extension-pomodoro-timer-menu-item',
+                                             reactive: false,
+                                             can_focus: false });
+        menuItem.label.visible = false;
+
+        const timerButton = new St.Button({ style_class: 'extension-pomodoro-timer-button',
+                                            reactive: true,
+                                            can_focus: true,
+                                            track_hover: true });
+        timerButton.add_style_class_name('button');
+        timerButton.add_style_class_name('flat');
+        timerButton.connect('clicked', this._onTimerButtonClicked.bind(this));
+        menuItem.add_child(timerButton);
+
+        const timerLabel = new Timer.TimerLabel(this._timer, { x_align: Clutter.ActorAlign.START });
+        timerButton.set_child(timerLabel);
+
+        const buttonsBox = new St.BoxLayout({ style_class: 'extension-pomodoro-timer-buttons-box',
+                                              x_align: Clutter.ActorAlign.END,
+                                              x_expand: true });
+        menuItem.add_child(buttonsBox);
+
+        const pauseResumeButton = this._createIconButton('gnome-pomodoro-pause-symbolic', _("Pause Timer"));
+        pauseResumeButton.connect('clicked',
+            () => {
+                if (!this._isPaused) {
+                    this._onPauseClicked();
+                }
+                else {
+                    this._onResumeClicked();
+                }
+            });
+        buttonsBox.add_actor(pauseResumeButton);
+
+        const skipStopButton = this._createIconButton('gnome-pomodoro-stop-symbolic', _("Stop Timer"));
+        skipStopButton.connect('clicked',
+            () => {
+                if (!this._isPaused) {
+                    this._onSkipClicked();
+                }
+                else {
+                    this._onStopClicked();
+                }
+            });
+        buttonsBox.add_actor(skipStopButton);
+
+        const blinkingGroup = this._indicator.blinkingGroup;
+        blinkingGroup.addActor(timerLabel);
+        blinkingGroup.addActor(pauseResumeButton);
+
+        this._timerMenuItem = menuItem;
+        this._timerButton = timerButton;
+        this._pauseResumeButton = pauseResumeButton;
+        this._skipStopButton = skipStopButton;
+
+        return menuItem;
+    }
+
+    _updateTimerButtons() {
+        const visible = this._timerState !== Timer.State.NULL;
+        const isBreak = this._timerState === Timer.State.SHORT_BREAK ||
+                        this._timerState === Timer.State.LONG_BREAK;
+
+        this._toggleMenuItem.visible = !visible;
+        this._timerMenuItem.visible = visible;
+
+        this._timerButton.reactive = isBreak && !this._isPaused;
+        this._timerButton.can_focus = this._timerButton.reactive;
+
+        if (!this._isPaused) {
+            this._pauseResumeButton.child.gicon = this._loadIcon('gnome-pomodoro-pause-symbolic');
+            this._pauseResumeButton.accessible_name = isBreak ? _("Pause break") : _("Pause Pomodoro");
+
+            this._skipStopButton.child.gicon = this._loadIcon('gnome-pomodoro-skip-symbolic');
+            this._skipStopButton.accessible_name = isBreak ? _("Start Pomodoro") : _("Take a break");
+        }
+        else {
+            this._pauseResumeButton.child.gicon = this._loadIcon('gnome-pomodoro-start-symbolic');
+            this._pauseResumeButton.accessible_name = isBreak ? _("Resume break") : _("Resume Pomodoro");
+
+            this._skipStopButton.child.gicon = this._loadIcon('gnome-pomodoro-stop-symbolic');
+            this._skipStopButton.accessible_name = _("Stop");
+        }
+    }
+
+    _updateStateItems() {
+        const visible = this._timerState !== Timer.State.NULL;
+
+        for (const [stateName, menuItem] of Object.entries(this._stateItems))
+        {
+            menuItem.visible = visible;
+
+            if (stateName === this._timerState) {
+                menuItem.setOrnament(PopupMenu.Ornament.DOT);
+                menuItem.add_style_class_name('active');
+            }
+            else {
+                menuItem.setOrnament(PopupMenu.Ornament.NONE);
+                menuItem.remove_style_class_name('active');
+            }
+        }
+    }
+
+    _onNotifyMapped(actor) {
+        if (actor.mapped) {
+            this._connectTimerSignals();
+
+            this._onTimerStateChanged();
+        }
+        else {
+            this._disconnectTimerSignals();
+        }
+    }
+
+    _onTimerStateChanged() {
+        const timerState = this._timer.getState();
+        const isPaused = this._timer.isPaused();
+
+        if (this._isPaused !== isPaused ||
+            this._timerState !== timerState)
+        {
+            this._isPaused = isPaused;
+            this._timerState = timerState;
+
+            this._updateTimerButtons();
+            this._updateStateItems();
+        }
+    }
+
+    _onTimerPaused() {
+        this._onTimerStateChanged();
+    }
+
+    _onTimerResumed() {
+        this._onTimerStateChanged();
+    }
+
+    _onTimerButtonClicked() {
+        const notificationManager = Extension.extension.notificationManager;
+
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+
+        if (notificationManager) {
+            notificationManager.openDialog();
+        }
+    }
+
+    _onStartClicked() {
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+
+        this._timer.start();
+    }
+
+    _onSkipClicked() {
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+
+        this._timer.skip();
+    }
+
+    _onStopClicked() {
+        const idleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+            this._timer.stop();
+
+            return GLib.SOURCE_REMOVE;
+        });
+        GLib.Source.set_name_by_id(idleId, '[gnome-pomodoro] this._timer.stop()');
+
+        // Closing menu leads to GrabHelper complaing about accessing deallocated St.Button,
+        // while doing savedFocus.grab_key_focus().
+        // As a walkaround we call timer.stop() with delay. Seems that these calls interfere
+        // with each other.
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+    }
+
+    _onPauseClicked() {
+        this._timer.pause();
+    }
+
+    _onResumeClicked() {
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+
+        this._timer.resume();
+    }
+
+    addAction(label, callback, icon) {
+        const menuItem = super.addAction(label, callback, icon);
+
+        menuItem.connect('leave-event', (actor) => {
+            if (actor.has_key_focus()) {
+                global.stage.set_key_focus(actor.get_parent());
+            }
+        });
+
+        return menuItem;
     }
 
     addStateMenuItem(name, label) {
@@ -216,118 +348,82 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         return menuItem;
     }
 
-    _onActorMapped(actor) {
-        if (actor.mapped && this._timerUpdateId == 0) {
-            this._timerUpdateId = this.indicator.timer.connect('update', this._onTimerUpdate.bind(this));
-            this._onTimerUpdate();
-        }
+    _activateState(stateName) {
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
 
-        if (!actor.mapped && this._timerUpdateId != 0) {
-            this.indicator.timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
-        }
-    }
-
-    _onTimerUpdate() {
-        let timer = this.indicator.timer;
-        let timerState = timer.getState();
-        let remaining = timer.getRemaining();
-        let isPaused = timer.isPaused();
-        let isRunning = timerState != Timer.State.NULL;
-
-        if (this._isPaused != isPaused ||
-            this._timerState != timerState)
-        {
-            this._isPaused = isPaused;
-            this._timerState = timerState;
-
-            this._toggleMenuItem.visible = !isRunning;
-            this._timerMenuItem.visible = isRunning;
-
-            this._timerLabelButton.reactive = isPaused || isRunning && timerState != Timer.State.POMODORO;
-            this.pauseAction.child.gicon = isPaused
-                                               ? this._loadIcon('gnome-pomodoro-start-symbolic')
-                                               : this._loadIcon('gnome-pomodoro-pause-symbolic');
-            this.pauseAction.accessible_name = isPaused
-                                               ? _("Resume Timer")
-                                               : _("Pause Timer");
-
-            for (let key in this._stateItems) {
-                let stateItem = this._stateItems[key];
-
-                stateItem.visible = isRunning;
-
-                if (key == timerState) {
-                    stateItem.setOrnament(PopupMenu.Ornament.DOT);
-                    stateItem.add_style_class_name('active');
-                }
-                else {
-                    stateItem.setOrnament(PopupMenu.Ornament.NONE);
-                    stateItem.remove_style_class_name('active');
-                }
-            }
-        }
-
-        this.timerLabel.set_text(this._formatTime(remaining));
-    }
-
-    _formatTime(remaining) {
-        if (remaining < 0.0) {
-            remaining = 0.0;
-        }
-
-        let minutes = Math.floor(remaining / 60);
-        let seconds = Math.floor(remaining % 60);
-
-        return '%02d:%02d'.format(minutes, seconds);
+        this._timer.setState(stateName);
     }
 
     _activateStats() {
-        let timestamp = global.get_current_time();
+        const timestamp = global.get_current_time();
 
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
         Main.overview.hide();
-        this.indicator.timer.showMainWindow('stats', timestamp);
+
+        this._timer.showMainWindow('stats', timestamp);
     }
 
     _activatePreferences() {
-        let timestamp = global.get_current_time();
+        const timestamp = global.get_current_time();
 
+        this.itemActivated(BoxPointer.PopupAnimation.NONE);
         Main.overview.hide();
-        this.indicator.timer.showPreferences(timestamp);
+
+        this._timer.showPreferences(timestamp);
     }
 
     _activateQuit() {
-        this.indicator.timer.quit();
+        this._timer.quit();
     }
 
-    _activateState(stateName) {
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
-        this.indicator.timer.setState(stateName);
+    _connectTimerSignals() {
+        if (!this._timerStateChangedId) {
+            this._timerStateChangedId = this._timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+            this._onTimerStateChanged();
+        }
+
+        if (!this._timerPausedId) {
+            this._timerPausedId = this._timer.connect('paused', this._onTimerPaused.bind(this));
+        }
+
+        if (!this._timerResumedId) {
+            this._timerResumedId = this._timer.connect('resumed', this._onTimerResumed.bind(this));
+        }
+    }
+
+    _disconnectTimerSignals() {
+        if (this._timerStateUpdateId) {
+            this._timer.disconnect(this._timerStateUpdateId);
+            this._timerStateUpdateId = 0;
+        }
+
+        if (this._timerPausedId) {
+            this._timer.disconnect(this._timerPausedId);
+            this._timerPausedId = 0;
+        }
+
+        if (this._timerResumedId) {
+            this._timer.disconnect(this._timerResumedId);
+            this._timerResumedId = 0;
+        }
     }
 
     close(animate) {
-        if (this._timerUpdateId) {
-            this.indicator.timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
-        }
+        this._disconnectTimerSignals();
 
         super.close(animate);
     }
 
     destroy() {
-        if (this._timerUpdateId) {
-            this.indicator.timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
-        }
+        this._disconnectTimerSignals();
 
         if (this._actorMappedId) {
             this.actor.disconnect(this._actorMappedId);
             this._actorMappedId = 0;
         }
 
-        this.indicator = null;
-        this.timerLabel = null;
-        this.pauseAction = null;
+        this._indicator = null;
+        this._timer = null;
         this._icons = null;
 
         super.destroy();
@@ -645,14 +741,12 @@ class PomodoroIndicator extends PanelMenu.Button {
         });
         this._container.add_child(this._iconBox);
 
-        this.setMenu(new IndicatorMenu(this));
-        this.setType(type);
-
         this._blinking = false;
         this._blinkingGroup = new Utils.TransitionGroup();
         this._blinkingGroup.addActor(this._iconBox);
-        this._blinkingGroup.addActor(this.menu.timerLabel);
-        this._blinkingGroup.addActor(this.menu.pauseAction.child);
+
+        this.setMenu(new IndicatorMenu(this));
+        this.setType(type);
 
         this._mappedId = this.connect('notify::mapped', this._onMappedChanged.bind(this));
 
@@ -684,6 +778,10 @@ class PomodoroIndicator extends PanelMenu.Button {
 
             this.timer = null;
         });
+    }
+
+    get blinkingGroup() {
+        return this._blinkingGroup;
     }
 
     _onMappedChanged() {

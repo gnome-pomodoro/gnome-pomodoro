@@ -17,8 +17,10 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-const Gio = imports.gi.Gio;
+const { Clutter, Gio, GObject, St, Pango } = imports.gi;
+
 const Main = imports.ui.main;
+const Params = imports.misc.params;
 const Signals = imports.misc.signals;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
@@ -258,3 +260,185 @@ var Timer = class extends Signals.EventEmitter {
         }
     }
 };
+
+
+var TimerLabel = GObject.registerClass({
+}, class PomodoroTimerLabel extends St.BoxLayout {
+    _init(timer, params) {
+        params = Params.parse(params, {
+            style_class: 'extension-pomodoro-timer-label',
+            vertical: false,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+            x_expand: false,
+            y_expand: false,
+            reactive: false,
+            can_focus: false,
+            track_hover: false,
+        }, true);
+
+        super._init(params);
+
+        this._timer = timer;
+        this._digitWidth = 0.0;
+        this._minHPadding = 0.0;
+        this._natHPadding = 0.0;
+        this._destroyed = false;
+
+        this._minutesLabel = new St.Label({
+            text: "0",
+            x_expand: true,
+            x_align: Clutter.ActorAlign.END,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._minutesLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this.add_actor(this._minutesLabel);
+
+        this._separatorLabel = new St.Label({
+            text: ":",
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._separatorLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this.add_actor(this._separatorLabel);
+
+        this._secondsLabel = new St.Label({
+            text: "00",
+            x_expand: true,
+            x_align: Clutter.ActorAlign.START,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._secondsLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this.add_actor(this._secondsLabel);
+
+        this._timerUpdateId = 0;
+        this._styleChangedId = 0;
+
+        this._updateAlignment();
+
+        this.connect('notify::x_align', () => this._updateAlignment());
+        this.connect('notify::y_align', () => this._updateAlignment());
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    freeze() {
+        this._frozen = true;
+    }
+
+    unfreeze() {
+        this._frozen = false;
+    }
+
+    vfunc_get_preferred_width(_forHeight) {
+        const [, minutesWidth]   = this._minutesLabel.get_preferred_width(-1);
+        const [, separatorWidth] = this._separatorLabel.get_preferred_width(-1);
+        const [, secondsWidth]   = this._secondsLabel.get_preferred_width(-1);
+
+        const naturalSize = 2 * Math.max(minutesWidth, secondsWidth, 2 * this._digitWidth) +
+                            2 * this._natHPadding +
+                            separatorWidth;
+        const minimumSize = naturalSize;
+
+        return [minimumSize, naturalSize];
+    }
+
+    vfunc_get_preferred_height(_forWidth) {
+        const child = this.get_first_child();
+
+        if (child) {
+            return child.get_preferred_height(-1);
+        }
+
+        return [0, 0];
+    }
+
+    vfunc_map() {
+        if (!this._styleChangedId) {
+            this._styleChangedId = this.connect('style-changed', this._onStyleChanged.bind(this));
+            this._onStyleChanged(this);
+        }
+
+        if (!this._timerUpdateId) {
+            this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
+        }
+
+        this._updateLabels();
+
+        super.vfunc_map();
+    }
+
+    vfunc_unmap() {
+        if (this._styleChangedId) {
+            this.disconnect(this._styleChangedId);
+            this._styleChangedId = 0;
+        }
+
+        if (this._timerUpdateId) {
+            this._timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
+
+        super.vfunc_unmap();
+    }
+
+    _updateAlignment() {
+        this._minutesLabel.y_align = this.y_align;
+        this._separatorLabel.y_align = this.y_align;
+        this._secondsLabel.y_align = this.y_align;
+
+        switch (this.x_align)
+        {
+            case Clutter.ActorAlign.CENTER:
+                this._minutesLabel.x_expand = true;
+                this._secondsLabel.x_expand = true;
+                break;
+
+            case Clutter.ActorAlign.START:
+                this._minutesLabel.x_expand = false;
+                this._secondsLabel.x_expand = true;
+                break;
+
+            case Clutter.ActorAlign.END:
+                this._minutesLabel.x_expand = true;
+                this._secondsLabel.x_expand = false;
+                break;
+        }
+    }
+
+    _updateLabels() {
+        if (this._destroyed || this._frozen) {
+            return;
+        }
+
+        const remaining = Math.max(this._timer.getRemaining(), 0.0);
+        const minutes   = Math.floor(remaining / 60);
+        const seconds   = Math.floor(remaining % 60);
+
+        if (this._minutesLabel.clutter_text) {
+            this._minutesLabel.clutter_text.set_text('%d'.format(minutes));
+        }
+
+        if (this._secondsLabel.clutter_text) {
+            this._secondsLabel.clutter_text.set_text('%02d'.format(seconds));
+        }
+    }
+
+    _onTimerUpdate() {
+        this._updateLabels();
+    }
+
+    _onStyleChanged(actor) {
+        const themeNode = actor.get_theme_node();
+        const font      = themeNode.get_font();
+        const context   = actor.get_pango_context();
+        const metrics   = context.get_metrics(font, context.get_language());
+
+        this._digitWidth = metrics.get_approximate_digit_width() / Pango.SCALE;
+        this._minHPadding = themeNode.get_length('-minimum-hpadding');
+        this._natHPadding = themeNode.get_length('-natural-hpadding');
+    }
+
+    _onDestroy() {
+        this._destroyed = true;
+    }
+});
