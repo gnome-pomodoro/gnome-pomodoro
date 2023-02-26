@@ -125,57 +125,11 @@ var Source = GObject.registerClass(
 class PomodoroSource extends MessageTray.Source {
     _init() {
         super._init(_("Pomodoro Timer"), ICON_NAME);
-
-        this._idleId = 0;
-
-        this.connect('destroy', () => {
-            if (this._idleId) {
-                GLib.source_remove(this._idleId);
-                this._idleId = 0;
-            }
-
-            this.destroyNotifications();
-        });
     }
 
     /* override parent method */
     _createPolicy() {
         return new NotificationPolicy();
-    }
-
-    _lastNotificationRemoved() {
-        this._idleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-            if (this.notifications.length == 0) {
-                this.destroy();
-            }
-
-            return GLib.SOURCE_REMOVE;
-        });
-        GLib.Source.set_name_by_id(this._idleId,
-                                   '[gnome-pomodoro] this._lastNotificationRemoved');
-    }
-
-    /* override parent method */
-    _onNotificationDestroy(notification) {
-        let index = this.notifications.indexOf(notification);
-        if (index < 0) {
-            return;
-        }
-
-        this.notifications.splice(index, 1);
-        this.countUpdated();
-
-        if (this.notifications.length == 0) {
-            this._lastNotificationRemoved();
-        }
-    }
-
-    destroyNotifications() {
-        let notifications = this.notifications.slice();
-
-        notifications.forEach((notification) => {
-            notification.destroy();
-        });
     }
 });
 

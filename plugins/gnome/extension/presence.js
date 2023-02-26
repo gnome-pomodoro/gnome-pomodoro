@@ -82,7 +82,8 @@ var Presence = class {
 
     _onPatchReverted() {
         try {
-            let status = Main.messageTray._presence.status;
+            const status = Main.messageTray._presence.status;
+
             Main.messageTray._onStatusChanged(status);
         }
         catch (error) {
