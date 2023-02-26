@@ -80,18 +80,22 @@ function getCurrentNotification() {
 
 
 function formatRemainingTime(remaining) {
-    remaining = remaining > 15.0
-        ? Math.round(remaining / 15.0) * 15
-        : Math.round(Math.max(remaining, 0.0));
+    remaining = Math.max(Math.round(remaining), 0.0);
 
-    const minutes = Math.floor(remaining / 60.0);
-    const seconds = remaining - minutes * 60.0;
+    if (remaining > 45.0) {
+        const minutes = Math.round(remaining / 60.0);
 
-    return remaining > 45.0
-        ? ngettext("%d minute remaining",
-                   "%d minutes remaining", minutes).format(minutes)
-        : ngettext("%d second remaining",
-                   "%d seconds remaining", seconds).format(seconds);
+        return ngettext("%d minute remaining",
+                        "%d minutes remaining", minutes).format(minutes)
+    }
+    else {
+        if (remaining > 15.0) {
+            remaining = Math.round(remaining / 15.0) * 15.0
+        }
+
+        return ngettext("%d second remaining",
+                        "%d seconds remaining", remaining).format(remaining);
+    }
 }
 
 
