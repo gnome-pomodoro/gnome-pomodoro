@@ -928,18 +928,59 @@ var NotificationManager = class extends Signals.EventEmitter {
         return timerState !== this._previousTimerState || view !== this._previousView;
     }
 
+    _expireNotification() {
+        if (!this._notification) {
+            return;
+        }
+
+        const notification = this._notification;
+        const banner = Main.messageTray._banner?.notification === notification ? Main.messageTray._banner : null;
+
+        notification.acknowledged = true;
+        notification.setTransient(true);
+        notification.setResident(false);
+        notification.setUrgency(MessageTray.Urgency.HIGH);
+
+        if (banner && banner.mapped) {
+            let destroyId = notification.connect('destroy', () => {
+                if (destroyId) {
+                    notification.disconnect(destroyId);
+                    destroyId = 0;
+                }
+
+                if (notifyMappedId) {
+                    banner.disconnect(notifyMappedId);
+                    notifyMappedId = 0;
+                }
+            });
+            let notifyMappedId = banner.connect('notify::mapped', () => {
+                if (!banner.mapped) {
+                    notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
+                }
+            });
+
+            if (Main.messageTray._notification === notification) {
+                Main.messageTray._expireNotification();
+            }
+        }
+        else {
+            notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
+        }
+
+        this._notification = null;
+    }
+
     _doNotify() {
         // We want extra notification banner animation between states. Easiest way to force it is destroying
         // existing notification.
-        const recreate = (
+        const expired = (
             this._previousView === NotificationView.BREAK_ENDED && this._view === NotificationView.POMODORO ||
             this._previousState === Timer.State.POMODORO && this._state === Timer.State.SHORT_BREAK ||
             this._previousState === Timer.State.POMODORO && this._state === Timer.State.LONG_BREAK
         );
 
-        if (this._notification && recreate) {
-            this._notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
-            this._notification = null;
+        if (this._notification && expired) {
+            this._expireNotification();
         }
 
         if (this._useDialog) {
