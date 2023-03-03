@@ -677,7 +677,7 @@ var NotificationManager = class extends Signals.EventEmitter {
                     this.addMessageAtIndex(message, this._nUrgent, this.mapped);
                 }
                 else {
-                    patch.initial._onNotificationAdded.bind(this)(source, notification);
+                    notificationSectionPatch.initial._onNotificationAdded.bind(this)(source, notification);
                 }
             }
         });

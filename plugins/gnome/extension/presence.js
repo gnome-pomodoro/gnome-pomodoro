@@ -63,11 +63,11 @@ var Presence = class {
     }
 
     setDefault() {
+        this._settings.set_boolean('show-banners', true);
+
         if (this._patch.applied) {
             this._patch.revert();
         }
-
-        this._settings.set_boolean('show-banners', true);
     }
 
     _onPatchApplied() {
