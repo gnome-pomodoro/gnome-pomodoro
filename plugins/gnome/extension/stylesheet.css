@@ -40,7 +40,7 @@
 
 .extension-pomodoro-toggle-menu-item {
     color: inherit;
-    margin-top: 3px;
+    margin-top: 5px;
     margin-bottom: 3px;
     padding-top: 0;
     padding-bottom: 0;
@@ -52,10 +52,10 @@
 
 .extension-pomodoro-timer-menu-item {
     color: inherit;
-    margin-top: 3px;
+    margin-top: 5px;
     margin-bottom: 3px;
     padding: 0;
-    padding-right: 5px;
+    padding-right: 10px;
     spacing: 0;
 }
 
