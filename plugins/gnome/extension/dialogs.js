@@ -993,31 +993,10 @@ class PomodoroEndDialog extends ModalDialog {
     _init(timer) {
         super._init();
 
-        this.timer = timer;
-        this._timerUpdateId = 0;
-        this._styleChangedId = 0;
-        this._minutesLabel = new St.Label({
-            text: "0",
-            x_expand: true,
-            x_align: Clutter.ActorAlign.END,
+        this._timer = timer;
+        this._timerLabel = new Timer.TimerLabel(timer, {
+            x_align: Clutter.ActorAlign.CENTER,
         });
-        this._separatorLabel = new St.Label({
-            text: ":",
-        });
-        this._secondsLabel = new St.Label({
-            text: "00",
-            x_expand: true,
-            x_align: Clutter.ActorAlign.START,
-        });
-        this._minutesLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._separatorLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this._secondsLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-
-        let hbox = new St.BoxLayout({ vertical: false, style_class: 'extension-pomodoro-dialog-timer' });
-        hbox.add_actor(this._minutesLabel);
-        hbox.add_actor(this._separatorLabel);
-        hbox.add_actor(this._secondsLabel);
-
         this._descriptionLabel = new St.Label({
             style_class: 'extension-pomodoro-dialog-description',
             text: _("It's time to take a break"),
@@ -1026,11 +1005,19 @@ class PomodoroEndDialog extends ModalDialog {
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
 
-        let box = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-box',
-                                     vertical: true });
-        box.add_actor(hbox);
+        const box = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-box',
+                                       vertical: true });
+        box.add_actor(this._timerLabel);
         box.add_actor(this._descriptionLabel);
         this._layout.add_actor(box);
+
+        this._timerStateChangedId = this._timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+
+        this._onTimerStateChanged();
+    }
+
+    get timer() {
+        return this._timer;
     }
 
     get description() {
@@ -1041,67 +1028,20 @@ class PomodoroEndDialog extends ModalDialog {
         this._descriptionLabel.clutter_text.set_text(value);
     }
 
-    _onStyleChanged(actor) {
-        let themeNode = actor.get_theme_node();
-        let font      = themeNode.get_font();
-        let context   = actor.get_pango_context();
-        let metrics   = context.get_metrics(font, context.get_language());
-        let digitWidth = metrics.get_approximate_digit_width() / Pango.SCALE;
-        const [, naturalWidth] = actor.get_preferred_width(-1);
+    _onTimerStateChanged() {
+        const timerState = this._timer.getState();
 
-        this._secondsLabel.natural_width = Math.max(2 * digitWidth, naturalWidth);
-    }
-
-    _updateLabels() {
-        if (this._destroyed) {
-            return;
-        }
-
-        const remaining = this.timer.isBreak() ? Math.max(this.timer.getRemaining(), 0.0) : 0.0;
-        const minutes   = Math.floor(remaining / 60);
-        const seconds   = Math.floor(remaining % 60);
-
-        if (this._minutesLabel.clutter_text) {
-            this._minutesLabel.clutter_text.set_text('%d'.format(minutes));
-        }
-
-        if (this._secondsLabel.clutter_text) {
-            this._secondsLabel.clutter_text.set_text('%02d'.format(seconds));
+        if (timerState === Timer.State.SHORT_BREAK || timerState === Timer.State.LONG_BREAK) {
+            this._timerLabel.freeze();
         }
     }
 
-    _onTimerUpdate() {
-        if (this.state === State.OPENED || this.state === State.OPENING) {
-            this._updateLabels();
-        }
-    }
-
-    vfunc_map() {
-        if (!this._styleChangedId) {
-            this._styleChangedId = this._secondsLabel.connect('style-changed', this._onStyleChanged.bind(this));
-            this._onStyleChanged(this._secondsLabel);
+    _onDestroy() {
+        if (this._timerStateChangedId) {
+            this._timer.disconnect(this._timerStateChangedId);
+            this._timerStateChangedId = 0;
         }
 
-        if (!this._timerUpdateId) {
-            this._timerUpdateId = this.timer.connect('update', this._onTimerUpdate.bind(this));
-        }
-
-        this._updateLabels();
-
-        super.vfunc_map();
-    }
-
-    vfunc_unmap() {
-        if (this._styleChangedId && !this._destroyed) {
-            this._secondsLabel.disconnect(this._styleChangedId);
-            this._styleChangedId = 0;
-        }
-
-        if (this._timerUpdateId) {
-            this.timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
-        }
-
-        super.vfunc_unmap();
+        super._onDestroy();
     }
 });

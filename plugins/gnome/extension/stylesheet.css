@@ -68,7 +68,7 @@
 .extension-pomodoro-timer-menu-item .extension-pomodoro-timer-label {
     font-size: 1.6em;
     font-weight: 500;
-    margin-left: 5px;
+    margin: 0 5px;
 }
 
 .extension-pomodoro-timer-menu-item .extension-pomodoro-timer-buttons-box {
@@ -101,28 +101,22 @@
     background-color: transparent;
 }
 
-.extension-pomodoro-dialog .extension-pomodoro-dialog-box {
-    spacing: 5px;
-    padding-bottom: 15px;
-    width: 250pt;
-}
-
-.extension-pomodoro-dialog .extension-pomodoro-dialog-timer {
-    font-size: 70pt;
-    font-weight: normal;
+.extension-pomodoro-dialog {
     color: white;
 }
 
-.extension-pomodoro-dialog .extension-pomodoro-dialog-timer > StLabel:first-child {
-    text-align: right;
+.extension-pomodoro-dialog .extension-pomodoro-dialog-box {
+    spacing: 5px;
+    padding-bottom: 15px;
+    width: 500px;
 }
 
-.extension-pomodoro-dialog .extension-pomodoro-dialog-timer > StLabel:last-child {
-    text-align: left;
+.extension-pomodoro-dialog .extension-pomodoro-timer-label {
+    font-size: 70pt;
+    font-weight: normal;
 }
 
 .extension-pomodoro-dialog .extension-pomodoro-dialog-description {
     font-size: 13pt;
     font-weight: normal;
-    color: white;
 }

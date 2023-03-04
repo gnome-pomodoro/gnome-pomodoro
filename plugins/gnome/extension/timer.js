@@ -262,8 +262,120 @@ var Timer = class extends Signals.EventEmitter {
 };
 
 
-var TimerLabel = GObject.registerClass({
-}, class PomodoroTimerLabel extends St.BoxLayout {
+var MonospaceLabel = GObject.registerClass({
+    Properties: {
+        'text': GObject.ParamSpec.string('text', '', '',
+                                       GObject.ParamFlags.READWRITE,
+                                       ''),
+        'text-align': GObject.ParamSpec.enum('text-align', '', '',
+                                       GObject.ParamFlags.READWRITE,
+                                       Pango.Alignment, Pango.Alignment.LEFT),
+    },
+}, class PomodoroMonospaceLabel extends St.Widget {
+    _init(params) {
+        params = Params.parse(params, {
+            style_class: 'extension-pomodoro-monospace-label',
+            layout_manager: new Clutter.BinLayout(),
+        }, true);
+
+        super._init(params);
+
+        this._digitWidth = 0.0;
+        this._styleChangedId = 0;
+        this._notifyTextAlignId = 0;
+
+        this._label = new St.Label({
+            x_expand: true,
+            y_expand: true,
+            y_align: Clutter.ActorAlign.FILL,
+        });
+        this._label.clutter_text.line_wrap = false;
+        this._label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+        this.add_child(this._label);
+
+        this.bind_property('text', this._label, 'text', GObject.BindingFlags.SYNC_CREATE);
+
+        this._styleChangedId = this.connect('style-changed', this._onStyleChanged.bind(this));
+        this._notifyTextAlignId = this.connect('notify::text-align', this._onNotifyTextAlign.bind(this));
+        this.connect('destroy', this._onDestroy.bind(this));
+
+        this._onStyleChanged();
+        this._onNotifyTextAlign();
+    }
+
+    vfunc_get_preferred_width(forHeight) {
+        const themeNode = this.get_theme_node();
+
+        if (this._digitWidth === 0.0) {
+            const font      = themeNode.get_font();
+            const context   = this.get_pango_context();
+            const metrics   = context.get_metrics(font, context.get_language());
+
+            this._digitWidth = metrics.get_approximate_digit_width() / Pango.SCALE;
+        }
+
+        const naturalWidth = Math.ceil(this.text.length * this._digitWidth);
+
+        return themeNode.adjust_preferred_width(naturalWidth, naturalWidth);
+    }
+
+    _onStyleChanged() {
+        this._digitWidth = 0.0;
+    }
+
+    _onNotifyTextAlign() {
+        // St.Label doesn't support text-align through css, so alignment is done through allocation.
+        switch (this.text_align)
+        {
+            case Pango.Alignment.LEFT:
+                this._label.x_align = Clutter.ActorAlign.START;
+                break;
+
+            case Pango.Alignment.CENTER:
+                this._label.x_align = Clutter.ActorAlign.CENTER;
+                break;
+
+            case Pango.Alignment.RIGHT:
+                this._label.x_align = Clutter.ActorAlign.END;
+                break;
+        }
+    }
+
+    _onDestroy() {
+        if (this._styleChangedId) {
+            this.disconnect(this._styleChangedId);
+            this._styleChangedId = 0;
+        }
+
+        if (this._notifyTextAlignId) {
+            this.disconnect(this._notifyTextAlignId);
+            this._notifyTextAlignId = 0;
+        }
+    }
+});
+
+
+// Label widget that for longer text behaves like a normal label, but for short text
+// behaves like a monospace label.
+var SemiMonospaceLabel = GObject.registerClass(
+class PomodoroSemiMonospaceLabel extends MonospaceLabel {
+    vfunc_get_preferred_width(forHeight) {
+        const themeNode = this.get_theme_node();
+
+        if (this.text.length > 1) {
+            const [minimumWidth, naturalWidth] = this._label.get_preferred_width(-1);
+
+            return themeNode.adjust_preferred_width(minimumWidth, naturalWidth);
+        }
+        else {
+            return super.vfunc_get_preferred_width(forHeight);
+        }
+    }
+});
+
+
+var TimerLabel = GObject.registerClass(
+class PomodoroTimerLabel extends St.BoxLayout {
     _init(timer, params) {
         params = Params.parse(params, {
             style_class: 'extension-pomodoro-timer-label',
@@ -280,84 +392,39 @@ var TimerLabel = GObject.registerClass({
         super._init(params);
 
         this._timer = timer;
-        this._digitWidth = 0.0;
-        this._minHPadding = 0.0;
-        this._natHPadding = 0.0;
-        this._destroyed = false;
+        this._timerState = null;
+        this._timerUpdateId = 0;
 
-        this._minutesLabel = new St.Label({
+        this._minutesLabel = new SemiMonospaceLabel({
             text: "0",
-            x_expand: true,
-            x_align: Clutter.ActorAlign.END,
-            y_align: Clutter.ActorAlign.CENTER,
+            text_align: Pango.Alignment.RIGHT,
         });
-        this._minutesLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.add_actor(this._minutesLabel);
 
         this._separatorLabel = new St.Label({
             text: ":",
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
         });
         this._separatorLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.add_actor(this._separatorLabel);
 
-        this._secondsLabel = new St.Label({
+        this._secondsLabel = new MonospaceLabel({
             text: "00",
-            x_expand: true,
-            x_align: Clutter.ActorAlign.START,
-            y_align: Clutter.ActorAlign.CENTER,
+            text_align: Pango.Alignment.LEFT,
         });
-        this._secondsLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.add_actor(this._secondsLabel);
 
-        this._timerUpdateId = 0;
-        this._styleChangedId = 0;
-
-        this._updateAlignment();
-
-        this.connect('notify::x_align', () => this._updateAlignment());
-        this.connect('notify::y_align', () => this._updateAlignment());
         this.connect('destroy', this._onDestroy.bind(this));
     }
 
     freeze() {
-        this._frozen = true;
+        this._timerState = this._timer.getState();
     }
 
     unfreeze() {
-        this._frozen = false;
-    }
-
-    vfunc_get_preferred_width(_forHeight) {
-        const [, minutesWidth]   = this._minutesLabel.get_preferred_width(-1);
-        const [, separatorWidth] = this._separatorLabel.get_preferred_width(-1);
-        const [, secondsWidth]   = this._secondsLabel.get_preferred_width(-1);
-
-        const naturalSize = 2 * Math.max(minutesWidth, secondsWidth, 2 * this._digitWidth) +
-                            2 * this._natHPadding +
-                            separatorWidth;
-        const minimumSize = naturalSize;
-
-        return [minimumSize, naturalSize];
-    }
-
-    vfunc_get_preferred_height(_forWidth) {
-        const child = this.get_first_child();
-
-        if (child) {
-            return child.get_preferred_height(-1);
-        }
-
-        return [0, 0];
+        this._timerState = null;
     }
 
     vfunc_map() {
-        if (!this._styleChangedId) {
-            this._styleChangedId = this.connect('style-changed', this._onStyleChanged.bind(this));
-            this._onStyleChanged(this);
-        }
-
         if (!this._timerUpdateId) {
             this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
         }
@@ -368,11 +435,6 @@ var TimerLabel = GObject.registerClass({
     }
 
     vfunc_unmap() {
-        if (this._styleChangedId) {
-            this.disconnect(this._styleChangedId);
-            this._styleChangedId = 0;
-        }
-
         if (this._timerUpdateId) {
             this._timer.disconnect(this._timerUpdateId);
             this._timerUpdateId = 0;
@@ -381,64 +443,27 @@ var TimerLabel = GObject.registerClass({
         super.vfunc_unmap();
     }
 
-    _updateAlignment() {
-        this._minutesLabel.y_align = this.y_align;
-        this._separatorLabel.y_align = this.y_align;
-        this._secondsLabel.y_align = this.y_align;
-
-        switch (this.x_align)
-        {
-            case Clutter.ActorAlign.CENTER:
-                this._minutesLabel.x_expand = true;
-                this._secondsLabel.x_expand = true;
-                break;
-
-            case Clutter.ActorAlign.START:
-                this._minutesLabel.x_expand = false;
-                this._secondsLabel.x_expand = true;
-                break;
-
-            case Clutter.ActorAlign.END:
-                this._minutesLabel.x_expand = true;
-                this._secondsLabel.x_expand = false;
-                break;
-        }
-    }
-
     _updateLabels() {
-        if (this._destroyed || this._frozen) {
+        if (this._timerState && this._timerState !== this._timer.getState()) {
             return;
         }
 
-        const remaining = Math.max(this._timer.getRemaining(), 0.0);
+        const remaining = Math.max(Math.round(this._timer.getRemaining()), 0);
         const minutes   = Math.floor(remaining / 60);
-        const seconds   = Math.floor(remaining % 60);
+        const seconds   = remaining - 60 * minutes;
 
-        if (this._minutesLabel.clutter_text) {
-            this._minutesLabel.clutter_text.set_text('%d'.format(minutes));
-        }
-
-        if (this._secondsLabel.clutter_text) {
-            this._secondsLabel.clutter_text.set_text('%02d'.format(seconds));
-        }
+        this._minutesLabel.text = '%d'.format(minutes);
+        this._secondsLabel.text = '%02d'.format(seconds);
     }
 
     _onTimerUpdate() {
         this._updateLabels();
     }
 
-    _onStyleChanged(actor) {
-        const themeNode = actor.get_theme_node();
-        const font      = themeNode.get_font();
-        const context   = actor.get_pango_context();
-        const metrics   = context.get_metrics(font, context.get_language());
-
-        this._digitWidth = metrics.get_approximate_digit_width() / Pango.SCALE;
-        this._minHPadding = themeNode.get_length('-minimum-hpadding');
-        this._natHPadding = themeNode.get_length('-natural-hpadding');
-    }
-
     _onDestroy() {
-        this._destroyed = true;
+        if (this._timerUpdateId) {
+            this._timer.disconnect(this._timerUpdateId);
+            this._timerUpdateId = 0;
+        }
     }
 });
