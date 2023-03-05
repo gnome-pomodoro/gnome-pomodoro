@@ -89,6 +89,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         return this._indicator;
     }
 
+    // TODO: move to utils
     _loadIcon(iconName) {
         let icon = this._icons[iconName];
 
@@ -392,9 +393,9 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _disconnectTimerSignals() {
-        if (this._timerStateUpdateId) {
-            this._timer.disconnect(this._timerStateUpdateId);
-            this._timerStateUpdateId = 0;
+        if (this._timerStateChangedId) {
+            this._timer.disconnect(this._timerStateChangedId);
+            this._timerStateChangedId = 0;
         }
 
         if (this._timerPausedId) {

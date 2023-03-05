@@ -22,7 +22,7 @@
 
 const Gettext = imports.gettext;
 
-const { GLib, Gio, Meta, Shell } = imports.gi;
+const { GLib, Gio, Meta, Shell, St } = imports.gi;
 
 const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -40,6 +40,7 @@ const Presence = Extension.imports.presence;
 const Settings = Extension.imports.settings;
 const Timer = Extension.imports.timer;
 const Utils = Extension.imports.utils;
+const ScreenShield = Extension.imports.screenShield;
 
 
 var ExtensionMode = {
@@ -115,12 +116,12 @@ var PomodoroExtension = class extends Signals.EventEmitter {
             if (mode === ExtensionMode.RESTRICTED) {
                 this._disableIndicator();
                 this._disableNotificationManager();
-                this._enableScreenShieldWidget();
+                this._enableScreenShieldManager();
             }
             else {
                 this._enableIndicator();
                 this._enableNotificationManager(previousMode !== ExtensionMode.RESTRICTED);
-                this._disableScreenShieldWidget();
+                this._disableScreenShieldManager();
             }
 
             if (this.pluginSettings.get_boolean('hide-system-notifications')) {
@@ -286,12 +287,21 @@ var PomodoroExtension = class extends Signals.EventEmitter {
         }
     }
 
-    _enableScreenShieldWidget() {
-        // TODO
+    _enableScreenShieldManager() {
+        if (!Main.screenShield) {
+            return;
+        }
+
+        if (!this._screenShieldManager) {
+            this._screenShieldManager = new ScreenShield.ScreenShieldManager(this.timer);
+        }
     }
 
-    _disableScreenShieldWidget() {
-        // TODO
+    _disableScreenShieldManager() {
+        if (this._screenShieldManager) {
+            this._screenShieldManager.destroy();
+            this._screenShieldManager = null;
+        }
     }
 
     _destroyPresence() {
@@ -315,7 +325,7 @@ var PomodoroExtension = class extends Signals.EventEmitter {
         this._destroying = true;
 
         this._disableKeybinding();
-        this._disableScreenShieldWidget();
+        this._disableScreenShieldManager();
         this._disableNotificationManager();
 
         this._destroyPresence();
@@ -381,13 +391,6 @@ function disable() {
     let extension = Extension.extension;
 
     if (extension) {
-        if (Main.sessionMode.isLocked && !Main.sessionMode.isGreeter) {
-            extension.setMode(ExtensionMode.RESTRICTED);
-
-            // Note that ExtensionSystem.disableExtension() will unload our stylesheet
-        }
-        else {
-            extension.destroy();
-        }
+        extension.destroy();
     }
 }

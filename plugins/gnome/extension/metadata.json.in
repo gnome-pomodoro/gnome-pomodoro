@@ -3,6 +3,7 @@
   "name": "Pomodoro",
   "description": "Desktop integration for Pomodoro application.",
   "shell-version": ["3.38", "40", "41", "42", "43", "44"],
+  "session-modes": ["user", "unlock-dialog"],
   "url": "@PACKAGE_URL@",
   "version": "@PACKAGE_VERSION@"
 }

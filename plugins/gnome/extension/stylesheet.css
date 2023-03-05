@@ -120,3 +120,35 @@
     font-size: 13pt;
     font-weight: normal;
 }
+
+.extension-pomodoro-widget {
+    font-size: 12pt;
+    font-weight: normal;
+    text-align: left;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.extension-pomodoro-widget .extension-pomodoro-widget-content {
+    spacing: 5px;
+    margin: 5px;
+    margin-left: 10px;
+}
+
+.extension-pomodoro-widget .extension-pomodoro-widget-title {
+    font-size: 13pt;
+    font-weight: bold;
+}
+
+.extension-pomodoro-widget .icon-button {
+    border-radius: 10px;
+}
+
+.extension-pomodoro-widget .icon-button.flat:hover {
+    background-color: rgba(255, 255, 255, 0.1);  /* override gradient */
+}
+
+.extension-pomodoro-widget .icon-button.flat:active {
+    background-color: rgba(255, 255, 255, 0.12);  /* override gradient */
+}

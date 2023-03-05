@@ -79,6 +79,7 @@ function getCurrentNotification() {
 }
 
 
+// TODO: move to timer.js
 function formatRemainingTime(remaining) {
     remaining = Math.max(Math.round(remaining), 0.0);
 
@@ -1054,6 +1055,7 @@ var NotificationManager = class extends Signals.EventEmitter {
         return GLib.SOURCE_REMOVE;
     }
 
+    // TODO: move annoucements to a helper class
     _scheduleAnnoucement() {
         const timeout = Math.round(this._timer.getRemaining() - ANNOUCEMENT_TIME);
 
@@ -1069,7 +1071,6 @@ var NotificationManager = class extends Signals.EventEmitter {
                                                               this._onAnnoucementTimeout.bind(this));
         GLib.Source.set_name_by_id(this._annoucementTimeoutId,
                                    '[gnome-pomodoro] NotificationManager._annoucementTimeoutId');
-
     }
 
     _unscheduleAnnoucement() {
@@ -1172,4 +1173,3 @@ var NotificationManager = class extends Signals.EventEmitter {
         this.emit('destroy');
     }
 };
-
