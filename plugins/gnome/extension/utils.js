@@ -115,12 +115,14 @@ var TransitionGroup = class {
             return;
         }
 
-        this._actors.push({
+        const meta = {
             actor: actor,
             destroyId: actor.connect('destroy', () => {
                 this.removeActor(actor);
-            })
-        });
+                meta.destroyId = 0;
+            }),
+        };
+        this._actors.push(meta);
 
         if (!this._referenceActor) {
             this._setReferenceActor(actor);
@@ -130,9 +132,10 @@ var TransitionGroup = class {
     removeActor(actor) {
         let index = this._findActor(actor);
         if (index >= 0) {
-            let meta = this._actors.splice(index, 1);
-
-            actor.disconnect(meta.destroyId);
+            const meta = this._actors.splice(index, 1);
+            if (meta.destroyId) {
+                actor.disconnect(meta.destroyId);
+            }
         }
 
         if (this._referenceActor === actor) {

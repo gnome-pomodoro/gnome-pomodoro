@@ -359,33 +359,12 @@ class PomodoroScreenShieldWidget extends St.Widget {
     }
 
     _onDestroy() {
-        if (this._timerStateChangedId) {
-            this._timer.disconnect(this._timerStateChangedId);
-            this._timerStateChangedId = 0;
-        }
-
-        if (this._timerPausedId) {
-            this._timer.disconnect(this._timerPausedId);
-            this._timerPausedId = 0;
-        }
-
-        if (this._timerResumedId) {
-            this._timer.disconnect(this._timerResumedId);
-            this._timerResumedId = 0;
-        }
-
-        if (this._timerUpdateId) {
-            this._timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
-        }
-
         if (this._blinkingGroup) {
             this._blinkingGroup.destroy();
             this._blinkingGroup = null;
         }
 
-        this._timer = null;
-        this._icons = null;
+        this._icons = {};
     }
 });
 
