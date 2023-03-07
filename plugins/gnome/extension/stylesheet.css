@@ -106,7 +106,7 @@
 }
 
 .extension-pomodoro-dialog .extension-pomodoro-dialog-box {
-    spacing: 5px;
+    spacing: 15px;
     padding-bottom: 15px;
     width: 500px;
 }
@@ -117,7 +117,7 @@
 }
 
 .extension-pomodoro-dialog .extension-pomodoro-dialog-description {
-    font-size: 13pt;
+    font-size: 14pt;
     font-weight: normal;
 }
 
@@ -137,7 +137,7 @@
 }
 
 .extension-pomodoro-widget .extension-pomodoro-widget-title {
-    font-size: 13pt;
+    font-size: 14pt;
     font-weight: bold;
 }
 
