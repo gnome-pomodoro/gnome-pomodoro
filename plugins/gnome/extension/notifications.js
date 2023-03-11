@@ -605,6 +605,7 @@ var NotificationManager = class extends Signals.EventEmitter {
         this._previousTimerState = Timer.State.NULL;
         this._patches = this._createPatches();
         this._animate = params.animate;
+        this._initialized = false;
         this._destroying = false;
 
         this._annoucementTimeoutId = 0;
@@ -615,6 +616,7 @@ var NotificationManager = class extends Signals.EventEmitter {
         this._onTimerStateChanged();
 
         this._animate = true;
+        this._initialized = true;
     }
 
     get timer() {
@@ -1001,7 +1003,19 @@ var NotificationManager = class extends Signals.EventEmitter {
             }
 
             this._ensureNotification();
-            this._notification.show();
+
+            if (this._initialized) {
+                this._notification.show();
+            }
+            else {
+                // When coming from lock-screen. Notification gets automatically acknowledged and don't
+                // show up.
+                GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                    this._notification.show();
+
+                    return GLib.SOURCE_REMOVE;
+                });
+            }
         }
     }
 
