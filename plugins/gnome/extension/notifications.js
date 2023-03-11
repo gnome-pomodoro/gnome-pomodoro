@@ -221,22 +221,6 @@ class PomodoroNotification extends MessageTray.Notification {
             Utils.logWarning('Called Notification.show() after destroy()');
         }
     }
-
-    hide() {
-        this.acknowledged = true;
-
-        if (this.urgency === MessageTray.Urgency.CRITICAL) {
-            this.setUrgency(MessageTray.Urgency.HIGH);
-        }
-
-        if (Main.messageTray._notification === this && (
-            Main.messageTray._notificationState === MessageTray.State.SHOWN ||
-            Main.messageTray._notificationState === MessageTray.State.SHOWING))
-        {
-            Main.messageTray._updateNotificationTimeout(0);
-            Main.messageTray._updateState();
-        }
-    }
 });
 
 
@@ -727,15 +711,14 @@ var NotificationManager = class extends Signals.EventEmitter {
         const dialog = new Dialogs.PomodoroEndDialog(this._timer);
         dialog.connect('opening',
             () => {
-                try {
-                    if (this._notification) {
-                        this._notification.hide();
-                    }
-                }
-                catch (error) {
-                    Utils.logWarning(error.message);
-                }
-           });
+                // Clicking on a notification baner in the date menu, notifcation should be
+                // destroyed after a delay.
+                GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                    this._expireNotification();
+
+                    return GLib.SOURCE_REMOVE;
+                });
+            });
         dialog.connect('closing',
             () => {
                 if (this._view !== NotificationView.NULL) {
