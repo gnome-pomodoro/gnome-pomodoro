@@ -137,9 +137,15 @@ class PomodoroScreenShieldWidget extends St.Widget {
     }
 
     _shouldBlink() {
-        return this._timerState === Timer.State.POMODORO && this._timer.getElapsed() === 0.0
-            ? false
-            : this._isPaused;
+        if (!this.mapped) {
+            return false;
+        }
+
+        if (this._timerState === Timer.State.POMODORO && this._timer.getElapsed() === 0.0) {
+            return false;
+        }
+
+        return this._isPaused;
     }
 
     _updateTitleLabel() {
@@ -214,6 +220,10 @@ class PomodoroScreenShieldWidget extends St.Widget {
         }
 
         super.vfunc_map();
+
+        if (this._shouldBlink()) {
+            this._blink();
+        }
     }
 
     vfunc_unmap() {
@@ -291,7 +301,6 @@ class PomodoroScreenShieldWidget extends St.Widget {
             this._blink();
         }
     }
-
 
     _blink() {
         if (!this.mapped) {
