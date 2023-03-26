@@ -6,35 +6,34 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro 0.13.0\n"
-"Report-Msgid-Bugs-To: https://github.com/gnome-pomodoro/gnome-pomodoro/issues\n"
-"POT-Creation-Date: 2017-03-24 12:06+0500\n"
-"PO-Revision-Date: 2017-03-24 12:32+0500\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-24 15:30+0100\n"
+"PO-Revision-Date: 2023-03-25 14:18+0100\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
 "Language-Team: Kazakh <kk_KZ@googlegroups.com>\n"
 "Language: kk\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 3.1.1\n"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:7
-#: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:51
-#: data/resources/window.ui:278 lib/about-dialog.vala:31
-#: lib/notifications-capability.vala:106 src/main.vala:50
-#: plugins/actions/enums.vala:91 plugins/gnome/extension/indicator.js:171
-#: plugins/gnome/extension/indicator.js:725
-#: plugins/gnome/extension/notifications.js:86
-#: plugins/gnome/extension/notifications.js:202
-#: plugins/gnome/extension/notifications.js:432
+#: data/org.gnome.Pomodoro.appdata.xml:8 data/org.gnome.Pomodoro.desktop.in:3
+#: data/resources/menus.ui:28 data/resources/window.ui:382
+#: plugins/actions/enums.vala:92 plugins/gnome/extension/indicator.js:77
+#: plugins/gnome/extension/indicator.js:729
+#: plugins/gnome/extension/notifications.js:281
+#: plugins/gnome/extension/timer.js:41 src/about-dialog.vala:31
+#: src/main.vala:50 src/notifications-capability.vala:129
+#: src/stats-page.vala:527 src/window.vala:44
 msgid "Pomodoro"
 msgstr "Pomodoro"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:8
+#: data/org.gnome.Pomodoro.appdata.xml:9
 msgid "A time management utility for GNOME"
 msgstr "GNOME үшін уақытты басқару утилитасы"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:10
+#: data/org.gnome.Pomodoro.appdata.xml:11
 msgid ""
 "A GNOME utility that helps managing time according to Pomodoro Technique. It "
 "intends to improve productivity and focus by taking short breaks after every "
@@ -44,25 +43,20 @@ msgstr ""
 "жұмыстың әр 25 минут сайын қысқа үзілістерді жасау арқылы өнімділікті және "
 "назарды жақсартуға көмектесуге арналған."
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:19
-#: data/resources/preferences-main-page.ui:45
-msgid "Timer"
-msgstr "Таймер"
+#: data/org.gnome.Pomodoro.appdata.xml:23
+msgid "Timer window"
+msgstr "Таймер терезесі"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:23 lib/preferences-dialog.vala:805
-#: plugins/gnome/extension/indicator.js:83
+#: data/org.gnome.Pomodoro.appdata.xml:27
+#: plugins/gnome/extension/indicator.js:83 src/preferences-dialog.vala:800
 msgid "Preferences"
 msgstr "Баптаулар"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:27
+#: data/org.gnome.Pomodoro.appdata.xml:31
 msgid "Indicator for GNOME Shell"
 msgstr "GNOME Shell үшін индикатор"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:32
-msgid "Kamil Prusko"
-msgstr "Kamil Prusko"
-
-#: data/org.gnome.Pomodoro.desktop.in:4 lib/about-dialog.vala:32
+#: data/org.gnome.Pomodoro.desktop.in:4 src/about-dialog.vala:32
 msgid "A simple time management utility"
 msgstr "Уақытты басқарудың қарапайым утилитасы"
 
@@ -70,64 +64,51 @@ msgstr "Уақытты басқарудың қарапайым утилитас�
 msgid "timer;"
 msgstr "timer;таймер;"
 
-#: data/org.gnome.Pomodoro.desktop.in:7
-msgid "gnome-pomodoro"
-msgstr "gnome-pomodoro"
-
-#: data/resources/menus.ui:6 data/resources/menus.ui:68
-msgid "_Timer"
-msgstr "_Таймер"
-
-#: data/resources/menus.ui:10 data/resources/menus.ui:72
-msgid "_Preferences"
-msgstr "_Баптаулар"
-
-#: data/resources/menus.ui:16
-msgid "_About"
-msgstr "Осы тур_алы"
-
-#: data/resources/menus.ui:20 data/resources/menus.ui:76
-msgid "_Quit"
-msgstr "_Шығу"
-
-#: data/resources/menus.ui:29 lib/application.vala:69
-#: plugins/actions/resources/action-page.ui:155 plugins/actions/enums.vala:185
+#: data/resources/menus.ui:6 plugins/actions/enums.vala:188
+#: plugins/actions/resources/action-page.ui:155 src/application.vala:90
 msgid "Start"
 msgstr "Бастау"
 
-#: data/resources/menus.ui:34 data/resources/window.ui:173
-#: lib/application.vala:78 lib/window.vala:161
-#: plugins/actions/resources/action-page.ui:200 plugins/actions/enums.vala:194
+#: data/resources/menus.ui:11 data/resources/window.ui:180
+#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:200
+#: src/application.vala:99
 msgid "Pause"
-msgstr "Аялдату"
+msgstr "Кідірту"
 
-#: data/resources/menus.ui:39 lib/application.vala:81 lib/window.vala:147
-#: plugins/actions/resources/action-page.ui:215 plugins/actions/enums.vala:197
+#: data/resources/menus.ui:16 plugins/actions/enums.vala:200
+#: plugins/actions/resources/action-page.ui:215 src/application.vala:102
 msgid "Resume"
 msgstr "Жалғастыру"
 
-#: data/resources/menus.ui:44 data/resources/window.ui:200
-#: lib/application.vala:72
+#: data/resources/menus.ui:21 data/resources/window.ui:207
+#: plugins/gnome/extension/indicator.js:221 src/application.vala:93
+#: src/window.vala:163 src/window.vala:176
 msgid "Stop"
 msgstr "Тоқтату"
 
-#: data/resources/menus.ui:56 data/resources/window.ui:294
-#: plugins/actions/enums.vala:94 plugins/gnome/extension/indicator.js:172
+#: data/resources/menus.ui:33 data/resources/window.ui:398
+#: plugins/actions/enums.vala:95 plugins/gnome/extension/indicator.js:78
+#: plugins/gnome/extension/timer.js:44 src/window.vala:45
 msgid "Short Break"
 msgstr "Қысқа үзіліс"
 
-#: data/resources/menus.ui:61 data/resources/window.ui:310
-#: plugins/actions/enums.vala:97 plugins/gnome/extension/indicator.js:173
+#: data/resources/menus.ui:38 data/resources/window.ui:414
+#: plugins/actions/enums.vala:98 plugins/gnome/extension/indicator.js:79
+#: plugins/gnome/extension/timer.js:47 src/window.vala:46
 msgid "Long Break"
 msgstr "Ұзақ үзіліс"
 
-#: data/resources/preferences.ui:8 lib/preferences-dialog.vala:809
-msgid "Plugins"
-msgstr "Плагиндер"
+#: data/resources/menus.ui:45
+msgid "_Timer"
+msgstr "_Таймер"
 
-#: data/resources/preferences.ui:47
-msgid "Back"
-msgstr "Артқа"
+#: data/resources/menus.ui:49 data/resources/window.ui:309
+msgid "_Preferences"
+msgstr "_Баптаулар"
+
+#: data/resources/menus.ui:53 data/resources/window.ui:348
+msgid "_Quit"
+msgstr "_Шығу"
 
 #: data/resources/preferences-keyboard-shortcut-page.ui:29
 msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
@@ -136,9 +117,13 @@ msgstr ""
 "жарлықты енгізіңіз."
 
 #: data/resources/preferences-keyboard-shortcut-page.ui:83
-#: plugins/actions/resources/action-page.ui:245 plugins/actions/enums.vala:203
+#: plugins/actions/enums.vala:206 plugins/actions/resources/action-page.ui:245
 msgid "Disable"
 msgstr "Сөндіру"
+
+#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:247
+msgid "Timer"
+msgstr "Таймер"
 
 #: data/resources/preferences-main-page.ui:108
 msgid "Pomodoro duration"
@@ -168,148 +153,96 @@ msgstr "Хабарламалар"
 msgid "Screen notifications"
 msgstr "Экрандағы хабарламалар"
 
-#: data/resources/preferences-main-page.ui:442
-msgid "Remind to take a break"
-msgstr "Үзілісті алу туралы еске салу"
-
-#: data/resources/preferences-main-page.ui:502
+#: data/resources/preferences-main-page.ui:460
 msgid "Desktop"
 msgstr "Жұмыс үстелі"
 
-#: data/resources/preferences-main-page.ui:551
+#: data/resources/preferences-main-page.ui:509
 msgid "Wait for activity after a break"
 msgstr "Үзілістен кейін белсенділікті күту"
 
-#: data/resources/preferences-main-page.ui:615
+#: data/resources/preferences-main-page.ui:573
 msgid "Plugins…"
 msgstr "Плагиндер…"
 
+#: data/resources/preferences.ui:8 src/preferences-dialog.vala:804
+msgid "Plugins"
+msgstr "Плагиндер"
+
+#: data/resources/preferences.ui:47
+msgid "Back"
+msgstr "Артқа"
+
 #: data/resources/screen-notification.ui:89
-#: plugins/gnome/extension/dialogs.js:465
+#: plugins/gnome/extension/dialogs.js:1002
 msgid "It's time to take a break"
 msgstr "Үзіліс алатын уақыт келді"
 
-#: data/resources/window.ui:31
+#: data/resources/stats-view.ui:28
+msgid "Nothing to see yet"
+msgstr "Әлі көретін ештеңе жоқ"
+
+#: data/resources/stats-view.ui:45
+msgid "Complete a few sessions"
+msgstr "Бірнеше сеанстарды аяқтаңыз"
+
+#: data/resources/stats-view.ui:86 data/resources/stats-view.ui:343
+msgid "Day"
+msgstr "Күн"
+
+#: data/resources/stats-view.ui:109 data/resources/stats-view.ui:356
+msgid "Week"
+msgstr "Апта"
+
+#: data/resources/stats-view.ui:133 data/resources/stats-view.ui:369
+msgid "Month"
+msgstr "Ай"
+
+#: data/resources/stats-view.ui:161
+msgid "Previous (Alt+Left)"
+msgstr "Алдыңғы (Alt+Сол)"
+
+#: data/resources/stats-view.ui:188
+msgid "Next (Alt+Right)"
+msgstr "Келесі (Alt+Оң)"
+
+#: data/resources/stats-view.ui:216 data/resources/stats-view.ui:319
+#: src/stats-day-page.vala:62
+msgid "Today"
+msgstr "Бүгін"
+
+#: data/resources/window.ui:36 plugins/gnome/extension/indicator.js:214
+#: src/window.vala:180
 msgid "Start Pomodoro"
 msgstr "Pomodoro іске қосу"
 
-#: lib/about-dialog.vala:30
-msgid "About Pomodoro"
-msgstr "Pomodoro туралы"
+#: data/resources/window.ui:323
+msgid "_About"
+msgstr "Осы тур_алы"
 
-#: lib/about-dialog.vala:41
-msgid "translator-credits"
-msgstr "Baurzhan Muftakhidinov <baurthefirst@gmail.com>"
+#: plugins/actions/actions.vala:423
+msgid "Actions"
+msgstr "Әрекеттер"
 
-#: lib/application.vala:66
-msgid "Start/Stop"
-msgstr "Бастау/тоқтату"
+#: plugins/actions/actions.vala:427
+msgid "Action"
+msgstr "Әрекет"
 
-#: lib/application.vala:75
-msgid "Pause/Resume"
-msgstr "Аялдату/жалғастыру"
+#: plugins/actions/actions.vala:452
+msgid "Custom actions…"
+msgstr "Таңдауыңызша әрекеттер…"
 
-#: lib/application.vala:84
-msgid "Run as background service"
-msgstr "Фон қызметі ретінде орындау"
+#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:170
+msgid "Complete"
+msgstr "Аяқталды"
 
-#: lib/application.vala:87
-msgid "Show preferences"
-msgstr "Баптауларды көрсету"
+#: plugins/actions/enums.vala:194 plugins/actions/resources/action-page.ui:185
+msgid "Skip"
+msgstr "Аттап кету"
 
-#: lib/application.vala:90
-msgid "Quit application"
-msgstr "Қолданба жұмысын аяқтау"
-
-#: lib/application.vala:93
-msgid "Print version information and exit"
-msgstr "Нұсқа ақпаратын шығару және шығу"
-
-#: lib/notifications-capability.vala:107
-#: plugins/gnome/extension/notifications.js:203
-msgid "Focus on your task."
-msgstr "Тапсырмаңызға бар күшіңізді салыңыз."
-
-#: lib/notifications-capability.vala:118 lib/notifications-capability.vala:139
-#: plugins/gnome/extension/notifications.js:212
-msgid "Take a break"
-msgstr "Үзілісті алыңыз"
-
-#: lib/notifications-capability.vala:133
-#, c-format
-msgid "You have %d minute"
-msgid_plural "You have %d minutes"
-msgstr[0] "Сізде %d минут бар"
-
-#: lib/notifications-capability.vala:135
-#, c-format
-msgid "You have %d second"
-msgid_plural "You have %d seconds"
-msgstr[0] "Сізде %d секунд бар"
-
-#: lib/notifications-capability.vala:140
-msgid "Take a longer break"
-msgstr "Ұзағырақ үзілісті алыңыз"
-
-#: lib/notifications-capability.vala:156
-#: plugins/gnome/extension/notifications.js:280
-msgid "Lengthen it"
-msgstr "Оны ұзарту"
-
-#: lib/notifications-capability.vala:161
-#: plugins/gnome/extension/notifications.js:280
-msgid "Shorten it"
-msgstr "Оны қысқарту"
-
-#: lib/notifications-capability.vala:166
-#: plugins/gnome/extension/notifications.js:300
-msgid "Start pomodoro"
-msgstr "Pomodoro іске қосу"
-
-#: lib/preferences-dialog.vala:158
-#, c-format
-msgid ""
-"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
-"such as Control, Alt or Shift."
-msgstr ""
-"Жарлық ретінде \"%s\" қолдануды теруге теріс әсер тигізеді. Басқа пернені "
-"қосып көріңіз, мысалы, Control, Alt немесе Shift."
-
-#: lib/preferences-dialog.vala:591 plugins/sounds/sounds-plugin.vala:596
-msgid "Off"
-msgstr "Сөнд."
-
-#: lib/preferences-dialog.vala:813
-msgid "Keyboard Shortcut"
-msgstr "Пернетақта жарлығы"
-
-#: lib/presence.vala:78
-msgid "Available"
-msgstr "Бар"
-
-#: lib/presence.vala:81
-msgid "Busy"
-msgstr "Бос емес"
-
-#: lib/presence.vala:84
-msgid "Idle"
-msgstr "Іссіз"
-
-#: lib/presence.vala:87
-msgid "Invisible"
-msgstr "Жасырын"
-
-#: lib/utils.vala:64
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d сағат"
-
-#: lib/utils.vala:73
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d минут"
+#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:230
+msgid "Enable"
+msgstr "Іске қосу"
 
 #: plugins/actions/resources/action-page.ui:28
 msgid "Command"
@@ -336,18 +269,6 @@ msgstr "Қы_сқа үзіліс"
 msgid "_Long Break"
 msgstr "Ұ_зақ үзіліс"
 
-#: plugins/actions/resources/action-page.ui:170 plugins/actions/enums.vala:188
-msgid "Complete"
-msgstr "Аяқталды"
-
-#: plugins/actions/resources/action-page.ui:185 plugins/actions/enums.vala:191
-msgid "Skip"
-msgstr "Аттап кету"
-
-#: plugins/actions/resources/action-page.ui:230 plugins/actions/enums.vala:200
-msgid "Enable"
-msgstr "Іске қосу"
-
 #: plugins/actions/resources/action-page.ui:299
 msgid "Add"
 msgstr "Қосу"
@@ -368,159 +289,382 @@ msgstr "Қалып-күйдің ұзақтығы"
 msgid "Elapsed Time"
 msgstr "Өткен уақыты"
 
-#: plugins/actions/actions.vala:423
-msgid "Actions"
-msgstr "Әрекеттер"
+#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
+#: plugins/gnome/extension/indicator.js:84 src/window.vala:101
+msgid "Stats"
+msgstr "Статистика"
 
-#: plugins/actions/actions.vala:427
-msgid "Action"
-msgstr "Әрекет"
+#: plugins/gnome/extension/indicator.js:85
+msgid "Quit"
+msgstr "Шығу"
 
-#: plugins/actions/actions.vala:452
-msgid "Custom actions…"
-msgstr "Таңдауыңызша әрекеттер…"
-
-#: plugins/gnome/extension/dialogs.js:141
-#, javascript-format
-msgid "%d new message"
-msgid_plural "%d new messages"
-msgstr[0] "%d жаңа хабарлама"
-
-#: plugins/gnome/extension/indicator.js:132
+#: plugins/gnome/extension/indicator.js:123
+#: plugins/gnome/extension/notifications.js:128
+#: plugins/gnome/extension/notifications.js:549
 msgid "Pomodoro Timer"
 msgstr "Pomodoro таймері"
 
-#: plugins/gnome/extension/indicator.js:150
+#: plugins/gnome/extension/indicator.js:129
 msgid "Start Timer"
 msgstr "Таймерді бастау"
 
-#: plugins/gnome/extension/indicator.js:155
-#: plugins/gnome/extension/indicator.js:231
+#: plugins/gnome/extension/indicator.js:162
 msgid "Pause Timer"
 msgstr "Таймерді аялдату"
 
-#: plugins/gnome/extension/indicator.js:159
+#: plugins/gnome/extension/indicator.js:174
 msgid "Stop Timer"
 msgstr "Таймерді тоқтату"
 
-#: plugins/gnome/extension/indicator.js:230
-msgid "Resume Timer"
-msgstr "Таймерді жалғастыру"
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:179
+msgid "Pause break"
+msgstr "Кідірту"
 
-#: plugins/gnome/extension/notifications.js:226
-msgid "Take a break!"
-msgstr "Үзілісті алыңыз!"
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:166
+msgid "Pause Pomodoro"
+msgstr "Кідірту"
 
-#: plugins/gnome/extension/notifications.js:260
+#: plugins/gnome/extension/indicator.js:214
+#: src/notifications-capability.vala:141 src/notifications-capability.vala:162
+#: src/window.vala:167
+msgid "Take a break"
+msgstr "Үзілісті алыңыз"
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:175
+msgid "Resume break"
+msgstr "Жалғастыру"
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:162
+msgid "Resume Pomodoro"
+msgstr "Жалғастыру"
+
+#: plugins/gnome/extension/notifications.js:89
 #, javascript-format
-msgid "You have %d minute until next pomodoro."
-msgid_plural "You have %d minutes until next pomodoro."
-msgstr[0] "Сізде келесі помодороға дейін %d минут бар."
+msgid "%d minute remaining"
+msgid_plural "%d minutes remaining"
+msgstr[0] "%d минут қалды"
 
-#: plugins/gnome/extension/notifications.js:262
+#: plugins/gnome/extension/notifications.js:97
 #, javascript-format
-msgid "You have %d second until next pomodoro."
-msgid_plural "You have %d seconds until next pomodoro."
-msgstr[0] "Сізде келесі помодороға дейін %d секунд бар."
+msgid "%d second remaining"
+msgid_plural "%d seconds remaining"
+msgstr[0] "%d секунд қалды"
 
-#: plugins/gnome/extension/notifications.js:415
-msgid "Hey!"
-msgstr "Назар аударыңыз!"
+#: plugins/gnome/extension/notifications.js:289
+msgid "Pomodoro is about to end"
+msgstr "Помодоро аяқталуға жақын"
 
-#: plugins/gnome/extension/notifications.js:416
-msgid "You're missing out on a break"
-msgstr "Үзілісті жіберіп отырсыз"
+#: plugins/gnome/extension/notifications.js:295
+msgid "Take a long break"
+msgstr "Ұзақ үзіліс жасаңыз"
 
-#: plugins/gnome/extension/notifications.js:440
-#: plugins/gnome/gnome-shell-extension.vala:394
+#: plugins/gnome/extension/notifications.js:296
+msgid "Take a short break"
+msgstr "Қысқа үзіліс жасаңыз"
+
+#: plugins/gnome/extension/notifications.js:304
+msgid "Break is about to end"
+msgstr "Үзіліс аяқталуға жақын"
+
+#: plugins/gnome/extension/notifications.js:308
+msgid "Break is over"
+msgstr "Үзіліс аяқталды"
+
+#. body = _("Get ready for Pomodoro");
+#: plugins/gnome/extension/notifications.js:336
+msgid "Get ready…"
+msgstr "Дайын бол…"
+
+#: plugins/gnome/extension/notifications.js:362
+msgid "Skip Break"
+msgstr "Үзілісті өткізіп жіберу"
+
+#: plugins/gnome/extension/notifications.js:365
+msgid "+1 Minute"
+msgstr "+1 минут"
+
+#: plugins/gnome/extension/notifications.js:557
 msgid "Report issue"
 msgstr "Ақаулық жөнінде хабарлау"
 
-#: plugins/gnome/extension/timer.js:236
+#: plugins/gnome/extension/timer.js:248
 #, javascript-format
 msgid "Failed to run <i>%s</i> service"
 msgstr "<i>%s</i> қызметін жөнелту сәтсіз аяқталды"
 
-#: plugins/gnome/gnome-plugin.vala:181
+#: plugins/gnome/gnome-plugin.vala:290
 msgid "Hide other notifications"
 msgstr "Басқа хабарламаларды жасыру"
-
-#: plugins/gnome/gnome-shell-extension.vala:340
-#: plugins/gnome/gnome-shell-extension.vala:359
-#: plugins/gnome/gnome-shell-extension.vala:392
-msgid "Failed to enable extension"
-msgstr "Кеңейтуді іске қосу сәтсіз аяқталды"
-
-#: plugins/gnome/gnome-shell-extension.vala:341
-msgid "It seems to be uninstalled"
-msgstr "Ол жойылған сияқты"
-
-#: plugins/gnome/gnome-shell-extension.vala:360
-msgid "Extension is out of date"
-msgstr "Кеңейту ескірген"
-
-#: plugins/gnome/gnome-shell-extension.vala:361
-msgid "Upgrade"
-msgstr "Жаңарту"
 
 #: plugins/sounds/resources/preferences-sound-page.ui:33
 msgid "Volume:"
 msgstr "Дыбыс:"
 
-#: plugins/sounds/resources/preferences-sound-page.ui:168
-msgid "Add Sound"
-msgstr "Дыбысты қосу"
-
-#: plugins/sounds/resources/preferences-sound-page.ui:180
-msgid "Remove Sound"
-msgstr "Дыбысты өшіру"
-
-#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:402
+#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:410
 msgid "Clock Ticking"
 msgstr "Сағат дыбысы"
 
-#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:403
+#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:411
 msgid "Timer Ticking"
 msgstr "Таймер дыбысы"
 
-#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:404
+#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:412
 msgid "Woodland Birds"
 msgstr "Құстар"
 
-#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:464
-#: plugins/sounds/sounds-plugin.vala:503
+#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:472
+#: plugins/sounds/sounds-plugin.vala:511
 msgid "Bell"
 msgstr "Қоңырау"
 
-#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:465
-#: plugins/sounds/sounds-plugin.vala:504
+#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:473
+#: plugins/sounds/sounds-plugin.vala:512
 msgid "Loud Bell"
 msgstr "Қатты қоңырау"
 
-#: plugins/sounds/sounds-plugin.vala:328
+#: plugins/sounds/sounds-plugin.vala:334
 msgid "Select Custom Sound"
 msgstr "Таңдауыңызша дыбысты таңдаңыз"
 
-#: plugins/sounds/sounds-plugin.vala:560
+#: plugins/sounds/sounds-plugin.vala:337
+msgid "_Cancel"
+msgstr "_Бас тарту"
+
+#: plugins/sounds/sounds-plugin.vala:339
+msgid "_Select"
+msgstr "_Таңдау"
+
+#: plugins/sounds/sounds-plugin.vala:568
 msgid "Ticking Sound"
 msgstr "Тықылдайтын дыбыс"
 
-#: plugins/sounds/sounds-plugin.vala:564
+#: plugins/sounds/sounds-plugin.vala:572
 msgid "End of Break Sound"
 msgstr "Үзілістің аяқталу дыбысы"
 
-#: plugins/sounds/sounds-plugin.vala:568
+#: plugins/sounds/sounds-plugin.vala:576
 msgid "Start of Break Sound"
 msgstr "Үзілістің басталу дыбысы"
 
-#: plugins/sounds/sounds-plugin.vala:729
+#: plugins/sounds/sounds-plugin.vala:604 src/preferences-dialog.vala:590
+msgid "Off"
+msgstr "Сөнд."
+
+#: plugins/sounds/sounds-plugin.vala:744
 msgid "Ticking sound"
 msgstr "Тықылдайтын дыбыс"
 
-#: plugins/sounds/sounds-plugin.vala:734
+#: plugins/sounds/sounds-plugin.vala:749
 msgid "Start of break sound"
 msgstr "Үзілістің басталу дыбысы"
 
-#: plugins/sounds/sounds-plugin.vala:739
+#: plugins/sounds/sounds-plugin.vala:754
 msgid "End of break sound"
 msgstr "Үзілістің аяқталу дыбысы"
+
+#: src/about-dialog.vala:30
+msgid "About Pomodoro"
+msgstr "Pomodoro туралы"
+
+#: src/about-dialog.vala:41
+msgid "translator-credits"
+msgstr "Baurzhan Muftakhidinov <baurthefirst@gmail.com>"
+
+#: src/application.vala:87
+msgid "Start/Stop"
+msgstr "Бастау/тоқтату"
+
+#: src/application.vala:96
+msgid "Pause/Resume"
+msgstr "Аялдату/жалғастыру"
+
+#: src/application.vala:105
+msgid "Skip to a pomodoro or to a break"
+msgstr "Помодороға немесе үзіліске өтіңіз"
+
+#: src/application.vala:108
+msgid "Extend current pomodoro or break"
+msgstr "Ағымдағы помодоро кеңейтіңіз немесе үзіңіз"
+
+#: src/application.vala:111
+msgid "Reset current session"
+msgstr "Ағымдағы сеансты қалпына келтіріңіз"
+
+#: src/application.vala:114
+msgid "Run as background service"
+msgstr "Фон қызметі ретінде орындау"
+
+#: src/application.vala:117
+msgid "Show preferences"
+msgstr "Баптауларды көрсету"
+
+#: src/application.vala:120
+msgid "Quit application"
+msgstr "Қолданба жұмысын аяқтау"
+
+#: src/application.vala:123
+msgid "Print version information and exit"
+msgstr "Нұсқа ақпаратын шығару және шығу"
+
+#: src/notifications-capability.vala:130
+msgid "Focus on your task."
+msgstr "Тапсырмаңызға бар күшіңізді салыңыз."
+
+#: src/notifications-capability.vala:156
+#, c-format
+msgid "You have %d minute"
+msgid_plural "You have %d minutes"
+msgstr[0] "Сізде %d минут бар"
+
+#: src/notifications-capability.vala:158
+#, c-format
+msgid "You have %d second"
+msgid_plural "You have %d seconds"
+msgstr[0] "Сізде %d секунд бар"
+
+#: src/notifications-capability.vala:163
+msgid "Take a longer break"
+msgstr "Ұзағырақ үзілісті алыңыз"
+
+#: src/notifications-capability.vala:179
+msgid "Lengthen it"
+msgstr "Оны ұзарту"
+
+#: src/notifications-capability.vala:184
+msgid "Shorten it"
+msgstr "Оны қысқарту"
+
+#: src/notifications-capability.vala:189
+msgid "Start pomodoro"
+msgstr "Pomodoro іске қосу"
+
+#: src/preferences-dialog.vala:158
+#, c-format
+msgid ""
+"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
+"such as Control, Alt or Shift."
+msgstr ""
+"Жарлық ретінде \"%s\" қолдануды теруге теріс әсер тигізеді. Басқа пернені "
+"қосып көріңіз, мысалы, Control, Alt немесе Shift."
+
+#: src/preferences-dialog.vala:808
+msgid "Keyboard Shortcut"
+msgstr "Пернетақта жарлығы"
+
+#: src/presence.vala:80
+msgid "Available"
+msgstr "Бар"
+
+#: src/presence.vala:83
+msgid "Busy"
+msgstr "Бос емес"
+
+#: src/presence.vala:86
+msgid "Idle"
+msgstr "Іссіз"
+
+#: src/presence.vala:89
+msgid "Invisible"
+msgstr "Жасырын"
+
+#: src/stats-day-page.vala:66
+msgid "Yesterday"
+msgstr "Кеше"
+
+#: src/stats-page.vala:87
+#, c-format
+msgid "%d m"
+msgstr "%d м"
+
+#: src/stats-page.vala:93
+#, c-format
+msgid "%.0f h"
+msgstr "%.0f с"
+
+#: src/stats-page.vala:96
+#, c-format
+msgid "%.1f h"
+msgstr "%.1f с"
+
+#: src/stats-page.vala:573
+msgid "Break"
+msgstr "Үзіліс"
+
+#: src/stats-week-page.vala:58
+msgid "This week"
+msgstr "Осы апта"
+
+#: src/utils.vala:32
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d сағат"
+
+#: src/utils.vala:41
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d минут"
+
+#~ msgid "Kamil Prusko"
+#~ msgstr "Kamil Prusko"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 4.0"
+#~ msgstr "GNOME Shell үшін индикатор"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 3.36"
+#~ msgstr "GNOME Shell үшін индикатор"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 3.34 only"
+#~ msgstr "GNOME Shell үшін индикатор"
+
+#~ msgid "gnome-pomodoro"
+#~ msgstr "gnome-pomodoro"
+
+#~ msgid "Remind to take a break"
+#~ msgstr "Үзілісті алу туралы еске салу"
+
+#, javascript-format
+#~ msgid "%d new message"
+#~ msgid_plural "%d new messages"
+#~ msgstr[0] "%d жаңа хабарлама"
+
+#~ msgid "Take a break!"
+#~ msgstr "Үзілісті алыңыз!"
+
+#, javascript-format
+#~ msgid "You have %d minute until next pomodoro."
+#~ msgid_plural "You have %d minutes until next pomodoro."
+#~ msgstr[0] "Сізде келесі помодороға дейін %d минут бар."
+
+#, javascript-format
+#~ msgid "You have %d second until next pomodoro."
+#~ msgid_plural "You have %d seconds until next pomodoro."
+#~ msgstr[0] "Сізде келесі помодороға дейін %d секунд бар."
+
+#~ msgid "Hey!"
+#~ msgstr "Назар аударыңыз!"
+
+#~ msgid "You're missing out on a break"
+#~ msgstr "Үзілісті жіберіп отырсыз"
+
+#~ msgid "Failed to enable extension"
+#~ msgstr "Кеңейтуді іске қосу сәтсіз аяқталды"
+
+#~ msgid "It seems to be uninstalled"
+#~ msgstr "Ол жойылған сияқты"
+
+#~ msgid "Extension is out of date"
+#~ msgstr "Кеңейту ескірген"
+
+#~ msgid "Upgrade"
+#~ msgstr "Жаңарту"
+
+#~ msgid "Add Sound"
+#~ msgstr "Дыбысты қосу"
+
+#~ msgid "Remove Sound"
+#~ msgstr "Дыбысты өшіру"

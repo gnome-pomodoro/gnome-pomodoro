@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-12 07:47+0530\n"
+"POT-Creation-Date: 2023-03-24 15:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,170 +18,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:8
-#: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:28
-#: data/resources/window.ui:379 lib/about-dialog.vala:31
-#: lib/notifications-capability.vala:129 lib/stats-page.vala:527
-#: lib/window.vala:44 plugins/actions/enums.vala:91
-#: plugins/gnome/extension/indicator.js:164
-#: plugins/gnome/extension/indicator.js:596
-#: plugins/gnome/extension/notifications.js:240
-#: plugins/gnome/extension/notifications.js:275
-#: plugins/gnome/extension/timer.js:40 src/main.vala:50
+#: data/org.gnome.Pomodoro.appdata.xml:8 data/org.gnome.Pomodoro.desktop.in:3
+#: data/resources/menus.ui:28 data/resources/window.ui:382
+#: plugins/actions/enums.vala:92 plugins/gnome/extension/indicator.js:77
+#: plugins/gnome/extension/indicator.js:729
+#: plugins/gnome/extension/notifications.js:281
+#: plugins/gnome/extension/timer.js:41 src/about-dialog.vala:31
+#: src/main.vala:50 src/notifications-capability.vala:129
+#: src/stats-page.vala:527 src/window.vala:44
 msgid "Pomodoro"
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:9
+#: data/org.gnome.Pomodoro.appdata.xml:9
 msgid "A time management utility for GNOME"
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:11
+#: data/org.gnome.Pomodoro.appdata.xml:11
 msgid ""
 "A GNOME utility that helps managing time according to Pomodoro Technique. It "
 "intends to improve productivity and focus by taking short breaks after every "
 "25 minutes of work."
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:23
+#: data/org.gnome.Pomodoro.appdata.xml:23
 msgid "Timer window"
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:27 lib/preferences-dialog.vala:800
-#: plugins/gnome/extension/indicator.js:170
+#: data/org.gnome.Pomodoro.appdata.xml:27
+#: plugins/gnome/extension/indicator.js:83 src/preferences-dialog.vala:800
 msgid "Preferences"
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:31
+#: data/org.gnome.Pomodoro.appdata.xml:31
 msgid "Indicator for GNOME Shell"
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:36
-msgid "Kamil Prusko"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:49
-msgid "Overview of changes in gnome-pomodoro 0.18.0"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:51
-msgid "Support for GNOME Shell 3.38 (@ignapk and @szpak)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:52
-msgid "Removed ayatana-appindicator3 support"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:53
-msgid "Added Norwegian translation (@arnotixe)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:54
-msgid "Added Finnish translation (@iqqmuT)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:55
-msgid "Updated Indonesian translation (@atriwidada)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:56
-msgid "Updated Chinese translation (@wffger)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:57
-msgid "Updated Russian translation (@rkaverin)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:58
-msgid "Updated French translation (@precondition)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:64
-msgid "Overview of changes in gnome-pomodoro 0.17.0"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:66
-msgid "Support for GNOME Shell 3.36"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:67
-msgid "Updated Catalan translation (@antoniofsm)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:73
-msgid "Overview of changes in gnome-pomodoro 0.16.0"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:75
-msgid "Support for GNOME Shell 3.34 only"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:76
-msgid "Added esperanto translation (@SeZuo)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:77
-msgid "Moved app-menu to main window"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:83
-msgid "Overview of changes in gnome-pomodoro 0.15.1"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:85
-msgid "Minor code cleanups"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:91
-msgid "Overview of changes in gnome-pomodoro 0.15.0"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:93
-msgid "Minor code cleanups to support ES6 syntax"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:94
-msgid "Support for GNOME Shell 3.32 (@demokritos)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:95
-msgid "Fix for build with vala 0.44.1 (@snizovtsev)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:96
-msgid "Updated German translation (@c7hm4r)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:97
-msgid "Fix for handle error recreating existing folder (@Rj7)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:103
-msgid "Overview of changes in gnome-pomodoro 0.14.0"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:105
-msgid "Support for GNOME Shell 3.28 and 3.30 (@aerostitch)"
-msgstr ""
-
-#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
-#: data/org.gnome.Pomodoro.appdata.xml.in:106 lib/window.vala:97
-#: plugins/gnome/extension/indicator.js:171
-msgid "Stats"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:107
-msgid "Background blur under the dialog during breaks"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:108
-msgid "Updated German translation (@tsabsch)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:109
-msgid "Updated Russian translation (@tigertv)"
-msgstr ""
-
-#: data/org.gnome.Pomodoro.desktop.in:4 lib/about-dialog.vala:32
+#: data/org.gnome.Pomodoro.desktop.in:4 src/about-dialog.vala:32
 msgid "A simple time management utility"
 msgstr ""
 
@@ -189,36 +61,37 @@ msgstr ""
 msgid "timer;"
 msgstr ""
 
-#: data/resources/menus.ui:6 lib/application.vala:88
-#: plugins/actions/enums.vala:185 plugins/actions/resources/action-page.ui:155
+#: data/resources/menus.ui:6 plugins/actions/enums.vala:188
+#: plugins/actions/resources/action-page.ui:155 src/application.vala:90
 msgid "Start"
 msgstr ""
 
-#: data/resources/menus.ui:11 data/resources/window.ui:216
-#: lib/application.vala:97 lib/window.vala:197 plugins/actions/enums.vala:194
-#: plugins/actions/resources/action-page.ui:200
+#: data/resources/menus.ui:11 data/resources/window.ui:180
+#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:200
+#: src/application.vala:99
 msgid "Pause"
 msgstr ""
 
-#: data/resources/menus.ui:16 lib/application.vala:100 lib/window.vala:183
-#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:215
+#: data/resources/menus.ui:16 plugins/actions/enums.vala:200
+#: plugins/actions/resources/action-page.ui:215 src/application.vala:102
 msgid "Resume"
 msgstr ""
 
-#: data/resources/menus.ui:21 data/resources/window.ui:243
-#: lib/application.vala:91
+#: data/resources/menus.ui:21 data/resources/window.ui:207
+#: plugins/gnome/extension/indicator.js:221 src/application.vala:93
+#: src/window.vala:163 src/window.vala:176
 msgid "Stop"
 msgstr ""
 
-#: data/resources/menus.ui:33 data/resources/window.ui:395 lib/window.vala:45
-#: plugins/actions/enums.vala:94 plugins/gnome/extension/indicator.js:165
-#: plugins/gnome/extension/timer.js:43
+#: data/resources/menus.ui:33 data/resources/window.ui:398
+#: plugins/actions/enums.vala:95 plugins/gnome/extension/indicator.js:78
+#: plugins/gnome/extension/timer.js:44 src/window.vala:45
 msgid "Short Break"
 msgstr ""
 
-#: data/resources/menus.ui:38 data/resources/window.ui:411 lib/window.vala:46
-#: plugins/actions/enums.vala:97 plugins/gnome/extension/indicator.js:166
-#: plugins/gnome/extension/timer.js:46
+#: data/resources/menus.ui:38 data/resources/window.ui:414
+#: plugins/actions/enums.vala:98 plugins/gnome/extension/indicator.js:79
+#: plugins/gnome/extension/timer.js:47 src/window.vala:46
 msgid "Long Break"
 msgstr ""
 
@@ -226,11 +99,11 @@ msgstr ""
 msgid "_Timer"
 msgstr ""
 
-#: data/resources/menus.ui:49 data/resources/window.ui:307
+#: data/resources/menus.ui:49 data/resources/window.ui:309
 msgid "_Preferences"
 msgstr ""
 
-#: data/resources/menus.ui:53 data/resources/window.ui:346
+#: data/resources/menus.ui:53 data/resources/window.ui:348
 msgid "_Quit"
 msgstr ""
 
@@ -239,11 +112,11 @@ msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
 msgstr ""
 
 #: data/resources/preferences-keyboard-shortcut-page.ui:83
-#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:245
+#: plugins/actions/enums.vala:206 plugins/actions/resources/action-page.ui:245
 msgid "Disable"
 msgstr ""
 
-#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:283
+#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:247
 msgid "Timer"
 msgstr ""
 
@@ -287,7 +160,7 @@ msgstr ""
 msgid "Plugins…"
 msgstr ""
 
-#: data/resources/preferences.ui:8 lib/preferences-dialog.vala:804
+#: data/resources/preferences.ui:8 src/preferences-dialog.vala:804
 msgid "Plugins"
 msgstr ""
 
@@ -296,7 +169,7 @@ msgid "Back"
 msgstr ""
 
 #: data/resources/screen-notification.ui:89
-#: plugins/gnome/extension/dialogs.js:611
+#: plugins/gnome/extension/dialogs.js:1002
 msgid "It's time to take a break"
 msgstr ""
 
@@ -329,160 +202,18 @@ msgid "Next (Alt+Right)"
 msgstr ""
 
 #: data/resources/stats-view.ui:216 data/resources/stats-view.ui:319
-#: lib/stats-day-page.vala:62
+#: src/stats-day-page.vala:62
 msgid "Today"
 msgstr ""
 
-#: data/resources/window.ui:74
+#: data/resources/window.ui:36 plugins/gnome/extension/indicator.js:214
+#: src/window.vala:180
 msgid "Start Pomodoro"
 msgstr ""
 
-#: data/resources/window.ui:321
+#: data/resources/window.ui:323
 msgid "_About"
 msgstr ""
-
-#: lib/about-dialog.vala:30
-msgid "About Pomodoro"
-msgstr ""
-
-#: lib/about-dialog.vala:41
-msgid "translator-credits"
-msgstr ""
-
-#: lib/application.vala:85
-msgid "Start/Stop"
-msgstr ""
-
-#: lib/application.vala:94
-msgid "Pause/Resume"
-msgstr ""
-
-#: lib/application.vala:103
-msgid "Run as background service"
-msgstr ""
-
-#: lib/application.vala:106
-msgid "Show preferences"
-msgstr ""
-
-#: lib/application.vala:109
-msgid "Quit application"
-msgstr ""
-
-#: lib/application.vala:112
-msgid "Print version information and exit"
-msgstr ""
-
-#: lib/notifications-capability.vala:130
-msgid "Focus on your task."
-msgstr ""
-
-#: lib/notifications-capability.vala:141 lib/notifications-capability.vala:162
-#: plugins/gnome/extension/notifications.js:430
-msgid "Take a break"
-msgstr ""
-
-#: lib/notifications-capability.vala:156
-#, c-format
-msgid "You have %d minute"
-msgid_plural "You have %d minutes"
-msgstr[0] ""
-msgstr[1] ""
-
-#: lib/notifications-capability.vala:158
-#, c-format
-msgid "You have %d second"
-msgid_plural "You have %d seconds"
-msgstr[0] ""
-msgstr[1] ""
-
-#: lib/notifications-capability.vala:163
-msgid "Take a longer break"
-msgstr ""
-
-#: lib/notifications-capability.vala:179
-msgid "Lengthen it"
-msgstr ""
-
-#: lib/notifications-capability.vala:184
-msgid "Shorten it"
-msgstr ""
-
-#: lib/notifications-capability.vala:189
-msgid "Start pomodoro"
-msgstr ""
-
-#: lib/preferences-dialog.vala:158
-#, c-format
-msgid ""
-"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
-"such as Control, Alt or Shift."
-msgstr ""
-
-#: lib/preferences-dialog.vala:590 plugins/sounds/sounds-plugin.vala:604
-msgid "Off"
-msgstr ""
-
-#: lib/preferences-dialog.vala:808
-msgid "Keyboard Shortcut"
-msgstr ""
-
-#: lib/presence.vala:78
-msgid "Available"
-msgstr ""
-
-#: lib/presence.vala:81
-msgid "Busy"
-msgstr ""
-
-#: lib/presence.vala:84
-msgid "Idle"
-msgstr ""
-
-#: lib/presence.vala:87
-msgid "Invisible"
-msgstr ""
-
-#: lib/stats-day-page.vala:66
-msgid "Yesterday"
-msgstr ""
-
-#: lib/stats-page.vala:87
-#, c-format
-msgid "%d m"
-msgstr ""
-
-#: lib/stats-page.vala:93
-#, c-format
-msgid "%.0f h"
-msgstr ""
-
-#: lib/stats-page.vala:96
-#, c-format
-msgid "%.1f h"
-msgstr ""
-
-#: lib/stats-page.vala:573
-msgid "Break"
-msgstr ""
-
-#: lib/stats-week-page.vala:58
-msgid "This week"
-msgstr ""
-
-#: lib/utils.vala:32
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
-
-#: lib/utils.vala:41
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
 
 #: plugins/actions/actions.vala:423
 msgid "Actions"
@@ -496,16 +227,15 @@ msgstr ""
 msgid "Custom actions…"
 msgstr ""
 
-#: plugins/actions/enums.vala:188 plugins/actions/resources/action-page.ui:170
+#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:170
 msgid "Complete"
 msgstr ""
 
-#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:185
-#: plugins/gnome/extension/notifications.js:681
+#: plugins/actions/enums.vala:194 plugins/actions/resources/action-page.ui:185
 msgid "Skip"
 msgstr ""
 
-#: plugins/actions/enums.vala:200 plugins/actions/resources/action-page.ui:230
+#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:230
 msgid "Enable"
 msgstr ""
 
@@ -554,100 +284,113 @@ msgstr ""
 msgid "Elapsed Time"
 msgstr ""
 
-#: plugins/gnome/extension/indicator.js:116
-#: plugins/gnome/extension/notifications.js:86
-#: plugins/gnome/extension/notifications.js:643
-msgid "Pomodoro Timer"
+#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
+#: plugins/gnome/extension/indicator.js:84 src/window.vala:101
+msgid "Stats"
 msgstr ""
 
-#: plugins/gnome/extension/indicator.js:123
-msgid "Start Timer"
-msgstr ""
-
-#: plugins/gnome/extension/indicator.js:149
-#: plugins/gnome/extension/indicator.js:225
-msgid "Pause Timer"
-msgstr ""
-
-#: plugins/gnome/extension/indicator.js:153
-msgid "Stop Timer"
-msgstr ""
-
-#: plugins/gnome/extension/indicator.js:172
+#: plugins/gnome/extension/indicator.js:85
 msgid "Quit"
 msgstr ""
 
-#: plugins/gnome/extension/indicator.js:224
-msgid "Resume Timer"
+#: plugins/gnome/extension/indicator.js:123
+#: plugins/gnome/extension/notifications.js:128
+#: plugins/gnome/extension/notifications.js:549
+msgid "Pomodoro Timer"
 msgstr ""
 
-#: plugins/gnome/extension/notifications.js:282
-msgid "Break is about to end"
+#: plugins/gnome/extension/indicator.js:129
+msgid "Start Timer"
 msgstr ""
 
-#: plugins/gnome/extension/notifications.js:311
-#: plugins/gnome/extension/notifications.js:458
-#: plugins/gnome/extension/notifications.js:585
-#: plugins/gnome/extension/notifications.js:720
+#: plugins/gnome/extension/indicator.js:162
+msgid "Pause Timer"
+msgstr ""
+
+#: plugins/gnome/extension/indicator.js:174
+msgid "Stop Timer"
+msgstr ""
+
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:179
+msgid "Pause break"
+msgstr ""
+
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:166
+msgid "Pause Pomodoro"
+msgstr ""
+
+#: plugins/gnome/extension/indicator.js:214
+#: src/notifications-capability.vala:141 src/notifications-capability.vala:162
+#: src/window.vala:167
+msgid "Take a break"
+msgstr ""
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:175
+msgid "Resume break"
+msgstr ""
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:162
+msgid "Resume Pomodoro"
+msgstr ""
+
+#: plugins/gnome/extension/notifications.js:89
 #, javascript-format
 msgid "%d minute remaining"
 msgid_plural "%d minutes remaining"
 msgstr[0] ""
 msgstr[1] ""
 
-#: plugins/gnome/extension/notifications.js:313
-#: plugins/gnome/extension/notifications.js:460
-#: plugins/gnome/extension/notifications.js:587
-#: plugins/gnome/extension/notifications.js:722
+#: plugins/gnome/extension/notifications.js:97
 #, javascript-format
 msgid "%d second remaining"
 msgid_plural "%d seconds remaining"
 msgstr[0] ""
 msgstr[1] ""
 
-#: plugins/gnome/extension/notifications.js:342
-#: plugins/gnome/extension/notifications.js:476
-#: plugins/gnome/extension/notifications.js:686
-msgid "+1 Minute"
-msgstr ""
-
-#: plugins/gnome/extension/notifications.js:423
+#: plugins/gnome/extension/notifications.js:289
 msgid "Pomodoro is about to end"
 msgstr ""
 
-#: plugins/gnome/extension/notifications.js:471
+#: plugins/gnome/extension/notifications.js:295
+msgid "Take a long break"
+msgstr ""
+
+#: plugins/gnome/extension/notifications.js:296
+msgid "Take a short break"
+msgstr ""
+
+#: plugins/gnome/extension/notifications.js:304
+msgid "Break is about to end"
+msgstr ""
+
+#: plugins/gnome/extension/notifications.js:308
+msgid "Break is over"
+msgstr ""
+
+#. body = _("Get ready for Pomodoro");
+#: plugins/gnome/extension/notifications.js:336
+msgid "Get ready…"
+msgstr ""
+
+#: plugins/gnome/extension/notifications.js:362
 msgid "Skip Break"
 msgstr ""
 
-#: plugins/gnome/extension/notifications.js:651
-#: plugins/gnome/gnome-shell-extension.vala:408
+#: plugins/gnome/extension/notifications.js:365
+msgid "+1 Minute"
+msgstr ""
+
+#: plugins/gnome/extension/notifications.js:557
 msgid "Report issue"
 msgstr ""
 
-#: plugins/gnome/extension/notifications.js:731
-msgid "Paused"
-msgstr ""
-
-#: plugins/gnome/extension/timer.js:245
+#: plugins/gnome/extension/timer.js:248
 #, javascript-format
 msgid "Failed to run <i>%s</i> service"
 msgstr ""
 
-#: plugins/gnome/gnome-plugin.vala:167
+#: plugins/gnome/gnome-plugin.vala:290
 msgid "Hide other notifications"
-msgstr ""
-
-#: plugins/gnome/gnome-shell-extension.vala:373
-#: plugins/gnome/gnome-shell-extension.vala:406
-msgid "Failed to enable extension"
-msgstr ""
-
-#: plugins/gnome/gnome-shell-extension.vala:374
-msgid "Extension is out of date"
-msgstr ""
-
-#: plugins/gnome/gnome-shell-extension.vala:375
-msgid "Upgrade"
 msgstr ""
 
 #: plugins/sounds/resources/preferences-sound-page.ui:33
@@ -700,6 +443,10 @@ msgstr ""
 msgid "Start of Break Sound"
 msgstr ""
 
+#: plugins/sounds/sounds-plugin.vala:604 src/preferences-dialog.vala:590
+msgid "Off"
+msgstr ""
+
 #: plugins/sounds/sounds-plugin.vala:744
 msgid "Ticking sound"
 msgstr ""
@@ -711,3 +458,149 @@ msgstr ""
 #: plugins/sounds/sounds-plugin.vala:754
 msgid "End of break sound"
 msgstr ""
+
+#: src/about-dialog.vala:30
+msgid "About Pomodoro"
+msgstr ""
+
+#: src/about-dialog.vala:41
+msgid "translator-credits"
+msgstr ""
+
+#: src/application.vala:87
+msgid "Start/Stop"
+msgstr ""
+
+#: src/application.vala:96
+msgid "Pause/Resume"
+msgstr ""
+
+#: src/application.vala:105
+msgid "Skip to a pomodoro or to a break"
+msgstr ""
+
+#: src/application.vala:108
+msgid "Extend current pomodoro or break"
+msgstr ""
+
+#: src/application.vala:111
+msgid "Reset current session"
+msgstr ""
+
+#: src/application.vala:114
+msgid "Run as background service"
+msgstr ""
+
+#: src/application.vala:117
+msgid "Show preferences"
+msgstr ""
+
+#: src/application.vala:120
+msgid "Quit application"
+msgstr ""
+
+#: src/application.vala:123
+msgid "Print version information and exit"
+msgstr ""
+
+#: src/notifications-capability.vala:130
+msgid "Focus on your task."
+msgstr ""
+
+#: src/notifications-capability.vala:156
+#, c-format
+msgid "You have %d minute"
+msgid_plural "You have %d minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/notifications-capability.vala:158
+#, c-format
+msgid "You have %d second"
+msgid_plural "You have %d seconds"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/notifications-capability.vala:163
+msgid "Take a longer break"
+msgstr ""
+
+#: src/notifications-capability.vala:179
+msgid "Lengthen it"
+msgstr ""
+
+#: src/notifications-capability.vala:184
+msgid "Shorten it"
+msgstr ""
+
+#: src/notifications-capability.vala:189
+msgid "Start pomodoro"
+msgstr ""
+
+#: src/preferences-dialog.vala:158
+#, c-format
+msgid ""
+"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
+"such as Control, Alt or Shift."
+msgstr ""
+
+#: src/preferences-dialog.vala:808
+msgid "Keyboard Shortcut"
+msgstr ""
+
+#: src/presence.vala:80
+msgid "Available"
+msgstr ""
+
+#: src/presence.vala:83
+msgid "Busy"
+msgstr ""
+
+#: src/presence.vala:86
+msgid "Idle"
+msgstr ""
+
+#: src/presence.vala:89
+msgid "Invisible"
+msgstr ""
+
+#: src/stats-day-page.vala:66
+msgid "Yesterday"
+msgstr ""
+
+#: src/stats-page.vala:87
+#, c-format
+msgid "%d m"
+msgstr ""
+
+#: src/stats-page.vala:93
+#, c-format
+msgid "%.0f h"
+msgstr ""
+
+#: src/stats-page.vala:96
+#, c-format
+msgid "%.1f h"
+msgstr ""
+
+#: src/stats-page.vala:573
+msgid "Break"
+msgstr ""
+
+#: src/stats-week-page.vala:58
+msgid "This week"
+msgstr ""
+
+#: src/utils.vala:32
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/utils.vala:41
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] ""
+msgstr[1] ""

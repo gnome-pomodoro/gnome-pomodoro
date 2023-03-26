@@ -7,9 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro master\n"
-"Report-Msgid-Bugs-To: https://github.com/gnome-pomodoro/gnome-pomodoro/issues\n"
-"POT-Creation-Date: 2017-09-22 20:00+0200\n"
-"PO-Revision-Date: 2020-04-26 14:32+0700\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-24 15:30+0100\n"
+"PO-Revision-Date: 2023-03-25 12:01+0100\n"
 "Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian\n"
 "Language: id\n"
@@ -17,26 +17,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 3.1.1\n"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:7
-#: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:57
-#: data/resources/window.ui:287 lib/about-dialog.vala:31
-#: lib/notifications-capability.vala:129 lib/stats-page.vala:558
-#: lib/window.vala:44 plugins/actions/enums.vala:91
-#: plugins/gnome/extension/indicator.js:176
-#: plugins/gnome/extension/indicator.js:735
-#: plugins/gnome/extension/notifications.js:218
-#: plugins/gnome/extension/notifications.js:244
-#: plugins/gnome/extension/timer.js:41 src/main.vala:50
+#: data/org.gnome.Pomodoro.appdata.xml:8 data/org.gnome.Pomodoro.desktop.in:3
+#: data/resources/menus.ui:28 data/resources/window.ui:382
+#: plugins/actions/enums.vala:92 plugins/gnome/extension/indicator.js:77
+#: plugins/gnome/extension/indicator.js:729
+#: plugins/gnome/extension/notifications.js:281
+#: plugins/gnome/extension/timer.js:41 src/about-dialog.vala:31
+#: src/main.vala:50 src/notifications-capability.vala:129
+#: src/stats-page.vala:527 src/window.vala:44
 msgid "Pomodoro"
 msgstr "Pomodoro"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:8
+#: data/org.gnome.Pomodoro.appdata.xml:9
 msgid "A time management utility for GNOME"
 msgstr "Suatu utilitas manajemen waktu untuk GNOME"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:10
+#: data/org.gnome.Pomodoro.appdata.xml:11
 msgid ""
 "A GNOME utility that helps managing time according to Pomodoro Technique. It "
 "intends to improve productivity and focus by taking short breaks after every "
@@ -46,25 +44,20 @@ msgstr ""
 "Pomodoro. Hal ini bermaksud untuk menambah fokus beserta produktifitas "
 "melalui mengambilan jeda istirahat sejenak setiap 25 menit dari pekerjaan."
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:19
-#| msgid "Timer Ticking"
+#: data/org.gnome.Pomodoro.appdata.xml:23
 msgid "Timer window"
 msgstr "Jendela pengatur waktu"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:23 lib/preferences-dialog.vala:798
-#: plugins/gnome/extension/indicator.js:182
+#: data/org.gnome.Pomodoro.appdata.xml:27
+#: plugins/gnome/extension/indicator.js:83 src/preferences-dialog.vala:800
 msgid "Preferences"
 msgstr "Preferensi"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:27
+#: data/org.gnome.Pomodoro.appdata.xml:31
 msgid "Indicator for GNOME Shell"
 msgstr "Indikator untuk GNOME Shell"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:32
-msgid "Kamil Prusko"
-msgstr "Kamil Prusko"
-
-#: data/org.gnome.Pomodoro.desktop.in:4 lib/about-dialog.vala:32
+#: data/org.gnome.Pomodoro.desktop.in:4 src/about-dialog.vala:32
 msgid "A simple time management utility"
 msgstr "Suatu utilitas simpel manajemen waktu"
 
@@ -72,63 +65,51 @@ msgstr "Suatu utilitas simpel manajemen waktu"
 msgid "timer;"
 msgstr "timer;"
 
-#: data/org.gnome.Pomodoro.desktop.in:7
-msgid "gnome-pomodoro"
-msgstr "gnome-pomodoro"
-
-#: data/resources/menus.ui:6 data/resources/menus.ui:74
-msgid "_Timer"
-msgstr "_Timer"
-
-#: data/resources/menus.ui:10
-#| msgid "State"
-msgid "_Stats"
-msgstr "_Statistik"
-
-#: data/resources/menus.ui:16 data/resources/menus.ui:78
-msgid "_Preferences"
-msgstr "_Preferensi"
-
-#: data/resources/menus.ui:22
-msgid "_About"
-msgstr "Tent_ang"
-
-#: data/resources/menus.ui:26 data/resources/menus.ui:82
-msgid "_Quit"
-msgstr "_Keluar"
-
-#: data/resources/menus.ui:35 lib/application.vala:88
-#: plugins/actions/enums.vala:185 plugins/actions/resources/action-page.ui:155
+#: data/resources/menus.ui:6 plugins/actions/enums.vala:188
+#: plugins/actions/resources/action-page.ui:155 src/application.vala:90
 msgid "Start"
 msgstr "Mulai"
 
-#: data/resources/menus.ui:40 data/resources/window.ui:178
-#: lib/application.vala:97 lib/window.vala:197 plugins/actions/enums.vala:194
-#: plugins/actions/resources/action-page.ui:200
+#: data/resources/menus.ui:11 data/resources/window.ui:180
+#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:200
+#: src/application.vala:99
 msgid "Pause"
 msgstr "Jeda"
 
-#: data/resources/menus.ui:45 lib/application.vala:100 lib/window.vala:183
-#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:215
+#: data/resources/menus.ui:16 plugins/actions/enums.vala:200
+#: plugins/actions/resources/action-page.ui:215 src/application.vala:102
 msgid "Resume"
 msgstr "Lanjut"
 
-#: data/resources/menus.ui:50 data/resources/window.ui:205
-#: lib/application.vala:91
+#: data/resources/menus.ui:21 data/resources/window.ui:207
+#: plugins/gnome/extension/indicator.js:221 src/application.vala:93
+#: src/window.vala:163 src/window.vala:176
 msgid "Stop"
 msgstr "Berhenti"
 
-#: data/resources/menus.ui:62 data/resources/window.ui:303 lib/window.vala:45
-#: plugins/actions/enums.vala:94 plugins/gnome/extension/indicator.js:177
-#: plugins/gnome/extension/timer.js:44
+#: data/resources/menus.ui:33 data/resources/window.ui:398
+#: plugins/actions/enums.vala:95 plugins/gnome/extension/indicator.js:78
+#: plugins/gnome/extension/timer.js:44 src/window.vala:45
 msgid "Short Break"
 msgstr "Rehat Pendek"
 
-#: data/resources/menus.ui:67 data/resources/window.ui:319 lib/window.vala:46
-#: plugins/actions/enums.vala:97 plugins/gnome/extension/indicator.js:178
-#: plugins/gnome/extension/timer.js:47
+#: data/resources/menus.ui:38 data/resources/window.ui:414
+#: plugins/actions/enums.vala:98 plugins/gnome/extension/indicator.js:79
+#: plugins/gnome/extension/timer.js:47 src/window.vala:46
 msgid "Long Break"
 msgstr "Rehat Panjang"
+
+#: data/resources/menus.ui:45
+msgid "_Timer"
+msgstr "_Timer"
+
+#: data/resources/menus.ui:49 data/resources/window.ui:309
+msgid "_Preferences"
+msgstr "_Preferensi"
+
+#: data/resources/menus.ui:53 data/resources/window.ui:348
+msgid "_Quit"
+msgstr "_Keluar"
 
 #: data/resources/preferences-keyboard-shortcut-page.ui:29
 msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
@@ -137,11 +118,11 @@ msgstr ""
 "pintasan baru."
 
 #: data/resources/preferences-keyboard-shortcut-page.ui:83
-#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:245
+#: plugins/actions/enums.vala:206 plugins/actions/resources/action-page.ui:245
 msgid "Disable"
 msgstr "Nonaktifkan"
 
-#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:245
+#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:247
 msgid "Timer"
 msgstr "Timer"
 
@@ -185,7 +166,7 @@ msgstr "Tunggu aktifitas setelah rehat"
 msgid "Plugins…"
 msgstr "Pengaya…"
 
-#: data/resources/preferences.ui:8 lib/preferences-dialog.vala:802
+#: data/resources/preferences.ui:8 src/preferences-dialog.vala:804
 msgid "Plugins"
 msgstr "Plugins"
 
@@ -194,7 +175,7 @@ msgid "Back"
 msgstr "Kembali"
 
 #: data/resources/screen-notification.ui:89
-#: plugins/gnome/extension/dialogs.js:591
+#: plugins/gnome/extension/dialogs.js:1002
 msgid "It's time to take a break"
 msgstr "Waktunya rehat"
 
@@ -206,15 +187,15 @@ msgstr "Belum ada yang dapat dilihat"
 msgid "Complete a few sessions"
 msgstr "Selesaikan beberapa sesi"
 
-#: data/resources/stats-view.ui:86 data/resources/stats-view.ui:344
+#: data/resources/stats-view.ui:86 data/resources/stats-view.ui:343
 msgid "Day"
 msgstr "Hari"
 
-#: data/resources/stats-view.ui:109 data/resources/stats-view.ui:357
+#: data/resources/stats-view.ui:109 data/resources/stats-view.ui:356
 msgid "Week"
 msgstr "Minggu"
 
-#: data/resources/stats-view.ui:133 data/resources/stats-view.ui:370
+#: data/resources/stats-view.ui:133 data/resources/stats-view.ui:369
 msgid "Month"
 msgstr "Bulan"
 
@@ -226,165 +207,19 @@ msgstr "Sebelumnya (Alt+Kiri)"
 msgid "Next (Alt+Right)"
 msgstr "Berikutnya (Alt+Kanan)"
 
-#: data/resources/stats-view.ui:216 data/resources/stats-view.ui:320
-#: lib/stats-day-page.vala:62
+#: data/resources/stats-view.ui:216 data/resources/stats-view.ui:319
+#: src/stats-day-page.vala:62
 msgid "Today"
 msgstr "Hari ini"
 
-#: data/resources/window.ui:36
+#: data/resources/window.ui:36 plugins/gnome/extension/indicator.js:214
+#: src/window.vala:180
 msgid "Start Pomodoro"
 msgstr "Mulai Pomodoro"
 
-#: lib/about-dialog.vala:30
-msgid "About Pomodoro"
-msgstr "Tentang Pomodoro"
-
-#: lib/about-dialog.vala:41
-msgid "translator-credits"
-msgstr ""
-"Ali <admin@situsali.com>, 2017\n"
-"Andika Triwidada <andika@gmail.com>, 2020"
-
-#: lib/application.vala:85
-msgid "Start/Stop"
-msgstr "Mulai/Berhenti"
-
-#: lib/application.vala:94
-msgid "Pause/Resume"
-msgstr "Jeda/Lanjut"
-
-#: lib/application.vala:103
-msgid "Run as background service"
-msgstr "Jalankan sebagai layanan latar belakang"
-
-#: lib/application.vala:106
-msgid "Show preferences"
-msgstr "Tampilkan preferensi"
-
-#: lib/application.vala:109
-msgid "Quit application"
-msgstr "Keluar aplikasi"
-
-#: lib/application.vala:112
-msgid "Print version information and exit"
-msgstr "Cetak informasi versi dan keluar"
-
-#: lib/notifications-capability.vala:130
-msgid "Focus on your task."
-msgstr "Fokus pada tugas Anda."
-
-#: lib/notifications-capability.vala:141 lib/notifications-capability.vala:162
-#: plugins/gnome/extension/notifications.js:387
-msgid "Take a break"
-msgstr "Waktunya rehat"
-
-#: lib/notifications-capability.vala:156
-#, c-format
-msgid "You have %d minute"
-msgid_plural "You have %d minutes"
-msgstr[0] "Kamu memiliki %d menit"
-msgstr[1] "Kamu memiliki %d menit"
-
-#: lib/notifications-capability.vala:158
-#, c-format
-msgid "You have %d second"
-msgid_plural "You have %d seconds"
-msgstr[0] "Kamu memiliki %d detik"
-msgstr[1] "Kamu memiliki %d detik"
-
-#: lib/notifications-capability.vala:163
-msgid "Take a longer break"
-msgstr "Ambil rehat yang lebih lama"
-
-#: lib/notifications-capability.vala:179
-msgid "Lengthen it"
-msgstr "Perpanjang"
-
-#: lib/notifications-capability.vala:184
-msgid "Shorten it"
-msgstr "Perpendek"
-
-#: lib/notifications-capability.vala:189
-msgid "Start pomodoro"
-msgstr "Mulai pomodoro"
-
-#: lib/preferences-dialog.vala:158
-#, c-format
-msgid ""
-"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
-"such as Control, Alt or Shift."
-msgstr ""
-"Menggunakan \"%s\" sebagai pintasan yang akan mengganggu pengetikan. Coba "
-"tambahkan tombol lainnya seperti Control, Alt, atau Shift."
-
-#: lib/preferences-dialog.vala:590 plugins/sounds/sounds-plugin.vala:597
-msgid "Off"
-msgstr "Mati"
-
-#: lib/preferences-dialog.vala:806
-msgid "Keyboard Shortcut"
-msgstr "Pintasan Papan Ketik"
-
-#: lib/presence.vala:78
-msgid "Available"
-msgstr "Ada"
-
-#: lib/presence.vala:81
-msgid "Busy"
-msgstr "Sibuk"
-
-#: lib/presence.vala:84
-msgid "Idle"
-msgstr "Mengganggur"
-
-#: lib/presence.vala:87
-msgid "Invisible"
-msgstr "Tak tampak"
-
-#: lib/stats-day-page.vala:66
-msgid "Yesterday"
-msgstr "Kemarin"
-
-#: lib/stats-page.vala:87
-#, c-format
-msgid "%d m"
-msgstr "%d m"
-
-#: lib/stats-page.vala:93
-#, c-format
-msgid "%.0f h"
-msgstr "%.0f j"
-
-#: lib/stats-page.vala:96
-#, c-format
-msgid "%.1f h"
-msgstr "%.1f j"
-
-#: lib/stats-page.vala:604
-msgid "Break"
-msgstr "Rehat"
-
-#: lib/stats-week-page.vala:58
-msgid "This week"
-msgstr "Minggu Ini"
-
-#: lib/utils.vala:64
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d jam"
-msgstr[1] "%d jam"
-
-#: lib/utils.vala:73
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d menit"
-msgstr[1] "%d menit"
-
-#: lib/window.vala:97 plugins/gnome/extension/indicator.js:183
-msgid "Stats"
-msgstr "Statistik"
+#: data/resources/window.ui:323
+msgid "_About"
+msgstr "Tent_ang"
 
 #: plugins/actions/actions.vala:423
 msgid "Actions"
@@ -398,16 +233,15 @@ msgstr "Aksi"
 msgid "Custom actions…"
 msgstr "Aksi ubahan…"
 
-#: plugins/actions/enums.vala:188 plugins/actions/resources/action-page.ui:170
+#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:170
 msgid "Complete"
 msgstr "Komplit"
 
-#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:185
-#: plugins/gnome/extension/notifications.js:619
+#: plugins/actions/enums.vala:194 plugins/actions/resources/action-page.ui:185
 msgid "Skip"
 msgstr "Lewati"
 
-#: plugins/actions/enums.vala:200 plugins/actions/resources/action-page.ui:230
+#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:230
 msgid "Enable"
 msgstr "Aktifkan"
 
@@ -456,159 +290,364 @@ msgstr "Durasi Keadaan"
 msgid "Elapsed Time"
 msgstr "Waktu Berlalu"
 
-#: plugins/gnome/extension/indicator.js:129
-#: plugins/gnome/extension/notifications.js:75
-#: plugins/gnome/extension/notifications.js:489
-msgid "Pomodoro Timer"
-msgstr "Timer Pomodoro"
+#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
+#: plugins/gnome/extension/indicator.js:84 src/window.vala:101
+msgid "Stats"
+msgstr "Statistik"
 
-#: plugins/gnome/extension/indicator.js:136
-msgid "Start Timer"
-msgstr "Timer Mulai"
-
-#: plugins/gnome/extension/indicator.js:161
-#: plugins/gnome/extension/indicator.js:238
-msgid "Pause Timer"
-msgstr "Timer Jeda"
-
-#: plugins/gnome/extension/indicator.js:165
-msgid "Stop Timer"
-msgstr "Timer Berhenti"
-
-#: plugins/gnome/extension/indicator.js:184
+#: plugins/gnome/extension/indicator.js:85
 msgid "Quit"
 msgstr "Keluar"
 
-#: plugins/gnome/extension/indicator.js:237
-msgid "Resume Timer"
-msgstr "Timer Lanjut"
+#: plugins/gnome/extension/indicator.js:123
+#: plugins/gnome/extension/notifications.js:128
+#: plugins/gnome/extension/notifications.js:549
+msgid "Pomodoro Timer"
+msgstr "Timer Pomodoro"
 
-#: plugins/gnome/extension/notifications.js:251
-msgid "Break is about to end"
-msgstr "Rehat akan berakhir"
+#: plugins/gnome/extension/indicator.js:129
+msgid "Start Timer"
+msgstr "Timer Mulai"
 
-#: plugins/gnome/extension/notifications.js:280
-#: plugins/gnome/extension/notifications.js:415
-#: plugins/gnome/extension/notifications.js:559
-#: plugins/gnome/extension/notifications.js:666
+#: plugins/gnome/extension/indicator.js:162
+msgid "Pause Timer"
+msgstr "Timer Jeda"
+
+#: plugins/gnome/extension/indicator.js:174
+msgid "Stop Timer"
+msgstr "Timer Berhenti"
+
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:179
+msgid "Pause break"
+msgstr "Jeda"
+
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:166
+msgid "Pause Pomodoro"
+msgstr "Jeda"
+
+#: plugins/gnome/extension/indicator.js:214
+#: src/notifications-capability.vala:141 src/notifications-capability.vala:162
+#: src/window.vala:167
+msgid "Take a break"
+msgstr "Waktunya rehat"
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:175
+msgid "Resume break"
+msgstr "Lanjut"
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:162
+msgid "Resume Pomodoro"
+msgstr "Lanjut"
+
+#: plugins/gnome/extension/notifications.js:89
 #, javascript-format
 msgid "%d minute remaining"
 msgid_plural "%d minutes remaining"
 msgstr[0] "%d menit tersisa"
 msgstr[1] "%d menit tersisa"
 
-#: plugins/gnome/extension/notifications.js:282
-#: plugins/gnome/extension/notifications.js:417
-#: plugins/gnome/extension/notifications.js:561
-#: plugins/gnome/extension/notifications.js:668
+#: plugins/gnome/extension/notifications.js:97
 #, javascript-format
 msgid "%d second remaining"
 msgid_plural "%d seconds remaining"
 msgstr[0] "%d detik tersisa"
 msgstr[1] "%d detik tersisa"
 
-#: plugins/gnome/extension/notifications.js:312
-#: plugins/gnome/extension/notifications.js:438
-#: plugins/gnome/extension/notifications.js:625
-#| msgid "%d minute"
-#| msgid_plural "%d minutes"
-msgid "+1 Minute"
-msgstr "+1 Menit"
-
-#: plugins/gnome/extension/notifications.js:380
+#: plugins/gnome/extension/notifications.js:289
 msgid "Pomodoro is about to end"
 msgstr "Pomodoro akan berakhir"
 
-#: plugins/gnome/extension/notifications.js:432
+#: plugins/gnome/extension/notifications.js:295
+msgid "Take a long break"
+msgstr "Istirahat panjang"
+
+#: plugins/gnome/extension/notifications.js:296
+msgid "Take a short break"
+msgstr "Istirahat sejenak"
+
+#: plugins/gnome/extension/notifications.js:304
+msgid "Break is about to end"
+msgstr "Rehat akan berakhir"
+
+#: plugins/gnome/extension/notifications.js:308
+msgid "Break is over"
+msgstr "Istirahat telah selesai"
+
+#. body = _("Get ready for Pomodoro");
+#: plugins/gnome/extension/notifications.js:336
+msgid "Get ready…"
+msgstr "Siap-siap…"
+
+#: plugins/gnome/extension/notifications.js:362
 msgid "Skip Break"
 msgstr "Lewati Rehat"
 
-#: plugins/gnome/extension/notifications.js:497
-#: plugins/gnome/gnome-shell-extension.vala:441
+#: plugins/gnome/extension/notifications.js:365
+msgid "+1 Minute"
+msgstr "+1 Menit"
+
+#: plugins/gnome/extension/notifications.js:557
 msgid "Report issue"
 msgstr "Laporkan isu"
 
-#: plugins/gnome/extension/notifications.js:677
-msgid "Paused"
-msgstr "Dijeda"
-
-#: plugins/gnome/extension/timer.js:247
+#: plugins/gnome/extension/timer.js:248
 #, javascript-format
 msgid "Failed to run <i>%s</i> service"
 msgstr "Gagal menjalankan layanan <i>%s</i>"
 
-#: plugins/gnome/gnome-plugin.vala:168
+#: plugins/gnome/gnome-plugin.vala:290
 msgid "Hide other notifications"
 msgstr "Sembunyikan notifikasi lainnya"
-
-#: plugins/gnome/gnome-shell-extension.vala:387
-#: plugins/gnome/gnome-shell-extension.vala:406
-#: plugins/gnome/gnome-shell-extension.vala:439
-msgid "Failed to enable extension"
-msgstr "Gagal mengaktifkan extension"
-
-#: plugins/gnome/gnome-shell-extension.vala:388
-msgid "It seems to be uninstalled"
-msgstr "Nampaknya tidak dipasang"
-
-#: plugins/gnome/gnome-shell-extension.vala:407
-msgid "Extension is out of date"
-msgstr "Extension sudah kedaluwarsa"
-
-#: plugins/gnome/gnome-shell-extension.vala:408
-msgid "Upgrade"
-msgstr "Tingkatkan"
 
 #: plugins/sounds/resources/preferences-sound-page.ui:33
 msgid "Volume:"
 msgstr "Volume:"
 
-#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:403
+#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:410
 msgid "Clock Ticking"
 msgstr "Detak Jam"
 
-#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:404
+#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:411
 msgid "Timer Ticking"
 msgstr "Detak Timer"
 
-#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:405
+#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:412
 msgid "Woodland Birds"
 msgstr "Burung Woodland"
 
-#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:465
-#: plugins/sounds/sounds-plugin.vala:504
+#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:472
+#: plugins/sounds/sounds-plugin.vala:511
 msgid "Bell"
 msgstr "Bel"
 
-#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:466
-#: plugins/sounds/sounds-plugin.vala:505
+#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:473
+#: plugins/sounds/sounds-plugin.vala:512
 msgid "Loud Bell"
 msgstr "Bel Kencang"
 
-#: plugins/sounds/sounds-plugin.vala:329
+#: plugins/sounds/sounds-plugin.vala:334
 msgid "Select Custom Sound"
 msgstr "Pilih Suara Ubahan"
 
-#: plugins/sounds/sounds-plugin.vala:561
+#: plugins/sounds/sounds-plugin.vala:337
+msgid "_Cancel"
+msgstr "_Batal"
+
+#: plugins/sounds/sounds-plugin.vala:339
+msgid "_Select"
+msgstr "_Pilih"
+
+#: plugins/sounds/sounds-plugin.vala:568
 msgid "Ticking Sound"
 msgstr "Suara Detak"
 
-#: plugins/sounds/sounds-plugin.vala:565
+#: plugins/sounds/sounds-plugin.vala:572
 msgid "End of Break Sound"
 msgstr "Suara Akhir Rehat"
 
-#: plugins/sounds/sounds-plugin.vala:569
+#: plugins/sounds/sounds-plugin.vala:576
 msgid "Start of Break Sound"
 msgstr "Suara Awal Rehat"
 
-#: plugins/sounds/sounds-plugin.vala:737
+#: plugins/sounds/sounds-plugin.vala:604 src/preferences-dialog.vala:590
+msgid "Off"
+msgstr "Mati"
+
+#: plugins/sounds/sounds-plugin.vala:744
 msgid "Ticking sound"
 msgstr "Suara Detak"
 
-#: plugins/sounds/sounds-plugin.vala:742
+#: plugins/sounds/sounds-plugin.vala:749
 msgid "Start of break sound"
 msgstr "Suara awal rehat"
 
-#: plugins/sounds/sounds-plugin.vala:747
+#: plugins/sounds/sounds-plugin.vala:754
 msgid "End of break sound"
 msgstr "Suara akhir rehat"
+
+#: src/about-dialog.vala:30
+msgid "About Pomodoro"
+msgstr "Tentang Pomodoro"
+
+#: src/about-dialog.vala:41
+msgid "translator-credits"
+msgstr ""
+"Ali <admin@situsali.com>, 2017\n"
+"Andika Triwidada <andika@gmail.com>, 2020"
+
+#: src/application.vala:87
+msgid "Start/Stop"
+msgstr "Mulai/Berhenti"
+
+#: src/application.vala:96
+msgid "Pause/Resume"
+msgstr "Jeda/Lanjut"
+
+#: src/application.vala:105
+msgid "Skip to a pomodoro or to a break"
+msgstr "Lewati ke pomodoro atau istirahat"
+
+#: src/application.vala:108
+msgid "Extend current pomodoro or break"
+msgstr "Perpanjang pomodoro saat ini atau putus"
+
+#: src/application.vala:111
+msgid "Reset current session"
+msgstr "Setel ulang sesi saat ini"
+
+#: src/application.vala:114
+msgid "Run as background service"
+msgstr "Jalankan sebagai layanan latar belakang"
+
+#: src/application.vala:117
+msgid "Show preferences"
+msgstr "Tampilkan preferensi"
+
+#: src/application.vala:120
+msgid "Quit application"
+msgstr "Keluar aplikasi"
+
+#: src/application.vala:123
+msgid "Print version information and exit"
+msgstr "Cetak informasi versi dan keluar"
+
+#: src/notifications-capability.vala:130
+msgid "Focus on your task."
+msgstr "Fokus pada tugas Anda."
+
+#: src/notifications-capability.vala:156
+#, c-format
+msgid "You have %d minute"
+msgid_plural "You have %d minutes"
+msgstr[0] "Kamu memiliki %d menit"
+msgstr[1] "Kamu memiliki %d menit"
+
+#: src/notifications-capability.vala:158
+#, c-format
+msgid "You have %d second"
+msgid_plural "You have %d seconds"
+msgstr[0] "Kamu memiliki %d detik"
+msgstr[1] "Kamu memiliki %d detik"
+
+#: src/notifications-capability.vala:163
+msgid "Take a longer break"
+msgstr "Ambil rehat yang lebih lama"
+
+#: src/notifications-capability.vala:179
+msgid "Lengthen it"
+msgstr "Perpanjang"
+
+#: src/notifications-capability.vala:184
+msgid "Shorten it"
+msgstr "Perpendek"
+
+#: src/notifications-capability.vala:189
+msgid "Start pomodoro"
+msgstr "Mulai pomodoro"
+
+#: src/preferences-dialog.vala:158
+#, c-format
+msgid ""
+"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
+"such as Control, Alt or Shift."
+msgstr ""
+"Menggunakan \"%s\" sebagai pintasan yang akan mengganggu pengetikan. Coba "
+"tambahkan tombol lainnya seperti Control, Alt, atau Shift."
+
+#: src/preferences-dialog.vala:808
+msgid "Keyboard Shortcut"
+msgstr "Pintasan Papan Ketik"
+
+#: src/presence.vala:80
+msgid "Available"
+msgstr "Ada"
+
+#: src/presence.vala:83
+msgid "Busy"
+msgstr "Sibuk"
+
+#: src/presence.vala:86
+msgid "Idle"
+msgstr "Mengganggur"
+
+#: src/presence.vala:89
+msgid "Invisible"
+msgstr "Tak tampak"
+
+#: src/stats-day-page.vala:66
+msgid "Yesterday"
+msgstr "Kemarin"
+
+#: src/stats-page.vala:87
+#, c-format
+msgid "%d m"
+msgstr "%d m"
+
+#: src/stats-page.vala:93
+#, c-format
+msgid "%.0f h"
+msgstr "%.0f j"
+
+#: src/stats-page.vala:96
+#, c-format
+msgid "%.1f h"
+msgstr "%.1f j"
+
+#: src/stats-page.vala:573
+msgid "Break"
+msgstr "Rehat"
+
+#: src/stats-week-page.vala:58
+msgid "This week"
+msgstr "Minggu Ini"
+
+#: src/utils.vala:32
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d jam"
+msgstr[1] "%d jam"
+
+#: src/utils.vala:41
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d menit"
+msgstr[1] "%d menit"
+
+#~ msgid "Kamil Prusko"
+#~ msgstr "Kamil Prusko"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 4.0"
+#~ msgstr "Indikator untuk GNOME Shell"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 3.36"
+#~ msgstr "Indikator untuk GNOME Shell"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 3.34 only"
+#~ msgstr "Indikator untuk GNOME Shell"
+
+#~ msgid "gnome-pomodoro"
+#~ msgstr "gnome-pomodoro"
+
+#~| msgid "State"
+#~ msgid "_Stats"
+#~ msgstr "_Statistik"
+
+#~ msgid "Paused"
+#~ msgstr "Dijeda"
+
+#~ msgid "Failed to enable extension"
+#~ msgstr "Gagal mengaktifkan extension"
+
+#~ msgid "It seems to be uninstalled"
+#~ msgstr "Nampaknya tidak dipasang"
+
+#~ msgid "Extension is out of date"
+#~ msgstr "Extension sudah kedaluwarsa"
+
+#~ msgid "Upgrade"
+#~ msgstr "Tingkatkan"

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro 0.13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-12 07:47+0530\n"
-"PO-Revision-Date: 2021-08-03 20:13+0200\n"
+"POT-Creation-Date: 2023-03-24 15:30+0100\n"
+"PO-Revision-Date: 2023-03-26 11:34+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch\n"
 "Language: nl\n"
@@ -16,26 +16,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.1.1\n"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:8
-#: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:28
-#: data/resources/window.ui:379 lib/about-dialog.vala:31
-#: lib/notifications-capability.vala:129 lib/stats-page.vala:527
-#: lib/window.vala:44 plugins/actions/enums.vala:91
-#: plugins/gnome/extension/indicator.js:164
-#: plugins/gnome/extension/indicator.js:596
-#: plugins/gnome/extension/notifications.js:240
-#: plugins/gnome/extension/notifications.js:275
-#: plugins/gnome/extension/timer.js:40 src/main.vala:50
+#: data/org.gnome.Pomodoro.appdata.xml:8 data/org.gnome.Pomodoro.desktop.in:3
+#: data/resources/menus.ui:28 data/resources/window.ui:382
+#: plugins/actions/enums.vala:92 plugins/gnome/extension/indicator.js:77
+#: plugins/gnome/extension/indicator.js:729
+#: plugins/gnome/extension/notifications.js:281
+#: plugins/gnome/extension/timer.js:41 src/about-dialog.vala:31
+#: src/main.vala:50 src/notifications-capability.vala:129
+#: src/stats-page.vala:527 src/window.vala:44
 msgid "Pomodoro"
 msgstr "Pomodoro"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:9
+#: data/org.gnome.Pomodoro.appdata.xml:9
 msgid "A time management utility for GNOME"
 msgstr "Een tijdindelingstoepassing voor GNOME"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:11
+#: data/org.gnome.Pomodoro.appdata.xml:11
 msgid ""
 "A GNOME utility that helps managing time according to Pomodoro Technique. It "
 "intends to improve productivity and focus by taking short breaks after every "
@@ -45,149 +43,20 @@ msgstr ""
 "techniek. Deze techniek is bedoeld om uw productiviteit en focus te "
 "verbeteren door telkens na 25 minuten werken korte pauzes te nemen."
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:23
+#: data/org.gnome.Pomodoro.appdata.xml:23
 msgid "Timer window"
 msgstr "Tijdklokvenster"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:27 lib/preferences-dialog.vala:800
-#: plugins/gnome/extension/indicator.js:170
+#: data/org.gnome.Pomodoro.appdata.xml:27
+#: plugins/gnome/extension/indicator.js:83 src/preferences-dialog.vala:800
 msgid "Preferences"
 msgstr "Voorkeuren"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:31
+#: data/org.gnome.Pomodoro.appdata.xml:31
 msgid "Indicator for GNOME Shell"
 msgstr "GNOME Shell-indicator"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:36
-msgid "Kamil Prusko"
-msgstr "Kamil Prusko"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:49
-msgid "Overview of changes in gnome-pomodoro 0.18.0"
-msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:51
-msgid "Support for GNOME Shell 3.38 (@ignapk and @szpak)"
-msgstr "Ondersteuning voor GNOME Shell 3.38 (met dank aan @ignapk en @szpak)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:52
-msgid "Removed ayatana-appindicator3 support"
-msgstr "ayatana-appindicator3-ondersteuning verwijderd"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:53
-msgid "Added Norwegian translation (@arnotixe)"
-msgstr "Noorse vertaling (met dank aan @arnotixe)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:54
-msgid "Added Finnish translation (@iqqmuT)"
-msgstr "Finse vertaling (met dank aan @iqqmuT)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:55
-msgid "Updated Indonesian translation (@atriwidada)"
-msgstr "Indonesische vertaling bijgewerkt (met dank aan @atriwidada)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:56
-msgid "Updated Chinese translation (@wffger)"
-msgstr "Chinese vertaling bijgewerkt (met dank aan @wffger)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:57
-msgid "Updated Russian translation (@rkaverin)"
-msgstr "Russische vertaling bijgewerkt (met dank aan @rkaverin)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:58
-msgid "Updated French translation (@precondition)"
-msgstr "Franse vertaling bijgewerkt (met dank aan @precondition)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:64
-msgid "Overview of changes in gnome-pomodoro 0.17.0"
-msgstr "Wijzigingslog van gnome-pomodoro 0.17.0"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:66
-msgid "Support for GNOME Shell 3.36"
-msgstr "Ondersteuning voor GNOME Shell 3.36"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:67
-msgid "Updated Catalan translation (@antoniofsm)"
-msgstr "Catalaanse vertaling bijgewerkt (met dank aan @antoniofsm)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:73
-msgid "Overview of changes in gnome-pomodoro 0.16.0"
-msgstr "Wijzigingslog van gnome-pomodoro 0.16.0"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:75
-msgid "Support for GNOME Shell 3.34 only"
-msgstr "Ondersteuning voor GNOME Shell 3.34"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:76
-msgid "Added esperanto translation (@SeZuo)"
-msgstr "Esperanto-vertaling (met dank aan @SeZuo)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:77
-msgid "Moved app-menu to main window"
-msgstr "Het toepassingsmenu is verplaatst naar het hoofdvenster"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:83
-msgid "Overview of changes in gnome-pomodoro 0.15.1"
-msgstr "Wijzigingslog van gnome-pomodoro 0.15.1"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:85
-msgid "Minor code cleanups"
-msgstr "Enkele codeverbeteringen"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:91
-msgid "Overview of changes in gnome-pomodoro 0.15.0"
-msgstr "Wijzigingslog van gnome-pomodoro 0.15.0"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:93
-msgid "Minor code cleanups to support ES6 syntax"
-msgstr "Enkele codeverbeteringen ten behoeve van de ES6-syntax"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:94
-msgid "Support for GNOME Shell 3.32 (@demokritos)"
-msgstr "Ondersteuning voor GNOME Shell 3.32 (met dank aan @demokritos)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:95
-msgid "Fix for build with vala 0.44.1 (@snizovtsev)"
-msgstr ""
-"Oplossing voor het compileren met vala 0.44.1 (met dank aan @snizovtsev)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:96
-msgid "Updated German translation (@c7hm4r)"
-msgstr "Duitse vertaling bijgewerkt (met dank aan @c7hm4r)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:97
-msgid "Fix for handle error recreating existing folder (@Rj7)"
-msgstr ""
-"Oplossing voor behandelingsfout omtrent het opnieuw aanmaken van een "
-"bestaande map (met dank aan @Rj7)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:103
-msgid "Overview of changes in gnome-pomodoro 0.14.0"
-msgstr "Wijzigingslog van gnome-pomodoro 0.14.0"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:105
-msgid "Support for GNOME Shell 3.28 and 3.30 (@aerostitch)"
-msgstr "Ondersteuning voor GNOME Shell 3.28 en 3.30 (met dank aan @aerostitch)"
-
-#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
-#: data/org.gnome.Pomodoro.appdata.xml.in:106 lib/window.vala:97
-#: plugins/gnome/extension/indicator.js:171
-msgid "Stats"
-msgstr "Statistieken"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:107
-msgid "Background blur under the dialog during breaks"
-msgstr "Achtergrondvervaging tijdens pauzes"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:108
-msgid "Updated German translation (@tsabsch)"
-msgstr "Duitse vertaling bijgewerkt (met dank aan @tsabsch)"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:109
-msgid "Updated Russian translation (@tigertv)"
-msgstr "Russische vertaling bijgewerkt (met dank aan @tigertv)"
-
-#: data/org.gnome.Pomodoro.desktop.in:4 lib/about-dialog.vala:32
+#: data/org.gnome.Pomodoro.desktop.in:4 src/about-dialog.vala:32
 msgid "A simple time management utility"
 msgstr "Een eenvoudige tijdindelingstoepassing"
 
@@ -195,36 +64,37 @@ msgstr "Een eenvoudige tijdindelingstoepassing"
 msgid "timer;"
 msgstr "timer;tijdklok;tijdindeling;"
 
-#: data/resources/menus.ui:6 lib/application.vala:88
-#: plugins/actions/enums.vala:185 plugins/actions/resources/action-page.ui:155
+#: data/resources/menus.ui:6 plugins/actions/enums.vala:188
+#: plugins/actions/resources/action-page.ui:155 src/application.vala:90
 msgid "Start"
 msgstr "Starten"
 
-#: data/resources/menus.ui:11 data/resources/window.ui:216
-#: lib/application.vala:97 lib/window.vala:197 plugins/actions/enums.vala:194
-#: plugins/actions/resources/action-page.ui:200
+#: data/resources/menus.ui:11 data/resources/window.ui:180
+#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:200
+#: src/application.vala:99
 msgid "Pause"
 msgstr "Onderbreken"
 
-#: data/resources/menus.ui:16 lib/application.vala:100 lib/window.vala:183
-#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:215
+#: data/resources/menus.ui:16 plugins/actions/enums.vala:200
+#: plugins/actions/resources/action-page.ui:215 src/application.vala:102
 msgid "Resume"
 msgstr "Hervatten"
 
-#: data/resources/menus.ui:21 data/resources/window.ui:243
-#: lib/application.vala:91
+#: data/resources/menus.ui:21 data/resources/window.ui:207
+#: plugins/gnome/extension/indicator.js:221 src/application.vala:93
+#: src/window.vala:163 src/window.vala:176
 msgid "Stop"
 msgstr "Stoppen"
 
-#: data/resources/menus.ui:33 data/resources/window.ui:395 lib/window.vala:45
-#: plugins/actions/enums.vala:94 plugins/gnome/extension/indicator.js:165
-#: plugins/gnome/extension/timer.js:43
+#: data/resources/menus.ui:33 data/resources/window.ui:398
+#: plugins/actions/enums.vala:95 plugins/gnome/extension/indicator.js:78
+#: plugins/gnome/extension/timer.js:44 src/window.vala:45
 msgid "Short Break"
 msgstr "Korte pauze"
 
-#: data/resources/menus.ui:38 data/resources/window.ui:411 lib/window.vala:46
-#: plugins/actions/enums.vala:97 plugins/gnome/extension/indicator.js:166
-#: plugins/gnome/extension/timer.js:46
+#: data/resources/menus.ui:38 data/resources/window.ui:414
+#: plugins/actions/enums.vala:98 plugins/gnome/extension/indicator.js:79
+#: plugins/gnome/extension/timer.js:47 src/window.vala:46
 msgid "Long Break"
 msgstr "Lange pauze"
 
@@ -232,11 +102,11 @@ msgstr "Lange pauze"
 msgid "_Timer"
 msgstr "_Tijdklok"
 
-#: data/resources/menus.ui:49 data/resources/window.ui:307
+#: data/resources/menus.ui:49 data/resources/window.ui:309
 msgid "_Preferences"
 msgstr "_Voorkeuren"
 
-#: data/resources/menus.ui:53 data/resources/window.ui:346
+#: data/resources/menus.ui:53 data/resources/window.ui:348
 msgid "_Quit"
 msgstr "_Afsluiten"
 
@@ -247,11 +117,11 @@ msgstr ""
 "toetscombinatie om te veranderen."
 
 #: data/resources/preferences-keyboard-shortcut-page.ui:83
-#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:245
+#: plugins/actions/enums.vala:206 plugins/actions/resources/action-page.ui:245
 msgid "Disable"
 msgstr "Uitschakelen"
 
-#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:283
+#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:247
 msgid "Timer"
 msgstr "Tijdklok"
 
@@ -295,7 +165,7 @@ msgstr "Wachten op activiteit na pauzes"
 msgid "Plugins…"
 msgstr "Plug-ins…"
 
-#: data/resources/preferences.ui:8 lib/preferences-dialog.vala:804
+#: data/resources/preferences.ui:8 src/preferences-dialog.vala:804
 msgid "Plugins"
 msgstr "Plug-ins"
 
@@ -304,7 +174,7 @@ msgid "Back"
 msgstr "Terug"
 
 #: data/resources/screen-notification.ui:89
-#: plugins/gnome/extension/dialogs.js:611
+#: plugins/gnome/extension/dialogs.js:1002
 msgid "It's time to take a break"
 msgstr "Het is tijd voor een pauze"
 
@@ -337,164 +207,18 @@ msgid "Next (Alt+Right)"
 msgstr "Vorige (Alt+pijltje naar rechts)"
 
 #: data/resources/stats-view.ui:216 data/resources/stats-view.ui:319
-#: lib/stats-day-page.vala:62
+#: src/stats-day-page.vala:62
 msgid "Today"
 msgstr "Vandaag"
 
-#: data/resources/window.ui:74
+#: data/resources/window.ui:36 plugins/gnome/extension/indicator.js:214
+#: src/window.vala:180
 msgid "Start Pomodoro"
 msgstr "Pomodoro starten"
 
-#: data/resources/window.ui:321
+#: data/resources/window.ui:323
 msgid "_About"
 msgstr "_Over"
-
-#: lib/about-dialog.vala:30
-msgid "About Pomodoro"
-msgstr "Over Pomodoro"
-
-#: lib/about-dialog.vala:41
-msgid "translator-credits"
-msgstr ""
-"Johannes Kool\n"
-"Heimen Stoffels <vistausss@fastmail.com>"
-
-#: lib/application.vala:85
-msgid "Start/Stop"
-msgstr "Starten/Stoppen"
-
-#: lib/application.vala:94
-msgid "Pause/Resume"
-msgstr "Onderbreken/Hervatten"
-
-#: lib/application.vala:103
-msgid "Run as background service"
-msgstr "Uitvoeren als achtergronddienst"
-
-#: lib/application.vala:106
-msgid "Show preferences"
-msgstr "Voorkeuren tonen"
-
-#: lib/application.vala:109
-msgid "Quit application"
-msgstr "Toepassing afsluiten"
-
-#: lib/application.vala:112
-msgid "Print version information and exit"
-msgstr "Versie-informatie tonen en afsluiten"
-
-#: lib/notifications-capability.vala:130
-msgid "Focus on your task."
-msgstr "Focus op je taak."
-
-#: lib/notifications-capability.vala:141 lib/notifications-capability.vala:162
-#: plugins/gnome/extension/notifications.js:430
-msgid "Take a break"
-msgstr "Neem een pauze"
-
-#: lib/notifications-capability.vala:156
-#, c-format
-msgid "You have %d minute"
-msgid_plural "You have %d minutes"
-msgstr[0] "Je hebt nog %d minuut"
-msgstr[1] "Je hebt nog %d minuten"
-
-#: lib/notifications-capability.vala:158
-#, c-format
-msgid "You have %d second"
-msgid_plural "You have %d seconds"
-msgstr[0] "Je hebt nog %d seconde"
-msgstr[1] "Je hebt nog %d seconden"
-
-#: lib/notifications-capability.vala:163
-msgid "Take a longer break"
-msgstr "Neem een langere pauze"
-
-#: lib/notifications-capability.vala:179
-msgid "Lengthen it"
-msgstr "Verlengen"
-
-#: lib/notifications-capability.vala:184
-msgid "Shorten it"
-msgstr "Inkorten"
-
-#: lib/notifications-capability.vala:189
-msgid "Start pomodoro"
-msgstr "Pomodoro starten"
-
-#: lib/preferences-dialog.vala:158
-#, c-format
-msgid ""
-"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
-"such as Control, Alt or Shift."
-msgstr ""
-"De toets ‘%s’ wordt gebruikt om te typen. Probeer een tweede toets toe te "
-"voegen, zoals Ctrl, Alt of Shift."
-
-#: lib/preferences-dialog.vala:590 plugins/sounds/sounds-plugin.vala:604
-msgid "Off"
-msgstr "Uit"
-
-#: lib/preferences-dialog.vala:808
-msgid "Keyboard Shortcut"
-msgstr "Sneltoets"
-
-#: lib/presence.vala:78
-msgid "Available"
-msgstr "Beschikbaar"
-
-#: lib/presence.vala:81
-msgid "Busy"
-msgstr "Bezig"
-
-#: lib/presence.vala:84
-msgid "Idle"
-msgstr "Inactief"
-
-#: lib/presence.vala:87
-msgid "Invisible"
-msgstr "Onzichtbaar"
-
-#: lib/stats-day-page.vala:66
-msgid "Yesterday"
-msgstr "Gisteren"
-
-#: lib/stats-page.vala:87
-#, c-format
-msgid "%d m"
-msgstr "%d min."
-
-#: lib/stats-page.vala:93
-#, c-format
-msgid "%.0f h"
-msgstr "%.0f uur"
-
-#: lib/stats-page.vala:96
-#, c-format
-msgid "%.1f h"
-msgstr "%.1f uur"
-
-#: lib/stats-page.vala:573
-msgid "Break"
-msgstr "Pauze"
-
-#: lib/stats-week-page.vala:58
-msgid "This week"
-msgstr "Deze week"
-
-#: lib/utils.vala:32
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d uur"
-msgstr[1] "%d uur"
-
-#: lib/utils.vala:41
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuut"
-msgstr[1] "%d minuten"
 
 #: plugins/actions/actions.vala:423
 msgid "Actions"
@@ -508,16 +232,15 @@ msgstr "Actie"
 msgid "Custom actions…"
 msgstr "Aangepaste acties…"
 
-#: plugins/actions/enums.vala:188 plugins/actions/resources/action-page.ui:170
+#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:170
 msgid "Complete"
 msgstr "Afronden"
 
-#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:185
-#: plugins/gnome/extension/notifications.js:681
+#: plugins/actions/enums.vala:194 plugins/actions/resources/action-page.ui:185
 msgid "Skip"
 msgstr "Overslaan"
 
-#: plugins/actions/enums.vala:200 plugins/actions/resources/action-page.ui:230
+#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:230
 msgid "Enable"
 msgstr "Inschakelen"
 
@@ -566,101 +289,114 @@ msgstr "Statusduur"
 msgid "Elapsed Time"
 msgstr "Verstreken tijd"
 
-#: plugins/gnome/extension/indicator.js:116
-#: plugins/gnome/extension/notifications.js:86
-#: plugins/gnome/extension/notifications.js:643
-msgid "Pomodoro Timer"
-msgstr "Pomodoro-tijdklok"
+#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
+#: plugins/gnome/extension/indicator.js:84 src/window.vala:101
+msgid "Stats"
+msgstr "Statistieken"
 
-#: plugins/gnome/extension/indicator.js:123
-msgid "Start Timer"
-msgstr "Tijdklok starten"
-
-#: plugins/gnome/extension/indicator.js:149
-#: plugins/gnome/extension/indicator.js:225
-msgid "Pause Timer"
-msgstr "Tijdklok onderbreken"
-
-#: plugins/gnome/extension/indicator.js:153
-msgid "Stop Timer"
-msgstr "Tijdklok stoppen"
-
-#: plugins/gnome/extension/indicator.js:172
+#: plugins/gnome/extension/indicator.js:85
 msgid "Quit"
 msgstr "Afsluiten"
 
-#: plugins/gnome/extension/indicator.js:224
-msgid "Resume Timer"
-msgstr "Tijdklok hervatten"
+#: plugins/gnome/extension/indicator.js:123
+#: plugins/gnome/extension/notifications.js:128
+#: plugins/gnome/extension/notifications.js:549
+msgid "Pomodoro Timer"
+msgstr "Pomodoro-tijdklok"
 
-#: plugins/gnome/extension/notifications.js:282
-msgid "Break is about to end"
-msgstr "De pauze is bijna voorbij"
+#: plugins/gnome/extension/indicator.js:129
+msgid "Start Timer"
+msgstr "Tijdklok starten"
 
-#: plugins/gnome/extension/notifications.js:311
-#: plugins/gnome/extension/notifications.js:458
-#: plugins/gnome/extension/notifications.js:585
-#: plugins/gnome/extension/notifications.js:720
+#: plugins/gnome/extension/indicator.js:162
+msgid "Pause Timer"
+msgstr "Tijdklok onderbreken"
+
+#: plugins/gnome/extension/indicator.js:174
+msgid "Stop Timer"
+msgstr "Tijdklok stoppen"
+
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:179
+msgid "Pause break"
+msgstr "Onderbreken"
+
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:166
+msgid "Pause Pomodoro"
+msgstr "Onderbreken"
+
+#: plugins/gnome/extension/indicator.js:214
+#: src/notifications-capability.vala:141 src/notifications-capability.vala:162
+#: src/window.vala:167
+msgid "Take a break"
+msgstr "Neem een pauze"
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:175
+msgid "Resume break"
+msgstr "Hervatten"
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:162
+msgid "Resume Pomodoro"
+msgstr "Hervatten"
+
+#: plugins/gnome/extension/notifications.js:89
 #, javascript-format
 msgid "%d minute remaining"
 msgid_plural "%d minutes remaining"
 msgstr[0] "Nog %d minuut te gaan"
 msgstr[1] "Nog %d minuten te gaan"
 
-#: plugins/gnome/extension/notifications.js:313
-#: plugins/gnome/extension/notifications.js:460
-#: plugins/gnome/extension/notifications.js:587
-#: plugins/gnome/extension/notifications.js:722
+#: plugins/gnome/extension/notifications.js:97
 #, javascript-format
 msgid "%d second remaining"
 msgid_plural "%d seconds remaining"
 msgstr[0] "%d seconde te gaan"
 msgstr[1] "%d seconden te gaan"
 
-#: plugins/gnome/extension/notifications.js:342
-#: plugins/gnome/extension/notifications.js:476
-#: plugins/gnome/extension/notifications.js:686
-msgid "+1 Minute"
-msgstr "+1 minuut"
-
-#: plugins/gnome/extension/notifications.js:423
+#: plugins/gnome/extension/notifications.js:289
 msgid "Pomodoro is about to end"
 msgstr "De Pomodoro verstrijkt bijna"
 
-#: plugins/gnome/extension/notifications.js:471
+#: plugins/gnome/extension/notifications.js:295
+msgid "Take a long break"
+msgstr "Neem een lange pauze"
+
+#: plugins/gnome/extension/notifications.js:296
+msgid "Take a short break"
+msgstr "Neem een korte pauze"
+
+#: plugins/gnome/extension/notifications.js:304
+msgid "Break is about to end"
+msgstr "De pauze is bijna voorbij"
+
+#: plugins/gnome/extension/notifications.js:308
+msgid "Break is over"
+msgstr "Pauze is afgelopen"
+
+#. body = _("Get ready for Pomodoro");
+#: plugins/gnome/extension/notifications.js:336
+msgid "Get ready…"
+msgstr "Maak je klaar…"
+
+#: plugins/gnome/extension/notifications.js:362
 msgid "Skip Break"
 msgstr "Pauze overslaan"
 
-#: plugins/gnome/extension/notifications.js:651
-#: plugins/gnome/gnome-shell-extension.vala:408
+#: plugins/gnome/extension/notifications.js:365
+msgid "+1 Minute"
+msgstr "+1 minuut"
+
+#: plugins/gnome/extension/notifications.js:557
 msgid "Report issue"
 msgstr "Probleem melden"
 
-#: plugins/gnome/extension/notifications.js:731
-msgid "Paused"
-msgstr "Onderbroken"
-
-#: plugins/gnome/extension/timer.js:245
+#: plugins/gnome/extension/timer.js:248
 #, javascript-format
 msgid "Failed to run <i>%s</i> service"
 msgstr "<i>%s</i> kan niet worden uitgevoerd"
 
-#: plugins/gnome/gnome-plugin.vala:167
+#: plugins/gnome/gnome-plugin.vala:290
 msgid "Hide other notifications"
 msgstr "Andere meldingen verbergen"
-
-#: plugins/gnome/gnome-shell-extension.vala:373
-#: plugins/gnome/gnome-shell-extension.vala:406
-msgid "Failed to enable extension"
-msgstr "De uitbreiding kan niet worden ingeschakeld"
-
-#: plugins/gnome/gnome-shell-extension.vala:374
-msgid "Extension is out of date"
-msgstr "De uitbreiding is verouderd"
-
-#: plugins/gnome/gnome-shell-extension.vala:375
-msgid "Upgrade"
-msgstr "Bijwerken"
 
 #: plugins/sounds/resources/preferences-sound-page.ui:33
 msgid "Volume:"
@@ -712,6 +448,10 @@ msgstr "Geluid aan het einde van de pauze"
 msgid "Start of Break Sound"
 msgstr "Geluid aan het begin van de pauze"
 
+#: plugins/sounds/sounds-plugin.vala:604 src/preferences-dialog.vala:590
+msgid "Off"
+msgstr "Uit"
+
 #: plugins/sounds/sounds-plugin.vala:744
 msgid "Ticking sound"
 msgstr "Getik"
@@ -723,6 +463,348 @@ msgstr "Geluid aan het begin van de pauze"
 #: plugins/sounds/sounds-plugin.vala:754
 msgid "End of break sound"
 msgstr "Geluid aan het einde de pauze"
+
+#: src/about-dialog.vala:30
+msgid "About Pomodoro"
+msgstr "Over Pomodoro"
+
+#: src/about-dialog.vala:41
+msgid "translator-credits"
+msgstr ""
+"Johannes Kool\n"
+"Heimen Stoffels <vistausss@fastmail.com>"
+
+#: src/application.vala:87
+msgid "Start/Stop"
+msgstr "Starten/Stoppen"
+
+#: src/application.vala:96
+msgid "Pause/Resume"
+msgstr "Onderbreken/Hervatten"
+
+#: src/application.vala:105
+msgid "Skip to a pomodoro or to a break"
+msgstr "Spring naar een pomodoro of naar een pauze"
+
+#: src/application.vala:108
+msgid "Extend current pomodoro or break"
+msgstr "Verleng huidige pomodoro of pauze"
+
+#: src/application.vala:111
+msgid "Reset current session"
+msgstr "Reset huidige sessie"
+
+#: src/application.vala:114
+msgid "Run as background service"
+msgstr "Uitvoeren als achtergronddienst"
+
+#: src/application.vala:117
+msgid "Show preferences"
+msgstr "Voorkeuren tonen"
+
+#: src/application.vala:120
+msgid "Quit application"
+msgstr "Toepassing afsluiten"
+
+#: src/application.vala:123
+msgid "Print version information and exit"
+msgstr "Versie-informatie tonen en afsluiten"
+
+#: src/notifications-capability.vala:130
+msgid "Focus on your task."
+msgstr "Focus op je taak."
+
+#: src/notifications-capability.vala:156
+#, c-format
+msgid "You have %d minute"
+msgid_plural "You have %d minutes"
+msgstr[0] "Je hebt nog %d minuut"
+msgstr[1] "Je hebt nog %d minuten"
+
+#: src/notifications-capability.vala:158
+#, c-format
+msgid "You have %d second"
+msgid_plural "You have %d seconds"
+msgstr[0] "Je hebt nog %d seconde"
+msgstr[1] "Je hebt nog %d seconden"
+
+#: src/notifications-capability.vala:163
+msgid "Take a longer break"
+msgstr "Neem een langere pauze"
+
+#: src/notifications-capability.vala:179
+msgid "Lengthen it"
+msgstr "Verlengen"
+
+#: src/notifications-capability.vala:184
+msgid "Shorten it"
+msgstr "Inkorten"
+
+#: src/notifications-capability.vala:189
+msgid "Start pomodoro"
+msgstr "Pomodoro starten"
+
+#: src/preferences-dialog.vala:158
+#, c-format
+msgid ""
+"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
+"such as Control, Alt or Shift."
+msgstr ""
+"De toets ‘%s’ wordt gebruikt om te typen. Probeer een tweede toets toe te "
+"voegen, zoals Ctrl, Alt of Shift."
+
+#: src/preferences-dialog.vala:808
+msgid "Keyboard Shortcut"
+msgstr "Sneltoets"
+
+#: src/presence.vala:80
+msgid "Available"
+msgstr "Beschikbaar"
+
+#: src/presence.vala:83
+msgid "Busy"
+msgstr "Bezig"
+
+#: src/presence.vala:86
+msgid "Idle"
+msgstr "Inactief"
+
+#: src/presence.vala:89
+msgid "Invisible"
+msgstr "Onzichtbaar"
+
+#: src/stats-day-page.vala:66
+msgid "Yesterday"
+msgstr "Gisteren"
+
+#: src/stats-page.vala:87
+#, c-format
+msgid "%d m"
+msgstr "%d min."
+
+#: src/stats-page.vala:93
+#, c-format
+msgid "%.0f h"
+msgstr "%.0f uur"
+
+#: src/stats-page.vala:96
+#, c-format
+msgid "%.1f h"
+msgstr "%.1f uur"
+
+#: src/stats-page.vala:573
+msgid "Break"
+msgstr "Pauze"
+
+#: src/stats-week-page.vala:58
+msgid "This week"
+msgstr "Deze week"
+
+#: src/utils.vala:32
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d uur"
+msgstr[1] "%d uur"
+
+#: src/utils.vala:41
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minuut"
+msgstr[1] "%d minuten"
+
+#~ msgid "Kamil Prusko"
+#~ msgstr "Kamil Prusko"
+
+#, fuzzy
+#~ msgid "Overview of changes in gnome-pomodoro 0.22.1"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.15.1"
+
+#, fuzzy
+#~ msgid "Overview of changes in gnome-pomodoro 0.22.0"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
+
+#, fuzzy
+#~ msgid "Updated Brazilian translation (thanks @costaronaldo)"
+#~ msgstr "Catalaanse vertaling bijgewerkt (met dank aan @antoniofsm)"
+
+#, fuzzy
+#~ msgid "Updated Russian translation (thanks @ViktorOn)"
+#~ msgstr "Russische vertaling bijgewerkt (met dank aan @rkaverin)"
+
+#, fuzzy
+#~ msgid "Updated Chinese translation (thanks @HaorongX)"
+#~ msgstr "Chinese vertaling bijgewerkt (met dank aan @wffger)"
+
+#, fuzzy
+#~ msgid "Overview of changes in gnome-pomodoro 0.21.1"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.15.1"
+
+#, fuzzy
+#~ msgid "Overview of changes in gnome-pomodoro 0.21.0"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 42 (@milotype and @kappa)"
+#~ msgstr ""
+#~ "Ondersteuning voor GNOME Shell 3.38 (met dank aan @ignapk en @szpak)"
+
+#, fuzzy
+#~ msgid "Added Croatian translation (thanks @dayeondev)"
+#~ msgstr "Noorse vertaling (met dank aan @arnotixe)"
+
+#, fuzzy
+#~ msgid "Overview of changes in gnome-pomodoro 0.20.0"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 41 (@mbooth101)"
+#~ msgstr "Ondersteuning voor GNOME Shell 3.32 (met dank aan @demokritos)"
+
+#, fuzzy
+#~ msgid "Overview of changes in gnome-pomodoro 0.19.2"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
+
+#, fuzzy
+#~ msgid "Updated Russian translation (@prokoudine)"
+#~ msgstr "Russische vertaling bijgewerkt (met dank aan @rkaverin)"
+
+#, fuzzy
+#~ msgid "Updated Dutch translation (@Vistaus)"
+#~ msgstr "Duitse vertaling bijgewerkt (met dank aan @tsabsch)"
+
+#, fuzzy
+#~ msgid "Overview of changes in gnome-pomodoro 0.19.1"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.15.1"
+
+#, fuzzy
+#~ msgid "Support GNOME Shell 40.0, not 4.0"
+#~ msgstr "Ondersteuning voor GNOME Shell 3.34"
+
+#, fuzzy
+#~ msgid "Overview of changes in gnome-pomodoro 0.19.0"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 4.0"
+#~ msgstr "Ondersteuning voor GNOME Shell 3.36"
+
+#, fuzzy
+#~ msgid "Changed blur effect during break"
+#~ msgstr "Achtergrondvervaging tijdens pauzes"
+
+#, fuzzy
+#~ msgid "Added Korean translation (@dayeondev)"
+#~ msgstr "Noorse vertaling (met dank aan @arnotixe)"
+
+#, fuzzy
+#~ msgid "Updated Brazilian translation (@alexandreafa)"
+#~ msgstr "Catalaanse vertaling bijgewerkt (met dank aan @antoniofsm)"
+
+#~ msgid "Overview of changes in gnome-pomodoro 0.18.0"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
+
+#~ msgid "Support for GNOME Shell 3.38 (@ignapk and @szpak)"
+#~ msgstr ""
+#~ "Ondersteuning voor GNOME Shell 3.38 (met dank aan @ignapk en @szpak)"
+
+#~ msgid "Removed ayatana-appindicator3 support"
+#~ msgstr "ayatana-appindicator3-ondersteuning verwijderd"
+
+#~ msgid "Added Norwegian translation (@arnotixe)"
+#~ msgstr "Noorse vertaling (met dank aan @arnotixe)"
+
+#~ msgid "Added Finnish translation (@iqqmuT)"
+#~ msgstr "Finse vertaling (met dank aan @iqqmuT)"
+
+#~ msgid "Updated Indonesian translation (@atriwidada)"
+#~ msgstr "Indonesische vertaling bijgewerkt (met dank aan @atriwidada)"
+
+#~ msgid "Updated Chinese translation (@wffger)"
+#~ msgstr "Chinese vertaling bijgewerkt (met dank aan @wffger)"
+
+#~ msgid "Updated Russian translation (@rkaverin)"
+#~ msgstr "Russische vertaling bijgewerkt (met dank aan @rkaverin)"
+
+#~ msgid "Updated French translation (@precondition)"
+#~ msgstr "Franse vertaling bijgewerkt (met dank aan @precondition)"
+
+#~ msgid "Overview of changes in gnome-pomodoro 0.17.0"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.17.0"
+
+#~ msgid "Support for GNOME Shell 3.36"
+#~ msgstr "Ondersteuning voor GNOME Shell 3.36"
+
+#~ msgid "Updated Catalan translation (@antoniofsm)"
+#~ msgstr "Catalaanse vertaling bijgewerkt (met dank aan @antoniofsm)"
+
+#~ msgid "Overview of changes in gnome-pomodoro 0.16.0"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.16.0"
+
+#~ msgid "Support for GNOME Shell 3.34 only"
+#~ msgstr "Ondersteuning voor GNOME Shell 3.34"
+
+#~ msgid "Added esperanto translation (@SeZuo)"
+#~ msgstr "Esperanto-vertaling (met dank aan @SeZuo)"
+
+#~ msgid "Moved app-menu to main window"
+#~ msgstr "Het toepassingsmenu is verplaatst naar het hoofdvenster"
+
+#~ msgid "Overview of changes in gnome-pomodoro 0.15.1"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.15.1"
+
+#~ msgid "Minor code cleanups"
+#~ msgstr "Enkele codeverbeteringen"
+
+#~ msgid "Overview of changes in gnome-pomodoro 0.15.0"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.15.0"
+
+#~ msgid "Minor code cleanups to support ES6 syntax"
+#~ msgstr "Enkele codeverbeteringen ten behoeve van de ES6-syntax"
+
+#~ msgid "Support for GNOME Shell 3.32 (@demokritos)"
+#~ msgstr "Ondersteuning voor GNOME Shell 3.32 (met dank aan @demokritos)"
+
+#~ msgid "Fix for build with vala 0.44.1 (@snizovtsev)"
+#~ msgstr ""
+#~ "Oplossing voor het compileren met vala 0.44.1 (met dank aan @snizovtsev)"
+
+#~ msgid "Updated German translation (@c7hm4r)"
+#~ msgstr "Duitse vertaling bijgewerkt (met dank aan @c7hm4r)"
+
+#~ msgid "Fix for handle error recreating existing folder (@Rj7)"
+#~ msgstr ""
+#~ "Oplossing voor behandelingsfout omtrent het opnieuw aanmaken van een "
+#~ "bestaande map (met dank aan @Rj7)"
+
+#~ msgid "Overview of changes in gnome-pomodoro 0.14.0"
+#~ msgstr "Wijzigingslog van gnome-pomodoro 0.14.0"
+
+#~ msgid "Support for GNOME Shell 3.28 and 3.30 (@aerostitch)"
+#~ msgstr ""
+#~ "Ondersteuning voor GNOME Shell 3.28 en 3.30 (met dank aan @aerostitch)"
+
+#~ msgid "Background blur under the dialog during breaks"
+#~ msgstr "Achtergrondvervaging tijdens pauzes"
+
+#~ msgid "Updated German translation (@tsabsch)"
+#~ msgstr "Duitse vertaling bijgewerkt (met dank aan @tsabsch)"
+
+#~ msgid "Updated Russian translation (@tigertv)"
+#~ msgstr "Russische vertaling bijgewerkt (met dank aan @tigertv)"
+
+#~ msgid "Paused"
+#~ msgstr "Onderbroken"
+
+#~ msgid "Failed to enable extension"
+#~ msgstr "De uitbreiding kan niet worden ingeschakeld"
+
+#~ msgid "Extension is out of date"
+#~ msgstr "De uitbreiding is verouderd"
+
+#~ msgid "Upgrade"
+#~ msgstr "Bijwerken"
 
 #~ msgid "gnome-pomodoro"
 #~ msgstr "gnome-pomodoro"
