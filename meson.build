@@ -2,7 +2,7 @@ project(
   'gnome-pomodoro',
   ['vala', 'c'],
   version: '0.23.0',
-  meson_version: '>=0.49.0',
+  meson_version: '>=0.62.0',
 )
 
 i18n = import('i18n')
@@ -26,6 +26,7 @@ cc = meson.get_compiler('c')
 libm_dep = cc.find_library('m')
 valac = meson.get_compiler('vala')
 posix_dep = valac.find_library('posix')
+itstool = find_program('itstool', required: false)
 
 add_project_arguments(
   [
@@ -127,10 +128,10 @@ configure_file(
 # Include the config.h we just generated
 incs = include_directories('.')
 
+subdir('po')
 subdir('data')
 subdir('src')
 subdir('plugins')
-subdir('po')
 subdir('tests')
 
 meson.add_install_script(

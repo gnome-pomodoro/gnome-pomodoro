@@ -21,13 +21,21 @@ i18n.merge_file(
   type: 'desktop',
 )
 
-i18n.merge_file(
-  input: 'org.gnome.Pomodoro.appdata.xml.in',
-  output: '@BASENAME@',
-  install: true,
-  install_dir: get_option('datadir') / 'metainfo',
-  po_dir: '..' / 'po',
-)
+if itstool.found()
+  i18n.itstool_join(
+    input: 'org.gnome.Pomodoro.appdata.xml',
+    output: '@BASENAME@',
+    mo_targets: mo_targets,
+    its_files: [],
+    install: true,
+    install_dir: get_option('datadir') / 'metainfo',
+  )
+else
+  install_data(
+    'org.gnome.Pomodoro.appdata.xml',
+    install_dir: get_option('datadir') / 'metainfo',
+  )
+endif
 
 install_data(
   'org.gnome.pomodoro.gschema.xml',
