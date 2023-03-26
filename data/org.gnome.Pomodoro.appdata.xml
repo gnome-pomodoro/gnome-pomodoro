@@ -44,6 +44,17 @@
   <translation type="gettext">gnome-pomodoro</translation>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="0.23.0" date="2023-03-26">
+      <description translatable="no">
+        <p>Overview of changes in gnome-pomodoro 0.23.0</p>
+        <ul>
+          <li>Marked extension as compatible with GNOME Shell 44 (thanks @jbicha)</li>
+          <li>Added skip button</li>
+          <li>Lock-screen widget</li>
+          <li>Fixed annoucement notification getting dismissed</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.22.1" date="2023-02-05">
       <description translatable="no">
         <p>Overview of changes in gnome-pomodoro 0.22.1</p>

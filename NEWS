@@ -1,3 +1,11 @@
+2023-03-26  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.23.0:
+
+	* Marked extension as compatible with GNOME Shell 44 (thanks @jbicha)
+	* Added skip button
+	* Lock-screen widget
+	* Fixed annoucement notification getting dismissed
+
 2023-02-05  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.22.1:
 
