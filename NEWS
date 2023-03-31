@@ -1,3 +1,8 @@
+2023-03-31  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.23.1:
+
+	* Fixed invalid appdata file
+
 2023-03-26  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.23.0:
 
