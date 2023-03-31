@@ -12,7 +12,7 @@ configure_file(
   install_dir: get_option('datadir') / 'dbus-1' / 'services',
 )
 
-i18n.merge_file(
+desktop_file = i18n.merge_file(
   input: 'org.gnome.Pomodoro.desktop.in',
   output: '@BASENAME@',
   install: true,
@@ -21,19 +21,32 @@ i18n.merge_file(
   type: 'desktop',
 )
 
-if itstool.found()
-  i18n.itstool_join(
-    input: 'org.gnome.Pomodoro.appdata.xml',
-    output: '@BASENAME@',
-    mo_targets: mo_targets,
-    its_files: [],
-    install: true,
-    install_dir: get_option('datadir') / 'metainfo',
+desktop_file_validate = find_program('desktop-file-validate', required:false)
+if desktop_file_validate.found()
+  test (
+    'Validate .desktop',
+    desktop_file_validate,
+    args: [desktop_file.full_path()]
   )
-else
-  install_data(
-    'org.gnome.Pomodoro.appdata.xml',
-    install_dir: get_option('datadir') / 'metainfo',
+endif
+
+appdata = i18n.merge_file(
+  input: 'org.gnome.Pomodoro.appdata.xml.in',
+  output: '@BASENAME@',
+  install: true,
+  install_dir:  get_option('datadir') / 'metainfo',
+  po_dir: '..' / 'po',
+)
+
+appstream_util = find_program('appstream-util', required: false)
+
+if appstream_util.found()
+  test(
+    'Validate .appdata.xml',
+    appstream_util,
+    args: [
+      'validate-relax', '--nonet', appdata.full_path()
+    ]
   )
 endif
 

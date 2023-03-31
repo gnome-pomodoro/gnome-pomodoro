@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-24 15:30+0100\n"
+"POT-Creation-Date: 2023-03-31 13:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,9 +18,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: data/org.gnome.Pomodoro.appdata.xml:8 data/org.gnome.Pomodoro.desktop.in:3
-#: data/resources/menus.ui:28 data/resources/window.ui:382
-#: plugins/actions/enums.vala:92 plugins/gnome/extension/indicator.js:77
+#: data/org.gnome.Pomodoro.appdata.xml.in:8
+#: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:28
+#: data/resources/window.ui:382 plugins/actions/enums.vala:92
+#: plugins/gnome/extension/indicator.js:77
 #: plugins/gnome/extension/indicator.js:729
 #: plugins/gnome/extension/notifications.js:281
 #: plugins/gnome/extension/timer.js:41 src/about-dialog.vala:31
@@ -29,27 +30,27 @@ msgstr ""
 msgid "Pomodoro"
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml:9
+#: data/org.gnome.Pomodoro.appdata.xml.in:9
 msgid "A time management utility for GNOME"
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml:11
+#: data/org.gnome.Pomodoro.appdata.xml.in:11
 msgid ""
 "A GNOME utility that helps managing time according to Pomodoro Technique. It "
 "intends to improve productivity and focus by taking short breaks after every "
 "25 minutes of work."
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml:23
+#: data/org.gnome.Pomodoro.appdata.xml.in:23
 msgid "Timer window"
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml:27
+#: data/org.gnome.Pomodoro.appdata.xml.in:27
 #: plugins/gnome/extension/indicator.js:83 src/preferences-dialog.vala:800
 msgid "Preferences"
 msgstr ""
 
-#: data/org.gnome.Pomodoro.appdata.xml:31
+#: data/org.gnome.Pomodoro.appdata.xml.in:31
 msgid "Indicator for GNOME Shell"
 msgstr ""
 
