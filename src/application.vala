@@ -350,6 +350,10 @@ namespace Pomodoro
                 enabled_hash.insert (name, true);
             }
 
+            // Ignore legacy plugins.
+            enabled_hash.remove ("indicator");
+            enabled_hash.remove ("notifications");
+
             foreach (var plugin_info in engine.get_plugin_list ())
             {
                 if (plugin_info.is_hidden () || enabled_hash.contains (plugin_info.get_module_name ())) {
