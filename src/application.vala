@@ -155,6 +155,9 @@ namespace Pomodoro
             }
         }
 
+        public const string[] LEGACY_PLUGINS = { "indicator", "notifications" };
+
+
         public Application ()
         {
             GLib.Object (
@@ -350,9 +353,10 @@ namespace Pomodoro
                 enabled_hash.insert (name, true);
             }
 
-            // Ignore legacy plugins.
-            enabled_hash.remove ("indicator");
-            enabled_hash.remove ("notifications");
+            foreach (var name in LEGACY_PLUGINS)
+            {
+                enabled_hash.remove (name);
+            }
 
             foreach (var plugin_info in engine.get_plugin_list ())
             {

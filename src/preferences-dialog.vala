@@ -459,6 +459,18 @@ namespace Pomodoro
             return row;
         }
 
+        private bool is_legacy_plugin (string plugin_name)
+        {
+            foreach (var name in Pomodoro.Application.LEGACY_PLUGINS)
+            {
+                if (name == plugin_name) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void populate ()
         {
             this.engine.rescan_plugins ();
@@ -466,6 +478,10 @@ namespace Pomodoro
             foreach (var plugin_info in this.engine.get_plugin_list ())
             {
                 if (plugin_info.is_hidden ()) {
+                    continue;
+                }
+
+                if (this.is_legacy_plugin (plugin_info.get_module_name ())) {
                     continue;
                 }
 
