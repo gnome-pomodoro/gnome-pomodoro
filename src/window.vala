@@ -103,15 +103,7 @@ namespace Pomodoro
             // TODO: this.default_page should be set from application.vala
             var application = Pomodoro.Application.get_default ();
 
-            // if (application.capabilities.has_enabled ("task-list")) {  // TODO
-            //     this.default_page = "task-list";
-            // }
-            if (application.capabilities.has_capability ("indicator")) {
-                this.default_page = "stats";
-            }
-            else {
-                this.default_page = "timer";
-            }
+            this.default_page = "timer";
 
             this.stack.visible_child_name = this.default_page;
 
