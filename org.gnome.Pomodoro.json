@@ -48,7 +48,8 @@
             "buildsystem": "meson",
             "config-opts": [
                 "-Dlua51=false",
-                "-Dpython3=false"
+                "-Dpython3=false",
+                "-Ddemos=false"
             ],
             "cleanup": [
                 "/bin/*",
