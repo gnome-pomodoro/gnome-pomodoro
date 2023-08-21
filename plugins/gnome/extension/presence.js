@@ -18,25 +18,28 @@
  *
  */
 
-const Gio = imports.gi.Gio;
+import Gio from 'gi://Gio';
 
-const Main = imports.ui.main;
-const MessageTray = imports.ui.messageTray;
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Utils = Extension.imports.utils;
+import {MessageTray} from 'resource:///org/gnome/shell/ui/messageTray.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+
+import {State} from './timer.js';
+import * as Utils from './utils.js';
 
 
 /**
  * Helps in managing presence for GNOME Shell according to the Pomodoro state.
  */
-var Presence = class {
-    constructor() {
+export const PresenceManager = class {
+    constructor(timer) {
+        this.timer = timer;
+
         this._busy = false;
 
         // Setup a patch for suppressing presence handlers.
         // When applied the main presence controller becomes gnome-pomodoro.
-        this._patch = new Utils.Patch(MessageTray.MessageTray.prototype, {
+        this._patch = new Utils.Patch(MessageTray.prototype, {
             _onStatusChanged(status) {
                 this._updateState();
             }
@@ -47,6 +50,25 @@ var Presence = class {
         this._settings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.notifications',
         });
+
+        this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+
+        this.update();
+    }
+
+    _onTimerStateChanged() {
+        this.update();
+    }
+
+    update() {
+        const timerState = this.timer.getState();
+
+        if (timerState === State.NULL) {
+            this.setDefault();
+        }
+        else {
+            this.setBusy(timerState === State.POMODORO);
+        }
     }
 
     setBusy(value) {

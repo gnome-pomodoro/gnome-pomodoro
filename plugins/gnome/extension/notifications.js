@@ -18,24 +18,25 @@
  *
  */
 
-const { Clutter, GLib, GObject, Meta, St } = imports.gi;
+import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Meta from 'gi://Meta';
+import St from 'gi://St';
 
-const Calendar = imports.ui.calendar;
-const Main = imports.ui.main;
-const MessageTray = imports.ui.messageTray;
-const Params = imports.misc.params;
-const Signals = imports.misc.signals;
-const Util = imports.misc.util;
+import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
+import {trySpawnCommandLine} from 'resource:///org/gnome/shell/misc/util.js';
+import {gettext as _, ngettext} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Calendar from 'resource:///org/gnome/shell/ui/calendar.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
+import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Config = Extension.imports.config;
-const Dialogs = Extension.imports.dialogs;
-const Timer = Extension.imports.timer;
-const Utils = Extension.imports.utils;
-
-const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
-const _ = Gettext.gettext;
-const ngettext = Gettext.ngettext;
+import {extension} from './extension.js';
+import {PomodoroEndDialog, DialogState} from './dialogs.js';
+import {State, Timer} from './timer.js';
+import * as Config from './config.js';
+import * as Utils from './utils.js';
 
 
 // Time in seconds to annouce next timer state.
@@ -48,7 +49,7 @@ const MIN_DISPLAY_TIME = 3000;
 const ICON_NAME = 'gnome-pomodoro-symbolic';
 
 
-var source = null;
+let source = null;
 
 
 function getDefaultSource() {
@@ -79,8 +80,8 @@ function getCurrentNotification() {
 }
 
 
-// TODO: move to timer.js
-function formatRemainingTime(remaining) {
+// TODO: move to utils.js
+export function formatRemainingTime(remaining) {
     remaining = Math.max(Math.round(remaining), 0.0);
 
     if (remaining > 45.0) {
@@ -100,7 +101,7 @@ function formatRemainingTime(remaining) {
 }
 
 
-var NotificationView = {
+const NotificationView = {
     NULL: 0,
     POMODORO: 1,
     POMODORO_ABOUT_TO_END: 2,
@@ -110,7 +111,7 @@ var NotificationView = {
 };
 
 
-var NotificationPolicy = GObject.registerClass(
+const NotificationPolicy = GObject.registerClass(
 class PomodoroNotificationPolicy extends MessageTray.NotificationPolicy {
     get showBanners() {
         return true;
@@ -122,7 +123,7 @@ class PomodoroNotificationPolicy extends MessageTray.NotificationPolicy {
 });
 
 
-var Source = GObject.registerClass(
+const Source = GObject.registerClass(
 class PomodoroSource extends MessageTray.Source {
     _init() {
         super._init(_("Pomodoro Timer"), ICON_NAME);
@@ -135,7 +136,7 @@ class PomodoroSource extends MessageTray.Source {
 });
 
 
-var Notification = GObject.registerClass({
+export const Notification = GObject.registerClass({
     Properties: {
         // TODO: timer should be a property
         'view': GObject.ParamSpec.int('view', 'view', 'view',
@@ -190,8 +191,8 @@ class PomodoroNotification extends MessageTray.Notification {
                     idleId = 0;
 
                     // TODO: this should be handled by NotificationManager
-                    if (this.resident && Extension.extension.notificationManager) {
-                        Extension.extension.notificationManager._updateNotification();
+                    if (this.resident && extension.notificationManager) {
+                        extension.notificationManager._updateNotification();
                     }
 
                     return GLib.SOURCE_REMOVE;
@@ -224,7 +225,7 @@ class PomodoroNotification extends MessageTray.Notification {
 });
 
 
-var NotificationBanner = GObject.registerClass(
+const NotificationBanner = GObject.registerClass(
 class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
     _init(notification) {
         super._init(notification);
@@ -281,7 +282,7 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
                     title = _("Pomodoro");
                 }
                 else {
-                    title = Timer.State.label(this._timerState);
+                    title = State.label(this._timerState);
                 }
                 break;
 
@@ -291,12 +292,12 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
 
             case NotificationView.BREAK:
                 if (isStarting) {
-                    title = this._timerState === Timer.State.LONG_BREAK
+                    title = this._timerState === State.LONG_BREAK
                         ? _("Take a long break")
                         : _("Take a short break");
                 }
                 else {
-                    title = Timer.State.label(this._timerState);
+                    title = State.label(this._timerState);
                 }
                 break;
 
@@ -309,7 +310,7 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
                 break;
 
             default:
-                title = Timer.State.label(this._timerState);
+                title = State.label(this._timerState);
                 break;
         }
 
@@ -360,7 +361,7 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
 
         if (showButtons) {
             this._skipBreakButton = this.addAction(_("Skip Break"), () => {
-                this._timer.setState(Timer.State.POMODORO);
+                this._timer.setState(State.POMODORO);
             });
             this._extendButton = this.addAction(_("+1 Minute"), () => {
                 this._blockUpdateActions();
@@ -383,7 +384,7 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
         // Don't update actions when "+1 Minute" was clicked.
         let updateActions = !this._updateActionsBlocked;
 
-        if (timerState === Timer.State.NULL || !view) {
+        if (timerState === State.NULL || !view) {
             return;
         }
 
@@ -449,7 +450,7 @@ class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
 });
 
 
-var NotificationMessage = GObject.registerClass(
+const NotificationMessage = GObject.registerClass(
 class PomodoroNotificationMessage extends Calendar.NotificationMessage {
     _init(notification) {
         super._init(notification);
@@ -483,7 +484,7 @@ class PomodoroNotificationMessage extends Calendar.NotificationMessage {
     }
 
     _updateTitle() {
-        this.setTitle(Timer.State.label(this._timerState));
+        this.setTitle(State.label(this._timerState));
     }
 
     _updateBody() {
@@ -496,7 +497,7 @@ class PomodoroNotificationMessage extends Calendar.NotificationMessage {
         const timerState = this._timer.getState();
         const isPaused = this._timer.isPaused();
 
-        if (timerState === Timer.State.NULL) {
+        if (timerState === State.NULL) {
             return;
         }
 
@@ -542,7 +543,7 @@ class PomodoroNotificationMessage extends Calendar.NotificationMessage {
 });
 
 
-var IssueNotification = GObject.registerClass(
+export const IssueNotification = GObject.registerClass(
 class PomodoroIssueNotification extends MessageTray.Notification {
     _init(message) {
         let source = getDefaultSource();
@@ -555,7 +556,7 @@ class PomodoroIssueNotification extends MessageTray.Notification {
         this.setUrgency(MessageTray.Urgency.HIGH);
 
         this.addAction(_("Report issue"), () => {
-                Util.trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
+                trySpawnCommandLine('xdg-open ' + GLib.shell_quote(url));
                 this.destroy();
             });
     }
@@ -570,7 +571,7 @@ class PomodoroIssueNotification extends MessageTray.Notification {
 });
 
 
-var NotificationManager = class extends Signals.EventEmitter {
+export const NotificationManager = class extends EventEmitter {
     constructor(timer, params) {
         params = Params.parse(params, {
             useDialog: true,
@@ -580,13 +581,13 @@ var NotificationManager = class extends Signals.EventEmitter {
         super();
 
         this._timer = timer;
-        this._timerState = Timer.State.NULL;
+        this._timerState = State.NULL;
         this._notification = null;
         this._dialog = null;
         this._useDialog = params.useDialog;
         this._view = NotificationView.NULL;
         this._previousView = NotificationView.NULL;
-        this._previousTimerState = Timer.State.NULL;
+        this._previousTimerState = State.NULL;
         this._patches = this._createPatches();
         this._animate = params.animate;
         this._initialized = false;
@@ -656,23 +657,24 @@ var NotificationManager = class extends Signals.EventEmitter {
             }
         });
 
-        const notificationSectionPatch = new Utils.Patch(Calendar.NotificationSection.prototype, {
-            _onNotificationAdded(source, notification) {
-                if (notification instanceof Notification) {
-                    const message = new NotificationMessage(notification);
-
-                    this.addMessageAtIndex(message, this._nUrgent, this.mapped);
-                }
-                else {
-                    notificationSectionPatch.initial._onNotificationAdded.bind(this)(source, notification);
-                }
-            }
-        });
+//        // TODO: patch CalendarMessageList._init / _notificationSection
+//        const notificationSectionPatch = new Utils.Patch(Calendar.NotificationSection.prototype, {
+//            _onNotificationAdded(source, notification) {
+//                if (notification instanceof Notification) {
+//                    const message = new Calendar.NotificationMessage(notification);
+//
+//                    this.addMessageAtIndex(message, this._nUrgent, this.mapped);
+//                }
+//                else {
+//                    notificationSectionPatch.initial._onNotificationAdded.bind(this)(source, notification);
+//                }
+//            }
+//        });
 
         return [
             messagesIndicatorPatch,
             messageTrayPatch,
-            notificationSectionPatch,
+//            notificationSectionPatch,
         ];
     }
 
@@ -708,7 +710,7 @@ var NotificationManager = class extends Signals.EventEmitter {
     _createDialog() {
         let idleId = 0;
 
-        const dialog = new Dialogs.PomodoroEndDialog(this._timer);
+        const dialog = new PomodoroEndDialog(this._timer);
         dialog.connect('opening',
             () => {
                 // Clicking on a notification baner in the date menu, notifcation should be
@@ -800,21 +802,21 @@ var NotificationManager = class extends Signals.EventEmitter {
 
     _resolveView(timerState, isPaused, isStarting, isEnding) {
         if (isPaused) {
-            return timerState === Timer.State.POMODORO && isStarting
+            return timerState === State.POMODORO && isStarting
                 ? NotificationView.BREAK_ENDED
                 : NotificationView.NULL;
         }
 
         switch (timerState) {
-            case Timer.State.POMODORO:
+            case State.POMODORO:
                 if (isEnding) {
                     return NotificationView.POMODORO_ABOUT_TO_END;
                 }
 
                 return NotificationView.POMODORO;
 
-            case Timer.State.SHORT_BREAK:
-            case Timer.State.LONG_BREAK:
+            case State.SHORT_BREAK:
+            case State.LONG_BREAK:
                 if (isEnding) {
                     return NotificationView.BREAK_ABOUT_TO_END;
                 }
@@ -873,7 +875,7 @@ var NotificationManager = class extends Signals.EventEmitter {
             changed = true;
         }
 
-        const title = Timer.State.label(timerState);
+        const title = State.label(timerState);
         if (notification.title !== title) {
             changed = true;
         }
@@ -890,7 +892,7 @@ var NotificationManager = class extends Signals.EventEmitter {
     }
 
     _shouldNotify(timerState, view) {
-        if (view === NotificationView.NULL || timerState === Timer.State.NULL) {
+        if (view === NotificationView.NULL || timerState === State.NULL) {
             return false;
         }
 
@@ -905,8 +907,8 @@ var NotificationManager = class extends Signals.EventEmitter {
         }
 
         // Dialog is already open.
-        if ((timerState === Timer.State.SHORT_BREAK || timerState === Timer.State.LONG_BREAK) &&
-            (this._dialog?.state === Dialogs.State.OPENED || this._dialog?.state === Dialogs.State.OPENING))
+        if ((timerState === State.SHORT_BREAK || timerState === State.LONG_BREAK) &&
+            (this._dialog?.state === DialogState.OPENED || this._dialog?.state === DialogState.OPENING))
         {
             return false;
         }
@@ -961,8 +963,8 @@ var NotificationManager = class extends Signals.EventEmitter {
         // existing notification.
         const expired = (
             this._previousView === NotificationView.BREAK_ENDED && this._view === NotificationView.POMODORO ||
-            this._previousState === Timer.State.POMODORO && this._state === Timer.State.SHORT_BREAK ||
-            this._previousState === Timer.State.POMODORO && this._state === Timer.State.LONG_BREAK
+            this._previousState === State.POMODORO && this._state === State.SHORT_BREAK ||
+            this._previousState === State.POMODORO && this._state === State.LONG_BREAK
         );
 
         if (this._notification && expired) {
@@ -1089,7 +1091,7 @@ var NotificationManager = class extends Signals.EventEmitter {
         {
             this._change(timerState, view);
         }
-        else if (timerState !== Timer.State.NULL &&
+        else if (timerState !== State.NULL &&
                  timerState === this._timerState &&
                  this._timer.getElapsed() < 0.1)
         {
@@ -1107,7 +1109,7 @@ var NotificationManager = class extends Signals.EventEmitter {
             this._unscheduleAnnoucement();
         }
 
-        if (timerState !== Timer.State.NULL) {
+        if (timerState !== State.NULL) {
             this._applyPatches();
         }
         else {

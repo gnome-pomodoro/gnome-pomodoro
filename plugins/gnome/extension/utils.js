@@ -18,12 +18,14 @@
  *
  */
 
-const { Gio, Meta, Shell } = imports.gi;
+import Gio from 'gi://Gio';
+import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 
-const Main = imports.ui.main;
-const Signals = imports.misc.signals;
+import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
+import * as Config from './config.js';
 
 const ENABLED_EXTENSIONS_KEY = 'enabled-extensions';
 
@@ -36,7 +38,7 @@ const VIDEO_PLAYER_CATEGORIES = [
 ];
 
 
-var Patch = class extends Signals.EventEmitter {
+export const Patch = class extends EventEmitter {
     constructor(object, overrides) {
         super();
 
@@ -85,7 +87,7 @@ var Patch = class extends Signals.EventEmitter {
 };
 
 
-var TransitionGroup = class {
+export const TransitionGroup = class {
 
     /* Helper class to share property transition between multiple actors */
 
@@ -220,7 +222,7 @@ function _isVideoPlayer(app) {
 }
 
 
-function isVideoPlayerOpen() {
+export function isVideoPlayerOpen() {
     const apps = Shell.AppSystem.get_default().get_running();
 
     for (let app of apps) {
@@ -243,18 +245,18 @@ function isVideoPlayerOpen() {
 }
 
 
-function logError(error) {
-    Main.extensionManager.logExtensionError(Extension.metadata.uuid, error);
+export function logError(error) {
+    Main.extensionManager.logExtensionError(Config.EXTENSION_UUID, error);
 }
 
 
-function logWarning(message) {
+export function logWarning(message) {
     console.warn(`Pomodoro: ${message}`);
 }
 
 
-function versionCheck(required) {
-    let current = imports.misc.config.PACKAGE_VERSION;
+export function versionCheck(required) {
+    let current = Config.PACKAGE_VERSION;
     let currentArray = current.split('.');
     let requiredArray = required.split('.');
 
@@ -269,7 +271,7 @@ function versionCheck(required) {
 }
 
 
-function disableExtension(uuid) {
+export function disableExtension(uuid) {
     let enabledExtensions = global.settings.get_strv(ENABLED_EXTENSIONS_KEY);
     let extensionIndex = enabledExtensions.indexOf(uuid);
 
@@ -280,7 +282,7 @@ function disableExtension(uuid) {
 }
 
 
-function wakeUpScreen() {
+export function wakeUpScreen() {
     if (Main.screenShield._dialog) {
         Main.screenShield._dialog.emit('wake-up-screen');
     }

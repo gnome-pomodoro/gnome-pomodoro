@@ -6,7 +6,6 @@ extension_files = [
   'indicator.js',
   'notifications.js',
   'presence.js',
-  'settings.js',
   'screenShield.js',
   'stylesheet.css',
   'timer.js',

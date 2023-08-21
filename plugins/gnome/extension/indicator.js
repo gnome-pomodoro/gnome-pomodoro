@@ -18,24 +18,27 @@
  *          Kamil Prusko <kamilprusko@gmail.com>
  */
 
-const Cairo = imports.cairo;
+import Cairo from 'gi://cairo';
+import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Meta from 'gi://Meta';
+import Pango from 'gi://Pango';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
 
-const { Clutter, Gio, GLib, GObject, Gtk, Meta, Pango, Shell, St } = imports.gi;
+import {PopupAnimation} from 'resource:///org/gnome/shell/ui/boxpointer.js';
+import {Button as PanelMenuButton} from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const BoxPointer = imports.ui.boxpointer;
-const Main = imports.ui.main;
-const MessageTray = imports.ui.messageTray;
-const PanelMenu = imports.ui.panelMenu;
-const PopupMenu = imports.ui.popupMenu;
-const Signals = imports.misc.signals;
-
-const Config = Extension.imports.config;
-const Timer = Extension.imports.timer;
-const Utils = Extension.imports.utils;
-
-const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
-const _ = Gettext.gettext;
+import {extension} from './extension.js';
+import {State, Timer, TimerLabel} from './timer.js';
+import * as Config from './config.js';
+import * as Utils from './utils.js';
 
 
 const FADE_IN_TIME = 1250;
@@ -47,14 +50,14 @@ const FADE_OUT_OPACITY = 0.38;
 const STEPS = 120;
 
 
-var IndicatorType = {
+const IndicatorType = {
     TEXT: 'text',
     SHORT_TEXT: 'short-text',
     ICON: 'icon'
 };
 
 
-var IndicatorMenu = class extends PopupMenu.PopupMenu {
+const IndicatorMenu = class extends PopupMenu.PopupMenu {
     constructor(indicator) {
         super(indicator, St.Align.START, St.Side.TOP);
 
@@ -94,7 +97,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         let icon = this._icons[iconName];
 
         if (!icon) {
-            const iconUri = '%s/icons/hicolor/scalable/actions/%s.svg'.format(Extension.dir.get_uri(), iconName);
+            const iconUri = '%s/icons/hicolor/scalable/actions/%s.svg'.format(extension.dir.get_uri(), iconName);
             icon = new Gio.FileIcon({
                 file: Gio.File.new_for_uri(iconUri)
             });
@@ -151,7 +154,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         timerButton.connect('clicked', this._onTimerButtonClicked.bind(this));
         menuItem.add_child(timerButton);
 
-        const timerLabel = new Timer.TimerLabel(this._timer, { x_align: Clutter.ActorAlign.START });
+        const timerLabel = new TimerLabel(this._timer, { x_align: Clutter.ActorAlign.START });
         timerButton.set_child(timerLabel);
 
         const buttonsBox = new St.BoxLayout({ style_class: 'extension-pomodoro-timer-buttons-box',
@@ -196,9 +199,9 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _updateTimerButtons() {
-        const visible = this._timerState !== Timer.State.NULL;
-        const isBreak = this._timerState === Timer.State.SHORT_BREAK ||
-                        this._timerState === Timer.State.LONG_BREAK;
+        const visible = this._timerState !== State.NULL;
+        const isBreak = this._timerState === State.SHORT_BREAK ||
+                        this._timerState === State.LONG_BREAK;
 
         this._toggleMenuItem.visible = !visible;
         this._timerMenuItem.visible = visible;
@@ -223,7 +226,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _updateStateItems() {
-        const visible = this._timerState !== Timer.State.NULL;
+        const visible = this._timerState !== State.NULL;
 
         for (const [stateName, menuItem] of Object.entries(this._stateItems))
         {
@@ -275,9 +278,9 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _onTimerButtonClicked() {
-        const notificationManager = Extension.extension.notificationManager;
+        const notificationManager = extension.notificationManager;
 
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
 
         if (notificationManager) {
             notificationManager.openDialog();
@@ -285,13 +288,13 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _onStartClicked() {
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
 
         this._timer.start();
     }
 
     _onSkipClicked() {
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
 
         this._timer.skip();
     }
@@ -308,7 +311,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         // while doing savedFocus.grab_key_focus().
         // As a walkaround we call timer.stop() with delay. Seems that these calls interfere
         // with each other.
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
     }
 
     _onPauseClicked() {
@@ -316,7 +319,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _onResumeClicked() {
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
 
         this._timer.resume();
     }
@@ -350,7 +353,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _activateState(stateName) {
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
 
         this._timer.setState(stateName);
     }
@@ -358,7 +361,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     _activateStats() {
         const timestamp = global.get_current_time();
 
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
         Main.overview.hide();
 
         this._timer.showMainWindow('stats', timestamp);
@@ -367,7 +370,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     _activatePreferences() {
         const timestamp = global.get_current_time();
 
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
         Main.overview.hide();
 
         this._timer.showPreferences(timestamp);
@@ -432,12 +435,12 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
 };
 
 
-var TextIndicator = class extends Signals.EventEmitter {
+const TextIndicator = class extends EventEmitter {
     constructor(timer) {
         super();
 
         this._initialized     = false;
-        this._state           = Timer.State.NULL;
+        this._state           = State.NULL;
         this._digitWidth      = 0;
         this._charWidth       = 0;
         this._onTimerUpdateId = 0;
@@ -471,7 +474,7 @@ var TextIndicator = class extends Signals.EventEmitter {
         this._state = this.timer.getState();
         this._initialized = true;
 
-        if (this._state == Timer.State.POMODORO) {
+        if (this._state === State.POMODORO) {
             this.actor.set_opacity(FADE_IN_OPACITY * 255);
         }
         else {
@@ -512,7 +515,7 @@ var TextIndicator = class extends Signals.EventEmitter {
         if (this._state != state && this._initialized) {
             this._state = state;
 
-            if (state == Timer.State.POMODORO) {
+            if (state === State.POMODORO) {
                 this.actor.ease({
                     opacity: FADE_IN_OPACITY * 255,
                     duration: FADE_IN_TIME,
@@ -548,7 +551,7 @@ var TextIndicator = class extends Signals.EventEmitter {
 };
 
 
-var ShortTextIndicator = class extends TextIndicator {
+const ShortTextIndicator = class extends TextIndicator {
     constructor(timer) {
         super(timer);
 
@@ -579,11 +582,11 @@ var ShortTextIndicator = class extends TextIndicator {
 };
 
 
-var IconIndicator = class extends Signals.EventEmitter {
+const IconIndicator = class extends EventEmitter {
     constructor(timer) {
         super();
 
-        this._state           = Timer.State.NULL;
+        this._state           = State.NULL;
         this._progress        = 0.0;
         this._primaryColor    = null;
         this._secondaryColor  = null;
@@ -630,9 +633,9 @@ var IconIndicator = class extends Signals.EventEmitter {
 
         let radius    = 0.5 * this._iconSize - 2.0;
         let progress  = this._progress;
-        let isRunning = this._state != Timer.State.NULL;
-        let isBreak   = (this._state == Timer.State.SHORT_BREAK ||
-                         this._state == Timer.State.LONG_BREAK);
+        let isRunning = this._state !== State.NULL;
+        let isBreak   = (this._state === State.SHORT_BREAK ||
+                         this._state === State.LONG_BREAK);
 
         cr.translate(0.5 * width, 0.5 * height);
         cr.setOperator(Cairo.Operator.SOURCE);
@@ -723,8 +726,8 @@ var IconIndicator = class extends Signals.EventEmitter {
 };
 
 
-var Indicator = GObject.registerClass(
-class PomodoroIndicator extends PanelMenu.Button {
+export const Indicator = GObject.registerClass(
+class PomodoroIndicator extends PanelMenuButton {
     _init(timer, type) {
         super._init(St.Align.START, _("Pomodoro"), true);
 

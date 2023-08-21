@@ -1,18 +1,19 @@
-const { Clutter, Gio, GLib, GObject, St } = imports.gi;
+import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import St from 'gi://St';
 
-const Main = imports.ui.main;
-const Params = imports.misc.params;
-const Signals = imports.misc.signals;
+import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Config = Extension.imports.config;
-const Timer = Extension.imports.timer;
-const Notifications = Extension.imports.notifications;
-const Utils = Extension.imports.utils;
-
-const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
-const _ = Gettext.gettext;
-const ngettext = Gettext.ngettext;
+import {extension} from './extension.js';
+import {State, Timer} from './timer.js';
+import {formatRemainingTime} from './notifications.js';
+import * as Config from './config.js';
+import * as Utils from './utils.js';
 
 
 // Time in seconds to annouce next timer state.
@@ -25,7 +26,7 @@ const FADE_OUT_TIME = 1250;
 const FADE_OUT_OPACITY = 0.38;
 
 
-var ScreenShieldWidget = GObject.registerClass(
+const ScreenShieldWidget = GObject.registerClass(
 class PomodoroScreenShieldWidget extends St.Widget {
     _init(timer) {
         super._init({
@@ -112,7 +113,7 @@ class PomodoroScreenShieldWidget extends St.Widget {
         let icon = this._icons[iconName];
 
         if (!icon) {
-            const iconUri = '%s/icons/hicolor/scalable/actions/%s.svg'.format(Extension.dir.get_uri(), iconName);
+            const iconUri = '%s/icons/hicolor/scalable/actions/%s.svg'.format(extension.dir.get_uri(), iconName);
             icon = new Gio.FileIcon({
                 file: Gio.File.new_for_uri(iconUri)
             });
@@ -141,7 +142,7 @@ class PomodoroScreenShieldWidget extends St.Widget {
             return false;
         }
 
-        if (this._timerState === Timer.State.POMODORO && this._timer.getElapsed() === 0.0) {
+        if (this._timerState === State.POMODORO && this._timer.getElapsed() === 0.0) {
             return false;
         }
 
@@ -151,14 +152,14 @@ class PomodoroScreenShieldWidget extends St.Widget {
     _updateTitleLabel() {
         let title;
 
-        if (this._timerState === Timer.State.POMODORO &&
+        if (this._timerState === State.POMODORO &&
             this._isPaused &&
             this._timer.getElapsed() === 0.0)
         {
             title = _("Break is over");
         }
         else {
-            title = Timer.State.label(this._timerState);
+            title = State.label(this._timerState);
         }
 
         this._titleLabel.text = title;
@@ -167,22 +168,22 @@ class PomodoroScreenShieldWidget extends St.Widget {
     _updateMessageLabel() {
         let message;
 
-        if (this._timerState === Timer.State.POMODORO &&
+        if (this._timerState === State.POMODORO &&
             this._isPaused &&
             this._timer.getElapsed() === 0.0)
         {
             message = _("Get ready…");
         }
         else {
-            message = Notifications.formatRemainingTime(this._timer.getRemaining());
+            message = formatRemainingTime(this._timer.getRemaining());
         }
 
         this._messageLabel.text = message;
     }
 
     _updateButtons() {
-        const isBreak = this._timerState === Timer.State.SHORT_BREAK ||
-                        this._timerState === Timer.State.LONG_BREAK;
+        const isBreak = this._timerState === State.SHORT_BREAK ||
+                        this._timerState === State.LONG_BREAK;
 
         if (!this._isPaused) {
             this._pauseResumeButton.child.gicon = this._loadIcon('gnome-pomodoro-pause-symbolic');
@@ -378,14 +379,14 @@ class PomodoroScreenShieldWidget extends St.Widget {
 });
 
 
-var ScreenShieldManager = class extends Signals.EventEmitter {
+export class ScreenShieldManager extends EventEmitter {
     constructor(timer) {
         super();
 
         this._timer = timer;
-        this._timerState = Timer.State.NULL;
+        this._timerState = State.NULL;
         this._widget = null;
-        this._previousTimerState = Timer.State.NULL;
+        this._previousTimerState = State.NULL;
         this._destroying = false;
 
         this._annoucementTimeoutId = 0;
@@ -481,7 +482,7 @@ var ScreenShieldManager = class extends Signals.EventEmitter {
             this._scheduleAnnoucement();
         }
 
-        if (timerState !== Timer.State.NULL) {
+        if (timerState !== State.NULL) {
             this._ensureWidget();
         }
         else {

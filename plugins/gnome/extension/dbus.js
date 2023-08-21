@@ -18,11 +18,11 @@
  *
  */
 
-const Signals = imports.signals;
-const Gio = imports.gi.Gio;
+import Gio from 'gi://Gio';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Capabilities = Extension.imports.capabilities;
+import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
+
+import {capabilities} from './capabilities.js';
 
 
 const PomodoroInterface = '<node> \
@@ -64,15 +64,17 @@ const PomodoroExtensionInterface = '<node> \
 </node>';
 
 
-var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
-function Pomodoro(callback, cancellable) {
+const PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
+export function PomodoroClient(callback, cancellable) {
     return new PomodoroProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', callback, cancellable);
 }
 
 
-var PomodoroExtension = class {
+export const PomodoroExtensionService = class extends EventEmitter {
     constructor() {
-        this.Capabilities = Capabilities.capabilities;
+        super();
+
+        this.Capabilities = capabilities;
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(PomodoroExtensionInterface, this);
         this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Pomodoro/Extension');
@@ -112,4 +114,3 @@ var PomodoroExtension = class {
         this.emit('destroy');
     }
 };
-Signals.addSignalMethods(PomodoroExtension.prototype);

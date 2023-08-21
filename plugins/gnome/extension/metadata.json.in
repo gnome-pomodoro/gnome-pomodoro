@@ -4,6 +4,8 @@
   "description": "Desktop integration for Pomodoro application.",
   "shell-version": ["45"],
   "session-modes": ["user", "unlock-dialog"],
+  "gettext-domain": "@GETTEXT_PACKAGE@",
+  "settings-schema": "@GSETTINGS_SCHEMA_DIR@",
   "url": "@PACKAGE_URL@",
   "version": "@PACKAGE_VERSION@"
 }

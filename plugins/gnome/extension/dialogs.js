@@ -18,22 +18,24 @@
  *
  */
 
-const { Atk, Clutter, GLib, GObject, Meta, Shell, St, Pango } = imports.gi;
+import Atk from 'gi://Atk';
+import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Meta from 'gi://Meta';
+import Pango from 'gi://Pango';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
 
-const Layout = imports.ui.layout;
-const Lightbox = imports.ui.lightbox;
-const Main = imports.ui.main;
+import {MonitorConstraint} from 'resource:///org/gnome/shell/ui/layout.js';
+import {Lightbox} from 'resource:///org/gnome/shell/ui/lightbox.js';
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
-const Params = imports.misc.params;
-
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Config = Extension.imports.config;
-const Timer = Extension.imports.timer;
-const Utils = Extension.imports.utils;
-
-const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
-const _ = Gettext.gettext;
-const ngettext = Gettext.ngettext;
+import {State, Timer, TimerLabel} from './timer.js';
+import * as Config from './config.js';
+import * as Utils from './utils.js';
 
 
 /* Time between user input events before making dialog modal.
@@ -60,20 +62,20 @@ const BLUR_SIGMA = 20.0;
 const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
 
 const DEFAULT_BACKGROUND_COLOR = Clutter.Color.from_pixel(0x000000ff);
-const HAVE_SHADERS_GLSL = Utils.versionCheck('42.0') || Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL);  // TODO there is no such feature flag since 42
+const HAVE_SHADERS_GLSL = true;  // Utils.versionCheck('42.0') || Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL);  // TODO there is no such feature flag since 42
 
-var State = {
+export const DialogState = {
     OPENED: 0,
     CLOSED: 1,
     OPENING: 2,
     CLOSING: 3
 };
 
-var overlayManager = null;
+let overlayManager = null;
 
 
-var BlurredLightbox = GObject.registerClass(
-class PomodoroBlurredLightbox extends Lightbox.Lightbox {
+const BlurredLightbox = GObject.registerClass(
+class PomodoroBlurredLightbox extends Lightbox {
     _init(container, params) {
         params = Params.parse(params, {
             inhibitEvents: false,
@@ -276,7 +278,7 @@ class OverlayManager {
     }
 
     _raiseChromeInternal(chromeData) {
-        if (chromeData.actor instanceof Lightbox.Lightbox) {
+        if (chromeData.actor instanceof Lightbox) {
             chromeData.notifyOpacityId = chromeData.actor.connect('notify::opacity', () => {
                 this._updateOpacity();
             });
@@ -306,7 +308,7 @@ class OverlayManager {
     }
 
     _lowerChromeInternal(chromeData) {
-        if (chromeData.actor instanceof Lightbox.Lightbox) {
+        if (chromeData.actor instanceof Lightbox) {
             chromeData.actor.disconnect(chromeData.notifyOpacityId);
         }
         else {
@@ -336,7 +338,7 @@ class OverlayManager {
     _updateOpacity() {
         let maxOpacity = 0;
         for (let chromeData of this._chromeActors) {
-            if (chromeData.actor instanceof Lightbox.Lightbox) {
+            if (chromeData.actor instanceof Lightbox) {
                 maxOpacity = Math.max(maxOpacity, chromeData.actor.opacity);
             }
         }
@@ -350,7 +352,7 @@ class OverlayManager {
         let visibleCount = 0;
 
         for (let overlayData of this._overlayActors) {
-            if (overlayData.actor.visible && !(overlayData.actor instanceof Lightbox.Lightbox)) {
+            if (overlayData.actor.visible && !(overlayData.actor instanceof Lightbox)) {
                 visibleCount++;
             }
         }
@@ -423,13 +425,13 @@ class OverlayManager {
  * class to have more event signals, different fade in/out times, and different
  * event blocking behavior.
  */
-var ModalDialog = GObject.registerClass({
+const ModalDialog = GObject.registerClass({
     Properties: {
         'state': GObject.ParamSpec.int('state', 'Dialog state', 'state',
                                        GObject.ParamFlags.READABLE,
-                                       Math.min(...Object.values(State)),
-                                       Math.max(...Object.values(State)),
-                                       State.CLOSED),
+                                       Math.min(...Object.values(DialogState)),
+                                       Math.max(...Object.values(DialogState)),
+                                       DialogState.CLOSED),
     },
     Signals: { 'opened': {}, 'opening': {}, 'closed': {}, 'closing': {} },
 }, class PomodoroModalDialog extends St.Widget {
@@ -441,7 +443,7 @@ var ModalDialog = GObject.registerClass({
                       visible: false,
                       opacity: 0 });
 
-        this._state = State.CLOSED;
+        this._state = DialogState.CLOSED;
         this._acknowledged = false;
         this._hasModal = false;
         this._grab = null;
@@ -459,7 +461,7 @@ var ModalDialog = GObject.registerClass({
         this._lastEventY = -1;
         this._bindingAction = 0;
         this._acceleratorActivatedId = 0;
-        this._monitorConstraint = new Layout.MonitorConstraint();
+        this._monitorConstraint = new MonitorConstraint();
         this._monitorConstraint.primary = true;
         this._stageConstraint = new Clutter.BindConstraint({
                                        source: global.stage,
@@ -559,7 +561,7 @@ var ModalDialog = GObject.registerClass({
     }
 
     acknowledge() {
-        if (this.state === State.CLOSED || this.state === State.CLOSING) {
+        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING) {
             return;
         }
 
@@ -575,7 +577,7 @@ var ModalDialog = GObject.registerClass({
     }
 
     _onOpenComplete() {
-        this._setState(State.OPENED);
+        this._setState(DialogState.OPENED);
 
         if (!this._acknowledgeTimeoutId) {
             this._acknowledgeTimeoutId = GLib.timeout_add(
@@ -642,7 +644,7 @@ var ModalDialog = GObject.registerClass({
     // Gradually open the dialog. Try to make it modal once user had chance to see it
     // and schedule to close it once user becomes active.
     open(animate) {
-        if (this.state === State.OPENED || this.state === State.OPENING || this._destroyed) {
+        if (this.state === DialogState.OPENED || this.state === DialogState.OPENING || this._destroyed) {
             return;
         }
 
@@ -670,7 +672,7 @@ var ModalDialog = GObject.registerClass({
 
         this.remove_all_transitions();
         this.show();
-        this._setState(State.OPENING);
+        this._setState(DialogState.OPENING);
         this._acknowledged = false;
         this.emit('opening');
 
@@ -714,7 +716,7 @@ var ModalDialog = GObject.registerClass({
 
     // Schedule to open when user becomes idle
     openWhenIdle() {
-        if (this.state === State.OPENED || this.state === State.OPENING || this._destroyed) {
+        if (this.state === DialogState.OPENED || this.state === DialogState.OPENING || this._destroyed) {
             return;
         }
 
@@ -735,18 +737,18 @@ var ModalDialog = GObject.registerClass({
 
     _onCloseComplete() {
         this.hide();
-        this._setState(State.CLOSED);
+        this._setState(DialogState.CLOSED);
 
         this.emit('closed');
     }
 
     close(animate) {
-        if (this.state === State.CLOSED || this.state === State.CLOSING) {
+        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING) {
             return;
         }
 
         this.popModal();
-        this._setState(State.CLOSING);
+        this._setState(DialogState.CLOSING);
         this.emit('closing');
 
         this.remove_all_transitions();
@@ -821,7 +823,7 @@ var ModalDialog = GObject.registerClass({
             return true;
         }
 
-        if (this.state === State.CLOSED || this.state === State.CLOSING || this._destroyed) {
+        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING || this._destroyed) {
             return false;
         }
 
@@ -988,13 +990,13 @@ var ModalDialog = GObject.registerClass({
 });
 
 
-var PomodoroEndDialog = GObject.registerClass(
+export const PomodoroEndDialog = GObject.registerClass(
 class PomodoroEndDialog extends ModalDialog {
     _init(timer) {
         super._init();
 
         this._timer = timer;
-        this._timerLabel = new Timer.TimerLabel(timer, {
+        this._timerLabel = new TimerLabel(timer, {
             x_align: Clutter.ActorAlign.CENTER,
         });
         this._descriptionLabel = new St.Label({
@@ -1031,7 +1033,7 @@ class PomodoroEndDialog extends ModalDialog {
     _onTimerStateChanged() {
         const timerState = this._timer.getState();
 
-        if (timerState === Timer.State.SHORT_BREAK || timerState === Timer.State.LONG_BREAK) {
+        if (timerState === State.SHORT_BREAK || timerState === State.LONG_BREAK) {
             this._timerLabel.freeze();
         }
     }

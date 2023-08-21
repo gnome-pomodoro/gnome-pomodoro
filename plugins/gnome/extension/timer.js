@@ -17,19 +17,22 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-const { Clutter, Gio, GObject, St, Pango } = imports.gi;
+import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GObject from 'gi://GObject';
+import Pango from 'gi://Pango';
+import St from 'gi://St';
 
-const Main = imports.ui.main;
-const Params = imports.misc.params;
-const Signals = imports.misc.signals;
+import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
+import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Config = Extension.imports.config;
-const DBus = Extension.imports.dbus;
-const Utils = Extension.imports.utils;
+import {PomodoroClient} from './dbus.js';
+import {IssueNotification} from './notifications.js';
+import * as Config from './config.js';
+import * as Utils from './utils.js';
 
 
-var State = {
+export const State = {
     NULL: 'null',
     POMODORO: 'pomodoro',
     SHORT_BREAK: 'short-break',
@@ -53,7 +56,7 @@ var State = {
 };
 
 
-var Timer = class extends Signals.EventEmitter {
+export const Timer = class extends EventEmitter {
     constructor() {
         super();
 
@@ -64,7 +67,7 @@ var Timer = class extends Signals.EventEmitter {
         this._propertiesChangedId = 0;
         this._elapsed = 0.0;
 
-        this._proxy = DBus.Pomodoro(this._onInit.bind(this));
+        this._proxy = PomodoroClient(this._onInit.bind(this));
 
         this._propertiesChangedId = this._proxy.connect(
                                        'g-properties-changed',
@@ -245,7 +248,8 @@ var Timer = class extends Signals.EventEmitter {
     }
 
     _notifyServiceNotInstalled() {
-        Extension.extension.notifyIssue(_("Failed to run <i>%s</i> service").format(Config.PACKAGE_NAME));
+        const notification = new IssueNotification(_("Failed to run <i>%s</i> service").format(Config.PACKAGE_NAME));
+        notification.show();
     }
 
     destroy() {
@@ -262,7 +266,7 @@ var Timer = class extends Signals.EventEmitter {
 };
 
 
-var MonospaceLabel = GObject.registerClass({
+const MonospaceLabel = GObject.registerClass({
     Properties: {
         'text': GObject.ParamSpec.string('text', '', '',
                                        GObject.ParamFlags.READWRITE,
@@ -357,7 +361,7 @@ var MonospaceLabel = GObject.registerClass({
 
 // Label widget that for longer text behaves like a normal label, but for short text
 // behaves like a monospace label.
-var SemiMonospaceLabel = GObject.registerClass(
+const SemiMonospaceLabel = GObject.registerClass(
 class PomodoroSemiMonospaceLabel extends MonospaceLabel {
     vfunc_get_preferred_width(forHeight) {
         const themeNode = this.get_theme_node();
@@ -374,7 +378,7 @@ class PomodoroSemiMonospaceLabel extends MonospaceLabel {
 });
 
 
-var TimerLabel = GObject.registerClass(
+export const TimerLabel = GObject.registerClass(
 class PomodoroTimerLabel extends St.BoxLayout {
     _init(timer, params) {
         params = Params.parse(params, {
