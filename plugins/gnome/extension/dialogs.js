@@ -33,6 +33,7 @@ import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js'
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
+import {extension} from './extension.js';
 import {State, Timer, TimerLabel} from './timer.js';
 import * as Config from './config.js';
 import * as Utils from './utils.js';
@@ -61,8 +62,7 @@ const BLUR_SIGMA = 20.0;
 
 const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
 
-const DEFAULT_BACKGROUND_COLOR = Clutter.Color.from_pixel(0x000000ff);
-const HAVE_SHADERS_GLSL = true;  // Utils.versionCheck('42.0') || Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL);  // TODO there is no such feature flag since 42
+const BACKGROUND_COLOR = Clutter.Color.from_pixel(0x000000ff);
 
 export const DialogState = {
     OPENED: 0,
@@ -72,6 +72,31 @@ export const DialogState = {
 };
 
 let overlayManager = null;
+
+
+const PlainLightbox = GObject.registerClass(
+class PomodoroPlainLightbox extends Lightbox {
+    _init(container, params) {
+        params = Params.parse(params, {
+            inhibitEvents: false,
+            width: null,
+            height: null,
+        });
+
+        super._init(container, {
+            inhibitEvents: params.inhibitEvents,
+            width: params.width,
+            height: params.height,
+            fadeFactor: 1.0,
+            radialEffect: false,
+        });
+
+        this.set({
+            opacity: 0,
+            style_class: 'extension-pomodoro-lightbox',
+        });
+    }
+});
 
 
 const BlurredLightbox = GObject.registerClass(
@@ -93,21 +118,21 @@ class PomodoroBlurredLightbox extends Lightbox {
 
         this.set({
             opacity: 0,
-            style_class: HAVE_SHADERS_GLSL ? 'extension-pomodoro-lightbox-blurred' : 'extension-pomodoro-lightbox',
+            style_class: 'extension-pomodoro-lightbox-blurred',
         });
         this._background = null;
 
-        let themeContext = St.ThemeContext.get_for_stage(global.stage);
+        const themeContext = St.ThemeContext.get_for_stage(global.stage);
         this._scaleChangedId = themeContext.connect('notify::scale-factor', this._updateEffects.bind(this));
         this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', this._updateEffects.bind(this));
     }
 
     _createBackground() {
-        if (!this._background && HAVE_SHADERS_GLSL) {
+        if (!this._background) {
             // Clone the group that contains all of UI on the screen. This is the
             // chrome, the windows, etc.
             this._background = new Clutter.Clone({ source: Main.uiGroup, clip_to_allocation: true });
-            this._background.set_background_color(DEFAULT_BACKGROUND_COLOR);
+            this._background.set_background_color(BACKGROUND_COLOR);
             this._background.add_effect_with_name('blur', new Shell.BlurEffect());
             this.set_child(this._background);
         }
@@ -125,7 +150,7 @@ class PomodoroBlurredLightbox extends Lightbox {
     _updateEffects() {
         if (this._background) {
             const themeContext = St.ThemeContext.get_for_stage(global.stage);
-            let effect = this._background.get_effect('blur');
+            const effect = this._background.get_effect('blur');
 
             if (effect) {
                 effect.set({
@@ -133,40 +158,6 @@ class PomodoroBlurredLightbox extends Lightbox {
                     sigma: BLUR_SIGMA * themeContext.scale_factor,
                 });
                 effect.queue_repaint();
-            }
-        }
-    }
-
-    lightOn(fadeInTime) {
-        super.lightOn(fadeInTime);
-
-        if (this._background && !Utils.versionCheck('40.0')) {  // TODO remove compatibility for 3.38
-            let effect = this._background.get_effect('blur');
-            if (effect) {
-                effect.set({
-                    brightness: BLUR_BRIGHTNESS * 0.99,
-                });
-            }
-
-            // HACK: force effect to be repaint itself during fading-in
-            // in theory effect.queue_repaint(); should be enough
-            this._background.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS, {
-                duration: fadeInTime || 0,
-            });
-        }
-    }
-
-    lightOff(fadeOutTime) {
-        super.lightOff(fadeOutTime);
-
-        if (this._background && !Utils.versionCheck('40.0')) {  // TODO remove compatibility for 3.38
-            let effect = this._background.get_effect('blur');
-            if (effect) {
-                // HACK: force effect to be repaint itself during fading-out
-                // in theory effect.queue_repaint(); should be enough
-                this._background.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS * 0.99, {
-                    duration: fadeOutTime || 0,
-                });
             }
         }
     }
@@ -190,10 +181,10 @@ class PomodoroBlurredLightbox extends Lightbox {
             delete this._monitorsChangedId;
         }
 
-        let themeContext = St.ThemeContext.get_for_stage(global.stage);
+        const themeContext = St.ThemeContext.get_for_stage(global.stage);
         if (this._scaleChangedId) {
             themeContext.disconnect(this._scaleChangedId);
-            delete this._scaleChangedId;
+            this._scaleChangedId = 0;
         }
 
         this._destroyBackground();
@@ -239,8 +230,8 @@ class OverlayManager {
                 name: 'overlayGroup',
                 reactive: false,
             });
-	        global.stage.add_actor(this._overlayGroup);
-	        global.stage.set_child_above_sibling(this._overlayGroup, null);
+            global.stage.add_actor(this._overlayGroup);
+            global.stage.set_child_above_sibling(this._overlayGroup, null);
         }
 
         if (!this._dummyChrome) {
@@ -468,12 +459,7 @@ const ModalDialog = GObject.registerClass({
                                        coordinate: Clutter.BindCoordinate.ALL });
         this.add_constraint(this._stageConstraint);
 
-        if (global.backend.get_core_idle_monitor !== undefined) {
-            this._idleMonitor = global.backend.get_core_idle_monitor();
-        }
-        else {
-            this._idleMonitor = Meta.IdleMonitor.get_core();  // TODO: remove along support for gnome-shell 40
-        }
+        this._idleMonitor = global.backend.get_core_idle_monitor();
 
         this.connect('destroy', this._onDestroy.bind(this));
 
@@ -485,8 +471,8 @@ const ModalDialog = GObject.registerClass({
         this.add_actor(this._layout);
 
         // Lightbox will be a direct child of the ModalDialog
-        this._lightbox = new BlurredLightbox(this,
-                                             { inhibitEvents: false });
+        this._lightbox = extension.pluginSettings.get_boolean('blur-effect')
+            ? new BlurredLightbox(this) : new PlainLightbox(this);
         this._lightbox.highlight(this._layout);
 
         global.focus_manager.add_group(this._lightbox);
@@ -805,13 +791,7 @@ const ModalDialog = GObject.registerClass({
             return;
         }
 
-        if (this._grab && this._grab.get_seat_state !== undefined) {
-            // gnome-shell 42 and newer
-            Main.popModal(this._grab, timestamp);
-        }
-        else {
-            Main.popModal(this, timestamp);
-        }
+        Main.popModal(this._grab, timestamp);
         this._grab = null;
         this._hasModal = false;
 
@@ -833,17 +813,14 @@ const ModalDialog = GObject.registerClass({
         }
 
         let grab = Main.pushModal(this, params);
-        if (grab && grab.get_seat_state !== undefined) {
-            // gnome-shell 42 and newer
-            if (grab.get_seat_state() !== Clutter.GrabState.ALL) {
-                Utils.logWarning('Unable become fully modal');
-                Main.popModal(grab);
-                return false;
-            }
-        } else {
-            if (!grab) {
-                return false;
-            }
+        if (grab && grab.get_seat_state() !== Clutter.GrabState.ALL) {
+            Utils.logWarning('Unable become fully modal');
+            Main.popModal(grab);
+            return false;
+        }
+
+        if (!grab) {
+            return false;
         }
 
         this._grab = grab;

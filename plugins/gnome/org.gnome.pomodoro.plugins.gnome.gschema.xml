@@ -15,5 +15,10 @@
       <summary>Hide notifications during pomodoro</summary>
       <description>Whether to hide other notifications during pomodoro.</description>
     </key>
+    <key name="blur-effect" type="b">
+      <default>true</default>
+      <summary>Blur effect</summary>
+      <description>Whether to use blur effect for the screen overlay background. On some graphics cards or drivers it can cause issues.</description>
+    </key>
   </schema>
 </schemalist>

@@ -134,6 +134,13 @@ export default class PomodoroExtension extends Extension {
                 }
 
                 break;
+
+            case 'blur-effect':
+                if (this._notificationManager) {
+                    this._disableNotificationManager();
+                    this._enableNotificationManager(true);
+                }
+                break;
         }
     }
 
@@ -298,6 +305,8 @@ export default class PomodoroExtension extends Extension {
         this.pluginSettings.connect('changed::hide-system-notifications',
                                     this._onSettingsChanged.bind(this));
         this.pluginSettings.connect('changed::indicator-type',
+                                    this._onSettingsChanged.bind(this));
+        this.pluginSettings.connect('changed::blur-effect',
                                     this._onSettingsChanged.bind(this));
 
         this.timer = new Timer();

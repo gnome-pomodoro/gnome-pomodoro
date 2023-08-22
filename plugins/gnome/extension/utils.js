@@ -255,7 +255,7 @@ export function logWarning(message) {
 }
 
 
-export function versionCheck(required) {
+export function isVersionAtLeast(required) {
     let current = Config.PACKAGE_VERSION;
     let currentArray = current.split('.');
     let requiredArray = required.split('.');
