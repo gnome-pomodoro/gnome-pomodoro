@@ -48,6 +48,7 @@ const FADE_OUT_TIME = 1250;
 const FADE_OUT_OPACITY = 0.38;
 
 const STEPS = 120;
+const X_ALIGNMENT = 0.5;
 
 
 const IndicatorType = {
@@ -59,7 +60,7 @@ const IndicatorType = {
 
 const IndicatorMenu = class extends PopupMenu.PopupMenu {
     constructor(indicator) {
-        super(indicator, St.Align.START, St.Side.TOP);
+        super(indicator, X_ALIGNMENT, St.Side.TOP);
 
         this._indicator = indicator;
         this._timer = indicator.timer;
@@ -729,7 +730,7 @@ const IconIndicator = class extends EventEmitter {
 export const Indicator = GObject.registerClass(
 class PomodoroIndicator extends PanelMenuButton {
     _init(timer, type) {
-        super._init(St.Align.START, _("Pomodoro"), true);
+        super._init(X_ALIGNMENT, _("Pomodoro"), true);
 
         this.timer  = timer;
         this.widget = null;
@@ -750,6 +751,8 @@ class PomodoroIndicator extends PanelMenuButton {
         this._blinkingGroup.addActor(this._iconBox);
 
         this.setMenu(new IndicatorMenu(this));
+        Main.panel.menuManager.addMenu(this.menu);
+
         this.setType(type);
 
         this._mappedId = this.connect('notify::mapped', this._onMappedChanged.bind(this));
