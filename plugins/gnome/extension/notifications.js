@@ -589,6 +589,7 @@ export const NotificationManager = class extends EventEmitter {
         this._previousView = NotificationView.NULL;
         this._previousTimerState = State.NULL;
         this._patches = this._createPatches();
+        this._notificationSectionPatch = null;
         this._animate = params.animate;
         this._initialized = false;
         this._destroying = false;
@@ -632,6 +633,51 @@ export const NotificationManager = class extends EventEmitter {
         this._useDialog = value;
     }
 
+    // Replace notification banner under date menu with our own `NotificationMessage`.
+    _patchNotificationSection() {
+        const notificationSection = Main.panel?.statusArea.dateMenu?._messageList?._notificationSection;
+
+        if (this._notificationSectionPatch) {
+            this._notificationSectionPatch.destroy();
+            this._notificationSectionPatch = null;
+        }
+
+        if (!notificationSection) {
+            return;
+        }
+
+        const notificationSectionPatch = new Utils.Patch(notificationSection, {
+            addMessageAtIndex(message, index, animate) {
+                const notification = message.notification;
+                const isUrgent = notification.urgency === MessageTray.Urgency.CRITICAL;
+
+                if ((notification instanceof Notification) && !(message instanceof NotificationMessage)) {
+                    // undo what _onNotificationAdded has done
+                    notification.disconnectObject(this);
+
+                    message = new NotificationMessage(message.notification);
+                    index = this._nUrgent;
+                    animate = this.mapped;
+
+                    notification.connectObject(
+                        'destroy', () => {
+                            if (isUrgent) {
+                                this._nUrgent--;
+                            }
+                        },
+                        'updated', () => {
+                            this.moveMessage(message, this._nUrgent, this.mapped);
+                        }, this);
+                }
+
+                notificationSectionPatch.initial.addMessageAtIndex.bind(this)(message, index, animate);
+            }
+        });
+        notificationSectionPatch.apply();
+
+        this._notificationSectionPatch = notificationSectionPatch;
+    }
+
     _createPatches() {
         const messagesIndicatorPatch = new Utils.Patch(Main.panel.statusArea.dateMenu._indicator, {
             _sync() {
@@ -657,24 +703,21 @@ export const NotificationManager = class extends EventEmitter {
             }
         });
 
-//        // TODO: patch CalendarMessageList._init / _notificationSection
-//        const notificationSectionPatch = new Utils.Patch(Calendar.NotificationSection.prototype, {
-//            _onNotificationAdded(source, notification) {
-//                if (notification instanceof Notification) {
-//                    const message = new Calendar.NotificationMessage(notification);
-//
-//                    this.addMessageAtIndex(message, this._nUrgent, this.mapped);
-//                }
-//                else {
-//                    notificationSectionPatch.initial._onNotificationAdded.bind(this)(source, notification);
-//                }
-//            }
-//        });
+        const messageListPatch = new Utils.Patch(Calendar.CalendarMessageList.prototype, {});
+        messageListPatch.connect('applied', () => {
+            this._patchNotificationSection();
+        });
+        messageListPatch.connect('reverted', () => {
+            if (this._notificationSectionPatch) {
+                this._notificationSectionPatch.destroy();
+                this._notificationSectionPatch = null;
+            }
+        });
 
         return [
             messagesIndicatorPatch,
             messageTrayPatch,
-//            notificationSectionPatch,
+            messageListPatch,
         ];
     }
 
@@ -1087,6 +1130,10 @@ export const NotificationManager = class extends EventEmitter {
 
         const view = this._resolveView(timerState, isPaused, isStarting, isEnding);
 
+        if (timerState !== State.NULL) {
+            this._applyPatches();
+        }
+
         if (timerState !== this._timerState || this._view !== view)
         {
             this._change(timerState, view);
@@ -1109,10 +1156,8 @@ export const NotificationManager = class extends EventEmitter {
             this._unscheduleAnnoucement();
         }
 
-        if (timerState !== State.NULL) {
-            this._applyPatches();
-        }
-        else {
+        if (timerState === State.NULL)
+        {
             this._revertPatches();
 
             if (this._notification) {
