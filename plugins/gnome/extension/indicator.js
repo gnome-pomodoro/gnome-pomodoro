@@ -29,10 +29,10 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import {PopupAnimation} from 'resource:///org/gnome/shell/ui/boxpointer.js';
-import {Button as PanelMenuButton} from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
 import {extension} from './extension.js';
@@ -728,7 +728,7 @@ const IconIndicator = class extends EventEmitter {
 
 
 export const Indicator = GObject.registerClass(
-class PomodoroIndicator extends PanelMenuButton {
+class PomodoroIndicator extends PanelMenu.Button {
     _init(timer, type) {
         super._init(X_ALIGNMENT, _("Pomodoro"), true);
 
@@ -737,14 +737,11 @@ class PomodoroIndicator extends PanelMenuButton {
 
         this.add_style_class_name('extension-pomodoro-indicator');
 
-        this._container = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
-        this.add_child(this._container);
-
         this._iconBox = new St.Bin({
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
         });
-        this._container.add_child(this._iconBox);
+        this.add_actor(this._iconBox);
 
         this._blinking = false;
         this._blinkingGroup = new Utils.TransitionGroup();
