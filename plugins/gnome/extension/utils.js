@@ -18,7 +18,6 @@
  *
  */
 
-import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
@@ -50,17 +49,15 @@ export const Patch = class extends EventEmitter {
         for (let name in this.overrides) {
             this.initial[name] = this.object[name];
 
-            if (typeof(this.initial[name]) == 'undefined') {
+            if (typeof this.initial[name] == 'undefined')
                 logWarning(`Property "${name}" for ${this.object} is not defined`);
-            }
         }
     }
 
     apply() {
         if (!this.applied) {
-            for (let name in this.overrides) {
+            for (let name in this.overrides)
                 this.object[name] = this.overrides[name];
-            }
 
             this.applied = true;
 
@@ -70,9 +67,8 @@ export const Patch = class extends EventEmitter {
 
     revert() {
         if (this.applied) {
-            for (let name in this.overrides) {
+            for (let name in this.overrides)
                 this.object[name] = this.initial[name];
-            }
 
             this.applied = false;
 
@@ -88,7 +84,6 @@ export const Patch = class extends EventEmitter {
 
 
 export const TransitionGroup = class {
-
     /* Helper class to share property transition between multiple actors */
 
     constructor() {
@@ -102,9 +97,8 @@ export const TransitionGroup = class {
 
     _findActor(actor) {
         for (var index = 0; index < this._actors.length; index++) {
-            if (this._actors[index].actor === actor) {
+            if (this._actors[index].actor === actor)
                 return index;
-            }
         }
 
         return -1;
@@ -113,12 +107,11 @@ export const TransitionGroup = class {
     addActor(actor) {
         let index = this._findActor(actor);
 
-        if (!actor || index >= 0) {
+        if (!actor || index >= 0)
             return;
-        }
 
         const meta = {
-            actor: actor,
+            actor,
             destroyId: actor.connect('destroy', () => {
                 this.removeActor(actor);
                 meta.destroyId = 0;
@@ -126,39 +119,36 @@ export const TransitionGroup = class {
         };
         this._actors.push(meta);
 
-        if (!this._referenceActor) {
+        if (!this._referenceActor)
             this._setReferenceActor(actor);
-        }
     }
 
     removeActor(actor) {
         let index = this._findActor(actor);
         if (index >= 0) {
             const meta = this._actors.splice(index, 1);
-            if (meta.destroyId) {
+            if (meta.destroyId)
                 actor.disconnect(meta.destroyId);
-            }
         }
 
-        if (this._referenceActor === actor) {
+        if (this._referenceActor === actor)
             this._setReferenceActor(this._actors.length > 0 ? this._actors[0].actor : null);
-        }
     }
 
     easeProperty(name, target, params) {
         let onStopped = params.onStopped;
         let onComplete = params.onComplete;
 
-        this._actors.forEach((meta) => {
+        this._actors.forEach(meta => {
             let localParams = Object.assign({
-                onStopped: (isFinished) => {
+                onStopped: isFinished => {
                     if (onStopped && meta.actor === this._referenceActor)
                         onStopped(isFinished);
                 },
                 onComplete: () => {
-                     if (onComplete && meta.actor === this._referenceActor)
-                         onComplete();
-                }
+                    if (onComplete && meta.actor === this._referenceActor)
+                        onComplete();
+                },
             }, params);
 
             meta.actor.ease_property(name, target, localParams);
@@ -167,77 +157,82 @@ export const TransitionGroup = class {
 
     setProperty(name, target) {
         let properties = {};
-        properties[name] = target
+        properties[name] = target;
 
-        this._actors.forEach((meta) => {
+        this._actors.forEach(meta => {
             meta.actor.set(properties);
         });
     }
 
     removeAllTransitions() {
-        this._actors.forEach((meta) => {
+        this._actors.forEach(meta => {
             meta.actor.remove_all_transitions();
         });
     }
 
     destroy() {
-        this._actors.slice().forEach((meta) => {
+        this._actors.slice().forEach(meta => {
             this.removeActor(meta.actor);
         });
     }
-}
+};
 
 
+/**
+ *
+ * @param {Array} subset - subset
+ * @param {Array} set - set
+ */
 function isSubset(subset, set) {
     for (let value of subset) {
-        if (set.indexOf(value) < 0) {
+        if (set.indexOf(value) < 0)
             return false;
-        }
     }
 
     return true;
 }
 
 
+/**
+ *
+ * @param {object} app - app object
+ */
 function _isVideoPlayer(app) {
     const appInfo = app.get_app_info();
-    if (!appInfo) {
+    if (!appInfo)
         return false;
-    }
 
     const categoriesStr = appInfo.get_categories();
     const categories    = categoriesStr ? categoriesStr.split(';') : [];
 
-    if (!categories.length) {
+    if (!categories.length)
         return false;
-    }
 
     for (let videoPlayerCategories of VIDEO_PLAYER_CATEGORIES) {
-        if (isSubset(videoPlayerCategories, categories)) {
+        if (isSubset(videoPlayerCategories, categories))
             return true;
-        }
     }
 
     return false;
 }
 
 
+/**
+ *
+ */
 export function isVideoPlayerOpen() {
     const apps = Shell.AppSystem.get_default().get_running();
 
     for (let app of apps) {
-        if (!_isVideoPlayer(app)) {
+        if (!_isVideoPlayer(app))
             continue;
-        }
 
         for (let window of app.get_windows()) {
-            if (window.window_type !== Meta.WindowType.NORMAL || window.is_hidden()) {
+            if (window.window_type !== Meta.WindowType.NORMAL || window.is_hidden())
                 continue;
-            }
 
-            if (window.fullscreen) {
+            if (window.fullscreen)
                 return true;
-            }
         }
     }
 
@@ -245,52 +240,67 @@ export function isVideoPlayerOpen() {
 }
 
 
+/**
+ *
+ * @param {Error} error - error
+ */
 export function logError(error) {
     Main.extensionManager.logExtensionError(Config.EXTENSION_UUID, error);
 }
 
 
+/**
+ *
+ * @param {string} message - error
+ */
 export function logWarning(message) {
     console.warn(`Pomodoro: ${message}`);
 }
 
 
+/**
+ *
+ * @param {string} required - version required
+ */
 export function isVersionAtLeast(required) {
-    let current = Config.PACKAGE_VERSION;
-    let currentArray = current.split('.');
-    let requiredArray = required.split('.');
+    const current = Config.PACKAGE_VERSION;
+    const currentArray = current.split('.');
+    const requiredArray = required.split('.');
 
     if (requiredArray[0] <= currentArray[0] &&
         requiredArray[1] <= currentArray[1] &&
-        (requiredArray[2] <= currentArray[2] ||
-         requiredArray[2] == undefined)) {
+        (requiredArray[2] <= currentArray[2] || requiredArray[2] === undefined))
         return true;
-    }
 
     return false;
 }
 
 
+/**
+ *
+ * @param {string} uuid - extension uuid
+ */
 export function disableExtension(uuid) {
-    let enabledExtensions = global.settings.get_strv(ENABLED_EXTENSIONS_KEY);
-    let extensionIndex = enabledExtensions.indexOf(uuid);
+    const enabledExtensions = global.settings.get_strv(ENABLED_EXTENSIONS_KEY);
+    const extensionIndex = enabledExtensions.indexOf(uuid);
 
-    if (extensionIndex != -1) {
+    if (extensionIndex < 0) {
         enabledExtensions.splice(extensionIndex, 1);
         global.settings.set_strv(ENABLED_EXTENSIONS_KEY, enabledExtensions);
     }
 }
 
 
+/**
+ *
+ */
 export function wakeUpScreen() {
     if (Main.screenShield._dialog) {
         Main.screenShield._dialog.emit('wake-up-screen');
-    }
-    else {
+    } else {
         try {
             Main.screenShield._wakeUpScreen();
-        }
-        catch (error) {
+        } catch (error) {
             logWarning(`Error while waking up the screen: ${error}`);
         }
     }

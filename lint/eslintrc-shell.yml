@@ -1,0 +1,14 @@
+rules:
+  camelcase:
+    - error
+    - properties: never
+      allow: [^vfunc_, ^on_]
+  consistent-return: error
+  eqeqeq:
+    - error
+    - smart
+  prefer-arrow-callback: error
+globals:
+  global: readonly
+parserOptions:
+  sourceType: module

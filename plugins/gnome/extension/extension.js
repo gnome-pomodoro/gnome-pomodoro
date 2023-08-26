@@ -25,15 +25,14 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
-import * as ShellConfig from 'resource:///org/gnome/shell/misc/config.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import {Indicator} from './indicator.js';
-import {IssueNotification, NotificationManager} from './notifications.js';
+import {NotificationManager} from './notifications.js';
 import {PomodoroExtensionService} from './dbus.js';
 import {PresenceManager} from './presence.js';
 import {ScreenShieldManager} from './screenShield.js';
-import {State, Timer} from './timer.js';
+import {Timer} from './timer.js';
 import * as Config from './config.js';
 import * as Utils from './utils.js';
 
@@ -72,7 +71,7 @@ export default class PomodoroExtension extends Extension {
     get application() {
         return Shell.AppSystem.get_default().lookup_app('org.gnome.Pomodoro.desktop');
     }
-    
+
     get notificationManager() {
         return this._notificationManager;
     }
@@ -88,20 +87,17 @@ export default class PomodoroExtension extends Extension {
                 this._disableNotificationManager();
                 this._enableScreenShieldManager();
                 this._enableKeybinding();
-            }
-            else {
+            } else {
                 this._enableIndicator();
                 this._enableNotificationManager(previousMode !== ExtensionMode.RESTRICTED);
                 this._disableScreenShieldManager();
                 this._enableKeybinding();
             }
 
-            if (this.pluginSettings.get_boolean('hide-system-notifications')) {
+            if (this.pluginSettings.get_boolean('hide-system-notifications'))
                 this._enablePresence();
-            }
-            else {
+            else
                 this._disablePresence();
-            }
         }
     }
 
@@ -110,37 +106,33 @@ export default class PomodoroExtension extends Extension {
     }
 
     _onSettingsChanged(settings, key) {
-        switch(key) {
-            case 'show-screen-notifications':
-                if (this._notificationManager) {
-                    this._notificationManager.useDialog = settings.get_boolean(key);
-                }
+        switch (key) {
+        case 'show-screen-notifications':
+            if (this._notificationManager)
+                this._notificationManager.useDialog = settings.get_boolean(key);
 
-                break;
+            break;
 
-            case 'hide-system-notifications':
-                if (settings.get_boolean(key)) {
-                    this._enablePresence();
-                }
-                else {
-                    this._disablePresence();
-                }
+        case 'hide-system-notifications':
+            if (settings.get_boolean(key))
+                this._enablePresence();
+            else
+                this._disablePresence();
 
-                break;
+            break;
 
-            case 'indicator-type':
-                if (this.indicator) {
-                    this.indicator.setType(settings.get_string(key));
-                }
+        case 'indicator-type':
+            if (this.indicator)
+                this.indicator.setType(settings.get_string(key));
 
-                break;
+            break;
 
-            case 'blur-effect':
-                if (this._notificationManager) {
-                    this._disableNotificationManager();
-                    this._enableNotificationManager(true);
-                }
-                break;
+        case 'blur-effect':
+            if (this._notificationManager) {
+                this._disableNotificationManager();
+                this._enableNotificationManager(true);
+            }
+            break;
         }
     }
 
@@ -148,7 +140,7 @@ export default class PomodoroExtension extends Extension {
     }
 
     _onServiceNameLost() {
-        Utils.logError(new Errror('Lost service name "org.gnome.Pomodoro.Extension"'));
+        Utils.logWarning('Lost service name "org.gnome.Pomodoro.Extension"');
     }
 
     _onTimerServiceConnected() {
@@ -162,28 +154,23 @@ export default class PomodoroExtension extends Extension {
     }
 
     _onKeybindingPressed() {
-        if (this.timer) {
+        if (this.timer)
             this.timer.toggle();
-        }
     }
 
     _enableIndicator() {
         if (!this.indicator) {
-            this.indicator = new Indicator(this.timer,
-                                           this.pluginSettings.get_string('indicator-type'));
-            this.indicator.connect('destroy',
-                () => {
-                    this.indicator = null;
-                });
+            this.indicator = new Indicator(this.timer, this.pluginSettings.get_string('indicator-type'));
+            this.indicator.connect('destroy', () => {
+                this.indicator = null;
+            });
 
             try {
                 Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
-            }
-            catch (error) {
+            } catch (error) {
                 Utils.logError(error);
             }
-        }
-        else {
+        } else {
             this.indicator.show();
         }
     }
@@ -198,11 +185,12 @@ export default class PomodoroExtension extends Extension {
     _enableKeybinding() {
         if (!this.keybinding) {
             this.keybinding = true;
-            Main.wm.addKeybinding('toggle-timer-key',
-                                  this.settings,
-                                  Meta.KeyBindingFlags.NONE,
-                                  Shell.ActionMode.ALL,
-                                  this._onKeybindingPressed.bind(this));
+            Main.wm.addKeybinding(
+                'toggle-timer-key',
+                this.settings,
+                Meta.KeyBindingFlags.NONE,
+                Shell.ActionMode.ALL,
+                this._onKeybindingPressed.bind(this));
         }
     }
 
@@ -214,9 +202,8 @@ export default class PomodoroExtension extends Extension {
     }
 
     _enablePresence() {
-        if (!this.presenceManager) {
+        if (!this.presenceManager)
             this.presenceManager = new PresenceManager(this.timer);
-        }
     }
 
     _disablePresence() {
@@ -230,7 +217,7 @@ export default class PomodoroExtension extends Extension {
         if (!this._notificationManager) {
             const params = {
                 useDialog: this.settings.get_boolean('show-screen-notifications'),
-                animate: animate,
+                animate,
             };
             this._notificationManager = new NotificationManager(this.timer, params);
         }
@@ -244,13 +231,11 @@ export default class PomodoroExtension extends Extension {
     }
 
     _enableScreenShieldManager() {
-        if (!Main.screenShield) {
+        if (!Main.screenShield)
             return;
-        }
 
-        if (!this._screenShieldManager) {
+        if (!this._screenShieldManager)
             this._screenShieldManager = new ScreenShieldManager(this.timer);
-        }
     }
 
     _disableScreenShieldManager() {
@@ -261,14 +246,11 @@ export default class PomodoroExtension extends Extension {
     }
 
     _connectSignals() {
-        this._sessionModeUpdatedId = Main.sessionMode.connect('updated',
-            () => {
-                this._updateMode();
-            });
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', () => this._updateMode());
     }
 
     _disconnectSignals() {
-        if (this._sessionModeUpdatedId != 0) {
+        if (this._sessionModeUpdatedId) {
             Main.sessionMode.disconnect(this._sessionModeUpdatedId);
             this._sessionModeUpdatedId = 0;
         }
@@ -277,37 +259,28 @@ export default class PomodoroExtension extends Extension {
     // override method
     getSettings(schema) {
         const schemaDir = Gio.File.new_for_path(Config.GSETTINGS_SCHEMA_DIR);
+        const defaultSource = Gio.SettingsSchemaSource.get_default();
         let schemaSource;
-        if (schemaDir.query_exists(null)) {
-            schemaSource = Gio.SettingsSchemaSource.new_from_directory(schemaDir.get_path(),
-                                                                       Gio.SettingsSchemaSource.get_default(),
-                                                                       false);
-        }
-        else {
-            schemaSource = Gio.SettingsSchemaSource.get_default();
-        }
+        if (schemaDir.query_exists(null))
+            schemaSource = Gio.SettingsSchemaSource.new_from_directory(schemaDir.get_path(), defaultSource, false);
+        else
+            schemaSource = defaultSource;
 
         const schemaObj = schemaSource.lookup(schema, true);
-        if (!schemaObj) {
-            throw new Error('Schema ' + schema + ' could not be found for extension '
-                            + this.uuid + '. Please check your installation.');
-        }
+        if (!schemaObj)
+            throw new Error(`Schema ${schema} could not be found for extension ${this.uuid}. Please check your installation.`);
 
-        return new Gio.Settings({ settings_schema: schemaObj });
+        return new Gio.Settings({settings_schema: schemaObj});
     }
 
     enable() {
         this.settings = this.getSettings('org.gnome.pomodoro.preferences');
-        this.settings.connect('changed::show-screen-notifications',
-                              this._onSettingsChanged.bind(this));
+        this.settings.connect('changed::show-screen-notifications', this._onSettingsChanged.bind(this));
 
         this.pluginSettings = this.getSettings('org.gnome.pomodoro.plugins.gnome');
-        this.pluginSettings.connect('changed::hide-system-notifications',
-                                    this._onSettingsChanged.bind(this));
-        this.pluginSettings.connect('changed::indicator-type',
-                                    this._onSettingsChanged.bind(this));
-        this.pluginSettings.connect('changed::blur-effect',
-                                    this._onSettingsChanged.bind(this));
+        this.pluginSettings.connect('changed::hide-system-notifications', this._onSettingsChanged.bind(this));
+        this.pluginSettings.connect('changed::indicator-type', this._onSettingsChanged.bind(this));
+        this.pluginSettings.connect('changed::blur-effect', this._onSettingsChanged.bind(this));
 
         this.timer = new Timer();
         this.timer.connect('service-connected', this._onTimerServiceConnected.bind(this));
@@ -333,15 +306,15 @@ export default class PomodoroExtension extends Extension {
         this.mode = null;
 
         this.service.destroy();
-        this.service = null
+        this.service = null;
 
         this.timer.destroy();
-        this.timer = null
+        this.timer = null;
 
         this.pluginSettings.run_dispose();
-        this.pluginSettings = null
+        this.pluginSettings = null;
 
         this.settings.run_dispose();
         this.settings = null;
     }
-};
+}

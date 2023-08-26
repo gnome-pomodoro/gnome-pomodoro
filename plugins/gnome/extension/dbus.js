@@ -65,6 +65,12 @@ const PomodoroExtensionInterface = '<node> \
 
 
 const PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
+
+/**
+ *
+ * @param {Function} callback - callback
+ * @param {object?} cancellable - cancellable
+ */
 export function PomodoroClient(callback, cancellable) {
     return new PomodoroProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', callback, cancellable);
 }
@@ -83,31 +89,35 @@ export const PomodoroExtensionService = class extends EventEmitter {
         this.initialized = false;
     }
 
-    _onNameAcquired(name) {
+    _onNameAcquired(name) {  // eslint-disable-line no-unused-vars
         this.initialized = true;
 
         this.emit('name-acquired');
     }
 
-    _onNameLost(name) {
+    _onNameLost(name) {  // eslint-disable-line no-unused-vars
         this.initialized = false;
 
         this.emit('name-lost');
     }
 
     run() {
-        if (this._dbusId == 0) {
-            this._dbusId = Gio.DBus.session.own_name('org.gnome.Pomodoro.Extension',
-                                                     Gio.BusNameOwnerFlags.REPLACE,
-                                                     this._onNameAcquired.bind(this),
-                                                     this._onNameLost.bind(this));
+        if (this._dbusId === 0) {
+            this._dbusId = Gio.DBus.session.own_name(
+                'org.gnome.Pomodoro.Extension',
+                Gio.BusNameOwnerFlags.REPLACE,
+                this._onNameAcquired.bind(this),
+                this._onNameLost.bind(this));
         }
     }
 
     destroy() {
         this.disconnectAll();
 
-        Gio.DBus.session.unown_name(this._dbusId);
+        if (this._dbusId !== 0) {
+            Gio.DBus.session.unown_name(this._dbusId);
+            this._dbusId = 0;
+        }
 
         this._dbusImpl.unexport();
 

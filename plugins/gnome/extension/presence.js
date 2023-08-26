@@ -40,9 +40,9 @@ export const PresenceManager = class {
         // Setup a patch for suppressing presence handlers.
         // When applied the main presence controller becomes gnome-pomodoro.
         this._patch = new Utils.Patch(MessageTray.prototype, {
-            _onStatusChanged(status) {
+            _onStatusChanged(status) {  // eslint-disable-line no-unused-vars
                 this._updateState();
-            }
+            },
         });
         this._patch.connect('applied', this._onPatchApplied.bind(this));
         this._patch.connect('reverted', this._onPatchReverted.bind(this));
@@ -63,23 +63,19 @@ export const PresenceManager = class {
     update() {
         const timerState = this.timer.getState();
 
-        if (timerState === State.NULL) {
+        if (timerState === State.NULL)
             this.setDefault();
-        }
-        else {
+        else
             this.setBusy(timerState === State.POMODORO);
-        }
     }
 
     setBusy(value) {
         this._busy = value;
 
-        if (!this._patch.applied) {
+        if (!this._patch.applied)
             this._patch.apply();
-        }
-        else {
+        else
             this._onPatchApplied();
-        }
 
         this._settings.set_boolean('show-banners', !value);
     }
@@ -87,17 +83,15 @@ export const PresenceManager = class {
     setDefault() {
         this._settings.set_boolean('show-banners', true);
 
-        if (this._patch.applied) {
+        if (this._patch.applied)
             this._patch.revert();
-        }
     }
 
     _onPatchApplied() {
         try {
             Main.messageTray._busy = this._busy;
             Main.messageTray._onStatusChanged();
-        }
-        catch (error) {
+        } catch (error) {
             Utils.logWarning(error.message);
         }
     }
@@ -107,8 +101,7 @@ export const PresenceManager = class {
             const status = Main.messageTray._presence.status;
 
             Main.messageTray._onStatusChanged(status);
-        }
-        catch (error) {
+        } catch (error) {
             Utils.logWarning(error.message);
         }
     }

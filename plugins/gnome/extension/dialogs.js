@@ -34,8 +34,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
 import {extension} from './extension.js';
-import {State, Timer, TimerLabel} from './timer.js';
-import * as Config from './config.js';
+import {State, TimerLabel} from './timer.js';
 import * as Utils from './utils.js';
 
 
@@ -68,7 +67,7 @@ export const DialogState = {
     OPENED: 0,
     CLOSED: 1,
     OPENING: 2,
-    CLOSING: 3
+    CLOSING: 3,
 };
 
 let overlayManager = null;
@@ -131,7 +130,7 @@ class PomodoroBlurredLightbox extends Lightbox {
         if (!this._background) {
             // Clone the group that contains all of UI on the screen. This is the
             // chrome, the windows, etc.
-            this._background = new Clutter.Clone({ source: Main.uiGroup, clip_to_allocation: true });
+            this._background = new Clutter.Clone({source: Main.uiGroup, clip_to_allocation: true});
             this._background.set_background_color(BACKGROUND_COLOR);
             this._background.add_effect_with_name('blur', new Shell.BlurEffect());
             this.set_child(this._background);
@@ -204,22 +203,19 @@ class OverlayManager {
         this._chromeActors = [];
 
         for (let chrome of [Main.messageTray,
-                            Main.screenShield._shortLightbox,
-                            Main.screenShield._longLightbox])
-        {
+            Main.screenShield._shortLightbox,
+            Main.screenShield._longLightbox]) {
             try {
                 this.addChrome(chrome);
-            }
-            catch (error) {
+            } catch (error) {
                 Utils.logError(error);
             }
         }
     }
 
     static getDefault() {
-        if (!overlayManager) {
+        if (!overlayManager)
             overlayManager = new OverlayManager();
-        }
 
         return overlayManager;
     }
@@ -237,8 +233,9 @@ class OverlayManager {
         if (!this._dummyChrome) {
             // LayoutManager tracks region changes, so create a mock member resembling overlayGroup.
             const constraint = new Clutter.BindConstraint({
-                                           source: this._overlayGroup,
-                                           coordinate: Clutter.BindCoordinate.ALL });
+                source: this._overlayGroup,
+                coordinate: Clutter.BindCoordinate.ALL,
+            });
             this._dummyChrome = new St.Widget({
                 name: 'dummyOverlayGroup',
                 reactive: false,
@@ -247,16 +244,15 @@ class OverlayManager {
             Main.layoutManager.addTopChrome(this._dummyChrome);
         }
 
-        for (const overlayData of this._overlayActors) {
+        for (const overlayData of this._overlayActors)
             this._overlayGroup.add_actor(overlayData.actor);
-        }
     }
 
     _destroyOverlayGroup() {
         if (this._overlayGroup) {
-            for (const overlayData of this._overlayActors) {
+            for (const overlayData of this._overlayActors)
                 this._overlayGroup.remove_actor(overlayData.actor);
-            }
+
 
             global.stage.remove_actor(this._overlayGroup);
             this._overlayGroup = null;
@@ -273,14 +269,12 @@ class OverlayManager {
             chromeData.notifyOpacityId = chromeData.actor.connect('notify::opacity', () => {
                 this._updateOpacity();
             });
-        }
-        else {
+        } else {
             chromeData.actor.ref();
             try {
                 Main.layoutManager.uiGroup.remove_actor(chromeData.actor);
                 global.stage.add_actor(chromeData.actor);
-            }
-            finally {
+            } finally {
                 chromeData.actor.unref();
             }
         }
@@ -290,9 +284,8 @@ class OverlayManager {
         if (!this._raised) {
             this._createOverlayGroup();
 
-            for (let chromeData of this._chromeActors) {
+            for (let chromeData of this._chromeActors)
                 this._raiseChromeInternal(chromeData);
-            }
 
             this._raised = true;
         }
@@ -301,14 +294,12 @@ class OverlayManager {
     _lowerChromeInternal(chromeData) {
         if (chromeData.actor instanceof Lightbox) {
             chromeData.actor.disconnect(chromeData.notifyOpacityId);
-        }
-        else {
+        } else {
             chromeData.actor.ref();
             try {
                 global.stage.remove_actor(chromeData.actor);
                 Main.layoutManager.uiGroup.add_actor(chromeData.actor);
-            }
-            finally {
+            } finally {
                 chromeData.actor.unref();
             }
         }
@@ -316,9 +307,8 @@ class OverlayManager {
 
     _lowerChrome() {
         if (this._raised) {
-            for (let chromeData of this._chromeActors) {
+            for (let chromeData of this._chromeActors)
                 this._lowerChromeInternal(chromeData);
-            }
 
             this._destroyOverlayGroup();
 
@@ -329,31 +319,27 @@ class OverlayManager {
     _updateOpacity() {
         let maxOpacity = 0;
         for (let chromeData of this._chromeActors) {
-            if (chromeData.actor instanceof Lightbox) {
+            if (chromeData.actor instanceof Lightbox)
                 maxOpacity = Math.max(maxOpacity, chromeData.actor.opacity);
-            }
         }
 
-        for (let overlayData of this._overlayActors) {
+        for (let overlayData of this._overlayActors)
             overlayData.actor._layout.opacity = 255 - maxOpacity;
-        }
     }
 
     _onOverlayNotifyVisible() {
         let visibleCount = 0;
 
         for (let overlayData of this._overlayActors) {
-            if (overlayData.actor.visible && !(overlayData.actor instanceof Lightbox)) {
+            if (overlayData.actor.visible && !(overlayData.actor instanceof Lightbox))
                 visibleCount++;
-            }
         }
 
-        if (visibleCount > 0) {
+        if (visibleCount > 0)
             this._raiseChrome();
-        }
-        else {
+
+        else
             this._lowerChrome();
-        }
     }
 
     _onOverlayDestroy(actor) {
@@ -371,7 +357,7 @@ class OverlayManager {
 
     add(actor) {
         this._overlayActors.push({
-            actor: actor,
+            actor,
             notifyVisibleId: actor.connect('notify::visible', this._onOverlayNotifyVisible.bind(this)),
             destroyId: actor.connect('destroy', this._onOverlayDestroy.bind(this)),
         });
@@ -381,19 +367,17 @@ class OverlayManager {
     }
 
     addChrome(actor) {
-        if (actor.get_parent() !== Main.layoutManager.uiGroup) {
+        if (actor.get_parent() !== Main.layoutManager.uiGroup)
             throw new Error('Passed actor is not a direct child of Main.layoutManager.uiGroup');
-        }
 
         const chromeData = {
-            actor: actor,
+            actor,
             notifyOpacityId: 0,
         };
         this._chromeActors.push(chromeData);
 
-        if (this._raised) {
+        if (this._raised)
             this._raiseChromeInternal(chromeData);
-        }
     }
 
     destroy() {
@@ -419,20 +403,22 @@ class OverlayManager {
 const ModalDialog = GObject.registerClass({
     Properties: {
         'state': GObject.ParamSpec.int('state', 'Dialog state', 'state',
-                                       GObject.ParamFlags.READABLE,
-                                       Math.min(...Object.values(DialogState)),
-                                       Math.max(...Object.values(DialogState)),
-                                       DialogState.CLOSED),
+            GObject.ParamFlags.READABLE,
+            Math.min(...Object.values(DialogState)),
+            Math.max(...Object.values(DialogState)),
+            DialogState.CLOSED),
     },
-    Signals: { 'opened': {}, 'opening': {}, 'closed': {}, 'closing': {} },
+    Signals: {'opened': {}, 'opening': {}, 'closed': {}, 'closing': {}},
 }, class PomodoroModalDialog extends St.Widget {
     _init() {
-        super._init({ style_class: 'extension-pomodoro-dialog',
-                      accessible_role: Atk.Role.DIALOG,
-                      layout_manager: new Clutter.BinLayout(),
-                      reactive: false,
-                      visible: false,
-                      opacity: 0 });
+        super._init({
+            style_class: 'extension-pomodoro-dialog',
+            accessible_role: Atk.Role.DIALOG,
+            layout_manager: new Clutter.BinLayout(),
+            reactive: false,
+            visible: false,
+            opacity: 0,
+        });
 
         this._state = DialogState.CLOSED;
         this._acknowledged = false;
@@ -455,8 +441,9 @@ const ModalDialog = GObject.registerClass({
         this._monitorConstraint = new MonitorConstraint();
         this._monitorConstraint.primary = true;
         this._stageConstraint = new Clutter.BindConstraint({
-                                       source: global.stage,
-                                       coordinate: Clutter.BindCoordinate.ALL });
+            source: global.stage,
+            coordinate: Clutter.BindCoordinate.ALL,
+        });
         this.add_constraint(this._stageConstraint);
 
         this._idleMonitor = global.backend.get_core_idle_monitor();
@@ -466,7 +453,7 @@ const ModalDialog = GObject.registerClass({
         // Modal dialogs are fixed width and grow vertically; set the request
         // mode accordingly so wrapped labels are handled correctly during
         // size requests.
-        this._layout = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+        this._layout = new St.Widget({layout_manager: new Clutter.BinLayout()});
         this._layout.add_constraint(this._monitorConstraint);
         this.add_actor(this._layout);
 
@@ -485,18 +472,16 @@ const ModalDialog = GObject.registerClass({
     }
 
     _setState(state) {
-        if (this._state === state) {
+        if (this._state === state)
             return;
-        }
 
         this._state = state;
         this.notify('state');
     }
 
-    _onAcceleratorActivated(display, action, device, timestamp) {
-        if (action === this._bindingAction) {
+    _onAcceleratorActivated(display, action, device, timestamp) {  // eslint-disable-line no-unused-vars
+        if (action === this._bindingAction)
             this.close(true);
-        }
     }
 
     // register a failsafe method of closing the dialog
@@ -515,9 +500,8 @@ const ModalDialog = GObject.registerClass({
             Main.wm.allowKeybinding(bindingName, Shell.ActionMode.ALL);
         }
 
-        if (!this._acceleratorActivatedId) {
+        if (!this._acceleratorActivatedId)
             this._acceleratorActivatedId = global.display.connect('accelerator-activated', this._onAcceleratorActivated.bind(this));
-        }
     }
 
     _ungrabAccelerators() {
@@ -525,12 +509,11 @@ const ModalDialog = GObject.registerClass({
             const bindingName = Meta.external_binding_name_for_action(this._bindingAction);
             Main.wm.allowKeybinding(bindingName, Shell.ActionMode.NONE);
 
-            if (global.display.ungrab_accelerator(this._bindingAction)) {
+            if (global.display.ungrab_accelerator(this._bindingAction))
                 this._bindingAction = null;
-            }
-            else {
+
+            else
                 Utils.logWarning('Failed to ungrab accelerator for the dialog.');
-            }
         }
 
         if (this._acceleratorActivatedId) {
@@ -547,9 +530,9 @@ const ModalDialog = GObject.registerClass({
     }
 
     acknowledge() {
-        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING) {
+        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING)
             return;
-        }
+
 
         this._acknowledged = true;
     }
@@ -557,9 +540,8 @@ const ModalDialog = GObject.registerClass({
     _onKeyFocusOut() {
         let focus = global.stage.key_focus;
 
-        if (focus === null || !this._lightbox.contains(focus)) {
+        if (focus === null || !this._lightbox.contains(focus))
             this.close(true);
-        }
     }
 
     _onOpenComplete() {
@@ -572,10 +554,10 @@ const ModalDialog = GObject.registerClass({
                 () => {
                     if (this._getIdleTime() >= IDLE_TIME_TO_ACKNOWLEDGE) {
                         this.acknowledge();
-                    }
-                    else {
-                        this._acknowledgeIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_ACKNOWLEDGE,
-                            (monitor) => this.acknowledge()
+                    } else {
+                        this._acknowledgeIdleWatchId = this._idleMonitor.add_idle_watch(
+                            IDLE_TIME_TO_ACKNOWLEDGE,
+                            monitor => this.acknowledge()  // eslint-disable-line no-unused-vars
                         );
                     }
 
@@ -583,25 +565,24 @@ const ModalDialog = GObject.registerClass({
                     return GLib.SOURCE_REMOVE;
                 });
             GLib.Source.set_name_by_id(this._acknowledgeTimeoutId,
-                                       '[gnome-pomodoro] this._acknowledgeTimeoutId');
+                '[gnome-pomodoro] this._acknowledgeTimeoutId');
         }
 
         this.emit('opened');
     }
 
-    _onIdleMonitorBecameIdle(monitor) {
+    _onIdleMonitorBecameIdle(monitor) {  // eslint-disable-line no-unused-vars
         let pushModalTries = 0;
-        let pushModalInterval = Math.floor(1000 / PUSH_MODAL_RATE);
-        let timestamp = global.get_current_time();
+        const pushModalInterval = Math.floor(1000 / PUSH_MODAL_RATE);
+        const timestamp = global.get_current_time();
 
         if (this._pushModalWatchId) {
             this._idleMonitor.remove_watch(this._pushModalWatchId);
             this._pushModalWatchId = 0;
         }
 
-        if (this.pushModal(timestamp)) {
-            return GLib.SOURCE_REMOVE;
-        }
+        if (this.pushModal(timestamp))
+            return;
 
         this._pushModalSource = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT,
@@ -624,15 +605,14 @@ const ModalDialog = GObject.registerClass({
                 return GLib.SOURCE_CONTINUE;
             });
         GLib.Source.set_name_by_id(this._pushModalSource,
-                                   '[gnome-pomodoro] this._pushModalSource');
+            '[gnome-pomodoro] this._pushModalSource');
     }
 
     // Gradually open the dialog. Try to make it modal once user had chance to see it
     // and schedule to close it once user becomes active.
     open(animate) {
-        if (this.state === DialogState.OPENED || this.state === DialogState.OPENING || this._destroyed) {
+        if (this.state === DialogState.OPENED || this.state === DialogState.OPENING || this._destroyed)
             return;
-        }
 
         if (this._pushModalTimeoutId) {
             GLib.source_remove(this._pushModalTimeoutId);
@@ -644,8 +624,9 @@ const ModalDialog = GObject.registerClass({
             Math.max(MIN_DISPLAY_TIME - IDLE_TIME_TO_PUSH_MODAL, 0),
             () => {
                 if (!this._pushModalWatchId) {
-                    this._pushModalWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_PUSH_MODAL,
-                                                                              this._onIdleMonitorBecameIdle.bind(this));
+                    this._pushModalWatchId = this._idleMonitor.add_idle_watch(
+                        IDLE_TIME_TO_PUSH_MODAL,
+                        this._onIdleMonitorBecameIdle.bind(this));
                 }
 
                 this._pushModalTimeoutId = 0;
@@ -654,7 +635,7 @@ const ModalDialog = GObject.registerClass({
             }
         );
         GLib.Source.set_name_by_id(this._pushModalTimeoutId,
-                                   '[gnome-pomodoro] this._pushModalTimeoutId');
+            '[gnome-pomodoro] this._pushModalTimeoutId');
 
         this.remove_all_transitions();
         this.show();
@@ -671,8 +652,7 @@ const ModalDialog = GObject.registerClass({
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 onComplete: this._onOpenComplete.bind(this),
             });
-        }
-        else {
+        } else {
             this._lightbox.lightOn();
             this.opacity = 255;
             this._onOpenComplete();
@@ -683,9 +663,7 @@ const ModalDialog = GObject.registerClass({
         if (!this.timer.isBreak() ||
             this.timer.isPaused() ||
             this.timer.getRemaining() < OPEN_WHEN_IDLE_MIN_REMAINING_TIME)
-        {
             return false;
-        }
 
         if (Utils.isVideoPlayerOpen()) {
             Utils.logWarning('Can\'t open dialog. A video player is running.');
@@ -702,19 +680,16 @@ const ModalDialog = GObject.registerClass({
 
     // Schedule to open when user becomes idle
     openWhenIdle() {
-        if (this.state === DialogState.OPENED || this.state === DialogState.OPENING || this._destroyed) {
+        if (this.state === DialogState.OPENED || this.state === DialogState.OPENING || this._destroyed)
             return;
-        }
 
         if (!this._openWhenIdleWatchId) {
             this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN,
-                (monitor) => {
+                monitor => {  // eslint-disable-line no-unused-vars
                     try {
-                        if (this.canOpen()) {
+                        if (this.canOpen())
                             this.open(true);
-                        }
-                    }
-                    catch (error) {
+                    } catch (error) {
                         Utils.logError(error);
                     }
                 });
@@ -729,9 +704,8 @@ const ModalDialog = GObject.registerClass({
     }
 
     close(animate) {
-        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING) {
+        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING)
             return;
-        }
 
         this.popModal();
         this._setState(DialogState.CLOSING);
@@ -787,9 +761,8 @@ const ModalDialog = GObject.registerClass({
             this._eventId = 0;
         }
 
-        if (!this._hasModal) {
+        if (!this._hasModal)
             return;
-        }
 
         Main.popModal(this._grab, timestamp);
         this._grab = null;
@@ -799,18 +772,15 @@ const ModalDialog = GObject.registerClass({
     }
 
     pushModal(timestamp) {
-        if (this._hasModal) {
+        if (this._hasModal)
             return true;
-        }
 
-        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING || this._destroyed) {
+        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING || this._destroyed)
             return false;
-        }
 
-        let params = { actionMode: Shell.ActionMode.SYSTEM_MODAL };
-        if (timestamp) {
+        let params = {actionMode: Shell.ActionMode.SYSTEM_MODAL};
+        if (timestamp)
             params['timestamp'] = timestamp;
-        }
 
         let grab = Main.pushModal(this, params);
         if (grab && grab.get_seat_state() !== Clutter.GrabState.ALL) {
@@ -819,9 +789,8 @@ const ModalDialog = GObject.registerClass({
             return false;
         }
 
-        if (!grab) {
+        if (!grab)
             return false;
-        }
 
         this._grab = grab;
         this._hasModal = true;
@@ -833,13 +802,11 @@ const ModalDialog = GObject.registerClass({
         this._lastEventX = -1;
         this._lastEventY = -1;
 
-        if (!this._keyFocusOutId) {
+        if (!this._keyFocusOutId)
             this._keyFocusOutId = this._lightbox.connect('key-focus-out', this._onKeyFocusOut.bind(this));
-        }
 
-        if (!this._eventId) {
+        if (!this._eventId)
             this._eventId = this._lightbox.connect('event', this._onEvent.bind(this));
-        }
 
         Main.layoutManager.emit('system-modal-opened');
 
@@ -853,91 +820,86 @@ const ModalDialog = GObject.registerClass({
     //   2. After the dialog gets acknowledged (when user becomes slightly idle), the dialog becomes trully reactive
     //      and any event should dismiss the dialog.
     _onEvent(actor, event) {
-        if (!event.get_device()) {
+        if (!event.get_device())
             return Clutter.EVENT_PROPAGATE;
-        }
 
         let x, y, dx, dy, distance;
         let isUserActive = false;
 
-        switch (event.type())
-        {
-            case Clutter.EventType.ENTER:
-            case Clutter.EventType.LEAVE:
-            case Clutter.EventType.STAGE_STATE:
-            case Clutter.EventType.DESTROY_NOTIFY:
-            case Clutter.EventType.CLIENT_MESSAGE:
-            case Clutter.EventType.DELETE:
+        switch (event.type()) {
+        case Clutter.EventType.ENTER:
+        case Clutter.EventType.LEAVE:
+        case Clutter.EventType.STAGE_STATE:
+        case Clutter.EventType.DESTROY_NOTIFY:
+        case Clutter.EventType.CLIENT_MESSAGE:
+        case Clutter.EventType.DELETE:
+            return Clutter.EVENT_PROPAGATE;
+
+        case Clutter.EventType.MOTION:
+            [x, y]   = event.get_coords();
+            dx       = this._lastEventX >= 0 ? x - this._lastEventX : 0;
+            dy       = this._lastEventY >= 0 ? y - this._lastEventY : 0;
+            distance = dx * dx + dy * dy;
+
+            this._lastEventX = x;
+            this._lastEventY = y;
+
+            if (distance > MOTION_DISTANCE_TO_CLOSE * MOTION_DISTANCE_TO_CLOSE)
+                isUserActive = true;
+
+            break;
+
+        case Clutter.EventType.KEY_PRESS:
+            switch (event.get_key_symbol()) {
+            case Clutter.KEY_AudioCycleTrack:
+            case Clutter.KEY_AudioForward:
+            case Clutter.KEY_AudioLowerVolume:
+            case Clutter.KEY_AudioNext:
+            case Clutter.KEY_AudioPause:
+            case Clutter.KEY_AudioPlay:
+            case Clutter.KEY_AudioPrev:
+            case Clutter.KEY_AudioRaiseVolume:
+            case Clutter.KEY_AudioRandomPlay:
+            case Clutter.KEY_AudioRecord:
+            case Clutter.KEY_AudioRepeat:
+            case Clutter.KEY_AudioRewind:
+            case Clutter.KEY_AudioStop:
+            case Clutter.KEY_AudioMicMute:
+            case Clutter.KEY_AudioMute:
+            case Clutter.KEY_MonBrightnessDown:
+            case Clutter.KEY_MonBrightnessUp:
+            case Clutter.KEY_Display:
                 return Clutter.EVENT_PROPAGATE;
 
-            case Clutter.EventType.MOTION:
-                [x, y]   = event.get_coords();
-                dx       = this._lastEventX >= 0 ? x - this._lastEventX : 0;
-                dy       = this._lastEventY >= 0 ? y - this._lastEventY : 0;
-                distance = dx * dx + dy * dy;
-
-                this._lastEventX = x;
-                this._lastEventY = y;
-
-                if (distance > MOTION_DISTANCE_TO_CLOSE * MOTION_DISTANCE_TO_CLOSE) {
-                    isUserActive = true;
-                }
-
-                break;
-
-            case Clutter.EventType.KEY_PRESS:
-                switch (event.get_key_symbol())
-                {
-                    case Clutter.KEY_AudioCycleTrack:
-                    case Clutter.KEY_AudioForward:
-                    case Clutter.KEY_AudioLowerVolume:
-                    case Clutter.KEY_AudioNext:
-                    case Clutter.KEY_AudioPause:
-                    case Clutter.KEY_AudioPlay:
-                    case Clutter.KEY_AudioPrev:
-                    case Clutter.KEY_AudioRaiseVolume:
-                    case Clutter.KEY_AudioRandomPlay:
-                    case Clutter.KEY_AudioRecord:
-                    case Clutter.KEY_AudioRepeat:
-                    case Clutter.KEY_AudioRewind:
-                    case Clutter.KEY_AudioStop:
-                    case Clutter.KEY_AudioMicMute:
-                    case Clutter.KEY_AudioMute:
-                    case Clutter.KEY_MonBrightnessDown:
-                    case Clutter.KEY_MonBrightnessUp:
-                    case Clutter.KEY_Display:
-                        return Clutter.EVENT_PROPAGATE;
-
-                    case Clutter.KEY_Escape:
-                        this.acknowledge();
-                        isUserActive = true;
-                        break;
-
-                    default:
-                        isUserActive = true;
-                        break;
-                }
-
-                break;
-
-            case Clutter.EventType.BUTTON_PRESS:
-            case Clutter.EventType.TOUCH_BEGIN:
+            case Clutter.KEY_Escape:
+                this.acknowledge();
                 isUserActive = true;
                 break;
+
+            default:
+                isUserActive = true;
+                break;
+            }
+
+            break;
+
+        case Clutter.EventType.BUTTON_PRESS:
+        case Clutter.EventType.TOUCH_BEGIN:
+            isUserActive = true;
+            break;
         }
 
-        if (isUserActive)
-        {
-            if (this._getIdleTime(event) >= IDLE_TIME_TO_ACKNOWLEDGE) {
+        if (isUserActive) {
+            if (this._getIdleTime(event) >= IDLE_TIME_TO_ACKNOWLEDGE)
                 this._acknowledged = true;
-            }
+
 
             this._lastActiveTime = event.get_time();
         }
 
-        if (this._acknowledged && isUserActive) {
+        if (this._acknowledged && isUserActive)
             this.close(true);
-        }
+
 
         return Clutter.EVENT_STOP;
     }
@@ -984,8 +946,10 @@ class PomodoroEndDialog extends ModalDialog {
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
 
-        const box = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-box',
-                                       vertical: true });
+        const box = new St.BoxLayout({
+            style_class: 'extension-pomodoro-dialog-box',
+            vertical: true,
+        });
         box.add_actor(this._timerLabel);
         box.add_actor(this._descriptionLabel);
         this._layout.add_actor(box);
@@ -1010,9 +974,8 @@ class PomodoroEndDialog extends ModalDialog {
     _onTimerStateChanged() {
         const timerState = this._timer.getState();
 
-        if (timerState === State.SHORT_BREAK || timerState === State.LONG_BREAK) {
+        if (timerState === State.SHORT_BREAK || timerState === State.LONG_BREAK)
             this._timerLabel.freeze();
-        }
     }
 
     _onDestroy() {
