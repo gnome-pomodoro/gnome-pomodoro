@@ -24,7 +24,7 @@ import St from 'gi://St';
 
 import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
 import {trySpawnCommandLine} from 'resource:///org/gnome/shell/misc/util.js';
-import {gettext as _, ngettext} from 'resource:///org/gnome/shell/extensions/extension.js';
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Calendar from 'resource:///org/gnome/shell/ui/calendar.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
@@ -67,7 +67,6 @@ function getDefaultSource() {
 }
 
 
-// TODO: move to utils.js
 /**
  * Format seconds as string "<number> <unit> remaining".
  *
@@ -75,16 +74,19 @@ function getDefaultSource() {
  * @returns {string}
  */
 export function formatRemainingTime(remaining) {
-    remaining = Math.max(Math.round(remaining), 0.0);
+    let seconds = Math.round(remaining);
+    let minutes;
 
-    if (remaining > 45.0) {
-        const minutes = Math.round(remaining / 60.0);
-        return ngettext('%d minute remaining', '%d minutes remaining', minutes).format(minutes);
+    if (seconds > 45) {
+        minutes = Math.round(seconds / 60);
+
+        return GLib.dngettext(Config.GETTEXT_PACKAGE, '%d minute remaining', '%d minutes remaining', minutes).format(minutes);
     } else {
-        if (remaining > 15.0)
-            remaining = Math.round(remaining / 15.0) * 15.0;
+        seconds = seconds > 15
+            ? Math.round(seconds / 15) * 15
+            : Math.max(seconds, 0);
 
-        return ngettext('%d second remaining', '%d seconds remaining', remaining).format(remaining);
+        return GLib.dngettext(Config.GETTEXT_PACKAGE, '%d second remaining', '%d seconds remaining', seconds).format(seconds);
     }
 }
 
