@@ -284,7 +284,7 @@ export function disableExtension(uuid) {
     const enabledExtensions = global.settings.get_strv(ENABLED_EXTENSIONS_KEY);
     const extensionIndex = enabledExtensions.indexOf(uuid);
 
-    if (extensionIndex < 0) {
+    if (extensionIndex >= 0) {
         enabledExtensions.splice(extensionIndex, 1);
         global.settings.set_strv(ENABLED_EXTENSIONS_KEY, enabledExtensions);
     }
