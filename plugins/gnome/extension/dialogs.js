@@ -18,22 +18,24 @@
  *
  */
 
-const { Atk, Clutter, GLib, GObject, Meta, Shell, St, Pango } = imports.gi;
+import Atk from 'gi://Atk';
+import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Meta from 'gi://Meta';
+import Pango from 'gi://Pango';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
 
-const Layout = imports.ui.layout;
-const Lightbox = imports.ui.lightbox;
-const Main = imports.ui.main;
+import {MonitorConstraint} from 'resource:///org/gnome/shell/ui/layout.js';
+import {Lightbox} from 'resource:///org/gnome/shell/ui/lightbox.js';
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
-const Params = imports.misc.params;
-
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Config = Extension.imports.config;
-const Timer = Extension.imports.timer;
-const Utils = Extension.imports.utils;
-
-const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
-const _ = Gettext.gettext;
-const ngettext = Gettext.ngettext;
+import {extension} from './extension.js';
+import {State, TimerLabel} from './timer.js';
+import * as Utils from './utils.js';
 
 
 /* Time between user input events before making dialog modal.
@@ -59,21 +61,20 @@ const BLUR_SIGMA = 20.0;
 
 const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
 
-const DEFAULT_BACKGROUND_COLOR = Clutter.Color.from_pixel(0x000000ff);
-const HAVE_SHADERS_GLSL = Utils.versionCheck('42.0') || Clutter.feature_available(Clutter.FeatureFlags.SHADERS_GLSL);  // TODO there is no such feature flag since 42
+const BACKGROUND_COLOR = Clutter.Color.from_pixel(0x000000ff);
 
-var State = {
+export const DialogState = {
     OPENED: 0,
     CLOSED: 1,
     OPENING: 2,
-    CLOSING: 3
+    CLOSING: 3,
 };
 
-var overlayManager = null;
+let overlayManager = null;
 
 
-var BlurredLightbox = GObject.registerClass(
-class PomodoroBlurredLightbox extends Lightbox.Lightbox {
+const PlainLightbox = GObject.registerClass(
+class PomodoroPlainLightbox extends Lightbox {
     _init(container, params) {
         params = Params.parse(params, {
             inhibitEvents: false,
@@ -91,21 +92,46 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
 
         this.set({
             opacity: 0,
-            style_class: HAVE_SHADERS_GLSL ? 'extension-pomodoro-lightbox-blurred' : 'extension-pomodoro-lightbox',
+            style_class: 'extension-pomodoro-lightbox',
+        });
+    }
+});
+
+
+const BlurredLightbox = GObject.registerClass(
+class PomodoroBlurredLightbox extends Lightbox {
+    _init(container, params) {
+        params = Params.parse(params, {
+            inhibitEvents: false,
+            width: null,
+            height: null,
+        });
+
+        super._init(container, {
+            inhibitEvents: params.inhibitEvents,
+            width: params.width,
+            height: params.height,
+            fadeFactor: 1.0,
+            radialEffect: false,
+        });
+
+        this.set({
+            opacity: 0,
+            style_class: 'extension-pomodoro-lightbox-blurred',
         });
         this._background = null;
 
-        let themeContext = St.ThemeContext.get_for_stage(global.stage);
+        const themeContext = St.ThemeContext.get_for_stage(global.stage);
         this._scaleChangedId = themeContext.connect('notify::scale-factor', this._updateEffects.bind(this));
         this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', this._updateEffects.bind(this));
     }
 
     _createBackground() {
-        if (!this._background && HAVE_SHADERS_GLSL) {
+        if (!this._background) {
             // Clone the group that contains all of UI on the screen. This is the
             // chrome, the windows, etc.
-            this._background = new Clutter.Clone({ source: Main.uiGroup, clip_to_allocation: true });
-            this._background.set_background_color(DEFAULT_BACKGROUND_COLOR);
+            this._background = new Clutter.Clone({source: Main.uiGroup, clip_to_allocation: true});
+            this._background.set_background_color(BACKGROUND_COLOR);
             this._background.add_effect_with_name('blur', new Shell.BlurEffect());
             this.set_child(this._background);
         }
@@ -123,7 +149,7 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
     _updateEffects() {
         if (this._background) {
             const themeContext = St.ThemeContext.get_for_stage(global.stage);
-            let effect = this._background.get_effect('blur');
+            const effect = this._background.get_effect('blur');
 
             if (effect) {
                 effect.set({
@@ -131,40 +157,6 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
                     sigma: BLUR_SIGMA * themeContext.scale_factor,
                 });
                 effect.queue_repaint();
-            }
-        }
-    }
-
-    lightOn(fadeInTime) {
-        super.lightOn(fadeInTime);
-
-        if (this._background && !Utils.versionCheck('40.0')) {  // TODO remove compatibility for 3.38
-            let effect = this._background.get_effect('blur');
-            if (effect) {
-                effect.set({
-                    brightness: BLUR_BRIGHTNESS * 0.99,
-                });
-            }
-
-            // HACK: force effect to be repaint itself during fading-in
-            // in theory effect.queue_repaint(); should be enough
-            this._background.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS, {
-                duration: fadeInTime || 0,
-            });
-        }
-    }
-
-    lightOff(fadeOutTime) {
-        super.lightOff(fadeOutTime);
-
-        if (this._background && !Utils.versionCheck('40.0')) {  // TODO remove compatibility for 3.38
-            let effect = this._background.get_effect('blur');
-            if (effect) {
-                // HACK: force effect to be repaint itself during fading-out
-                // in theory effect.queue_repaint(); should be enough
-                this._background.ease_property('@effects.blur.brightness', BLUR_BRIGHTNESS * 0.99, {
-                    duration: fadeOutTime || 0,
-                });
             }
         }
     }
@@ -188,10 +180,10 @@ class PomodoroBlurredLightbox extends Lightbox.Lightbox {
             delete this._monitorsChangedId;
         }
 
-        let themeContext = St.ThemeContext.get_for_stage(global.stage);
+        const themeContext = St.ThemeContext.get_for_stage(global.stage);
         if (this._scaleChangedId) {
             themeContext.disconnect(this._scaleChangedId);
-            delete this._scaleChangedId;
+            this._scaleChangedId = 0;
         }
 
         this._destroyBackground();
@@ -211,22 +203,19 @@ class OverlayManager {
         this._chromeActors = [];
 
         for (let chrome of [Main.messageTray,
-                            Main.screenShield._shortLightbox,
-                            Main.screenShield._longLightbox])
-        {
+            Main.screenShield._shortLightbox,
+            Main.screenShield._longLightbox]) {
             try {
                 this.addChrome(chrome);
-            }
-            catch (error) {
+            } catch (error) {
                 Utils.logError(error);
             }
         }
     }
 
     static getDefault() {
-        if (!overlayManager) {
+        if (!overlayManager)
             overlayManager = new OverlayManager();
-        }
 
         return overlayManager;
     }
@@ -237,15 +226,16 @@ class OverlayManager {
                 name: 'overlayGroup',
                 reactive: false,
             });
-	        global.stage.add_actor(this._overlayGroup);
-	        global.stage.set_child_above_sibling(this._overlayGroup, null);
+            global.stage.add_actor(this._overlayGroup);
+            global.stage.set_child_above_sibling(this._overlayGroup, null);
         }
 
         if (!this._dummyChrome) {
             // LayoutManager tracks region changes, so create a mock member resembling overlayGroup.
             const constraint = new Clutter.BindConstraint({
-                                           source: this._overlayGroup,
-                                           coordinate: Clutter.BindCoordinate.ALL });
+                source: this._overlayGroup,
+                coordinate: Clutter.BindCoordinate.ALL,
+            });
             this._dummyChrome = new St.Widget({
                 name: 'dummyOverlayGroup',
                 reactive: false,
@@ -254,16 +244,15 @@ class OverlayManager {
             Main.layoutManager.addTopChrome(this._dummyChrome);
         }
 
-        for (const overlayData of this._overlayActors) {
+        for (const overlayData of this._overlayActors)
             this._overlayGroup.add_actor(overlayData.actor);
-        }
     }
 
     _destroyOverlayGroup() {
         if (this._overlayGroup) {
-            for (const overlayData of this._overlayActors) {
+            for (const overlayData of this._overlayActors)
                 this._overlayGroup.remove_actor(overlayData.actor);
-            }
+
 
             global.stage.remove_actor(this._overlayGroup);
             this._overlayGroup = null;
@@ -276,18 +265,16 @@ class OverlayManager {
     }
 
     _raiseChromeInternal(chromeData) {
-        if (chromeData.actor instanceof Lightbox.Lightbox) {
+        if (chromeData.actor instanceof Lightbox) {
             chromeData.notifyOpacityId = chromeData.actor.connect('notify::opacity', () => {
                 this._updateOpacity();
             });
-        }
-        else {
+        } else {
             chromeData.actor.ref();
             try {
                 Main.layoutManager.uiGroup.remove_actor(chromeData.actor);
                 global.stage.add_actor(chromeData.actor);
-            }
-            finally {
+            } finally {
                 chromeData.actor.unref();
             }
         }
@@ -297,25 +284,22 @@ class OverlayManager {
         if (!this._raised) {
             this._createOverlayGroup();
 
-            for (let chromeData of this._chromeActors) {
+            for (let chromeData of this._chromeActors)
                 this._raiseChromeInternal(chromeData);
-            }
 
             this._raised = true;
         }
     }
 
     _lowerChromeInternal(chromeData) {
-        if (chromeData.actor instanceof Lightbox.Lightbox) {
+        if (chromeData.actor instanceof Lightbox) {
             chromeData.actor.disconnect(chromeData.notifyOpacityId);
-        }
-        else {
+        } else {
             chromeData.actor.ref();
             try {
                 global.stage.remove_actor(chromeData.actor);
                 Main.layoutManager.uiGroup.add_actor(chromeData.actor);
-            }
-            finally {
+            } finally {
                 chromeData.actor.unref();
             }
         }
@@ -323,9 +307,8 @@ class OverlayManager {
 
     _lowerChrome() {
         if (this._raised) {
-            for (let chromeData of this._chromeActors) {
+            for (let chromeData of this._chromeActors)
                 this._lowerChromeInternal(chromeData);
-            }
 
             this._destroyOverlayGroup();
 
@@ -336,31 +319,27 @@ class OverlayManager {
     _updateOpacity() {
         let maxOpacity = 0;
         for (let chromeData of this._chromeActors) {
-            if (chromeData.actor instanceof Lightbox.Lightbox) {
+            if (chromeData.actor instanceof Lightbox)
                 maxOpacity = Math.max(maxOpacity, chromeData.actor.opacity);
-            }
         }
 
-        for (let overlayData of this._overlayActors) {
+        for (let overlayData of this._overlayActors)
             overlayData.actor._layout.opacity = 255 - maxOpacity;
-        }
     }
 
     _onOverlayNotifyVisible() {
         let visibleCount = 0;
 
         for (let overlayData of this._overlayActors) {
-            if (overlayData.actor.visible && !(overlayData.actor instanceof Lightbox.Lightbox)) {
+            if (overlayData.actor.visible && !(overlayData.actor instanceof Lightbox))
                 visibleCount++;
-            }
         }
 
-        if (visibleCount > 0) {
+        if (visibleCount > 0)
             this._raiseChrome();
-        }
-        else {
+
+        else
             this._lowerChrome();
-        }
     }
 
     _onOverlayDestroy(actor) {
@@ -378,7 +357,7 @@ class OverlayManager {
 
     add(actor) {
         this._overlayActors.push({
-            actor: actor,
+            actor,
             notifyVisibleId: actor.connect('notify::visible', this._onOverlayNotifyVisible.bind(this)),
             destroyId: actor.connect('destroy', this._onOverlayDestroy.bind(this)),
         });
@@ -388,19 +367,17 @@ class OverlayManager {
     }
 
     addChrome(actor) {
-        if (actor.get_parent() !== Main.layoutManager.uiGroup) {
+        if (actor.get_parent() !== Main.layoutManager.uiGroup)
             throw new Error('Passed actor is not a direct child of Main.layoutManager.uiGroup');
-        }
 
         const chromeData = {
-            actor: actor,
+            actor,
             notifyOpacityId: 0,
         };
         this._chromeActors.push(chromeData);
 
-        if (this._raised) {
+        if (this._raised)
             this._raiseChromeInternal(chromeData);
-        }
     }
 
     destroy() {
@@ -423,25 +400,27 @@ class OverlayManager {
  * class to have more event signals, different fade in/out times, and different
  * event blocking behavior.
  */
-var ModalDialog = GObject.registerClass({
+const ModalDialog = GObject.registerClass({
     Properties: {
         'state': GObject.ParamSpec.int('state', 'Dialog state', 'state',
-                                       GObject.ParamFlags.READABLE,
-                                       Math.min(...Object.values(State)),
-                                       Math.max(...Object.values(State)),
-                                       State.CLOSED),
+            GObject.ParamFlags.READABLE,
+            Math.min(...Object.values(DialogState)),
+            Math.max(...Object.values(DialogState)),
+            DialogState.CLOSED),
     },
-    Signals: { 'opened': {}, 'opening': {}, 'closed': {}, 'closing': {} },
+    Signals: {'opened': {}, 'opening': {}, 'closed': {}, 'closing': {}},
 }, class PomodoroModalDialog extends St.Widget {
     _init() {
-        super._init({ style_class: 'extension-pomodoro-dialog',
-                      accessible_role: Atk.Role.DIALOG,
-                      layout_manager: new Clutter.BinLayout(),
-                      reactive: false,
-                      visible: false,
-                      opacity: 0 });
+        super._init({
+            style_class: 'extension-pomodoro-dialog',
+            accessible_role: Atk.Role.DIALOG,
+            layout_manager: new Clutter.BinLayout(),
+            reactive: false,
+            visible: false,
+            opacity: 0,
+        });
 
-        this._state = State.CLOSED;
+        this._state = DialogState.CLOSED;
         this._acknowledged = false;
         this._hasModal = false;
         this._grab = null;
@@ -459,32 +438,28 @@ var ModalDialog = GObject.registerClass({
         this._lastEventY = -1;
         this._bindingAction = 0;
         this._acceleratorActivatedId = 0;
-        this._monitorConstraint = new Layout.MonitorConstraint();
+        this._monitorConstraint = new MonitorConstraint();
         this._monitorConstraint.primary = true;
         this._stageConstraint = new Clutter.BindConstraint({
-                                       source: global.stage,
-                                       coordinate: Clutter.BindCoordinate.ALL });
+            source: global.stage,
+            coordinate: Clutter.BindCoordinate.ALL,
+        });
         this.add_constraint(this._stageConstraint);
 
-        if (global.backend.get_core_idle_monitor !== undefined) {
-            this._idleMonitor = global.backend.get_core_idle_monitor();
-        }
-        else {
-            this._idleMonitor = Meta.IdleMonitor.get_core();  // TODO: remove along support for gnome-shell 40
-        }
+        this._idleMonitor = global.backend.get_core_idle_monitor();
 
         this.connect('destroy', this._onDestroy.bind(this));
 
         // Modal dialogs are fixed width and grow vertically; set the request
         // mode accordingly so wrapped labels are handled correctly during
         // size requests.
-        this._layout = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+        this._layout = new St.Widget({layout_manager: new Clutter.BinLayout()});
         this._layout.add_constraint(this._monitorConstraint);
         this.add_actor(this._layout);
 
         // Lightbox will be a direct child of the ModalDialog
-        this._lightbox = new BlurredLightbox(this,
-                                             { inhibitEvents: false });
+        this._lightbox = extension.pluginSettings.get_boolean('blur-effect')
+            ? new BlurredLightbox(this) : new PlainLightbox(this);
         this._lightbox.highlight(this._layout);
 
         global.focus_manager.add_group(this._lightbox);
@@ -497,18 +472,16 @@ var ModalDialog = GObject.registerClass({
     }
 
     _setState(state) {
-        if (this._state === state) {
+        if (this._state === state)
             return;
-        }
 
         this._state = state;
         this.notify('state');
     }
 
-    _onAcceleratorActivated(display, action, device, timestamp) {
-        if (action === this._bindingAction) {
+    _onAcceleratorActivated(display, action, device, timestamp) {  // eslint-disable-line no-unused-vars
+        if (action === this._bindingAction)
             this.close(true);
-        }
     }
 
     // register a failsafe method of closing the dialog
@@ -527,9 +500,8 @@ var ModalDialog = GObject.registerClass({
             Main.wm.allowKeybinding(bindingName, Shell.ActionMode.ALL);
         }
 
-        if (!this._acceleratorActivatedId) {
+        if (!this._acceleratorActivatedId)
             this._acceleratorActivatedId = global.display.connect('accelerator-activated', this._onAcceleratorActivated.bind(this));
-        }
     }
 
     _ungrabAccelerators() {
@@ -537,12 +509,11 @@ var ModalDialog = GObject.registerClass({
             const bindingName = Meta.external_binding_name_for_action(this._bindingAction);
             Main.wm.allowKeybinding(bindingName, Shell.ActionMode.NONE);
 
-            if (global.display.ungrab_accelerator(this._bindingAction)) {
+            if (global.display.ungrab_accelerator(this._bindingAction))
                 this._bindingAction = null;
-            }
-            else {
+
+            else
                 Utils.logWarning('Failed to ungrab accelerator for the dialog.');
-            }
         }
 
         if (this._acceleratorActivatedId) {
@@ -559,9 +530,9 @@ var ModalDialog = GObject.registerClass({
     }
 
     acknowledge() {
-        if (this.state === State.CLOSED || this.state === State.CLOSING) {
+        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING)
             return;
-        }
+
 
         this._acknowledged = true;
     }
@@ -569,13 +540,12 @@ var ModalDialog = GObject.registerClass({
     _onKeyFocusOut() {
         let focus = global.stage.key_focus;
 
-        if (focus === null || !this._lightbox.contains(focus)) {
+        if (focus === null || !this._lightbox.contains(focus))
             this.close(true);
-        }
     }
 
     _onOpenComplete() {
-        this._setState(State.OPENED);
+        this._setState(DialogState.OPENED);
 
         if (!this._acknowledgeTimeoutId) {
             this._acknowledgeTimeoutId = GLib.timeout_add(
@@ -584,10 +554,10 @@ var ModalDialog = GObject.registerClass({
                 () => {
                     if (this._getIdleTime() >= IDLE_TIME_TO_ACKNOWLEDGE) {
                         this.acknowledge();
-                    }
-                    else {
-                        this._acknowledgeIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_ACKNOWLEDGE,
-                            (monitor) => this.acknowledge()
+                    } else {
+                        this._acknowledgeIdleWatchId = this._idleMonitor.add_idle_watch(
+                            IDLE_TIME_TO_ACKNOWLEDGE,
+                            monitor => this.acknowledge()  // eslint-disable-line no-unused-vars
                         );
                     }
 
@@ -595,25 +565,24 @@ var ModalDialog = GObject.registerClass({
                     return GLib.SOURCE_REMOVE;
                 });
             GLib.Source.set_name_by_id(this._acknowledgeTimeoutId,
-                                       '[gnome-pomodoro] this._acknowledgeTimeoutId');
+                '[gnome-pomodoro] this._acknowledgeTimeoutId');
         }
 
         this.emit('opened');
     }
 
-    _onIdleMonitorBecameIdle(monitor) {
+    _onIdleMonitorBecameIdle(monitor) {  // eslint-disable-line no-unused-vars
         let pushModalTries = 0;
-        let pushModalInterval = Math.floor(1000 / PUSH_MODAL_RATE);
-        let timestamp = global.get_current_time();
+        const pushModalInterval = Math.floor(1000 / PUSH_MODAL_RATE);
+        const timestamp = global.get_current_time();
 
         if (this._pushModalWatchId) {
             this._idleMonitor.remove_watch(this._pushModalWatchId);
             this._pushModalWatchId = 0;
         }
 
-        if (this.pushModal(timestamp)) {
-            return GLib.SOURCE_REMOVE;
-        }
+        if (this.pushModal(timestamp))
+            return;
 
         this._pushModalSource = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT,
@@ -636,15 +605,14 @@ var ModalDialog = GObject.registerClass({
                 return GLib.SOURCE_CONTINUE;
             });
         GLib.Source.set_name_by_id(this._pushModalSource,
-                                   '[gnome-pomodoro] this._pushModalSource');
+            '[gnome-pomodoro] this._pushModalSource');
     }
 
     // Gradually open the dialog. Try to make it modal once user had chance to see it
     // and schedule to close it once user becomes active.
     open(animate) {
-        if (this.state === State.OPENED || this.state === State.OPENING || this._destroyed) {
+        if (this.state === DialogState.OPENED || this.state === DialogState.OPENING || this._destroyed)
             return;
-        }
 
         if (this._pushModalTimeoutId) {
             GLib.source_remove(this._pushModalTimeoutId);
@@ -656,8 +624,9 @@ var ModalDialog = GObject.registerClass({
             Math.max(MIN_DISPLAY_TIME - IDLE_TIME_TO_PUSH_MODAL, 0),
             () => {
                 if (!this._pushModalWatchId) {
-                    this._pushModalWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_PUSH_MODAL,
-                                                                              this._onIdleMonitorBecameIdle.bind(this));
+                    this._pushModalWatchId = this._idleMonitor.add_idle_watch(
+                        IDLE_TIME_TO_PUSH_MODAL,
+                        this._onIdleMonitorBecameIdle.bind(this));
                 }
 
                 this._pushModalTimeoutId = 0;
@@ -666,11 +635,11 @@ var ModalDialog = GObject.registerClass({
             }
         );
         GLib.Source.set_name_by_id(this._pushModalTimeoutId,
-                                   '[gnome-pomodoro] this._pushModalTimeoutId');
+            '[gnome-pomodoro] this._pushModalTimeoutId');
 
         this.remove_all_transitions();
         this.show();
-        this._setState(State.OPENING);
+        this._setState(DialogState.OPENING);
         this._acknowledged = false;
         this.emit('opening');
 
@@ -683,8 +652,7 @@ var ModalDialog = GObject.registerClass({
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 onComplete: this._onOpenComplete.bind(this),
             });
-        }
-        else {
+        } else {
             this._lightbox.lightOn();
             this.opacity = 255;
             this._onOpenComplete();
@@ -695,9 +663,7 @@ var ModalDialog = GObject.registerClass({
         if (!this.timer.isBreak() ||
             this.timer.isPaused() ||
             this.timer.getRemaining() < OPEN_WHEN_IDLE_MIN_REMAINING_TIME)
-        {
             return false;
-        }
 
         if (Utils.isVideoPlayerOpen()) {
             Utils.logWarning('Can\'t open dialog. A video player is running.');
@@ -714,19 +680,16 @@ var ModalDialog = GObject.registerClass({
 
     // Schedule to open when user becomes idle
     openWhenIdle() {
-        if (this.state === State.OPENED || this.state === State.OPENING || this._destroyed) {
+        if (this.state === DialogState.OPENED || this.state === DialogState.OPENING || this._destroyed)
             return;
-        }
 
         if (!this._openWhenIdleWatchId) {
             this._openWhenIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_OPEN,
-                (monitor) => {
+                monitor => {  // eslint-disable-line no-unused-vars
                     try {
-                        if (this.canOpen()) {
+                        if (this.canOpen())
                             this.open(true);
-                        }
-                    }
-                    catch (error) {
+                    } catch (error) {
                         Utils.logError(error);
                     }
                 });
@@ -735,18 +698,17 @@ var ModalDialog = GObject.registerClass({
 
     _onCloseComplete() {
         this.hide();
-        this._setState(State.CLOSED);
+        this._setState(DialogState.CLOSED);
 
         this.emit('closed');
     }
 
     close(animate) {
-        if (this.state === State.CLOSED || this.state === State.CLOSING) {
+        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING)
             return;
-        }
 
         this.popModal();
-        this._setState(State.CLOSING);
+        this._setState(DialogState.CLOSING);
         this.emit('closing');
 
         this.remove_all_transitions();
@@ -799,17 +761,10 @@ var ModalDialog = GObject.registerClass({
             this._eventId = 0;
         }
 
-        if (!this._hasModal) {
+        if (!this._hasModal)
             return;
-        }
 
-        if (this._grab && this._grab.get_seat_state !== undefined) {
-            // gnome-shell 42 and newer
-            Main.popModal(this._grab, timestamp);
-        }
-        else {
-            Main.popModal(this, timestamp);
-        }
+        Main.popModal(this._grab, timestamp);
         this._grab = null;
         this._hasModal = false;
 
@@ -817,32 +772,25 @@ var ModalDialog = GObject.registerClass({
     }
 
     pushModal(timestamp) {
-        if (this._hasModal) {
+        if (this._hasModal)
             return true;
-        }
 
-        if (this.state === State.CLOSED || this.state === State.CLOSING || this._destroyed) {
+        if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING || this._destroyed)
+            return false;
+
+        let params = {actionMode: Shell.ActionMode.SYSTEM_MODAL};
+        if (timestamp)
+            params['timestamp'] = timestamp;
+
+        let grab = Main.pushModal(this, params);
+        if (grab && grab.get_seat_state() !== Clutter.GrabState.ALL) {
+            Utils.logWarning('Unable become fully modal');
+            Main.popModal(grab);
             return false;
         }
 
-        let params = { actionMode: Shell.ActionMode.SYSTEM_MODAL };
-        if (timestamp) {
-            params['timestamp'] = timestamp;
-        }
-
-        let grab = Main.pushModal(this, params);
-        if (grab && grab.get_seat_state !== undefined) {
-            // gnome-shell 42 and newer
-            if (grab.get_seat_state() !== Clutter.GrabState.ALL) {
-                Utils.logWarning('Unable become fully modal');
-                Main.popModal(grab);
-                return false;
-            }
-        } else {
-            if (!grab) {
-                return false;
-            }
-        }
+        if (!grab)
+            return false;
 
         this._grab = grab;
         this._hasModal = true;
@@ -854,13 +802,11 @@ var ModalDialog = GObject.registerClass({
         this._lastEventX = -1;
         this._lastEventY = -1;
 
-        if (!this._keyFocusOutId) {
+        if (!this._keyFocusOutId)
             this._keyFocusOutId = this._lightbox.connect('key-focus-out', this._onKeyFocusOut.bind(this));
-        }
 
-        if (!this._eventId) {
+        if (!this._eventId)
             this._eventId = this._lightbox.connect('event', this._onEvent.bind(this));
-        }
 
         Main.layoutManager.emit('system-modal-opened');
 
@@ -874,91 +820,86 @@ var ModalDialog = GObject.registerClass({
     //   2. After the dialog gets acknowledged (when user becomes slightly idle), the dialog becomes trully reactive
     //      and any event should dismiss the dialog.
     _onEvent(actor, event) {
-        if (!event.get_device()) {
+        if (!event.get_device())
             return Clutter.EVENT_PROPAGATE;
-        }
 
         let x, y, dx, dy, distance;
         let isUserActive = false;
 
-        switch (event.type())
-        {
-            case Clutter.EventType.ENTER:
-            case Clutter.EventType.LEAVE:
-            case Clutter.EventType.STAGE_STATE:
-            case Clutter.EventType.DESTROY_NOTIFY:
-            case Clutter.EventType.CLIENT_MESSAGE:
-            case Clutter.EventType.DELETE:
+        switch (event.type()) {
+        case Clutter.EventType.ENTER:
+        case Clutter.EventType.LEAVE:
+        case Clutter.EventType.STAGE_STATE:
+        case Clutter.EventType.DESTROY_NOTIFY:
+        case Clutter.EventType.CLIENT_MESSAGE:
+        case Clutter.EventType.DELETE:
+            return Clutter.EVENT_PROPAGATE;
+
+        case Clutter.EventType.MOTION:
+            [x, y]   = event.get_coords();
+            dx       = this._lastEventX >= 0 ? x - this._lastEventX : 0;
+            dy       = this._lastEventY >= 0 ? y - this._lastEventY : 0;
+            distance = dx * dx + dy * dy;
+
+            this._lastEventX = x;
+            this._lastEventY = y;
+
+            if (distance > MOTION_DISTANCE_TO_CLOSE * MOTION_DISTANCE_TO_CLOSE)
+                isUserActive = true;
+
+            break;
+
+        case Clutter.EventType.KEY_PRESS:
+            switch (event.get_key_symbol()) {
+            case Clutter.KEY_AudioCycleTrack:
+            case Clutter.KEY_AudioForward:
+            case Clutter.KEY_AudioLowerVolume:
+            case Clutter.KEY_AudioNext:
+            case Clutter.KEY_AudioPause:
+            case Clutter.KEY_AudioPlay:
+            case Clutter.KEY_AudioPrev:
+            case Clutter.KEY_AudioRaiseVolume:
+            case Clutter.KEY_AudioRandomPlay:
+            case Clutter.KEY_AudioRecord:
+            case Clutter.KEY_AudioRepeat:
+            case Clutter.KEY_AudioRewind:
+            case Clutter.KEY_AudioStop:
+            case Clutter.KEY_AudioMicMute:
+            case Clutter.KEY_AudioMute:
+            case Clutter.KEY_MonBrightnessDown:
+            case Clutter.KEY_MonBrightnessUp:
+            case Clutter.KEY_Display:
                 return Clutter.EVENT_PROPAGATE;
 
-            case Clutter.EventType.MOTION:
-                [x, y]   = event.get_coords();
-                dx       = this._lastEventX >= 0 ? x - this._lastEventX : 0;
-                dy       = this._lastEventY >= 0 ? y - this._lastEventY : 0;
-                distance = dx * dx + dy * dy;
-
-                this._lastEventX = x;
-                this._lastEventY = y;
-
-                if (distance > MOTION_DISTANCE_TO_CLOSE * MOTION_DISTANCE_TO_CLOSE) {
-                    isUserActive = true;
-                }
-
-                break;
-
-            case Clutter.EventType.KEY_PRESS:
-                switch (event.get_key_symbol())
-                {
-                    case Clutter.KEY_AudioCycleTrack:
-                    case Clutter.KEY_AudioForward:
-                    case Clutter.KEY_AudioLowerVolume:
-                    case Clutter.KEY_AudioNext:
-                    case Clutter.KEY_AudioPause:
-                    case Clutter.KEY_AudioPlay:
-                    case Clutter.KEY_AudioPrev:
-                    case Clutter.KEY_AudioRaiseVolume:
-                    case Clutter.KEY_AudioRandomPlay:
-                    case Clutter.KEY_AudioRecord:
-                    case Clutter.KEY_AudioRepeat:
-                    case Clutter.KEY_AudioRewind:
-                    case Clutter.KEY_AudioStop:
-                    case Clutter.KEY_AudioMicMute:
-                    case Clutter.KEY_AudioMute:
-                    case Clutter.KEY_MonBrightnessDown:
-                    case Clutter.KEY_MonBrightnessUp:
-                    case Clutter.KEY_Display:
-                        return Clutter.EVENT_PROPAGATE;
-
-                    case Clutter.KEY_Escape:
-                        this.acknowledge();
-                        isUserActive = true;
-                        break;
-
-                    default:
-                        isUserActive = true;
-                        break;
-                }
-
-                break;
-
-            case Clutter.EventType.BUTTON_PRESS:
-            case Clutter.EventType.TOUCH_BEGIN:
+            case Clutter.KEY_Escape:
+                this.acknowledge();
                 isUserActive = true;
                 break;
+
+            default:
+                isUserActive = true;
+                break;
+            }
+
+            break;
+
+        case Clutter.EventType.BUTTON_PRESS:
+        case Clutter.EventType.TOUCH_BEGIN:
+            isUserActive = true;
+            break;
         }
 
-        if (isUserActive)
-        {
-            if (this._getIdleTime(event) >= IDLE_TIME_TO_ACKNOWLEDGE) {
+        if (isUserActive) {
+            if (this._getIdleTime(event) >= IDLE_TIME_TO_ACKNOWLEDGE)
                 this._acknowledged = true;
-            }
+
 
             this._lastActiveTime = event.get_time();
         }
 
-        if (this._acknowledged && isUserActive) {
+        if (this._acknowledged && isUserActive)
             this.close(true);
-        }
+
 
         return Clutter.EVENT_STOP;
     }
@@ -988,13 +929,13 @@ var ModalDialog = GObject.registerClass({
 });
 
 
-var PomodoroEndDialog = GObject.registerClass(
+export const PomodoroEndDialog = GObject.registerClass(
 class PomodoroEndDialog extends ModalDialog {
     _init(timer) {
         super._init();
 
         this._timer = timer;
-        this._timerLabel = new Timer.TimerLabel(timer, {
+        this._timerLabel = new TimerLabel(timer, {
             x_align: Clutter.ActorAlign.CENTER,
         });
         this._descriptionLabel = new St.Label({
@@ -1005,8 +946,10 @@ class PomodoroEndDialog extends ModalDialog {
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
 
-        const box = new St.BoxLayout({ style_class: 'extension-pomodoro-dialog-box',
-                                       vertical: true });
+        const box = new St.BoxLayout({
+            style_class: 'extension-pomodoro-dialog-box',
+            vertical: true,
+        });
         box.add_actor(this._timerLabel);
         box.add_actor(this._descriptionLabel);
         this._layout.add_actor(box);
@@ -1031,9 +974,8 @@ class PomodoroEndDialog extends ModalDialog {
     _onTimerStateChanged() {
         const timerState = this._timer.getState();
 
-        if (timerState === Timer.State.SHORT_BREAK || timerState === Timer.State.LONG_BREAK) {
+        if (timerState === State.SHORT_BREAK || timerState === State.LONG_BREAK)
             this._timerLabel.freeze();
-        }
     }
 
     _onDestroy() {

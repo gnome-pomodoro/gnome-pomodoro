@@ -18,11 +18,11 @@
  *
  */
 
-const Signals = imports.signals;
-const Gio = imports.gi.Gio;
+import Gio from 'gi://Gio';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Capabilities = Extension.imports.capabilities;
+import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
+
+import {capabilities} from './capabilities.js';
 
 
 const PomodoroInterface = '<node> \
@@ -64,15 +64,23 @@ const PomodoroExtensionInterface = '<node> \
 </node>';
 
 
-var PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
-function Pomodoro(callback, cancellable) {
+const PomodoroProxy = Gio.DBusProxy.makeProxyWrapper(PomodoroInterface);
+
+/**
+ *
+ * @param {Function} callback - callback
+ * @param {object?} cancellable - cancellable
+ */
+export function PomodoroClient(callback, cancellable) {
     return new PomodoroProxy(Gio.DBus.session, 'org.gnome.Pomodoro', '/org/gnome/Pomodoro', callback, cancellable);
 }
 
 
-var PomodoroExtension = class {
+export const PomodoroExtensionService = class extends EventEmitter {
     constructor() {
-        this.Capabilities = Capabilities.capabilities;
+        super();
+
+        this.Capabilities = capabilities;
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(PomodoroExtensionInterface, this);
         this._dbusImpl.export(Gio.DBus.session, '/org/gnome/Pomodoro/Extension');
@@ -81,35 +89,38 @@ var PomodoroExtension = class {
         this.initialized = false;
     }
 
-    _onNameAcquired(name) {
+    _onNameAcquired(name) {  // eslint-disable-line no-unused-vars
         this.initialized = true;
 
         this.emit('name-acquired');
     }
 
-    _onNameLost(name) {
+    _onNameLost(name) {  // eslint-disable-line no-unused-vars
         this.initialized = false;
 
         this.emit('name-lost');
     }
 
     run() {
-        if (this._dbusId == 0) {
-            this._dbusId = Gio.DBus.session.own_name('org.gnome.Pomodoro.Extension',
-                                                     Gio.BusNameOwnerFlags.REPLACE,
-                                                     this._onNameAcquired.bind(this),
-                                                     this._onNameLost.bind(this));
+        if (this._dbusId === 0) {
+            this._dbusId = Gio.DBus.session.own_name(
+                'org.gnome.Pomodoro.Extension',
+                Gio.BusNameOwnerFlags.REPLACE,
+                this._onNameAcquired.bind(this),
+                this._onNameLost.bind(this));
         }
     }
 
     destroy() {
         this.disconnectAll();
 
-        Gio.DBus.session.unown_name(this._dbusId);
+        if (this._dbusId !== 0) {
+            Gio.DBus.session.unown_name(this._dbusId);
+            this._dbusId = 0;
+        }
 
         this._dbusImpl.unexport();
 
         this.emit('destroy');
     }
 };
-Signals.addSignalMethods(PomodoroExtension.prototype);

@@ -20,234 +20,179 @@
  *          Kamil Prusko <kamilprusko@gmail.com>
  */
 
-const Gettext = imports.gettext;
+import Gio from 'gi://Gio';
+import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 
-const { GLib, Gio, Meta, Shell, St } = imports.gi;
+import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-const Main = imports.ui.main;
-const ExtensionUtils = imports.misc.extensionUtils;
-const ExtensionSystem = imports.ui.extensionSystem;
-const MessageTray = imports.ui.messageTray;
-const Signals = imports.misc.signals;
-const UnlockDialog = imports.ui.unlockDialog;
-
-const Extension = ExtensionUtils.getCurrentExtension();
-const Config = Extension.imports.config;
-const DBus = Extension.imports.dbus;
-const Indicator = Extension.imports.indicator;
-const Notifications = Extension.imports.notifications;
-const Presence = Extension.imports.presence;
-const Settings = Extension.imports.settings;
-const Timer = Extension.imports.timer;
-const Utils = Extension.imports.utils;
-const ScreenShield = Extension.imports.screenShield;
+import {Indicator} from './indicator.js';
+import {NotificationManager} from './notifications.js';
+import {PomodoroExtensionService} from './dbus.js';
+import {PresenceManager} from './presence.js';
+import {ScreenShieldManager} from './screenShield.js';
+import {Timer} from './timer.js';
+import * as Config from './config.js';
+import * as Utils from './utils.js';
 
 
-var ExtensionMode = {
+const ExtensionMode = {
     DEFAULT: 0,
-    RESTRICTED: 1
+    RESTRICTED: 1,
 };
 
 
-var PomodoroExtension = class extends Signals.EventEmitter {
-    constructor(mode) {
-        super();
+export let extension = null;
 
-        this.settings            = null;
-        this.pluginSettings      = null;
-        this.timer               = null;
-        this.indicator           = null;
-        this._notificationManager = null;
-        this.presence            = null;
-        this.mode                = null;
-        this.service             = null;
-        this.keybinding          = false;
-        this._pendingMode        = false;
 
-        try {
-            this.settings = Settings.getSettings('org.gnome.pomodoro.preferences');
-            this.settings.connect('changed::show-screen-notifications',
-                                  this._onSettingsChanged.bind(this));
+export default class PomodoroExtension extends Extension {
+    constructor(metadata) {
+        super(metadata);
 
-            this.pluginSettings = Settings.getSettings('org.gnome.pomodoro.plugins.gnome');
-            this.pluginSettings.connect('changed::hide-system-notifications',
-                                        this._onSettingsChanged.bind(this));
-            this.pluginSettings.connect('changed::indicator-type',
-                                        this._onSettingsChanged.bind(this));
+        this.settings              = null;
+        this.pluginSettings        = null;
+        this.timer                 = null;
+        this.indicator             = null;
+        this._notificationManager  = null;
+        this.presenceManager       = null;
+        this.mode                  = null;
+        this.service               = null;
+        this.keybinding            = false;
+        this._sessionModeUpdatedId = 0;
 
-            this.timer = new Timer.Timer();
-            this.timer.connect('service-connected', this._onTimerServiceConnected.bind(this));
-            this.timer.connect('service-disconnected', this._onTimerServiceDisconnected.bind(this));
-            this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+        extension = this;
+    }
 
-            this.service = new DBus.PomodoroExtension();
-            this.service.connect('name-acquired', this._onServiceNameAcquired.bind(this));
-            this.service.connect('name-lost', this._onServiceNameLost.bind(this));
-
-            this.setMode(mode);
-        }
-        catch (error) {
-            Utils.logError(error);
-        }
+    static getInstance() {
+        return extension;
     }
 
     get application() {
         return Shell.AppSystem.get_default().lookup_app('org.gnome.Pomodoro.desktop');
     }
-    
+
     get notificationManager() {
         return this._notificationManager;
     }
 
     setMode(mode) {
         const previousMode = this.mode;
+        const hideSystemNotifications = this.pluginSettings.get_boolean('hide-system-notifications');
 
-        if (!this.service.initialized) {
+        if (this.mode !== mode) {
             this.mode = mode;
-            this._isModePending = true;  // TODO: make setMode async instead of using _isModePending
 
-            return;  /* wait until service name is acquired */
-        }
-
-        if (this.mode !== mode || this._isModePending) {
-            this.mode = mode;
-            this._isModePending = false;
+            if (hideSystemNotifications)
+                this._enablePresence();
 
             if (mode === ExtensionMode.RESTRICTED) {
                 this._disableIndicator();
                 this._disableNotificationManager();
                 this._enableScreenShieldManager();
-            }
-            else {
+                this._enableKeybinding();
+            } else {
                 this._enableIndicator();
                 this._enableNotificationManager(previousMode !== ExtensionMode.RESTRICTED);
                 this._disableScreenShieldManager();
+                this._enableKeybinding();
             }
 
-            if (this.pluginSettings.get_boolean('hide-system-notifications')) {
-                this._enablePresence();
-            }
-            else {
+            if (!hideSystemNotifications)
                 this._disablePresence();
-            }
-
-            this._enableKeybinding();
-
-            this._updatePresence();
         }
     }
 
-    notifyIssue(message) {
-        const notification = new Notifications.IssueNotification(message);
-        notification.show();
+    _updateMode() {
+        this.setMode(Main.sessionMode.isLocked ? ExtensionMode.RESTRICTED : ExtensionMode.DEFAULT);
     }
 
     _onSettingsChanged(settings, key) {
-        switch(key) {
-            case 'show-screen-notifications':
-                if (this._notificationManager) {
-                    this._notificationManager.useDialog = settings.get_boolean(key);
-                }
+        switch (key) {
+        case 'show-screen-notifications':
+            if (this._notificationManager)
+                this._notificationManager.useDialog = settings.get_boolean(key);
 
-                break;
+            break;
 
-            case 'hide-system-notifications':
-                if (settings.get_boolean(key)) {
-                    this._enablePresence();
-                }
-                else {
-                    this._disablePresence();
-                }
+        case 'hide-system-notifications':
+            if (settings.get_boolean(key))
+                this._enablePresence();
+            else
+                this._disablePresence();
 
-                break;
+            break;
 
-            case 'indicator-type':
-                if (this.indicator) {
-                    this.indicator.setType(settings.get_string(key));
-                }
+        case 'indicator-type':
+            if (this.indicator)
+                this.indicator.setType(settings.get_string(key));
 
-                break;
+            break;
+
+        case 'blur-effect':
+            if (this._notificationManager) {
+                this._disableNotificationManager();
+                this._enableNotificationManager(true);
+            }
+            break;
         }
     }
 
     _onServiceNameAcquired() {
-        this.emit('service-name-acquired');
-
-        this.setMode(this.mode);
     }
 
     _onServiceNameLost() {
-        this.emit('service-name-lost');
-
-        Utils.logError(new Errror('Lost service name "org.gnome.Pomodoro.Extension"'));
+        Utils.logWarning('Lost service name "org.gnome.Pomodoro.Extension"');
     }
 
     _onTimerServiceConnected() {
         this.service.run();
+        this._updateMode();
     }
 
     _onTimerServiceDisconnected() {
         Utils.logWarning('Lost connection to "org.gnome.Pomodoro"');
-    }
-
-    _onTimerStateChanged() {
-        this._updatePresence();
+        this._updateMode();
     }
 
     _onKeybindingPressed() {
-        if (this.timer) {
+        if (this.timer)
             this.timer.toggle();
-        }
-    }
-
-    _updatePresence() {
-        if (this.presence) {
-            const timerState = this.timer.getState();
-
-            if (timerState === Timer.State.NULL) {
-                this.presence.setDefault();
-            }
-            else {
-                this.presence.setBusy(timerState === Timer.State.POMODORO);
-            }
-        }
     }
 
     _enableIndicator() {
         if (!this.indicator) {
-            this.indicator = new Indicator.Indicator(this.timer,
-                                                     this.pluginSettings.get_string('indicator-type'));
-            this.indicator.connect('destroy',
-                () => {
-                    this.indicator = null;
-                });
+            this.indicator = new Indicator(this.timer, this.pluginSettings.get_string('indicator-type'));
+            this.indicator.connect('destroy', () => {
+                this.indicator = null;
+            });
 
             try {
                 Main.panel.addToStatusArea(Config.PACKAGE_NAME, this.indicator);
-            }
-            catch (error) {
+            } catch (error) {
                 Utils.logError(error);
             }
-        }
-        else {
+        } else {
             this.indicator.show();
         }
     }
 
     _disableIndicator() {
         if (this.indicator) {
-            this.indicator.hide();
+            this.indicator.destroy();
+            this.indicator = null;
         }
     }
 
     _enableKeybinding() {
         if (!this.keybinding) {
             this.keybinding = true;
-            Main.wm.addKeybinding('toggle-timer-key',
-                                  this.settings,
-                                  Meta.KeyBindingFlags.NONE,
-                                  Shell.ActionMode.ALL,
-                                  this._onKeybindingPressed.bind(this));
+            Main.wm.addKeybinding(
+                'toggle-timer-key',
+                this.settings,
+                Meta.KeyBindingFlags.NONE,
+                Shell.ActionMode.ALL,
+                this._onKeybindingPressed.bind(this));
         }
     }
 
@@ -259,24 +204,24 @@ var PomodoroExtension = class extends Signals.EventEmitter {
     }
 
     _enablePresence() {
-        if (!this.presence) {
-            this.presence = new Presence.Presence();
-        }
-
-        this._updatePresence();
+        if (!this.presenceManager)
+            this.presenceManager = new PresenceManager(this.timer);
     }
 
     _disablePresence() {
-        this._destroyPresence();
+        if (this.presenceManager) {
+            this.presenceManager.destroy();
+            this.presenceManager = null;
+        }
     }
 
     _enableNotificationManager(animate) {
         if (!this._notificationManager) {
             const params = {
                 useDialog: this.settings.get_boolean('show-screen-notifications'),
-                animate: animate,
+                animate,
             };
-            this._notificationManager = new Notifications.NotificationManager(this.timer, params);
+            this._notificationManager = new NotificationManager(this.timer, params);
         }
     }
 
@@ -288,13 +233,11 @@ var PomodoroExtension = class extends Signals.EventEmitter {
     }
 
     _enableScreenShieldManager() {
-        if (!Main.screenShield) {
+        if (!Main.screenShield)
             return;
-        }
 
-        if (!this._screenShieldManager) {
-            this._screenShieldManager = new ScreenShield.ScreenShieldManager(this.timer);
-        }
+        if (!this._screenShieldManager)
+            this._screenShieldManager = new ScreenShieldManager(this.timer);
     }
 
     _disableScreenShieldManager() {
@@ -304,93 +247,76 @@ var PomodoroExtension = class extends Signals.EventEmitter {
         }
     }
 
-    _destroyPresence() {
-        if (this.presence) {
-            this.presence.destroy();
-            this.presence = null;
+    _connectSignals() {
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', () => this._updateMode());
+    }
+
+    _disconnectSignals() {
+        if (this._sessionModeUpdatedId) {
+            Main.sessionMode.disconnect(this._sessionModeUpdatedId);
+            this._sessionModeUpdatedId = 0;
         }
     }
 
-    _destroyIndicator() {
-        if (this.indicator) {
-            this.indicator.destroy();
-            this.indicator = null;
-        }
+    // override method
+    getSettings(schema) {
+        const schemaDir = Gio.File.new_for_path(Config.GSETTINGS_SCHEMA_DIR);
+        const defaultSource = Gio.SettingsSchemaSource.get_default();
+        let schemaSource;
+        if (schemaDir.query_exists(null))
+            schemaSource = Gio.SettingsSchemaSource.new_from_directory(schemaDir.get_path(), defaultSource, false);
+        else
+            schemaSource = defaultSource;
+
+        const schemaObj = schemaSource.lookup(schema, true);
+        if (!schemaObj)
+            throw new Error(`Schema ${schema} could not be found for extension ${this.uuid}. Please check your installation.`);
+
+        return new Gio.Settings({settings_schema: schemaObj});
     }
 
-    destroy() {
-        if (this._destroying) {
-            return;
-        }
-        this._destroying = true;
+    enable() {
+        this.settings = this.getSettings('org.gnome.pomodoro.preferences');
+        this.settings.connect('changed::show-screen-notifications', this._onSettingsChanged.bind(this));
+
+        this.pluginSettings = this.getSettings('org.gnome.pomodoro.plugins.gnome');
+        this.pluginSettings.connect('changed::hide-system-notifications', this._onSettingsChanged.bind(this));
+        this.pluginSettings.connect('changed::indicator-type', this._onSettingsChanged.bind(this));
+        this.pluginSettings.connect('changed::blur-effect', this._onSettingsChanged.bind(this));
+
+        this.timer = new Timer();
+        this.timer.connect('service-connected', this._onTimerServiceConnected.bind(this));
+        this.timer.connect('service-disconnected', this._onTimerServiceDisconnected.bind(this));
+
+        this.service = new PomodoroExtensionService();
+        this.service.connect('name-acquired', this._onServiceNameAcquired.bind(this));
+        this.service.connect('name-lost', this._onServiceNameLost.bind(this));
+
+        this._updateMode();
+        this._connectSignals();
+    }
+
+    disable() {
+        this._disconnectSignals();
 
         this._disableKeybinding();
         this._disableScreenShieldManager();
         this._disableNotificationManager();
+        this._disablePresence();
+        this._disableIndicator();
 
-        this._destroyPresence();
-        this._destroyIndicator();
+        this.mode = null;
+
+        this.service.destroy();
+        this.service = null;
 
         this.timer.destroy();
-        this.service.destroy();
+        this.timer = null;
+
+        this.pluginSettings.run_dispose();
+        this.pluginSettings = null;
+
         this.settings.run_dispose();
-
-        this.emit('destroy');
-    }
-};
-
-
-function init(metadata) {
-    Gettext.bindtextdomain(Config.GETTEXT_PACKAGE,
-                           Config.PACKAGE_LOCALE_DIR);
-}
-
-
-function enable() {
-    let extension = Extension.extension;
-    let sessionModeUpdatedId;
-
-    if (!extension) {
-        extension = new PomodoroExtension(Main.sessionMode.isLocked
-                                          ? ExtensionMode.RESTRICTED : ExtensionMode.DEFAULT);
-        extension.connect('destroy',
-            () => {
-                if (Extension.extension === extension) {
-                    Extension.extension = null;
-                }
-
-                if (sessionModeUpdatedId != 0) {
-                    Main.sessionMode.disconnect(sessionModeUpdatedId);
-                    sessionModeUpdatedId = 0;
-                }
-            });
-        extension.connect('service-name-lost',
-            () => {
-                let metadata = ExtensionUtils.extensions[Config.EXTENSION_UUID];
-
-                if (metadata && metadata.extension === extension) {
-                    ExtensionSystem.disableExtension(Config.EXTENSION_UUID);
-                }
-                else {
-                    extension.destroy();
-                }
-            });
-
-        sessionModeUpdatedId = Main.sessionMode.connect('updated',
-            () => {
-                extension.setMode(Main.sessionMode.isLocked
-                                  ? ExtensionMode.RESTRICTED : ExtensionMode.DEFAULT);
-            });
-
-        Extension.extension = extension;
-    }
-}
-
-
-function disable() {
-    let extension = Extension.extension;
-
-    if (extension) {
-        extension.destroy();
+        this.settings = null;
     }
 }

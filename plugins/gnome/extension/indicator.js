@@ -18,24 +18,24 @@
  *          Kamil Prusko <kamilprusko@gmail.com>
  */
 
-const Cairo = imports.cairo;
+import Cairo from 'gi://cairo';
+import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Pango from 'gi://Pango';
+import St from 'gi://St';
 
-const { Clutter, Gio, GLib, GObject, Gtk, Meta, Pango, Shell, St } = imports.gi;
+import {PopupAnimation} from 'resource:///org/gnome/shell/ui/boxpointer.js';
+import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const BoxPointer = imports.ui.boxpointer;
-const Main = imports.ui.main;
-const MessageTray = imports.ui.messageTray;
-const PanelMenu = imports.ui.panelMenu;
-const PopupMenu = imports.ui.popupMenu;
-const Signals = imports.misc.signals;
-
-const Config = Extension.imports.config;
-const Timer = Extension.imports.timer;
-const Utils = Extension.imports.utils;
-
-const Gettext = imports.gettext.domain(Config.GETTEXT_PACKAGE);
-const _ = Gettext.gettext;
+import {extension} from './extension.js';
+import {State, TimerLabel} from './timer.js';
+import * as Utils from './utils.js';
 
 
 const FADE_IN_TIME = 1250;
@@ -48,14 +48,14 @@ const STEPS = 120;
 const X_ALIGNMENT = 0.5;
 
 
-var IndicatorType = {
+const IndicatorType = {
     TEXT: 'text',
     SHORT_TEXT: 'short-text',
-    ICON: 'icon'
+    ICON: 'icon',
 };
 
 
-var IndicatorMenu = class extends PopupMenu.PopupMenu {
+const IndicatorMenu = class extends PopupMenu.PopupMenu {
     constructor(indicator) {
         super(indicator, X_ALIGNMENT, St.Side.TOP);
 
@@ -75,15 +75,15 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         this.addMenuItem(this._createToggleMenuItem());
         this.addMenuItem(this._createTimerMenuItem());
 
-        this.addStateMenuItem('pomodoro', _("Pomodoro"));
-        this.addStateMenuItem('short-break', _("Short Break"));
-        this.addStateMenuItem('long-break', _("Long Break"));
+        this.addStateMenuItem('pomodoro', _('Pomodoro'));
+        this.addStateMenuItem('short-break', _('Short Break'));
+        this.addStateMenuItem('long-break', _('Long Break'));
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-        this.addAction(_("Preferences"), this._activatePreferences.bind(this));
-        this.addAction(_("Stats"), this._activateStats.bind(this));
-        this.addAction(_("Quit"), this._activateQuit.bind(this));
+        this.addAction(_('Preferences'), this._activatePreferences.bind(this));
+        this.addAction(_('Stats'), this._activateStats.bind(this));
+        this.addAction(_('Quit'), this._activateQuit.bind(this));
     }
 
     get indicator() {
@@ -95,9 +95,9 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         let icon = this._icons[iconName];
 
         if (!icon) {
-            const iconUri = '%s/icons/hicolor/scalable/actions/%s.svg'.format(Extension.dir.get_uri(), iconName);
+            const iconUri = '%s/icons/hicolor/scalable/actions/%s.svg'.format(extension.dir.get_uri(), iconName);
             icon = new Gio.FileIcon({
-                file: Gio.File.new_for_uri(iconUri)
+                file: Gio.File.new_for_uri(iconUri),
             });
 
             this._icons[iconName] = icon;
@@ -107,13 +107,17 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _createIconButton(iconName, accessibleName) {
-        const icon = new St.Icon({ gicon: this._loadIcon(iconName),
-                                   style_class: 'popup-menu-icon' });
-        const iconButton = new St.Button({ reactive: true,
-                                           can_focus: true,
-                                           track_hover: true,
-                                           accessible_name: accessibleName,
-                                           style_class: 'icon-button' });
+        const icon = new St.Icon({
+            gicon: this._loadIcon(iconName),
+            style_class: 'popup-menu-icon',
+        });
+        const iconButton = new St.Button({
+            reactive: true,
+            can_focus: true,
+            track_hover: true,
+            accessible_name: accessibleName,
+            style_class: 'icon-button',
+        });
         iconButton.add_style_class_name('flat');
         iconButton.set_child(icon);
 
@@ -121,13 +125,15 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _createToggleMenuItem() {
-        const menuItem = new PopupMenu.PopupMenuItem(_("Pomodoro Timer"),
-                                           { style_class: 'extension-pomodoro-toggle-menu-item',
-                                             reactive: false,
-                                             can_focus: false });
+        const menuItem = new PopupMenu.PopupMenuItem(_('Pomodoro Timer'),
+            {
+                style_class: 'extension-pomodoro-toggle-menu-item',
+                reactive: false,
+                can_focus: false,
+            });
         menuItem.label.y_align = Clutter.ActorAlign.CENTER;
 
-        const startButton = this._createIconButton('gnome-pomodoro-start-symbolic', _("Start Timer"));
+        const startButton = this._createIconButton('gnome-pomodoro-start-symbolic', _('Start Timer'));
         startButton.connect('clicked', this._onStartClicked.bind(this));
         menuItem.add_child(startButton);
 
@@ -137,50 +143,53 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _createTimerMenuItem() {
-        const menuItem = new PopupMenu.PopupMenuItem("",
-                                           { style_class: 'extension-pomodoro-timer-menu-item',
-                                             reactive: false,
-                                             can_focus: false });
+        const menuItem = new PopupMenu.PopupMenuItem('',
+            {
+                style_class: 'extension-pomodoro-timer-menu-item',
+                reactive: false,
+                can_focus: false,
+            });
         menuItem.label.visible = false;
 
-        const timerButton = new St.Button({ style_class: 'extension-pomodoro-timer-button',
-                                            reactive: true,
-                                            can_focus: true,
-                                            track_hover: true });
+        const timerButton = new St.Button({
+            style_class: 'extension-pomodoro-timer-button',
+            reactive: true,
+            can_focus: true,
+            track_hover: true,
+        });
         timerButton.add_style_class_name('button');
         timerButton.add_style_class_name('flat');
         timerButton.connect('clicked', this._onTimerButtonClicked.bind(this));
         menuItem.add_child(timerButton);
 
-        const timerLabel = new Timer.TimerLabel(this._timer, { x_align: Clutter.ActorAlign.START });
+        const timerLabel = new TimerLabel(this._timer, {x_align: Clutter.ActorAlign.START});
         timerButton.set_child(timerLabel);
 
-        const buttonsBox = new St.BoxLayout({ style_class: 'extension-pomodoro-timer-buttons-box',
-                                              x_align: Clutter.ActorAlign.END,
-                                              x_expand: true });
+        const buttonsBox = new St.BoxLayout({
+            style_class: 'extension-pomodoro-timer-buttons-box',
+            x_align: Clutter.ActorAlign.END,
+            x_expand: true,
+        });
         menuItem.add_child(buttonsBox);
 
-        const pauseResumeButton = this._createIconButton('gnome-pomodoro-pause-symbolic', _("Pause Timer"));
+        const pauseResumeButton = this._createIconButton('gnome-pomodoro-pause-symbolic', _('Pause Timer'));
         pauseResumeButton.connect('clicked',
             () => {
-                if (!this._isPaused) {
+                if (!this._isPaused)
                     this._onPauseClicked();
-                }
-                else {
+
+                else
                     this._onResumeClicked();
-                }
             });
         buttonsBox.add_actor(pauseResumeButton);
 
-        const skipStopButton = this._createIconButton('gnome-pomodoro-stop-symbolic', _("Stop Timer"));
+        const skipStopButton = this._createIconButton('gnome-pomodoro-stop-symbolic', _('Stop Timer'));
         skipStopButton.connect('clicked',
             () => {
-                if (!this._isPaused) {
+                if (!this._isPaused)
                     this._onSkipClicked();
-                }
-                else {
+                else
                     this._onStopClicked();
-                }
             });
         buttonsBox.add_actor(skipStopButton);
 
@@ -197,9 +206,9 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _updateTimerButtons() {
-        const visible = this._timerState !== Timer.State.NULL;
-        const isBreak = this._timerState === Timer.State.SHORT_BREAK ||
-                        this._timerState === Timer.State.LONG_BREAK;
+        const visible = this._timerState !== State.NULL;
+        const isBreak = this._timerState === State.SHORT_BREAK ||
+                        this._timerState === State.LONG_BREAK;
 
         this._toggleMenuItem.visible = !visible;
         this._timerMenuItem.visible = visible;
@@ -209,32 +218,29 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
 
         if (!this._isPaused) {
             this._pauseResumeButton.child.gicon = this._loadIcon('gnome-pomodoro-pause-symbolic');
-            this._pauseResumeButton.accessible_name = isBreak ? _("Pause break") : _("Pause Pomodoro");
+            this._pauseResumeButton.accessible_name = isBreak ? _('Pause break') : _('Pause Pomodoro');
 
             this._skipStopButton.child.gicon = this._loadIcon('gnome-pomodoro-skip-symbolic');
-            this._skipStopButton.accessible_name = isBreak ? _("Start Pomodoro") : _("Take a break");
-        }
-        else {
+            this._skipStopButton.accessible_name = isBreak ? _('Start Pomodoro') : _('Take a break');
+        } else {
             this._pauseResumeButton.child.gicon = this._loadIcon('gnome-pomodoro-start-symbolic');
-            this._pauseResumeButton.accessible_name = isBreak ? _("Resume break") : _("Resume Pomodoro");
+            this._pauseResumeButton.accessible_name = isBreak ? _('Resume break') : _('Resume Pomodoro');
 
             this._skipStopButton.child.gicon = this._loadIcon('gnome-pomodoro-stop-symbolic');
-            this._skipStopButton.accessible_name = _("Stop");
+            this._skipStopButton.accessible_name = _('Stop');
         }
     }
 
     _updateStateItems() {
-        const visible = this._timerState !== Timer.State.NULL;
+        const visible = this._timerState !== State.NULL;
 
-        for (const [stateName, menuItem] of Object.entries(this._stateItems))
-        {
+        for (const [stateName, menuItem] of Object.entries(this._stateItems)) {
             menuItem.visible = visible;
 
             if (stateName === this._timerState) {
                 menuItem.setOrnament(PopupMenu.Ornament.DOT);
                 menuItem.add_style_class_name('active');
-            }
-            else {
+            } else {
                 menuItem.setOrnament(PopupMenu.Ornament.NONE);
                 menuItem.remove_style_class_name('active');
             }
@@ -246,8 +252,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
             this._connectTimerSignals();
 
             this._onTimerStateChanged();
-        }
-        else {
+        } else {
             this._disconnectTimerSignals();
         }
     }
@@ -257,8 +262,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         const isPaused = this._timer.isPaused();
 
         if (this._isPaused !== isPaused ||
-            this._timerState !== timerState)
-        {
+            this._timerState !== timerState) {
             this._isPaused = isPaused;
             this._timerState = timerState;
 
@@ -276,23 +280,22 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _onTimerButtonClicked() {
-        const notificationManager = Extension.extension.notificationManager;
+        const notificationManager = extension.notificationManager;
 
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
 
-        if (notificationManager) {
+        if (notificationManager)
             notificationManager.openDialog();
-        }
     }
 
     _onStartClicked() {
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
 
         this._timer.start();
     }
 
     _onSkipClicked() {
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
 
         this._timer.skip();
     }
@@ -309,7 +312,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
         // while doing savedFocus.grab_key_focus().
         // As a walkaround we call timer.stop() with delay. Seems that these calls interfere
         // with each other.
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
     }
 
     _onPauseClicked() {
@@ -317,7 +320,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _onResumeClicked() {
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
 
         this._timer.resume();
     }
@@ -325,23 +328,21 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     addAction(label, callback, icon) {
         const menuItem = super.addAction(label, callback, icon);
 
-        menuItem.connect('leave-event', (actor) => {
-            if (actor.has_key_focus()) {
+        menuItem.connect('leave-event', actor => {
+            if (actor.has_key_focus())
                 global.stage.set_key_focus(actor.get_parent());
-            }
         });
 
         return menuItem;
     }
 
     addStateMenuItem(name, label) {
-        if (!this._stateItems) {
+        if (!this._stateItems)
             this._stateItems = {};
-        }
 
-        let menuItem = this.addAction(label, (menuItem, event) => {
-                this._activateState(name);
-            });
+        let menuItem = this.addAction(label, (_menuItem, event) => {  // eslint-disable-line no-unused-vars
+            this._activateState(name);
+        });
 
         menuItem.add_style_class_name('state-item');
 
@@ -351,7 +352,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     }
 
     _activateState(stateName) {
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
 
         this._timer.setState(stateName);
     }
@@ -359,7 +360,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     _activateStats() {
         const timestamp = global.get_current_time();
 
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
         Main.overview.hide();
 
         this._timer.showMainWindow('stats', timestamp);
@@ -368,7 +369,7 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
     _activatePreferences() {
         const timestamp = global.get_current_time();
 
-        this.itemActivated(BoxPointer.PopupAnimation.NONE);
+        this.itemActivated(PopupAnimation.NONE);
         Main.overview.hide();
 
         this._timer.showPreferences(timestamp);
@@ -384,13 +385,12 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
             this._onTimerStateChanged();
         }
 
-        if (!this._timerPausedId) {
+        if (!this._timerPausedId)
             this._timerPausedId = this._timer.connect('paused', this._onTimerPaused.bind(this));
-        }
 
-        if (!this._timerResumedId) {
+
+        if (!this._timerResumedId)
             this._timerResumedId = this._timer.connect('resumed', this._onTimerResumed.bind(this));
-        }
     }
 
     _disconnectTimerSignals() {
@@ -433,24 +433,26 @@ var IndicatorMenu = class extends PopupMenu.PopupMenu {
 };
 
 
-var TextIndicator = class extends Signals.EventEmitter {
+const TextIndicator = class extends EventEmitter {
     constructor(timer) {
         super();
 
         this._initialized     = false;
-        this._state           = Timer.State.NULL;
+        this._state           = State.NULL;
         this._digitWidth      = 0;
         this._charWidth       = 0;
         this._onTimerUpdateId = 0;
 
         this.timer = timer;
 
-        this.actor = new St.Widget({ reactive: true });
+        this.actor = new St.Widget({reactive: true});
         this.actor._delegate = this;
 
-        this.label = new St.Label({ style_class: 'system-status-label',
-                                    x_align: Clutter.ActorAlign.CENTER,
-                                    y_align: Clutter.ActorAlign.CENTER });
+        this.label = new St.Label({
+            style_class: 'system-status-label',
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
         this.label.clutter_text.line_wrap = false;
         this.label.clutter_text.ellipsize = false;
         this.label.connect('destroy',
@@ -472,20 +474,17 @@ var TextIndicator = class extends Signals.EventEmitter {
         this._state = this.timer.getState();
         this._initialized = true;
 
-        if (this._state == Timer.State.POMODORO) {
+        if (this._state === State.POMODORO)
             this.actor.set_opacity(FADE_IN_OPACITY * 255);
-        }
-        else {
+        else
             this.actor.set_opacity(FADE_OUT_OPACITY * 255);
-        }
     }
 
     _onStyleChanged(actor) {
-        let themeNode    = actor.get_theme_node();
-        let themeContext = St.ThemeContext.get_for_stage(global.stage);
-        let font         = themeNode.get_font();
-        let context      = actor.get_pango_context();
-        let metrics      = context.get_metrics(font, context.get_language());
+        const themeNode    = actor.get_theme_node();
+        const font         = themeNode.get_font();
+        const context      = actor.get_pango_context();
+        const metrics      = context.get_metrics(font, context.get_language());
 
         this._digitWidth  = metrics.get_approximate_digit_width() / Pango.SCALE;
         this._charWidth   = metrics.get_approximate_char_width() / Pango.SCALE;
@@ -496,36 +495,34 @@ var TextIndicator = class extends Signals.EventEmitter {
     }
 
     _getText(state, remaining) {
-        if (remaining < 0.0) {
+        if (remaining < 0.0)
             remaining = 0.0;
-        }
 
-        let minutes = Math.floor(remaining / 60);
-        let seconds = Math.floor(remaining % 60);
+        const minutes = Math.floor(remaining / 60);
+        const seconds = Math.floor(remaining % 60);
 
         return '%02d:%02d'.format(minutes, seconds);
     }
 
     _onTimerUpdate() {
-        let state = this.timer.getState();
-        let remaining = this.timer.getRemaining();
+        const state = this.timer.getState();
+        const remaining = this.timer.getRemaining();
 
-        if (this._state != state && this._initialized) {
+        if (this._state !== state && this._initialized) {
             this._state = state;
 
-            if (state == Timer.State.POMODORO) {
+            if (state === State.POMODORO) {
                 this.actor.ease({
                     opacity: FADE_IN_OPACITY * 255,
                     duration: FADE_IN_TIME,
-                    mode: Clutter.AnimationMode.EASE_OUT_QUAD
+                    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 });
-            }
-            else {
-               this.actor.ease({
+            } else {
+                this.actor.ease({
                     opacity: FADE_OUT_OPACITY * 255,
                     duration: FADE_OUT_TIME,
-                    mode: Clutter.AnimationMode.EASE_OUT_QUAD
-               });
+                    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                });
             }
         }
 
@@ -549,7 +546,7 @@ var TextIndicator = class extends Signals.EventEmitter {
 };
 
 
-var ShortTextIndicator = class extends TextIndicator {
+const ShortTextIndicator = class extends TextIndicator {
     constructor(timer) {
         super(timer);
 
@@ -558,33 +555,31 @@ var ShortTextIndicator = class extends TextIndicator {
 
     _getWidth() {
         return Math.ceil(2 * this._digitWidth +
-                         1 * this._charWidth);
+                         Number(this._charWidth));
     }
 
     _getText(state, remaining) {
-        if (remaining < 0.0) {
+        if (remaining < 0.0)
             remaining = 0.0;
-        }
 
         let minutes = Math.round(remaining / 60);
         let seconds = Math.round(remaining % 60);
 
-        if (remaining > 15) {
+        if (remaining > 15)
             seconds = Math.ceil(seconds / 15) * 15;
-        }
 
-        return (remaining > 45)
-                ? "%d′".format(minutes, remaining)
-                : "%d″".format(seconds, remaining);
+        return remaining > 45
+            ? '%d′'.format(minutes)
+            : '%d″'.format(seconds);
     }
 };
 
 
-var IconIndicator = class extends Signals.EventEmitter {
+const IconIndicator = class extends EventEmitter {
     constructor(timer) {
         super();
 
-        this._state           = Timer.State.NULL;
+        this._state           = State.NULL;
         this._progress        = 0.0;
         this._primaryColor    = null;
         this._secondaryColor  = null;
@@ -592,10 +587,10 @@ var IconIndicator = class extends Signals.EventEmitter {
 
         this.timer = timer;
 
-        this.actor = new St.Widget({ reactive: true });
+        this.actor = new St.Widget({reactive: true});
         this.actor._delegate = this;
 
-        this.icon = new St.DrawingArea({ style_class: 'system-status-icon' });
+        this.icon = new St.DrawingArea({style_class: 'system-status-icon'});
         this.icon.connect('style-changed', this._onIconStyleChanged.bind(this));
         this.icon.connect('repaint', this._onIconRepaint.bind(this));
         this.icon.connect('destroy', this._onIconDestroy.bind(this));
@@ -625,22 +620,22 @@ var IconIndicator = class extends Signals.EventEmitter {
     }
 
     _onIconRepaint(area) {
-        let cr = area.get_context();
-        let [width, height] = area.get_surface_size();
-        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+        const cr = area.get_context();
+        const [width, height] = area.get_surface_size();
+        const scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
 
-        let radius    = 0.5 * this._iconSize - 2.0;
-        let progress  = this._progress;
-        let isRunning = this._state != Timer.State.NULL;
-        let isBreak   = (this._state == Timer.State.SHORT_BREAK ||
-                         this._state == Timer.State.LONG_BREAK);
+        const radius    = 0.5 * this._iconSize - 2.0;
+        const progress  = this._progress;
+        const isRunning = this._state !== State.NULL;
+        const isBreak   = this._state === State.SHORT_BREAK ||
+                          this._state === State.LONG_BREAK;
 
         cr.translate(0.5 * width, 0.5 * height);
         cr.setOperator(Cairo.Operator.SOURCE);
         cr.setLineCap(Cairo.LineCap.ROUND);
 
-        let angle1 = - 0.5 * Math.PI - 2.0 * Math.PI * Math.min(Math.max(progress, 0.000001), 1.0);
-        let angle2 = - 0.5 * Math.PI;
+        const angle1 = -0.5 * Math.PI - 2.0 * Math.PI * Math.min(Math.max(progress, 0.000001), 1.0);
+        const angle2 = -0.5 * Math.PI;
 
         /* background pie */
         if (isBreak || !isRunning) {
@@ -648,8 +643,7 @@ var IconIndicator = class extends Signals.EventEmitter {
             cr.arcNegative(0, 0, radius, angle1, angle2);
             cr.setLineWidth(2.2 * scaleFactor);
             cr.stroke();
-        }
-        else {
+        } else {
             Clutter.cairo_set_source_color(cr, this._secondaryColor);
             cr.arc(0, 0, radius, 0.0, 2.0 * Math.PI);
             cr.setLineWidth(2.2 * scaleFactor);
@@ -679,22 +673,21 @@ var IconIndicator = class extends Signals.EventEmitter {
     }
 
     _onStyleChanged(actor) {
-        let themeNode = actor.get_theme_node();
-
-        let color = themeNode.get_foreground_color();
+        const themeNode = actor.get_theme_node();
+        const color = themeNode.get_foreground_color();
         this._primaryColor = color;
         this._secondaryColor = new Clutter.Color({
             red: color.red,
             green: color.green,
             blue: color.blue,
-            alpha: color.alpha * FADE_OUT_OPACITY
+            alpha: color.alpha * FADE_OUT_OPACITY,
         });
     }
 
 
     _onTimerUpdate() {
-        let state = this.timer.getState();
-        let progress = Math.floor(this.timer.getProgress() * STEPS) / STEPS;
+        const state = this.timer.getState();
+        const progress = Math.floor(this.timer.getProgress() * STEPS) / STEPS;
 
         if (this._progress !== progress || this._state !== state) {
             this._state = state;
@@ -724,24 +717,21 @@ var IconIndicator = class extends Signals.EventEmitter {
 };
 
 
-var Indicator = GObject.registerClass(
+export const Indicator = GObject.registerClass(
 class PomodoroIndicator extends PanelMenu.Button {
     _init(timer, type) {
-        super._init(X_ALIGNMENT, _("Pomodoro"), true);
+        super._init(X_ALIGNMENT, _('Pomodoro'), true);
 
         this.timer  = timer;
         this.widget = null;
 
         this.add_style_class_name('extension-pomodoro-indicator');
 
-        this._container = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
-        this.add_child(this._container);
-
         this._iconBox = new St.Bin({
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
         });
-        this._container.add_child(this._iconBox);
+        this.add_actor(this._iconBox);
 
         this._blinking = false;
         this._blinkingGroup = new Utils.TransitionGroup();
@@ -790,15 +780,13 @@ class PomodoroIndicator extends PanelMenu.Button {
 
     _onMappedChanged() {
         if (this.mapped) {
-            if (!this._timerPausedId) {
+            if (!this._timerPausedId)
                 this._timerPausedId = this.timer.connect('paused', this._onTimerPaused.bind(this));
-            }
 
-            if (!this._timerResumedId) {
+
+            if (!this._timerResumedId)
                 this._timerResumedId = this.timer.connect('resumed', this._onTimerResumed.bind(this));
-            }
-        }
-        else {
+        } else {
             if (this._timerPausedId) {
                 this.timer.disconnect(this._timerPausedId);
                 this._timerPausedId = 0;
@@ -820,17 +808,17 @@ class PomodoroIndicator extends PanelMenu.Button {
         }
 
         switch (type) {
-            case IndicatorType.TEXT:
-                this.widget = new TextIndicator(this.timer);
-                break;
+        case IndicatorType.TEXT:
+            this.widget = new TextIndicator(this.timer);
+            break;
 
-            case IndicatorType.SHORT_TEXT:
-                this.widget = new ShortTextIndicator(this.timer);
-                break;
+        case IndicatorType.SHORT_TEXT:
+            this.widget = new ShortTextIndicator(this.timer);
+            break;
 
-            default:
-                this.widget = new IconIndicator(this.timer);
-                break;
+        default:
+            this.widget = new IconIndicator(this.timer);
+            break;
         }
 
         this._iconBox.set_child(this.widget.actor);
@@ -844,15 +832,13 @@ class PomodoroIndicator extends PanelMenu.Button {
             this._blinkingGroup.setProperty('opacity', 255);
         }
 
-        if (this.timer.isPaused()) {
+        if (this.timer.isPaused())
             this._blink();
-        }
     }
 
     _blink() {
-        if (!this.mapped) {
+        if (!this.mapped)
             return;
-        }
 
         if (!this._blinking) {
             let ignoreSignals = false;
@@ -862,22 +848,19 @@ class PomodoroIndicator extends PanelMenu.Button {
                         duration: 1750,
                         mode: Clutter.AnimationMode.EASE_IN_OUT_CUBIC,
                         onComplete: () => {
-                            if (!this.mapped) {
+                            if (!this.mapped)
                                 return;
-                            }
 
                             if (!ignoreSignals) {
                                 ignoreSignals = true;
-                                fadeOut()
+                                fadeOut();
                                 ignoreSignals = false;
-                            }
-                            else {
+                            } else {
                                 // stop recursion
                             }
                         },
                     });
-                }
-                else {
+                } else {
                     this._onBlinked();
                 }
             };
@@ -891,14 +874,12 @@ class PomodoroIndicator extends PanelMenu.Button {
                                 ignoreSignals = true;
                                 fadeIn();
                                 ignoreSignals = false;
-                            }
-                            else {
+                            } else {
                                 // stop recursion
                             }
-                        }
+                        },
                     });
-                }
-                else {
+                } else {
                     this._onBlinked();
                 }
             };
@@ -923,7 +904,7 @@ class PomodoroIndicator extends PanelMenu.Button {
             this._blinkingGroup.easeProperty('opacity', FADE_IN_OPACITY * 255, {
                 duration: 200,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: this._onBlinked.bind(this)
+                onComplete: this._onBlinked.bind(this),
             });
         }
     }

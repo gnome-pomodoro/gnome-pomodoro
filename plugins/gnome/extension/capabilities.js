@@ -20,9 +20,9 @@
  * dynamically enabled/disabled depending on availability.
  */
 
-var capabilities = [
+export const capabilities = [
     'notifications',
     'indicator',
     'accelerator',
-    'hide-system-notifications'
+    'hide-system-notifications',
 ];

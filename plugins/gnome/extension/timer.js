@@ -17,19 +17,23 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-const { Clutter, Gio, GObject, St, Pango } = imports.gi;
+import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GObject from 'gi://GObject';
+import Pango from 'gi://Pango';
+import St from 'gi://St';
 
-const Main = imports.ui.main;
-const Params = imports.misc.params;
-const Signals = imports.misc.signals;
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
+import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Config = Extension.imports.config;
-const DBus = Extension.imports.dbus;
-const Utils = Extension.imports.utils;
+import {PomodoroClient} from './dbus.js';
+import {IssueNotification} from './notifications.js';
+import * as Config from './config.js';
+import * as Utils from './utils.js';
 
 
-var State = {
+export const State = {
     NULL: 'null',
     POMODORO: 'pomodoro',
     SHORT_BREAK: 'short-break',
@@ -37,23 +41,23 @@ var State = {
 
     label(state) {
         switch (state) {
-            case State.POMODORO:
-                return _("Pomodoro");
+        case State.POMODORO:
+            return _('Pomodoro');
 
-            case State.SHORT_BREAK:
-                return _("Short Break");
+        case State.SHORT_BREAK:
+            return _('Short Break');
 
-            case State.LONG_BREAK:
-                return _("Long Break");
+        case State.LONG_BREAK:
+            return _('Long Break');
 
-            default:
-                return null;
+        default:
+            return null;
         }
-    }
+    },
 };
 
 
-var Timer = class extends Signals.EventEmitter {
+export class Timer extends EventEmitter {
     constructor() {
         super();
 
@@ -64,17 +68,17 @@ var Timer = class extends Signals.EventEmitter {
         this._propertiesChangedId = 0;
         this._elapsed = 0.0;
 
-        this._proxy = DBus.Pomodoro(this._onInit.bind(this));
+        this._proxy = PomodoroClient(this._onInit.bind(this));
 
         this._propertiesChangedId = this._proxy.connect(
-                                       'g-properties-changed',
-                                       this._onPropertiesChanged.bind(this));
+            'g-properties-changed',
+            this._onPropertiesChanged.bind(this));
 
         this._nameWatcherId = Gio.DBus.session.watch_name(
-                                       'org.gnome.Pomodoro',
-                                       Gio.BusNameWatcherFlags.AUTO_START,
-                                       this._onNameAppeared.bind(this),
-                                       this._onNameVanished.bind(this));
+            'org.gnome.Pomodoro',
+            Gio.BusNameWatcherFlags.AUTO_START,
+            this._onNameAppeared.bind(this),
+            this._onNameVanished.bind(this));
     }
 
     _onNameAppeared() {
@@ -91,7 +95,7 @@ var Timer = class extends Signals.EventEmitter {
         this.emit('service-disconnected');
     }
 
-    _onPropertiesChanged(proxy, properties) {
+    _onPropertiesChanged(proxy, properties) {  // eslint-disable-line no-unused-vars
         const state = proxy.State;
         const stateDuration = proxy.StateDuration;
         const elapsed = proxy.Elapsed;
@@ -100,11 +104,10 @@ var Timer = class extends Signals.EventEmitter {
         if (this._state !== state || this._stateDuration !== stateDuration || this._elapsed > elapsed) {
             this._state = state;
             this._stateDuration = stateDuration;
-            this._elapsed = elapsed
+            this._elapsed = elapsed;
 
             this.emit('state-changed');
-        }
-        else {
+        } else {
             this._elapsed = elapsed;
         }
 
@@ -127,24 +130,24 @@ var Timer = class extends Signals.EventEmitter {
         if (error) {
             Utils.logWarning(error.message);
 
-            if (error.matches(Gio.DBusError, Gio.DBusError.SERVICE_UNKNOWN)) {
+            if (error.matches(Gio.DBusError, Gio.DBusError.SERVICE_UNKNOWN))
                 this._notifyServiceNotInstalled();
-            }
         }
     }
 
     getState() {
-        if (!this._connected || this._proxy.State === null) {
+        if (!this._connected || this._proxy.State === null)
             return State.NULL;
-        }
+
 
         return this._proxy.State;
     }
 
     setState(state, timestamp) {
-        this._proxy.SetStateRemote(state,
-                                   timestamp || 0,
-                                   this._onCallback.bind(this));
+        this._proxy.SetStateRemote(
+            state,
+            timestamp || 0,
+            this._onCallback.bind(this));
     }
 
     getStateDuration() {
@@ -152,9 +155,10 @@ var Timer = class extends Signals.EventEmitter {
     }
 
     setStateDuration(duration) {
-        this._proxy.SetStateDurationRemote(this._proxy.State,
-                                           duration,
-                                           this._onCallback.bind(this));
+        this._proxy.SetStateDurationRemote(
+            this._proxy.State,
+            duration,
+            this._onCallback.bind(this));
     }
 
     get stateDuration() {
@@ -162,9 +166,10 @@ var Timer = class extends Signals.EventEmitter {
     }
 
     set stateDuration(value) {
-        this._proxy.SetStateDurationRemote(this._proxy.State,
-                                           value,
-                                           this._onCallback.bind(this));
+        this._proxy.SetStateDurationRemote(
+            this._proxy.State,
+            value,
+            this._onCallback.bind(this));
     }
 
     getElapsed() {
@@ -174,17 +179,17 @@ var Timer = class extends Signals.EventEmitter {
     getRemaining() {
         let state = this.getState();
 
-        if (state === State.NULL) {
+        if (state === State.NULL)
             return 0.0;
-        }
+
 
         return Math.ceil(this._proxy.StateDuration - this._proxy.Elapsed);
     }
 
     getProgress() {
-        return (this._connected && this._proxy.StateDuration > 0)
-                ? this._proxy.Elapsed / this._proxy.StateDuration
-                : 0.0;
+        return this._connected && this._proxy.StateDuration > 0
+            ? this._proxy.Elapsed / this._proxy.StateDuration
+            : 0.0;
     }
 
     isPaused() {
@@ -216,16 +221,14 @@ var Timer = class extends Signals.EventEmitter {
     }
 
     toggle() {
-        if (this.getState() === State.NULL) {
+        if (this.getState() === State.NULL)
             this.start();
-        }
-        else {
+        else
             this.stop();
-        }
     }
 
     isBreak() {
-        let state = this.getState();
+        const state = this.getState();
 
         return state === State.SHORT_BREAK || state === State.LONG_BREAK;
     }
@@ -239,17 +242,18 @@ var Timer = class extends Signals.EventEmitter {
     }
 
     quit() {
-        this._proxy.QuitRemote((result, error) => {
+        this._proxy.QuitRemote((result, error) => {  // eslint-disable-line no-unused-vars
             Utils.disableExtension(Config.EXTENSION_UUID);
         });
     }
 
     _notifyServiceNotInstalled() {
-        Extension.extension.notifyIssue(_("Failed to run <i>%s</i> service").format(Config.PACKAGE_NAME));
+        const notification = new IssueNotification(_('Failed to run <i>%s</i> service').format(Config.PACKAGE_NAME));
+        notification.show();
     }
 
     destroy() {
-        if (this._propertiesChangedId != 0) {
+        if (this._propertiesChangedId) {
             this._proxy.disconnect(this._propertiesChangedId);
             this._propertiesChangedId = 0;
         }
@@ -259,17 +263,17 @@ var Timer = class extends Signals.EventEmitter {
             this._nameWatcherId = 0;
         }
     }
-};
+}
 
 
-var MonospaceLabel = GObject.registerClass({
+const MonospaceLabel = GObject.registerClass({
     Properties: {
         'text': GObject.ParamSpec.string('text', '', '',
-                                       GObject.ParamFlags.READWRITE,
-                                       ''),
+            GObject.ParamFlags.READWRITE,
+            ''),
         'text-align': GObject.ParamSpec.enum('text-align', '', '',
-                                       GObject.ParamFlags.READWRITE,
-                                       Pango.Alignment, Pango.Alignment.LEFT),
+            GObject.ParamFlags.READWRITE,
+            Pango.Alignment, Pango.Alignment.LEFT),
     },
 }, class PomodoroMonospaceLabel extends St.Widget {
     _init(params) {
@@ -303,6 +307,7 @@ var MonospaceLabel = GObject.registerClass({
         this._onNotifyTextAlign();
     }
 
+    // eslint-disable-next-line no-unused-vars
     vfunc_get_preferred_width(forHeight) {
         const themeNode = this.get_theme_node();
 
@@ -325,19 +330,18 @@ var MonospaceLabel = GObject.registerClass({
 
     _onNotifyTextAlign() {
         // St.Label doesn't support text-align through css, so alignment is done through allocation.
-        switch (this.text_align)
-        {
-            case Pango.Alignment.LEFT:
-                this._label.x_align = Clutter.ActorAlign.START;
-                break;
+        switch (this.text_align) {
+        case Pango.Alignment.LEFT:
+            this._label.x_align = Clutter.ActorAlign.START;
+            break;
 
-            case Pango.Alignment.CENTER:
-                this._label.x_align = Clutter.ActorAlign.CENTER;
-                break;
+        case Pango.Alignment.CENTER:
+            this._label.x_align = Clutter.ActorAlign.CENTER;
+            break;
 
-            case Pango.Alignment.RIGHT:
-                this._label.x_align = Clutter.ActorAlign.END;
-                break;
+        case Pango.Alignment.RIGHT:
+            this._label.x_align = Clutter.ActorAlign.END;
+            break;
         }
     }
 
@@ -357,7 +361,7 @@ var MonospaceLabel = GObject.registerClass({
 
 // Label widget that for longer text behaves like a normal label, but for short text
 // behaves like a monospace label.
-var SemiMonospaceLabel = GObject.registerClass(
+const SemiMonospaceLabel = GObject.registerClass(
 class PomodoroSemiMonospaceLabel extends MonospaceLabel {
     vfunc_get_preferred_width(forHeight) {
         const themeNode = this.get_theme_node();
@@ -366,15 +370,14 @@ class PomodoroSemiMonospaceLabel extends MonospaceLabel {
             const [minimumWidth, naturalWidth] = this._label.get_preferred_width(-1);
 
             return themeNode.adjust_preferred_width(minimumWidth, naturalWidth);
-        }
-        else {
+        } else {
             return super.vfunc_get_preferred_width(forHeight);
         }
     }
 });
 
 
-var TimerLabel = GObject.registerClass(
+export const TimerLabel = GObject.registerClass(
 class PomodoroTimerLabel extends St.BoxLayout {
     _init(timer, params) {
         params = Params.parse(params, {
@@ -396,19 +399,19 @@ class PomodoroTimerLabel extends St.BoxLayout {
         this._timerUpdateId = 0;
 
         this._minutesLabel = new SemiMonospaceLabel({
-            text: "0",
+            text: '0',
             text_align: Pango.Alignment.RIGHT,
         });
         this.add_actor(this._minutesLabel);
 
         this._separatorLabel = new St.Label({
-            text: ":",
+            text: ':',
         });
         this._separatorLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.add_actor(this._separatorLabel);
 
         this._secondsLabel = new MonospaceLabel({
-            text: "00",
+            text: '00',
             text_align: Pango.Alignment.LEFT,
         });
         this.add_actor(this._secondsLabel);
@@ -425,9 +428,8 @@ class PomodoroTimerLabel extends St.BoxLayout {
     }
 
     vfunc_map() {
-        if (!this._timerUpdateId) {
+        if (!this._timerUpdateId)
             this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
-        }
 
         this._updateLabels();
 
@@ -444,9 +446,8 @@ class PomodoroTimerLabel extends St.BoxLayout {
     }
 
     _updateLabels() {
-        if (this._timerState && this._timerState !== this._timer.getState()) {
+        if (this._timerState && this._timerState !== this._timer.getState())
             return;
-        }
 
         const remaining = Math.max(Math.round(this._timer.getRemaining()), 0);
         const minutes   = Math.floor(remaining / 60);

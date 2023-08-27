@@ -2,7 +2,7 @@ project(
   'gnome-pomodoro',
   ['vala', 'c'],
   version: '0.23.1',
-  meson_version: '>=0.49.0',
+  meson_version: '>=0.58.0',
 )
 
 i18n = import('i18n')

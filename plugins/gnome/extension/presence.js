@@ -18,28 +18,31 @@
  *
  */
 
-const Gio = imports.gi.Gio;
+import Gio from 'gi://Gio';
 
-const Main = imports.ui.main;
-const MessageTray = imports.ui.messageTray;
 
-const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Utils = Extension.imports.utils;
+import {MessageTray} from 'resource:///org/gnome/shell/ui/messageTray.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+
+import {State} from './timer.js';
+import * as Utils from './utils.js';
 
 
 /**
  * Helps in managing presence for GNOME Shell according to the Pomodoro state.
  */
-var Presence = class {
-    constructor() {
+export const PresenceManager = class {
+    constructor(timer) {
+        this.timer = timer;
+
         this._busy = false;
 
         // Setup a patch for suppressing presence handlers.
         // When applied the main presence controller becomes gnome-pomodoro.
-        this._patch = new Utils.Patch(MessageTray.MessageTray.prototype, {
-            _onStatusChanged(status) {
+        this._patch = new Utils.Patch(MessageTray.prototype, {
+            _onStatusChanged(status) {  // eslint-disable-line no-unused-vars
                 this._updateState();
-            }
+            },
         });
         this._patch.connect('applied', this._onPatchApplied.bind(this));
         this._patch.connect('reverted', this._onPatchReverted.bind(this));
@@ -47,17 +50,32 @@ var Presence = class {
         this._settings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.notifications',
         });
+
+        this.timer.connect('state-changed', this._onTimerStateChanged.bind(this));
+
+        this.update();
+    }
+
+    _onTimerStateChanged() {
+        this.update();
+    }
+
+    update() {
+        const timerState = this.timer.getState();
+
+        if (timerState === State.NULL)
+            this.setDefault();
+        else
+            this.setBusy(timerState === State.POMODORO);
     }
 
     setBusy(value) {
         this._busy = value;
 
-        if (!this._patch.applied) {
+        if (!this._patch.applied)
             this._patch.apply();
-        }
-        else {
+        else
             this._onPatchApplied();
-        }
 
         this._settings.set_boolean('show-banners', !value);
     }
@@ -65,17 +83,15 @@ var Presence = class {
     setDefault() {
         this._settings.set_boolean('show-banners', true);
 
-        if (this._patch.applied) {
+        if (this._patch.applied)
             this._patch.revert();
-        }
     }
 
     _onPatchApplied() {
         try {
             Main.messageTray._busy = this._busy;
             Main.messageTray._onStatusChanged();
-        }
-        catch (error) {
+        } catch (error) {
             Utils.logWarning(error.message);
         }
     }
@@ -85,8 +101,7 @@ var Presence = class {
             const status = Main.messageTray._presence.status;
 
             Main.messageTray._onStatusChanged(status);
-        }
-        catch (error) {
+        } catch (error) {
             Utils.logWarning(error.message);
         }
     }

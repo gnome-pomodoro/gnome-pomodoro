@@ -16,7 +16,7 @@
  */
 
 .extension-pomodoro-indicator .system-status-icon {
-    padding: 0;  /* default theme enlarges allocation by padding, which doesn't play nice with the DrawingArea */
+    padding: 0;  /* default theme enlarges allocation with padding, which doesn't play nice with the DrawingArea */
     margin: 0 5px;
 }
 
@@ -38,6 +38,10 @@
     height: 36px;
 }
 
+.extension-pomodoro-indicator-menu .popup-menu-item > StLabel:first-child {
+    padding-left: 16px;
+}
+
 .extension-pomodoro-toggle-menu-item {
     color: inherit;
     margin-top: 5px;
@@ -54,8 +58,7 @@
     color: inherit;
     margin-top: 5px;
     margin-bottom: 3px;
-    padding: 0;
-    padding-right: 10px;
+    padding: 0 10px 0 16px;
     spacing: 0;
 }
 
