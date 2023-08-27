@@ -78,9 +78,13 @@ export default class PomodoroExtension extends Extension {
 
     setMode(mode) {
         const previousMode = this.mode;
+        const hideSystemNotifications = this.pluginSettings.get_boolean('hide-system-notifications');
 
         if (this.mode !== mode) {
             this.mode = mode;
+
+            if (hideSystemNotifications)
+                this._enablePresence();
 
             if (mode === ExtensionMode.RESTRICTED) {
                 this._disableIndicator();
@@ -94,9 +98,7 @@ export default class PomodoroExtension extends Extension {
                 this._enableKeybinding();
             }
 
-            if (this.pluginSettings.get_boolean('hide-system-notifications'))
-                this._enablePresence();
-            else
+            if (!hideSystemNotifications)
                 this._disablePresence();
         }
     }
