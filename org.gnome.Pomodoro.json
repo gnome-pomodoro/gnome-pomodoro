@@ -64,7 +64,7 @@
             "sources": [
                 {
                     "type": "git",
-                    "branch": "master",
+                    "branch": "1.36",
                     "url": "https://gitlab.gnome.org/GNOME/libpeas.git"
                 }
             ]
@@ -83,9 +83,23 @@
                 }
             ]
         },
+                {
+            "name": "libcanberra",
+            "buildsystem": "autotools",
+            "config-opts": [
+                "--prefix=/app"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "branch": "master",
+                    "url": "git://git.0pointer.net/libcanberra.git"
+                }
+            ]
+        },
         {
             "name": "gnome-pomodoro",
-            "buildsystem": "autotools",
+            "buildsystem": "meson",
             "sources": [
                 {
                     "type": "file",
