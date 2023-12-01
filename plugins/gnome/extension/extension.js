@@ -248,7 +248,13 @@ export default class PomodoroExtension extends Extension {
     }
 
     _connectSignals() {
-        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', () => this._updateMode());
+        this._sessionModeUpdatedId = Main.sessionMode.connect('updated', () => {
+            try {
+                this._updateMode();
+            } catch (error) {
+                Utils.logError(error);
+            }
+        });
     }
 
     _disconnectSignals() {
