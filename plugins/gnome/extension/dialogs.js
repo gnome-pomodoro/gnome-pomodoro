@@ -250,10 +250,7 @@ class OverlayManager {
 
     _destroyOverlayGroup() {
         if (this._overlayGroup) {
-            for (const overlayData of this._overlayActors)
-                this._overlayGroup.remove_actor(overlayData.actor);
-
-
+            this._overlayGroup.remove_all_children ();
             global.stage.remove_actor(this._overlayGroup);
             this._overlayGroup = null;
         }
@@ -337,7 +334,6 @@ class OverlayManager {
 
         if (visibleCount > 0)
             this._raiseChrome();
-
         else
             this._lowerChrome();
     }
