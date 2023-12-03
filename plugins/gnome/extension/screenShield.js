@@ -447,7 +447,7 @@ export class ScreenShieldManager extends EventEmitter {
 
         this._unscheduleAnnoucement();
 
-        if (!isPaused)
+        if (timerState !== State.NULL && !isPaused)
             this._scheduleAnnoucement();
 
         if (timerState !== State.NULL) {
