@@ -370,7 +370,7 @@ export class ScreenShieldManager extends EventEmitter {
         this._timerPausedId = this._timer.connect('paused', this._onTimerPaused.bind(this));
         this._timerResumedId = this._timer.connect('resumed', this._onTimerResumed.bind(this));
 
-        this._onTimerStateChanged();
+        this._refresh();
     }
 
     get timer() {
@@ -441,12 +441,9 @@ export class ScreenShieldManager extends EventEmitter {
         }
     }
 
-    _onTimerStateChanged() {
+    _refresh() {
         const timerState = this._timer.getState();
         const isPaused = this._timer.isPaused();
-
-        if (timerState !== this._timerState)
-            Utils.wakeUpScreen();
 
         this._unscheduleAnnoucement();
 
@@ -459,6 +456,16 @@ export class ScreenShieldManager extends EventEmitter {
             this._widget.destroy();
             this._widget = null;
         }
+    }
+
+    _onTimerStateChanged() {
+        const timerState = this._timer.getState();
+
+        // skip waking up if previous state was unknown
+        if (timerState !== this._timerState && this._timerState !== null)
+            Utils.wakeUpScreen();
+
+        this._refresh();
 
         this._timerState = timerState;
     }
