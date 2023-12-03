@@ -361,9 +361,8 @@ export class ScreenShieldManager extends EventEmitter {
         super();
 
         this._timer = timer;
-        this._timerState = State.NULL;
+        this._timerState = null;
         this._widget = null;
-        this._previousTimerState = State.NULL;
         this._destroying = false;
 
         this._annoucementTimeoutId = 0;
@@ -460,6 +459,8 @@ export class ScreenShieldManager extends EventEmitter {
             this._widget.destroy();
             this._widget = null;
         }
+
+        this._timerState = timerState;
     }
 
     _onTimerPaused() {
