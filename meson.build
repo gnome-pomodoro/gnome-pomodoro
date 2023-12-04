@@ -1,7 +1,7 @@
 project(
   'gnome-pomodoro',
   ['vala', 'c'],
-  version: '0.24.1',
+  version: '0.24.2',
   meson_version: '>=0.58.0',
 )
 
