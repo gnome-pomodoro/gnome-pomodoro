@@ -108,6 +108,7 @@ namespace Pomodoro
             return null;
         }
 
+        /*
         private unowned Pomodoro.Lightbox? get_window_for_monitor (Gdk.Monitor monitor)
         {
             unowned Pomodoro.Lightbox? found_window = null;
@@ -140,15 +141,23 @@ namespace Pomodoro
 
             this.window_group.add_window (window);
 
+            //var monitor_gemoetry = monitor.get_geometry ();
+            //window.move (monitor_gemoetry.x, monitor_gemoetry.y);
+            //window.resize (monitor_gemoetry.width, monitor_gemoetry.height);
+
             // Keep in mind that new window may steal focus from the main overlay.
             window.present ();
         }
+        */
 
         private void update_windows ()
         {
+            debug ("### update_windows");
+
             // Place main overlay window on primary monitor.
             this.monitor = this.get_primary_monitor ();
 
+            /*
             // Track which of windows and monitors do not have a valid pair.
             var unmapped_windows = new GLib.GenericSet<unowned Gtk.Window> (GLib.direct_hash,
                                                                             GLib.direct_equal);
@@ -198,6 +207,7 @@ namespace Pomodoro
                 (monitor) => {
                     this.create_window (monitor);
                 });
+            */
         }
 
         private void queue_update_windows ()
