@@ -713,10 +713,6 @@ namespace Pomodoro
 
             this.save_timer ();
 
-            foreach (var window in this.get_windows ()) {
-                this.remove_window (window);
-            }
-
             this.capabilities.disable_all ();
 
             var engine = Peas.Engine.get_default ();
@@ -732,6 +728,10 @@ namespace Pomodoro
             }
             catch (GLib.Error error) {
             }
+
+            this.window = null;
+            this.preferences_dialog = null;
+            this.about_dialog = null;
 
             base.shutdown ();
 
