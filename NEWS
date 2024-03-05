@@ -1,3 +1,9 @@
+2024-03-05  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.25.0:
+
+	* Support for GNOME Shell 46
+	* Adjust build script to meson 0.59.0 (thanks @mattst88)
+
 2023-12-04  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.24.1:
 

@@ -44,6 +44,15 @@
   <translation type="gettext">gnome-pomodoro</translation>
   <content_rating type="oars-1.1" />
   <releases>
+      <release version="0.25.0" date="2024-03-05">
+      <description translatable="no">
+        <p>Overview of changes in gnome-pomodoro 0.25.0</p>
+        <ul>
+          <li>Support for GNOME Shell 46</li>
+          <li>Adjust build script to meson 0.59.0 (thanks @mattst88)</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.24.1" date="2023-12-04">
       <description translatable="no">
         <p>Overview of changes in gnome-pomodoro 0.24.1</p>
