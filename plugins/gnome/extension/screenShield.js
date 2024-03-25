@@ -46,29 +46,29 @@ class PomodoroScreenShieldWidget extends St.Widget {
             vertical: true,
             x_expand: true,
         });
-        this.add_actor(vbox);
+        this.add_child(vbox);
 
         const hbox = new St.BoxLayout();
-        vbox.add_actor(hbox);
+        vbox.add_child(hbox);
 
         const contentBox = new St.BoxLayout({
             style_class: 'extension-pomodoro-widget-content',
             vertical: true,
             x_expand: true,
         });
-        hbox.add_actor(contentBox);
+        hbox.add_child(contentBox);
 
         const blinkingGroup = new Utils.TransitionGroup();
 
         const titleLabel = new St.Label({style_class: 'extension-pomodoro-widget-title'});
-        contentBox.add_actor(titleLabel);
+        contentBox.add_child(titleLabel);
 
         const messageLabel = new St.Label({style_class: 'extension-pomodoro-widget-message', text: '15 minutes remaining'});
-        contentBox.add_actor(messageLabel);
+        contentBox.add_child(messageLabel);
         blinkingGroup.addActor(messageLabel);
 
         const buttonsBox = new St.BoxLayout();
-        hbox.add_actor(buttonsBox);
+        hbox.add_child(buttonsBox);
 
         const pauseResumeButton = this._createIconButton('gnome-pomodoro-pause-symbolic', _('Pause Timer'));
         pauseResumeButton.connect('clicked',
@@ -79,7 +79,7 @@ class PomodoroScreenShieldWidget extends St.Widget {
                 else
                     this._timer.resume();
             });
-        buttonsBox.add_actor(pauseResumeButton);
+        buttonsBox.add_child(pauseResumeButton);
         blinkingGroup.addActor(pauseResumeButton);
 
         const skipStopButton = this._createIconButton('gnome-pomodoro-stop-symbolic', _('Stop Timer'));
@@ -90,7 +90,7 @@ class PomodoroScreenShieldWidget extends St.Widget {
                 else
                     this._timer.stop();
             });
-        buttonsBox.add_actor(skipStopButton);
+        buttonsBox.add_child(skipStopButton);
 
         this._blinkingGroup = blinkingGroup;
         this._titleLabel = titleLabel;

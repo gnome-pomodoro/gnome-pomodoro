@@ -226,7 +226,7 @@ class OverlayManager {
                 name: 'overlayGroup',
                 reactive: false,
             });
-            global.stage.add_actor(this._overlayGroup);
+            global.stage.add_child(this._overlayGroup);
             global.stage.set_child_above_sibling(this._overlayGroup, null);
         }
 
@@ -245,13 +245,13 @@ class OverlayManager {
         }
 
         for (const overlayData of this._overlayActors)
-            this._overlayGroup.add_actor(overlayData.actor);
+            this._overlayGroup.add_child(overlayData.actor);
     }
 
     _destroyOverlayGroup() {
         if (this._overlayGroup) {
             this._overlayGroup.remove_all_children ();
-            global.stage.remove_actor(this._overlayGroup);
+            global.stage.remove_child(this._overlayGroup);
             this._overlayGroup = null;
         }
 
@@ -269,8 +269,8 @@ class OverlayManager {
         } else {
             chromeData.actor.ref();
             try {
-                Main.layoutManager.uiGroup.remove_actor(chromeData.actor);
-                global.stage.add_actor(chromeData.actor);
+                Main.layoutManager.uiGroup.remove_child(chromeData.actor);
+                global.stage.add_child(chromeData.actor);
             } finally {
                 chromeData.actor.unref();
             }
@@ -294,8 +294,8 @@ class OverlayManager {
         } else {
             chromeData.actor.ref();
             try {
-                global.stage.remove_actor(chromeData.actor);
-                Main.layoutManager.uiGroup.add_actor(chromeData.actor);
+                global.stage.remove_child(chromeData.actor);
+                Main.layoutManager.uiGroup.add_child(chromeData.actor);
             } finally {
                 chromeData.actor.unref();
             }
@@ -451,7 +451,7 @@ const ModalDialog = GObject.registerClass({
         // size requests.
         this._layout = new St.Widget({layout_manager: new Clutter.BinLayout()});
         this._layout.add_constraint(this._monitorConstraint);
-        this.add_actor(this._layout);
+        this.add_child(this._layout);
 
         // Lightbox will be a direct child of the ModalDialog
         this._lightbox = extension.pluginSettings.get_boolean('blur-effect')
@@ -946,9 +946,9 @@ class PomodoroEndDialog extends ModalDialog {
             style_class: 'extension-pomodoro-dialog-box',
             vertical: true,
         });
-        box.add_actor(this._timerLabel);
-        box.add_actor(this._descriptionLabel);
-        this._layout.add_actor(box);
+        box.add_child(this._timerLabel);
+        box.add_child(this._descriptionLabel);
+        this._layout.add_child(box);
 
         this._timerStateChangedId = this._timer.connect('state-changed', this._onTimerStateChanged.bind(this));
 

@@ -181,7 +181,7 @@ const IndicatorMenu = class extends PopupMenu.PopupMenu {
                 else
                     this._onResumeClicked();
             });
-        buttonsBox.add_actor(pauseResumeButton);
+        buttonsBox.add_child(pauseResumeButton);
 
         const skipStopButton = this._createIconButton('gnome-pomodoro-stop-symbolic', _('Stop Timer'));
         skipStopButton.connect('clicked',
@@ -191,7 +191,7 @@ const IndicatorMenu = class extends PopupMenu.PopupMenu {
                 else
                     this._onStopClicked();
             });
-        buttonsBox.add_actor(skipStopButton);
+        buttonsBox.add_child(skipStopButton);
 
         const blinkingGroup = this._indicator.blinkingGroup;
         blinkingGroup.addActor(timerLabel);
@@ -731,7 +731,7 @@ class PomodoroIndicator extends PanelMenu.Button {
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
         });
-        this.add_actor(this._iconBox);
+        this.add_child(this._iconBox);
 
         this._blinking = false;
         this._blinkingGroup = new Utils.TransitionGroup();
