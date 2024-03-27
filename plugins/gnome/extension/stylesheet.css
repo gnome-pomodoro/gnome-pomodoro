@@ -32,12 +32,6 @@
     background-color: transparent;
 }
 
-.extension-pomodoro-indicator-menu .icon-button {
-    padding: 0;
-    width: 36px;
-    height: 36px;
-}
-
 .extension-pomodoro-indicator-menu .popup-menu-item > StLabel:first-child {
     padding-left: 16px;
 }
