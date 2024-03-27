@@ -28,7 +28,7 @@ import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
 import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
 import {PomodoroClient} from './dbus.js';
-import {IssueNotification} from './notifications.js';
+import {IssueNotification, getDefaultSource} from './notifications.js';
 import * as Config from './config.js';
 import * as Utils from './utils.js';
 
@@ -248,8 +248,9 @@ export class Timer extends EventEmitter {
     }
 
     _notifyServiceNotInstalled() {
+        const source = new getDefaultSource();
         const notification = new IssueNotification(_('Failed to run <i>%s</i> service').format(Config.PACKAGE_NAME));
-        notification.show();
+        source.addNotification(notification);
     }
 
     destroy() {

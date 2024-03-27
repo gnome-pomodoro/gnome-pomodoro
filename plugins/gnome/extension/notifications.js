@@ -22,15 +22,13 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 
-import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
 import {trySpawnCommandLine} from 'resource:///org/gnome/shell/misc/util.js';
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
-import * as Calendar from 'resource:///org/gnome/shell/ui/calendar.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import * as Params from 'resource:///org/gnome/shell/misc/params.js';
+import * as Signals from 'resource:///org/gnome/shell/misc/signals.js';
 
-import {extension} from './extension.js';
 import {PomodoroEndDialog, DialogState} from './dialogs.js';
 import {State} from './timer.js';
 import * as Config from './config.js';
@@ -51,16 +49,20 @@ let source = null;
 
 
 /**
- *
+ * The source that should be used for our notifications.
  */
-function getDefaultSource() {
+export function getDefaultSource() {
     if (!source) {
-        source = new Source();
-        source.connect('destroy',
-            _source => {
-                if (_source === source)
-                    source = null;
-            });
+        source = new MessageTray.Source({
+            title: _('Pomodoro Timer'),
+            iconName: ICON_NAME,
+            policy: new NotificationPolicy(),
+        });
+
+        source.connect('destroy', () => {
+            source = null;
+        });
+        Main.messageTray.add(source);
     }
 
     return source;
@@ -113,332 +115,51 @@ class PomodoroNotificationPolicy extends MessageTray.NotificationPolicy {
 });
 
 
-const Source = GObject.registerClass(
-class PomodoroSource extends MessageTray.Source {
-    _init() {
-        super._init(_('Pomodoro Timer'), ICON_NAME);
-    }
-
-    /* override parent method */
-    _createPolicy() {
-        return new NotificationPolicy();
-    }
-});
-
-
 export const Notification = GObject.registerClass({
     Properties: {
-        // TODO: timer should be a property
-        'view': GObject.ParamSpec.int('view', 'view', 'view',
+        'view': GObject.ParamSpec.int('view', '', '',
             GObject.ParamFlags.READWRITE,
-            Math.min(...Object.values(NotificationView)),
-            Math.max(...Object.values(NotificationView)),
+            0,
+            GLib.MAXINT32,
             NotificationView.NULL),
     },
 },
 class PomodoroNotification extends MessageTray.Notification {
-    _init(timer) {
-        super._init(null, '', null, null);
+    constructor(timer, params) {
+        params = Params.parse(params, {
+            source: getDefaultSource(),
+            useBodyMarkup: false,
+        });
+
+        super(params);
 
         // Notification will update its contents.
-        this.setResident(true);
+        this.resident = true;
 
         // Notification should not expire while the timer is running.
-        this.setTransient(false);
+        this.isTransient = false;
 
         // Show notification regardless of session busy status.
-        this.setForFeedback(true);
+        this.forFeedback = true;
+
+        // Hide notification on screen shield.
+        this.privacyScope = MessageTray.PrivacyScope.USER;
 
         // We want notifications to be shown right after the action,
         // therefore urgency bump.
-        this.setUrgency(MessageTray.Urgency.HIGH);
+        this.urgency = MessageTray.Urgency.HIGH;
 
         this._timer = timer;
-    }
-
-    get timer() {
-        return this._timer;
-    }
-
-    // `createBanner()` is used only to display a notification popup.
-    // Banners in calendar menu or the lock screen are made by GNOME Shell.
-    createBanner() {
-        let idleId = 0;
-
-        const banner = new NotificationBanner(this);
-
-        // We keep notification as resident to keep banner visible. Once we want to hide the banner
-        // we need to update the notification.
-        // Note that `notify::mapped` will be triggered when we're moving MessageTray above the dialog.
-        banner.connect('notify::mapped', () => {
-            if (idleId) {
-                GLib.source_remove(idleId);
-                idleId = 0;
-            }
-
-            if (!banner.mapped) {
-                idleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-                    idleId = 0;
-
-                    // TODO: this should be handled by NotificationManager
-                    if (this.resident && extension.notificationManager)
-                        extension.notificationManager._updateNotification();
-
-
-                    return GLib.SOURCE_REMOVE;
-                });
-                GLib.Source.set_name_by_id(idleId, '[gnome-shell] banner._onNotifyMapped()');
-            }
-        });
-
-        return banner;
-    }
-
-    show() {
-        if (!this.source)
-            this.source = getDefaultSource();
-
-
-        if (this.source) {
-            this.acknowledged = false;
-
-            if (!Main.messageTray.contains(this.source))
-                Main.messageTray.add(this.source);
-
-            this.source.showNotification(this);
-        } else {
-            Utils.logWarning('Called Notification.show() after destroy()');
-        }
-    }
-});
-
-
-const NotificationBanner = GObject.registerClass(
-class PomodoroNotificationBanner extends MessageTray.NotificationBanner {
-    _init(notification) {
-        super._init(notification);
-
-        this._timer = notification.timer;
-        this._view = NotificationView.NULL;
-        this._timerState = null;
-        this._skipBreakButton = null;
-        this._extendButton = null;
-        this._updateActionsBlocked = false;
-        this._timerUpdateId = 0;
-
-        this._notificationUpdatedId = this.notification.connect('updated', this._onNotificationUpdated.bind(this));
-
-        this.notification.connectObject(
-            'destroy', reason => {  // eslint-disable-line no-unused-vars
-                if (this._notificationUpdatedId) {
-                    notification.disconnect(this._notificationUpdatedId);
-                    this._notificationUpdatedId = 0;
-                }
-
-                if (this._timerUpdateId) {
-                    this._timer.disconnect(this._timerUpdateId);
-                    this._timerUpdateId = 0;
-                }
-            }
-        );
-
-        this._onNotificationUpdated();
-    }
-
-    get timer() {
-        return this._timer;
-    }
-
-    /* override parent method */
-    canClose() {
-        return false;
-    }
-
-    _blockUpdateActions() {
-        if (!this._updateActionsBlocked)
-            this._updateActionsBlocked = true;
-    }
-
-    _updateTitle() {
-        let title;
-        const isStarting = this._timer.getElapsed() < ANNOUCEMENT_TIME;
-
-        switch (this._view) {
-        case NotificationView.POMODORO:
-            title = isStarting ? _('Pomodoro') : State.label(this._timerState);
-            break;
-
-        case NotificationView.POMODORO_ABOUT_TO_END:
-            title = _('Pomodoro is about to end');
-            break;
-
-        case NotificationView.BREAK:
-            if (isStarting) {
-                title = this._timerState === State.LONG_BREAK
-                    ? _('Take a long break')
-                    : _('Take a short break');
-            } else {
-                title = State.label(this._timerState);
-            }
-            break;
-
-        case NotificationView.BREAK_ABOUT_TO_END:
-            title = _('Break is about to end');
-            break;
-
-        case NotificationView.BREAK_ENDED:
-            title = _('Break is over');
-            break;
-
-        default:
-            title = State.label(this._timerState);
-            break;
-        }
-
-        this.setTitle(title);
-    }
-
-    _updateBody() {
-        let body;
-
-        if (this._timer.getState() !== this._timerState)
-            return;
-
-        switch (this._view) {
-        case NotificationView.POMODORO:
-        case NotificationView.POMODORO_ABOUT_TO_END:
-        case NotificationView.BREAK:
-        case NotificationView.BREAK_ABOUT_TO_END:
-            body = formatRemainingTime(this._timer.getRemaining());
-            break;
-
-        case NotificationView.BREAK_ENDED:
-            body = _('Get ready…');
-            break;
-
-        default:
-            body = '';
-            break;
-        }
-
-        this.setBody(body);
-    }
-
-    _updateActions() {
-        // Currently we display only one variant of buttons across all notification views.
-
-        const hasButtons = this._skipBreakButton !== null && this._extendButton !== null;
-        const showButtons =
-            this._view === NotificationView.POMODORO_ABOUT_TO_END ||
-            this._view === NotificationView.BREAK ||
-            this._view === NotificationView.BREAK_ABOUT_TO_END;
-        if (hasButtons === showButtons)
-            return;
-
-        if (showButtons) {
-            this._skipBreakButton = this.addAction(_('Skip Break'), () => {
-                this._timer.setState(State.POMODORO);
-            });
-            this._extendButton = this.addAction(_('+1 Minute'), () => {
-                this._blockUpdateActions();
-                this._timer.stateDuration += 60.0;
-            });
-        } else {
-            this._skipBreakButton.destroy();
-            this._extendButton.destroy();
-
-            this._skipBreakButton = null;
-            this._extendButton = null;
-        }
-    }
-
-    _onNotificationUpdated() {
-        const timerState = this._timer.getState();
-        const view = this.notification.view;
-
-        // Don't update actions when "+1 Minute" was clicked.
-        let updateActions = !this._updateActionsBlocked;
-
-        if (timerState === State.NULL || !view)
-            return;
-
-        if (this._timerState !== timerState) {
-            this._timerState = timerState;
-            updateActions = true;
-        }
-
-        if (this._view !== view)
-            this._view = view;
+        this._timerState = this._timer.getState();
+        this._isPaused = this._timer.isPaused();
 
         this._updateTitle();
         this._updateBody();
 
-        if (updateActions) {
-            if (this.expanded && !this.hover)
-                this.unexpand();
-
-
-            this._updateActions();
-        }
-
-        this._updateActionsBlocked = false;
-    }
-
-    _onTimerUpdate() {
-        this._updateBody();
-    }
-
-    vfunc_map() {
         if (!this._timerUpdateId)
             this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
 
-        this._onTimerUpdate();
-
-        super.vfunc_map();
-    }
-
-    vfunc_unmap() {
-        if (this._timerUpdateId) {
-            this._timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
-        }
-
-        super.vfunc_unmap();
-    }
-
-    _onDestroy() {
-        if (this.notification && this._notificationUpdatedId) {
-            this.notification.disconnect(this._notificationUpdatedId);
-            this._notificationUpdatedId = 0;
-        }
-
-        if (this._timerUpdateId) {
-            this._timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
-        }
-
-        super._onDestroy();
-    }
-});
-
-
-const NotificationMessage = GObject.registerClass(
-class PomodoroNotificationMessage extends Calendar.NotificationMessage {
-    _init(notification) {
-        super._init(notification);
-
-        this._timer = notification.timer;
-        this._timerState = null;
-        this._isPaused = false;
-
-        this.setUseBodyMarkup(false);
-
-        // Reclaim space used by unused elements.
-        this._secondaryBin.hide();
-        this._closeButton.hide();
-
-        this.notification.connectObject(
-            'updated', this._onNotificationUpdated.bind(this),
+        this.connect(
             'destroy', () => {
                 if (this._timerUpdateId) {
                     this._timer.disconnect(this._timerUpdateId);
@@ -446,25 +167,29 @@ class PomodoroNotificationMessage extends Calendar.NotificationMessage {
                 }
             }
         );
-
-        this._onNotificationUpdated();
     }
 
-    /* override parent method */
-    canClose() {
-        return false;
+    get timer() {
+        return this._timer;
+    }
+
+    get datetime() {
+        return null;
+    }
+
+    set datetime(value) {
     }
 
     _updateTitle() {
-        this.setTitle(State.label(this._timerState));
+        this.title = State.label(this._timerState);
     }
 
     _updateBody() {
         if (this._timer.getState() === this._timerState)
-            this.setBody(formatRemainingTime(this._timer.getRemaining()));
+            this.body = formatRemainingTime(this._timer.getRemaining());
     }
 
-    _onNotificationUpdated() {
+    _onTimerUpdate() {
         const timerState = this._timer.getState();
         const isPaused = this._timer.isPaused();
 
@@ -474,68 +199,46 @@ class PomodoroNotificationMessage extends Calendar.NotificationMessage {
         this._timerState = timerState;
         this._isPaused = isPaused;
 
-        this._updateTitle();
         this._updateBody();
     }
 
-    _onTimerUpdate() {
-        this._updateBody();
-    }
-
-    /* override parent method */
-    _onUpdated(n, clear) {  // eslint-disable-line no-unused-vars
-    }
-
-    vfunc_clicked() {
-        super.vfunc_clicked();
-
-        Main.panel.closeCalendar();
-    }
-
-    vfunc_map() {
-        if (!this._timerUpdateId)
-            this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
-
-        this._onTimerUpdate();
-
-        super.vfunc_map();
-    }
-
-    vfunc_unmap() {
-        if (this._timerUpdateId) {
-            this._timer.disconnect(this._timerUpdateId);
-            this._timerUpdateId = 0;
+    show() {
+        if (!this.source) {
+            Utils.logWarning('Called Notification.show() after destroy()');
+            return;
         }
 
-        super.vfunc_unmap();
+        if (this.source.notifications.includes(this)) {
+            this.acknowledged = false;
+            this.source.emit('notification-request-banner', this);
+        } else {
+            this.source.addNotification(this);
+        }
     }
 });
 
 
 export const IssueNotification = GObject.registerClass(
 class PomodoroIssueNotification extends MessageTray.Notification {
-    _init(message) {
-        super._init(getDefaultSource(), _('Pomodoro Timer'), message, {bannerMarkup: true});
-
-        this.setTransient(true);
-        this.setUrgency(MessageTray.Urgency.HIGH);
+    constructor(message) {
+        super({
+            source: getDefaultSource(),
+            title: _('Pomodoro Timer'),
+            body: message,
+            urgency: MessageTray.Urgency.HIGH,
+            isTransient: true,
+            useBodyMarkup: true,
+        });
 
         this.addAction(_('Report issue'), () => {
             trySpawnCommandLine(`xdg-open ${GLib.shell_quote(Config.PACKAGE_BUGREPORT)}`);
             this.destroy();
         });
     }
-
-    show() {
-        if (!Main.messageTray.contains(this.source))
-            Main.messageTray.add(this.source);
-
-        this.source.showNotification(this);
-    }
 });
 
 
-export const NotificationManager = class extends EventEmitter {
+export const NotificationManager = class extends Signals.EventEmitter {
     constructor(timer, params) {
         params = Params.parse(params, {
             useDialog: true,
@@ -553,7 +256,6 @@ export const NotificationManager = class extends EventEmitter {
         this._previousView = NotificationView.NULL;
         this._previousTimerState = State.NULL;
         this._patches = this._createPatches();
-        this._notificationSectionPatch = null;
         this._animate = params.animate;
         this._initialized = false;
         this._destroying = false;
@@ -595,49 +297,6 @@ export const NotificationManager = class extends EventEmitter {
         this._useDialog = value;
     }
 
-    // Replace notification banner under date menu with our own `NotificationMessage`.
-    _patchNotificationSection() {
-        const notificationSection = Main.panel?.statusArea.dateMenu?._messageList?._notificationSection;
-
-        if (this._notificationSectionPatch) {
-            this._notificationSectionPatch.destroy();
-            this._notificationSectionPatch = null;
-        }
-
-        if (!notificationSection)
-            return;
-
-        const notificationSectionPatch = new Utils.Patch(notificationSection, {
-            addMessageAtIndex(message, index, animate) {
-                const notification = message.notification;
-                const isUrgent = notification.urgency === MessageTray.Urgency.CRITICAL;
-
-                if ((notification instanceof Notification) && !(message instanceof NotificationMessage)) {
-                    // undo what _onNotificationAdded has done
-                    notification.disconnectObject(this);
-
-                    message = new NotificationMessage(message.notification);
-                    index = this._nUrgent;
-                    animate = this.mapped;
-
-                    notification.connectObject(
-                        'destroy', () => {
-                            if (isUrgent)
-                                this._nUrgent--;
-                        },
-                        'updated', () => {
-                            this.moveMessage(message, this._nUrgent, this.mapped);
-                        }, this);
-                }
-
-                notificationSectionPatch.initial.addMessageAtIndex.bind(this)(message, index, animate);
-            },
-        });
-        notificationSectionPatch.apply();
-
-        this._notificationSectionPatch = notificationSectionPatch;
-    }
-
     _createPatches() {
         const messagesIndicatorPatch = new Utils.Patch(Main.panel.statusArea.dateMenu._indicator, {
             _sync() {
@@ -662,21 +321,9 @@ export const NotificationManager = class extends EventEmitter {
             },
         });
 
-        const messageListPatch = new Utils.Patch(Calendar.CalendarMessageList.prototype, {});
-        messageListPatch.connect('applied', () => {
-            this._patchNotificationSection();
-        });
-        messageListPatch.connect('reverted', () => {
-            if (this._notificationSectionPatch) {
-                this._notificationSectionPatch.destroy();
-                this._notificationSectionPatch = null;
-            }
-        });
-
         return [
             messagesIndicatorPatch,
             messageTrayPatch,
-            messageListPatch,
         ];
     }
 
@@ -835,7 +482,7 @@ export const NotificationManager = class extends EventEmitter {
         // Use Urgency.CRITICAL to force notification banner to stay open.
         const urgency = isUrgent ? MessageTray.Urgency.CRITICAL : MessageTray.Urgency.HIGH;
         if (notification.urgency !== urgency) {
-            notification.setUrgency(urgency);
+            notification.urgency = urgency;
             changed = true;
         }
 
@@ -843,7 +490,7 @@ export const NotificationManager = class extends EventEmitter {
             view === NotificationView.POMODORO ||
             view === NotificationView.NULL;
         if (notification.isTransient !== isTransient) {
-            notification.setTransient(isTransient);
+            notification.isTransient = isTransient;
             changed = true;
         }
 
@@ -851,9 +498,9 @@ export const NotificationManager = class extends EventEmitter {
             view === NotificationView.POMODORO_ABOUT_TO_END ||
             view === NotificationView.BREAK_ABOUT_TO_END ||
             view === NotificationView.BREAK_ENDED;
-        const isResident = (!isTransient || forceResident) && view !== NotificationView.NULL;
-        if (notification.resident !== isResident) {
-            notification.setResident(isResident);
+        const resident = (!isTransient || forceResident) && view !== NotificationView.NULL;
+        if (notification.resident !== resident) {
+            notification.resident = resident;
             changed = true;
         }
 
@@ -863,12 +510,12 @@ export const NotificationManager = class extends EventEmitter {
         }
 
         const title = State.label(timerState);
-        if (notification.title !== title)
+        if (notification.title !== title) {
+            notification.title = title;
             changed = true;
+        }
 
         if (changed) {
-            notification.update(title, '', {});
-
             if (Main.messageTray._notification === notification && isTransient)
                 Main.messageTray._updateNotificationTimeout(MIN_DISPLAY_TIME);
 
@@ -903,12 +550,14 @@ export const NotificationManager = class extends EventEmitter {
         const notification = this._notification;
         const banner = Main.messageTray._banner?.notification === notification ? Main.messageTray._banner : null;
 
-        notification.acknowledged = true;
-        notification.setTransient(true);
-        notification.setResident(false);
-        notification.setUrgency(MessageTray.Urgency.HIGH);
-
         if (banner && banner.mapped) {
+            notification.acknowledged = true;
+            notification.isTransient = true;
+            notification.resident = false;
+
+            if (notification.urgency === MessageTray.Urgency.CRITICAL)
+                notification.urgency = MessageTray.Urgency.HIGH;
+
             let destroyId = notification.connect('destroy', () => {
                 if (destroyId) {
                     notification.disconnect(destroyId);
@@ -930,8 +579,6 @@ export const NotificationManager = class extends EventEmitter {
         } else {
             notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
         }
-
-        this._notification = null;
     }
 
     _doNotify() {
