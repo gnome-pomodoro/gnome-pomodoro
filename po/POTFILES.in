@@ -27,7 +27,6 @@ plugins/gnome/extension/extension.js
 plugins/gnome/extension/indicator.js
 plugins/gnome/extension/notifications.js
 plugins/gnome/extension/presence.js
-plugins/gnome/extension/settings.js
 plugins/gnome/extension/timer.js
 plugins/gnome/extension/utils.js
 plugins/gnome/gnome-idle-monitor.vala
