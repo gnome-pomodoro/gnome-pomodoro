@@ -2,7 +2,7 @@
   "uuid": "@EXTENSION_UUID@",
   "name": "Pomodoro",
   "description": "Desktop integration for Pomodoro application.",
-  "shell-version": ["45", "46"],
+  "shell-version": ["46"],
   "session-modes": ["user", "unlock-dialog"],
   "gettext-domain": "@GETTEXT_PACKAGE@",
   "url": "@PACKAGE_URL@",
