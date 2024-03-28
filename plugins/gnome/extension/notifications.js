@@ -150,14 +150,11 @@ class PomodoroNotification extends MessageTray.Notification {
         this.urgency = MessageTray.Urgency.HIGH;
 
         this._timer = timer;
-        this._timerState = this._timer.getState();
-        this._isPaused = this._timer.isPaused();
+        this._skipBreakAction = null;
+        this._extendAction = null;
+        this._updateActionsBlocked = false;
 
-        this._updateTitle();
-        this._updateBody();
-
-        if (!this._timerUpdateId)
-            this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
+        this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
 
         this.connect(
             'destroy', () => {
@@ -165,12 +162,30 @@ class PomodoroNotification extends MessageTray.Notification {
                     this._timer.disconnect(this._timerUpdateId);
                     this._timerUpdateId = 0;
                 }
+
+                this._timer = null;
             }
         );
     }
 
     get timer() {
         return this._timer;
+    }
+
+    get view() {
+        return this._view;
+    }
+
+    set view(value) {
+        if (!Object.values(NotificationView).includes(value))
+            throw new Error('out of range');
+
+        if (this._view === value)
+            return;
+
+        this._view = value;
+        this._update();
+        this.notify('view');
     }
 
     get datetime() {
@@ -180,24 +195,116 @@ class PomodoroNotification extends MessageTray.Notification {
     set datetime(value) {
     }
 
+    _blockUpdateActions() {
+        if (!this._updateActionsBlocked)
+            this._updateActionsBlocked = true;
+    }
+
     _updateTitle() {
-        this.title = State.label(this._timerState);
+        let title;
+        const isStarting = this._timer.getElapsed() < ANNOUCEMENT_TIME;
+
+        switch (this._view) {
+        case NotificationView.POMODORO:
+            title = isStarting ? _('Pomodoro') : State.label(this._timerState);  // TODO: change title when starting a pomodoro
+            break;
+
+        case NotificationView.POMODORO_ABOUT_TO_END:
+            title = _('Pomodoro is about to end');
+            break;
+
+        case NotificationView.BREAK:
+            if (isStarting) {
+                title = this._timerState === State.LONG_BREAK
+                    ? _('Take a long break')
+                    : _('Take a short break');
+            } else {
+                title = State.label(this._timerState);
+            }
+            break;
+
+        case NotificationView.BREAK_ABOUT_TO_END:
+            title = _('Break is about to end');
+            break;
+
+        case NotificationView.BREAK_ENDED:
+            title = _('Break is over');
+            break;
+
+        default:
+            title = State.label(this._timerState);
+            break;
+        }
+
+        this.title = title;
     }
 
     _updateBody() {
-        if (this._timer.getState() === this._timerState)
-            this.body = formatRemainingTime(this._timer.getRemaining());
+        let body;
+
+        switch (this._view) {
+        case NotificationView.POMODORO:
+        case NotificationView.POMODORO_ABOUT_TO_END:
+        case NotificationView.BREAK:
+        case NotificationView.BREAK_ABOUT_TO_END:
+            body = formatRemainingTime(this._timer.getRemaining());
+            break;
+
+        case NotificationView.BREAK_ENDED:
+            body = _('Get ready…');
+            break;
+
+        default:
+            body = '';
+            break;
+        }
+
+        this.body = body;
+    }
+
+    _updateActions() {
+        // Currently we display only one variant of buttons across all notification views.
+
+        const hasActions = this._skipBreakAction !== null && this._extendAction !== null;
+        const showActions =
+            this._view === NotificationView.POMODORO_ABOUT_TO_END ||
+            this._view === NotificationView.BREAK ||
+            this._view === NotificationView.BREAK_ABOUT_TO_END;
+        if (hasActions === showActions)
+            return;
+
+        if (showActions) {
+            this._skipBreakAction = this.addAction(_('Skip Break'), () => {
+                this._timer.setState(State.POMODORO);
+            });
+            this._extendAction = this.addAction(_('+1 Minute'), () => {
+                this._blockUpdateActions();
+                this._timer.stateDuration += 60.0;
+            });
+        } else {
+            if (this._skipBreakAction) {
+                this._skipBreakAction.destroy();
+                this._skipBreakAction = null;
+            }
+
+            if (this._extendAction) {
+                this._extendAction.destroy();
+                this._extendAction = null;
+            }
+        }
+    }
+
+    _update() {
+        this._timerState = this._timer.getState();
+
+        this._updateTitle();
+        this._updateBody();
+        this._updateActions();
     }
 
     _onTimerUpdate() {
-        const timerState = this._timer.getState();
-        const isPaused = this._timer.isPaused();
-
-        if (timerState === State.NULL)
+        if (this._timer.getState() !== this._timerState)
             return;
-
-        this._timerState = timerState;
-        this._isPaused = isPaused;
 
         this._updateBody();
     }
@@ -232,7 +339,6 @@ class PomodoroIssueNotification extends MessageTray.Notification {
 
         this.addAction(_('Report issue'), () => {
             trySpawnCommandLine(`xdg-open ${GLib.shell_quote(Config.PACKAGE_BUGREPORT)}`);
-            this.destroy();
         });
     }
 });
@@ -506,12 +612,6 @@ export const NotificationManager = class extends Signals.EventEmitter {
 
         if (notification.view !== view) {
             notification.view = view;
-            changed = true;
-        }
-
-        const title = State.label(timerState);
-        if (notification.title !== title) {
-            notification.title = title;
             changed = true;
         }
 
