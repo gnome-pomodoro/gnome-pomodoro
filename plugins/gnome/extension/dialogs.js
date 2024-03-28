@@ -57,7 +57,7 @@ const FADE_IN_TIME = 500;
 const FADE_OUT_TIME = 350;
 
 const BLUR_BRIGHTNESS = 0.4;
-const BLUR_SIGMA = 20.0;
+const BLUR_RADIUS = 40.0;
 
 const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
 
@@ -130,7 +130,7 @@ class PomodoroBlurredLightbox extends Lightbox {
         if (!this._background) {
             // Clone the group that contains all of UI on the screen. This is the
             // chrome, the windows, etc.
-            this._background = new Clutter.Clone({source: Main.uiGroup, clip_to_allocation: true});
+            this._background = new Clutter.Clone({source: Main.uiGroup, clip_to_allocation: false});
             this._background.set_background_color(BACKGROUND_COLOR);
             this._background.add_effect_with_name('blur', new Shell.BlurEffect());
             this.set_child(this._background);
@@ -154,7 +154,7 @@ class PomodoroBlurredLightbox extends Lightbox {
             if (effect) {
                 effect.set({
                     brightness: BLUR_BRIGHTNESS,
-                    sigma: BLUR_SIGMA * themeContext.scale_factor,
+                    radius: BLUR_RADIUS * themeContext.scale_factor,
                 });
                 effect.queue_repaint();
             }
@@ -250,7 +250,7 @@ class OverlayManager {
 
     _destroyOverlayGroup() {
         if (this._overlayGroup) {
-            this._overlayGroup.remove_all_children ();
+            this._overlayGroup.remove_all_children();
             global.stage.remove_child(this._overlayGroup);
             this._overlayGroup = null;
         }
@@ -577,7 +577,7 @@ const ModalDialog = GObject.registerClass({
             this._pushModalWatchId = 0;
         }
 
-        if (this.pushModal(timestamp))
+        if (this.pushModal())
             return;
 
         this._pushModalSource = GLib.timeout_add(
@@ -744,7 +744,7 @@ const ModalDialog = GObject.registerClass({
     // Drop modal status without closing the dialog; this makes the
     // dialog insensitive as well, so it needs to be followed shortly
     // by either a close() or a pushModal()
-    popModal(timestamp) {
+    popModal() {
         this._disconnectPushModalSignals();
 
         if (this._keyFocusOutId) {
@@ -760,25 +760,21 @@ const ModalDialog = GObject.registerClass({
         if (!this._hasModal)
             return;
 
-        Main.popModal(this._grab, timestamp);
+        Main.popModal(this._grab);
         this._grab = null;
         this._hasModal = false;
 
         this._lightbox.reactive = false;
     }
 
-    pushModal(timestamp) {
+    pushModal() {
         if (this._hasModal)
             return true;
 
         if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING || this._destroyed)
             return false;
 
-        let params = {actionMode: Shell.ActionMode.SYSTEM_MODAL};
-        if (timestamp)
-            params['timestamp'] = timestamp;
-
-        let grab = Main.pushModal(this, params);
+        const grab = Main.pushModal(this, {actionMode: Shell.ActionMode.SYSTEM_MODAL});
         if (grab && grab.get_seat_state() !== Clutter.GrabState.ALL) {
             Utils.logWarning('Unable become fully modal');
             Main.popModal(grab);
