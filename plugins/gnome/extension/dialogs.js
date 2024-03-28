@@ -570,7 +570,6 @@ const ModalDialog = GObject.registerClass({
     _onIdleMonitorBecameIdle(monitor) {  // eslint-disable-line no-unused-vars
         let pushModalTries = 0;
         const pushModalInterval = Math.floor(1000 / PUSH_MODAL_RATE);
-        const timestamp = global.get_current_time();
 
         if (this._pushModalWatchId) {
             this._idleMonitor.remove_watch(this._pushModalWatchId);

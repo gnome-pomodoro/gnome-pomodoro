@@ -574,7 +574,6 @@ export const NotificationManager = class extends Signals.EventEmitter {
     _updateNotification() {
         const notification = this._notification;
         const view = this._view;
-        const timerState = this._timer.getState();
 
         let changed = false;
 
