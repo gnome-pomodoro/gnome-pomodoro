@@ -33,7 +33,7 @@
   </screenshots>
   <url type="homepage">https://gnomepomodoro.org</url>
   <url type="bugtracker">https://github.com/gnome-pomodoro/gnome-pomodoro</url>
-  <developer_name translatable="no">Kamil Prusko</developer_name>
+  <developer_name translate="no">Kamil Prusko</developer_name>
   <update_contact>kamilprusko@gmail.com</update_contact>
   <kudos>
     <kudo>AppMenu</kudo>
@@ -45,7 +45,7 @@
   <content_rating type="oars-1.1" />
   <releases>
     <release version="0.25.1" date="2024-03-28">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.25.1</p>
         <ul>
           <li>Fixes for GNOME Shell 46</li>
@@ -54,7 +54,7 @@
       </description>
     </release>
     <release version="0.25.0" date="2024-03-05">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.25.0</p>
         <ul>
           <li>Support for GNOME Shell 46</li>
@@ -63,7 +63,7 @@
       </description>
     </release>
     <release version="0.24.1" date="2023-12-04">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.24.1</p>
         <ul>
           <li>Fixed timerState tracking and waking up of screen on the screen shield (thanks @real-or-random)</li>
@@ -71,7 +71,7 @@
       </description>
     </release>
     <release version="0.24.0" date="2023-08-27">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.24.0</p>
         <ul>
           <li>Marked extension as compatible with GNOME Shell 45 with no backwards compatibility</li>
@@ -81,7 +81,7 @@
       </description>
     </release>
     <release version="0.23.1" date="2023-03-31">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.23.1</p>
         <ul>
           <li>Fixed invalid appdata file</li>
@@ -89,7 +89,7 @@
       </description>
     </release>
     <release version="0.23.0" date="2023-03-26">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.23.0</p>
         <ul>
           <li>Marked extension as compatible with GNOME Shell 44 (thanks @jbicha)</li>
@@ -100,7 +100,7 @@
       </description>
     </release>
     <release version="0.22.1" date="2023-02-05">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.22.1</p>
         <ul>
           <li>Close screen overlay by hitting Esc key - a failsafe method</li>
@@ -112,7 +112,7 @@
       </description>
     </release>
     <release version="0.22.0" date="2022-10-02">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.22.0</p>
         <ul>
           <li>Marked extension as compatible with GNOME Shell 43 (thanks @jbicha)</li>
@@ -127,7 +127,7 @@
       </description>
     </release>
     <release version="0.21.1" date="2022-05-01">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.21.1</p>
         <ul>
           <li>Fixed break overlay geting stuck at 0:01 on GNOME 42 (thanks @upsuper)</li>
@@ -135,7 +135,7 @@
       </description>
     </release>
     <release version="0.21.0" date="2022-04-01">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.21.0</p>
         <ul>
           <li>Support for GNOME Shell 42 (@milotype and @kappa)</li>
@@ -145,7 +145,7 @@
       </description>
     </release>
     <release version="0.20.0" date="2021-09-25">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.20.0</p>
         <ul>
           <li>Support for GNOME Shell 41 (@mbooth101)</li>
@@ -153,7 +153,7 @@
       </description>
     </release>
     <release version="0.19.2" date="2021-09-19">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.19.2</p>
         <ul>
           <li>Fixed GNOME Shell freezing the lockscreen</li>
@@ -164,7 +164,7 @@
       </description>
     </release>
     <release version="0.19.1" date="2021-04-09">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.19.1</p>
         <ul>
           <li>Support GNOME Shell 40.0, not 4.0</li>
@@ -172,7 +172,7 @@
       </description>
     </release>
     <release version="0.19.0" date="2021-04-04">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.19.0</p>
         <ul>
           <li>Support for GNOME Shell 4.0</li>
@@ -184,7 +184,7 @@
       </description>
     </release>
     <release version="0.18.0" date="2020-10-04">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.18.0</p>
         <ul>
           <li>Support for GNOME Shell 3.38 (@ignapk and @szpak)</li>
@@ -199,7 +199,7 @@
       </description>
     </release>
     <release version="0.17.0" date="2020-03-22">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.17.0</p>
         <ul>
           <li>Support for GNOME Shell 3.36</li>
@@ -208,7 +208,7 @@
       </description>
     </release>
     <release version="0.16.0" date="2019-10-01">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.16.0</p>
         <ul>
           <li>Support for GNOME Shell 3.34 only</li>
@@ -218,7 +218,7 @@
       </description>
     </release>
     <release version="0.15.1" date="2019-04-07">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.15.1</p>
         <ul>
           <li>Minor code cleanups</li>
@@ -226,7 +226,7 @@
       </description>
     </release>
     <release version="0.15.0" date="2019-04-07">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.15.0</p>
         <ul>
           <li>Minor code cleanups to support ES6 syntax</li>
@@ -238,7 +238,7 @@
       </description>
     </release>
     <release version="0.14.0" date="2018-11-24">
-      <description translatable="no">
+      <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.14.0</p>
         <ul>
           <li>Support for GNOME Shell 3.28 and 3.30 (@aerostitch)</li>
