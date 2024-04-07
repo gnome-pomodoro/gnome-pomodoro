@@ -39,21 +39,38 @@ namespace Pomodoro
         private GLib.Settings               settings;
         private Pomodoro.Timer              timer;
         private Pomodoro.ScreenNotification screen_notification;
-        private Freedesktop.Notifications   proxy;
+        private uint                        watcher_id = 0;
 
         private bool have_actions = false;
         private bool have_persistence = false;
 
         construct
         {
+            this.watcher_id = GLib.Bus.watch_name (GLib.BusType.SESSION,
+                                                   "org.freedesktop.Notifications",
+                                                   GLib.BusNameWatcherFlags.NONE,
+                                                   this.on_name_appeared,
+                                                   this.on_name_vanished);
+        }
+
+        public NotificationsCapability (string name)
+        {
+            base (name);
+        }
+
+        private void on_name_appeared (GLib.DBusConnection connection,
+                                       string              name,
+                                       string              name_owner)
+        {
             string[] capabilities;
 
             try {
-                this.proxy = GLib.Bus.get_proxy_sync<Freedesktop.Notifications> (GLib.BusType.SESSION,
-                                                        "org.freedesktop.Notifications",
-                                                        "/org/freedesktop/Notifications",
-                                                        GLib.DBusProxyFlags.DO_NOT_AUTO_START);
-                this.proxy.get_capabilities (out capabilities);
+                var proxy = GLib.Bus.get_proxy_sync<Freedesktop.Notifications> (
+                                GLib.BusType.SESSION,
+                                "org.freedesktop.Notifications",
+                                "/org/freedesktop/Notifications",
+                                GLib.DBusProxyFlags.DO_NOT_AUTO_START | GLib.DBusProxyFlags.DO_NOT_CONNECT_SIGNALS);
+                proxy.get_capabilities (out capabilities);
 
                 for (var i=0; i < capabilities.length; i++) {
                     switch (capabilities[i]) {
@@ -68,12 +85,13 @@ namespace Pomodoro
                 }
             }
             catch (GLib.Error error) {
+                GLib.warning ("Error getting notification capabilities: %s", error.message);
             }
         }
 
-        public NotificationsCapability (string name)
+        private void on_name_vanished (GLib.DBusConnection connection,
+                                       string              name)
         {
-            base (name);
         }
 
         private void notify_pomodoro_start ()
@@ -302,6 +320,16 @@ namespace Pomodoro
             }
 
             base.disable ();
+        }
+
+        public override void dispose ()
+        {
+            if (this.watcher_id != 0) {
+                GLib.Bus.unwatch_name (this.watcher_id);
+                this.watcher_id = 0;
+            }
+
+            base.dispose ();
         }
     }
 }
