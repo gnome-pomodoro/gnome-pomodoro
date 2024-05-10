@@ -8,3 +8,8 @@ uses [GNOME](https://www.gnome.org/) technologies, and so it has complete integr
 This software is licensed under the [GPL 3](https://github.com/gnome-pomodoro/gnome-pomodoro/blob/master/COPYING).
 
 *This project is not affiliated with, authorized by, sponsored by, or otherwise approved by GNOME Foundation and/or the Pomodoro Technique®. The GNOME logo and GNOME name are registered trademarks or trademarks of GNOME Foundation in the United States or other countries. The Pomodoro Technique® and Pomodoro™ are registered trademarks of Francesco Cirillo.*
+
+
+## Package download and building from source
+
+You can find detailed information under the Download section on our webpage https://gnomepomodoro.org/
