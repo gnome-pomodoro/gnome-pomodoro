@@ -633,10 +633,10 @@ const ModalDialog = GObject.registerClass({
             '[gnome-pomodoro] this._pushModalTimeoutId');
 
         this.remove_all_transitions();
-        this.show();
         this._setState(DialogState.OPENING);
         this._acknowledged = false;
         this.emit('opening');
+        this.show();
 
         if (animate) {
             this._lightbox.lightOn(FADE_IN_TIME);

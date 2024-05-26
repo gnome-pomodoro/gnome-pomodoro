@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2023 gnome-pomodoro contributors
+ * Copyright (c) 2011-2024 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import St from 'gi://St';
 
 import {trySpawnCommandLine} from 'resource:///org/gnome/shell/misc/util.js';
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import {PopupAnimation} from 'resource:///org/gnome/shell/ui/boxpointer.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import * as Params from 'resource:///org/gnome/shell/misc/params.js';
@@ -39,7 +40,7 @@ import * as Utils from './utils.js';
 const ANNOUCEMENT_TIME = 10.0;
 
 // Min display time in milliseconds after content changes.
-const MIN_DISPLAY_TIME = 3000;
+const NOTIFICATION_TIMEOUT = 3000;
 
 // Use symbolic icon instead of hi-res as in the app.
 const ICON_NAME = 'gnome-pomodoro-symbolic';
@@ -150,11 +151,9 @@ class PomodoroNotification extends MessageTray.Notification {
         this.urgency = MessageTray.Urgency.HIGH;
 
         this._timer = timer;
-        this._skipBreakAction = null;
-        this._extendAction = null;
-        this._updateActionsBlocked = false;
-
+        this._timerState = State.NULL;
         this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
+        this._view = NotificationView.NULL;
 
         this.connect(
             'destroy', () => {
@@ -180,12 +179,16 @@ class PomodoroNotification extends MessageTray.Notification {
         if (!Object.values(NotificationView).includes(value))
             throw new Error('out of range');
 
-        if (this._view === value)
-            return;
+        if (this._view !== value) {
+            this._view = value;
+            this.notify('view');
+        }
 
-        this._view = value;
         this._update();
-        this.notify('view');
+    }
+
+    get timerState() {
+        return this._timerState;
     }
 
     get datetime() {
@@ -195,14 +198,9 @@ class PomodoroNotification extends MessageTray.Notification {
     set datetime(value) {
     }
 
-    _blockUpdateActions() {
-        if (!this._updateActionsBlocked)
-            this._updateActionsBlocked = true;
-    }
-
     _updateTitle() {
         let title;
-        const isStarting = this._timer.getElapsed() < ANNOUCEMENT_TIME;
+        const isStarting = this._timer.getElapsed() < 0.1;
 
         switch (this._view) {
         case NotificationView.POMODORO:
@@ -263,9 +261,9 @@ class PomodoroNotification extends MessageTray.Notification {
     }
 
     _updateActions() {
-        // Currently we display only one variant of buttons across all notification views.
+        // Display only one variant of buttons or none across all notification views.
 
-        const hasActions = this._skipBreakAction !== null && this._extendAction !== null;
+        const hasActions = this.actions.length > 0;
         const showActions =
             this._view === NotificationView.POMODORO_ABOUT_TO_END ||
             this._view === NotificationView.BREAK ||
@@ -274,23 +272,14 @@ class PomodoroNotification extends MessageTray.Notification {
             return;
 
         if (showActions) {
-            this._skipBreakAction = this.addAction(_('Skip Break'), () => {
+            this.addAction(_('Skip Break'), () => {
                 this._timer.setState(State.POMODORO);
             });
-            this._extendAction = this.addAction(_('+1 Minute'), () => {
-                this._blockUpdateActions();
+            this.addAction(_('+1 Minute'), () => {
                 this._timer.stateDuration += 60.0;
             });
         } else {
-            if (this._skipBreakAction) {
-                this._skipBreakAction.destroy();
-                this._skipBreakAction = null;
-            }
-
-            if (this._extendAction) {
-                this._extendAction.destroy();
-                this._extendAction = null;
-            }
+            this.clearActions();
         }
     }
 
@@ -307,20 +296,6 @@ class PomodoroNotification extends MessageTray.Notification {
             return;
 
         this._updateBody();
-    }
-
-    show() {
-        if (!this.source) {
-            Utils.logWarning('Called Notification.show() after destroy()');
-            return;
-        }
-
-        if (this.source.notifications.includes(this)) {
-            this.acknowledged = false;
-            this.source.emit('notification-request-banner', this);
-        } else {
-            this.source.addNotification(this);
-        }
     }
 });
 
@@ -359,22 +334,17 @@ export const NotificationManager = class extends Signals.EventEmitter {
         this._dialog = null;
         this._useDialog = params.useDialog;
         this._view = NotificationView.NULL;
-        this._previousView = NotificationView.NULL;
-        this._previousTimerState = State.NULL;
         this._patches = this._createPatches();
-        this._animate = params.animate;
-        this._initialized = false;
         this._destroying = false;
 
         this._annoucementTimeoutId = 0;
+        this._bannerDestroyId = 0;
+        this._bannerNotifyMappedId = 0;
         this._timerStateChangedId = this._timer.connect('state-changed', this._onTimerStateChanged.bind(this));
         this._timerPausedId = this._timer.connect('paused', this._onTimerPaused.bind(this));
         this._timerResumedId = this._timer.connect('resumed', this._onTimerResumed.bind(this));
 
-        this._onTimerStateChanged();
-
-        this._animate = true;
-        this._initialized = true;
+        this._update(params.animate);
     }
 
     get timer() {
@@ -382,16 +352,10 @@ export const NotificationManager = class extends Signals.EventEmitter {
     }
 
     get notification() {
-        if (this._view !== NotificationView.NULL)
-            this._ensureNotification();
-
         return this._notification;
     }
 
     get dialog() {
-        if (this._view !== NotificationView.NULL)
-            this._ensureDialog();
-
         return this._dialog;
     }
 
@@ -465,23 +429,24 @@ export const NotificationManager = class extends Signals.EventEmitter {
         const dialog = new PomodoroEndDialog(this._timer);
         dialog.connect('opening',
             () => {
-                // Clicking on a notification baner in the date menu, notifcation should be
-                // destroyed after a delay.
-                GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-                    this._expireNotification();
+                // `MessageTray` opens a banner as soon as the date menu starts closing. To avoid unnecessary flicker
+                // destroy the notification before `MessageTray` considers it.
+                const dateMenu = Main.panel.statusArea.dateMenu?.menu;
 
-                    return GLib.SOURCE_REMOVE;
-                });
+                this._expireNotification();
+
+                if (dateMenu && dateMenu.actor.visible)
+                    dateMenu.close(PopupAnimation.NONE);
             });
         dialog.connect('closing',
             () => {
-                if (this._view !== NotificationView.NULL) {
-                    this._ensureNotification();
-                    this._notification.show();
-                }
+                if (this._view !== NotificationView.NULL && !this._destroying) {
+                    this._expireNotification();
+                    this._notify();
 
-                if (this._view === NotificationView.BREAK)
-                    dialog.openWhenIdle();
+                    if (this._view === NotificationView.BREAK)  // TODO: test dismissing the dialog, extending the brteak, and wait for `openWhenIdle`
+                        dialog.openWhenIdle();
+                }
             });
         dialog.connect('destroy',
             () => {
@@ -492,22 +457,37 @@ export const NotificationManager = class extends Signals.EventEmitter {
         return dialog;
     }
 
-    _ensureNotification() {
-        if (!this._notification)
-            this._notification = this._createNotification();
-
-        this._updateNotification();
-    }
-
-    _ensureDialog() {
-        if (!this._dialog)
-            this._dialog = this._createDialog();
+    _isDialogOpen() {
+        return this._dialog && (
+            this._dialog.state === DialogState.OPENED || this._dialog.state === DialogState.OPENING);
     }
 
     openDialog(animate = true) {
-        this._ensureDialog();
-        this._dialog.open(animate);
-        this._dialog.pushModal();
+        if (this._destroying)
+            return;
+
+        if (!this._dialog)
+            this._dialog = this._createDialog();
+
+        if (this._dialog) {
+            this._dialog.open(animate);  // TODO: `open` should be async
+
+            if (!animate)
+                this._dialog.pushModal();
+        }
+    }
+
+    _tryOpenDialog(animate = true) {
+        if (this._destroying)
+            return;
+
+        if (!this._dialog)
+            this._dialog = this._createDialog();
+
+        if (this._dialog && this._dialog.canOpen())
+            this.openDialog(animate);
+        else
+            this._notify();
     }
 
     _showDoNotDisturbButton() {
@@ -544,225 +524,6 @@ export const NotificationManager = class extends Signals.EventEmitter {
             patch.revert();
     }
 
-    _resolveView(timerState, isPaused, isStarting, isEnding) {
-        if (isPaused) {
-            return timerState === State.POMODORO && isStarting
-                ? NotificationView.BREAK_ENDED
-                : NotificationView.NULL;
-        }
-
-        switch (timerState) {
-        case State.POMODORO:
-            if (isEnding)
-                return NotificationView.POMODORO_ABOUT_TO_END;
-
-
-            return NotificationView.POMODORO;
-
-        case State.SHORT_BREAK:
-        case State.LONG_BREAK:
-            if (isEnding)
-                return NotificationView.BREAK_ABOUT_TO_END;
-
-
-            return NotificationView.BREAK;
-        }
-
-        return NotificationView.NULL;
-    }
-
-    _updateNotification() {
-        const notification = this._notification;
-        const view = this._view;
-
-        let changed = false;
-
-        if (!notification || this._destroying)
-            return;
-
-        const isUrgent =
-            view === NotificationView.POMODORO_ABOUT_TO_END ||
-            view === NotificationView.BREAK_ABOUT_TO_END ||
-            view === NotificationView.BREAK_ENDED;
-        // Use Urgency.CRITICAL to force notification banner to stay open.
-        const urgency = isUrgent ? MessageTray.Urgency.CRITICAL : MessageTray.Urgency.HIGH;
-        if (notification.urgency !== urgency) {
-            notification.urgency = urgency;
-            changed = true;
-        }
-
-        const isTransient =
-            view === NotificationView.POMODORO ||
-            view === NotificationView.NULL;
-        if (notification.isTransient !== isTransient) {
-            notification.isTransient = isTransient;
-            changed = true;
-        }
-
-        const forceResident =
-            view === NotificationView.POMODORO_ABOUT_TO_END ||
-            view === NotificationView.BREAK_ABOUT_TO_END ||
-            view === NotificationView.BREAK_ENDED;
-        const resident = (!isTransient || forceResident) && view !== NotificationView.NULL;
-        if (notification.resident !== resident) {
-            notification.resident = resident;
-            changed = true;
-        }
-
-        if (notification.view !== view) {
-            notification.view = view;
-            changed = true;
-        }
-
-        if (changed) {
-            if (Main.messageTray._notification === notification && isTransient)
-                Main.messageTray._updateNotificationTimeout(MIN_DISPLAY_TIME);
-
-            Main.messageTray._updateState();
-        }
-    }
-
-    _shouldNotify(timerState, view) {
-        if (view === NotificationView.NULL || timerState === State.NULL)
-            return false;
-
-        // Pomodoro has been extended.
-        if (this._previousView === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.POMODORO)
-            return false;
-
-        // Break has been extended.
-        if (this._previousView === NotificationView.BREAK_ABOUT_TO_END && view === NotificationView.BREAK)
-            return false;
-
-        // Dialog is already open.
-        if ((timerState === State.SHORT_BREAK || timerState === State.LONG_BREAK) &&
-            (this._dialog?.state === DialogState.OPENED || this._dialog?.state === DialogState.OPENING))
-            return false;
-
-        return timerState !== this._previousTimerState || view !== this._previousView;
-    }
-
-    _expireNotification() {
-        if (!this._notification)
-            return;
-
-        const notification = this._notification;
-        const banner = Main.messageTray._banner?.notification === notification ? Main.messageTray._banner : null;
-
-        if (banner && banner.mapped) {
-            notification.acknowledged = true;
-            notification.isTransient = true;
-            notification.resident = false;
-
-            if (notification.urgency === MessageTray.Urgency.CRITICAL)
-                notification.urgency = MessageTray.Urgency.HIGH;
-
-            let destroyId = notification.connect('destroy', () => {
-                if (destroyId) {
-                    notification.disconnect(destroyId);
-                    destroyId = 0;
-                }
-
-                if (notifyMappedId) {
-                    banner.disconnect(notifyMappedId);
-                    notifyMappedId = 0;
-                }
-            });
-            let notifyMappedId = banner.connect('notify::mapped', () => {
-                if (!banner.mapped)
-                    notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
-            });
-
-            if (Main.messageTray._notification === notification)
-                Main.messageTray._expireNotification();
-        } else {
-            notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
-        }
-    }
-
-    _doNotify() {
-        // We want extra notification banner animation between states. Easiest way to force it is destroying
-        // existing notification.
-        const expired =
-            this._previousView === NotificationView.BREAK_ENDED && this._view === NotificationView.POMODORO ||
-            this._previousState === State.POMODORO && this._state === State.SHORT_BREAK ||
-            this._previousState === State.POMODORO && this._state === State.LONG_BREAK;
-        if (this._notification && expired)
-            this._expireNotification();
-
-        if (this._useDialog)
-            this._ensureDialog();  // TODO: can be done afer `.canOpen()`
-
-        if (this._useDialog && this._view === NotificationView.BREAK && this._dialog.canOpen()) {
-            this._dialog.open(this._animate);
-
-            if (!this._animate)
-                this._dialog.pushModal();
-        } else {
-            if (this._dialog)
-                this._dialog.close(true);
-
-            this._ensureNotification();
-
-            if (this._initialized) {
-                this._notification.show();
-            } else {
-                // When coming from lock-screen. Notification gets automatically acknowledged and don't
-                // show up.
-                GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-                    this._notification.show();
-
-                    return GLib.SOURCE_REMOVE;
-                });
-            }
-        }
-    }
-
-    notify() {
-        const timerState = this._timer.getState();
-        const view = this._view;
-
-        let notified = false;
-
-        if (view !== NotificationView.NULL) {
-            if (this._shouldNotify(timerState, view)) {
-                this._doNotify();
-
-                notified = true;
-            } else {
-                this._updateNotification();
-            }
-        } else {
-            if (this._dialog)
-                this._dialog.close(true);
-
-            if (this._notification)
-                this._notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
-        }
-
-        return notified;
-    }
-
-    _change(timerState, view) {
-        if (this._timerState === timerState && this._view === view)
-            return;
-
-        this._previousTimerState = this._timerState;
-        this._previousView = this._view;
-        this._timerState = timerState;
-        this._view = view;
-
-        this.notify();
-    }
-
-    _onAnnoucementTimeout() {
-        this._annoucementTimeoutId = 0;
-
-        this._change(this._timerState, this._resolveView(this._timerState, false, false, true));
-
-        return GLib.SOURCE_REMOVE;
-    }
-
     // TODO: move annoucements to a helper class
     _scheduleAnnoucement() {
         const timeout = Math.round(this._timer.getRemaining() - ANNOUCEMENT_TIME);
@@ -788,54 +549,253 @@ export const NotificationManager = class extends Signals.EventEmitter {
         }
     }
 
-    _onTimerStateChanged() {
+    _resolveView(timerState, isPaused, isStarting, isEnding) {
+        if (isPaused) {
+            return timerState === State.POMODORO && isStarting
+                ? NotificationView.BREAK_ENDED
+                : NotificationView.NULL;
+        }
+
+        switch (timerState) {
+        case State.POMODORO:
+            if (isEnding)
+                return NotificationView.POMODORO_ABOUT_TO_END;
+
+            return NotificationView.POMODORO;
+
+        case State.SHORT_BREAK:
+        case State.LONG_BREAK:
+            if (isEnding)
+                return NotificationView.BREAK_ABOUT_TO_END;
+
+            return NotificationView.BREAK;
+        }
+
+        return NotificationView.NULL;
+    }
+
+    _expireNotification(animate = false) {
+        if (!this._notification)
+            return;
+
+        const notification = this._notification;
+
+        this._notification = null;
+
+        if (animate &&
+            Main.messageTray._notification === notification &&
+            Main.messageTray._notificationState !== MessageTray.State.HIDDEN) {
+            notification.isTransient = true;
+            notification.acknowledged = true;
+
+            Main.messageTray._expireNotification();
+        } else {
+            notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
+        }
+    }
+
+    _updateNotification() {
+        if (!this._notification || this._destroying)
+            return;
+
+        const notification = this._notification;
+        const timerState = this._timerState;
+        const view = this._view;
+
+        let changed = false;
+
+        // Use Urgency.CRITICAL to force notification banner to stay open.
+        const isUrgent =
+            view === NotificationView.POMODORO_ABOUT_TO_END ||
+            view === NotificationView.BREAK_ABOUT_TO_END ||
+            view === NotificationView.BREAK_ENDED;
+        const urgency = isUrgent ? MessageTray.Urgency.CRITICAL : MessageTray.Urgency.HIGH;
+        if (notification.urgency !== urgency) {
+            notification.urgency = urgency;
+            changed = true;
+        }
+
+        const isTransient =
+            view === NotificationView.POMODORO ||
+            view === NotificationView.NULL;
+        if (notification.isTransient !== isTransient) {
+            notification.isTransient = isTransient;
+            changed = true;
+        }
+
+        const forceResident =
+            view === NotificationView.POMODORO_ABOUT_TO_END ||
+            view === NotificationView.BREAK_ABOUT_TO_END ||
+            view === NotificationView.BREAK_ENDED;
+        const resident = (!isTransient || forceResident) && view !== NotificationView.NULL;
+        if (notification.resident !== resident) {
+            notification.resident = resident;
+            changed = true;
+        }
+
+        // Keep the view shown in the banner after extending duration.
+        const banner = Main.messageTray._banner?.notification === notification ? Main.messageTray._banner : null;
+        const keepBannerView =
+            (notification.view === NotificationView.BREAK_ABOUT_TO_END && view === NotificationView.BREAK) ||
+            (notification.view === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.POMODORO);
+        if (banner && banner.mapped && keepBannerView)
+            changed = false;
+        else if (notification.view !== view)
+            changed = true;
+        else if (notification.timerState !== timerState)
+            changed = true;
+
+        if (changed) {
+            notification.view = view;
+            notification.acknowledged = false;
+        }
+    }
+
+    _notify(animate = true) {
+        if (this._destroying)
+            return;
+
+        if (this._dialog)
+            this._dialog.close(animate);
+
+        if (!this._notification)
+            this._notification = this._createNotification();
+
+        this._updateNotification();
+
+        const notification = this._notification;
+
+        if (notification.acknowledged)
+            notification.acknowledged = false;
+
+        notification.source.addNotification(notification);
+
+        if (Main.messageTray._notification === notification && notification.urgency !== MessageTray.Urgency.CRITICAL)
+            Main.messageTray._updateNotificationTimeout(NOTIFICATION_TIMEOUT);
+    }
+
+    _shouldNotify(timerState, view, isStarting) {
+        if (view === NotificationView.NULL || timerState === State.NULL)
+            return false;
+
+        // Pomodoro has been extended or a break has been skipped.
+        if (this._view === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.POMODORO)
+            return false;
+
+        // Break has been extended.
+        if (this._view === NotificationView.BREAK_ABOUT_TO_END && view === NotificationView.BREAK)
+            return false;
+
+        // Dialog is already open.
+        if (this._isDialogOpen()) {
+            if (timerState === State.SHORT_BREAK || timerState === State.LONG_BREAK)
+                return false;
+
+            if (view === NotificationView.BREAK_ABOUT_TO_END)
+                return false;
+        }
+
+        return this._timerState !== timerState || this._view !== view || isStarting;
+    }
+
+    _update(animate = true) {
         const timerState = this._timer.getState();
-        const isPaused = this._timer.isPaused();
-        const isEnding = this._timer.getRemaining() <= ANNOUCEMENT_TIME;
-        const isStarting = this._timer.getElapsed() === 0.0;
 
-        const view = this._resolveView(timerState, isPaused, isStarting, isEnding);
+        if (timerState !== State.NULL) {
+            const isPaused = this._timer.isPaused();
+            const isStarting = this._timer.getElapsed() < 0.1;
+            const isEnding = this._timer.getRemaining() <= ANNOUCEMENT_TIME + 5.0;
 
-        if (timerState !== State.NULL)
+            const previousView = this._view;
+            const view = this._resolveView(timerState, isPaused, isStarting, isEnding);
+            const notify = this._shouldNotify(timerState, view, isStarting);
+
             this._applyPatches();
 
-        if (timerState !== this._timerState || this._view !== view)
-            this._change(timerState, view);
-        else if (timerState !== State.NULL && timerState === this._timerState && this._timer.getElapsed() < 0.1)
-            // Show notification when starting same state from start.
-            this.notify();
+            this._timerState = timerState;
+            this._view = view;
 
-        // Change of state duration may not trigger "changed" signal, so (re)schedule annoucement here.
-        if (view === NotificationView.POMODORO || view === NotificationView.BREAK)
-            this._scheduleAnnoucement();
-        else
+            if (notify) {
+                if (this._useDialog && view === NotificationView.BREAK) {
+                    this._tryOpenDialog(animate);
+                } else {
+                    if (previousView === NotificationView.BREAK_ENDED && view === NotificationView.POMODORO ||
+                        previousView === NotificationView.BREAK_ABOUT_TO_END && view === NotificationView.POMODORO ||
+                        previousView === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.BREAK)
+                        this._expireNotification(animate);
+
+                    this._notify(animate);
+                }
+            } else {
+                if (this._dialog && (timerState !== State.SHORT_BREAK && timerState !== State.LONG_BREAK))
+                    this._dialog.close(animate);
+
+                if (view !== NotificationView.NULL)
+                    this._updateNotification();
+                else
+                    this._expireNotification(false);
+            }
+
+            // Change of state duration may not trigger "changed" signal, so (re)schedule annoucement here.
+            if (view === NotificationView.POMODORO || view === NotificationView.BREAK)
+                this._scheduleAnnoucement();
+            else
+                this._unscheduleAnnoucement();
+        } else {
+            this._timerState = State.NULL;
+            this._view = NotificationView.NULL;
+
             this._unscheduleAnnoucement();
 
-        if (timerState === State.NULL) {
-            this._revertPatches();
+            if (this._dialog) {
+                this._dialog.destroy();
+                this._dialog = null;
+            }
 
             if (this._notification) {
                 this._notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
                 this._notification = null;
             }
 
-            if (this._dialog) {
-                this._dialog.destroy();
-                this._dialog = null;
+            // Ensure stopping the timer removes all notifications.
+            if (source) {
+                const notifications = source ? source.notifications : [];
+
+                notifications.forEach(notification => {
+                    if (notification instanceof Notification)
+                        notification.destroy(MessageTray.NotificationDestroyedReason.EXPIRED);
+                });
             }
+
+            this._revertPatches();
         }
     }
 
+    _onAnnoucementTimeout() {
+        this._annoucementTimeoutId = 0;
+        this._view = this._resolveView(this._timerState, false, false, true);
+
+        if (!this._isDialogOpen() && this._view !== NotificationView.NULL)
+            this._notify();
+
+        return GLib.SOURCE_REMOVE;
+    }
+
+    _onTimerStateChanged() {
+        this._update();
+    }
+
     _onTimerPaused() {
-        this._onTimerStateChanged();
+        this._update();
     }
 
     _onTimerResumed() {
-        this._onTimerStateChanged();
+        this._update();
     }
 
     destroy() {
         this._destroying = true;
+        this._timerState = State.NULL;
         this._view = NotificationView.NULL;
         this._unscheduleAnnoucement();
 
