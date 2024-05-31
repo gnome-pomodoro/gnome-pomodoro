@@ -1,3 +1,8 @@
+2024-05-31  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.25.2:
+
+	* Fix keeping notification after extending Pomodoro
+
 2024-03-28  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.25.1:
 

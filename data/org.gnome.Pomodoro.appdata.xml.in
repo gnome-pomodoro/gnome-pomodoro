@@ -44,6 +44,14 @@
   <translation type="gettext">gnome-pomodoro</translation>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="0.25.2" date="2024-05-31">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.25.2</p>
+        <ul>
+          <li>Fix keeping notification after extending Pomodoro</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.25.1" date="2024-03-28">
       <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.25.1</p>
