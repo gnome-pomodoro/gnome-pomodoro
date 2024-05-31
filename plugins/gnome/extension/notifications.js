@@ -276,6 +276,10 @@ class PomodoroNotification extends MessageTray.Notification {
                 this._timer.setState(State.POMODORO);
             });
             this.addAction(_('+1 Minute'), () => {
+                // Force not closing the banner after click. This may be reverted back to proper value after
+                // the timer state change.
+                this.resident = true;
+
                 this._timer.stateDuration += 60.0;
             });
         } else {
@@ -338,8 +342,6 @@ export const NotificationManager = class extends Signals.EventEmitter {
         this._destroying = false;
 
         this._annoucementTimeoutId = 0;
-        this._bannerDestroyId = 0;
-        this._bannerNotifyMappedId = 0;
         this._timerStateChangedId = this._timer.connect('state-changed', this._onTimerStateChanged.bind(this));
         this._timerPausedId = this._timer.connect('paused', this._onTimerPaused.bind(this));
         this._timerResumedId = this._timer.connect('resumed', this._onTimerResumed.bind(this));
@@ -399,10 +401,9 @@ export const NotificationManager = class extends Signals.EventEmitter {
 
     _createNotification() {
         const notification = new Notification(this._timer);
-        notification.view = this._view;
         notification.connect('activated',
             () => {
-                switch (notification.view) {
+                switch (this._view) {
                 case NotificationView.POMODORO:
                     break;
 
@@ -444,7 +445,7 @@ export const NotificationManager = class extends Signals.EventEmitter {
                     this._expireNotification();
                     this._notify();
 
-                    if (this._view === NotificationView.BREAK)  // TODO: test dismissing the dialog, extending the brteak, and wait for `openWhenIdle`
+                    if (this._view === NotificationView.BREAK)
                         dialog.openWhenIdle();
                 }
             });
@@ -601,6 +602,7 @@ export const NotificationManager = class extends Signals.EventEmitter {
         const notification = this._notification;
         const timerState = this._timerState;
         const view = this._view;
+        const isStarting = this._timer.getElapsed() < 0.1;
 
         let changed = false;
 
@@ -635,10 +637,10 @@ export const NotificationManager = class extends Signals.EventEmitter {
 
         // Keep the view shown in the banner after extending duration.
         const banner = Main.messageTray._banner?.notification === notification ? Main.messageTray._banner : null;
-        const keepBannerView =
-            (notification.view === NotificationView.BREAK_ABOUT_TO_END && view === NotificationView.BREAK) ||
-            (notification.view === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.POMODORO);
-        if (banner && banner.mapped && keepBannerView)
+        const keepBannerView = !isStarting && (
+            notification.view === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.POMODORO);
+
+        if (banner && keepBannerView)
             changed = false;
         else if (notification.view !== view)
             changed = true;
@@ -678,12 +680,18 @@ export const NotificationManager = class extends Signals.EventEmitter {
         if (view === NotificationView.NULL || timerState === State.NULL)
             return false;
 
-        // Pomodoro has been extended or a break has been skipped.
-        if (this._view === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.POMODORO)
+        // Pomodoro has been extended.
+        if (this._view === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.POMODORO && !isStarting)
             return false;
 
         // Break has been extended.
-        if (this._view === NotificationView.BREAK_ABOUT_TO_END && view === NotificationView.BREAK)
+        if (this._view === NotificationView.BREAK_ABOUT_TO_END && view === NotificationView.BREAK && !isStarting)
+            return false;
+
+        // Update existing banner after skipping a break.
+        const banner = Main.messageTray._banner?.notification === this._notification
+            ? Main.messageTray._banner : null;
+        if (banner && Main.messageTray._notificationHovered && view === NotificationView.POMODORO && isStarting)
             return false;
 
         // Dialog is already open.
@@ -706,6 +714,7 @@ export const NotificationManager = class extends Signals.EventEmitter {
             const isStarting = this._timer.getElapsed() < 0.1;
             const isEnding = this._timer.getRemaining() <= ANNOUCEMENT_TIME + 5.0;
 
+            const previousTimerState = this._timerState;
             const previousView = this._view;
             const view = this._resolveView(timerState, isPaused, isStarting, isEnding);
             const notify = this._shouldNotify(timerState, view, isStarting);
@@ -719,9 +728,12 @@ export const NotificationManager = class extends Signals.EventEmitter {
                 if (this._useDialog && view === NotificationView.BREAK) {
                     this._tryOpenDialog(animate);
                 } else {
-                    if (previousView === NotificationView.BREAK_ENDED && view === NotificationView.POMODORO ||
+                    if (previousView === NotificationView.POMODORO && view === NotificationView.BREAK ||
+                        previousView === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.BREAK ||
+                        previousView === NotificationView.BREAK && view === NotificationView.POMODORO ||
                         previousView === NotificationView.BREAK_ABOUT_TO_END && view === NotificationView.POMODORO ||
-                        previousView === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.BREAK)
+                        previousView === NotificationView.BREAK_ENDED && view === NotificationView.POMODORO ||
+                        previousView === view && previousTimerState !== timerState)
                         this._expireNotification(animate);
 
                     this._notify(animate);
