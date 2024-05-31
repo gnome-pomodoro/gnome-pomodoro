@@ -250,7 +250,7 @@ class OverlayManager {
 
     _destroyOverlayGroup() {
         if (this._overlayGroup) {
-            this._overlayGroup.remove_all_children ();
+            this._overlayGroup.remove_all_children();
             global.stage.remove_actor(this._overlayGroup);
             this._overlayGroup = null;
         }
@@ -634,10 +634,10 @@ const ModalDialog = GObject.registerClass({
             '[gnome-pomodoro] this._pushModalTimeoutId');
 
         this.remove_all_transitions();
-        this.show();
         this._setState(DialogState.OPENING);
         this._acknowledged = false;
         this.emit('opening');
+        this.show();
 
         if (animate) {
             this._lightbox.lightOn(FADE_IN_TIME);
