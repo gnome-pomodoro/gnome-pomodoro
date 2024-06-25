@@ -30,6 +30,7 @@ import St from 'gi://St';
 import {MonitorConstraint} from 'resource:///org/gnome/shell/ui/layout.js';
 import {Lightbox} from 'resource:///org/gnome/shell/ui/lightbox.js';
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as GnomeSession from 'resource:///org/gnome/shell/misc/gnomeSession.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
@@ -443,6 +444,7 @@ const ModalDialog = GObject.registerClass({
         this.add_constraint(this._stageConstraint);
 
         this._idleMonitor = global.backend.get_core_idle_monitor();
+        this._session = new GnomeSession.SessionManager();
 
         this.connect('destroy', this._onDestroy.bind(this));
 
@@ -529,7 +531,6 @@ const ModalDialog = GObject.registerClass({
         if (this.state === DialogState.CLOSED || this.state === DialogState.CLOSING)
             return;
 
-
         this._acknowledged = true;
     }
 
@@ -540,6 +541,19 @@ const ModalDialog = GObject.registerClass({
             this.close(true);
     }
 
+    async _acknowledgeOnIdle() {
+        const isInhibited = await this._session.IsInhibitedAsync(GnomeSession.InhibitFlags.IDLE);
+
+        if (isInhibited || this._getIdleTime() >= IDLE_TIME_TO_ACKNOWLEDGE) {
+            this.acknowledge();
+        } else {
+            this._acknowledgeIdleWatchId = this._idleMonitor.add_idle_watch(
+                IDLE_TIME_TO_ACKNOWLEDGE,
+                monitor => this.acknowledge()  // eslint-disable-line no-unused-vars
+            );
+        }
+    }
+
     _onOpenComplete() {
         this._setState(DialogState.OPENED);
 
@@ -548,16 +562,9 @@ const ModalDialog = GObject.registerClass({
                 GLib.PRIORITY_DEFAULT,
                 MIN_DISPLAY_TIME,
                 () => {
-                    if (this._getIdleTime() >= IDLE_TIME_TO_ACKNOWLEDGE) {
-                        this.acknowledge();
-                    } else {
-                        this._acknowledgeIdleWatchId = this._idleMonitor.add_idle_watch(
-                            IDLE_TIME_TO_ACKNOWLEDGE,
-                            monitor => this.acknowledge()  // eslint-disable-line no-unused-vars
-                        );
-                    }
-
                     this._acknowledgeTimeoutId = 0;
+                    this._acknowledgeOnIdle().catch(logError);
+
                     return GLib.SOURCE_REMOVE;
                 });
             GLib.Source.set_name_by_id(this._acknowledgeTimeoutId,
@@ -604,6 +611,17 @@ const ModalDialog = GObject.registerClass({
             '[gnome-pomodoro] this._pushModalSource');
     }
 
+    async _pushModalOnIdle() {
+        const isInhibited = await this._session.IsInhibitedAsync(GnomeSession.InhibitFlags.IDLE);
+
+        if (isInhibited)
+            this._onIdleMonitorBecameIdle();
+        else if (!this._pushModalWatchId)
+            this._pushModalWatchId = this._idleMonitor.add_idle_watch(
+                IDLE_TIME_TO_PUSH_MODAL,
+                this._onIdleMonitorBecameIdle.bind(this));
+    }
+
     // Gradually open the dialog. Try to make it modal once user had chance to see it
     // and schedule to close it once user becomes active.
     open(animate) {
@@ -619,13 +637,8 @@ const ModalDialog = GObject.registerClass({
             GLib.PRIORITY_DEFAULT,
             Math.max(MIN_DISPLAY_TIME - IDLE_TIME_TO_PUSH_MODAL, 0),
             () => {
-                if (!this._pushModalWatchId) {
-                    this._pushModalWatchId = this._idleMonitor.add_idle_watch(
-                        IDLE_TIME_TO_PUSH_MODAL,
-                        this._onIdleMonitorBecameIdle.bind(this));
-                }
-
                 this._pushModalTimeoutId = 0;
+                this._pushModalOnIdle().catch(logError);
 
                 return GLib.SOURCE_REMOVE;
             }
@@ -889,13 +902,11 @@ const ModalDialog = GObject.registerClass({
             if (this._getIdleTime(event) >= IDLE_TIME_TO_ACKNOWLEDGE)
                 this._acknowledged = true;
 
-
             this._lastActiveTime = event.get_time();
         }
 
         if (this._acknowledged && isUserActive)
             this.close(true);
-
 
         return Clutter.EVENT_STOP;
     }
