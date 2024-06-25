@@ -25,6 +25,7 @@ const Lightbox = imports.ui.lightbox;
 const Main = imports.ui.main;
 
 const Params = imports.misc.params;
+const GnomeSession = imports.misc.gnomeSession;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Config = Extension.imports.config;
@@ -473,6 +474,8 @@ var ModalDialog = GObject.registerClass({
             this._idleMonitor = Meta.IdleMonitor.get_core();  // TODO: remove along support for gnome-shell 40
         }
 
+        this._session = new GnomeSession.SessionManager();
+
         this.connect('destroy', this._onDestroy.bind(this));
 
         // Modal dialogs are fixed width and grow vertically; set the request
@@ -574,6 +577,19 @@ var ModalDialog = GObject.registerClass({
         }
     }
 
+    async _acknowledgeOnIdle() {
+        const isInhibited = await this._session.IsInhibitedAsync(GnomeSession.InhibitFlags.IDLE);
+
+        if (isInhibited || this._getIdleTime() >= IDLE_TIME_TO_ACKNOWLEDGE) {
+            this.acknowledge();
+        } else {
+            this._acknowledgeIdleWatchId = this._idleMonitor.add_idle_watch(
+                IDLE_TIME_TO_ACKNOWLEDGE,
+                monitor => this.acknowledge()  // eslint-disable-line no-unused-vars
+            );
+        }
+    }
+
     _onOpenComplete() {
         this._setState(State.OPENED);
 
@@ -582,16 +598,9 @@ var ModalDialog = GObject.registerClass({
                 GLib.PRIORITY_DEFAULT,
                 MIN_DISPLAY_TIME,
                 () => {
-                    if (this._getIdleTime() >= IDLE_TIME_TO_ACKNOWLEDGE) {
-                        this.acknowledge();
-                    }
-                    else {
-                        this._acknowledgeIdleWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_ACKNOWLEDGE,
-                            (monitor) => this.acknowledge()
-                        );
-                    }
-
                     this._acknowledgeTimeoutId = 0;
+                    this._acknowledgeOnIdle().catch(logError);
+
                     return GLib.SOURCE_REMOVE;
                 });
             GLib.Source.set_name_by_id(this._acknowledgeTimeoutId,
@@ -639,6 +648,17 @@ var ModalDialog = GObject.registerClass({
                                    '[gnome-pomodoro] this._pushModalSource');
     }
 
+    async _pushModalOnIdle() {
+        const isInhibited = await this._session.IsInhibitedAsync(GnomeSession.InhibitFlags.IDLE);
+
+        if (isInhibited)
+            this._onIdleMonitorBecameIdle();
+        else if (!this._pushModalWatchId)
+            this._pushModalWatchId = this._idleMonitor.add_idle_watch(
+                IDLE_TIME_TO_PUSH_MODAL,
+                this._onIdleMonitorBecameIdle.bind(this));
+    }
+
     // Gradually open the dialog. Try to make it modal once user had chance to see it
     // and schedule to close it once user becomes active.
     open(animate) {
@@ -655,12 +675,8 @@ var ModalDialog = GObject.registerClass({
             GLib.PRIORITY_DEFAULT,
             Math.max(MIN_DISPLAY_TIME - IDLE_TIME_TO_PUSH_MODAL, 0),
             () => {
-                if (!this._pushModalWatchId) {
-                    this._pushModalWatchId = this._idleMonitor.add_idle_watch(IDLE_TIME_TO_PUSH_MODAL,
-                                                                              this._onIdleMonitorBecameIdle.bind(this));
-                }
-
                 this._pushModalTimeoutId = 0;
+                this._pushModalOnIdle().catch(logError);
 
                 return GLib.SOURCE_REMOVE;
             }
