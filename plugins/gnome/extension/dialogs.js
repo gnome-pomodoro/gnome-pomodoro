@@ -45,6 +45,7 @@ const ngettext = Gettext.ngettext;
  */
 const IDLE_TIME_TO_PUSH_MODAL = 600;
 const PUSH_MODAL_TIME_LIMIT = 1000;
+const PUSH_MODAL_FALLBACK_TIME_LIMIT = 10000;
 const PUSH_MODAL_RATE = 60;
 const MOTION_DISTANCE_TO_CLOSE = 20;
 
@@ -562,7 +563,7 @@ var ModalDialog = GObject.registerClass({
         this.emit('opened');
     }
 
-    _onIdleMonitorBecameIdle(monitor) {
+    _onIdleMonitorBecameIdle() {
         let pushModalTries = 0;
         let pushModalInterval = Math.floor(1000 / PUSH_MODAL_RATE);
         let timestamp = global.get_current_time();
@@ -572,9 +573,13 @@ var ModalDialog = GObject.registerClass({
             this._pushModalWatchId = 0;
         }
 
-        if (this.pushModal(timestamp)) {
-            return GLib.SOURCE_REMOVE;
+        if (this._pushModalTimeoutId) {
+            GLib.Source.remove(this._pushModalTimeoutId);
+            this._pushModalTimeoutId = 0;
         }
+
+        if (this.pushModal(timestamp))
+            return;
 
         this._pushModalSource = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT,
@@ -603,12 +608,22 @@ var ModalDialog = GObject.registerClass({
     async _pushModalOnIdle() {
         const isInhibited = await this._session.IsInhibitedAsync(GnomeSession.InhibitFlags.IDLE);
 
-        if (isInhibited)
+        if (isInhibited) {
             this._onIdleMonitorBecameIdle();
-        else if (!this._pushModalWatchId)
+        } else if (!this._pushModalWatchId) {
+            this._pushModalTimeoutId = GLib.timeout_add(
+                GLib.PRIORITY_DEFAULT,
+                PUSH_MODAL_FALLBACK_TIME_LIMIT,
+                () => {
+                    this._pushModalTimeoutId = 0;
+                    this._onIdleMonitorBecameIdle();
+
+                    return GLib.Source.REMOVE;
+                });
             this._pushModalWatchId = this._idleMonitor.add_idle_watch(
                 IDLE_TIME_TO_PUSH_MODAL,
                 this._onIdleMonitorBecameIdle.bind(this));
+        }
     }
 
     // Gradually open the dialog. Try to make it modal once user had chance to see it
