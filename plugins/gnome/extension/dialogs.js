@@ -458,8 +458,6 @@ var ModalDialog = GObject.registerClass({
         this._lastActiveTime = -1;
         this._lastEventX = -1;
         this._lastEventY = -1;
-        this._bindingAction = 0;
-        this._acceleratorActivatedId = 0;
         this._monitorConstraint = new Layout.MonitorConstraint();
         this._monitorConstraint.primary = true;
         this._stageConstraint = new Clutter.BindConstraint({
@@ -506,52 +504,6 @@ var ModalDialog = GObject.registerClass({
 
         this._state = state;
         this.notify('state');
-    }
-
-    _onAcceleratorActivated(display, action, device, timestamp) {
-        if (action === this._bindingAction) {
-            this.close(true);
-        }
-    }
-
-    // register a failsafe method of closing the dialog
-    _grabAccelerators() {
-        if (!this._bindingAction) {
-            const bindingAction = global.display.grab_accelerator('Escape', Meta.KeyBindingFlags.NONE);
-            const bindingName = Meta.external_binding_name_for_action(bindingAction);
-
-            if (bindingAction === Meta.KeyBindingAction.NONE) {
-                Utils.logWarning('Failed to grab accelerator for the dialog.');
-                return;
-            }
-
-            this._bindingAction = bindingAction;
-
-            Main.wm.allowKeybinding(bindingName, Shell.ActionMode.ALL);
-        }
-
-        if (!this._acceleratorActivatedId) {
-            this._acceleratorActivatedId = global.display.connect('accelerator-activated', this._onAcceleratorActivated.bind(this));
-        }
-    }
-
-    _ungrabAccelerators() {
-        if (this._bindingAction) {
-            const bindingName = Meta.external_binding_name_for_action(this._bindingAction);
-            Main.wm.allowKeybinding(bindingName, Shell.ActionMode.NONE);
-
-            if (global.display.ungrab_accelerator(this._bindingAction)) {
-                this._bindingAction = null;
-            }
-            else {
-                Utils.logWarning('Failed to ungrab accelerator for the dialog.');
-            }
-        }
-
-        if (this._acceleratorActivatedId) {
-            global.display.disconnect(this._acceleratorActivatedId);
-            this._acceleratorActivatedId = 0;
-        }
     }
 
     _getIdleTime(event) {
@@ -977,18 +929,6 @@ var ModalDialog = GObject.registerClass({
         }
 
         return Clutter.EVENT_STOP;
-    }
-
-    vfunc_map() {
-        this._grabAccelerators();
-
-        super.vfunc_map();
-    }
-
-    vfunc_unmap() {
-        super.vfunc_unmap();
-
-        this._ungrabAccelerators();
     }
 
     _onDestroy() {
