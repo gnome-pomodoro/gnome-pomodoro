@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-31 13:18+0200\n"
-"PO-Revision-Date: 2024-06-27 05:53+0200\n"
+"PO-Revision-Date: 2024-06-27 09:01+0200\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <(nothing)>\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.3.2\n"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:8
@@ -74,7 +74,7 @@ msgstr "გაშვება"
 #: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:200
 #: src/application.vala:99
 msgid "Pause"
-msgstr "გაჩერება"
+msgstr "პაუზა"
 
 #: data/resources/menus.ui:16 plugins/actions/enums.vala:200
 #: plugins/actions/resources/action-page.ui:215 src/application.vala:102
@@ -311,7 +311,7 @@ msgstr "წამმზომის გაშვება"
 
 #: plugins/gnome/extension/indicator.js:162
 msgid "Pause Timer"
-msgstr "წამმზომის შეჩერება"
+msgstr "წამმზომის პაუზა"
 
 #: plugins/gnome/extension/indicator.js:174
 msgid "Stop Timer"
@@ -319,11 +319,11 @@ msgstr "ტაიმერის გაჩერება"
 
 #: plugins/gnome/extension/indicator.js:211 src/window.vala:179
 msgid "Pause break"
-msgstr "დასვენების შეჩერება"
+msgstr "დასვენების პაუზა"
 
 #: plugins/gnome/extension/indicator.js:211 src/window.vala:166
 msgid "Pause Pomodoro"
-msgstr "პომოდოროს შეჩერება"
+msgstr "პომოდოროს პაუზა"
 
 #: plugins/gnome/extension/indicator.js:214
 #: src/notifications-capability.vala:141 src/notifications-capability.vala:162
@@ -344,14 +344,12 @@ msgstr "პომოდოროს გაგრძელება"
 msgid "%d minute remaining"
 msgid_plural "%d minutes remaining"
 msgstr[0] "დარჩენილია %d წუთი"
-msgstr[1] "დარჩენილია %d წუთი"
 
 #: plugins/gnome/extension/notifications.js:97
 #, javascript-format
 msgid "%d second remaining"
 msgid_plural "%d seconds remaining"
 msgstr[0] "დარჩენილია %d წამი"
-msgstr[1] "დარჩენილია %d წამი"
 
 #: plugins/gnome/extension/notifications.js:289
 msgid "Pomodoro is about to end"
@@ -479,7 +477,7 @@ msgstr "გაშვება/დასრულება"
 
 #: src/application.vala:96
 msgid "Pause/Resume"
-msgstr "გაჩერება/გაგრძელება"
+msgstr "პაუზა/გაგრძელება"
 
 #: src/application.vala:105
 msgid "Skip to a pomodoro or to a break"
@@ -518,14 +516,12 @@ msgstr "იქონიეთ ფოკუსი თქვენს ამოც
 msgid "You have %d minute"
 msgid_plural "You have %d minutes"
 msgstr[0] "გაქვთ %d წუთი"
-msgstr[1] "გაქვთ %d წუთი"
 
 #: src/notifications-capability.vala:158
 #, c-format
 msgid "You have %d second"
 msgid_plural "You have %d seconds"
 msgstr[0] "გაქვთ %d წამი"
-msgstr[1] "გაქვთ %d წამი"
 
 #: src/notifications-capability.vala:163
 msgid "Take a longer break"
@@ -593,7 +589,7 @@ msgstr "%.1f სთ"
 
 #: src/stats-page.vala:573
 msgid "Break"
-msgstr "გაჩერება"
+msgstr "გაწყვეტა"
 
 #: src/stats-week-page.vala:58
 msgid "This week"
@@ -604,11 +600,9 @@ msgstr "ეს კვირა"
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d საათი"
-msgstr[1] "%d საათი"
 
 #: src/utils.vala:41
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d წუთი"
-msgstr[1] "%d წუთი"
