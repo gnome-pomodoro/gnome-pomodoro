@@ -530,8 +530,17 @@ var ModalDialog = GObject.registerClass({
         }
     }
 
+    async _isIdleMonitorInhibited() {
+        try {
+            return await this._session.IsInhibitedAsync(GnomeSession.InhibitFlags.IDLE);
+        } catch (error) {
+            Utils.logWarning('Can\'t check sessions idle inhibitor.');
+            return false;
+        }
+    }
+
     async _acknowledgeOnIdle() {
-        const isInhibited = await this._session.IsInhibitedAsync(GnomeSession.InhibitFlags.IDLE);
+        const isInhibited = await this._isIdleMonitorInhibited();
 
         if (isInhibited || this._getIdleTime() >= IDLE_TIME_TO_ACKNOWLEDGE) {
             this.acknowledge();
@@ -552,7 +561,7 @@ var ModalDialog = GObject.registerClass({
                 MIN_DISPLAY_TIME,
                 () => {
                     this._acknowledgeTimeoutId = 0;
-                    this._acknowledgeOnIdle().catch(logError);
+                    this._acknowledgeOnIdle().catch(Utils.logError);
 
                     return GLib.SOURCE_REMOVE;
                 });
@@ -606,7 +615,7 @@ var ModalDialog = GObject.registerClass({
     }
 
     async _pushModalOnIdle() {
-        const isInhibited = await this._session.IsInhibitedAsync(GnomeSession.InhibitFlags.IDLE);
+        const isInhibited = await this._isIdleMonitorInhibited();
 
         if (isInhibited) {
             this._onIdleMonitorBecameIdle();
@@ -620,6 +629,8 @@ var ModalDialog = GObject.registerClass({
 
                     return GLib.Source.REMOVE;
                 });
+            GLib.Source.set_name_by_id(this._pushModalTimeoutId,
+                '[gnome-pomodoro] this._pushModalTimeoutId stage 2');
             this._pushModalWatchId = this._idleMonitor.add_idle_watch(
                 IDLE_TIME_TO_PUSH_MODAL,
                 this._onIdleMonitorBecameIdle.bind(this));
@@ -643,13 +654,13 @@ var ModalDialog = GObject.registerClass({
             Math.max(MIN_DISPLAY_TIME - IDLE_TIME_TO_PUSH_MODAL, 0),
             () => {
                 this._pushModalTimeoutId = 0;
-                this._pushModalOnIdle().catch(logError);
+                this._pushModalOnIdle().catch(Utils.logError);
 
                 return GLib.SOURCE_REMOVE;
             }
         );
         GLib.Source.set_name_by_id(this._pushModalTimeoutId,
-                                   '[gnome-pomodoro] this._pushModalTimeoutId');
+            '[gnome-pomodoro] this._pushModalTimeoutId stage 1');
 
         this.remove_all_transitions();
         this.show();
