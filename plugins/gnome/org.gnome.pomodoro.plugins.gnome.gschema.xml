@@ -20,5 +20,10 @@
       <summary>Blur effect</summary>
       <description>Whether to use blur effect for the screen overlay background. On some graphics cards or drivers it can cause issues.</description>
     </key>
+    <key name="dismiss-gesture" type="b">
+      <default>true</default>
+      <summary>Dismiss screen overlay by gesture</summary>
+      <description>Easily dismiss overlay with a gesture. If disabled, will show buttons for closing the overlay.</description>
+    </key>
   </schema>
 </schemalist>

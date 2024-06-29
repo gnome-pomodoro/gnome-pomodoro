@@ -52,7 +52,7 @@ endif
 
 install_data(
   'org.gnome.pomodoro.gschema.xml',
-  install_dir: get_option('datadir') / 'glib-2.0' / 'schemas',
+  install_dir: gschema_dir,
 )
 
 subdir('icons')

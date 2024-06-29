@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
@@ -8,7 +7,6 @@ import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
 import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-import {extension} from './extension.js';
 import {State} from './timer.js';
 import {formatRemainingTime} from './notifications.js';
 import * as Utils from './utils.js';
@@ -101,24 +99,8 @@ class PomodoroScreenShieldWidget extends St.Widget {
         this.connect('destroy', this._onDestroy.bind(this));
     }
 
-    // TODO: move to utils
-    _loadIcon(iconName) {
-        let icon = this._icons[iconName];
-
-        if (!icon) {
-            const iconUri = '%s/icons/hicolor/scalable/actions/%s.svg'.format(extension.dir.get_uri(), iconName);
-            icon = new Gio.FileIcon({
-                file: Gio.File.new_for_uri(iconUri),
-            });
-
-            this._icons[iconName] = icon;
-        }
-
-        return icon;
-    }
-
     _createIconButton(iconName, accessibleName) {
-        const icon = new St.Icon({gicon: this._loadIcon(iconName)});
+        const icon = new St.Icon({gicon: Utils.loadIcon(iconName)});
         const iconButton = new St.Button({
             reactive: true,
             can_focus: true,
@@ -173,16 +155,16 @@ class PomodoroScreenShieldWidget extends St.Widget {
                         this._timerState === State.LONG_BREAK;
 
         if (!this._isPaused) {
-            this._pauseResumeButton.child.gicon = this._loadIcon('gnome-pomodoro-pause-symbolic');
+            this._pauseResumeButton.child.gicon = Utils.loadIcon('gnome-pomodoro-pause-symbolic');
             this._pauseResumeButton.accessible_name = isBreak ? _('Pause break') : _('Pause Pomodoro');
 
-            this._skipStopButton.child.gicon = this._loadIcon('gnome-pomodoro-skip-symbolic');
+            this._skipStopButton.child.gicon = Utils.loadIcon('gnome-pomodoro-skip-symbolic');
             this._skipStopButton.accessible_name = isBreak ? _('Start Pomodoro') : _('Take a break');
         } else {
-            this._pauseResumeButton.child.gicon = this._loadIcon('gnome-pomodoro-start-symbolic');
+            this._pauseResumeButton.child.gicon = Utils.loadIcon('gnome-pomodoro-start-symbolic');
             this._pauseResumeButton.accessible_name = isBreak ? _('Resume break') : _('Resume Pomodoro');
 
-            this._skipStopButton.child.gicon = this._loadIcon('gnome-pomodoro-stop-symbolic');
+            this._skipStopButton.child.gicon = Utils.loadIcon('gnome-pomodoro-stop-symbolic');
             this._skipStopButton.accessible_name = _('Stop');
         }
     }

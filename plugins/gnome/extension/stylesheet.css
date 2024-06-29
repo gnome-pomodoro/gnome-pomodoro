@@ -85,24 +85,48 @@
     background-color: transparent;
 }
 
-.extension-pomodoro-dialog {
+.extension-pomodoro-overlay {
     color: white;
 }
 
-.extension-pomodoro-dialog .extension-pomodoro-dialog-box {
+.extension-pomodoro-overlay .extension-pomodoro-overlay-container {
+    margin: 30px;
+}
+
+.extension-pomodoro-overlay .extension-pomodoro-overlay-buttons {
+    spacing: 10px;
+}
+
+.extension-pomodoro-overlay .icon-button {
+    padding: 14px;
+    background-color: rgba(255, 255, 255, 0.0);
+}
+
+.extension-pomodoro-overlay .icon-button:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.extension-pomodoro-overlay .icon-button:active {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.extension-pomodoro-overlay .extension-pomodoro-overlay-contents {
     spacing: 15px;
-    padding-bottom: 15px;
-    width: 500px;
 }
 
-.extension-pomodoro-dialog .extension-pomodoro-timer-label {
+.extension-pomodoro-overlay .extension-pomodoro-timer-label {
     font-size: 70pt;
-    font-weight: normal;
+    font-weight: 400;
 }
 
-.extension-pomodoro-dialog .extension-pomodoro-dialog-description {
+.extension-pomodoro-overlay .extension-pomodoro-overlay-description {
     font-size: 14pt;
     font-weight: normal;
+}
+
+.extension-pomodoro-overlay .extension-pomodoro-do-not-touch-icon {
+    margin-top: 20px;
+    margin-bottom: 50px;
 }
 
 .extension-pomodoro-widget {

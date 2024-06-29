@@ -398,6 +398,7 @@ class PomodoroTimerLabel extends St.BoxLayout {
         this._timer = timer;
         this._timerState = null;
         this._timerUpdateId = 0;
+        this._frozen = false;
 
         this._minutesLabel = new SemiMonospaceLabel({
             text: '0',
@@ -420,18 +421,27 @@ class PomodoroTimerLabel extends St.BoxLayout {
         this.connect('destroy', this._onDestroy.bind(this));
     }
 
-    freeze() {
+    freezeState() {
         this._timerState = this._timer.getState();
     }
 
-    unfreeze() {
+    unfreezeState() {
         this._timerState = null;
+    }
+
+    freeze() {
+        this._frozen = true;
+    }
+
+    unfreeze() {
+        this._frozen = false;
     }
 
     vfunc_map() {
         if (!this._timerUpdateId)
             this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
 
+        this.unfreeze();
         this._updateLabels();
 
         super.vfunc_map();
@@ -459,7 +469,8 @@ class PomodoroTimerLabel extends St.BoxLayout {
     }
 
     _onTimerUpdate() {
-        this._updateLabels();
+        if (!this._frozen)
+            this._updateLabels();
     }
 
     _onDestroy() {

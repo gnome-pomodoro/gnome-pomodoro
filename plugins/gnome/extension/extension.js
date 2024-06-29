@@ -111,7 +111,7 @@ export default class PomodoroExtension extends Extension {
         switch (key) {
         case 'show-screen-notifications':
             if (this._notificationManager)
-                this._notificationManager.useDialog = settings.get_boolean(key);
+                this._notificationManager.useScreenOverlay = settings.get_boolean(key);
 
             break;
 
@@ -218,7 +218,7 @@ export default class PomodoroExtension extends Extension {
     _enableNotificationManager(animate) {
         if (!this._notificationManager) {
             const params = {
-                useDialog: this.settings.get_boolean('show-screen-notifications'),
+                useScreenOverlay: this.settings.get_boolean('show-screen-notifications'),
                 animate,
             };
             this._notificationManager = new NotificationManager(this.timer, params);
