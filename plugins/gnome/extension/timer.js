@@ -397,40 +397,50 @@ class PomodoroTimerLabel extends St.BoxLayout {
         this._timer = timer;
         this._timerState = null;
         this._timerUpdateId = 0;
+        this._frozen = false;
 
         this._minutesLabel = new SemiMonospaceLabel({
             text: '0',
             text_align: Pango.Alignment.RIGHT,
         });
-        this.add_actor(this._minutesLabel);
+        this.add_child(this._minutesLabel);
 
         this._separatorLabel = new St.Label({
             text: ':',
         });
         this._separatorLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        this.add_actor(this._separatorLabel);
+        this.add_child(this._separatorLabel);
 
         this._secondsLabel = new MonospaceLabel({
             text: '00',
             text_align: Pango.Alignment.LEFT,
         });
-        this.add_actor(this._secondsLabel);
+        this.add_child(this._secondsLabel);
 
         this.connect('destroy', this._onDestroy.bind(this));
     }
 
-    freeze() {
+    freezeState() {
         this._timerState = this._timer.getState();
     }
 
-    unfreeze() {
+    unfreezeState() {
         this._timerState = null;
+    }
+
+    freeze() {
+        this._frozen = true;
+    }
+
+    unfreeze() {
+        this._frozen = false;
     }
 
     vfunc_map() {
         if (!this._timerUpdateId)
             this._timerUpdateId = this._timer.connect('update', this._onTimerUpdate.bind(this));
 
+        this.unfreeze();
         this._updateLabels();
 
         super.vfunc_map();
@@ -458,7 +468,8 @@ class PomodoroTimerLabel extends St.BoxLayout {
     }
 
     _onTimerUpdate() {
-        this._updateLabels();
+        if (!this._frozen)
+            this._updateLabels();
     }
 
     _onDestroy() {

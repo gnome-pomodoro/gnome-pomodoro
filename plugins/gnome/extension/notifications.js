@@ -18,6 +18,7 @@
  *
  */
 
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
@@ -32,9 +33,9 @@ import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 
 import {extension} from './extension.js';
-import {PomodoroEndDialog, DialogState} from './dialogs.js';
 import {State} from './timer.js';
 import * as Config from './config.js';
+import * as ScreenOverlay from './screenOverlay.js';
 import * as Utils from './utils.js';
 
 
@@ -170,7 +171,7 @@ class PomodoroNotification extends MessageTray.Notification {
 
         // We keep notification as resident to keep banner visible. Once we want to hide the banner
         // we need to update the notification.
-        // Note that `notify::mapped` will be triggered when we're moving MessageTray above the dialog.
+        // Note that `notify::mapped` will be triggered when we're moving MessageTray above the screen overlay.
         banner.connect('notify::mapped', () => {
             if (idleId) {
                 GLib.source_remove(idleId);
@@ -537,7 +538,7 @@ class PomodoroIssueNotification extends MessageTray.Notification {
 export const NotificationManager = class extends EventEmitter {
     constructor(timer, params) {
         params = Params.parse(params, {
-            useDialog: true,
+            useScreenOverlay: true,
             animate: true,
         });
 
@@ -546,8 +547,8 @@ export const NotificationManager = class extends EventEmitter {
         this._timer = timer;
         this._timerState = State.NULL;
         this._notification = null;
-        this._dialog = null;
-        this._useDialog = params.useDialog;
+        this._screenOverlay = null;
+        this._useScreenOverlay = params.useScreenOverlay;
         this._view = NotificationView.NULL;
         this._patches = this._createPatches();
         this._notificationSectionPatch = null;
@@ -569,16 +570,16 @@ export const NotificationManager = class extends EventEmitter {
         return this._notification;
     }
 
-    get dialog() {
-        return this._dialog;
+    get screenOverlay() {
+        return this._screenOverlay;
     }
 
-    get useDialog() {
-        return this._useDialog;
+    get useScreenOverlay() {
+        return this._useScreenOverlay;
     }
 
-    set useDialog(value) {
-        this._useDialog = value;
+    set useScreenOverlay(value) {
+        this._useScreenOverlay = value;
     }
 
     // Replace notification banner under date menu with our own `NotificationMessage`.
@@ -676,11 +677,11 @@ export const NotificationManager = class extends EventEmitter {
 
                 case NotificationView.POMODORO_ABOUT_TO_END:
                     this._timer.skip();
-                    this.openDialog();
+                    this.openScreenOverlay();
                     break;
 
                 case NotificationView.BREAK:
-                    this.openDialog();
+                    this.openScreenOverlay();
                     break;
                 }
             });
@@ -693,9 +694,9 @@ export const NotificationManager = class extends EventEmitter {
         return notification;
     }
 
-    _createDialog() {
-        const dialog = new PomodoroEndDialog(this._timer);
-        dialog.connect('opening',
+    _createScreenOverlay() {
+        const screenOverlay = new ScreenOverlay.ScreenOverlay(this._timer);
+        screenOverlay.connect('opening',
             () => {
                 // `MessageTray` opens a banner as soon as the date menu starts closing. To avoid unnecessary flicker
                 // destroy the notification before `MessageTray` considers it.
@@ -706,55 +707,53 @@ export const NotificationManager = class extends EventEmitter {
                 if (dateMenu && dateMenu.actor.visible)
                     dateMenu.close(PopupAnimation.NONE);
             });
-        dialog.connect('closing',
+        screenOverlay.connect('closing',
             () => {
                 if (this._view !== NotificationView.NULL && !this._destroying) {
                     this._expireNotification();
                     this._notify();
 
                     if (this._view === NotificationView.BREAK)
-                        dialog.openWhenIdle();
+                        screenOverlay.openWhenIdle();
                 }
             });
-        dialog.connect('destroy',
+        screenOverlay.connect('destroy',
             () => {
-                if (this._dialog === dialog)
-                    this._dialog = null;
+                if (this._screenOverlay === screenOverlay)
+                    this._screenOverlay = null;
             });
 
-        return dialog;
+        extension.pluginSettings.bind('dismiss-gesture', screenOverlay, 'use-gestures', Gio.SettingsBindFlags.DEFAULT);
+
+        return screenOverlay;
     }
 
-    _isDialogOpen() {
-        return this._dialog && (
-            this._dialog.state === DialogState.OPENED || this._dialog.state === DialogState.OPENING);
+    _isScreenOverlayOpened() {
+        return this._screenOverlay && (
+            this._screenOverlay.state === ScreenOverlay.OverlayState.OPENED ||
+            this._screenOverlay.state === ScreenOverlay.OverlayState.OPENING);
     }
 
-    openDialog(animate = true) {
+    openScreenOverlay(animate = true) {
+        if (this._destroying)
+            return false;
+
+        if (!this._screenOverlay)
+            this._screenOverlay = this._createScreenOverlay();
+
+        return this._screenOverlay.open(animate);
+    }
+
+    _openScreenOverlayOrNotify(animate) {
         if (this._destroying)
             return;
 
-        if (!this._dialog)
-            this._dialog = this._createDialog();
+        // TODO: detect webcam
 
-        if (this._dialog) {
-            this._dialog.open(animate);
+        if (!this._screenOverlay)
+            this._screenOverlay = this._createScreenOverlay();
 
-            if (!animate)
-                this._dialog.pushModal();
-        }
-    }
-
-    _tryOpenDialog(animate = true) {
-        if (this._destroying)
-            return;
-
-        if (!this._dialog)
-            this._dialog = this._createDialog();
-
-        if (this._dialog && this._dialog.canOpen())
-            this.openDialog(animate);
-        else
+        if (!this.openScreenOverlay(animate))
             this._notify();
     }
 
@@ -928,8 +927,8 @@ export const NotificationManager = class extends EventEmitter {
         if (this._destroying)
             return;
 
-        if (this._dialog)
-            this._dialog.close(animate);
+        if (this._screenOverlay)
+            this._screenOverlay.close(animate);
 
         if (!this._notification)
             this._notification = this._createNotification();
@@ -965,8 +964,8 @@ export const NotificationManager = class extends EventEmitter {
         if (banner && Main.messageTray._notificationHovered && view === NotificationView.POMODORO && isStarting)
             return false;
 
-        // Dialog is already open.
-        if (this._isDialogOpen()) {
+        // Screen overlay is already opened.
+        if (this._isScreenOverlayOpened()) {
             if (timerState === State.SHORT_BREAK || timerState === State.LONG_BREAK)
                 return false;
 
@@ -996,8 +995,8 @@ export const NotificationManager = class extends EventEmitter {
             this._view = view;
 
             if (notify) {
-                if (this._useDialog && view === NotificationView.BREAK) {
-                    this._tryOpenDialog(animate);
+                if (this._useScreenOverlay && view === NotificationView.BREAK) {
+                    this._openScreenOverlayOrNotify(animate);
                 } else {
                     if (previousView === NotificationView.POMODORO && view === NotificationView.BREAK ||
                         previousView === NotificationView.POMODORO_ABOUT_TO_END && view === NotificationView.BREAK ||
@@ -1010,8 +1009,8 @@ export const NotificationManager = class extends EventEmitter {
                     this._notify(animate);
                 }
             } else {
-                if (this._dialog && (timerState !== State.SHORT_BREAK && timerState !== State.LONG_BREAK))
-                    this._dialog.close(animate);
+                if (this._screenOverlay && (timerState !== State.SHORT_BREAK && timerState !== State.LONG_BREAK))
+                    this._screenOverlay.close(animate);
 
                 if (view !== NotificationView.NULL)
                     this._updateNotification();
@@ -1030,9 +1029,9 @@ export const NotificationManager = class extends EventEmitter {
 
             this._unscheduleAnnoucement();
 
-            if (this._dialog) {
-                this._dialog.destroy();
-                this._dialog = null;
+            if (this._screenOverlay) {
+                this._screenOverlay.destroy();
+                this._screenOverlay = null;
             }
 
             if (this._notification) {
@@ -1058,7 +1057,7 @@ export const NotificationManager = class extends EventEmitter {
         this._annoucementTimeoutId = 0;
         this._view = this._resolveView(this._timerState, false, false, true);
 
-        if (!this._isDialogOpen() && this._view !== NotificationView.NULL)
+        if (!this._isScreenOverlayOpened() && this._view !== NotificationView.NULL)
             this._notify();
 
         return GLib.SOURCE_REMOVE;
@@ -1082,9 +1081,9 @@ export const NotificationManager = class extends EventEmitter {
         this._view = NotificationView.NULL;
         this._unscheduleAnnoucement();
 
-        if (this._dialog) {
-            this._dialog.destroy();
-            this._dialog = null;
+        if (this._screenOverlay) {
+            this._screenOverlay.destroy();
+            this._screenOverlay = null;
         }
 
         if (this._notification) {

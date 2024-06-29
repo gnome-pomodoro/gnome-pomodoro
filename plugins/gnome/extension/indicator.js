@@ -20,7 +20,6 @@
 
 import Cairo from 'gi://cairo';
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
@@ -90,25 +89,9 @@ const IndicatorMenu = class extends PopupMenu.PopupMenu {
         return this._indicator;
     }
 
-    // TODO: move to utils
-    _loadIcon(iconName) {
-        let icon = this._icons[iconName];
-
-        if (!icon) {
-            const iconUri = '%s/icons/hicolor/scalable/actions/%s.svg'.format(extension.dir.get_uri(), iconName);
-            icon = new Gio.FileIcon({
-                file: Gio.File.new_for_uri(iconUri),
-            });
-
-            this._icons[iconName] = icon;
-        }
-
-        return icon;
-    }
-
     _createIconButton(iconName, accessibleName) {
         const icon = new St.Icon({
-            gicon: this._loadIcon(iconName),
+            gicon: Utils.loadIcon(iconName),
             style_class: 'popup-menu-icon',
         });
         const iconButton = new St.Button({
@@ -181,7 +164,7 @@ const IndicatorMenu = class extends PopupMenu.PopupMenu {
                 else
                     this._onResumeClicked();
             });
-        buttonsBox.add_actor(pauseResumeButton);
+        buttonsBox.add_child(pauseResumeButton);
 
         const skipStopButton = this._createIconButton('gnome-pomodoro-stop-symbolic', _('Stop Timer'));
         skipStopButton.connect('clicked',
@@ -191,7 +174,7 @@ const IndicatorMenu = class extends PopupMenu.PopupMenu {
                 else
                     this._onStopClicked();
             });
-        buttonsBox.add_actor(skipStopButton);
+        buttonsBox.add_child(skipStopButton);
 
         const blinkingGroup = this._indicator.blinkingGroup;
         blinkingGroup.addActor(timerLabel);
@@ -217,16 +200,16 @@ const IndicatorMenu = class extends PopupMenu.PopupMenu {
         this._timerButton.can_focus = this._timerButton.reactive;
 
         if (!this._isPaused) {
-            this._pauseResumeButton.child.gicon = this._loadIcon('gnome-pomodoro-pause-symbolic');
+            this._pauseResumeButton.child.gicon = Utils.loadIcon('gnome-pomodoro-pause-symbolic');
             this._pauseResumeButton.accessible_name = isBreak ? _('Pause break') : _('Pause Pomodoro');
 
-            this._skipStopButton.child.gicon = this._loadIcon('gnome-pomodoro-skip-symbolic');
+            this._skipStopButton.child.gicon = Utils.loadIcon('gnome-pomodoro-skip-symbolic');
             this._skipStopButton.accessible_name = isBreak ? _('Start Pomodoro') : _('Take a break');
         } else {
-            this._pauseResumeButton.child.gicon = this._loadIcon('gnome-pomodoro-start-symbolic');
+            this._pauseResumeButton.child.gicon = Utils.loadIcon('gnome-pomodoro-start-symbolic');
             this._pauseResumeButton.accessible_name = isBreak ? _('Resume break') : _('Resume Pomodoro');
 
-            this._skipStopButton.child.gicon = this._loadIcon('gnome-pomodoro-stop-symbolic');
+            this._skipStopButton.child.gicon = Utils.loadIcon('gnome-pomodoro-stop-symbolic');
             this._skipStopButton.accessible_name = _('Stop');
         }
     }
@@ -285,7 +268,7 @@ const IndicatorMenu = class extends PopupMenu.PopupMenu {
         this.itemActivated(PopupAnimation.NONE);
 
         if (notificationManager)
-            notificationManager.openDialog();
+            notificationManager.openScreenOverlay();
     }
 
     _onStartClicked() {
@@ -731,7 +714,7 @@ class PomodoroIndicator extends PanelMenu.Button {
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
         });
-        this.add_actor(this._iconBox);
+        this.add_child(this._iconBox);
 
         this._blinking = false;
         this._blinkingGroup = new Utils.TransitionGroup();

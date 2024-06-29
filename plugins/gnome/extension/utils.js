@@ -18,23 +18,18 @@
  *
  */
 
-import Meta from 'gi://Meta';
-import Shell from 'gi://Shell';
+import Gio from 'gi://Gio';
 
 import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import * as Config from './config.js';
+import {extension} from './extension.js';
+
 
 const ENABLED_EXTENSIONS_KEY = 'enabled-extensions';
 
-const VIDEO_PLAYER_CATEGORIES = [
-    ['Player', 'Video'],
-    ['Player', 'AudioVideo'],
-    ['VideoConference'],
-    ['Telephony'],
-    ['Game'],
-];
+const icons = {};
 
 
 export const Patch = class extends EventEmitter {
@@ -180,68 +175,6 @@ export const TransitionGroup = class {
 
 /**
  *
- * @param {Array} subset - subset
- * @param {Array} set - set
- */
-function isSubset(subset, set) {
-    for (let value of subset) {
-        if (set.indexOf(value) < 0)
-            return false;
-    }
-
-    return true;
-}
-
-
-/**
- *
- * @param {object} app - app object
- */
-function _isVideoPlayer(app) {
-    const appInfo = app.get_app_info();
-    if (!appInfo)
-        return false;
-
-    const categoriesStr = appInfo.get_categories();
-    const categories    = categoriesStr ? categoriesStr.split(';') : [];
-
-    if (!categories.length)
-        return false;
-
-    for (let videoPlayerCategories of VIDEO_PLAYER_CATEGORIES) {
-        if (isSubset(videoPlayerCategories, categories))
-            return true;
-    }
-
-    return false;
-}
-
-
-/**
- *
- */
-export function isVideoPlayerOpen() {
-    const apps = Shell.AppSystem.get_default().get_running();
-
-    for (let app of apps) {
-        if (!_isVideoPlayer(app))
-            continue;
-
-        for (let window of app.get_windows()) {
-            if (window.window_type !== Meta.WindowType.NORMAL || window.is_hidden())
-                continue;
-
-            if (window.fullscreen)
-                return true;
-        }
-    }
-
-    return false;
-}
-
-
-/**
- *
  * @param {Error} error - error
  */
 export function logError(error) {
@@ -304,4 +237,23 @@ export function wakeUpScreen() {
             logWarning(`Error while waking up the screen: ${error}`);
         }
     }
+}
+
+
+/**
+ * @param {string} iconName - icon name
+ */
+export function loadIcon(iconName) {
+    let icon = icons[iconName];
+
+    if (!icon) {
+        const iconUri = '%s/icons/hicolor/scalable/actions/%s.svg'.format(extension.dir.get_uri(), iconName);
+        icon = new Gio.FileIcon({
+            file: Gio.File.new_for_uri(iconUri),
+        });
+
+        icons[iconName] = icon;
+    }
+
+    return icon;
 }

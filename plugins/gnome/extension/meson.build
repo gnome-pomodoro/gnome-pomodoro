@@ -1,11 +1,11 @@
 extension_files = [
   'capabilities.js',
   'dbus.js',
-  'dialogs.js',
   'extension.js',
   'indicator.js',
   'notifications.js',
   'presence.js',
+  'screenOverlay.js',
   'screenShield.js',
   'stylesheet.css',
   'timer.js',
