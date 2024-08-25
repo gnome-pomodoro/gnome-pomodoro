@@ -20,6 +20,7 @@
 
 import Cairo from 'gi://cairo';
 import Clutter from 'gi://Clutter';
+import Cogl from 'gi://Cogl';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
@@ -659,12 +660,21 @@ const IconIndicator = class extends EventEmitter {
         const themeNode = actor.get_theme_node();
         const color = themeNode.get_foreground_color();
         this._primaryColor = color;
-        this._secondaryColor = new Clutter.Color({
-            red: color.red,
-            green: color.green,
-            blue: color.blue,
-            alpha: color.alpha * FADE_OUT_OPACITY,
-        });
+
+        if (Utils.isVersionAtLeast('47'))
+            this._secondaryColor = new Cogl.Color({
+                red: color.red,
+                green: color.green,
+                blue: color.blue,
+                alpha: color.alpha * FADE_OUT_OPACITY,
+            });
+        else
+            this._secondaryColor = new Clutter.Color({
+                red: color.red,
+                green: color.green,
+                blue: color.blue,
+                alpha: color.alpha * FADE_OUT_OPACITY,
+            });
     }
 
 

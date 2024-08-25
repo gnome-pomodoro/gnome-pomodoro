@@ -20,6 +20,7 @@
 
 import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
+import Cogl from 'gi://Cogl';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
@@ -57,7 +58,9 @@ const BLUR_RADIUS = 40.0;
 
 const OPEN_WHEN_IDLE_MIN_REMAINING_TIME = 3.0;
 
-const BACKGROUND_COLOR = Clutter.Color.from_pixel(0x000000ff);
+const BACKGROUND_COLOR = Utils.isVersionAtLeast('47')
+    ? new Cogl.Color({red: 0, green: 0, blue: 0, alpha: 255})
+    : Clutter.Color.from_pixel(0x000000ff);
 const ICON_SIZE = 24;
 
 export const OverlayState = {
@@ -264,13 +267,8 @@ class OverlayManager {
                 this._updateOpacity();
             });
         } else {
-            chromeData.actor.ref();
-            try {
-                Main.layoutManager.uiGroup.remove_child(chromeData.actor);
-                global.stage.add_child(chromeData.actor);
-            } finally {
-                chromeData.actor.unref();
-            }
+            Main.layoutManager.uiGroup.remove_child(chromeData.actor);
+            global.stage.add_child(chromeData.actor);
         }
     }
 
@@ -289,13 +287,8 @@ class OverlayManager {
         if (chromeData.actor instanceof Lightbox) {
             chromeData.actor.disconnect(chromeData.notifyOpacityId);
         } else {
-            chromeData.actor.ref();
-            try {
-                global.stage.remove_child(chromeData.actor);
-                Main.layoutManager.uiGroup.add_child(chromeData.actor);
-            } finally {
-                chromeData.actor.unref();
-            }
+            global.stage.remove_child(chromeData.actor);
+            Main.layoutManager.uiGroup.add_child(chromeData.actor);
         }
     }
 
@@ -354,7 +347,6 @@ class OverlayManager {
             notifyVisibleId: actor.connect('notify::visible', this._onOverlayNotifyVisible.bind(this)),
             destroyId: actor.connect('destroy', this._onOverlayDestroy.bind(this)),
         });
-        actor.ref();
 
         this._onOverlayNotifyVisible();
     }
@@ -379,7 +371,6 @@ class OverlayManager {
         for (const overlayData of this._overlayActors) {
             overlayData.actor.disconnect(overlayData.notifyVisibleId);
             overlayData.actor.disconnect(overlayData.destroyId);
-            overlayData.actor.unref();
         }
 
         this._overlayActors = [];

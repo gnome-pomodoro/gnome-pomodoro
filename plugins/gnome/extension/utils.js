@@ -22,6 +22,7 @@ import Gio from 'gi://Gio';
 
 import {EventEmitter} from 'resource:///org/gnome/shell/misc/signals.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as ShellConfig from 'resource:///org/gnome/shell/misc/config.js';
 
 import * as Config from './config.js';
 import {extension} from './extension.js';
@@ -196,12 +197,12 @@ export function logWarning(message) {
  * @param {string} required - version required
  */
 export function isVersionAtLeast(required) {
-    const current = Config.PACKAGE_VERSION;
+    const current = ShellConfig.PACKAGE_VERSION;
     const currentArray = current.split('.');
     const requiredArray = required.split('.');
 
     if (requiredArray[0] <= currentArray[0] &&
-        requiredArray[1] <= currentArray[1] &&
+        (requiredArray[1] <= currentArray[1] || requiredArray[1] === undefined) &&
         (requiredArray[2] <= currentArray[2] || requiredArray[2] === undefined))
         return true;
 
