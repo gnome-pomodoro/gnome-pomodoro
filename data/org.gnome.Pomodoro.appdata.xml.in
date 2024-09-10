@@ -44,6 +44,17 @@
   <translation type="gettext">gnome-pomodoro</translation>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="0.26.0" date="2024-09-10">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.26.0</p>
+        <ul>
+          <li>Support for GNOME Shell 47</li>
+          <li>Allow to dismiss screen overlay by gesture when a video is playing</li>
+          <li>Added Georgian translation (thanks @NorwayFun)</li>
+          <li>Adjusted translations in appdata (thanks @yakushabb)</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.25.2" date="2024-05-31">
       <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.25.2</p>

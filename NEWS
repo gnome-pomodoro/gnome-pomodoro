@@ -1,3 +1,11 @@
+2024-09-10  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.26.0:
+
+	* Support for GNOME Shell 47
+	* Allow to dismiss screen overlay by gesture when a video is playing
+	* Added Georgian translation (thanks @NorwayFun)
+	* Adjusted translations in appdata (thanks @yakushabb)
+
 2024-05-31  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.25.2:
 
