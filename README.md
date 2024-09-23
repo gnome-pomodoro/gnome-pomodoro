@@ -13,3 +13,8 @@ This software is licensed under the [GPL 3](https://github.com/gnome-pomodoro/gn
 ## Package download and building from source
 
 You can find detailed information under the Download section on our webpage https://gnomepomodoro.org/
+
+
+## Sync your Pomodoros with popular time-tracking services
+
+https://github.com/gnome-pomodoro/gnome-pomodoro-tracking
