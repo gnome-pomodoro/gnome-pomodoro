@@ -28,18 +28,20 @@ msgstr ""
 #: src/main.vala:50 src/notifications-capability.vala:129
 #: src/stats-page.vala:527 src/window.vala:44
 msgid "Pomodoro"
-msgstr ""
+msgstr "పోమోడోరో"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:9
 msgid "A time management utility for GNOME"
-msgstr ""
+msgstr "గ్నోమ్ కోసం సమయ నిర్వహణ యుటిలిటీ"
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:11
 msgid ""
 "A GNOME utility that helps managing time according to Pomodoro Technique. It "
 "intends to improve productivity and focus by taking short breaks after every "
 "25 minutes of work."
-msgstr ""
+msgstr "పోమోడోరో టెక్నిక్ ప్రకారం సమయాన్ని నిర్వహించడంలో సహాయపడే గ్నోమ్ యుటిలిటీ. ఇది"
+"ప్రతి తర్వాత చిన్న విరామాలు తీసుకోవడం ద్వారా ఉత్పాదకత మరియు దృష్టిని మెరుగుపరచాలని భావిస్తుంది"
+"25 నిమిషాల పని."
 
 #: data/org.gnome.Pomodoro.appdata.xml.in:23
 msgid "Timer window"
