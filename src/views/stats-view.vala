@@ -68,7 +68,7 @@ namespace Pomodoro
 
         construct
         {
-            this.repository = Pomodoro.get_repository ();
+            this.repository = Pomodoro.Database.get_repository ();
             this.history = new GLib.Queue<unowned Gtk.Widget> ();
 
             this.mode = "none";
