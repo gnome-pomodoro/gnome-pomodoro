@@ -113,7 +113,7 @@ namespace Pomodoro
         }
         public weak Pomodoro.Session session { get; set; }
 
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public int64 start_time {
             get {
                 return this._start_time;
@@ -133,7 +133,7 @@ namespace Pomodoro
             }
         }
 
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public int64 end_time {
             get {
                 return this._end_time;
@@ -156,7 +156,7 @@ namespace Pomodoro
         /**
          * `duration` of a time block, including gaps
          */
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public int64 duration {
             get {
                 return Pomodoro.Timestamp.subtract (this._end_time, this._start_time);
@@ -194,15 +194,15 @@ namespace Pomodoro
             };
         }
 
-        public TimeBlock (Pomodoro.State  state = Pomodoro.State.STOPPED)
+        public TimeBlock (Pomodoro.State state = Pomodoro.State.STOPPED)
         {
             GLib.Object (
                 state: state
             );
         }
 
-        public TimeBlock.with_start_time (int64           start_time,
-                                          Pomodoro.State  state = Pomodoro.State.STOPPED)
+        public TimeBlock.with_start_time (int64          start_time,
+                                          Pomodoro.State state = Pomodoro.State.STOPPED)
         {
             GLib.Object (
                 state: state
