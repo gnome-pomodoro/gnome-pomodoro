@@ -917,7 +917,6 @@ namespace Pomodoro
                                              Pomodoro.TimerState state,
                                              Pomodoro.TimerState previous_state)
         {
-            this.hold ();
             this.save_timer ();
 
             if (this.timer.is_paused)
@@ -925,10 +924,50 @@ namespace Pomodoro
                 this.timer.resume ();
             }
 
-            if (!(previous_state is Pomodoro.DisabledState))
+            if (!(previous_state is Pomodoro.DisabledState) && previous_state.elapsed > 0)
             {
+                var datetime = new GLib.DateTime.from_unix_utc (
+                    (int64) Math.floor (state.timestamp)).to_local ();
+
+                var midnight_datetime = new GLib.DateTime.local (
+                        datetime.get_year (),
+                        datetime.get_month (),
+                        datetime.get_day_of_month (),
+                        0,
+                        0,
+                        0);
+                midnight_datetime.add_days (1);
+                var midnight_timestamp = (double) midnight_datetime.to_unix ();
+                var midnight_split_ratio =
+                        ((midnight_timestamp - previous_state.timestamp) /
+                        (state.timestamp - previous_state.timestamp)).clamp (0.0, 1.0);
+
                 var entry = new Pomodoro.Entry.from_state (previous_state);
                 entry.repository = this.repository;
+
+                if (midnight_split_ratio > 0.0)
+                {
+                    entry.elapsed = (int64) Math.round ((double) entry.elapsed * midnight_split_ratio);
+
+                    var entry_after_midnight = new Pomodoro.Entry.from_state (previous_state);
+                    entry_after_midnight.repository = this.repository;
+                    entry_after_midnight.set_datetime (midnight_datetime);
+                    entry_after_midnight.elapsed -= entry.elapsed;
+
+                    this.hold ();
+                    entry_after_midnight.save_async.begin ((obj, res) => {
+                        try {
+                            entry_after_midnight.save_async.end (res);
+                        }
+                        catch (GLib.Error error) {
+                            GLib.warning ("Error while saving entry: %s", error.message);
+                        }
+
+                        this.release ();
+                    });
+                }
+
+                this.hold ();
                 entry.save_async.begin ((obj, res) => {
                     try {
                         entry.save_async.end (res);
