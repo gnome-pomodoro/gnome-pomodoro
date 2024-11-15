@@ -316,9 +316,26 @@ namespace Pomodoro
 
         public virtual signal void update (double timestamp = Pomodoro.get_current_time ())
         {
+            var last_state = this._state;
+            var last_timestamp = this.timestamp;
+
+            if (last_state != null &&
+                !(last_state is Pomodoro.DisabledState) &&
+                timestamp - last_timestamp >= TIME_TO_RESET_SCORE)
+            {
+                this.state_leave (last_state);
+                this._state = new Pomodoro.DisabledState.with_timestamp (timestamp);
+                this.timestamp = timestamp;
+                this.update_offset ();
+                this.state_enter (this._state);
+                this.state_changed (this._state, last_state);
+
+                return;
+            }
+
             this.timestamp = timestamp;
 
-            if (!this._is_paused)
+            if (!this._is_paused && (timestamp - last_timestamp) < 10.0)
             {
                 this.update_elapsed ();
 
@@ -431,7 +448,7 @@ namespace Pomodoro
                 }
             }
 
-            if (state != null && timestamp - last_timestamp < TIME_TO_RESET_SCORE)
+            if (state != null && ((timestamp - last_timestamp) < TIME_TO_RESET_SCORE))
             {
                 this.freeze_notify ();
                 this.score = score;
