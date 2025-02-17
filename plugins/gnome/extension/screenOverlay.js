@@ -630,14 +630,11 @@ const ScreenOverlayBase = GObject.registerClass({
         this._idleMonitor = global.backend.get_core_idle_monitor();
         this._session = new GnomeSession.SessionManager();
 
-        // Modal dialogs are fixed width and grow vertically; set the request
-        // mode accordingly so wrapped labels are handled correctly during
-        // size requests.
         this._layout = new St.Widget({layout_manager: new Clutter.BinLayout()});
         this._layout.add_constraint(this._monitorConstraint);
         this.add_child(this._layout);
 
-        // Lightbox will be a direct child of the ModalDialog
+        // Lightbox will be a direct child of the overlay
         this._lightbox = extension.pluginSettings.get_boolean('blur-effect')
             ? new BlurredLightbox(this) : new PlainLightbox(this);
         this._lightbox.highlight(this._layout);
@@ -929,10 +926,13 @@ export const ScreenOverlay = GObject.registerClass({
 
         const buttonsBox = new St.BoxLayout({
             style_class: 'extension-pomodoro-overlay-buttons',
-            vertical: false,
             x_align: Clutter.ActorAlign.END,
             y_align: Clutter.ActorAlign.START,
         });
+        if (Utils.isVersionAtLeast('48'))
+            buttonsBox.orientation = Clutter.Orientation.HORIZONTAL;
+        else
+            buttonsBox.vertical = false;
 
         const lockScreenButton = this._createIconButton('lock-screen-symbolic');
         lockScreenButton.connect('clicked', this._onLockScreenButtonClicked.bind(this));
@@ -944,11 +944,14 @@ export const ScreenOverlay = GObject.registerClass({
 
         const contentsBox = new St.BoxLayout({
             style_class: 'extension-pomodoro-overlay-contents',
-            vertical: true,
             x_align: Clutter.ActorAlign.FILL,
             y_align: Clutter.ActorAlign.CENTER,
             y_expand: true,
         });
+        if (Utils.isVersionAtLeast('48'))
+            contentsBox.orientation = Clutter.Orientation.VERTICAL;
+        else
+            contentsBox.vertical = true;
 
         const timerLabel = new TimerLabel(timer, {
             x_align: Clutter.ActorAlign.CENTER,
@@ -974,10 +977,14 @@ export const ScreenOverlay = GObject.registerClass({
 
         const container = new St.BoxLayout({
             style_class: 'extension-pomodoro-overlay-container',
-            vertical: true,
             x_expand: true,
             y_expand: true,
         });
+        if (Utils.isVersionAtLeast('48'))
+            container.orientation = Clutter.Orientation.VERTICAL;
+        else
+            container.vertical = true;
+
         container.add_child(buttonsBox);
         container.add_child(contentsBox);
         container.add_child(doNotTouchIcon);

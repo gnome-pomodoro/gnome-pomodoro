@@ -41,9 +41,12 @@ class PomodoroScreenShieldWidget extends St.Widget {
         this._blinking = false;
 
         const vbox = new St.BoxLayout({
-            vertical: true,
             x_expand: true,
         });
+        if (Utils.isVersionAtLeast('48'))
+            vbox.orientation = Clutter.Orientation.VERTICAL;
+        else
+            vbox.vertical = true;
         this.add_child(vbox);
 
         const hbox = new St.BoxLayout();
@@ -51,9 +54,12 @@ class PomodoroScreenShieldWidget extends St.Widget {
 
         const contentBox = new St.BoxLayout({
             style_class: 'extension-pomodoro-widget-content',
-            vertical: true,
             x_expand: true,
         });
+        if (Utils.isVersionAtLeast('48'))
+            contentBox.orientation = Clutter.Orientation.VERTICAL;
+        else
+            contentBox.vertical = true;
         hbox.add_child(contentBox);
 
         const blinkingGroup = new Utils.TransitionGroup();

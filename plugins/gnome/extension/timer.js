@@ -383,7 +383,6 @@ class PomodoroTimerLabel extends St.BoxLayout {
     _init(timer, params) {
         params = Params.parse(params, {
             style_class: 'extension-pomodoro-timer-label',
-            vertical: false,
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
             x_expand: false,
