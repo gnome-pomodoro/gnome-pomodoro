@@ -1,7 +1,7 @@
 {
     "app-id" : "org.gnomepomodoro.Pomodoro",
     "runtime" : "org.gnome.Platform",
-    "runtime-version" : "master",
+    "runtime-version" : "48",
     "sdk" : "org.gnome.Sdk",
     "command" : "gnome-pomodoro",
     "tags" : [],
@@ -54,7 +54,8 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "https://gitlab.gnome.org/GNOME/gsound.git"
+                    "url" : "https://gitlab.gnome.org/GNOME/gsound.git",
+                    "tag" : "1.0.3"
                 }
             ],
             "modules" : [
@@ -89,8 +90,8 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "branch" : "1.34",
-                    "url" : "https://gitlab.gnome.org/GNOME/libpeas.git"
+                    "url" : "https://gitlab.gnome.org/GNOME/libpeas.git",
+                    "tag" : "libpeas-1.36.0"
                 }
             ]
         },
@@ -107,7 +108,7 @@
                 {
                     "type" : "git",
                     "url" : "https://gitlab.gnome.org/GNOME/libadwaita.git",
-                    "branch" : "libadwaita-1-4"
+                    "tag" : "1.7.4"
                 }
             ],
             "modules" : [
@@ -153,8 +154,8 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "branch" : "master",
-                    "url" : "https://gitlab.gnome.org/GNOME/gom.git"
+                    "url" : "https://gitlab.gnome.org/GNOME/gom.git",
+                    "tag" : "0.5.3"
                 }
             ]
         },
