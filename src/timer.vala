@@ -321,7 +321,7 @@ namespace Pomodoro
 
             if (last_state != null &&
                 !(last_state is Pomodoro.DisabledState) &&
-                timestamp - last_timestamp >= TIME_TO_RESET_SCORE)
+                (timestamp - last_timestamp) >= TIME_TO_RESET_SCORE)
             {
                 this.state_leave (last_state);
                 this._state = new Pomodoro.DisabledState.with_timestamp (timestamp);
@@ -335,7 +335,7 @@ namespace Pomodoro
 
             this.timestamp = timestamp;
 
-            if (!this._is_paused && (timestamp - last_timestamp) < 10.0)
+            if (!this._is_paused)
             {
                 this.update_elapsed ();
 
