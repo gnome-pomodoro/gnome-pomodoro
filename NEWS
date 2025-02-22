@@ -1,3 +1,10 @@
+2025-02-22  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 0.27.0:
+
+	* Support for GNOME Shell 48
+	* Split time spent across midnight
+	* Added Telugu translation (thanks @SpaciousCoder78)
+
 2024-09-10  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.26.0:
 

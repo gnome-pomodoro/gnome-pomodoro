@@ -44,6 +44,16 @@
   <translation type="gettext">gnome-pomodoro</translation>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="0.27.0" date="2025-02-22">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.27.0</p>
+        <ul>
+          <li>Support for GNOME Shell 48</li>
+          <li>Split time spent across midnight</li>
+          <li>Added Telugu translation (thanks @SpaciousCoder78)</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.26.0" date="2024-09-10">
       <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.26.0</p>
