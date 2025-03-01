@@ -215,6 +215,39 @@ statsview .title-2 {
 
 
 /**
+ * PomodoroStatsCard
+ */
+statsview .value {
+    font-size: 1.6em;
+    font-weight: bold;
+}
+
+statscard > button {
+    padding: 15px;
+}
+
+statscard .pill {
+    padding: 1pt 6pt 2pt 6pt;
+    font-size: 10pt;
+    border: none;
+    border-radius: 10pt;
+    background-clip: padding-box;
+    color: #666;
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+statscard .pill.positive {
+    color: #449e70;
+    background-color: rgba(78, 160, 114, 0.15);
+}
+
+statscard .pill.negative {
+    color: #d24444;
+    background-color: rgba(184, 52, 52, 0.15);
+}
+
+
+/**
  * PomodoroHistogram, PomodoroBubbleChart widgets
  */
 chart scrolledwindow undershoot.left {

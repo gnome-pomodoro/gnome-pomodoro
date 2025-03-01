@@ -24,7 +24,7 @@ using GLib;
 namespace Pomodoro
 {
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/stats-month-page.ui")]
-    private class StatsMonthPage : Gtk.Box, Pomodoro.StatsPage
+    public class StatsMonthPage : Gtk.Box, Pomodoro.StatsPage
     {
         private const double REFERENCE_VALUE = 28800.0;  // 8 hours per day
 
@@ -34,7 +34,10 @@ namespace Pomodoro
 
         [GtkChild]
         private unowned Pomodoro.BubbleChart bubble_chart;
-
+        [GtkChild]
+        private unowned Pomodoro.StatsCard pomodoro_card;
+        [GtkChild]
+        private unowned Pomodoro.StatsCard screen_time_card;
 
         construct
         {
@@ -101,6 +104,12 @@ namespace Pomodoro
                     date.add_days (1U);
                 }
             }
+
+            this.pomodoro_card.value = this.bubble_chart.get_category_total (0U);
+            this.pomodoro_card.reference_value = random.double_range (0.0, 8.0 * 3600.0);
+
+            this.screen_time_card.value = this.bubble_chart.get_category_total (1U);
+            this.screen_time_card.reference_value = this.pomodoro_card.reference_value + random.double_range (0.0, 3.0 * 3600.0);
 
             this.update_category_colors ();
         }

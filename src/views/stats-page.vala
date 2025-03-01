@@ -23,7 +23,7 @@ using GLib;
 
 namespace Pomodoro
 {
-    private interface StatsPage : Gtk.Widget
+    public interface StatsPage : Gtk.Widget
     {
     }
 }
