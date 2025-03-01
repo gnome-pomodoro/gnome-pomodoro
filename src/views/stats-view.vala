@@ -23,6 +23,28 @@ using GLib;
 
 namespace Pomodoro
 {
+    public enum Unit
+    {
+        AMOUNT,
+        INTERVAL;
+
+        public string format (double value)
+        {
+            switch (this)
+            {
+                case AMOUNT:
+                    return ((int) Math.floor (value)).to_string ();
+
+                case INTERVAL:
+                    return Pomodoro.Interval.format_short (Pomodoro.Interval.from_seconds (value));
+
+                default:
+                    assert_not_reached ();
+            }
+        }
+    }
+
+
     public enum Timeframe
     {
         DAY,

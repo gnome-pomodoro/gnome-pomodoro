@@ -24,7 +24,7 @@ using GLib;
 namespace Pomodoro
 {
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/stats-day-page.ui")]
-    private class StatsDayPage : Gtk.Box, Pomodoro.StatsPage
+    public class StatsDayPage : Gtk.Box, Pomodoro.StatsPage
     {
         public Gom.Repository repository { get; construct; }
 
@@ -32,6 +32,10 @@ namespace Pomodoro
 
         [GtkChild]
         private unowned Pomodoro.Histogram histogram;
+        [GtkChild]
+        private unowned Pomodoro.StatsCard pomodoro_card;
+        [GtkChild]
+        private unowned Pomodoro.StatsCard screen_time_card;
 
         construct
         {
@@ -91,6 +95,12 @@ namespace Pomodoro
 
                 bucket_index++;
             }
+
+            this.pomodoro_card.value = this.histogram.get_category_total (0U);
+            this.pomodoro_card.reference_value = random.double_range (0.0, 8.0 * 3600.0);
+
+            this.screen_time_card.value = this.histogram.get_category_total (1U);
+            this.screen_time_card.reference_value = this.pomodoro_card.reference_value + random.double_range (0.0, 3.0 * 3600.0);
         }
 
         public StatsDayPage (Gom.Repository repository,

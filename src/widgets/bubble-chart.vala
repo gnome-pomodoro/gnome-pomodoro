@@ -276,6 +276,20 @@ namespace Pomodoro
             this.queue_draw ();
         }
 
+        public double get_category_total (uint category_index)
+        {
+            var total = this.data.get_matrix (-1, (int) category_index).sum ();
+
+            if (this._stacked)
+            {
+                for (var index = 0; index < category_index; index++) {
+                    total += this.data.get_matrix (-1, index).sum ();
+                }
+            }
+
+            return total;
+        }
+
         private string get_tooltip_label (uint row,
                                           uint column)
         {

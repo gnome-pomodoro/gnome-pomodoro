@@ -37,6 +37,7 @@
     <file alias="ui/lightbox.ui" compressed="true" preprocess="xml-stripblanks">widgets/lightbox.ui</file>
     <file alias="ui/log-scale-row.ui" compressed="true" preprocess="xml-stripblanks">widgets/log-scale-row.ui</file>
     <file alias="ui/sidebar-row.ui" compressed="true" preprocess="xml-stripblanks">widgets/sidebar-row.ui</file>
+    <file alias="ui/stats-card.ui" compressed="true" preprocess="xml-stripblanks">widgets/stats-card.ui</file>
     <file alias="ui/timer-control-buttons.ui" compressed="true" preprocess="xml-stripblanks">widgets/timer-control-buttons.ui</file>
     <file alias="ui/timer-label.ui" compressed="true" preprocess="xml-stripblanks">widgets/timer-label.ui</file>
     <file alias="ui/variable-popover.ui" compressed="true" preprocess="xml-stripblanks">widgets/variable-popover.ui</file>

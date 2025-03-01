@@ -24,7 +24,7 @@ using GLib;
 namespace Pomodoro
 {
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/stats-week-page.ui")]
-    private class StatsWeekPage : Gtk.Box, Pomodoro.StatsPage
+    public class StatsWeekPage : Gtk.Box, Pomodoro.StatsPage
     {
         private const double REFERENCE_VALUE = 28800.0;  // 8 hours per day
 
@@ -34,6 +34,10 @@ namespace Pomodoro
 
         [GtkChild]
         private unowned Pomodoro.Histogram histogram;
+        [GtkChild]
+        private unowned Pomodoro.StatsCard pomodoro_card;
+        [GtkChild]
+        private unowned Pomodoro.StatsCard screen_time_card;
 
         construct
         {
@@ -65,6 +69,9 @@ namespace Pomodoro
 
             for (var weekday = 0; weekday <= 6; weekday++)
             {
+                var date = this.date.copy ();
+                date.add_days (weekday);
+
                 var value_1 = random.double_range (0.0, 3600.0 * 8);
                 var value_2 = value_1 + random.double_range (0.0, 3600.0 * 8 - value_1);
 
@@ -87,6 +94,12 @@ namespace Pomodoro
 
                 bucket_index++;
             }
+
+            this.pomodoro_card.value = this.histogram.get_category_total (0U);
+            this.pomodoro_card.reference_value = random.double_range (0.0, 8.0 * 3600.0);
+
+            this.screen_time_card.value = this.histogram.get_category_total (1U);
+            this.screen_time_card.reference_value = this.pomodoro_card.reference_value + random.double_range (0.0, 3.0 * 3600.0);
         }
 
         public StatsWeekPage (Gom.Repository repository,

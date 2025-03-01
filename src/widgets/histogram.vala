@@ -179,6 +179,20 @@ namespace Pomodoro
             return this.categories.length;
         }
 
+        public double get_category_total (uint category_index)
+        {
+            var total = this.data.get_vector (-1, (int) category_index).sum ();
+
+            if (this._stacked)
+            {
+                for (var index = 0; index < category_index; index++) {
+                    total += this.data.get_vector (-1, index).sum ();
+                }
+            }
+
+            return total;
+        }
+
         public uint add_category (string label)
         {
             var category_index = this.categories.length;

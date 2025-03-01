@@ -155,6 +155,7 @@ gnome_pomodoro_vala_sources = files(
   'widgets/session-progress-bar.vala',
   'widgets/sidebar-row.vala',
   'widgets/size-stack.vala',
+  'widgets/stats-card.vala',
   'widgets/time-label.vala',
   'widgets/timer-control-buttons.vala',
   'widgets/timer-label.vala',
