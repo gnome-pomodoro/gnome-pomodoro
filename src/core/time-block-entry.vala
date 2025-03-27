@@ -14,7 +14,7 @@ namespace Pomodoro
 
         static construct
         {
-            set_table ("time_blocks");
+            set_table ("timeblocks");
             set_primary_key ("id");
             set_notnull ("session-id");
             set_notnull ("start-time");
