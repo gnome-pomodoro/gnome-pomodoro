@@ -17,7 +17,7 @@ namespace Pomodoro
             set_notnull ("start-time");
             set_notnull ("end-time");
             set_unique ("start-time");
-            set_reference ("time-block-id", "time_blocks", "id");
+            set_reference ("time-block-id", "timeblocks", "id");
         }
     }
 }
