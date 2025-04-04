@@ -172,4 +172,146 @@ namespace Pomodoro
 
         return result.str;
     }
+
+
+    /**
+     * Convenience class for waiting until an internal counter reaches zero / the number of holds
+     * reaches zero.
+     *
+     * Unlike promises in JavaScript, it is reusable and does not transfer result value.
+     */
+    public class Promise
+    {
+        private int counter = 0;
+        private bool resolved = false;
+        private bool in_dispose = false;
+        private GLib.Mutex mutex;
+        private GLib.Cond cond;
+        private GLib.GenericArray<GLib.Thread<bool>> waiting_threads;
+
+        public Promise ()
+        {
+            this.mutex = GLib.Mutex ();
+            this.cond = GLib.Cond ();
+            this.waiting_threads = new GLib.GenericArray<GLib.Thread<bool>> ();
+        }
+
+        ~Promise ()
+        {
+            this.mutex.lock ();
+            this.in_dispose = true;
+            this.resolved = true;  // Signal any waiting threads to exit
+            this.cond.broadcast ();  // Wake up all waiting threads
+            this.mutex.unlock ();
+
+            // Wait for all spawned threads to complete
+            foreach (var thread in waiting_threads) {
+                thread.join ();
+            }
+        }
+
+        /**
+         * Returns the current counter value.
+         *
+         * @return the current counter value
+         */
+        public int get_counter()
+        {
+            this.mutex.lock ();
+            var value = this.counter;
+            this.mutex.unlock ();
+
+            return value;
+        }
+
+        /**
+         * Increases the internal counter.
+         */
+        public void hold ()
+        {
+            this.mutex.lock ();
+
+            if (!this.in_dispose) {
+                this.counter++;
+                this.resolved = false;
+            }
+
+            this.mutex.unlock ();
+        }
+
+        /**
+         * Decreases the internal counter.
+         * If the counter reaches zero, any waiting tasks will be notified.
+         */
+        public void release ()
+        {
+            this.mutex.lock ();
+
+            if (!this.in_dispose && this.counter > 0)
+            {
+                this.counter--;
+
+                if (this.counter == 0) {
+                    this.resolved = true;
+                    this.cond.broadcast ();
+                }
+            }
+            else if (this.counter == 0) {
+                GLib.critical ("Too many calls of Promise.release()");
+            }
+
+            this.mutex.unlock ();
+        }
+
+        /**
+         * Asynchronously waits until the internal counter reaches zero.
+         *
+         * @return true when the internal counter has reached zero
+         */
+        public async void wait ()
+        {
+            if (this.in_dispose) {
+                return;
+            }
+
+            // Check if already resolved to avoid creating a thread
+            this.mutex.lock ();
+            var already_resolved = this.resolved || this.counter == 0;
+            this.mutex.unlock ();
+
+            if (already_resolved) {
+                return;
+            }
+
+            SourceFunc callback = this.wait.callback;
+
+            var thread = new GLib.Thread<bool> (
+                "promise-wait",
+                () => {
+                    this.mutex.lock ();
+
+                    while (!this.resolved && !this.in_dispose) {
+                        this.cond.wait (this.mutex);
+                    }
+
+                    this.mutex.unlock ();
+
+                    // Schedule the callback in the main loop
+                    GLib.Idle.add ((owned) callback);
+
+                    return true;
+                });
+
+            this.mutex.lock ();
+            this.waiting_threads.add (thread);
+            this.mutex.unlock ();
+
+            // Wait for the callback
+            yield;
+
+            this.mutex.lock ();
+            this.waiting_threads.remove_fast (thread);
+            this.mutex.unlock ();
+        }
+    }
 }
