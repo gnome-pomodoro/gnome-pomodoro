@@ -819,7 +819,7 @@ namespace Pomodoro
             return this.entry.version != this.version;
         }
 
-        internal Pomodoro.SessionEntry create_or_update_entry ()
+        internal unowned Pomodoro.SessionEntry create_or_update_entry ()
         {
             if (this.entry == null) {
                 this.entry = new Pomodoro.SessionEntry ();

@@ -5,6 +5,7 @@ namespace Pomodoro.Database
 {
     private const uint VERSION = 2;
     private const string MIGRATIONS_URI = "resource:///org/gnomepomodoro/Pomodoro/migrations";
+    private const string DATE_FORMAT = "%Y-%m-%d";  // TODO: make functions to convert date
 
     private Gom.Adapter? adapter = null;
     private Gom.Repository? repository = null;
@@ -86,7 +87,7 @@ namespace Pomodoro.Database
             }
         }
         catch (GLib.Error error) {
-            GLib.error ("Failed to open database '%s': %s", file?.get_uri (), error.message);
+            GLib.critical ("Failed to open database '%s': %s", file?.get_uri (), error.message);
             return null;
         }
 
@@ -107,6 +108,8 @@ namespace Pomodoro.Database
         }
         catch (GLib.Error error) {
             GLib.error ("Failed to migrate database: %s", error.message);
+
+            // TODO: backup and create a new database
         }
 
         return repository;
@@ -158,5 +161,29 @@ namespace Pomodoro.Database
 
         Pomodoro.Database.repository = null;
         Pomodoro.Database.adapter = null;
+    }
+
+    public string serialize_date (GLib.Date date)
+    {
+        return Pomodoro.DateUtils.format_date (date, DATE_FORMAT);
+    }
+
+    public GLib.Date parse_date (string date_string)
+    {
+        var parts = date_string.split ("-");
+        var date = GLib.Date ();
+
+        if (parts.length == 3)
+        {
+            var year  = uint.parse (parts[0]);
+            var month = uint.parse (parts[1]);
+            var day   = uint.parse (parts[2]);
+
+            date.set_dmy ((GLib.DateDay) day,
+                          (GLib.DateMonth) month,
+                          (GLib.DateYear) year);
+        }
+
+        return date;
     }
 }

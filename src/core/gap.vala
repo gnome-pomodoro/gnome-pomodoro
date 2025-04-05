@@ -159,15 +159,15 @@ namespace Pomodoro
 
         internal bool should_update_entry ()
         {
-            if (this.entry == null || this.entry.id == 0) {  // !this.entry.get_is_from_table ()) {
+            if (this.entry == null || this.entry.id == 0) {
                 return true;
             }
 
             return this.entry.version != this.version;
         }
 
-        internal Pomodoro.GapEntry create_or_update_entry ()
-                                                           requires (this.time_block.entry != null)
+        internal unowned Pomodoro.GapEntry create_or_update_entry ()
+                                           requires (this.time_block.entry != null)
         {
             if (this.entry == null)
             {
