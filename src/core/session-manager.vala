@@ -747,13 +747,13 @@ namespace Pomodoro
 
             var filter = new Gom.Filter.and_full (filters);
             var command_builder = (Gom.CommandBuilder) GLib.Object.@new (
-                typeof (Gom.CommandBuilder),
-                resource_type: typeof (Pomodoro.TimeBlockEntry),
-                adapter: adapter,
-                filter: filter);
+                    typeof (Gom.CommandBuilder),
+                    resource_type: typeof (Pomodoro.TimeBlockEntry),
+                    adapter: adapter,
+                    filter: filter);
             var command = command_builder.build_delete ();
 
-            command.@ref ();
+            command.@ref ();  // TODO: is it needed?
 
             adapter.queue_write (
                 () => {
@@ -839,15 +839,17 @@ namespace Pomodoro
             // Collect session data.
             var is_updating_session_entry = session.should_update_entry ();
             var session_entry = is_updating_session_entry
-                ? session.create_or_update_entry ()
-                : session.entry;
-
-            Pomodoro.TimeBlockEntry[] time_block_entries_array = {};
-            Pomodoro.GapEntry[] gap_entries_array = {};
-
+                    ? session.create_or_update_entry ()
+                    : session.entry;
             var keep_time_block_ids = new GLib.Array<int64> ();
             var keep_gap_ids = new GLib.HashTable<int64?, GLib.Array> (GLib.direct_hash,
                                                                        GLib.direct_equal);
+            var time_block_mapping = new GLib.HashTable
+                    <unowned Pomodoro.TimeBlock, unowned Pomodoro.TimeBlockEntry>
+                    (GLib.direct_hash, GLib.direct_equal);
+            var gap_mapping = new GLib.HashTable
+                    <unowned Pomodoro.Gap, unowned Pomodoro.GapEntry>
+                    (GLib.direct_hash, GLib.direct_equal);
 
             session.@foreach (
                 (time_block) => {
@@ -866,7 +868,7 @@ namespace Pomodoro
                         var gap_ids = new GLib.Array<int64> ();
 
                         time_block_entry = time_block.create_or_update_entry ();
-                        time_block_entries_array += time_block_entry;
+                        time_block_mapping.insert (time_block, time_block_entry);
                         time_block.foreach_gap (
                             (gap) => {
                                 if (!gap.should_create_entry ()) {
@@ -881,7 +883,7 @@ namespace Pomodoro
 
                                 if (gap.should_update_entry ()) {
                                     gap_entry = gap.create_or_update_entry ();
-                                    gap_entries_array += gap_entry;
+                                    gap_mapping.insert (gap, gap_entry);
                                 }
                             });
 
@@ -902,17 +904,16 @@ namespace Pomodoro
                         repository: repository,
                         resource_type: typeof (Pomodoro.TimeBlockEntry),
                         is_writable: true);
+                time_block_mapping.@foreach (
+                    (time_block, time_block_entry) => {
+                        assert (time_block_entry.session_id != 0);
 
-                foreach (var time_block_entry in time_block_entries_array)
-                {
-                    assert (time_block_entry.session_id != 0);
+                        // HACK: Gom is eager to erase is-from-table flag,
+                        //       which leads entries to being inserted again, not updated.
+                        time_block_entry.set_data<bool> ("is-from-table", time_block_entry.id != 0);
 
-                    // HACK: gom is eager to erase is-from-table flag,
-                    //       which leads entries to being inserted again not updated
-                    time_block_entry.set_data<bool> ("is-from-table", time_block_entry.id != 0);
-
-                    time_block_entries.append (time_block_entry);
-                }
+                        time_block_entries.append (time_block_entry);
+                    });
 
                 this.delete_time_blocks (repository,
                                          session_entry.id,
@@ -920,30 +921,41 @@ namespace Pomodoro
                 time_block_entries.write_sync ();
                 // yield time_block_entries.write_async ();  // XXX: should use async
 
-                // HACK: Tell gom that entries are from db
-                foreach (var time_block_entry in time_block_entries_array) {
-                    time_block_entry.set_data<bool> ("is-from-table", true);
-                }
+                time_block_mapping.@foreach (
+                    (time_block, time_block_entry) => {
+                        // HACK: Tell Gom that entries are from db
+                        time_block_entry.set_data<bool> ("is-from-table", true);
+
+                        this.time_block_saved (time_block, time_block_entry);
+                    });
 
                 var gap_entries = (Gom.ResourceGroup) GLib.Object.@new (
                         typeof (Gom.ResourceGroup),
                         repository: repository,
                         resource_type: typeof (Pomodoro.TimeBlockEntry),
                         is_writable: true);
-
-                foreach (var gap_entry in gap_entries_array) {
-                    assert (gap_entry.time_block_id != 0);
-                    gap_entries.append (gap_entry);
-                }
+                gap_mapping.@foreach (
+                    (gap, gap_entry) => {
+                        assert (gap_entry.time_block_id != 0);
+                        gap_entries.append (gap_entry);
+                    });
 
                 keep_gap_ids.@foreach (
-                    (time_block_id, gap_ids) => {
+                    (time_block_id, gap_ids_to_keep) => {
                         this.delete_gaps (repository,
                                           time_block_id,
-                                          gap_ids);
+                                          gap_ids_to_keep);
                     });
                 gap_entries.write_sync ();
                 // yield gap_entries.write_async ();  // XXX: should use async
+
+                gap_mapping.@foreach (
+                    (gap, gap_entry) => {
+                        // HACK: Tell Gom that entries are from db
+                        gap_entry.set_data<bool> ("is-from-table", true);
+
+                        this.gap_saved (gap, gap_entry);
+                    });
             }
             catch (GLib.Error error) {
                 throw error;
@@ -1957,12 +1969,14 @@ namespace Pomodoro
                                      Pomodoro.Session?   previous_session,
                                      Pomodoro.TimeBlock? previous_time_block);
 
+        public signal void time_block_saved (Pomodoro.TimeBlock      time_block,
+                                             Pomodoro.TimeBlockEntry time_block_entry);
+
+        public signal void gap_saved (Pomodoro.Gap      gap,
+                                      Pomodoro.GapEntry gap_entry);
+
         public override void dispose ()
         {
-            if (Pomodoro.SessionManager.instance == this) {
-                Pomodoro.SessionManager.instance = null;
-            }
-
             if (this._timer != null)
             {
                 if (this.timer_resolve_state_id != 0) {

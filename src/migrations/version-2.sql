@@ -39,21 +39,22 @@ CREATE TABLE "timezones" (
 
 CREATE TABLE "stats" (
     "id"                    INTEGER PRIMARY KEY AUTOINCREMENT,
-    "date"                  DATE NOT NULL,        -- date adjusted for virtual midnight
-    "offset"                INTEGER NOT NULL,     -- offset in seconds, local time of day
-    "duration"              INTEGER DEFAULT 0,    -- in seconds
+    "time"                  INTEGER NOT NULL,     -- Unix timestamp in microseconds, UTC
+    "date"                  DATE NOT NULL,        -- date adjusted for virtual midnight, local
+    "offset"                INTEGER NOT NULL,     -- time of day in microseconds, local
+    "duration"              INTEGER DEFAULT 0,    -- in microseconds
     "category"              TEXT NOT NULL,
-    "time-block-id"         INTEGER NULL,
-    FOREIGN KEY ("time-block-id") REFERENCES "timeblocks" ("id") ON DELETE SET NULL
+    "source-id"             INTEGER DEFAULT 0
 );
+CREATE INDEX "stats-time" ON "stats" ("time");
 CREATE INDEX "stats-date" ON "stats" ("date");
-CREATE INDEX "stats-time-block-id" ON "stats" ("time-block-id");
+CREATE INDEX "stats-source-id" ON "stats" ("source-id");
 
 CREATE TABLE "aggregatedstats" (
     "id"                    INTEGER PRIMARY KEY AUTOINCREMENT,
     "date"                  DATE NOT NULL,        -- date adjusted for virtual midnight
     "category"              TEXT NOT NULL,
-    "duration"              INTEGER DEFAULT 0     -- in seconds
+    "duration"              INTEGER DEFAULT 0     -- in microseconds
 );
 CREATE INDEX "aggregated-stats-date" ON "aggregatedstats" ("date");
 CREATE UNIQUE INDEX "aggregated-stats-date-category" ON "aggregatedstats" (

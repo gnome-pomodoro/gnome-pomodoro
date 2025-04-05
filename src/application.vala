@@ -126,6 +126,7 @@ namespace Pomodoro
         public Pomodoro.SessionManager?      session_manager;
         public Pomodoro.CapabilityManager?   capability_manager;
 
+        private Pomodoro.StatsManager?       stats_manager;
         private Pomodoro.EventProducer?      event_producer;
         private Pomodoro.EventBus?           event_bus;
         private Pomodoro.ActionManager?      action_manager;
@@ -525,6 +526,7 @@ namespace Pomodoro
             this.settings        = Pomodoro.get_settings ();
             this.session_manager = Pomodoro.SessionManager.get_default ();
             this.timer           = this.session_manager.timer;
+            this.stats_manager   = new Pomodoro.StatsManager ();
             this.event_producer  = new Pomodoro.EventProducer ();
             this.event_bus       = this.event_producer.bus;
             this.action_manager  = new Pomodoro.ActionManager ();
@@ -654,6 +656,7 @@ namespace Pomodoro
             this.event_producer = null;
             this.event_bus = null;
             this.capability_manager = null;
+            this.stats_manager = null;
             this.session_manager = null;
             this.timer = null;
 

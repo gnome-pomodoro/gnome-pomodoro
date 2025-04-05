@@ -669,6 +669,7 @@ namespace Pomodoro
             // XXX: we may want to save SCHEDULED time-blocks in future, e.g. when setting up
             //      a custom session / warm-up.
             return this.meta.status != Pomodoro.TimeBlockStatus.SCHEDULED &&
+                   this.state != Pomodoro.State.STOPPED &&
                    Pomodoro.Timestamp.is_defined (this.start_time);
         }
 
@@ -682,8 +683,8 @@ namespace Pomodoro
                    this.entry.status != this.meta.status.to_string ();
         }
 
-        internal Pomodoro.TimeBlockEntry create_or_update_entry ()
-                                                                 requires (this.session != null)
+        internal unowned Pomodoro.TimeBlockEntry create_or_update_entry ()
+                                                 requires (this.session != null)
         {
             if (this.entry == null)
             {
