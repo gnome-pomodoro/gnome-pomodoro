@@ -37,8 +37,12 @@ namespace Pomodoro
         [GtkChild]
         private unowned Pomodoro.StatsCard screen_time_card;
 
+        private Pomodoro.StatsManager? stats_manager;
+
         construct
         {
+            this.stats_manager = new Pomodoro.StatsManager ();
+
             this.histogram.reference_value = 3600.0;  // 1 hour (same as bucket size)
             this.histogram.y_spacing = 1800.0;  // 30 minutes
             this.histogram.set_format_value_func (
@@ -101,6 +105,13 @@ namespace Pomodoro
 
             this.screen_time_card.value = this.histogram.get_category_total (1U);
             this.screen_time_card.reference_value = this.pomodoro_card.reference_value + random.double_range (0.0, 3.0 * 3600.0);
+
+            this.populate.begin (
+                (obj, res) => {
+                    this.populate.end (res);
+
+                    this.stats_manager.entry_saved.connect (this.on_entry_saved);
+                });
         }
 
         public StatsDayPage (Gom.Repository repository,
@@ -110,6 +121,91 @@ namespace Pomodoro
                 repository: repository,
                 date: date
             );
+        }
+
+        private void include_entry (Pomodoro.StatsEntry entry)
+        {
+            // TODO: extend data
+        }
+
+        private void exclude_entry (Pomodoro.StatsEntry entry)
+        {
+            // TODO:
+        }
+
+        private async void populate ()
+        {
+            var date_value = GLib.Value (typeof (string));
+            date_value.set_string (Pomodoro.Database.serialize_date (this.date));
+
+            var date_filter = new Gom.Filter.eq (
+                    typeof (Pomodoro.StatsEntry),
+                    "date",
+                    date_value);
+
+            try {
+                var results = yield this.repository.find_async (
+                        typeof (Pomodoro.StatsEntry),
+                        date_filter);
+                yield results.fetch_async (0U, results.count);
+
+                for (var index = 0U; index < results.count; index++) {
+                    this.include_entry ((Pomodoro.StatsEntry) results.get_index (index));
+                }
+            }
+            catch (GLib.Error error) {
+                GLib.critical ("Error while populating daily stats: %s", error.message);
+            }
+
+            /*
+            var adapter = Pomodoro.Database.get_repository ().get_adapter ();
+            var elapsed = (int64) 0;
+
+            adapter.queue_read (() => {
+                Gom.Cursor? cursor = null;
+
+                var command = (Gom.Command) GLib.Object.@new (typeof (Gom.Command),
+                                                              adapter: adapter);
+                command.set_sql ("""
+                    SELECT """ + group_by_sql + """ AS "group", SUM("elapsed") AS "elapsed-sum"
+                        FROM "aggregated-entries"
+                        GROUP BY "group"
+                        ORDER BY "elapsed-sum" DESC
+                        LIMIT 1;
+                    """);
+
+                try {
+                    command.execute (out cursor);
+
+                    if (cursor != null && cursor.next ()) {
+                        elapsed = cursor.get_column_int64 (1);
+                    }
+                    else {
+                        GLib.assert_not_reached ();
+                    }
+                }
+                catch (GLib.Error error) {
+                    GLib.critical ("%s", error.message);
+                }
+
+                GLib.Idle.add (get_max_elapsed_sum.callback);
+            });
+
+            yield;
+            */
+
+            // SELECT category, SUM(duration) AS total_duration
+            //     FROM your_table_name
+            //     GROUP BY category;
+        }
+
+        private void on_entry_saved (Pomodoro.StatsEntry entry)
+        {
+            if (entry.date != Pomodoro.Database.serialize_date (this.date)) {
+                return;
+            }
+
+            this.include_entry (entry);
         }
 
         private void update_category_colors ()
