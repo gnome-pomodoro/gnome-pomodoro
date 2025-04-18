@@ -71,6 +71,11 @@ namespace Pomodoro.Interval
         return round (interval, Pomodoro.Interval.SECOND);
     }
 
+    public double to_seconds (int64 interval)
+    {
+        return ((double) interval) / ((double) Pomodoro.Interval.SECOND);
+    }
+
     public string format_short (int64 interval)
     {
         if (interval < 0) {
@@ -186,7 +191,7 @@ namespace Pomodoro.Timestamp
         return (uint) (timestamp / Pomodoro.Interval.MILLISECOND).clamp (0, uint.MAX);
     }
 
-    public GLib.DateTime? to_datetime (int64 timestamp,
+    public GLib.DateTime? to_datetime (int64          timestamp,
                                        GLib.TimeZone? timezone = null)
     {
         if (is_undefined (timestamp)) {
@@ -194,6 +199,7 @@ namespace Pomodoro.Timestamp
         }
 
         var datetime = new GLib.DateTime.from_unix_utc (timestamp / Pomodoro.Interval.SECOND);
+        // var datetime = new GLib.DateTime.from_unix_epoch_utc_usecs (timestamp);  XXX: not available yet
 
         return timezone != null
             ? datetime.to_timezone (timezone)

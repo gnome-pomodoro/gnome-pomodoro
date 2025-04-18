@@ -168,6 +168,8 @@ namespace Pomodoro
 
             try {
                 entry.save_sync ();
+
+                this.changed ();
             }
             catch (GLib.Error error) {
                 if (!this.replace_in_database (timestamp, timezone)) {
@@ -210,6 +212,54 @@ namespace Pomodoro
             this.search_internal (timestamp, out marker, null);
 
             return marker?.timezone;
+        }
+
+        public unowned GLib.TimeZone? search_by_date (GLib.Date date,
+                                                      int64     offset = 0)
+        {
+            unowned Pomodoro.TimezoneMarker? marker = null;
+            unowned Pomodoro.TimezoneMarker? last_valid_marker = null;
+            uint index;
+
+            var estimated_datetime = new GLib.DateTime.utc (
+                    date.get_year (),
+                    date.get_month (),
+                    date.get_day (),
+                    0, 0, 0);
+            estimated_datetime.add_days (-2);
+            var estimated_timestamp = estimated_datetime.to_unix ();
+
+            this.search_internal (estimated_timestamp, out marker, out index);
+
+            if (marker == null && this.data.length > 0) {
+                index  = this.data.length - 1;
+                marker = this.data.index (index);
+            }
+
+            while (marker != null)
+            {
+                var datetime = new GLib.DateTime (
+                        marker.timezone,
+                        date.get_year (),
+                        date.get_month (),
+                        date.get_day (),
+                        0, 0, 0);
+                if (offset != 0) {
+                    datetime = datetime.add_seconds (Pomodoro.Interval.to_seconds (offset));
+                }
+
+                if (marker.timestamp > datetime.to_unix ()) {
+                    break;
+                }
+
+                last_valid_marker = marker;
+                index++;
+                marker = index < this.data.length
+                        ? this.data.index (index)
+                        : null;
+            }
+
+            return last_valid_marker?.timezone;
         }
 
         /**
@@ -317,6 +367,8 @@ namespace Pomodoro
             this.fetched_timestamp = Pomodoro.Timestamp.UNDEFINED;
             this.fetched_all = false;
         }
+
+        public signal void changed ();
 
         public override void dispose ()
         {
