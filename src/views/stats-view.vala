@@ -236,7 +236,7 @@ namespace Pomodoro
             switch (timeframe)
             {
                 case Pomodoro.Timeframe.DAY:
-                    return new Pomodoro.StatsDayPage (this.repository, date);
+                    return new Pomodoro.StatsDayPage (date);
 
                 case Pomodoro.Timeframe.WEEK:
                     return new Pomodoro.StatsWeekPage (this.repository, date);
@@ -290,6 +290,8 @@ namespace Pomodoro
                     assert_not_reached ();
             }
 
+            // TODO: skip empty
+
             this.update_title ();
             this.update_actions ();
 
@@ -318,6 +320,8 @@ namespace Pomodoro
                 default:
                     assert_not_reached ();
             }
+
+            // TODO: skip empty
 
             this.update_title ();
             this.update_actions ();

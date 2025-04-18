@@ -23,6 +23,22 @@ using GLib;
 
 namespace Pomodoro
 {
+    public enum StatsCategory
+    {
+        POMODORO = 0,
+        SCREEN_TIME = 1
+    }
+
+
+    public enum StatsReference
+    {
+        NONE,
+        PREVIOUS,
+        WEEK,
+        MONTH;
+    }
+
+
     public interface StatsPage : Gtk.Widget
     {
     }

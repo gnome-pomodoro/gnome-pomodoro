@@ -48,8 +48,8 @@ namespace Pomodoro
                     return Pomodoro.Interval.format_short (Pomodoro.Interval.from_seconds (value));
                 });
 
-            this.histogram.add_category ("Pomodoro");
-            this.histogram.add_category ("Screen Time");
+            // this.histogram.add_category ("Pomodoro");
+            // this.histogram.add_category ("Screen Time");
 
             var random = new GLib.Rand ();
             var bucket_index = 0;
@@ -62,9 +62,9 @@ namespace Pomodoro
                 var weekday_value = GLib.Value (typeof (uint));
                 weekday_value.set_uint (weekday);
 
-                this.histogram.add_bucket (
-                        capitalize_words (Pomodoro.DateUtils.format_date (date, "%a")),
-                        weekday_value);
+                // this.histogram.add_bucket (
+                //         capitalize_words (Pomodoro.DateUtils.format_date (date, "%a")),
+                //         weekday_value);
             }
 
             for (var weekday = 0; weekday <= 6; weekday++)
@@ -85,9 +85,9 @@ namespace Pomodoro
                     value_2 = 0.0;
                 }
 
-                this.histogram.set_tooltip_label (
-                        bucket_index,
-                        capitalize_words (Pomodoro.DateUtils.format_date (date, "%e %B")));
+                // this.histogram.set_tooltip_label (
+                //         bucket_index,
+                //         capitalize_words (Pomodoro.DateUtils.format_date (date, "%e %B")));
                 this.histogram.set_values (
                         bucket_index,
                         { value_1, value_2 });

@@ -135,6 +135,49 @@ namespace Pomodoro
             this.queue_allocate ();
         }
 
+        private void ensure_categories (uint count)
+        {
+            var previous_count = this.categories.length;
+
+            if (previous_count >= count) {
+                return;
+            }
+
+            this.categories.resize ((int) count);
+
+            for (var index = previous_count; index < count; index++)
+            {
+                this.categories[index] = Category () {
+                    label = "",
+                    color = this.get_color ()
+                };
+            }
+
+            this.dirty = true;
+            this.queue_allocate ();
+        }
+
+        private void ensure_buckets (uint count)
+        {
+            var previous_count = this.buckets.length;
+
+            if (previous_count >= count) {
+                return;
+            }
+
+            this.buckets.resize ((int) count);
+
+            for (var index = previous_count; index < count; index++)
+            {
+                this.buckets[index] = Bucket () {
+                    label = ""
+                };
+            }
+
+            this.dirty = true;
+            this.queue_allocate ();
+        }
+
         private void ensure_data ()
         {
             var bucket_count = this.buckets.length;
@@ -152,22 +195,22 @@ namespace Pomodoro
         }
 
         // TODO: remove it? it's more suitable for a BarChart
-        public uint add_bucket (string     label,
-                                GLib.Value identity)
-        {
-            var bucket_index = this.buckets.length;
+        // public uint add_bucket (string     label,
+        //                         GLib.Value identity)
+        // {
+        //     var bucket_index = this.buckets.length;
 
-            this.buckets += Bucket () {
-                label         = label,
-                tooltip_label = label,
+        //     this.buckets += Bucket () {
+        //         label         = label,
+        //         tooltip_label = label,
                 // identity      = identity
-            };
-            this.dirty = true;
+        //     };
+        //     this.dirty = true;
 
-            this.queue_allocate ();
+        //     this.queue_allocate ();
 
-            return bucket_index;
-        }
+        //     return bucket_index;
+        // }
 
         public uint get_buckets_count ()
         {
@@ -193,58 +236,83 @@ namespace Pomodoro
             return total;
         }
 
-        public uint add_category (string label)
+        // public void set_category_label (uint   category_index,
+        //                                 string label)
+        // {
+        //     this.ensure_categories (category_index + 1);
+
+        //     this.dirty = true;
+
+        //     this.queue_allocate ();
+        // }
+
+        // public uint add_category (string label)
+        // {
+        //     var category_index = this.categories.length;
+
+        //     this.categories += Category () {
+        //         label = label,
+        //         color = this.get_color ()
+        //     };
+        //     this.dirty = true;
+
+        //     this.queue_allocate ();
+
+        //     return category_index;
+        // }
+
+        public void set_bucket_label (uint   bucket_index,
+                                      string label,
+                                      string tooltip_label = "")
         {
-            var category_index = this.categories.length;
+            if (tooltip_label == "") {
+                tooltip_label = label;
+            }
 
-            this.categories += Category () {
-                label = label,
-                color = this.get_color ()
-            };
+            this.ensure_buckets (bucket_index + 1);
+
+            this.buckets[bucket_index].label = label;
+            this.buckets[bucket_index].tooltip_label = tooltip_label;
+
             this.dirty = true;
-
             this.queue_allocate ();
-
-            return category_index;
         }
 
         public void set_category_label (uint   category_index,
                                         string label)
         {
-            if (category_index < this.categories.length)
-            {
-                this.categories[category_index].label = label;
-            }
-            else {
-                GLib.warning ("Can't set label for category #%u", category_index);
-            }
+            this.ensure_categories (category_index + 1);
+
+            this.categories[category_index].label = label;
+
+            // this.queue_allocate ();
+
+            // if (category_index < this.categories.length)
+            // {
+            //     this.categories[category_index].label = label;
+            // }
+            // else {
+            //     GLib.warning ("Can't set label for category #%u", category_index);
+            // }
         }
 
         public void set_category_color (uint     category_index,
                                         Gdk.RGBA color)
         {
-            if (category_index < this.categories.length)
-            {
-                this.categories[category_index].color = color;
+            this.ensure_categories (category_index + 1);
 
-                this.queue_draw ();
-            }
-            else {
-                GLib.warning ("Can't set color for category #%u", category_index);
-            }
+            this.categories[category_index].color = color;
 
+            this.queue_draw ();
         }
 
-        public void set_tooltip_label (uint   bucket_index,
-                                       string label)
-        {
-            if (bucket_index < this.buckets.length) {
-                this.buckets[bucket_index].tooltip_label = label;
-            }
-            else {
-                GLib.warning ("Can't set tooltip_label for bucket #%u", bucket_index);
-            }
-        }
+        // public void set_tooltip_label (uint   bucket_index,
+        //                                string label)
+        // {
+        //     this.ensure_buckets (bucket_index + 1);
+
+        //     this.buckets[bucket_index].tooltip_label = label;
+        // }
 
         public void set_values (uint     bucket_index,
                                 double[] values)
@@ -264,6 +332,14 @@ namespace Pomodoro
             this.invalidate_max_value ();
         }
 
+        public double get_value (uint bucket_index,
+                                 uint category_index)
+        {
+            return this.data != null
+                    ? this.data.@get ((int) bucket_index, (int) category_index)
+                    : 0.0;
+        }
+
         public void set_value (uint   bucket_index,
                                uint   category_index,
                                double value)
@@ -272,7 +348,19 @@ namespace Pomodoro
 
             this.data.@set ((int) bucket_index, (int) category_index, value);
 
+            // TODO: optimise this
             this.invalidate_max_value ();
+        }
+
+        public inline void add_value (uint   bucket_index,
+                                      uint   category_index,
+                                      double value)
+        {
+            var current_value = this.get_value (bucket_index, category_index);
+
+            this.set_value (bucket_index,
+                            category_index,
+                            current_value + value);
         }
 
         private inline bool is_bucket_empty (uint bucket_index)
@@ -617,3 +705,4 @@ namespace Pomodoro
         }
     }
 }
+

@@ -332,6 +332,8 @@ namespace Pomodoro
                     {
                         continue;
                     }
+
+                    entry.set_data<bool> ("updated", true);
                 }
                 else {
                     entry = new Pomodoro.StatsEntry ();
@@ -355,7 +357,7 @@ namespace Pomodoro
             // yield to_save.write_async ();  // XXX: should use async
 
             while (entry_index < entries.count) {
-                to_delete.append (entries.get_index (entry_index));
+                // to_delete.append (entries.get_index (entry_index));
                 to_delete_count++;
                 entry_index++;
             }
@@ -364,15 +366,17 @@ namespace Pomodoro
                 yield to_delete.delete_async ();
             }
 
-            for (var index = 0; index < to_save_count; index++) {
-                unowned var tmp = (Pomodoro.StatsEntry?) to_delete.get_index (index);
-                this.entry_saved (tmp);
-            }
+            // FIXME
+            // for (var index = 0; index < to_save_count; index++) {
+            //     unowned var tmp = (Pomodoro.StatsEntry?) to_save.get_index (index);
+            //     this.entry_saved (tmp);
+            // }
 
-            for (var index = 0; index < to_delete_count; index++) {
-                unowned var tmp = (Pomodoro.StatsEntry?) to_delete.get_index (index);
-                this.entry_deleted (tmp);
-            }
+            // FIXME
+            // for (var index = 0; index < to_delete_count; index++) {
+            //     unowned var tmp = (Pomodoro.StatsEntry?) to_delete.get_index (index);
+            //     this.entry_deleted (tmp);
+            // }
         }
 
         public void track (string category,
@@ -561,6 +565,29 @@ namespace Pomodoro
         public async void flush ()
         {
             yield this.saving_promise.wait ();
+        }
+
+        public GLib.DateTime get_midnight (GLib.Date date)
+        {
+            var timezone = this.timezone_history.search_by_date (
+                    date,
+                    Pomodoro.StatsManager.MIDNIGHT_OFFSET);
+
+            if (timezone == null) {
+                timezone = new GLib.TimeZone.local ();
+            }
+
+            var midnight_hour = (int) (Pomodoro.StatsManager.MIDNIGHT_OFFSET / Pomodoro.Interval.HOUR);
+            var midnight = new GLib.DateTime (
+                    timezone,
+                    date.get_year (),
+                    date.get_month (),
+                    date.get_day (),
+                    midnight_hour,
+                    0,
+                    0);
+
+            return midnight;
         }
 
         private void on_time_block_saved (Pomodoro.TimeBlock      time_block,
