@@ -199,7 +199,6 @@ namespace Pomodoro.Timestamp
         }
 
         var datetime = new GLib.DateTime.from_unix_utc (timestamp / Pomodoro.Interval.SECOND);
-        // var datetime = new GLib.DateTime.from_unix_epoch_utc_usecs (timestamp);  XXX: not available yet
 
         return timezone != null
             ? datetime.to_timezone (timezone)

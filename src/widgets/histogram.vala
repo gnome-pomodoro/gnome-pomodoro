@@ -91,6 +91,10 @@ namespace Pomodoro
 
         private double calculate_bucket_sum (uint bucket_index)
         {
+            if (this.data == null) {
+                return 0.0;
+            }
+
             var values = this.data.get_vector (0, (int) bucket_index);
 
             return values != null ? values.sum () : 0.0;
@@ -98,14 +102,22 @@ namespace Pomodoro
 
         private double calculate_bucket_max (uint bucket_index)
         {
+            if (this.data == null) {
+                return 0.0;
+            }
+
             var values = this.data.get_vector (0, (int) bucket_index);
 
-            return values != null ? values.max () : double.NAN;
+            return values != null ? values.max () : 0.0;
         }
 
         private double calculate_max_value ()
         {
-            var max_value = double.NAN;
+            if (this.data == null) {
+                return 0.0;
+            }
+
+            var max_value = 0.0;
 
             if (this._stacked && this.data.shape[1] > 0U)
             {
@@ -193,6 +205,12 @@ namespace Pomodoro
                 this.data.resize (bucket_count, category_count);
             }
         }
+
+        // public void clear ()
+        // {
+        //     this.buckets = {};
+        //     this.data    = null;
+        // }
 
         // TODO: remove it? it's more suitable for a BarChart
         // public uint add_bucket (string     label,
@@ -639,7 +657,7 @@ namespace Pomodoro
             }
 
             x_range_from = 0.0;
-            x_range_to   = (double) (this.buckets.length - 1);
+            x_range_to   = (double) int.max (this.buckets.length - 1, 0);
             y_range_from = 0.0;
             y_range_to   = this.max_value;
         }
@@ -665,7 +683,7 @@ namespace Pomodoro
             max_width = int.min ((int) Math.roundf (MAX_EXPANSION * (float) max_width), available_width);
 
             var nat_width       = available_width.clamp (min_width, max_width);
-            var x_spacing       = nat_width / bucket_count;
+            var x_spacing       = bucket_count != 0 ? nat_width / bucket_count : 0;
 
             // Calculate optimal bar size and spacing
             var bar_spacing = int.max ((int) Math.floorf (BAR_SPACING * (float) x_spacing),

@@ -29,6 +29,8 @@ namespace Pomodoro
     public class Axis : Pomodoro.CanvasItem
     {
         public const int BASE_LABEL_OFFSET = 5;
+        private const double EPSILON = 0.00001;
+        private const uint MAX_TICKS = 100;
 
         public Gtk.Orientation orientation { get; construct; }  // TODO: use Gtk.Border to handle RTL languages
 
@@ -63,18 +65,28 @@ namespace Pomodoro
                                                  double value_to,
                                                  double value_spacing)
         {
-            // XXX: we assume value_to > value_from
-
-            var tick_from  = (int) Math.floor (value_from / value_spacing);
-            var tick_to    = (int) Math.ceil (value_to / value_spacing);
-            var tick_count = tick_to > tick_from ? tick_to - tick_from + 1 : 0;
-            var y_ticks    = new double[tick_count];
-
-            for (var index = 0; index < y_ticks.length; index++) {
-                y_ticks[index] = (double) (tick_from + index) * value_spacing;
+            if ((value_to - value_from).abs () < EPSILON ||
+                value_spacing <= 0.0 ||
+                value_spacing < EPSILON)
+            {
+                debug ("### calculate_ticks value_from=%.6f value_to=%.6f value_spacing=%.6f",
+                       value_from, value_to, value_spacing);
+                return new double[0];
             }
 
-            return y_ticks;
+            var tick_from   = (int) Math.floor (value_from / value_spacing);
+            var tick_to     = (int) Math.ceil (value_to / value_spacing);
+            var tick_count  = tick_to > tick_from ? tick_to - tick_from + 1 : 0;
+            var tick_values = new double[tick_count];
+
+            for (var index = 0; index < tick_values.length; index++) {
+                tick_values[index] = (double) (tick_from + index) * value_spacing;
+            }
+
+            debug ("### calculate_ticks tick_count=%d value_from=%.6f value_to=%.6f value_spacing=%.6f",
+                   tick_count, value_from, value_to, value_spacing);
+
+            return tick_values;
         }
 
         public void set_range (double value_from,
@@ -82,6 +94,13 @@ namespace Pomodoro
                                double value_spacing)
                                requires (this.child != null)
         {
+            var min_value_spacing = (value_to - value_from).abs () / (double) MAX_TICKS;
+
+            if (value_spacing < min_value_spacing) {
+                // XXX: round to the exponent of 2?
+                value_spacing *= Math.ceil (min_value_spacing / value_spacing);
+            }
+
             var tick_values = calculate_ticks (value_from,
                                                value_to,
                                                value_spacing);
@@ -107,15 +126,15 @@ namespace Pomodoro
                 this.label_height = int.max (this.label_height, tick_label_height);
             }
 
-            if (this.value_from != value_from ||
-                this.value_to != value_to ||
+            if (this.value_from    != value_from ||
+                this.value_to      != value_to ||
                 this.value_spacing != value_spacing ||
-                this.tick_count != tick_count)
+                this.tick_count    != tick_values.length)
             {
-                this.value_from    = value_from;
-                this.value_to      = value_to;
-                this.value_spacing = value_spacing;
-                this.tick_count    = tick_values.length;
+                this.value_from     = value_from;
+                this.value_to       = value_to;
+                this.value_spacing  = value_spacing;
+                this.tick_count     = tick_values.length;
 
                 this.layouts = null;
             }
@@ -132,6 +151,7 @@ namespace Pomodoro
 
         private void update_layouts ()
         {
+            var monotonic_time = GLib.get_monotonic_time ();
             var layout_count = this.tick_count >= 2U
                     ? (this.tick_count - 1U) / this.stride + 1U
                     : 0U;
@@ -169,25 +189,36 @@ namespace Pomodoro
                 this.width  = this.label_width + this.label_offset;
                 this.height = (int) Math.ceil ((last_tick_value - this.value_from) * this.scale) + this.label_height;
             }
+
+            var milliseconds = (GLib.get_monotonic_time () - monotonic_time) /
+                               Pomodoro.Interval.MILLISECOND;
+            if (layout_count >= MAX_TICKS || milliseconds >= 10) {
+                GLib.warning ("Building an axis with %u ticks took %lldms", this.tick_count, milliseconds);
+            }
         }
 
         internal void update (int    available_size,
                               int    label_offset,
                               double scale)
         {
-            var spacing = available_size / this.tick_count;
+            debug ("Axis.update scale=%s, tick_count=%u", scale.to_string (), this.tick_count);
+
+            var spacing = this.tick_count > 0 ? available_size / this.tick_count : available_size;
             var stride = 1;
 
-            if (this.orientation == Gtk.Orientation.HORIZONTAL)
+            if (spacing != 0)
             {
-                stride = int.max (
-                        (int) Math.roundf ((float) this.label_width * 2.0f / (float) spacing),
-                        1);
-            }
-            else {
-                stride = int.max (
-                        (int) Math.ceilf ((float) this.label_height * 2.0f / (float) spacing),
-                        1);
+                if (this.orientation == Gtk.Orientation.HORIZONTAL)
+                {
+                    stride = int.max (
+                            (int) Math.roundf ((float) this.label_width * 2.0f / (float) spacing),
+                            1);
+                }
+                else {
+                    stride = int.max (
+                            (int) Math.ceilf ((float) this.label_height * 2.0f / (float) spacing),
+                            1);
+                }
             }
 
             this.label_offset = label_offset + Pomodoro.Axis.BASE_LABEL_OFFSET;
@@ -498,8 +529,25 @@ namespace Pomodoro
                                  viewport_height,
                                  out working_area);
 
-            var x_scale = (double) working_area.width / (x_value_to - x_value_from);
-            var y_scale = (double) working_area.height / (y_value_to - y_value_from);
+            debug ("x_value_from = %g", x_value_from);
+            debug ("x_value_to   = %g", x_value_to);
+            debug ("y_value_from = %g", y_value_from);
+            debug ("y_value_to   = %g isNan=%s", y_value_to, y_value_to.is_nan ().to_string ());
+
+            // if (x_scale.is_nan ()) {
+            //     x_scale = 0.0;
+            // }
+
+            // if (y_scale.is_nan ()) {
+            //     y_scale = 0.0;
+            // }
+
+            var x_scale = x_value_to != x_value_from
+                    ? (double) working_area.width / (x_value_to - x_value_from)
+                    : 0.0;
+            var y_scale = y_value_to != y_value_from
+                    ? (double) working_area.height / (y_value_to - y_value_from)
+                    : 0.0;
 
             this.canvas.x_scale = (float) x_scale;
             this.canvas.y_scale = (float) y_scale;
