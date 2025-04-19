@@ -281,6 +281,7 @@ namespace Pomodoro
             return true;
         }
 
+        // TODO: can we return unowned value here?
         public inline Vector? get_vector_internal (int axis,
                                                    int index)
         {

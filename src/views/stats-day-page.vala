@@ -61,8 +61,6 @@ namespace Pomodoro
                 (value) => {
                     return Pomodoro.Interval.format_short (Pomodoro.Interval.from_seconds (value));
                 });
-
-            this.timezone_history.changed.connect (this.on_timezone_history_changed);
         }
 
         public StatsDayPage (GLib.Date date)
@@ -73,33 +71,41 @@ namespace Pomodoro
         }
 
         /**
-         * Update histograms timeline. It may change when user changes timezones.
+         * Update timeline. It may change when user changes timezones.
          */
         private void update_histogram_buckets ()
         {
-            var start_datetime = this.stats_manager.get_midnight (this.date);
-            var end_datetime   = start_datetime.add_days (1);
+            debug ("### update_histogram_buckets");
+            // var buckets_count = this.histogram.get_buckets_count ();
 
-            this.start_time    = Pomodoro.Timestamp.from_datetime (start_datetime);
-            this.end_time      = Pomodoro.Timestamp.from_datetime (end_datetime);   // TODO: update on time zone change
+            var buckets_count = (uint) Math.ceil ((double)(this.end_time - this.start_time) /
+                                                  (double) BUCKET_INTERVAL);
+            var bucket_index = 0U;
+            var bucket_timestamp = this.start_time;
 
+            // this.histogram.clear ();
             // var index = int.max ((int) this.histogram.get_buckets_count () - 1, 0);
 
-            // for (; index <= bucket_index; index++)
-            // {
-            //     var timestamp = this.start_time + index * BUCKET_INTERVAL;
-            //     var timezone  = this.timezone_history.search (timestamp);
-            //     var datetime  = Pomodoro.Timestamp.to_datetime (timestamp, timezone);
+            this.timezone_history.scan (
+                this.start_time,
+                this.end_time,
+                (start_time, end_time, timezone) => {
+                    while (bucket_timestamp < end_time)
+                    {
+                        var datetime = Pomodoro.Timestamp.to_datetime (bucket_timestamp, timezone);
 
-                // TODO
-                // this.histogram.set_bucket_label (
-                //     datetime. (),
-                // );
-            // }
+                        this.histogram.set_bucket_label (bucket_index, datetime.format ("%c"));  // TODO: tooltip label
+
+                        bucket_index++;
+                        bucket_timestamp += BUCKET_INTERVAL;
+                    }
+                });
+
+            // TODO: remove unnecessary buckets
         }
 
-        private void update_buckets ()
-        {
+        // private void update_buckets ()
+        // {
             // this.timezone_history.scan (
             //     this.start_time,
             //     this.end_time,
@@ -119,27 +125,29 @@ namespace Pomodoro
 
             //     this.histogram.add_bucket ("%d:00".printf (hour), hour_value);
             // }
-        }
+        // }
 
-        private void ensure_bucket (uint bucket_index)
-        {
-            var index = int.max ((int) this.histogram.get_buckets_count () - 1, 0);
+        // private void ensure_bucket (uint bucket_index)
+        // {
+        //     var index = int.max ((int) this.histogram.get_buckets_count () - 1, 0);
 
-            for (; index <= bucket_index; index++)
-            {
-                var timestamp = this.start_time + index * BUCKET_INTERVAL;
-                var timezone  = this.timezone_history.search (timestamp);
-                var datetime  = Pomodoro.Timestamp.to_datetime (timestamp, timezone);
+        //     for (; index <= bucket_index; index++)
+        //     {
+        //         var timestamp = this.start_time + index * BUCKET_INTERVAL;
+        //         var timezone  = this.timezone_history.search (timestamp);
+        //         var datetime  = Pomodoro.Timestamp.to_datetime (timestamp, timezone);
 
                 // TODO
                 // this.histogram.set_bucket_label (
                 //     datetime. (),
                 // );
-            }
-        }
+        //     }
+        // }
 
         private async Gom.ResourceGroup? fetch_entries ()
         {
+            debug ("### fetch_entries begin");
+
             var repository = Pomodoro.Database.get_repository ();
 
             var date_value = GLib.Value (typeof (string));
@@ -157,8 +165,10 @@ namespace Pomodoro
                 var entries = yield repository.find_sorted_async (typeof (Pomodoro.StatsEntry),
                                                                   date_filter,
                                                                   sorting);
+                debug ("### found entries: %u", entries.count);
                 yield entries.fetch_async (0U, entries.count);
 
+                debug ("### fetch_entries end");
                 return entries;
             }
             catch (GLib.Error error) {
@@ -184,6 +194,7 @@ namespace Pomodoro
             //     return;
             // }
             if (entry.date != Pomodoro.Database.serialize_date (this.date)) {
+                GLib.debug ("Skipping entry with date '%s'", entry.date);
                 return;
             }
 
@@ -204,57 +215,70 @@ namespace Pomodoro
             }
 
             var bucket_index = (uint) ((entry.time - this.start_time) / BUCKET_INTERVAL);
-            this.ensure_bucket (bucket_index);
+            // this.ensure_bucket (bucket_index);
 
             this.histogram.add_value (bucket_index,
                                       category_index,
-                                      sign * entry.duration);
+                                      Pomodoro.Interval.to_seconds (sign * entry.duration));
         }
 
+        private void update_cards ()
+        {
+            // this.pomodoro_card.value = this.histogram.get_category_total (Pomodoro.StatsCategory.POMODORO);
+            // this.pomodoro_card.reference_value = random.double_range (0.0, 8.0 * 3600.0);  // TODO
+
+            // this.screen_time_card.value = this.histogram.get_category_total (Pomodoro.StatsCategory.SCREEN_TIME);
+            // this.screen_time_card.reference_value = this.pomodoro_card.reference_value + random.double_range (0.0, 3.0 * 3600.0);  // TODO
+        }
+
+        /**
+         * Update `this.data` and `this.reference_data`
+         */
         private async void populate ()
         {
+            debug ("### populate begin");
+
             // TODO: handle loader?
 
-            this.update_histogram_buckets ();
-            // this.update_bucket_labels ();
+            var entries        = yield this.fetch_entries ();
+            var start_datetime = this.stats_manager.get_midnight (this.date);
+            var end_datetime   = start_datetime.add_days (1);
 
-            var entries = yield this.fetch_entries ();
-
-            this.data = Data () {
+            this.start_time = Pomodoro.Timestamp.from_datetime (start_datetime);
+            this.end_time   = Pomodoro.Timestamp.from_datetime (end_datetime);
+            this.data       = Data () {
                 // buckets = new int64[0,2]
             };
+
+            this.update_histogram_buckets ();
 
             for (var index = 0U; index < entries.count; index++)
             {
                 this.process_entry ((Pomodoro.StatsEntry) entries.get_index (index));
             }
 
-            this.pomodoro_card.value = this.histogram.get_category_total (Pomodoro.StatsCategory.POMODORO);
-            // this.pomodoro_card.reference_value = random.double_range (0.0, 8.0 * 3600.0);  // TODO
+            // this.update_cards ();
 
-            this.screen_time_card.value = this.histogram.get_category_total (Pomodoro.StatsCategory.SCREEN_TIME);
-            // this.screen_time_card.reference_value = this.pomodoro_card.reference_value + random.double_range (0.0, 3.0 * 3600.0);  // TODO
+            debug ("### populate end");
         }
 
         private void on_entry_saved (Pomodoro.StatsEntry entry)
         {
-            // if (entry.date != Pomodoro.Database.serialize_date (this.date)) {
-            //     return;
-            // }
+            debug ("### on_entry_saved");
 
             if (entry.get_data<bool> ("updated")) {
+                // if (entry.date != Pomodoro.Database.serialize_date (this.date)) {
+                //     return;
+                // }
                 assert_not_reached ();  // TODO: schedule populate
             }
-            else {
-                this.process_entry (entry);
-            }
+
+            this.process_entry (entry);
         }
 
         private void on_entry_deleted (Pomodoro.StatsEntry entry)
         {
-            // if (entry.date != Pomodoro.Database.serialize_date (this.date)) {
-            //     return;
-            // }
+            debug ("### on_entry_deleted");
 
             this.process_entry (entry, -1);
         }
@@ -281,8 +305,8 @@ namespace Pomodoro
             var pomodoro_color = foreground_color;
             var screen_time_color = mix_colors (background_color, foreground_color, 0.2f);
 
-            this.histogram.set_category_color (0U, pomodoro_color);
-            this.histogram.set_category_color (1U, screen_time_color);
+            this.histogram.set_category_color (Pomodoro.StatsCategory.POMODORO, pomodoro_color);
+            this.histogram.set_category_color (Pomodoro.StatsCategory.SCREEN_TIME, screen_time_color);
         }
 
         public override void css_changed (Gtk.CssStyleChange change)
@@ -300,13 +324,19 @@ namespace Pomodoro
 
                     this.stats_manager.entry_saved.connect (this.on_entry_saved);
                     this.stats_manager.entry_deleted.connect (this.on_entry_deleted);
+                    this.timezone_history.changed.connect (this.on_timezone_history_changed);
                 });
+
+            base.map ();
         }
 
         public override void unmap ()
         {
             this.stats_manager.entry_saved.disconnect (this.on_entry_saved);
             this.stats_manager.entry_deleted.disconnect (this.on_entry_deleted);
+            this.timezone_history.changed.disconnect (this.on_timezone_history_changed);
+
+            base.unmap ();
         }
     }
 }
