@@ -71,8 +71,6 @@ namespace Tests
 
             Pomodoro.Database.open ();
 
-            debug ("@@@ A");
-
             try {
                 this.new_york_timezone = new GLib.TimeZone.identifier ("America/New_York");  // 3 AM
                 this.london_timezone = new GLib.TimeZone.identifier ("Europe/London");  // 8 AM
@@ -82,23 +80,15 @@ namespace Tests
                 assert_no_error (error);
             }
 
-            debug ("@@@ B");
-
             this.main_loop = new GLib.MainLoop ();
 
             this.timezone_history = new Pomodoro.TimezoneHistory ();
             this.timezone_history.insert (Pomodoro.Timestamp.peek (), this.new_york_timezone);
 
-            debug ("@@@ C");
-
             this.stats_manager = new Pomodoro.StatsManager ();
             assert (this.stats_manager != this.previous_stats_manager);
 
-            debug ("@@@ D");
-
             this.repository = Pomodoro.Database.get_repository ();
-
-            debug ("@@@ E");
         }
 
         public override void teardown ()
