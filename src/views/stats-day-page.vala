@@ -86,6 +86,8 @@ namespace Pomodoro
             // this.histogram.clear ();
             // var index = int.max ((int) this.histogram.get_buckets_count () - 1, 0);
 
+            var use_am_pm = false;  // TODO: fetch from locale or settings
+
             this.timezone_history.scan (
                 this.start_time,
                 this.end_time,
@@ -94,7 +96,11 @@ namespace Pomodoro
                     {
                         var datetime = Pomodoro.Timestamp.to_datetime (bucket_timestamp, timezone);
 
-                        this.histogram.set_bucket_label (bucket_index, datetime.format ("%c"));  // TODO: tooltip label
+                        GLib.debug ("### bucket %u %s", bucket_index, datetime.to_string ());
+
+
+                        this.histogram.set_bucket_label (bucket_index, datetime.format (use_am_pm ? "%l:%M %p" : "%k:%M"));
+                        //this.histogram.set_bucket_label (bucket_index, datetime.format (use_am_pm ? "%i:%M %p" : "%H:%M"));
 
                         bucket_index++;
                         bucket_timestamp += BUCKET_INTERVAL;

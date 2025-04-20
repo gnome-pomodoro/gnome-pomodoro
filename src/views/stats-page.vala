@@ -35,7 +35,7 @@ namespace Pomodoro
         NONE,
         PREVIOUS,
         WEEK,
-        MONTH;
+        MONTH
     }
 
 

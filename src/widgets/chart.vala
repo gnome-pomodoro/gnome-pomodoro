@@ -332,7 +332,7 @@ namespace Pomodoro
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/chart.ui")]
     public abstract class Chart : Gtk.Widget, Gtk.Buildable
     {
-        private const int MIN_WIDTH = 400;
+        private const int MIN_WIDTH = 300;
         private const int MIN_HEIGHT = 200;
 
         /**

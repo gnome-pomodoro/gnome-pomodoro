@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="PomodoroChart" parent="GtkWidget">
-    <property name="width-request">400</property>
-    <property name="height-request">200</property>
     <property name="accessible-role">img</property>
     <child>
       <object class="PomodoroCanvas" id="guides">
