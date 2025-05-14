@@ -656,6 +656,8 @@ namespace Pomodoro
                 this.max_value = this.calculate_max_value ();
             }
 
+            debug ("### calculate_values_range max_value = %f", this.max_value);
+
             x_range_from = 0.0;
             x_range_to   = (double) int.max (this.buckets.length - 1, 0);
             y_range_from = 0.0;
