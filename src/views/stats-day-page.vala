@@ -252,9 +252,9 @@ namespace Pomodoro
 
             this.start_time = Pomodoro.Timestamp.from_datetime (start_datetime);
             this.end_time   = Pomodoro.Timestamp.from_datetime (end_datetime);
-            this.data       = Data () {
+            // this.data       = Data () {
                 // buckets = new int64[0,2]
-            };
+            // };
 
             this.update_histogram_buckets ();
 
