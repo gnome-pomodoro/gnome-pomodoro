@@ -114,6 +114,10 @@
       <default>(-1, -1, false)</default>
       <summary>State of preferences window</summary>
     </key>
+    <key name="global-shortcuts-configured" type="b">
+      <default>false</default>
+      <summary>State of global shortcuts</summary>
+    </key>
   </schema>
 
   <!-- Actions -->

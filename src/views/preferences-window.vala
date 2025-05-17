@@ -68,6 +68,19 @@ namespace Pomodoro
         model.append (panel_info);
 
         panel_info = new PreferencesPanelInfo ();
+        panel_info.name = "keyboard-shortcuts";
+        panel_info.title = _("Keyboard Shortcuts");
+        panel_info.icon_name = "preferences-keyboard-shortcuts-symbolic";
+        panel_info.content_class = typeof (Pomodoro.PreferencesPanelKeyboardShortcuts);
+        model.append (panel_info);
+
+        var keyboard_manager = new Pomodoro.KeyboardManager ();
+        keyboard_manager.bind_property ("global-shortcuts-supported",
+                                        panel_info,
+                                        "visible",
+                                        GLib.BindingFlags.SYNC_CREATE);
+
+        panel_info = new PreferencesPanelInfo ();
         panel_info.name = "actions";
         panel_info.title = _("Custom Actions");
         panel_info.icon_name = "custom-action-symbolic";
@@ -112,7 +125,7 @@ namespace Pomodoro
 
             this.load_window_state ();
 
-            this.model.selection_changed.connect (this.on_selection_changed);
+            this._model.selection_changed.connect (this.on_selection_changed);
 
             this.sidebar.model = model;
 
@@ -159,7 +172,7 @@ namespace Pomodoro
 
         private void update_split_view_content ()
         {
-            var panel_info = (Pomodoro.PreferencesPanelInfo?) this.model.selected_item;
+            var panel_info = (Pomodoro.PreferencesPanelInfo?) this._model.selected_item;
 
             if (panel_info != null)
             {
