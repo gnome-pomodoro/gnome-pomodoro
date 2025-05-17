@@ -93,10 +93,10 @@ namespace Pomodoro
 
         public override void initialize ()
         {
-            this.providers = new Pomodoro.ProviderSet<Pomodoro.NotificationsProvider> ();
+            this.providers = new Pomodoro.ProviderSet<Pomodoro.NotificationsProvider> (Pomodoro.SelectionMode.SINGLE);
             this.providers.provider_enabled.connect (this.on_provider_enabled);
             this.providers.add (new Freedesktop.NotificationsProvider ());
-            this.providers.enable_one ();
+            this.providers.enable ();
 
             base.initialize ();
         }

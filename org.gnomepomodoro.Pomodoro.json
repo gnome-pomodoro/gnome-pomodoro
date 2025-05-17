@@ -7,6 +7,7 @@
     "tags" : [],
     "finish-args" : [
         "--share=ipc",
+        "--socket=x11",
         "--socket=fallback-x11",
         "--socket=wayland",
         "--socket=pulseaudio",
@@ -16,6 +17,7 @@
         "--talk-name=org.freedesktop.Flatpak",
         "--talk-name=org.freedesktop.Notifications",
         "--talk-name=org.freedesktop.ScreenSaver",
+        "--talk-name=org.freedesktop.portal.Desktop",
         "--talk-name=org.gnome.Mutter.IdleMonitor",
         "--talk-name=org.gnome.ScreenSaver",
         "--talk-name=org.gtk.vfs.*",

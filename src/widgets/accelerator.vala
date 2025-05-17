@@ -1,7 +1,7 @@
 /*
  * based on keyboard-shortcuts.c from gnome-control-center
  *
- * Copyright (c) 2013 gnome-pomodoro contributors
+ * Copyright (c) 2013-2025 gnome-pomodoro contributors
  *               2010 Intel, Inc
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,284 +22,328 @@
  *          Rodrigo Moya <rodrigo@gnome.org>
  */
 
-/* TODO:
- * Handle integration with window manager
- *  - suppress any keybings from being triggered
- *  - if keybinding is taken, notify about it
- *
- * For now gnome-shell extension is responsible for setting it.
- */
-
 using GLib;
-
-
-// TODO: Use Gtk.Shortcut / Gtk.ShortcutController API?
 
 
 namespace Pomodoro
 {
-    private errordomain AcceleratorError
+    public struct Accelerator
     {
-        INVALID,
-        FORBIDDEN,
-        TYPING_COLLISION
-    }
+        private const uint[] FORBIDDEN_KEYVALS = {
+            Gdk.Key.Home,
+            Gdk.Key.Left,
+            Gdk.Key.Up,
+            Gdk.Key.Right,
+            Gdk.Key.Down,
+            Gdk.Key.Page_Up,
+            Gdk.Key.Page_Down,
+            Gdk.Key.End,
+            Gdk.Key.Tab,
+            Gdk.Key.Escape,
+            Gdk.Key.KP_Enter,
+            Gdk.Key.Return,
+            Gdk.Key.space,
+            Gdk.Key.BackSpace,
+            Gdk.Key.Mode_switch
+        };
 
-    private class Accelerator : GLib.Object
-    {
-        private uint key { get; private set; }
-        private Gdk.ModifierType modifiers { get; private set; }
+        public uint             keycode;
+        public uint             keyval;
+        public Gdk.ModifierType modifiers;
 
-        public string name {
-            owned get {
-                var name = new GLib.StringBuilder ();
-
-                foreach (var element in this.get_keys_internal (true)) {
-                    name.append (element);
-                }
-
-                return name.str;
-            }
-            set {
-                uint keyval = 0;
-                Gdk.ModifierType modifiers = 0;
-
-                Pomodoro.Accelerator.parse (value, out keyval, out modifiers);
-
-                this.set_keyval (keyval, modifiers);
-            }
+        public static Pomodoro.Accelerator empty ()
+        {
+            return Pomodoro.Accelerator () {
+                keycode   = 0,
+                keyval    = 0,
+                modifiers = Gdk.ModifierType.NO_MODIFIER_MASK
+            };
         }
 
-        public string display_name {
-            owned get {
-                var name = new GLib.StringBuilder ();
-                var is_first = true;
+        public static Pomodoro.Accelerator from_keycode (uint             keycode,
+                                                         Gdk.ModifierType modifiers,
+                                                         uint             group)
+        {
+            var accelerator = Pomodoro.Accelerator () {
+                keycode   = keycode,
+                keyval    = 0,
+                modifiers = modifiers
+            };
 
-                foreach (var element in this.get_keys_internal (false))
+            return accelerator.normalize (group);
+        }
+
+        public static Pomodoro.Accelerator from_string (string accelerator_string)
+        {
+            int index = 0;
+            int modifier_position = -1;
+            int keyval_position = 0;
+            unichar chr;
+
+            var modifiers = Gdk.ModifierType.NO_MODIFIER_MASK;
+
+            while (accelerator_string.get_next_char (ref index, out chr))
+            {
+                if (chr == '<' && modifier_position == -1) {
+                    modifier_position = index;
+                }
+                else if (chr == '>' && modifier_position >= 0)
                 {
-                    if (is_first) {
-                        is_first = false;
-                    } else {
-                        name.append (" + ");
+                    var modifier_name = accelerator_string.slice (modifier_position, index - 1);
+
+                    switch (modifier_name.down ())
+                    {
+                        case "ctrl":
+                        case "control":
+                            modifiers |= Gdk.ModifierType.CONTROL_MASK;
+                            break;
+
+                        case "alt":
+                            modifiers |= Gdk.ModifierType.ALT_MASK;
+                            break;
+
+                        case "shift":
+                            modifiers |= Gdk.ModifierType.SHIFT_MASK;
+                            break;
+
+                        case "super":
+                            modifiers |= Gdk.ModifierType.SUPER_MASK;
+                            break;
+
+                        case "hyper":
+                            modifiers |= Gdk.ModifierType.HYPER_MASK;
+                            break;
+
+                        default:
+                            GLib.warning ("Unknown modifier name: '%s'", modifier_name);
+                            break;
                     }
 
-                    name.append (element);
+                    modifier_position = -1;
+                    keyval_position = index;
                 }
-
-                return name.str;
-            }
-        }
-
-        public Accelerator.from_name (string name)
-        {
-            this.name = name;
-        }
-
-        private static void parse (string?              name,
-                                   out uint             keyval,
-                                   out Gdk.ModifierType modifiers)
-        {
-            int pos = 0;
-            int start = 0;
-            char chr = '\0';
-            bool is_modifier = false;
-
-            keyval = 0;
-            modifiers = 0;
-
-            if (name == null || name == "") {
-                return;
             }
 
-            while ((chr = name[pos]) != '\0')
-            {
-                if (chr == '<') {
-                    start = pos + 1;
-                    is_modifier = true;
-                }
-                else if (chr == '>' && is_modifier)
-                {
-                    var modifier = name.slice (start, pos);
-
-                    if (modifier == "Ctrl" || modifier == "Control") {
-                        modifiers |= Gdk.ModifierType.CONTROL_MASK;
-                    }
-
-                    if (modifier == "Alt") {
-                        modifiers |= Gdk.ModifierType.ALT_MASK;
-                    }
-
-                    if (modifier == "Shift") {
-                        modifiers |= Gdk.ModifierType.SHIFT_MASK;
-                    }
-
-                    if (modifier == "Super") {
-                        modifiers |= Gdk.ModifierType.SUPER_MASK;
-                    }
-
-                    is_modifier = false;
-                    start = pos + 1;
-                }
-
-                pos++;
-            }
-
-            keyval = Gdk.keyval_from_name (name.slice (start, pos));
+            return Pomodoro.Accelerator () {
+                keycode   = 0,
+                keyval    = Gdk.keyval_from_name (accelerator_string.slice (keyval_position, index)),
+                modifiers = modifiers
+            };
         }
 
-        public void unset ()
+        public bool is_empty ()
         {
-            this.key = 0;
-            this.modifiers = 0;
-
-            this.changed ();
+            return this.keycode == 0 && this.keyval == 0;
         }
 
-        private static void normalize (ref uint             keyval,
-                                       ref Gdk.ModifierType modifiers)
+        public bool is_valid ()
         {
-            Gdk.ModifierType keyval_modifier = 0;
-
-            switch (keyval)
-            {
-                case Gdk.Key.Control_L:
-                case Gdk.Key.Control_R:
-                    keyval_modifier = Gdk.ModifierType.CONTROL_MASK;
-                    break;
-
-                case Gdk.Key.Shift_L:
-                case Gdk.Key.Shift_R:
-                    keyval_modifier = Gdk.ModifierType.SHIFT_MASK;
-                    break;
-
-                case Gdk.Key.Super_L:
-                case Gdk.Key.Super_R:
-                    keyval_modifier = Gdk.ModifierType.SUPER_MASK;
-                    break;
-
-                case Gdk.Key.Alt_L:
-                case Gdk.Key.Alt_R:
-                    keyval_modifier = Gdk.ModifierType.ALT_MASK;
-                    break;
-            }
-
-            if (keyval_modifier != 0) {
-                keyval = 0;
-                modifiers |= keyval_modifier;
-            }
-
-            modifiers &= (Gdk.ModifierType.CONTROL_MASK |
-                          Gdk.ModifierType.SHIFT_MASK |
-                          Gdk.ModifierType.SUPER_MASK |
-                          Gdk.ModifierType.ALT_MASK);
-        }
-
-        public void set_keyval (uint             keyval,
-                                Gdk.ModifierType modifiers)
-        {
-            Accelerator.normalize (ref keyval,
-                                   ref modifiers);
-
-            if (this.key != keyval || this.modifiers != modifiers)
-            {
-                this.key = keyval;
-                this.modifiers = modifiers;
-
-                this.changed ();
-            }
-        }
-
-        public void validate () throws AcceleratorError
-        {
-            var key = this.key;
+            var keyval    = this.keyval;
             var modifiers = this.modifiers;
 
-            if (key == 0 && modifiers == 0)
-            {
-                return;
+            if (this.is_empty ()) {
+                return true;
             }
 
-            if (!Gtk.accelerator_valid (key, modifiers))
+            if (modifiers == Gdk.ModifierType.NO_MODIFIER_MASK ||
+                modifiers == Gdk.ModifierType.SHIFT_MASK)
             {
-                throw new AcceleratorError.INVALID ("Invalid");
-            }
-
-            if (key != 0 && modifiers == 0)
-            {
-                if (key == Gdk.Key.Escape ||
-                    key == Gdk.Key.BackSpace ||
-                    key == Gdk.Key.Return)
+                /* Check for typing collision */
+                if ((keyval >= Gdk.Key.a && keyval <= Gdk.Key.z) ||
+                    (keyval >= Gdk.Key.A && keyval <= Gdk.Key.Z) ||
+                    (keyval >= Gdk.Key.@0 && keyval <= Gdk.Key.@9) ||
+                    (keyval >= Gdk.Key.kana_fullstop && keyval <= Gdk.Key.semivoicedsound) ||
+                    (keyval >= Gdk.Key.Arabic_comma && keyval <= Gdk.Key.Arabic_sukun) ||
+                    (keyval >= Gdk.Key.Serbian_dje && keyval <= Gdk.Key.Cyrillic_HARDSIGN) ||
+                    (keyval >= Gdk.Key.Greek_ALPHAaccent && keyval <= Gdk.Key.Greek_omega) ||
+                    (keyval >= Gdk.Key.hebrew_doublelowline && keyval <= Gdk.Key.hebrew_taf) ||
+                    (keyval >= Gdk.Key.Thai_kokai && keyval <= Gdk.Key.Thai_lekkao) ||
+                    (keyval >= Gdk.Key.Hangul_Kiyeog && keyval <= Gdk.Key.Hangul_J_YeorinHieuh))
                 {
-                    throw new AcceleratorError.FORBIDDEN ("Forbidden");
+                    return false;
+                }
+
+                /* Don't allow navigation keys and such */
+                for (var index = 0; index < FORBIDDEN_KEYVALS.length; index++)
+                {
+                    if (keyval == FORBIDDEN_KEYVALS[index]) {
+                        return false;
+                    }
                 }
             }
 
-            /* Check for unmodified keys */
-            if (key != 0 && (modifiers == 0 || modifiers == Gdk.ModifierType.SHIFT_MASK))
-            {
-                if ((key >= Gdk.Key.a && key <= Gdk.Key.z) ||
-                    (key >= Gdk.Key.A && key <= Gdk.Key.Z) ||
-                    (key >= Gdk.Key.@0 && key <= Gdk.Key.@9) ||
-                    (key >= Gdk.Key.kana_fullstop && key <= Gdk.Key.semivoicedsound) ||
-                    (key >= Gdk.Key.Arabic_comma && key <= Gdk.Key.Arabic_sukun) ||
-                    (key >= Gdk.Key.Serbian_dje && key <= Gdk.Key.Cyrillic_HARDSIGN) ||
-                    (key >= Gdk.Key.Greek_ALPHAaccent && key <= Gdk.Key.Greek_omega) ||
-                    (key >= Gdk.Key.hebrew_doublelowline && key <= Gdk.Key.hebrew_taf) ||
-                    (key >= Gdk.Key.Thai_kokai && key <= Gdk.Key.Thai_lekkao) ||
-                    (key >= Gdk.Key.Hangul && key <= Gdk.Key.Hangul_Special) ||
-                    (key >= Gdk.Key.Hangul_Kiyeog && key <= Gdk.Key.Hangul_J_YeorinHieuh))
-                {
-                    throw new AcceleratorError.TYPING_COLLISION ("Typing collision");
-                }
-            }
+            return Gtk.accelerator_valid (keyval, modifiers);
         }
 
-        private string[] get_keys_internal (bool escape)
+        /* This adjusts the keyval and modifiers such that it matches how
+         * gnome-shell detects shortcuts, which works as follows:
+         * First for the non-modifier key, the keycode that generates this
+         * keyval at the lowest shift level is determined, which might be a
+         * level > 0, such as for numbers in the num-row in AZERTY.
+         * Next it checks if all the specified modifiers were pressed.
+         */
+        public Pomodoro.Accelerator normalize (uint group)
         {
-            var elements = new string[0];
+            uint unmodified_keyval;
+            uint shifted_keyval;
 
-            if (Gdk.ModifierType.SHIFT_MASK in this.modifiers) {
-                elements += escape ? "<Shift>" : "Shift";
+            /* We want shift to always be included as explicit modifier for
+             * gnome-shell shortcuts. That's because users usually think of
+             * shortcuts as including the shift key rather than being defined
+             * for the shifted keyval.
+             * This helps with num-row keys which have different keyvals on
+             * different layouts for example, but also with keys that have
+             * explicit key codes at shift level 0, that gnome-shell would prefer
+             * over shifted ones, such the DOLLAR key.
+             */
+            var explicit_modifiers = Gdk.ModifierType.SHIFT_MASK |
+                                     Gtk.accelerator_get_default_mod_mask ();
+            var used_modifiers     = this.modifiers & explicit_modifiers;
+
+            /* Find the base keyval of the pressed key without the explicit
+             * modifiers. */
+            var display = Gdk.Display.get_default ();
+            display.translate_key (this.keycode,
+                                   this.modifiers & ~explicit_modifiers,
+                                   (int) group,
+                                   out unmodified_keyval,
+                                   null,
+                                   null,
+                                   null);
+
+            /* Normalize num-row keys to the number value. This allows these
+             * shortcuts to work when switching between AZERTY and layouts where
+             * the numbers are at shift level 0. */
+            display.translate_key (this.keycode,
+                                   Gdk.ModifierType.SHIFT_MASK | (this.modifiers &
+                                                                  ~explicit_modifiers),
+                                   (int) group,
+                                   out shifted_keyval,
+                                   null,
+                                   null,
+                                   null);
+
+            if (shifted_keyval >= Gdk.Key.@0 && shifted_keyval <= Gdk.Key.@9) {
+                unmodified_keyval = shifted_keyval;
             }
 
-            if (Gdk.ModifierType.SUPER_MASK in this.modifiers) {
-                elements += (escape ? "<Super>" : "Super");
+            /* Normalise <Tab> */
+            if (unmodified_keyval == Gdk.Key.ISO_Left_Tab) {
+                unmodified_keyval = Gdk.Key.Tab;
+            }
+
+            /* CapsLock isn't supported as a keybinding modifier, so keep it from confusing us */
+            used_modifiers &= ~Gdk.ModifierType.LOCK_MASK;
+
+            return Pomodoro.Accelerator () {
+                keycode   = 0,
+                keyval    = unmodified_keyval,
+                modifiers = used_modifiers
+            };
+        }
+
+        /**
+         * Intention here is to match the behaviour somewhat of `GtkShortcutLabel` which we use
+         * in the edit dialog.
+         */
+        private string[] get_labels ()
+        {
+            var labels = new string[0];
+
+            if (Gdk.ModifierType.SHIFT_MASK in this.modifiers) {
+                labels += "Shift";
             }
 
             if (Gdk.ModifierType.CONTROL_MASK in this.modifiers) {
-                elements += (escape ? "<Ctrl>" : "Ctrl");
+                labels += "Ctrl";
             }
 
             if (Gdk.ModifierType.ALT_MASK in this.modifiers) {
-                elements += (escape ? "<Alt>" : "Alt");
+                labels += "Alt";
             }
 
-            if (this.key != 0) {
-                var keyval = Gdk.keyval_to_upper (this.key);
-                var name = Gdk.keyval_name (keyval);
+            if (Gdk.ModifierType.SUPER_MASK in this.modifiers) {
+                labels += "Super";
+            }
 
-                if (escape) {
-                    elements += (name);
+            if (Gdk.ModifierType.HYPER_MASK in this.modifiers) {
+                labels += "Hyper";
+            }
+
+            if (Gdk.ModifierType.META_MASK in this.modifiers) {
+                labels += "Meta";
+            }
+
+            var chr = (unichar) Gdk.keyval_to_unicode (this.keyval);
+
+            if (chr != '\x00' && chr < '\x80' && chr.isgraph ())
+            {
+                switch (chr)
+                {
+                    case '\\':
+                        labels += "Backslash";
+                        break;
+
+                    default:
+                        labels += chr.toupper ().to_string ();
+                        break;
                 }
-                else {
-                    unichar key = Gdk.keyval_to_unicode (keyval);
+            }
+            else
+            {
+                switch (this.keyval)
+                {
+                    case Gdk.Key.Left:
+                        labels += "\xe2\x86\x90";
+                        break;
 
-                    elements += (key > 0 ? key.to_string () : name.replace ("_", " "));
+                    case Gdk.Key.Up:
+                        labels += "\xe2\x86\x91";
+                        break;
+
+                    case Gdk.Key.Right:
+                        labels += "\xe2\x86\x92";
+                        break;
+
+                    case Gdk.Key.Down:
+                        labels += "\xe2\x86\x93";
+                        break;
+
+                    case Gdk.Key.space:
+                        labels += "Space";
+                        break;
+
+                    case Gdk.Key.Return:
+                        labels += "Return";
+                        break;
+
+                    case Gdk.Key.Page_Up:
+                        labels += "Page Up";
+                        break;
+
+                    case Gdk.Key.Page_Down:
+                        labels += "Page Down";
+                        break;
+
+                    default:
+                        labels += Gdk.keyval_name (this.keyval).replace ("_", " ");
+                        break;
                 }
             }
 
-            return elements;
+            return labels;
         }
 
-        public string[] get_keys ()
+        public string get_label ()
         {
-            return this.get_keys_internal (false);
+            return string.joinv (" + ", this.get_labels ());
         }
 
-        public virtual signal void changed ()
+        public string to_string ()
         {
-            this.notify_property ("name");
-            this.notify_property ("display-name");
+            return !this.is_empty ()
+                ? Gtk.accelerator_name (this.keyval, this.modifiers)
+                : "";
         }
     }
 }

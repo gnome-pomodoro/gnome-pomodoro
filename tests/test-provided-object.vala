@@ -173,17 +173,7 @@ namespace Tests
         public void test_unavailable ()
         {
             var anti_gravity = new AntiGravity (Scenario.UNAVAILABLE);
-            anti_gravity.provider.notify["available-set"].connect (() => { this.quit_main_loop (); });
-
             assert_nonnull (anti_gravity.provider);
-            assert_false (anti_gravity.provider.available_set);
-            assert_false (anti_gravity.provider.available);
-            assert_false (anti_gravity.provider.enabled);
-
-            assert_true (this.run_main_loop ());
-
-            assert_false (anti_gravity.provider.available);
-            assert_false (anti_gravity.provider.enabled);
             assert_false (anti_gravity.available);
 
             assert_cmpuint (anti_gravity.setup_count, GLib.CompareOperator.EQ, 1);

@@ -54,6 +54,18 @@ namespace Pomodoro
             var rewind_action = new GLib.SimpleAction ("rewind", null);
             rewind_action.activate.connect (this.activate_rewind);
             this.add_action (rewind_action);
+
+            var toggle_action = new GLib.SimpleAction ("toggle", null);  // alias for start-stop
+            toggle_action.activate.connect (this.activate_start_stop);
+            this.add_action (toggle_action);
+
+            var start_stop_action = new GLib.SimpleAction ("start-stop", null);
+            start_stop_action.activate.connect (this.activate_start_stop);
+            this.add_action (start_stop_action);
+
+            var start_pause_resume_action = new GLib.SimpleAction ("start-pause-resume", null);
+            start_pause_resume_action.activate.connect (this.activate_start_pause_resume);
+            this.add_action (start_pause_resume_action);
         }
 
         private void activate_start (GLib.SimpleAction action,
@@ -91,6 +103,36 @@ namespace Pomodoro
 
             Pomodoro.Context.set_event_source ("timer.rewind");
             this.timer.rewind (Pomodoro.Interval.MINUTE);
+        }
+
+        private void activate_start_stop (GLib.SimpleAction action,
+                                          GLib.Variant?     parameter)
+        {
+            if (!this.timer.is_started ()) {
+                Pomodoro.Context.set_event_source ("timer.start");
+                this.timer.start ();
+            }
+            else {
+                Pomodoro.Context.set_event_source ("timer.reset");
+                this.timer.reset ();
+            }
+        }
+
+        private void activate_start_pause_resume (GLib.SimpleAction action,
+                                                  GLib.Variant?     parameter)
+        {
+            if (!this.timer.is_started ()) {
+                Pomodoro.Context.set_event_source ("timer.start");
+                this.timer.start ();
+            }
+            else if (this.timer.is_paused ()) {
+                Pomodoro.Context.set_event_source ("timer.resume");
+                this.timer.resume ();
+            }
+            else {
+                Pomodoro.Context.set_event_source ("timer.pause");
+                this.timer.pause ();
+            }
         }
     }
 }

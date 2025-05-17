@@ -57,8 +57,6 @@ namespace Pomodoro
         private Pomodoro.Provider       _provider = null;
         private bool                    _available = false;
         private bool                    _enabled = false;
-        // private ulong                   provider_initialized_id = 0;
-        // private ulong                   provider_uninitialized_id = 0;
         private ulong                   provider_selected_id = 0;
         private ulong                   provider_unselected_id = 0;
         private ulong                   provider_enabled_id = 0;
@@ -67,17 +65,15 @@ namespace Pomodoro
 
         construct
         {
-            this.providers = new Pomodoro.ProviderSet<Pomodoro.Provider> ();
-            this.provider_selected_id = this.providers.provider_selected.connect (this.on_provider_selected);
+            this.providers              = new Pomodoro.ProviderSet<Pomodoro.Provider> (Pomodoro.SelectionMode.SINGLE);
+            this.provider_selected_id   = this.providers.provider_selected.connect (this.on_provider_selected);
             this.provider_unselected_id = this.providers.provider_unselected.connect (this.on_provider_unselected);
-            // this.provider_initialized_id = this.providers.provider_initialized.connect (this.on_provider_initialized);
-            // this.provider_uninitialized_id = this.providers.provider_uninitialized.connect (this.on_provider_uninitialized);
-            this.provider_enabled_id = this.providers.provider_enabled.connect (this.on_provider_enabled);
-            this.provider_disabled_id = this.providers.provider_disabled.connect (this.on_provider_disabled);
+            this.provider_enabled_id    = this.providers.provider_enabled.connect (this.on_provider_enabled);
+            this.provider_disabled_id   = this.providers.provider_disabled.connect (this.on_provider_disabled);
 
             this.setup_providers ();
 
-            this.providers.enable_one ();
+            this.providers.enable ();
         }
 
         private void on_provider_notify_available (GLib.Object    object,
@@ -149,28 +145,18 @@ namespace Pomodoro
                 this.provider_unselected_id = 0;
             }
 
+            if (this.provider_enabled_id != 0) {
+                this.providers.disconnect (this.provider_enabled_id);
+                this.provider_enabled_id = 0;
+            }
+
+            if (this.provider_disabled_id != 0) {
+                this.providers.disconnect (this.provider_disabled_id);
+                this.provider_disabled_id = 0;
+            }
+
             this._provider = null;
             this.providers = null;
-
-            // if (this.provider_initialized_id != 0) {
-            //     this.providers.disconnect (this.provider_initialized_id);
-            //     this.provider_initialized_id = 0;
-            // }
-
-            // if (this.provider_uninitialized_id != 0) {
-            //     this.providers.disconnect (this.provider_uninitialized_id);
-            //     this.provider_uninitialized_id = 0;
-            // }
-
-            // if (this.provider_enabled_id != 0) {
-            //     this.providers.disconnect (this.provider_enabled_id);
-            //     this.provider_enabled_id = 0;
-            // }
-
-            // if (this.provider_disabled_id != 0) {
-            //     this.providers.disconnect (this.provider_disabled_id);
-            //     this.provider_disabled_id = 0;
-            // }
 
             base.dispose ();
         }

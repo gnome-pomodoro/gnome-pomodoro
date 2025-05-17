@@ -352,6 +352,19 @@ popover.menu .title.no-padding {
 
 
 /*
+ * Shortcut edit window
+ */
+shortcut {
+    font-size: 150%;
+}
+
+shortcut label.keycap {
+     padding: 0.4em 0.7em;
+     margin: 0.3em;
+}
+
+
+/*
  * Common
  */
 

@@ -11,6 +11,7 @@ resources = gnome.compile_resources(
 
 # Common library
 libgnome_pomodoro_sources = files(
+  'integrations/freedesktop/global-shortcuts-provider.vala',
   'integrations/freedesktop/interfaces.vala',
   'integrations/freedesktop/lock-screen-provider.vala',
   'integrations/freedesktop/notifications-provider.vala',
@@ -41,6 +42,7 @@ libgnome_pomodoro_sources = files(
   'core/gap-entry.vala',
   'core/idle-monitor.vala',
   'core/job.vala',
+  'core/keyboard-manager.vala',
   'core/lock-screen.vala',
   'core/logger.vala',
   'core/matrix.vala',
@@ -116,6 +118,7 @@ gnome_pomodoro_vala_sources = files(
   'application.vala',
   'main.vala',
   'service.vala',
+  'capabilities/global-shortcuts.vala',
   'capabilities/notifications.vala',
   'capabilities/sounds.vala',
   'views/about-window.vala',
@@ -125,6 +128,7 @@ gnome_pomodoro_vala_sources = files(
   'views/log-window.vala',
   'views/preferences-panel-actions.vala',
   'views/preferences-panel-appearance.vala',
+  'views/preferences-panel-keyboard-shortcuts.vala',
   'views/preferences-panel-notifications.vala',
   'views/preferences-panel-sounds.vala',
   'views/preferences-panel-timer.vala',
@@ -139,6 +143,8 @@ gnome_pomodoro_vala_sources = files(
   'views/timer-view.vala',
   'views/window.vala',
   'widgets/accelerator.vala',
+  'widgets/accelerator-chooser-window.vala',
+  'widgets/accelerator-row.vala',
   'widgets/bubble-chart.vala',
   'widgets/canvas.vala',
   'widgets/chart.vala',
@@ -175,6 +181,8 @@ executable(
   dependencies: [
     libgnome_pomodoro_dep,
     gtk_dep,
+    gtk_x11_dep,
+    gtk_wayland_dep,
     cairo_dep,
     graphene_dep,
     libadwaita_dep,

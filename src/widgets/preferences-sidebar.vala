@@ -79,10 +79,6 @@ namespace Pomodoro
             label.halign = Gtk.Align.START;
             label.valign = Gtk.Align.CENTER;
 
-            var page = this._model.get_item (position);
-            page.bind_property ("title", label, "label", GLib.BindingFlags.SYNC_CREATE);
-            page.bind_property ("icon-name", icon, "icon-name", GLib.BindingFlags.SYNC_CREATE);
-
             var hbox = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             hbox.margin_start = 6;
             hbox.margin_end = 6;
@@ -95,6 +91,11 @@ namespace Pomodoro
             row.child = hbox;
             row.update_relation (Gtk.AccessibleRelation.LABELLED_BY, label, null, -1);
             row.set_data<uint> ("child-index", position);
+
+            var panel_info = this._model.get_item (position);
+            panel_info.bind_property ("title", label, "label", GLib.BindingFlags.SYNC_CREATE);
+            panel_info.bind_property ("icon-name", icon, "icon-name", GLib.BindingFlags.SYNC_CREATE);
+            panel_info.bind_property ("visible", row, "visible", GLib.BindingFlags.SYNC_CREATE);
 
             this.list.append (row);
 

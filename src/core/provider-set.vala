@@ -7,10 +7,10 @@ namespace Pomodoro
     private const int64 AVAILABILITY_TIMEOUT_TOLERANCE = Pomodoro.Interval.MILLISECOND * 20;
 
 
-    private enum SelectionMode
+    public enum SelectionMode
     {
         NONE,
-        ONE,
+        SINGLE,
         ALL
     }
 
@@ -91,14 +91,34 @@ namespace Pomodoro
     public class ProviderSet<T> : GLib.Object
     {
         private GLib.GenericSet<Pomodoro.ProviderInfo> providers = null;
-        private Pomodoro.SelectionMode                 _selection_mode = Pomodoro.SelectionMode.NONE;
+        private Pomodoro.SelectionMode                 _selection_mode = Pomodoro.SelectionMode.ALL;
         private uint                                   update_selection_timeout_id = 0;
+        private uint                                   update_selection_idle_id = 0;
         private bool                                   selection_invalid = false;
         private bool                                   updating_selection = false;
+        private bool                                   should_enable = false;
+
+        public Pomodoro.SelectionMode selection_mode
+        {
+            get {
+                return this._selection_mode;
+            }
+            construct {
+                this._selection_mode = value;
+            }
+        }
 
         construct
         {
-            this.providers = new GLib.GenericSet<Pomodoro.ProviderInfo> (direct_hash, direct_equal);
+            this.providers = new GLib.GenericSet<Pomodoro.ProviderInfo> (GLib.direct_hash,
+                                                                         GLib.direct_equal);
+        }
+
+        public ProviderSet (Pomodoro.SelectionMode selection_mode = Pomodoro.SelectionMode.ALL)
+        {
+            GLib.Object (
+                selection_mode: selection_mode
+            );
         }
 
         /**
@@ -130,8 +150,6 @@ namespace Pomodoro
                                 provider.initialize.end (res);
                                 provider_info.status = Pomodoro.ProviderStatus.DISABLED;
 
-                                // this.provider_initialized ((T) provider);
-
                                 this.check_provider_status (provider_info);
                             }
                             catch (GLib.Error error) {
@@ -142,10 +160,9 @@ namespace Pomodoro
                             }
                         });
                 }
-
-                if (provider_info.status == Pomodoro.ProviderStatus.DISABLED &&
-                    provider_info.selected &&
-                    provider.available)
+                else if (this.should_enable &&
+                         provider_info.status == Pomodoro.ProviderStatus.DISABLED &&
+                         provider.available)
                 {
                     provider_info.status = Pomodoro.ProviderStatus.ENABLING;
                     provider_info.cancellable = new GLib.Cancellable ();
@@ -166,8 +183,8 @@ namespace Pomodoro
                             }
                         });
                 }
-
-                if (provider_info.status == Pomodoro.ProviderStatus.ENABLED && !provider_info.selected)
+                else if (!this.should_enable &&
+                         provider_info.status == Pomodoro.ProviderStatus.ENABLED)
                 {
                     provider_info.status = Pomodoro.ProviderStatus.DISABLING;
                     provider.enabled = false;
@@ -228,8 +245,6 @@ namespace Pomodoro
 
                         // We always mark it here as NOT_INITIALIZED when destroying.
                         provider_info.status = Pomodoro.ProviderStatus.NOT_INITIALIZED;
-
-                        // this.provider_uninitialized ((T) provider);
                     });
             }
         }
@@ -296,10 +311,11 @@ namespace Pomodoro
         /**
          * Find best provider, preferably available with highest priority.
          */
-        private void update_selection_one ()
+        private void select_single ()
         {
             unowned Pomodoro.ProviderInfo? preferred_provider_info = null;
             int64                          preferred_provider_timeout = 0;
+            var                            selection_changed = false;
 
             this.get_preferred_provider_info (out preferred_provider_info,
                                               out preferred_provider_timeout);
@@ -322,6 +338,7 @@ namespace Pomodoro
                     if (provider_info.selected != selected)
                     {
                         provider_info.selected = selected;
+                        selection_changed = true;
 
                         if (selected) {
                             this.provider_selected ((T) provider_info.instance);
@@ -333,36 +350,55 @@ namespace Pomodoro
                         this.check_provider_status (provider_info);
                     }
                 });
+
+            if (selection_changed) {
+                this.selection_changed ();
+            }
         }
 
         /**
          * Disable all providers.
          */
-        private void update_selection_none ()
+        private void select_none ()
         {
+            var selection_changed = false;
+
             this.providers.@foreach (
                 (provider_info) => {
                     if (provider_info.selected) {
                         provider_info.selected = false;
+                        selection_changed = true;
+
                         this.provider_unselected ((T) provider_info.instance);
                         this.check_provider_status (provider_info);
                     }
                 });
+
+            if (selection_changed) {
+                this.selection_changed ();
+            }
         }
 
         /**
          * Try enabling all providers.
          */
-        private void update_selection_all ()
+        private void select_all ()
         {
+            var selection_changed = false;
+
             this.providers.@foreach (
                 (provider_info) => {
                     if (!provider_info.selected) {
                         provider_info.selected = true;
+                        selection_changed = true;
                         this.provider_selected ((T) provider_info.instance);
                         this.check_provider_status (provider_info);
                     }
                 });
+
+            if (selection_changed) {
+                this.selection_changed ();
+            }
         }
 
         private void update_selection ()
@@ -372,26 +408,31 @@ namespace Pomodoro
                 return;
             }
 
-            this.updating_selection = true;
-            this.selection_invalid = false;
-
             if (this.update_selection_timeout_id != 0) {
                 GLib.Source.remove (this.update_selection_timeout_id);
                 this.update_selection_timeout_id = 0;
             }
 
+            if (this.update_selection_idle_id != 0) {
+                GLib.Source.remove (this.update_selection_idle_id);
+                this.update_selection_idle_id = 0;
+            }
+
+            this.updating_selection = true;
+            this.selection_invalid = false;
+
             switch (this._selection_mode)
             {
                 case Pomodoro.SelectionMode.NONE:
-                    this.update_selection_none ();
+                    this.select_none ();
                     break;
 
-                case Pomodoro.SelectionMode.ONE:
-                    this.update_selection_one ();
+                case Pomodoro.SelectionMode.SINGLE:
+                    this.select_single ();
                     break;
 
                 case Pomodoro.SelectionMode.ALL:
-                    this.update_selection_all ();
+                    this.select_all ();
                     break;
 
                 default:
@@ -403,6 +444,21 @@ namespace Pomodoro
             if (this.selection_invalid) {
                 this.update_selection ();
             }
+        }
+
+        private void schedule_update_selection ()
+        {
+            if (this.update_selection_idle_id != 0) {
+                return;
+            }
+
+            this.update_selection_idle_id = GLib.Idle.add (
+                () => {
+                    this.update_selection_idle_id = 0;
+                    this.update_selection ();
+
+                    return GLib.Source.REMOVE;
+                });
         }
 
         private unowned Pomodoro.ProviderInfo? lookup_info (Pomodoro.Provider instance)
@@ -492,7 +548,7 @@ namespace Pomodoro
                 }
             }
 
-            this.update_selection ();
+            this.schedule_update_selection ();
         }
 
         public void remove (T provider)
@@ -528,35 +584,27 @@ namespace Pomodoro
             this.providers.remove_all ();
         }
 
-        public void enable_one ()
+        public void enable ()
         {
-            if (this._selection_mode != Pomodoro.SelectionMode.ONE)
-            {
-                this._selection_mode = Pomodoro.SelectionMode.ONE;
+            this.should_enable = true;
 
-                this.update_selection ();
-            }
+            this.update_selection ();
+
+            this.providers.@foreach (
+                (provider_info) => {
+                    this.check_provider_status (provider_info);
+                });
         }
 
-        // public void enable_all ()
-        // {
-        //     if (this._selection_mode != Pomodoro.SelectionMode.ALL)
-        //     {
-        //         this._selection_mode = Pomodoro.SelectionMode.ALL;
-        //
-        //         this.update_selection ();
-        //     }
-        // }
+        public void disable ()
+        {
+            this.should_enable = false;
 
-        // public void disable_all ()
-        // {
-        //     if (this._selection_mode != Pomodoro.SelectionMode.NONE)
-        //     {
-        //         this._selection_mode = Pomodoro.SelectionMode.NONE;
-        //
-        //         this.update_selection ();
-        //     }
-        // }
+            this.providers.@foreach (
+                (provider_info) => {
+                    this.check_provider_status (provider_info);
+                });
+        }
 
         public void @foreach (GLib.Func<T> func)
         {
@@ -566,25 +614,15 @@ namespace Pomodoro
                 });
         }
 
-        // public void foreach_selected (GLib.Func<T> func)
-        // {
-        //     this.providers.@foreach (
-        //         (provider_info) => {
-        //             if (provider_info.selected) {
-        //                 func ((T) provider_info.instance);
-        //             }
-        //         });
-        // }
-
-        // public void foreach_available (GLib.Func<T> func)
-        // {
-        //     this.providers.@foreach (
-        //         (provider_info) => {
-        //             if (provider_info.instance.available) {
-        //                 func ((T) provider_info.instance);
-        //             }
-        //         });
-        // }
+        public void foreach_selected (GLib.Func<T> func)
+        {
+            this.providers.@foreach (
+                (provider_info) => {
+                    if (provider_info.selected) {
+                        func ((T) provider_info.instance);
+                    }
+                });
+        }
 
         public void foreach_enabled (GLib.Func<T> func)
         {
@@ -600,16 +638,24 @@ namespace Pomodoro
 
         internal signal void provider_unselected (T provider);
 
-        // public signal void provider_initialized (T provider);
-
-        // public signal void provider_uninitialized (T provider);
-
         public signal void provider_enabled (T provider);
 
         public signal void provider_disabled (T provider);
 
+        public signal void selection_changed ();
+
         public override void dispose ()
         {
+            if (this.update_selection_timeout_id != 0) {
+                GLib.Source.remove (this.update_selection_timeout_id);
+                this.update_selection_timeout_id = 0;
+            }
+
+            if (this.update_selection_idle_id != 0) {
+                GLib.Source.remove (this.update_selection_idle_id);
+                this.update_selection_idle_id = 0;
+            }
+
             if (this.providers != null)
             {
                 this.remove_all ();

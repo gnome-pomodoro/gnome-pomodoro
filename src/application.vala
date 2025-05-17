@@ -126,6 +126,7 @@ namespace Pomodoro
         public Pomodoro.SessionManager?      session_manager;
         public Pomodoro.CapabilityManager?   capability_manager;
 
+        private Pomodoro.KeyboardManager?    keyboard_manager;
         private Pomodoro.StatsManager?       stats_manager;
         private Pomodoro.EventProducer?      event_producer;
         private Pomodoro.EventBus?           event_bus;
@@ -193,10 +194,12 @@ namespace Pomodoro
 
             this.capability_manager = new Pomodoro.CapabilityManager ();
             this.capability_manager.register (new Pomodoro.NotificationsCapability ());
+            this.capability_manager.register (new Pomodoro.GlobalShortcutsCapability ());
             this.capability_manager.register (new Pomodoro.SoundsCapability ());
 
             var idle_id = GLib.Idle.add (() => {
                 this.capability_manager.enable ("notifications");
+                this.capability_manager.enable ("global-shortcuts");
 
                 if (this.settings.get_boolean ("sounds")) {
                     this.capability_manager.enable ("sounds");
@@ -287,6 +290,20 @@ namespace Pomodoro
             var view = Pomodoro.WindowView.from_string (parameter.get_string ());
 
             this.show_window (view);
+        }
+
+        private void activate_toggle_window (GLib.SimpleAction action,
+                                             GLib.Variant?     parameter)
+        {
+            var window = this.get_window<Pomodoro.Window> ();
+
+            if (window == null || !window.is_active) {
+                this.show_window (Pomodoro.WindowView.TIMER);
+            }
+            else {
+                // window.close ();  // TODO: the app must be running in background
+                window.minimize ();
+            }
         }
 
         private void activate_timer (GLib.SimpleAction action,
@@ -429,6 +446,10 @@ namespace Pomodoro
             action.activate.connect (this.activate_window);
             this.add_action (action);
 
+            action = new GLib.SimpleAction ("toggle-window", null);
+            action.activate.connect (this.activate_toggle_window);
+            this.add_action (action);
+
             action = new GLib.SimpleAction ("preferences", null);
             action.activate.connect (this.activate_preferences);
             this.add_action (action);
@@ -476,6 +497,29 @@ namespace Pomodoro
             this.set_accels_for_action ("app.log", {"<Primary>l"});
             this.set_accels_for_action ("app.quit", {"<Primary>q"});
             this.set_accels_for_action ("win.toggle-compact-size", {"F9"});
+
+            this.keyboard_manager = new Pomodoro.KeyboardManager ();
+            this.keyboard_manager.add_shortcut ("timer.start-stop",
+                                                _("Start or Stop"),
+                                                "<Ctrl><Alt>p");
+            this.keyboard_manager.add_shortcut ("timer.start-pause-resume",
+                                                _("Start, Pause or Resume"));
+            this.keyboard_manager.add_shortcut ("timer.start",
+                                                _("Start"));
+            this.keyboard_manager.add_shortcut ("timer.reset",
+                                                _("Stop"));
+            this.keyboard_manager.add_shortcut ("timer.pause",
+                                                _("Pause"));
+            this.keyboard_manager.add_shortcut ("timer.resume",
+                                                _("Resume"));
+            this.keyboard_manager.add_shortcut ("session-manager.advance",
+                                                _("Skip"));
+            this.keyboard_manager.add_shortcut ("timer.rewind",
+                                                _("Rewind"));
+            this.keyboard_manager.add_shortcut ("app.toggle-window",
+                                                _("Bring to Focus"),
+                                                "<Ctrl><Alt><Shift>p");
+            this.keyboard_manager.shortcut_activated.connect (this.on_shortcut_activated);
         }
 
         private void update_color_scheme ()
@@ -848,9 +892,36 @@ namespace Pomodoro
             this.logger.log_event (event);
         }
 
+        private void on_shortcut_activated (string shortcut_name)
+        {
+            GLib.ActionGroup action_group;
 
-        // -----------------------------------------------------------------------------------------------------
+            var parts = shortcut_name.split (".", 2);
 
+            if (parts.length != 2) {
+                return;
+            }
+
+            switch (parts[0])
+            {
+                case "app":
+                    action_group = (GLib.ActionGroup) this;
+                    break;
+
+                case "timer":
+                    action_group = new Pomodoro.TimerActionGroup ();
+                    break;
+
+                case "session-manager":
+                    action_group = new Pomodoro.SessionManagerActionGroup ();
+                    break;
+
+                default:
+                    return;
+            }
+
+            action_group.activate_action (parts[1], null);
+        }
 
         /*
         private void load_plugins ()
