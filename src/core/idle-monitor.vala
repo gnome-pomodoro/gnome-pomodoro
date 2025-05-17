@@ -119,6 +119,8 @@ namespace Pomodoro
         {
             this.providers.remove_all ();
             this.providers.add (new Pomodoro.DummyIdleMonitorProvider ());
+
+            this.providers.enable ();
         }
 
         construct

@@ -11,9 +11,9 @@
     <file alias="ui/compact-timer-view.ui" compressed="true" preprocess="xml-stripblanks">views/compact-timer-view.ui</file>
     <file alias="ui/install-extension-dialog.ui" compressed="true" preprocess="xml-stripblanks">views/install-extension-dialog.ui</file>
     <file alias="ui/log-window.ui" compressed="true" preprocess="xml-stripblanks">views/log-window.ui</file>
-    <file alias="ui/preferences-keyboard-shortcut-page.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-keyboard-shortcut-page.ui</file>
     <file alias="ui/preferences-panel-actions.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-actions.ui</file>
     <file alias="ui/preferences-panel-appearance.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-appearance.ui</file>
+    <file alias="ui/preferences-panel-keyboard-shortcuts.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-keyboard-shortcuts.ui</file>
     <file alias="ui/preferences-panel-notifications.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-notifications.ui</file>
     <file alias="ui/preferences-panel-sounds.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-sounds.ui</file>
     <file alias="ui/preferences-panel-timer.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-timer.ui</file>
@@ -29,6 +29,8 @@
     <file alias="ui/menus.ui" compressed="true" preprocess="xml-stripblanks">views/menus.ui</file>
 
     <!-- Widgets -->
+    <file alias="ui/accelerator-chooser-window.ui" compressed="true" preprocess="xml-stripblanks">widgets/accelerator-chooser-window.ui</file>
+    <file alias="ui/accelerator-row.ui" compressed="true" preprocess="xml-stripblanks">widgets/accelerator-row.ui</file>
     <file alias="ui/bubble-chart.ui" compressed="true" preprocess="xml-stripblanks">widgets/bubble-chart.ui</file>
     <file alias="ui/chart.ui" compressed="true" preprocess="xml-stripblanks">widgets/chart.ui</file>
     <file alias="ui/command-entryrow.ui" compressed="true" preprocess="xml-stripblanks">widgets/command-entryrow.ui</file>
@@ -66,6 +68,7 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/list-drag-handle-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lock-screen-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/preferences-appearance-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/preferences-keyboard-shortcuts-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/preferences-notifications-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/preferences-sounds-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/screen-overlay-close-symbolic.svg</file>
@@ -81,5 +84,8 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/variable-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/window-compact-size-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/window-normal-size-symbolic.svg</file>
+
+    <!-- Images -->
+    <file alias="ui/enter-keyboard-shortcut.svg" preprocess="xml-stripblanks">widgets/enter-keyboard-shortcut.svg</file>
   </gresource>
 </gresources>

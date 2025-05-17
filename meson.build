@@ -24,6 +24,8 @@ gstreamer_dep = dependency('gstreamer-1.0', version: '>=1.0.10')
 json_dep = dependency('json-glib-1.0', version: '>=1.6.2')
 sqlite_dep = dependency('sqlite3')
 pangocairo_dep = dependency('pangocairo')
+gtk_x11_dep = dependency('gtk4-x11', required: false)
+gtk_wayland_dep = dependency('gtk4-wayland', required: false)
 
 cc = meson.get_compiler('c')
 libm_dep = cc.find_library('m')
@@ -55,6 +57,14 @@ add_project_arguments(
   '-D_GNU_SOURCE',
   language: 'c',
 )
+
+if gtk_x11_dep.found()
+  add_project_arguments(['--define', 'HAVE_GDK_X11'], language: 'vala')
+endif
+
+if gtk_wayland_dep.found()
+  add_project_arguments(['--define', 'HAVE_GDK_WAYLAND'], language: 'vala')
+endif
 
 # We are going to use these variables later on for the plugins
 gschema_dir = get_option('prefix') / get_option('datadir') / 'glib-2.0' / 'schemas'
@@ -145,6 +155,7 @@ conf.set_quoted(
 
 # Not all systems support nl_langinfo (ALTMON_*)
 if cc.has_header_symbol('langinfo.h', 'ALTMON_1', args: '-D_GNU_SOURCE')
+  # FIXME: use add_project_arguments()
   conf.set('HAVE_ALTMON', true)
 endif
 

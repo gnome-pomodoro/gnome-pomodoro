@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <template class="PomodoroPreferencesPanelKeyboardShortcuts" parent="PomodoroPreferencesPanel">
+    <property name="child">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar" id="content_headerbar">
+            <property name="show-title">true</property>
+          </object>
+        </child>
+        <property name="content">
+          <object class="AdwPreferencesPage">
+            <child>
+              <object class="AdwPreferencesGroup">
+                <property name="description" translatable="yes">Global shortcuts let you control the app even when it’s not on screen. They work as long as the app is running in the background.</property>
+                <property name="header-suffix">
+                  <object class="GtkButton">
+                    <property name="tooltip-text" translatable="yes">Open app settings for editing global shortcuts</property>
+                    <property name="margin-start">20</property>
+                    <property name="valign">center</property>
+                    <child>
+                      <object class="AdwButtonContent">
+                        <property name="label" translatable="yes">_Edit</property>
+                        <property name="use-underline">true</property>
+                        <property name="icon-name">document-edit-symbolic</property>
+                      </object>
+                    </child>
+                    <signal name="clicked" handler="on_edit_button_clicked"/>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwPreferencesGroup">
+                <property name="title" translatable="yes">Timer</property>
+                <child>
+                  <object class="PomodoroAcceleratorRow" id="start_stop_timer_row">
+                    <property name="title" translatable="yes">Start or Stop</property>
+                    <property name="description" translatable="yes">Enter new shortcut for starting or stopping the timer</property>
+                    <property name="activatable">false</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="PomodoroAcceleratorRow" id="start_pause_resume_timer_row">
+                    <property name="title" translatable="yes">Start, Pause or Resume</property>
+                    <property name="description" translatable="yes">Enter new shortcut to start/pause/resume the timer</property>
+                    <property name="activatable">false</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwExpanderRow">
+                    <property name="title" translatable="yes">Actions</property>
+                    <child>
+                      <object class="PomodoroAcceleratorRow" id="start_timer_row">
+                        <property name="title" translatable="yes">Start</property>
+                        <property name="description" translatable="yes">Enter new shortcut for starting the timer</property>
+                        <property name="activatable">false</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="PomodoroAcceleratorRow" id="stop_timer_row">
+                        <property name="title" translatable="yes">Stop</property>
+                        <property name="description" translatable="yes">Enter new shortcut for stopping the timer</property>
+                        <property name="activatable">false</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="PomodoroAcceleratorRow" id="pause_timer_row">
+                        <property name="title" translatable="yes">Pause</property>
+                        <property name="description" translatable="yes">Enter new shortcut for pausing the timer</property>
+                        <property name="activatable">false</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="PomodoroAcceleratorRow" id="resume_timer_row">
+                        <property name="title" translatable="yes">Resume</property>
+                        <property name="description" translatable="yes">Enter new shortcut for resuming the timer</property>
+                        <property name="activatable">false</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="PomodoroAcceleratorRow" id="skip_timer_row">
+                        <property name="title" translatable="yes">Skip</property>
+                        <property name="description" translatable="yes">Enter new shortcut for skipping</property>
+                        <property name="activatable">false</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="PomodoroAcceleratorRow" id="rewind_timer_row">
+                        <property name="title" translatable="yes">Rewind One Minute</property>
+                        <property name="description" translatable="yes">Enter new shortcut for rewinding</property>
+                        <property name="activatable">false</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="AdwPreferencesGroup">
+                <property name="title" translatable="yes">Main Window</property>
+                <child>
+                  <object class="PomodoroAcceleratorRow" id="toggle_window_row">
+                    <property name="title" translatable="yes">Bring to Focus</property>
+                    <property name="description" translatable="yes">Enter new shortcut for bringing window to focus</property>
+                    <property name="activatable">false</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property><!-- content -->
+      </object>
+    </property>
+  </template>
+</interface>
