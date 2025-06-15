@@ -237,8 +237,8 @@ namespace Pomodoro
 
             if (this.creating)
             {
-                this.title = _("Create Custom Action");
-                this.save_button.label = _("Cre_ate");
+                this.title = _("Add Custom Action");
+                this.save_button.label = _("_Add");
                 this.buttons_group.visible = false;
             }
 

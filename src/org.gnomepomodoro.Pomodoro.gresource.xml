@@ -11,8 +11,8 @@
     <file alias="ui/compact-timer-view.ui" compressed="true" preprocess="xml-stripblanks">views/compact-timer-view.ui</file>
     <file alias="ui/install-extension-dialog.ui" compressed="true" preprocess="xml-stripblanks">views/install-extension-dialog.ui</file>
     <file alias="ui/log-window.ui" compressed="true" preprocess="xml-stripblanks">views/log-window.ui</file>
-    <file alias="ui/preferences-panel-actions.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-actions.ui</file>
     <file alias="ui/preferences-panel-appearance.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-appearance.ui</file>
+    <file alias="ui/preferences-panel-automation.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-automation.ui</file>
     <file alias="ui/preferences-panel-keyboard-shortcuts.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-keyboard-shortcuts.ui</file>
     <file alias="ui/preferences-panel-notifications.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-notifications.ui</file>
     <file alias="ui/preferences-panel-sounds.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-sounds.ui</file>

@@ -81,10 +81,10 @@ namespace Pomodoro
                                         GLib.BindingFlags.SYNC_CREATE);
 
         panel_info = new PreferencesPanelInfo ();
-        panel_info.name = "actions";
-        panel_info.title = _("Custom Actions");
+        panel_info.name = "automation";
+        panel_info.title = _("Automation");
         panel_info.icon_name = "custom-action-symbolic";
-        panel_info.content_class = typeof (Pomodoro.PreferencesPanelActions);
+        panel_info.content_class = typeof (Pomodoro.PreferencesPanelAutomation);
         model.append (panel_info);
 
         return new Gtk.SingleSelection ((owned) model);

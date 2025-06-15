@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroPreferencesPanelActions" parent="PomodoroPreferencesPanel">
+  <template class="PomodoroPreferencesPanelAutomation" parent="PomodoroPreferencesPanel">
     <property name="child">
       <object class="AdwToolbarView">
         <child type="top">
@@ -21,7 +21,7 @@
         </child>
         <property name="content">
           <object class="AdwPreferencesPage">
-            <property name="description" translatable="yes"><![CDATA[Set up custom actions for automating things and integrating with other services. <a href="">Learn more.</a>]]></property>
+            <property name="description" translatable="yes"><![CDATA[Run shell commands automatically on timer events or conditions. <a href="">Learn more.</a>]]></property>
             <child>
               <object class="AdwPreferencesGroup">
                 <child>
