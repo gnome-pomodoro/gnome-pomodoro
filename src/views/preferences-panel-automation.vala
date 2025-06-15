@@ -1,7 +1,7 @@
 namespace Pomodoro
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences-panel-actions.ui")]
-    public class PreferencesPanelActions : Pomodoro.PreferencesPanel
+    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences-panel-automation.ui")]
+    public class PreferencesPanelAutomation : Pomodoro.PreferencesPanel
     {
         [GtkChild]
         private unowned Adw.PreferencesRow add_row;
