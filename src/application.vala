@@ -231,7 +231,7 @@ namespace Pomodoro
                 this.add_window (window);
 
                 if (this.application_id.has_suffix ("Devel")) {
-                    window.get_style_context ().add_class ("devel");
+                    window.add_css_class ("devel");
                 }
             }
 
