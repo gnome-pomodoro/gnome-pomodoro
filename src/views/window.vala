@@ -275,6 +275,23 @@ namespace Pomodoro
             this.update_timer_indicator ();
         }
 
+        [GtkCallback]
+        private void on_gesture_click_pressed (Gtk.GestureClick gesture,
+                                               int              n_press,
+                                               double           x,
+                                               double           y)
+        {
+            if (gesture.get_current_button () == Gdk.BUTTON_PRIMARY &&
+                n_press == 2)
+            {
+                this.size = this.size != Pomodoro.WindowSize.COMPACT
+                    ? Pomodoro.WindowSize.COMPACT
+                    : Pomodoro.WindowSize.NORMAL;
+
+                gesture.set_state (Gtk.EventSequenceState.CLAIMED);
+            }
+        }
+
         /*
         [GtkCallback]
         private void on_in_app_notification_install_extension_install_button_clicked (Gtk.Button button)

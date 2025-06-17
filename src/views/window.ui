@@ -125,7 +125,13 @@
                             <property name="title" translatable="yes">Timer</property>
                             <property name="icon-name">timer-symbolic</property>
                             <property name="child">
-                              <object class="PomodoroTimerView" id="timer_view"/>
+                              <object class="PomodoroTimerView" id="timer_view">
+                                <child>
+                                  <object class="GtkGestureClick">
+                                    <signal name="pressed" handler="on_gesture_click_pressed"/>
+                                  </object>
+                                </child>
+                              </object>
                             </property>
                           </object>
                         </child>
@@ -157,16 +163,15 @@
                 <property name="halign">fill</property>
                 <property name="valign">start</property>
                 <property name="child">
-                  <object class="PomodoroCompactTimerView"/>
-                </property>
-                <!-- TODO: handle double-click -->
-                <!--
-                <child>
-                  <object class="GtkGestureClick">
-                    <signal name="pressed" handler="on_click_gesture_pressed_cb" swapped="no"/>
+                  <object class="PomodoroCompactTimerView">
+                    <child>
+                      <object class="GtkGestureClick">
+                        <property name="propagation-phase">capture</property>
+                        <signal name="pressed" handler="on_gesture_click_pressed"/>
+                      </object>
+                    </child>
                   </object>
-                </child>
-                -->
+                </property>
               </object>
             </property>
           </object>
