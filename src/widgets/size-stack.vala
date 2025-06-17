@@ -215,6 +215,7 @@ namespace Pomodoro
             if (this.interpolate_window_size && window != null) {
                 window.halign = Gtk.Align.START;
                 window.valign = Gtk.Align.START;
+                window.set_size_request (-1, -1);
             }
 
             if (this._visible_child == null || this.last_visible_child == null || transition_duration == 0) {
