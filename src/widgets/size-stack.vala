@@ -402,11 +402,9 @@ namespace Pomodoro
             }
         }
 
-        private void remove_child_internal (ChildInfo child_info,
-                                            bool      in_dispose)
+        private void remove_child_internal (ChildInfo child_info)
         {
-            var child       = child_info.page.child;
-            var was_visible = false;
+            var child = child_info.page.child;
 
             child.disconnect (child_info.notify_visible_id);
             child.disconnect (child_info.unmap_id);
@@ -414,7 +412,6 @@ namespace Pomodoro
 
             if (this._visible_child == child_info) {
                 this._visible_child = null;
-                was_visible = child.visible;
             }
 
             if (this.last_visible_child == child_info) {
@@ -422,11 +419,6 @@ namespace Pomodoro
             }
 
             this.children.remove (child_info);
-
-            if (!in_dispose && was_visible)
-            {
-                this.queue_resize ();
-            }
         }
 
         private void add_page (Pomodoro.SizeStackPage page)
@@ -668,7 +660,7 @@ namespace Pomodoro
                 var child_info = this.find_child_info_for_widget (child);
 
                 if (child_info != null) {
-                    this.remove_child_internal (child_info, true);
+                    this.remove_child_internal (child_info);
                 }
             }
 

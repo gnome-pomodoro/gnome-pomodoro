@@ -1,7 +1,7 @@
 namespace Pomodoro
 {
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/compact-timer-view.ui")]
-    public class CompactTimerView : Gtk.Widget, Gtk.Buildable
+    public class CompactTimerView : Adw.Bin, Gtk.Buildable
     {
         [GtkChild]
         private unowned Gtk.MenuButton state_menubutton;
@@ -28,7 +28,6 @@ namespace Pomodoro
         {
             this.session_manager = Pomodoro.SessionManager.get_default ();
             this.timer           = session_manager.timer;
-            this.layout_manager  = new Gtk.BinLayout ();
 
             var builder = new Gtk.Builder.from_resource ("/org/gnomepomodoro/Pomodoro/ui/menus.ui");
             this.state_menu = (GLib.MenuModel) builder.get_object ("state_menu");
@@ -65,8 +64,8 @@ namespace Pomodoro
         private void update_buttons ()
         {
             this.state_menubutton.label = !this.timer.is_finished ()
-                ? this.get_state_label ()
-                : _("Finished!");
+                    ? this.get_state_label ()
+                    : _("Finished!");
         }
 
         private void update_timer_label_placeholder ()
@@ -76,12 +75,17 @@ namespace Pomodoro
             this.timer_label.placeholder_has_hours = session_template.pomodoro_duration >= Pomodoro.Interval.HOUR;
         }
 
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
+        private void update ()
         {
             this.update_css_classes ();
             this.update_buttons ();
             this.update_timer_label_placeholder ();
+        }
+
+        private void on_timer_state_changed (Pomodoro.TimerState current_state,
+                                             Pomodoro.TimerState previous_state)
+        {
+            this.update ();
         }
 
         private void on_current_time_block_changed ()
@@ -110,8 +114,8 @@ namespace Pomodoro
         private void on_session_manager_notify_has_uniform_breaks ()
         {
             this.state_menubutton.menu_model = this.session_manager.has_uniform_breaks
-                ? this.uniform_state_menu
-                : this.state_menu;
+                    ? this.uniform_state_menu
+                    : this.state_menu;
         }
 
         private void connect_signals ()
@@ -132,8 +136,7 @@ namespace Pomodoro
         public override void map ()
         {
             this.session_manager.ensure_session ();
-
-            this.on_timer_state_changed (this.timer.state, this.timer.state);
+            this.update ();
 
             base.map ();
 

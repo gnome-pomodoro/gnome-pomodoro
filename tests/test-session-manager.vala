@@ -696,7 +696,15 @@ namespace Tests
             session_manager.enter_session.connect (() => { signals += "enter-session"; });
             session_manager.enter_time_block.connect (() => { signals += "enter-time-block"; });
             session_manager.leave_session.connect (() => { signals += "leave-session"; });
-            session_manager.leave_time_block.connect (() => { signals += "leave-time-block"; });
+            session_manager.leave_time_block.connect ((session_manager_, session) => {
+                signals += "leave-time-block";
+
+                if (!handler_called) {
+                    assert_true (session_manager_.current_time_block == time_block_1);
+                    handler_called = true;
+                    session_manager_.current_time_block = time_block_3;
+                }
+            });
             session_manager.notify["current-session"].connect (() => {
                 notify_current_session_emitted++;
             });
@@ -704,12 +712,7 @@ namespace Tests
                 notify_current_time_block_emitted++;
             });
 
-            session_manager.leave_time_block.connect ((session_manager_, session) => {
-                if (!handler_called) {
-                    handler_called = true;
-                    session_manager_.current_time_block = time_block_3;
-                }
-            });
+            // Expect switching to `time_block_2` to be interrupted
             session_manager.current_time_block = time_block_2;
             assert_true (session_manager.current_time_block == time_block_3);
             assert_cmpstrv (signals, {

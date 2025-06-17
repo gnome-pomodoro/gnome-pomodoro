@@ -2,7 +2,6 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.4"/>
-
   <menu id="primary_menu">
     <section>
       <item>
@@ -28,64 +27,17 @@
       </item>
     </section>
   </menu>
-  <!--
-  <object class="GtkPopoverMenu" id="state_popover">
-    <property name="can-focus">False</property>
-    <property name="relative-to">state_togglebutton</property>
-    <child>
-      <object class="GtkBox">
-        <property name="can-focus">False</property>
-        <property name="margin-start">10</property>
-        <property name="margin-end">10</property>
-        <property name="margin-top">10</property>
-        <property name="margin-bottom">10</property>
-        <property name="orientation">vertical</property>
-        <child>
-          <object class="GtkModelButton">
-            <property name="can-focus">True</property>
-            <property name="receives-default">False</property>
-            <property name="action-name">app.advance-to-state</property>
-            <property name="action-target">'pomodoro'</property>
-            <property name="text" translatable="yes">Pomodoro</property>
-            <property name="centered">True</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkModelButton">
-            <property name="can-focus">True</property>
-            <property name="receives-default">False</property>
-            <property name="action-name">app.advance-to-state</property>
-            <property name="action-target">'short-break'</property>
-            <property name="text" translatable="yes">Short Break</property>
-            <property name="centered">True</property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkModelButton">
-            <property name="can-focus">True</property>
-            <property name="receives-default">False</property>
-            <property name="action-name">app.advance-to-state</property>
-            <property name="action-target">'long-break'</property>
-            <property name="text" translatable="yes">Long Break</property>
-            <property name="centered">True</property>
-          </object>
-        </child>
-      </object>
-    </child>
-  </object>
-  -->
-
   <template class="PomodoroWindow" parent="AdwApplicationWindow">
     <property name="default-width">400</property>
     <property name="default-height">600</property>
     <property name="content">
       <object class="PomodoroSizeStack" id="size_stack">
         <property name="transition-duration">500</property>
-        <property name="interpolate-window-size">True</property>
+        <property name="interpolate-window-size">true</property>
         <child>
           <object class="PomodoroSizeStackPage">
             <property name="name">normal</property>
-            <property name="resizable">True</property>
+            <property name="resizable">true</property>
             <property name="child">
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
@@ -106,7 +58,7 @@
                       <object class="GtkMenuButton">
                         <property name="icon-name">open-menu-symbolic</property>
                         <property name="menu-model">primary_menu</property>
-                        <property name="primary">True</property>
+                        <property name="primary">true</property>
                         <accessibility>
                           <property name="label" translatable="yes">Primary Menu</property>
                         </accessibility>
@@ -116,7 +68,7 @@
                 </child>
                 <child>
                   <object class="AdwToastOverlay" id="toast_overlay">
-                    <property name="vexpand">True</property>
+                    <property name="vexpand">true</property>
                     <property name="child">
                       <object class="AdwViewStack" id="view_stack">
                         <child>
@@ -145,7 +97,7 @@
                             </property>
                           </object>
                         </child>
-                        <signal name="notify::visible-child" handler="on_view_stack_visible_child_notify" swapped="false" />
+                        <signal name="notify::visible-child" handler="on_view_stack_visible_child_notify"/>
                       </object><!-- view_stack -->
                     </property>
                   </object><!-- toast_overlay -->
@@ -157,7 +109,7 @@
         <child>
           <object class="PomodoroSizeStackPage">
             <property name="name">compact</property>
-            <property name="resizable">False</property>
+            <property name="resizable">false</property>
             <property name="child">
               <object class="GtkWindowHandle">
                 <property name="halign">fill</property>
@@ -176,7 +128,7 @@
             </property>
           </object>
         </child>
-        <signal name="notify::visible-child" handler="on_size_stack_visible_child_notify" swapped="false" />
+        <signal name="notify::visible-child" handler="on_size_stack_visible_child_notify"/>
       </object><!-- size_stack -->
     </property>
     <signal name="close_request" handler="on_close_request"/>

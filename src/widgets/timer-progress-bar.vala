@@ -184,7 +184,13 @@ namespace Pomodoro
             var self = TimerProgress.from_gizmo (gizmo);
 
             if (self != null) {
-                self.measure_child (gizmo, orientation, for_size, out minimum, out natural, out minimum_baseline, out natural_baseline);
+                self.measure_child (gizmo,
+                                    orientation,
+                                    for_size,
+                                    out minimum,
+                                    out natural,
+                                    out minimum_baseline,
+                                    out natural_baseline);
             }
             else {
                 minimum = 0;
@@ -296,8 +302,8 @@ namespace Pomodoro
                 return;
             }
 
-            var animation_duration = this.calculate_animation_duration (this._value, this.last_value);
-
+            var animation_duration = this.calculate_animation_duration (this._value,
+                                                                        this.last_value);
             if (animation_duration > 0)
             {
                 var animation_target = new Adw.CallbackAnimationTarget (this.queue_draw_highlight);
@@ -445,7 +451,8 @@ namespace Pomodoro
 
         private void start_timeout ()
         {
-            var timeout_interval = uint.max (this.calculate_timeout_interval (), MIN_TIMEOUT_INTERVAL);
+            var timeout_interval = uint.max (this.calculate_timeout_interval (),
+                                             MIN_TIMEOUT_INTERVAL);
 
             if (this.timeout_interval != timeout_interval) {
                 this.timeout_interval = timeout_interval;
@@ -454,13 +461,16 @@ namespace Pomodoro
 
             if (this.timeout_id == 0 && this.timeout_interval > 0)
             {
-                this.timeout_id = GLib.Timeout.add (this.timeout_interval, () => {
-                    this.invalidate_value ();
+                this.timeout_id = GLib.Timeout.add (
+                    this.timeout_interval,
+                    () => {
+                        this.invalidate_value ();
 
-                    return GLib.Source.CONTINUE;
-                });
-                GLib.Source.set_name_by_id (this.timeout_id,
-                                            "Pomodoro.TimerProgressBar.invalidate_value");
+                        return GLib.Source.CONTINUE;
+                    });
+                GLib.Source.set_name_by_id (
+                        this.timeout_id,
+                        @"Pomodoro.$(this.get_type().name()).invalidate_value");
             }
         }
 
@@ -488,7 +498,8 @@ namespace Pomodoro
         private void connect_signals ()
         {
             if (this.timer_state_changed_id == 0) {
-                this.timer_state_changed_id = this._timer.state_changed.connect (this.on_timer_state_changed);
+                this.timer_state_changed_id = this._timer.state_changed.connect (
+                        this.on_timer_state_changed);
             }
 
             if (this._timer.is_running ()) {

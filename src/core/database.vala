@@ -77,9 +77,15 @@ namespace Pomodoro.Database
                                     uint           version)
                                     throws GLib.Error
     {
+        var is_test = Pomodoro.is_test ();
+
         // Gom tries to re-apply last migration (bug in Gom?).
-        if (is_migration_applied (repository, adapter, version)) {
-            GLib.info ("Migration version %u already applied, skipping", version);
+        if (is_migration_applied (repository, adapter, version))
+        {
+            if (!is_test) {
+                GLib.info ("Migration version %u already applied, skipping", version);
+            }
+
             return true;
         }
 
@@ -89,7 +95,10 @@ namespace Pomodoro.Database
         file.load_contents (null, out file_contents, null);
 
         try {
-            GLib.info ("Migrating database to version %u", version);
+            if (!is_test) {
+                GLib.info ("Migrating database to version %u", version);
+            }
+
             Pomodoro.Database.execute_sql (adapter, (string) file_contents);
         }
         catch (GLib.Error error) {

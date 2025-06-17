@@ -178,8 +178,10 @@ namespace Pomodoro
             }
             catch (GLib.Error error) {
                 if (!this.replace_in_database (timestamp, timezone)) {
-                    GLib.warning ("Failed to save timezone %s at %lld: %s",
-                                  timezone.get_identifier (), timestamp, error.message);
+                    GLib.warning ("Failed to save timezone %s at %s: %s",
+                                  timezone.get_identifier (),
+                                  timestamp.to_string (),
+                                  error.message);
                 }
             }
         }

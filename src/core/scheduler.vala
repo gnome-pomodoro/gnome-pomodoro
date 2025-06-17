@@ -197,9 +197,9 @@ namespace Pomodoro
             unowned GLib.List<Pomodoro.TimeBlock> link = session.time_blocks.first ();
 
             context = Pomodoro.SchedulerContext.initial (
-                link != null && link.data.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED
-                ? link.data.start_time
-                : timestamp);
+                    link != null && link.data.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED
+                    ? link.data.start_time
+                    : timestamp);
             first_scheduled_link = null;
 
             while (link != null && !context.is_session_completed)
@@ -283,6 +283,9 @@ namespace Pomodoro
                                         Pomodoro.TimeBlock? next_time_block = null,
                                         int64               timestamp = Pomodoro.Timestamp.UNDEFINED)
         {
+            assert (next_time_block == null ||
+                    next_time_block.session == session);
+
             Pomodoro.ensure_timestamp (ref timestamp);
 
             Pomodoro.SchedulerContext context;
@@ -291,19 +294,20 @@ namespace Pomodoro
             // Jump to first scheduled time-block.
             this.build_scheduler_context (session, timestamp, out context, out link);
 
-            var is_populating = next_time_block == null
-                ? session.time_blocks.is_empty ()
-                : session.time_blocks.length () == 1 && session.time_blocks.first ().data == next_time_block;
-            var n = 1;
-
             // Treat external changes to a long-break as schedule changes.
             var initial_version = context.state == Pomodoro.State.LONG_BREAK
-                ? session.get_data<ulong> ("rescheduled-version")
-                : session.version;
+                    ? session.get_data<ulong> ("rescheduled-version")
+                    : session.version;
+            var is_populating = next_time_block != null
+                    ? (session.time_blocks.length () == 1 &&
+                       session.get_first_time_block () == next_time_block)
+                    : session.time_blocks.is_empty ();
+            var n = 1;
 
             session.freeze_changed ();
 
-            // Remove scheduled time-blocks until next_time_block and shift the time-block to the timestamp.
+            // Remove scheduled time-blocks until next_time_block and shift the time-block
+            // to the timestamp.
             if (next_time_block != null)
             {
                 while (link != null && link.data != next_time_block)
@@ -371,7 +375,7 @@ namespace Pomodoro
             if (is_populating) {
                 this.populated_session (session);
             }
-            else if (initial_version != session.version) {
+            else if (session.version != initial_version) {
                 this.rescheduled_session (session);
             }
         }

@@ -136,7 +136,7 @@ namespace Pomodoro
             // }
 
             GLib.Application.get_default ()?
-                .send_notification (@"action:$(action.uuid)", notification);
+                            .send_notification (@"action:$(action.uuid)", notification);
         }
 
         private void watch_action_failed (Pomodoro.Action            action,

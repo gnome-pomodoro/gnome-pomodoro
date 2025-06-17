@@ -20,7 +20,7 @@
     </section>
   </menu>
 
-  <template class="PomodoroCompactTimerView" parent="GtkWidget">
+  <template class="PomodoroCompactTimerView" parent="AdwBin">
     <property name="width-request">300</property>
     <child>
       <object class="GtkGrid">
@@ -96,7 +96,7 @@
           </object>
         </child>
         <child>
-          <object class="GtkSeparator" id="separator">
+          <object class="GtkSeparator">
             <layout>
               <property name="column">1</property>
               <property name="row">0</property>
@@ -129,7 +129,7 @@
             </layout>
           </object>
         </child>
-      </object>
+      </object><!-- grid -->
     </child>
   </template>
 </interface>

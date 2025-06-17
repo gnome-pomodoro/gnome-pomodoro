@@ -663,10 +663,6 @@ namespace Pomodoro
             return execution;
         }
 
-        /**
-         * TODO: Its unnecessary. `execution.run` should be async and ensure that the command
-         *       is executed once.
-         */
         public async Pomodoro.CommandExecution? execute_async (Pomodoro.Context context)
         {
             var execution = this.prepare (context);

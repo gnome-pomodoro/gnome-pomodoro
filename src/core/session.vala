@@ -159,7 +159,7 @@ namespace Pomodoro
         /**
          * Time-blocks can me modified by scheduler.
          */
-        internal GLib.List<Pomodoro.TimeBlock> time_blocks;
+        internal GLib.List<Pomodoro.TimeBlock> time_blocks;  // XXX: make it private
         internal ulong                         version = 0;
         internal Pomodoro.SessionEntry?        entry = null;
 
@@ -708,7 +708,6 @@ namespace Pomodoro
         /*
          * Methods for managing time-blocks metadata
          */
-
 
         public void set_time_block_status (Pomodoro.TimeBlock       time_block,
                                            Pomodoro.TimeBlockStatus status)

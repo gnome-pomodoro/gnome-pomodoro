@@ -139,7 +139,7 @@ namespace Tests
 
         private Pomodoro.CommandExecution? execute_sync (Pomodoro.Command command,
                                                          Pomodoro.Context context)
-                                                         throws Pomodoro.CommandError
+                                                         throws Pomodoro.CommandError, GLib.Error
         {
             Pomodoro.CommandExecution? execution = null;
 
@@ -159,7 +159,6 @@ namespace Tests
 
             return (owned) execution;
         }
-
 
         public void test_validate__empty_line ()
         {
@@ -247,7 +246,6 @@ namespace Tests
                                         int              expected_error_code)
         {
             var command = new Pomodoro.Command (line);
-            Pomodoro.CommandError? error = null;
 
             var execution = command.prepare (context);
 

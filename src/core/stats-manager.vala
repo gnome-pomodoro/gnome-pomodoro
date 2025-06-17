@@ -87,7 +87,7 @@ namespace Pomodoro
             var timezone = this.timezone_history.search (timestamp);
 
             if (timezone == null) {
-                GLib.warning ("Did not find timezone for timestamp %lld", timestamp);
+                GLib.warning ("Did not find timezone for timestamp %s", timestamp.to_string ());
             }
 
             return Pomodoro.Timestamp.to_datetime (timestamp, timezone);
@@ -151,7 +151,7 @@ namespace Pomodoro
                     var datetime = this.transform_timestamp (start_time);
 
                     if (datetime == null) {
-                        GLib.warning ("Failed to convert timestamp %lld", start_time);
+                        GLib.warning ("Failed to convert timestamp %s", start_time.to_string ());
                         return;
                     }
 

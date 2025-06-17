@@ -231,7 +231,7 @@ namespace Pomodoro.Timestamp
         var datetime_string = (new GLib.DateTime.from_unix_utc (seconds)).format_iso8601 ();  // TODO: do we really need UTC, local may be prefferable?
 
         if (microseconds > 0) {
-            datetime_string = datetime_string.splice (-1, -1, microseconds.to_string (".%06lld"));
+            datetime_string = datetime_string.splice (-1, -1, microseconds.to_string (@".%06$(int64.FORMAT)"));
         }
 
         return datetime_string;

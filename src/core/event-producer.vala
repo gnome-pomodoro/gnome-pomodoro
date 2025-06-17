@@ -351,7 +351,7 @@ namespace Pomodoro
         }
 
         private void on_session_manager_notify_current_state (GLib.Object    object,
-                                                             GLib.ParamSpec pspec)
+                                                              GLib.ParamSpec pspec)
         {
             var current_state = this._session_manager.current_state;
             var previous_state = this.previous_state;

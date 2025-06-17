@@ -376,7 +376,7 @@ namespace Pomodoro
 
         public double get_category_total (uint category_index)
         {
-            return this.data.get_matrix (-1, (int) category_index).sum ();;
+            return this.data.get_matrix (-1, (int) category_index).sum ();
         }
 
         private string get_tooltip_label (uint row,

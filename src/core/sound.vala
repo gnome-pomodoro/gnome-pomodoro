@@ -173,7 +173,7 @@ namespace Pomodoro
                 return GLib.Source.CONTINUE;
             }
             else {
-                this._value = this._value_to;;
+                this._value = this._value_to;
                 this.notify_property ("value");
 
                 this.timeout_id = 0;

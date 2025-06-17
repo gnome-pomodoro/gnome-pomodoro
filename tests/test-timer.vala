@@ -316,7 +316,7 @@ namespace Tests
          * Tests for constructors
          */
 
-        private void test_new__without_args ()
+        public void test_new__without_args ()
         {
             var expected_state = create_initial_state (0);
 
@@ -341,7 +341,7 @@ namespace Tests
             assert_cmpuint (get_timestamp_call_count (), GLib.CompareOperator.EQ, 0);
         }
 
-        private void test_new__with_args ()
+        public void test_new__with_args ()
         {
             var user_data = GLib.MainContext.@default ();
             var expected_state = create_initial_state (Pomodoro.Interval.MINUTE,
@@ -363,7 +363,7 @@ namespace Tests
             assert_false (timer.is_finished ());
         }
 
-        private void test_new_with__paused_state ()
+        public void test_new_with__paused_state ()
         {
             var paused_state = create_paused_state ();
             var timer = new Pomodoro.Timer.with_state (paused_state);
@@ -375,7 +375,7 @@ namespace Tests
             assert_false (timer.is_running ());
         }
 
-        private void test_new_with__started_state ()
+        public void test_new_with__started_state ()
         {
             var started_state = create_started_state ();
             var timer = new Pomodoro.Timer.with_state (started_state);
@@ -392,7 +392,7 @@ namespace Tests
          * Tests for static methods
          */
 
-        private void test_set_default ()
+        public void test_set_default ()
         {
             // Expect timer to be created on demand
             var default_timer = Pomodoro.Timer.get_default ();
@@ -421,7 +421,7 @@ namespace Tests
         /*
          * Tests for properties
          */
-        private void test_state ()
+        public void test_state ()
         {
             var timer = new Pomodoro.Timer ();
 
@@ -445,7 +445,7 @@ namespace Tests
             assert_cmpint (notify_state_emitted, GLib.CompareOperator.EQ, 2);
         }
 
-        private void test_duration ()
+        public void test_duration ()
         {
             var timer = new Pomodoro.Timer ();
 
@@ -469,7 +469,7 @@ namespace Tests
             assert_cmpint (notify_duration_emitted, GLib.CompareOperator.EQ, 2);
         }
 
-        private void test_started_time ()
+        public void test_started_time ()
         {
             var timer = new Pomodoro.Timer ();
 
@@ -494,7 +494,7 @@ namespace Tests
             assert_cmpint (notify_started_time_emitted, GLib.CompareOperator.EQ, 2);
         }
 
-        private void test_offset ()
+        public void test_offset ()
         {
             var timer = new Pomodoro.Timer ();
 
@@ -519,7 +519,7 @@ namespace Tests
             assert_cmpint (notify_offset_emitted, GLib.CompareOperator.EQ, 2);
         }
 
-        private void test_user_data ()
+        public void test_user_data ()
         {
             var timer = new Pomodoro.Timer ();
 
