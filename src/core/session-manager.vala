@@ -859,7 +859,7 @@ namespace Pomodoro
 
                     var time_block_entry = time_block.entry;
 
-                    if (time_block_entry != null && time_block_entry.get_is_from_table ()) {
+                    if (time_block_entry != null && time_block_entry.id != 0) {
                         keep_time_block_ids.append_val (time_block_entry.id);
                     }
 
@@ -877,7 +877,7 @@ namespace Pomodoro
 
                                 var gap_entry = gap.entry;
 
-                                if (gap_entry != null && gap_entry.get_is_from_table ()) {
+                                if (gap_entry != null && time_block_entry.id != 0) {
                                     gap_ids.append_val (gap_entry.id);
                                 }
 
@@ -887,7 +887,7 @@ namespace Pomodoro
                                 }
                             });
 
-                        if (time_block_entry.get_is_from_table ()) {
+                        if (time_block_entry.id != 0) {
                             keep_gap_ids.insert (time_block_entry.id, gap_ids);
                         }
                     }

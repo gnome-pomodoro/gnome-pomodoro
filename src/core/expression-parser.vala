@@ -60,28 +60,6 @@ namespace Pomodoro
             return root;
         }
 
-        public unowned Token? last_sibling ()
-        {
-            unowned var last_sibling = this.next;
-
-            while (last_sibling.next != null) {
-                last_sibling = last_sibling.next;
-            }
-
-            return last_sibling;
-        }
-
-        public unowned Token? last_child ()
-        {
-            unowned var last_child = this.children;
-
-            while (last_child.next != null) {
-                last_child = last_child.next;
-            }
-
-            return last_child;
-        }
-
         public void append (Token token)
                             requires (token.parent == null)
         {
@@ -130,17 +108,6 @@ namespace Pomodoro
 
             this.parent    = token;
             this.prev      = null;
-        }
-
-        public void foreach_child (GLib.Func<Token> func)
-        {
-            unowned var child = this.children;
-
-            while (child != null)
-            {
-                func (child);
-                child = child.next;
-            }
         }
     }
 
@@ -774,7 +741,6 @@ namespace Pomodoro
                     return this.interpret (token.children);
 
                 default:
-                    GLib.error ("Unandled token: %s", token.type.to_string ());
                     assert_not_reached ();
             }
         }

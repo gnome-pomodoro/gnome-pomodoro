@@ -147,7 +147,6 @@ namespace Gom {
 		public bool delete_sync () throws GLib.Error;
 		public async Gom.ResourceGroup fetch_m2m_async (GLib.Type resource_type, string m2m_table, Gom.Filter filter) throws GLib.Error;
 		public static GLib.Quark from_bytes_func_quark ();
-		public bool get_is_from_table ();
 		public static bool has_dynamic_pkey (GLib.Type type);
 		public static GLib.Quark new_in_version_quark ();
 		public static GLib.Quark not_mapped_quark ();
@@ -156,7 +155,6 @@ namespace Gom {
 		public static GLib.Quark ref_table_class ();
 		public async bool save_async () throws GLib.Error;
 		public bool save_sync () throws GLib.Error;
-		public void set_is_from_table (bool is_from_table);
 		[CCode (cname = "gom_resource_class_set_notnull")]
 		public class void set_notnull (string property_name);
 		[CCode (cname = "gom_resource_class_set_primary_key")]
