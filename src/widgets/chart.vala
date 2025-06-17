@@ -193,7 +193,7 @@ namespace Pomodoro
             var milliseconds = (GLib.get_monotonic_time () - monotonic_time) /
                                Pomodoro.Interval.MILLISECOND;
             if (layout_count >= MAX_TICKS || milliseconds >= 10) {
-                GLib.warning ("Building an axis with %u ticks took %lldms", this.tick_count, milliseconds);
+                GLib.warning ("Building an axis with %u ticks took %sms", this.tick_count, milliseconds.to_string ());
             }
         }
 

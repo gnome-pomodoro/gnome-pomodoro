@@ -368,6 +368,7 @@ namespace Pomodoro
                                              GLib.Variant?     parameter)
         {
             try {
+                // TODO: does it work in flatpak?
                 string[] spawn_args = { "xdg-open", Config.PACKAGE_URL };
                 string[] spawn_env = GLib.Environ.get ();
 
@@ -387,6 +388,7 @@ namespace Pomodoro
                                             GLib.Variant?     parameter)
         {
             try {
+                // TODO: does it work in flatpak?
                 string[] spawn_args = { "xdg-open", Config.PACKAGE_BUGREPORT };
                 string[] spawn_env = GLib.Environ.get ();
 
