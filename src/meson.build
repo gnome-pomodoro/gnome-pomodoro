@@ -11,6 +11,7 @@ resources = gnome.compile_resources(
 
 # Common library
 libgnome_pomodoro_sources = files(
+  'integrations/freedesktop/background-provider.vala',
   'integrations/freedesktop/global-shortcuts-provider.vala',
   'integrations/freedesktop/interfaces.vala',
   'integrations/freedesktop/lock-screen-provider.vala',
@@ -25,6 +26,7 @@ libgnome_pomodoro_sources = files(
   'core/action.vala',
   'core/action-list-model.vala',
   'core/action-manager.vala',
+  'core/background-manager.vala',
   'core/capability.vala',
   'core/capability-manager.vala',
   'core/capability-set.vala',

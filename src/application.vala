@@ -23,7 +23,7 @@ using GLib;
 
 namespace Pomodoro
 {
-    public class Application : Adw.Application
+    public class Application : Adw.Application, Pomodoro.BackgroundApplication
     {
         private enum ExitStatus
         {
@@ -122,6 +122,17 @@ namespace Pomodoro
             }
         }
 
+        public bool can_background {
+            get {
+                return this._can_background;
+            }
+            set {
+                this._can_background = value;
+
+                this.update_background_hold ();
+            }
+        }
+
         public Pomodoro.Timer?               timer;
         public Pomodoro.SessionManager?      session_manager;
         public Pomodoro.CapabilityManager?   capability_manager;
@@ -131,10 +142,14 @@ namespace Pomodoro
         private Pomodoro.EventProducer?      event_producer;
         private Pomodoro.EventBus?           event_bus;
         private Pomodoro.ActionManager?      action_manager;
+        private Pomodoro.BackgroundManager?  background_manager;
         private Pomodoro.ApplicationService? service;
         private Pomodoro.TimerService?       timer_service;
         private Pomodoro.Logger?             logger;
         private GLib.Settings?               settings;
+        private int                          background_holds_count = 0;
+        private bool                         has_background_hold = false;
+        private bool                         _can_background = false;
 
         public Application ()
         {
@@ -301,8 +316,7 @@ namespace Pomodoro
                 this.show_window (Pomodoro.WindowView.TIMER);
             }
             else {
-                // window.close ();  // TODO: the app must be running in background
-                window.minimize ();
+                window.destroy ();
             }
         }
 
@@ -496,6 +510,7 @@ namespace Pomodoro
             this.set_accels_for_action ("app.preferences", {"<Primary>comma"});
             this.set_accels_for_action ("app.log", {"<Primary>l"});
             this.set_accels_for_action ("app.quit", {"<Primary>q"});
+            this.set_accels_for_action ("window.close", {"<Primary>w"});
             this.set_accels_for_action ("win.toggle-compact-size", {"F9"});
 
             this.keyboard_manager = new Pomodoro.KeyboardManager ();
@@ -534,6 +549,42 @@ namespace Pomodoro
             }
         }
 
+        private void update_background_hold ()
+        {
+            var should_hold = this._can_background && this.background_holds_count > 0;
+
+            if (!this.has_background_hold && should_hold)
+            {
+                this.has_background_hold = true;
+                this.hold ();
+            }
+
+            if (this.has_background_hold && !should_hold)
+            {
+                this.has_background_hold = false;
+                this.release ();
+            }
+        }
+
+        public void hold_background ()
+        {
+            this.background_holds_count++;
+
+            this.update_background_hold ();
+        }
+
+        public void release_background ()
+        {
+            this.background_holds_count--;
+
+            this.update_background_hold ();
+        }
+
+        public bool should_run_in_background ()
+        {
+            return this._can_background && this.background_holds_count > 0;
+        }
+
         /**
          * This is just for local things, like showing help
          */
@@ -567,14 +618,15 @@ namespace Pomodoro
 
             base.startup ();
 
-            this.settings        = Pomodoro.get_settings ();
-            this.session_manager = Pomodoro.SessionManager.get_default ();
-            this.timer           = this.session_manager.timer;
-            this.stats_manager   = new Pomodoro.StatsManager ();
-            this.event_producer  = new Pomodoro.EventProducer ();
-            this.event_bus       = this.event_producer.bus;
-            this.action_manager  = new Pomodoro.ActionManager ();
-            this.logger          = new Pomodoro.Logger ();
+            this.settings           = Pomodoro.get_settings ();
+            this.session_manager    = Pomodoro.SessionManager.get_default ();
+            this.timer              = this.session_manager.timer;
+            this.stats_manager      = new Pomodoro.StatsManager ();
+            this.event_producer     = new Pomodoro.EventProducer ();
+            this.event_bus          = this.event_producer.bus;
+            this.action_manager     = new Pomodoro.ActionManager ();
+            this.logger             = new Pomodoro.Logger ();
+            this.background_manager = new Pomodoro.BackgroundManager ();
 
             this.setup_resources ();
             this.setup_database ();
@@ -698,6 +750,7 @@ namespace Pomodoro
 
             this.event_producer = null;
             this.event_bus = null;
+            this.background_manager = null;
             this.capability_manager = null;
             this.stats_manager = null;
             this.session_manager = null;
