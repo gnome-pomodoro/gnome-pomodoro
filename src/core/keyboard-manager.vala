@@ -70,9 +70,9 @@ namespace Pomodoro
         private Pomodoro.ProviderSet<Pomodoro.GlobalShortcutsProvider> providers;
         private unowned Pomodoro.GlobalShortcutsProvider?              provider = null;
 
-        private GLib.HashTable<string, Shortcut> shortcuts = null;
-        private bool                             inhibited = false;
-        private bool                             _global_shortcuts_supported = false;
+        private GLib.HashTable<string, Shortcut>        shortcuts = null;
+        private bool                                    inhibited = false;
+        private bool                                    _global_shortcuts_supported = false;
 
         construct
         {

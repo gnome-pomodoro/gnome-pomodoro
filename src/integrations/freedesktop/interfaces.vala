@@ -77,6 +77,16 @@ namespace Freedesktop
     }
 
 
+    [DBus (name = "org.freedesktop.portal.Background")]
+    interface Background : GLib.Object
+    {
+        public abstract uint32 version { owned get; }
+
+        public abstract async GLib.ObjectPath request_background (string                               parent_window,
+                                                                  GLib.HashTable<string, GLib.Variant> options) throws GLib.DBusError, GLib.IOError;
+    }
+
+
     [DBus (name = "org.freedesktop.portal.GlobalShortcuts")]
     public interface GlobalShortcuts : GLib.Object
     {

@@ -1,9 +1,5 @@
 namespace Freedesktop
 {
-    private delegate void ResponseCallback (uint32                               response,
-                                            GLib.HashTable<string, GLib.Variant> results);
-
-
     private errordomain GlobalShortcutsError
     {
         REQUEST,
@@ -26,11 +22,9 @@ namespace Freedesktop
         private Freedesktop.Shortcut[]                    shortcuts = null;
         private GLib.Cancellable?                         cancellable = null;
         private GLib.ObjectPath?                          session_handle = null;
-        private GLib.HashTable<uint, Freedesktop.Request> requests = null;
         private GLib.HashTable<string, string>?           accelerators = null;
-        private uint                                      dbus_watcher_id = 0;
-        private uint                                      next_request_id = 1U;
-        private uint                                      bind_shortcuts_idle_id = 0;
+        private uint                                      dbus_watcher_id = 0U;
+        private uint                                      bind_shortcuts_idle_id = 0U;
         private bool                                      is_configured = false;
 
         private void mark_as_configured ()
@@ -44,42 +38,13 @@ namespace Freedesktop
             }
         }
 
-        private async string prepare_request (ResponseCallback callback) throws GlobalShortcutsError
-        {
-            var request_id     = this.next_request_id;
-            var handle_token   = "gnomepomodoro_" + request_id.to_string ();
-            var sender         = this.connection.get_unique_name ();
-            var sender_escaped = sender.replace (":", "").replace (".", "_");
-
-            this.next_request_id++;
-
-            try {
-                var request_proxy = yield GLib.Bus.get_proxy<Freedesktop.Request> (
-                        BusType.SESSION,
-                        "org.freedesktop.portal.Desktop",
-                        @"/org/freedesktop/portal/desktop/request/$(sender_escaped)/$(handle_token)");
-                request_proxy.response.connect (
-                    (response, results) => {
-                        this.requests.remove (request_id);
-
-                        callback (response, results);
-                    });
-
-                this.requests.insert (request_id, request_proxy);
-            }
-            catch (GLib.Error error) {
-                throw new GlobalShortcutsError.REQUEST (error.message);
-            }
-
-            return handle_token;
-        }
-
         private async void create_session () throws GlobalShortcutsError
         {
             var timestamp = Pomodoro.Timestamp.to_seconds_uint32 (Pomodoro.Timestamp.from_now ());
 
             try {
-                var handle_token = yield this.prepare_request (
+                var handle_token = yield Freedesktop.create_request (
+                    this.connection,
                     (response, results) => {
                         if (results != null)
                         {
@@ -216,14 +181,21 @@ namespace Freedesktop
                                              requires (this.session_handle != null)
 
         {
+            string handle_token;
             GLib.Variant? shortcuts_variant = null;
 
-            var handle_token = yield this.prepare_request (
-                (response, results) => {
-                    shortcuts_variant = results != null ? results.lookup ("shortcuts") : null;
+            try {
+                handle_token = yield Freedesktop.create_request (
+                    this.connection,
+                    (response, results) => {
+                        shortcuts_variant = results != null ? results.lookup ("shortcuts") : null;
 
-                    this.list_shortcuts.callback ();
-                });
+                        this.list_shortcuts.callback ();
+                    });
+            }
+            catch (GLib.Error error) {
+                throw new GlobalShortcutsError.REQUEST (error.message);
+            }
 
             try {
                 var options = new GLib.HashTable<string, GLib.Variant> (GLib.str_hash, GLib.str_equal);
@@ -244,10 +216,18 @@ namespace Freedesktop
 
         private async void bind_shortcuts () throws GlobalShortcutsError
         {
-            var handle_token = yield this.prepare_request (
-                (response, results) => {
-                    this.bind_shortcuts.callback ();
-                });
+            string handle_token;
+
+            try {
+                handle_token = yield Freedesktop.create_request (
+                    this.connection,
+                    (response, results) => {
+                        this.bind_shortcuts.callback ();
+                    });
+            }
+            catch (GLib.Error error) {
+                throw new GlobalShortcutsError.REQUEST (error.message);
+            }
 
             try {
                 var options = new GLib.HashTable<string, GLib.Variant> (GLib.str_hash, GLib.str_equal);
@@ -321,6 +301,8 @@ namespace Freedesktop
         private async void open_global_shortcuts_dialog_async (string window_identifier)
                                                                throws GlobalShortcutsError
         {
+            string handle_token;
+
             if (this.proxy == null || this.shortcuts.length == 0) {
                 return;
             }
@@ -328,10 +310,16 @@ namespace Freedesktop
             // HACK: It's possible to open the dialog only once per session.
             yield this.create_session ();
 
-            var handle_token = yield this.prepare_request (
-                (response, results) => {
-                    this.open_global_shortcuts_dialog_async.callback ();
-                });
+            try {
+                handle_token = yield Freedesktop.create_request (
+                    this.connection,
+                    (response, results) => {
+                        this.open_global_shortcuts_dialog_async.callback ();
+                    });
+            }
+            catch (GLib.Error error) {
+                throw new GlobalShortcutsError.REQUEST (error.message);
+            }
 
             var options = new GLib.HashTable<string, GLib.Variant> (GLib.str_hash, GLib.str_equal);
             options.insert ("handle_token", new GLib.Variant.string (handle_token));
@@ -367,13 +355,14 @@ namespace Freedesktop
                                        string              name_owner)
         {
             this.available = true;
+            this.connection = connection;
         }
 
         private void on_name_vanished (GLib.DBusConnection? connection,
                                        string               name)
         {
             this.available = false;
-            this.session_handle = null;
+            this.connection = null;
         }
 
         private void on_activated (GLib.ObjectPath                      session_handle,
@@ -408,8 +397,6 @@ namespace Freedesktop
         public override async void initialize (GLib.Cancellable? cancellable) throws GLib.Error
         {
             this.shortcuts = new Freedesktop.Shortcut[0];
-            this.requests  = new GLib.HashTable<uint, Freedesktop.Request> (GLib.direct_hash,
-                                                                            GLib.direct_equal);
 
             if (this.dbus_watcher_id == 0) {
                 this.dbus_watcher_id = GLib.Bus.watch_name (GLib.BusType.SESSION,
@@ -472,9 +459,7 @@ namespace Freedesktop
                 this.proxy = null;
             }
 
-            this.connection = null;
             this.session_handle = null;
-            this.requests = null;
         }
 
         public override async void uninitialize () throws GLib.Error

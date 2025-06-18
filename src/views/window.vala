@@ -292,6 +292,63 @@ namespace Pomodoro
             }
         }
 
+        private void show_close_confirmation_dialog ()
+        {
+            var parent = this;
+
+            var dialog = new Adw.AlertDialog (
+                _("Keep timer running?"),
+                _("You can keep it running in the background — notifications and keyboard shortcuts will still work.")
+            );
+            dialog.prefer_wide_layout = true;
+
+            dialog.add_response ("quit", _("Quit"));
+            dialog.set_response_appearance ("quit", Adw.ResponseAppearance.DEFAULT);
+
+            dialog.add_response ("run-in-background", _("Run in background"));
+            dialog.set_response_appearance ("run-in-background", Adw.ResponseAppearance.SUGGESTED);
+
+            dialog.set_default_response ("run-in-background");
+            dialog.set_close_response ("cancel");
+            dialog.response.connect (
+                (response) => {
+                    switch (response)
+                    {
+                        case "run-in-background":
+                            parent.destroy ();
+                            break;
+
+                        case "quit":
+                            parent.application.quit ();
+                            break;
+
+                        case "cancel":
+                            dialog.close ();
+                            break;
+
+                        default:
+                            assert_not_reached ();
+                    }
+                });
+
+            dialog.present (parent);
+        }
+
+        [GtkCallback]
+        private bool on_close_request ()
+        {
+            var application = this.application as Pomodoro.BackgroundApplication;
+
+            if (application.should_run_in_background ())
+            {
+                this.show_close_confirmation_dialog ();
+
+                return true;
+            }
+
+            return false;
+        }
+
         /*
         [GtkCallback]
         private void on_in_app_notification_install_extension_install_button_clicked (Gtk.Button button)
