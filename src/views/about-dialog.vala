@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 gnome-pomodoro contributors
+ * Copyright (c) 2013-2025 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,23 +23,23 @@ using GLib;
 
 namespace Pomodoro
 {
-    public Adw.AboutWindow create_about_window ()
+    public Adw.AboutDialog create_about_dialog ()
     {
-        var about_window = new Adw.AboutWindow ();
-        about_window.application_icon = "org.gnomepomodoro.Pomodoro";
-        about_window.application_name = _("Pomodoro");
-        about_window.comments = _("A simple time management utility");
-        about_window.version = Config.PACKAGE_VERSION;
-        about_window.website = Config.PACKAGE_URL;
-        about_window.issue_url = Config.PACKAGE_BUGREPORT;
-        about_window.developers = {
+        var about_dialog = new Adw.AboutDialog ();
+        about_dialog.application_icon = Config.APPLICATION_ID;
+        about_dialog.application_name = _("Pomodoro");
+        about_dialog.comments = _("A simple time management utility");
+        about_dialog.version = Config.PACKAGE_VERSION;
+        about_dialog.website = Config.PACKAGE_URL;
+        about_dialog.issue_url = Config.PACKAGE_BUGREPORT;
+        about_dialog.developers = {
             "Arun Mahapatra <pratikarun@gmail.com>",
             "Kamil Prusko <kamilprusko@gmail.com>"
         };
-        about_window.translator_credits = _("translator-credits");
-        about_window.copyright = "\xc2\xa9 2011-2022 Arun Mahapatra, Kamil Prusko";
-        about_window.license_type = Gtk.License.GPL_3_0;
+        about_dialog.translator_credits = _("translator-credits");
+        about_dialog.copyright = "\xc2\xa9 2011-2025 Arun Mahapatra, Kamil Prusko";
+        about_dialog.license_type = Gtk.License.GPL_3_0;
 
-        return about_window;
+        return about_dialog;
     }
 }
