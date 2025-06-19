@@ -280,23 +280,16 @@ namespace Pomodoro
             preferences_window.present ();
         }
 
-        public void show_about_window ()
+        public void show_about_dialog ()
         {
             var window = this.get_window<Pomodoro.Window> ();
-            var about_window = this.get_window<Adw.AboutWindow> ();
+            var about_dialog = this.get_window<Adw.AboutDialog> ();
 
-            if (about_window == null)
-            {
-                about_window = Pomodoro.create_about_window ();
-
-                if (window != null) {
-                    about_window.set_transient_for (window);
-                }
-
-                this.add_window (about_window);
+            if (about_dialog == null) {
+                about_dialog = Pomodoro.create_about_dialog ();
             }
 
-            about_window.present ();
+            about_dialog.present (window);
         }
 
         private void activate_window (GLib.SimpleAction action,
@@ -358,7 +351,7 @@ namespace Pomodoro
         private void activate_about (GLib.SimpleAction action,
                                      GLib.Variant?     parameter)
         {
-            this.show_about_window ();
+            this.show_about_dialog ();
         }
 
         private void activate_screen_overlay (GLib.SimpleAction action,

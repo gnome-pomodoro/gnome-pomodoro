@@ -124,7 +124,7 @@ gnome_pomodoro_vala_sources = files(
   'capabilities/global-shortcuts.vala',
   'capabilities/notifications.vala',
   'capabilities/sounds.vala',
-  'views/about-window.vala',
+  'views/about-dialog.vala',
   'views/action-edit-window.vala',
   'views/action-listboxrow.vala',
   'views/compact-timer-view.vala',
