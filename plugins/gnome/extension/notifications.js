@@ -30,6 +30,10 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import * as Params from 'resource:///org/gnome/shell/misc/params.js';
 import * as Signals from 'resource:///org/gnome/shell/misc/signals.js';
+let DoNotDisturb;
+try {
+    DoNotDisturb = await import('resource:///org/gnome/shell/ui/status/doNotDisturb.js');
+} catch {}
 
 import {extension} from './extension.js';
 import {State} from './timer.js';
@@ -489,6 +493,17 @@ export const NotificationManager = class extends Signals.EventEmitter {
     }
 
     _showDoNotDisturbButton() {
+        if (DoNotDisturb) {
+            for (const indicator of Main.panel.statusArea.quickSettings._indicators.get_children()) {
+                if (indicator instanceof DoNotDisturb.Indicator) {
+                    for (const qs of indicator.quickSettingsItems) {
+                        qs.reactive = true;
+                    }
+                }
+            }
+            return;
+        }
+
         const dndButton = Main.panel.statusArea.dateMenu._messageList._dndButton;
         dndButton.show();
 
@@ -499,6 +514,17 @@ export const NotificationManager = class extends Signals.EventEmitter {
     }
 
     _hideDoNotDisturbButton() {
+        if (DoNotDisturb) {
+            for (const indicator of Main.panel.statusArea.quickSettings._indicators.get_children()) {
+                if (indicator instanceof DoNotDisturb.Indicator) {
+                    for (const qs of indicator.quickSettingsItems) {
+                        qs.reactive = false;
+                    }
+                }
+            }
+            return;
+        }
+
         const dndButton = Main.panel.statusArea.dateMenu._messageList._dndButton;
         dndButton.hide();
 
