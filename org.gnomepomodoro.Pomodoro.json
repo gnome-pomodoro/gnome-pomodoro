@@ -22,6 +22,7 @@
         "--talk-name=org.gnome.Mutter.IdleMonitor",
         "--talk-name=org.gnome.ScreenSaver",
         "--talk-name=org.gtk.vfs.*",
+        "--filesystem=home:ro",
         "--filesystem=xdg-run/gvfsd"
     ],
     "build-options" : {
