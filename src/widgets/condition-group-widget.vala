@@ -11,7 +11,7 @@ namespace Pomodoro
 
 
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/condition-group-widget.ui")]
-    public class ConditionGroupWidget : Gtk.Widget, Pomodoro.ExpressionWidget
+    public sealed class ConditionGroupWidget : Gtk.Widget, Pomodoro.ExpressionWidget
     {
         private const int BRACKET_WIDTH = 24;
         private const int MIN_BRACKET_HEIGHT = 20;
@@ -85,10 +85,6 @@ namespace Pomodoro
 
         public bool is_nested { get; set; default = false; }
 
-        private Pomodoro.Operation? _operation = null;
-        private Pomodoro.Operator   _operator = Pomodoro.Operator.AND;
-        private bool                _removable = false;
-
         [GtkChild]
         private unowned Gtk.Button operator_button;
         [GtkChild]
@@ -96,8 +92,11 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Box buttons_box;
 
-        private weak Pomodoro.Gizmo? top_bracket;
-        private weak Pomodoro.Gizmo? bottom_bracket;
+        private Pomodoro.Operation? _operation = null;
+        private Pomodoro.Operator   _operator = Pomodoro.Operator.AND;
+        private bool                _removable = false;
+        private Pomodoro.Gizmo?     top_bracket;
+        private Pomodoro.Gizmo?     bottom_bracket;
 
         static construct
         {
@@ -106,21 +105,23 @@ namespace Pomodoro
 
         construct
         {
-            var top_bracket = new Pomodoro.Gizmo (this.measure_bracket_child,
-                                                  null,
-                                                  this.snapshot_top_bracket,
-                                                  null,
-                                                  null,
-                                                  null);
+            var top_bracket = new Pomodoro.Gizmo (
+                    ConditionGroupWidget.measure_bracket_child_cb,
+                    null,
+                    ConditionGroupWidget.snapshot_top_bracket_cb,
+                    null,
+                    null,
+                    null);
             top_bracket.focusable = false;
             top_bracket.set_parent (this);
 
-            var bottom_bracket = new Pomodoro.Gizmo (this.measure_bracket_child,
-                                                     null,
-                                                     this.snapshot_bottom_bracket,
-                                                     null,
-                                                     null,
-                                                     null);
+            var bottom_bracket = new Pomodoro.Gizmo (
+                    ConditionGroupWidget.measure_bracket_child_cb,
+                    null,
+                    ConditionGroupWidget.snapshot_bottom_bracket_cb,
+                    null,
+                    null,
+                    null);
             bottom_bracket.focusable = false;
             bottom_bracket.set_parent (this);
 
@@ -128,6 +129,71 @@ namespace Pomodoro
             this.bottom_bracket = bottom_bracket;
 
             this.populate ();
+        }
+
+        private static Pomodoro.ConditionGroupWidget? from_gizmo (Pomodoro.Gizmo gizmo)
+        {
+            Gtk.Widget? widget = gizmo;
+
+            while (widget != null)
+            {
+                var group = widget as Pomodoro.ConditionGroupWidget;
+
+                if (group != null) {
+                    return group;
+                }
+
+                widget = widget.get_parent ();
+            }
+
+            return null;
+        }
+
+        private static void measure_bracket_child_cb (Pomodoro.Gizmo  gizmo,
+                                                      Gtk.Orientation orientation,
+                                                      int             for_size,
+                                                      out int         minimum,
+                                                      out int         natural,
+                                                      out int         minimum_baseline,
+                                                      out int         natural_baseline)
+        {
+            var self = ConditionGroupWidget.from_gizmo (gizmo);
+
+            if (self != null) {
+                self.measure_bracket_child (gizmo,
+                                            orientation,
+                                            for_size,
+                                            out minimum,
+                                            out natural,
+                                            out minimum_baseline,
+                                            out natural_baseline);
+            }
+            else {
+                minimum = 0;
+                natural = 0;
+                minimum_baseline = -1;
+                natural_baseline = -1;
+            }
+        }
+
+        private static void snapshot_top_bracket_cb (Pomodoro.Gizmo gizmo,
+                                                     Gtk.Snapshot   snapshot)
+        {
+            var self = ConditionGroupWidget.from_gizmo (gizmo);
+
+            if (self != null) {
+                self.snapshot_top_bracket (gizmo, snapshot);
+            }
+        }
+
+        private static void snapshot_bottom_bracket_cb (Pomodoro.Gizmo gizmo,
+                                                        Gtk.Snapshot   snapshot)
+        {
+            var self = ConditionGroupWidget.from_gizmo (gizmo);
+
+            if (self != null) {
+                self.snapshot_bottom_bracket (gizmo, snapshot);
+            }
         }
 
         private Pomodoro.ExpressionWidget create_condition (Pomodoro.Expression? expression = null)
@@ -543,6 +609,26 @@ namespace Pomodoro
             this.operator_button.allocate_size (operator_allocation, -1);
             this.bottom_bracket.allocate_size (bottom_bracket_allocation, -1);
             this.arguments_box.allocate_size (arguments_allocation, -1);
+        }
+
+        public override void dispose ()
+        {
+            this._operation = null;
+
+            if (this.top_bracket != null) {
+                this.top_bracket.unparent ();
+                this.top_bracket = null;
+            }
+
+            if (this.bottom_bracket != null) {
+                this.bottom_bracket.unparent ();
+                this.bottom_bracket = null;
+            }
+
+            // HACK: Without this children do not get disposed properly
+            this.dispose_template (typeof (Pomodoro.ConditionGroupWidget));
+
+            base.dispose ();
         }
     }
 }

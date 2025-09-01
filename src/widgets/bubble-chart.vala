@@ -486,10 +486,10 @@ namespace Pomodoro
         private Gtk.Widget? create_bubble (uint row,
                                            uint column)
         {
-            var bubble = new Pomodoro.Gizmo (this.measure_bubble,
+            var bubble = new Pomodoro.Gizmo (BubbleChart.measure_bubble_cb,
                                              null,
-                                             this.snapshot_bubble,
-                                             this.contains_bubble,
+                                             BubbleChart.snapshot_bubble_cb,
+                                             BubbleChart.contains_bubble_cb,
                                              null,
                                              null);
             bubble.focusable = false;
@@ -498,20 +498,111 @@ namespace Pomodoro
             bubble.set_data<uint> ("row", row);
             bubble.set_data<uint> ("column", column);
 
-            bubble.query_tooltip.connect (
-                (x, y, keyboard_tooltip, tooltip) => {
-                    if (this.tooltip_row != row || this.tooltip_column != column) {
-                        this.tooltip_row    = (int) row;
-                        this.tooltip_column = (int) column;
-                        this.tooltip_widget = this.create_tooltip_widget (row, column);
-                    }
-
-                    tooltip.set_custom (this.tooltip_widget);
-
-                    return this.tooltip_widget != null;
-                });
+            bubble.query_tooltip.connect (BubbleChart.on_query_tooltip_cb);
 
             return (Gtk.Widget) bubble;
+        }
+
+        private static Pomodoro.BubbleChart? from_gizmo (Pomodoro.Gizmo gizmo)
+        {
+            Gtk.Widget? widget = gizmo;
+
+            while (widget != null)
+            {
+                var chart = widget as Pomodoro.BubbleChart;
+
+                if (chart != null) {
+                    return chart;
+                }
+
+                widget = widget.get_parent ();
+            }
+
+            return null;
+        }
+
+        private static Pomodoro.BubbleChart? from_widget (Gtk.Widget widget)
+        {
+            Gtk.Widget? current = widget;
+
+            while (current != null)
+            {
+                var chart = current as Pomodoro.BubbleChart;
+
+                if (chart != null) {
+                    return chart;
+                }
+
+                current = current.get_parent ();
+            }
+
+            return null;
+        }
+
+        private static void measure_bubble_cb (Pomodoro.Gizmo  gizmo,
+                                               Gtk.Orientation orientation,
+                                               int             for_size,
+                                               out int         minimum,
+                                               out int         natural,
+                                               out int         minimum_baseline,
+                                               out int         natural_baseline)
+        {
+            var self = BubbleChart.from_gizmo (gizmo);
+
+            if (self != null) {
+                self.measure_bubble (gizmo, orientation, for_size, out minimum, out natural, out minimum_baseline, out natural_baseline);
+            }
+            else {
+                minimum = 0;
+                natural = 0;
+                minimum_baseline = -1;
+                natural_baseline = -1;
+            }
+        }
+
+        private static void snapshot_bubble_cb (Pomodoro.Gizmo gizmo,
+                                                Gtk.Snapshot   snapshot)
+        {
+            var self = BubbleChart.from_gizmo (gizmo);
+
+            if (self != null) {
+                self.snapshot_bubble (gizmo, snapshot);
+            }
+        }
+
+        private static bool contains_bubble_cb (Pomodoro.Gizmo gizmo,
+                                                double         x,
+                                                double         y)
+        {
+            var self = BubbleChart.from_gizmo (gizmo);
+
+            return self != null ? self.contains_bubble (gizmo, x, y) : false;
+        }
+
+        private static bool on_query_tooltip_cb (Gtk.Widget  widget,
+                                                 int         x,
+                                                 int         y,
+                                                 bool        keyboard_tooltip,
+                                                 Gtk.Tooltip tooltip)
+        {
+            var self = BubbleChart.from_widget (widget);
+
+            if (self == null) {
+                return false;
+            }
+
+            var row = widget.get_data<uint> ("row");
+            var column = widget.get_data<uint> ("column");
+
+            if (self.tooltip_row != row || self.tooltip_column != column) {
+                self.tooltip_row    = (int) row;
+                self.tooltip_column = (int) column;
+                self.tooltip_widget = self.create_tooltip_widget (row, column);
+            }
+
+            tooltip.set_custom (self.tooltip_widget);
+
+            return self.tooltip_widget != null;
         }
 
         public override Gtk.SizeRequestMode get_request_mode ()

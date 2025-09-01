@@ -121,8 +121,8 @@ namespace Pomodoro
             this.update_value_fields ();
 
             /**
-             * TODO: Having each field in it's own .ui file + constructing them dynamically
-             *       would be a cleaner approach.
+             * XXX: Having each field in it's own .ui file + constructing them dynamically
+             *      would be a cleaner approach.
              */
             Gtk.Widget[] fields = {
                 this.field_dropdown,
@@ -565,14 +565,20 @@ namespace Pomodoro
                 this.interval_unit_dropdown,
             };
 
+            foreach (var field in fields) {
+                field.@unref ();
+            }
+
             if (this.update_idle_id != 0) {
                 this.remove_tick_callback (this.update_idle_id);
                 this.update_idle_id = 0;
             }
 
-            foreach (var field in fields) {
-                field.@unref ();
-            }
+            this.fields.remove_all ();
+            this._comparison = null;
+
+            // HACK: Without this children do not get disposed properly
+            this.dispose_template (typeof (Pomodoro.ConditionGroupWidget));
 
             base.dispose ();
         }

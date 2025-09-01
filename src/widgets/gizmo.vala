@@ -7,10 +7,15 @@ namespace Pomodoro
                                            out int natural,
                                            out int minimum_baseline,
                                            out int natural_baseline);
+
     public delegate void GizmoAllocateFunc (Pomodoro.Gizmo gizmo, int width, int height, int baseline);
+
     public delegate void GizmoSnapshotFunc (Pomodoro.Gizmo gizmo, Gtk.Snapshot snapshot);
+
     public delegate bool GizmoContainsFunc (Pomodoro.Gizmo gizmo, double x, double y);
+
     public delegate bool GizmoFocusFunc (Pomodoro.Gizmo gizmo, Gtk.DirectionType direction);
+
     public delegate bool GizmoGrabFocusFunc (Pomodoro.Gizmo gizmo);
 
 
@@ -35,11 +40,11 @@ namespace Pomodoro
                       owned Pomodoro.GizmoFocusFunc?     focus_func,
                       owned Pomodoro.GizmoGrabFocusFunc? grab_focus_func)
         {
-            this.measure_func  = (owned) measure_func;
-            this.allocate_func = (owned) allocate_func;
-            this.snapshot_func = (owned) snapshot_func;
-            this.contains_func = (owned) contains_func;
-            this.focus_func = (owned) focus_func;
+            this.measure_func    = (owned) measure_func;
+            this.allocate_func   = (owned) allocate_func;
+            this.snapshot_func   = (owned) snapshot_func;
+            this.contains_func   = (owned) contains_func;
+            this.focus_func      = (owned) focus_func;
             this.grab_focus_func = (owned) grab_focus_func;
         }
 
@@ -55,24 +60,12 @@ namespace Pomodoro
                 accessible_role: role
             );
 
-            this.measure_func  = (owned) measure_func;
-            this.allocate_func = (owned) allocate_func;
-            this.snapshot_func = (owned) snapshot_func;
-            this.contains_func = (owned) contains_func;
-            this.focus_func = (owned) focus_func;
+            this.measure_func    = (owned) measure_func;
+            this.allocate_func   = (owned) allocate_func;
+            this.snapshot_func   = (owned) snapshot_func;
+            this.contains_func   = (owned) contains_func;
+            this.focus_func      = (owned) focus_func;
             this.grab_focus_func = (owned) grab_focus_func;
-        }
-
-        ~Gizmo ()
-        {
-            var child = this.get_first_child ();
-
-            while (child != null)
-            {
-                var next_child = child.get_next_sibling ();
-                child.unparent ();
-                child = next_child;
-            }
         }
 
         public override Gtk.SizeRequestMode get_request_mode ()
@@ -149,6 +142,18 @@ namespace Pomodoro
             }
 
             return false;
+        }
+
+        public override void dispose ()
+        {
+            this.measure_func    = null;
+            this.allocate_func   = null;
+            this.snapshot_func   = null;
+            this.contains_func   = null;
+            this.focus_func      = null;
+            this.grab_focus_func = null;
+
+            base.dispose ();
         }
     }
 }

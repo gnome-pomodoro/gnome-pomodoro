@@ -131,18 +131,18 @@ namespace Pomodoro
         {
             this._timer = Pomodoro.Timer.get_default ();
 
-            var through = new Pomodoro.Gizmo (this.measure_child,
+            var through = new Pomodoro.Gizmo (TimerProgress.measure_child_cb,
                                               null,
-                                              this.snapshot_through,
+                                              TimerProgress.snapshot_through_cb,
                                               null,
                                               null,
                                               null);
             through.focusable = false;
             through.set_parent (this);
 
-            var highlight = new Pomodoro.Gizmo (this.measure_child,
+            var highlight = new Pomodoro.Gizmo (TimerProgress.measure_child_cb,
                                                 null,
-                                                this.snapshot_highlight_internal,
+                                                TimerProgress.snapshot_highlight_internal_cb,
                                                 null,
                                                 null,
                                                 null);
@@ -153,6 +153,65 @@ namespace Pomodoro
             this.through = through;
 
             this.notify["value"].connect (this.on_value_notify);
+        }
+
+        private static Pomodoro.TimerProgress? from_gizmo (Pomodoro.Gizmo gizmo)
+        {
+            Gtk.Widget? widget = gizmo;
+
+            while (widget != null)
+            {
+                var progress = widget as Pomodoro.TimerProgress;
+
+                if (progress != null) {
+                    return progress;
+                }
+
+                widget = widget.get_parent ();
+            }
+
+            return null;
+        }
+
+        private static void measure_child_cb (Pomodoro.Gizmo  gizmo,
+                                              Gtk.Orientation orientation,
+                                              int             for_size,
+                                              out int         minimum,
+                                              out int         natural,
+                                              out int         minimum_baseline,
+                                              out int         natural_baseline)
+        {
+            var self = TimerProgress.from_gizmo (gizmo);
+
+            if (self != null) {
+                self.measure_child (gizmo, orientation, for_size, out minimum, out natural, out minimum_baseline, out natural_baseline);
+            }
+            else {
+                minimum = 0;
+                natural = 0;
+                minimum_baseline = -1;
+                natural_baseline = -1;
+            }
+        }
+
+        private static void snapshot_through_cb (Pomodoro.Gizmo gizmo,
+                                                 Gtk.Snapshot   snapshot)
+        {
+            var self = TimerProgress.from_gizmo (gizmo);
+
+            if (self != null) {
+                self.snapshot_through (gizmo, snapshot);
+            }
+        }
+
+        private static void snapshot_highlight_internal_cb (Pomodoro.Gizmo gizmo,
+                                                             Gtk.Snapshot   snapshot)
+        {
+            var self = TimerProgress.from_gizmo (gizmo);
+
+            if (self != null) {
+                self.snapshot_highlight_internal (gizmo, snapshot);
+            }
         }
 
         protected virtual uint calculate_timeout_interval ()
