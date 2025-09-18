@@ -44,6 +44,15 @@
   <translation type="gettext">gnome-pomodoro</translation>
   <content_rating type="oars-1.1" />
   <releases>
+    <release version="0.28.0" date="2025-09-18">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.28.0</p>
+        <ul>
+          <li>Support for GNOME Shell 49 (thanks @aleasto)</li>
+          <li>Updated German translation (thanks @daPhipz)</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.27.0" date="2025-02-22">
       <description translate="no">
         <p>Overview of changes in gnome-pomodoro 0.27.0</p>
