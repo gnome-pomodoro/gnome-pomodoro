@@ -445,7 +445,7 @@ const AcknowledgeGesture = GObject.registerClass({
         if (!this._began)
             return false;
 
-        if (!event.get_device())
+        if (event.get_device && !event.get_device())
             return false;
 
         switch (event.type()) {
@@ -522,7 +522,7 @@ const DismissGesture = GObject.registerClass({
         if (!this._began)
             return false;
 
-        if (!event.get_device())
+        if (event.get_device && !event.get_device())
             return false;
 
         switch (event.type()) {
