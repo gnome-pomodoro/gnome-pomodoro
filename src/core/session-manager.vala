@@ -1333,7 +1333,7 @@ namespace Pomodoro
         {
             if (this._current_time_block == null ||
                 this._current_time_block.state != Pomodoro.State.POMODORO ||
-                !this._timer.is_running ())
+                !this._timer.is_running () && !this.auto_paused)
             {
                 return false;
             }
@@ -1349,18 +1349,41 @@ namespace Pomodoro
             return false;
         }
 
-        private void pause ()
+        private bool should_auto_resume ()
         {
             if (!this.auto_paused) {
+                return false;
+            }
+
+            if (this.lockscreen != null && this.lockscreen.enabled && this.lockscreen.active) {
+                return false;
+            }
+
+            if (this.screensaver != null && this.screensaver.enabled && this.screensaver.active) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void pause ()
+        {
+            if (!this.auto_paused)
+            {
                 this.auto_paused = true;
+
+                Pomodoro.Context.set_event_source ("session-manager.auto-pause");
                 this._timer.pause ();
             }
         }
 
         private void resume ()
         {
-            if (this.auto_paused) {
+            if (this.auto_paused)
+            {
                 this.auto_paused = false;
+
+                Pomodoro.Context.set_event_source ("session-manager.auto-resume");
                 this._timer.resume ();
             }
         }
@@ -1743,7 +1766,7 @@ namespace Pomodoro
             if (this.should_auto_pause ()) {
                 this.pause ();
             }
-            else {
+            else if (this.should_auto_resume ()) {
                 this.resume ();
             }
 
@@ -1758,7 +1781,7 @@ namespace Pomodoro
             if (this.should_auto_pause ()) {
                 this.pause ();
             }
-            else {
+            else if (this.should_auto_resume ()) {
                 this.resume ();
             }
 
