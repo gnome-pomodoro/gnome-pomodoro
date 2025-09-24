@@ -21,6 +21,9 @@ namespace Tests
             this.add_test ("move_to", this.test_move_to);
             this.add_test ("add_gap", this.test_add_gap);
             this.add_test ("remove_gap", this.test_remove_gap);
+            this.add_test ("normalize_gaps__invalid", this.test_normalize_gaps__invalid);
+            this.add_test ("normalize_gaps__overlap", this.test_normalize_gaps__overlap);
+            this.add_test ("normalize_gaps__unfinished", this.test_normalize_gaps__unfinished);
 
             this.add_test ("calculate_elapsed__without_gaps",
                            this.test_calculate_elapsed__without_gaps);
@@ -385,6 +388,194 @@ namespace Tests
                                   time_block.start_time + 25 * Pomodoro.Interval.MINUTE);
             time_block.add_gap (gap_3);
             assert_true (time_block.get_last_gap () == gap_3);
+        }
+
+        public void test_normalize_gaps__invalid ()
+        {
+            var time_block = new Pomodoro.TimeBlock ();
+
+            var gap_valid = new Pomodoro.Gap ();
+            gap_valid.set_time_range (10 * Pomodoro.Interval.MINUTE,
+                                      20 * Pomodoro.Interval.MINUTE);
+
+            var gap_invalid_undefined_start = new Pomodoro.Gap ();
+            gap_invalid_undefined_start.set_time_range (Pomodoro.Timestamp.UNDEFINED,
+                                                        12 * Pomodoro.Interval.MINUTE);
+
+            var gap_invalid_end_before_start = new Pomodoro.Gap ();
+            gap_invalid_end_before_start.set_time_range (25 * Pomodoro.Interval.MINUTE,
+                                                         24 * Pomodoro.Interval.MINUTE);
+
+            time_block.add_gap (gap_valid);
+            time_block.add_gap (gap_invalid_undefined_start);
+            time_block.add_gap (gap_invalid_end_before_start);
+
+            time_block.normalize_gaps ();
+
+            // Expect only the valid gap to remain and to be unchanged
+            var gaps_count = 0;
+
+            time_block.foreach_gap (
+                (gap) => {
+                    if (gaps_count == 0)
+                    {
+                        assert_true (gap == gap_valid);
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (gap.start_time),
+                            new GLib.Variant.int64 (10 * Pomodoro.Interval.MINUTE)
+                        );
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (gap.end_time),
+                            new GLib.Variant.int64 (20 * Pomodoro.Interval.MINUTE)
+                        );
+                    }
+
+                    gaps_count++;
+                });
+
+            assert_cmpuint (gaps_count, GLib.CompareOperator.EQ, 1);
+        }
+
+        public void test_normalize_gaps__overlap ()
+        {
+            int gaps_count;
+            // unowned Pomodoro.Gap? gap;
+
+            // Case 1: Two finite gaps overlapping. Expect them to be merged into one
+            //         by extending the later gap backwards - preserving total duration.
+            var time_block_1 = new Pomodoro.TimeBlock ();
+
+            var gap_1 = new Pomodoro.Gap ();
+            gap_1.set_time_range (10 * Pomodoro.Interval.MINUTE,
+                                  20 * Pomodoro.Interval.MINUTE);
+
+            var gap_2 = new Pomodoro.Gap ();
+            gap_2.set_time_range (18 * Pomodoro.Interval.MINUTE,
+                                  25 * Pomodoro.Interval.MINUTE);
+
+            time_block_1.add_gap (gap_1);
+            time_block_1.add_gap (gap_2);
+
+            time_block_1.normalize_gaps ();
+
+            // Expect one gap to remain with start moved to 8 and end 25
+            gaps_count = 0;
+
+            time_block_1.foreach_gap (
+                (gap) => {
+                    if (gaps_count == 0)
+                    {
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (gap.start_time),
+                            new GLib.Variant.int64 (8 * Pomodoro.Interval.MINUTE)
+                        );
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (gap.end_time),
+                            new GLib.Variant.int64 (25 * Pomodoro.Interval.MINUTE)
+                        );
+                    }
+
+                    gaps_count++;
+                });
+
+            assert_cmpuint (gaps_count, GLib.CompareOperator.EQ, 1);
+
+            // Case 2: Overlap with an ongoing (unfinished) next gap. Expect previous gap
+            //         to be shifted back.
+            var time_block_2 = new Pomodoro.TimeBlock ();
+
+            var gap_3 = new Pomodoro.Gap ();
+            gap_3.set_time_range (10 * Pomodoro.Interval.MINUTE,
+                                  20 * Pomodoro.Interval.MINUTE);
+
+            var gap_4 = new Pomodoro.Gap ();
+            gap_4.set_time_range (18 * Pomodoro.Interval.MINUTE,
+                                  Pomodoro.Timestamp.UNDEFINED);
+
+            time_block_2.add_gap (gap_3);
+            time_block_2.add_gap (gap_4);
+
+            time_block_2.normalize_gaps ();
+
+            gaps_count = 0;
+
+            time_block_2.foreach_gap (
+                (gap) => {
+                    if (gaps_count == 0)
+                    {
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (gap.start_time),
+                            new GLib.Variant.int64 (8 * Pomodoro.Interval.MINUTE)
+                        );
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (gap.end_time),
+                            new GLib.Variant.int64 (18 * Pomodoro.Interval.MINUTE)
+                        );
+                    }
+
+                    if (gaps_count == 1)
+                    {
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (gap.start_time),
+                            new GLib.Variant.int64 (18 * Pomodoro.Interval.MINUTE)
+                        );
+                        assert_true (Pomodoro.Timestamp.is_undefined (gap.end_time));
+                    }
+
+                    gaps_count++;
+                });
+
+            assert_cmpuint (gaps_count, GLib.CompareOperator.EQ, 2);
+        }
+
+        public void test_normalize_gaps__unfinished ()
+        {
+            // Unfinished (ongoing) gap not overlapping should remain unchanged
+            var time_block = new Pomodoro.TimeBlock ();
+
+            var gap_1 = new Pomodoro.Gap ();
+            gap_1.set_time_range (10 * Pomodoro.Interval.MINUTE,
+                                  15 * Pomodoro.Interval.MINUTE);
+
+            var gap_2 = new Pomodoro.Gap ();
+            gap_2.set_time_range (20 * Pomodoro.Interval.MINUTE,
+                                  Pomodoro.Timestamp.UNDEFINED);
+
+            time_block.add_gap (gap_1);
+            time_block.add_gap (gap_2);
+
+            time_block.normalize_gaps ();
+
+            // Expect both gaps unchanged
+            var gaps_count = 0;
+
+            time_block.foreach_gap (
+                (gap) => {
+                    if (gaps_count == 0)
+                    {
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (gap.start_time),
+                            new GLib.Variant.int64 (10 * Pomodoro.Interval.MINUTE)
+                        );
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (gap.end_time),
+                            new GLib.Variant.int64 (15 * Pomodoro.Interval.MINUTE)
+                        );
+                    }
+
+                    if (gaps_count == 1)
+                    {
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (gap.start_time),
+                            new GLib.Variant.int64 (20 * Pomodoro.Interval.MINUTE)
+                        );
+                        assert_true (Pomodoro.Timestamp.is_undefined (gap.end_time));
+                    }
+
+                    gaps_count++;
+                });
+
+            assert_cmpuint (gaps_count, GLib.CompareOperator.EQ, 2);
         }
 
         public void test_remove_gap ()

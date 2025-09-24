@@ -546,7 +546,7 @@ namespace Pomodoro
                 }
 
                 // Handle overlapping gaps.
-                if (link.next != null && link.data.end_time >= link.next.data.start_time)
+                if (link.next != null && link.data.end_time > link.next.data.start_time)
                 {
                     var overlap = link.data.end_time - link.next.data.start_time;
 
