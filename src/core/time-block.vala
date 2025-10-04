@@ -496,14 +496,14 @@ namespace Pomodoro
             this.emit_changed ();
         }
 
-        public Pomodoro.Gap? get_last_gap ()
+        public unowned Pomodoro.Gap? get_last_gap ()
         {
             unowned GLib.List<Pomodoro.Gap> link = this.gaps.last ();
 
             return link != null ? link.data : null;
         }
 
-        public void foreach_gap (GLib.Func<Pomodoro.Gap> func)
+        public void foreach_gap (GLib.Func<unowned Pomodoro.Gap> func)
         {
             this.gaps.@foreach (func);
         }
@@ -523,7 +523,7 @@ namespace Pomodoro
          *
          * Handling of overlapped gaps is tailored for the rewind action.
          */
-        public void normalize_gaps (int64 timestamp)
+        public void normalize_gaps ()
         {
             unowned GLib.List<Pomodoro.Gap> link = this.gaps.last ();
             unowned GLib.List<Pomodoro.Gap> tmp;
@@ -531,9 +531,11 @@ namespace Pomodoro
 
             this.freeze_changed ();
 
+            // assume that gaps are sorted
+
             while (link != null)
             {
-                // Handle invalid gaps.
+                // Remove invalid gaps.
                 if (Pomodoro.Timestamp.is_defined (link.data.end_time) && link.data.end_time < link.data.start_time ||
                     Pomodoro.Timestamp.is_undefined (link.data.start_time))
                 {

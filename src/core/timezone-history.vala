@@ -337,6 +337,14 @@ namespace Pomodoro
 
             this.search_internal (start_time, out marker, out index);
 
+            if (marker == null && !Pomodoro.is_test ())  // XXX: avoid `is_test`; specify a fallback-timezone
+            {
+                func (start_time,
+                      marker != null ? marker.timestamp : end_time,
+                      new GLib.TimeZone.local ());
+                return;
+            }
+
             while (marker != null && marker.timestamp < end_time)
             {
                 next_marker = index >= 1

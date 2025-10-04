@@ -492,6 +492,7 @@ namespace Pomodoro
 
             var previous_session    = this._current_session;
             var previous_time_block = this._current_time_block;
+            var previous_gap        = this._current_gap;
             var previous_state      = this._current_state;
             var state               = time_block != null ? time_block.state : Pomodoro.State.STOPPED;
 
@@ -505,7 +506,12 @@ namespace Pomodoro
                     GLib.SignalHandler.block (previous_time_block, this.current_time_block_changed_id);
                 }
 
-                if (previous_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS) {
+                if (previous_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS)
+                {
+                    if (previous_gap != null) {
+                        this.mark_gap_end (previous_gap, timestamp);
+                    }
+
                     this.mark_time_block_end (previous_time_block, timestamp);
                 }
 
@@ -798,10 +804,10 @@ namespace Pomodoro
 
             var filter = new Gom.Filter.and_full (filters);
             var command_builder = (Gom.CommandBuilder) GLib.Object.@new (
-                typeof (Gom.CommandBuilder),
-                resource_type: typeof (Pomodoro.GapEntry),
-                adapter: adapter,
-                filter: filter);
+                    typeof (Gom.CommandBuilder),
+                    resource_type: typeof (Pomodoro.GapEntry),
+                    adapter: adapter,
+                    filter: filter);
             var command = command_builder.build_delete ();
 
             command.@ref ();
@@ -1066,6 +1072,21 @@ namespace Pomodoro
             };
         }
 
+        private void mark_gap_end (Pomodoro.Gap gap,
+                                   int64        timestamp)
+                                   ensures (gap.end_time <= timestamp)
+        {
+            gap.end_time = timestamp;
+
+            // Invalidate interruption when stopping the timer
+            // TODO: also invalidate interruption on session expiry
+            if (gap.has_flag (Pomodoro.GapFlags.INTERRUPTION) &&
+                Pomodoro.Context.get_event_source () == "timer.reset")
+            {
+                gap.unset_flag (Pomodoro.GapFlags.INTERRUPTION);
+            }
+        }
+
         /**
          * Adjust time-blocks `end-time` and its status.
          */
@@ -1083,8 +1104,8 @@ namespace Pomodoro
             time_block.foreach_gap (
                 (gap) => {
                     gap.end_time = Pomodoro.Timestamp.is_undefined (gap.end_time)
-                        ? end_time
-                        : int64.min (gap.end_time, end_time);
+                            ? end_time
+                            : int64.min (gap.end_time, end_time);
                 }
             );
 
@@ -1488,30 +1509,45 @@ namespace Pomodoro
             {
                 // Handle rewind.
                 var interval = current_state.offset - previous_state.offset;
-                var gap = new Pomodoro.Gap ();
+
+                var gap_flags = current_time_block.state == Pomodoro.State.POMODORO
+                        ? Pomodoro.GapFlags.INTERRUPTION
+                        : Pomodoro.GapFlags.DEFAULT;
+                var gap = new Pomodoro.Gap (gap_flags);
                 gap.end_time = this._current_gap != null ? this._current_gap.start_time : timestamp;
-                gap.start_time = int64.max (Pomodoro.Timestamp.subtract_interval (gap.end_time, interval),
-                                            current_time_block.start_time);
+                gap.start_time = int64.max (
+                        Pomodoro.Timestamp.subtract_interval (gap.end_time, interval),
+                        current_time_block.start_time);
+
                 current_time_block.add_gap (gap);
-                current_time_block.normalize_gaps (timestamp);
+                current_time_block.normalize_gaps ();
             }
             else if (current_state.is_paused ())
             {
                 // Mark pause start.
-                if (this._current_gap == null) {
-                    this._current_gap = new Pomodoro.Gap.with_start_time (current_state.paused_time);
+                if (this._current_gap == null)
+                {
+                    var event_source = Pomodoro.Context.get_event_source ();
+                    var gap_flags = current_time_block.state == Pomodoro.State.POMODORO && (
+                                    event_source == "timer.pause" ||
+                                    event_source == "session-manager.auto-pause")
+                            ? Pomodoro.GapFlags.INTERRUPTION
+                            : Pomodoro.GapFlags.DEFAULT;
+                    this._current_gap = new Pomodoro.Gap.with_start_time (current_state.paused_time,
+                                                                          gap_flags);
                     this._current_time_block.add_gap (this._current_gap);
                 }
                 else {
                     if (this._current_gap.start_time != current_state.paused_time) {
-                        GLib.warning ("Gap.start_time does not match with TimerState.paused_time.");
+                        GLib.warning ("`Gap.start_time` does not match `TimerState.paused_time`.");
                     }
                 }
             }
             else {
                 // Mark pause end.
-                if (this._current_gap != null) {
-                    this._current_gap.end_time = timestamp;
+                if (this._current_gap != null)
+                {
+                    this.mark_gap_end (this._current_gap, timestamp);
                     this._current_gap = null;
                 }
             }
@@ -1661,16 +1697,28 @@ namespace Pomodoro
 
         private void on_timer_suspending (int64 start_time)
         {
-            if (this._current_gap != null)
-            {
-                this._current_gap.end_time = start_time;
-                this._current_gap = null;
-            }
-
             if (this._current_time_block != null)
             {
-                this._current_gap = new Pomodoro.Gap.with_start_time (start_time);  // TODO: mark gap as SLEEP
-                this._current_time_block.add_gap (this._current_gap);
+                this.pause ();
+
+                // Splitting a gap into smaller chunks would complicate tracking the number of
+                // interruptions, so flag ongoing gap as "sleep".
+                var gap_flags = Pomodoro.GapFlags.SLEEP;
+
+                if (this._current_time_block.state == Pomodoro.State.POMODORO &&
+                    this._timer.is_running ())
+                {
+                    gap_flags |= Pomodoro.GapFlags.INTERRUPTION;
+                }
+
+                if (this._current_gap == null)
+                {
+                    this._current_gap = new Pomodoro.Gap.with_start_time (start_time, gap_flags);
+                    this._current_time_block.add_gap (this._current_gap);
+                }
+                else {
+                    this._current_gap.set_flag (gap_flags);
+                }
             }
 
             if (this._current_session != null)
@@ -1690,14 +1738,24 @@ namespace Pomodoro
         private void on_timer_suspended (int64 start_time,
                                          int64 end_time)
         {
-            if (this._current_session != null)
+            if (this._current_session == null) {
+                return;
+            }
+
+            if (this._current_session.is_expired (end_time)) {
+                this.expire_current_session (end_time);
+            }
+            else {
+                this.bump_expiry_time (SESSION_EXPIRY_TIMEOUT);
+            }
+
+            if (this._current_gap != null &&
+                this._current_gap.start_time == start_time &&
+                this._current_gap.has_flag (Pomodoro.GapFlags.SLEEP) &&
+                !this.auto_paused)
             {
-                if (this._current_session.is_expired (end_time)) {
-                    this.expire_current_session (end_time);
-                }
-                else {
-                    this.bump_expiry_time (SESSION_EXPIRY_TIMEOUT);
-                }
+                this._current_gap.end_time = end_time;
+                this._current_gap = null;
             }
         }
 

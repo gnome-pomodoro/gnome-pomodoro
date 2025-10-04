@@ -1,5 +1,58 @@
 namespace Pomodoro
 {
+    [Flags]
+    public enum GapFlags
+    {
+        DEFAULT = 0,
+        INTERRUPTION = 1,
+        SLEEP = 2;
+
+        public static Pomodoro.GapFlags from_string (string? str)
+        {
+            var result = DEFAULT;
+
+            if (str == null) {
+                return result;
+            }
+
+            foreach (var part in str.split ("|"))
+            {
+                switch (part.strip ())
+                {
+                    case "interruption":
+                        result |= INTERRUPTION;
+                        break;
+
+                    case "sleep":
+                        result |= SLEEP;
+                        break;
+
+                    default:
+                        GLib.warning ("Unknown `GapFlags` value '%s'", part.strip ());
+                        break;
+                }
+            }
+
+            return result;
+        }
+
+        public string to_string ()
+        {
+            string[] strings_array = {};
+
+            if ((this & INTERRUPTION) > 0) {
+                strings_array += "interruption";
+            }
+
+            if ((this & SLEEP) > 0) {
+                strings_array += "sleep";
+            }
+
+            return strings_array.length > 0 ? string.joinv (" | ", strings_array) : "default";
+        }
+    }
+
+
     public class Gap : GLib.InitiallyUnowned, Pomodoro.Schedulable
     {
         [CCode (notify = false)]
@@ -61,6 +114,18 @@ namespace Pomodoro
             }
         }
 
+        public Pomodoro.GapFlags flags {
+            get {
+                return this._flags;
+            }
+            set {
+                if (this._flags != value) {
+                    this._flags = value;
+                    this.version++;
+                }
+            }
+        }
+
         public weak Pomodoro.TimeBlock time_block { get; set; }  // parent
 
         internal ulong              version = 0;
@@ -68,17 +133,38 @@ namespace Pomodoro
 
         private int64               _start_time = Pomodoro.Timestamp.UNDEFINED;
         private int64               _end_time = Pomodoro.Timestamp.UNDEFINED;
+        private Pomodoro.GapFlags   _flags = Pomodoro.GapFlags.DEFAULT;
 
-        public Gap ()
+        public Gap (Pomodoro.GapFlags flags = Pomodoro.GapFlags.DEFAULT)
         {
-            GLib.Object ();
+            GLib.Object (
+                flags: flags
+            );
         }
 
-        public Gap.with_start_time (int64 start_time)
+        public Gap.with_start_time (int64             start_time,
+                                    Pomodoro.GapFlags flags = Pomodoro.GapFlags.DEFAULT)
         {
-            GLib.Object ();
+            GLib.Object (
+                flags: flags
+            );
 
             this.set_time_range (start_time, this._end_time);
+        }
+
+        public inline bool has_flag (Pomodoro.GapFlags flag)
+        {
+            return (this.flags & flag) == flag;
+        }
+
+        public inline void set_flag (Pomodoro.GapFlags flag)
+        {
+            this.flags |= flag;
+        }
+
+        public inline void unset_flag (Pomodoro.GapFlags flag)
+        {
+            this.flags = this.flags & (~flag);
         }
 
         private void emit_changed ()
@@ -180,8 +266,9 @@ namespace Pomodoro
                                                      GLib.BindingFlags.SYNC_CREATE);
             }
 
-            this.entry.start_time = this.start_time;
-            this.entry.end_time = this.end_time;
+            this.entry.start_time = this._start_time;
+            this.entry.end_time = this._end_time;
+            this.entry.flags = this._flags.to_string ();
             this.entry.version = this.version;
 
             return this.entry;

@@ -1732,6 +1732,8 @@ namespace Tests
             this.add_test ("timer_reset__ignore_call", this.test_timer_reset__ignore_call);
 
             this.add_test ("timer_pause", this.test_timer_pause);
+            this.add_test ("timer_pause__mark_interruption", this.test_timer_pause__mark_interruption);
+            this.add_test ("timer_pause__unmark_interruption", this.test_timer_pause__unmark_interruption);
             this.add_test ("timer_resume", this.test_timer_resume);
             this.add_test ("timer_rewind", this.test_timer_rewind);
             this.add_test ("timer_rewind__multiple", this.test_timer_rewind__multiple);
@@ -2404,6 +2406,69 @@ namespace Tests
             assert_cmpuint (session.get_cycles ().length (),
                             GLib.CompareOperator.EQ, this.session_template.cycles);
             assert_cmpfloat_with_epsilon (cycle.calculate_progress (now), 1.0, EPSILON);
+        }
+
+        /**
+         * Pausing the timer during a pomodoro should mark the created gap as an INTERRUPTION.
+         */
+        public void test_timer_pause__mark_interruption ()
+        {
+            var timer           = new Pomodoro.Timer ();
+            var session_manager = new Pomodoro.SessionManager.with_timer (timer);
+            var timer_action_group = new Pomodoro.TimerActionGroup.with_timer (timer);
+
+            var now = Pomodoro.Timestamp.peek ();
+            timer_action_group.activate_action ("start", null);
+
+            now = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            timer_action_group.activate_action ("pause", null);
+
+            var time_block = session_manager.current_time_block;
+            var gap = time_block.get_last_gap ();
+
+            assert_nonnull (gap);
+            assert_true (gap.has_flag (Pomodoro.GapFlags.INTERRUPTION));
+            assert_true (Pomodoro.Timestamp.is_defined (gap.start_time));
+            assert_false (Pomodoro.Timestamp.is_defined (gap.end_time));
+
+            // Resume the timer; expect INTERRUPTION to be preserved
+            now = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            timer_action_group.activate_action ("resume", null);
+
+            gap = time_block.get_last_gap ();
+            assert_true (gap.has_flag (Pomodoro.GapFlags.INTERRUPTION));
+            assert_true (Pomodoro.Timestamp.is_defined (gap.end_time));
+        }
+
+        /**
+         * Pausing then stopping should invalidate the INTERRUPTION by changing gap type to OTHER.
+         */
+        public void test_timer_pause__unmark_interruption ()
+        {
+            var timer              = new Pomodoro.Timer ();
+            var session_manager    = new Pomodoro.SessionManager.with_timer (timer);
+            var timer_action_group = new Pomodoro.TimerActionGroup.with_timer (timer);
+
+            var now = Pomodoro.Timestamp.peek ();
+            timer_action_group.activate_action ("start", null);
+
+            now = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            timer_action_group.activate_action ("pause", null);
+
+            var time_block = session_manager.current_time_block;
+            var gap = time_block.get_last_gap ();
+            assert_nonnull (gap);
+            assert_true (gap.has_flag (Pomodoro.GapFlags.INTERRUPTION));
+            assert_true (Pomodoro.Timestamp.is_defined (gap.start_time));
+            assert_false (Pomodoro.Timestamp.is_defined (gap.end_time));
+
+            // Stop the timer; expect the interruption to be invalidated
+            now = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            timer_action_group.activate_action ("reset", null);
+
+            assert_null (session_manager.current_time_block);
+            assert_false (gap.has_flag (Pomodoro.GapFlags.INTERRUPTION));
+            assert_true (Pomodoro.Timestamp.is_defined (gap.end_time));
         }
 
         public void test_timer_resume ()
@@ -3402,6 +3467,7 @@ namespace Tests
                 extra_gap_entry.time_block_id = time_block_entry.id;
                 extra_gap_entry.start_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
                 extra_gap_entry.end_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+                extra_gap_entry.flags = Pomodoro.GapFlags.DEFAULT.to_string ();
                 extra_gap_entry.save_sync ();
 
                 var results = repository.find_sync (typeof (Pomodoro.GapEntry), null);
