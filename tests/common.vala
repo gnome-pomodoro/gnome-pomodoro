@@ -140,11 +140,12 @@ namespace Tests
     public abstract class TestSuite : GLib.Object
     {
         private GLib.TestSuite   g_test_suite;
-        private Tests.TestCase[] test_cases = new Tests.TestCase[0];
+        private Tests.TestCase[] test_cases;
 
         construct
         {
             this.g_test_suite = new GLib.TestSuite (this.get_name ());
+            this.test_cases = new Tests.TestCase[0];
         }
 
         public string get_name ()
@@ -172,6 +173,57 @@ namespace Tests
 
         public virtual void teardown ()
         {
+        }
+    }
+
+
+    public abstract class MainLoopTestSuite : TestSuite
+    {
+        private uint timeout_id = 0;
+
+        protected GLib.MainLoop? main_loop;
+
+        protected bool run_main_loop (uint timeout = 1000)
+                                      requires (this.timeout_id == 0)
+        {
+            var success = true;
+
+            this.timeout_id = GLib.Timeout.add (timeout, () => {
+                this.timeout_id = 0;
+                this.main_loop.quit ();
+
+                success = false;
+
+                return GLib.Source.REMOVE;
+            });
+
+            this.main_loop.run ();
+
+            return success;
+        }
+
+        protected void quit_main_loop ()
+        {
+            if (this.timeout_id != 0) {
+                GLib.Source.remove (this.timeout_id);
+                this.timeout_id = 0;
+            }
+
+            this.main_loop.quit ();
+        }
+
+        public override void setup ()
+        {
+            base.setup ();
+
+            this.main_loop = new GLib.MainLoop ();
+        }
+
+        public override void teardown ()
+        {
+            base.teardown ();
+
+            this.main_loop = null;
         }
     }
 
