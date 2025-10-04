@@ -128,6 +128,25 @@ namespace Pomodoro
 
             return result;
         }
+
+        public string to_representation ()
+        {
+            var string_builder = new GLib.StringBuilder ();
+            string_builder.append ("{ ");
+
+            for (var i = 0; i < this.data.length; i++)
+            {
+                if (i > 0) {
+                    string_builder.append (", ");
+                }
+
+                string_builder.append ("%.3g".printf (this.data[i]));
+            }
+
+            string_builder.append (" }");
+
+            return string_builder.str;
+        }
     }
 
 
@@ -245,6 +264,17 @@ namespace Pomodoro
             }
         }
 
+        public void fill (double value)
+        {
+            for (var i = 0; i < this.shape[0]; i++)
+            {
+                for (var j = 0; j < this.shape[1]; j++)
+                {
+                    this.data[i, j] = value;
+                }
+            }
+        }
+
         public bool equals (Pomodoro.Matrix other)
         {
             if (this.shape[0] != other.shape[0] || this.shape[1] != other.shape[1]) {
@@ -279,6 +309,18 @@ namespace Pomodoro
             }
 
             return true;
+        }
+
+        public void add_value (int    i,
+                               int    j,
+                               double value)
+        {
+            if (this.validate_indices (ref i, ref j)) {
+                this.data[i, j] += value;
+            }
+            else {
+                GLib.warning ("Matrix indices %u, %u are out of bounds", i, j);
+            }
         }
 
         // TODO: can we return unowned value here?
@@ -337,7 +379,9 @@ namespace Pomodoro
 
         public double min ()
         {
-            var result = this.data[0, 0];
+            var result = this.shape[0] > 0 && this.shape[1] > 0
+                    ? this.data[0, 0]
+                    : double.NAN;
 
             for (var i = 0; i < this.data.length[0]; i++)
             {
@@ -354,7 +398,9 @@ namespace Pomodoro
 
         public double max ()
         {
-            var result = this.data[0, 0];
+            var result = this.shape[0] > 0 && this.shape[1] > 0
+                    ? this.data[0, 0]
+                    : double.NAN;
 
             for (var i = 0; i < this.data.length[0]; i++)
             {
@@ -545,6 +591,20 @@ namespace Pomodoro
             }
         }
 
+        public void fill (double value)
+        {
+            for (var i = 0; i < this.shape[0]; i++)
+            {
+                for (var j = 0; j < this.shape[1]; j++)
+                {
+                    for (var k = 0; k < this.shape[2]; k++)
+                    {
+                        this.data[i, j, k] = value;
+                    }
+                }
+            }
+        }
+
         public bool equals (Pomodoro.Matrix3D other)
         {
             if (this.shape[0] != other.shape[0] ||
@@ -570,8 +630,8 @@ namespace Pomodoro
             return true;
         }
 
-        public inline Matrix? get_matrix_internal (int axis,
-                                                   int index)
+        public inline Pomodoro.Matrix? get_matrix_internal (int axis,
+                                                            int index)
         {
             switch (axis)
             {
@@ -646,7 +706,9 @@ namespace Pomodoro
 
         public double min ()
         {
-            var result = this.data[0, 0, 0];
+            var result = this.shape[0] > 0 && this.shape[1] > 0 && this.shape[2] > 0
+                    ? this.data[0, 0, 0]
+                    : double.NAN;
 
             for (var i = 0; i < this.data.length[0]; i++)
             {
@@ -666,7 +728,9 @@ namespace Pomodoro
 
         public double max ()
         {
-            var result = this.data[0, 0, 0];
+            var result = this.shape[0] > 0 && this.shape[1] > 0 && this.shape[2] > 0
+                    ? this.data[0, 0, 0]
+                    : double.NAN;
 
             for (var i = 0; i < this.data.length[0]; i++)
             {
@@ -691,7 +755,7 @@ namespace Pomodoro
          * Splitting will replace those vectors with numeric values, and will return same number of
          * matrices as the vectors length.
          */
-        public Matrix[] unstack (int axis = -1)
+        public Pomodoro.Matrix[] unstack (int axis = -1)
         {
             assert (validate_axis (ref axis));
 
@@ -707,7 +771,7 @@ namespace Pomodoro
                 }
             }
 
-            var result = new Matrix[this.shape[axis]];
+            var result = new Pomodoro.Matrix[this.shape[axis]];
 
             for (var index = 0; index < this.shape[axis]; index++) {
                 result[index] = this.get_matrix (axis, index);
