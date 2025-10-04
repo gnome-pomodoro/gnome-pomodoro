@@ -221,7 +221,25 @@ namespace Pomodoro.Database
 
     public string serialize_date (GLib.Date date)
     {
-        return Pomodoro.DateUtils.format_date (date, DATE_FORMAT);
+        return date.valid ()
+                ? Pomodoro.DateUtils.format_date (date, DATE_FORMAT)
+                : "";  // TODO: is this acceptable by SQLite?
+    }
+
+    /**
+     * Remove leading zeros from a string
+     */
+    private inline string chug_zeros (string str)
+    {
+        var index = 0;
+
+        while (str.@get (index) == '0') {
+            index++;
+        }
+
+        return index > 0
+                ? str.substring (index)
+                : str;
     }
 
     public GLib.Date parse_date (string date_string)
@@ -231,9 +249,9 @@ namespace Pomodoro.Database
 
         if (parts.length == 3)
         {
-            var year  = uint.parse (parts[0]);
-            var month = uint.parse (parts[1]);
-            var day   = uint.parse (parts[2]);
+            var year  = uint.parse (chug_zeros (parts[0]));
+            var month = uint.parse (chug_zeros (parts[1]));
+            var day   = uint.parse (chug_zeros (parts[2]));
 
             date.set_dmy ((GLib.DateDay) day,
                           (GLib.DateMonth) month,

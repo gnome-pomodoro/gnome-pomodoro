@@ -45,6 +45,19 @@ namespace Pomodoro
             // `source-id` may reference `timeblocks` and `gaps` tables.
             // Therefore, we treat it like an integer.
         }
+
+        public Pomodoro.StatsEntry copy ()
+        {
+            return (Pomodoro.StatsEntry) GLib.Object.@new (
+                    typeof (Pomodoro.StatsEntry),
+                    id: this.id,
+                    time: this.time,
+                    date: this.date,
+                    offset: this.offset,
+                    duration: this.duration,
+                    category: this.category,
+                    source_id: this.source_id);
+        }
     }
 
 
@@ -57,6 +70,7 @@ namespace Pomodoro
         public string date { get; set; }
         public string category { get; set; }
         public int64 duration { get; set; }
+        public int64 count { get; set; }
 
         static construct
         {

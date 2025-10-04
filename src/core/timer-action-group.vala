@@ -33,6 +33,13 @@ namespace Pomodoro
             );
         }
 
+        public TimerActionGroup.with_timer (Pomodoro.Timer timer)
+        {
+            GLib.Object (
+                timer: timer
+            );
+        }
+
         construct
         {
             var start_action = new GLib.SimpleAction ("start", null);

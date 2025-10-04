@@ -6,6 +6,7 @@ namespace Pomodoro
         public int64 time_block_id { get; set; }
         public int64 start_time { get; set; }
         public int64 end_time { get; set; }
+        public string flags { get; set; }
 
         internal ulong version = 0;
 
@@ -16,6 +17,7 @@ namespace Pomodoro
             set_notnull ("time-block-id");
             set_notnull ("start-time");
             set_notnull ("end-time");
+            set_notnull ("flags");
             set_unique ("start-time");
             set_reference ("time-block-id", "timeblocks", "id");
         }
