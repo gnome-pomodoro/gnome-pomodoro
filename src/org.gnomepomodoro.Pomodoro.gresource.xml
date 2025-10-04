@@ -21,6 +21,7 @@
     <file alias="ui/preferences-window.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-window.ui</file>
     <file alias="ui/screen-overlay.ui" compressed="true" preprocess="xml-stripblanks">views/screen-overlay.ui</file>
     <file alias="ui/sound-chooser-window.ui" compressed="true" preprocess="xml-stripblanks">views/sound-chooser-window.ui</file>
+    <file alias="ui/stats-date-popover.ui" compressed="true" preprocess="xml-stripblanks">views/stats-date-popover.ui</file>
     <file alias="ui/stats-day-page.ui" compressed="true" preprocess="xml-stripblanks">views/stats-day-page.ui</file>
     <file alias="ui/stats-week-page.ui" compressed="true" preprocess="xml-stripblanks">views/stats-week-page.ui</file>
     <file alias="ui/stats-month-page.ui" compressed="true" preprocess="xml-stripblanks">views/stats-month-page.ui</file>
@@ -37,14 +38,17 @@
     <file alias="ui/command-entryrow.ui" compressed="true" preprocess="xml-stripblanks">widgets/command-entryrow.ui</file>
     <file alias="ui/condition-group-widget.ui" compressed="true" preprocess="xml-stripblanks">widgets/condition-group-widget.ui</file>
     <file alias="ui/condition-widget.ui" compressed="true" preprocess="xml-stripblanks">widgets/condition-widget.ui</file>
+    <file alias="ui/day-chooser.ui" compressed="true" preprocess="xml-stripblanks">widgets/day-chooser.ui</file>
     <file alias="ui/lightbox.ui" compressed="true" preprocess="xml-stripblanks">widgets/lightbox.ui</file>
     <file alias="ui/log-scale-row.ui" compressed="true" preprocess="xml-stripblanks">widgets/log-scale-row.ui</file>
+    <file alias="ui/month-chooser.ui" compressed="true" preprocess="xml-stripblanks">widgets/month-chooser.ui</file>
     <file alias="ui/sidebar-row.ui" compressed="true" preprocess="xml-stripblanks">widgets/sidebar-row.ui</file>
     <file alias="ui/stats-card.ui" compressed="true" preprocess="xml-stripblanks">widgets/stats-card.ui</file>
     <file alias="ui/timer-control-buttons.ui" compressed="true" preprocess="xml-stripblanks">widgets/timer-control-buttons.ui</file>
     <file alias="ui/timer-label.ui" compressed="true" preprocess="xml-stripblanks">widgets/timer-label.ui</file>
     <file alias="ui/variable-popover.ui" compressed="true" preprocess="xml-stripblanks">widgets/variable-popover.ui</file>
     <file alias="ui/volume-slider.ui" compressed="true" preprocess="xml-stripblanks">widgets/volume-slider.ui</file>
+    <file alias="ui/week-chooser.ui" compressed="true" preprocess="xml-stripblanks">widgets/week-chooser.ui</file>
 
     <!-- CSS -->
     <file>style.css</file>
@@ -66,8 +70,14 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/document-edit-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/event-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/filter-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/go-last-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/go-next-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/go-previous-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/go-up-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/list-drag-handle-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lock-screen-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/pan-end-custom-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/pan-start-custom-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/preferences-appearance-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/preferences-keyboard-shortcuts-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/preferences-notifications-symbolic.svg</file>

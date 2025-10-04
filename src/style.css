@@ -203,6 +203,11 @@ compacttimerview:dir(rtl) progressbar {
 /**
  * PomodoroStatsView
  */
+
+statsview #title > button {
+    padding: 4px 12px 4px 12px;
+}
+
 statsview .title-1 {
     font-size: 1.6em;
     font-weight: bold;
@@ -213,17 +218,50 @@ statsview .title-2 {
     font-weight: bold;
 }
 
+statsview .osd.toolbar {
+    padding: 2px;
+    border-radius: 14px;
+}
+
+statsview .osd.toolbar > button {
+    border: none;
+    padding: 2px;
+    border-radius: 12px;
+    min-height: 20px;
+    min-width: 20px;
+}
+
+statsview chart,
+statsview statscard label.heading {
+   color: alpha(@theme_fg_color, 0.7);
+}
+
+statsview:backdrop #navigation image,
+statsview:backdrop label.heading,
+statsview:backdrop chart {
+   color: @insensitive_fg_color;
+}
+
+statsview:backdrop canvas {
+   opacity: 0.95;
+}
+
 
 /**
  * PomodoroStatsCard
  */
-statsview .value {
-    font-size: 1.6em;
-    font-weight: bold;
+statscard {
+    padding: 12px;
 }
 
-statscard > button {
-    padding: 15px;
+statscard label.heading {
+    font-size: 1em;
+    font-weight: 800;
+}
+
+statscard label.value {
+    font-size: 1.6em;
+    font-weight: 400;
 }
 
 statscard .pill {
@@ -248,7 +286,7 @@ statscard .pill.negative {
 
 
 /**
- * PomodoroHistogram, PomodoroBubbleChart widgets
+ * PomodoroBarChart, PomodoroBubbleChart widgets
  */
 chart scrolledwindow undershoot.left {
     background: linear-gradient(to right, @theme_bg_color, transparent 100%);
@@ -256,6 +294,95 @@ chart scrolledwindow undershoot.left {
 
 chart scrolledwindow undershoot.right {
     background: linear-gradient(to left, @theme_bg_color, transparent 100%);
+}
+
+chart .bar:not(:disabled):hover,
+chart .bubble:not(:disabled):hover {
+    filter: contrast(0.75) brightness(1.15);
+}
+
+
+/**
+ * PomodoroDayChooser widgets
+ */
+calendar {
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-size: inherit;
+}
+
+calendar header {
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-size: inherit;
+    font-weight: 600;
+}
+
+calendar grid,
+calendar box.weekday {
+    font-size: 90%;
+}
+
+calendar box.weekday {
+    margin: 8px 12px 3px 12px;
+}
+
+calendar box.weekday.dim-label {
+    color: alpha(@theme_fg_color, 0.5);
+    opacity: 1;
+    filter: none;
+}
+
+calendar grid button {
+    font-weight: 400;
+}
+
+calendar grid button:selected {
+   color: @accent_fg_color;
+   background-color: @accent_bg_color;
+   font-weight: 600;
+}
+
+calendar grid button:disabled,
+calendar grid button.dim-label {
+    color: alpha(@theme_fg_color, 0.5);
+    opacity: 1;
+    filter: none;
+}
+
+calendar grid button.dim-label:selected {
+    color: @accent_fg_color;
+    background-color: alpha(@accent_bg_color, 0.5);
+    opacity: 1;
+    filter: none;
+}
+
+calendar grid .week-number {
+    font-weight: 600;
+}
+
+calendar grid .week:selected .day-number {
+    color: alpha(@accent_fg_color, 0.8);
+}
+
+calendar grid .week:selected .day-number.dim-label {
+    color: alpha(@accent_fg_color, 0.6);
+}
+
+calendar grid .circular {
+    padding: 0px;
+    min-height: 32px;
+}
+
+calendar grid .pill {
+    padding: 6px;
+}
+
+calendar grid .pill.week {
+    padding: 0px 12px;
+    font-weight: 400;
 }
 
 

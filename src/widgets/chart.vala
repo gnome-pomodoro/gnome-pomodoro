@@ -23,367 +23,137 @@ using GLib;
 
 namespace Pomodoro
 {
-    public delegate string FormatValueFunc (double value);
-
-
-    public class Axis : Pomodoro.CanvasItem
+    public enum Unit
     {
-        public const int BASE_LABEL_OFFSET = 5;
-        private const double EPSILON = 0.00001;
-        private const uint MAX_TICKS = 100;
+        AMOUNT,
+        PERCENT,
+        INTERVAL;
 
-        public Gtk.Orientation orientation { get; construct; }  // TODO: use Gtk.Border to handle RTL languages
-
-        // XXX: we put an item on a canvas that already has scale - it seems redundant
-        internal double scale = 1.0;
-        internal uint   tick_count = 2U;
-        internal uint   stride = 1U;
-        internal int    label_width;
-        internal int    label_height;
-        internal int    label_offset;
-        internal int    width;
-        internal int    height;
-        internal double value_from;
-        internal double value_to;
-        internal double value_spacing;
-
-        private Pango.Layout[]            layouts;
-        private Pomodoro.FormatValueFunc? format_value_func;
-
-        public Axis (Gtk.Orientation                 orientation,
-                     owned Pomodoro.FormatValueFunc? format_value_func = null)
+        public string format (double value)
         {
-            GLib.Object (
-                orientation: orientation
-            );
+            if (value.is_nan ()) {
+                return "–";
+            }
 
-            this.format_value_func = (owned) format_value_func;
-            this.layouts = {};
-        }
-
-        private static double[] calculate_ticks (double value_from,
-                                                 double value_to,
-                                                 double value_spacing)
-        {
-            if ((value_to - value_from).abs () < EPSILON ||
-                value_spacing <= 0.0 ||
-                value_spacing < EPSILON)
+            switch (this)
             {
-                debug ("### calculate_ticks value_from=%.6f value_to=%.6f value_spacing=%.6f",
-                       value_from, value_to, value_spacing);
-                return new double[0];
-            }
+                case AMOUNT:
+                    var value_rounded = (long) Math.round (value * 10.0);
+                    var number        = value_rounded / 10;
+                    var decimal       = value_rounded.abs () % 10;
 
-            var tick_from   = (int) Math.floor (value_from / value_spacing);
-            var tick_to     = (int) Math.ceil (value_to / value_spacing);
-            var tick_count  = tick_to > tick_from ? tick_to - tick_from + 1 : 0;
-            var tick_values = new double[tick_count];
+                    return decimal == 0 ? number.to_string () : @"$(number).$(decimal)";
 
-            for (var index = 0; index < tick_values.length; index++) {
-                tick_values[index] = (double) (tick_from + index) * value_spacing;
-            }
+                case PERCENT:
+                    var value_rounded = (int) Math.round (100.0 * value);
 
-            debug ("### calculate_ticks tick_count=%d value_from=%.6f value_to=%.6f value_spacing=%.6f",
-                   tick_count, value_from, value_to, value_spacing);
+                    return @"$(value_rounded)%";
 
-            return tick_values;
-        }
+                case INTERVAL:
+                    // round +/- 10s
+                    var value_rounded = 20.0 * Math.round (value / 20.0);
 
-        public void set_range (double value_from,
-                               double value_to,
-                               double value_spacing)
-                               requires (this.child != null)
-        {
-            var min_value_spacing = (value_to - value_from).abs () / (double) MAX_TICKS;
+                    return Pomodoro.Interval.format_short (
+                            Pomodoro.Interval.from_seconds (value_rounded));
 
-            if (value_spacing < min_value_spacing) {
-                // XXX: round to the exponent of 2?
-                value_spacing *= Math.ceil (min_value_spacing / value_spacing);
-            }
-
-            var tick_values = calculate_ticks (value_from,
-                                               value_to,
-                                               value_spacing);
-            var context     = this.child.create_pango_context ();
-            var layout      = new Pango.Layout (context);
-            layout.set_ellipsize (Pango.EllipsizeMode.NONE);
-
-            this.label_width = 0;
-            this.label_height = 0;
-
-            // TODO: estimate stride, currently we may check too many layouts
-
-            foreach (var tick_value in tick_values)
-            {
-                var text = this.format_value_func (tick_value);
-                layout.set_text (text, text.length);
-
-                var tick_label_width  = 0;
-                var tick_label_height = 0;
-                layout.get_pixel_size (out tick_label_width, out tick_label_height);
-
-                this.label_width = int.max (this.label_width, tick_label_width);
-                this.label_height = int.max (this.label_height, tick_label_height);
-            }
-
-            if (this.value_from    != value_from ||
-                this.value_to      != value_to ||
-                this.value_spacing != value_spacing ||
-                this.tick_count    != tick_values.length)
-            {
-                this.value_from     = value_from;
-                this.value_to       = value_to;
-                this.value_spacing  = value_spacing;
-                this.tick_count     = tick_values.length;
-
-                this.layouts = null;
-            }
-
-            if (this.orientation == Gtk.Orientation.HORIZONTAL) {
-                this.width  = 0;
-                this.height = this.label_height + Pomodoro.Axis.BASE_LABEL_OFFSET;
-            }
-            else {
-                this.width  = this.label_width + Pomodoro.Axis.BASE_LABEL_OFFSET;
-                this.height = 0;
+                default:
+                    assert_not_reached ();
             }
         }
+    }
 
-        private void update_layouts ()
-        {
-            var monotonic_time = GLib.get_monotonic_time ();
-            var layout_count = this.tick_count >= 2U
-                    ? (this.tick_count - 1U) / this.stride + 1U
-                    : 0U;
-            var context      = this.child.create_pango_context ();
-            var tick_index   = 0U;
-            var layout_index = 0U;
-            var last_tick_value = this.value_from;
 
-            this.layouts = new Pango.Layout[layout_count];
+    private struct Category
+    {
+        public string        label;
+        public Gdk.RGBA      color;
+        public Pomodoro.Unit unit;
+        public bool          visible;
+    }
 
-            while (layout_index < layout_count)
-            {
-                var tick_value = (double) tick_index * this.value_spacing + this.value_from;
-                var tick_label = this.format_value_func (tick_value);
 
-                var layout = new Pango.Layout (context);
-                layout.set_width (this.label_width);
-                layout.set_alignment (this.orientation == Gtk.Orientation.HORIZONTAL
-                                      ? Pango.Alignment.CENTER : Pango.Alignment.RIGHT);
-                layout.set_ellipsize (Pango.EllipsizeMode.NONE);
-                layout.set_text (tick_label, tick_label.length);
-
-                this.layouts[layout_index] = layout;
-
-                layout_index++;
-                tick_index += this.stride;
-                last_tick_value = tick_value;
-            }
-
-            if (this.orientation == Gtk.Orientation.HORIZONTAL) {
-                this.width  = (int) Math.ceil ((last_tick_value - this.value_from) * this.scale) + this.label_width;
-                this.height = this.label_offset + this.label_height;
-            }
-            else {
-                this.width  = this.label_width + this.label_offset;
-                this.height = (int) Math.ceil ((last_tick_value - this.value_from) * this.scale) + this.label_height;
-            }
-
-            var milliseconds = (GLib.get_monotonic_time () - monotonic_time) /
-                               Pomodoro.Interval.MILLISECOND;
-            if (layout_count >= MAX_TICKS || milliseconds >= 10) {
-                GLib.warning ("Building an axis with %u ticks took %lldms", this.tick_count, milliseconds);
-            }
-        }
-
-        internal void update (int    available_size,
-                              int    label_offset,
-                              double scale)
-        {
-            debug ("Axis.update scale=%s, tick_count=%u", scale.to_string (), this.tick_count);
-
-            var spacing = this.tick_count > 0 ? available_size / this.tick_count : available_size;
-            var stride = 1;
-
-            if (spacing != 0)
-            {
-                if (this.orientation == Gtk.Orientation.HORIZONTAL)
-                {
-                    stride = int.max (
-                            (int) Math.roundf ((float) this.label_width * 2.0f / (float) spacing),
-                            1);
-                }
-                else {
-                    stride = int.max (
-                            (int) Math.ceilf ((float) this.label_height * 2.0f / (float) spacing),
-                            1);
-                }
-            }
-
-            this.label_offset = label_offset + Pomodoro.Axis.BASE_LABEL_OFFSET;
-            this.scale = scale;
-            this.stride = stride;
-
-            this.update_layouts ();
-
-            if (this.orientation == Gtk.Orientation.HORIZONTAL)
-            {
-                this.x_origin = this.label_width / 2;
-                this.y_origin = 0;
-                this.x        = (float) this.value_from;
-                this.y        = 0.0f;
-            }
-            else {
-                this.x_origin = this.width;
-                this.y_origin = this.height - this.label_height / 2;
-                this.x        = 0.0f;
-                this.y        = (float) this.value_from;
-            }
-
-            this.child.queue_resize ();
-        }
-
-        private void measure_child (Pomodoro.Gizmo  gizmo,
-                                    Gtk.Orientation orientation,
-                                    int             for_size,
-                                    out int         minimum,
-                                    out int         natural,
-                                    out int         minimum_baseline,
-                                    out int         natural_baseline)
-        {
-            natural = orientation == Gtk.Orientation.HORIZONTAL ? this.width : this.height;
-            minimum = natural;
-            minimum_baseline = -1;
-            natural_baseline = -1;
-        }
-
-        private void snapshot_child (Pomodoro.Gizmo gizmo,
-                                     Gtk.Snapshot   snapshot)
-        {
-            var color = gizmo.get_color ();
-            var tick_index   = 0U;
-            var layout_index = 0U;
-
-            while (layout_index < this.layouts.length)
-            {
-                var tick_value = (double) tick_index * this.value_spacing + this.value_from;
-
-                unowned var layout = this.layouts[layout_index];
-
-                var layout_position = (float) (tick_value * this.scale);
-                int layout_width;
-                int layout_height;
-                Graphene.Point layout_origin;
-
-                layout.get_pixel_size (out layout_width, out layout_height);
-
-                // Pango layout is placed on the left side of origin, at the bottom
-                if (this.orientation == Gtk.Orientation.HORIZONTAL) {
-                    layout_origin = Graphene.Point () {
-                        x = (float) this.x_origin + layout_position,
-                        y = (float) this.height - (float) layout_height
-                    };
-                }
-                else {
-                    layout_origin = Graphene.Point () {
-                        x = (float) this.width - (float) this.label_offset,
-                        y = (float) this.y_origin - layout_position - (float) layout_height / 2.0f
-                    };
-                }
-
-                snapshot.save ();
-                snapshot.translate (layout_origin);
-                snapshot.append_layout (layout, color);
-                snapshot.restore ();
-
-                tick_index += this.stride;
-                layout_index++;
-            }
-        }
-
-        protected override Gtk.Widget? create_child ()
-        {
-            var child = new Pomodoro.Gizmo (this.measure_child,
-                                            null,
-                                            this.snapshot_child,
-                                            null,
-                                            null,
-                                            null);
-            child.focusable = false;
-            child.add_css_class ("axis");
-
-            return (Gtk.Widget?) child;
-        }
-
-        public override void dispose ()
-        {
-            this.layouts = null;
-            this.format_value_func  = null;
-
-            base.dispose ();
-        }
+    private struct Bucket
+    {
+        public string label;
+        public string tooltip_label;
     }
 
 
     /**
      * Base class for drawing a 2D charts with X and Y axes.
+     *
+     * The content is scrollable horizontally.
      */
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/chart.ui")]
     public abstract class Chart : Gtk.Widget, Gtk.Buildable
     {
         private const int MIN_WIDTH = 300;
-        private const int MIN_HEIGHT = 200;
+        private const int MIN_HEIGHT = 150;
+        private const double EPSILON = 0.00001;
 
         /**
-         * Interval between x-ticks in value units
+         * Interval between ticks on x axis
          */
-        public double x_spacing {
+        public float x_spacing {
             get {
-                return this._x_tick_spacing;
+                return this._x_spacing;
             }
             set {
-                if (this._x_tick_spacing == value) {
+                if (this._x_spacing == value) {
                     return;
                 }
 
-                this._x_tick_spacing = value;
+                this._x_spacing = value;
 
                 this.queue_allocate ();
             }
         }
 
         /**
-         * Interval between y-ticks in value units
+         * Interval between ticks on y axis
          */
-        public double y_spacing {
+        public float y_spacing {
             get {
-                return this._y_tick_spacing;
+                return this._y_spacing;
             }
             set {
-                if (this._y_tick_spacing == value) {
+                if (this._y_spacing == value) {
                     return;
                 }
 
-                this._y_tick_spacing = value;
+                this._y_spacing = value;
 
                 this.queue_allocate ();
             }
         }
 
-        [GtkChild]
-        protected unowned Pomodoro.Canvas guides;
-        [GtkChild]
-        protected unowned Pomodoro.Canvas canvas;
-        [GtkChild]
-        protected unowned Gtk.ScrolledWindow scrolled_window;
+        public float aspect_ratio {
+            get {
+                return this._aspect_ratio;
+            }
+            set {
+                this._aspect_ratio = value;
 
-        protected Pomodoro.Axis? x_axis;
-        protected Pomodoro.Axis? y_axis;
-        private double           _x_tick_spacing = 1.0;
-        private double           _y_tick_spacing = 1.0;
-        private FormatValueFunc? format_value_func;
-        private double           drag_start_x;
+                this.queue_resize ();
+            }
+        }
+
+        [GtkChild]
+        protected unowned Pomodoro.ChartContents contents;
+        [GtkChild]
+        private unowned Gtk.ScrolledWindow scrolled_window;
+
+        private Pomodoro.ChartAxis? y_axis = null;
+        private float               _x_spacing = 1.0f;
+        private float               _y_spacing = 1.0f;
+        private float               _aspect_ratio = 1.0f;
+        private double              drag_start_x;
+        private bool                zooming = false;
+        private double              zoom_x_value;
+        private double              zoom_y_value;
+        private double              zoom_x;
+        private double              zoom_y;
+        private FormatValueFunc?    format_value_func = null;
 
         static construct
         {
@@ -392,33 +162,36 @@ namespace Pomodoro
 
         construct
         {
-            this.x_axis = new Pomodoro.Axis (
-                    Gtk.Orientation.HORIZONTAL,
-                    (value) => {
-                        return this.format_x_value (value);
-                    });
-            this.y_axis = new Pomodoro.Axis (
-                    Gtk.Orientation.VERTICAL,
-                    (value) => {
-                        return this.format_y_value (value);
-                    });
+            unowned var self = this;
 
-            this.canvas.add_item (this.x_axis);
-            this.guides.add_item (this.y_axis);
+            this.contents.x_axis.set_format_value_func (
+                (value) => {
+                    return self.format_x_value (value);
+                });
+            this.contents.y_axis.set_format_value_func (
+                (value) => {
+                    return self.format_y_value (value);
+                });
+
+            this.y_axis = this.contents.y_axis.detach ();
+            this.y_axis.insert_before (this, null);
+
+            // HACK: counteract delegates/self increasing `this.ref_count`
+            this.@unref ();
         }
 
         public void set_format_value_func (owned Pomodoro.FormatValueFunc? func)
         {
             this.format_value_func = (owned) func;
 
-            // TODO: invalidate Axis labels / layouts
-
             this.queue_allocate ();
         }
 
         public virtual string format_x_value (double value)
         {
-            return "%.2f".printf (value);
+            return this.format_value_func != null
+                    ? this.format_value_func (value)
+                    : "%.2f".printf (value);
         }
 
         public virtual string format_y_value (double value)
@@ -440,35 +213,164 @@ namespace Pomodoro
                              Gtk.PanDirection direction,
                              double           offset)
         {
-            // TODO: test this with RTL
             if (direction == Gtk.PanDirection.LEFT) {
                 offset = -offset;
             }
 
-            // TODO: only do this if canvas is really RTL
             this.scrolled_window.hadjustment.value = this.drag_start_x - offset;
         }
 
-        [GtkCallback]
-        private void on_y_origin_notify (GLib.Object    object,
-                                         GLib.ParamSpec pspec)
+        private bool get_pointer_position (out double x,
+                                           out double y)
         {
-            this.queue_allocate ();
+            double px, py;
+            double nx, ny;
+            Graphene.Point point;
+
+            var native = this.get_native ();
+            var surface = native?.get_surface ();
+            var pointer = surface?.get_display ().get_default_seat ()?.get_pointer ();
+
+            if (pointer == null)
+            {
+                x = double.NAN;
+                y = double.NAN;
+
+                return false;
+            }
+
+            surface.get_device_position (pointer, out px, out py, null);
+            native.get_surface_transform (out nx, out ny);
+
+            var surface_point = Graphene.Point ();
+            surface_point.init ((float)(px - nx), (float)(py - ny));
+
+            if (native.compute_point (this, surface_point, out point))
+            {
+                x = (double) point.x;
+                y = (double) point.y;
+
+                return true;
+            }
+            else {
+                x = double.NAN;
+                y = double.NAN;
+
+                return false;
+            }
         }
 
-        protected abstract void calculate_values_range (out double x_range_from,
-                                                        out double x_range_to,
-                                                        out double y_range_from,
-                                                        out double y_range_to);
+        [GtkCallback]
+        private bool on_scroll (Gtk.EventControllerScroll controller,
+                                double                    dx,
+                                double                    dy)
+        {
+            var event = controller.get_current_event ();
+            double x, y;
+
+            if (event == null) {
+                return false;
+            }
+
+            if ((event.get_modifier_state () & Gdk.ModifierType.CONTROL_MASK) == 0) {
+                return false;
+            }
+
+            if (!this.get_pointer_position (out x, out y)) {
+                return false;
+            }
+
+            var point = Graphene.Point ();
+            point.init ((float) x, (float) y);
+
+            var contents_point = Graphene.Point ();
+
+            if (!this.compute_point (this.contents, point, out contents_point)) {
+                return false;
+            }
+
+            contents_point = this.contents.canvas.transform_point (contents_point);
+
+            if (dy < 0.0) {
+                this.zoom_begin (contents_point.x, contents_point.y, x, y);
+                this.zoom_in ();
+            }
+            else if (dy > 0.0) {
+                this.zoom_begin (contents_point.x, contents_point.y, x, y);
+                this.zoom_out ();
+            }
+
+            return true;
+        }
+
+        public abstract Gtk.SizeRequestMode get_contents_request_mode (Pomodoro.Canvas canvas);
 
         /**
-         * A function for measuring and allocating content widgets. If content size exceeds
-         * available size it will be scrolled. The content may include padding, `working_area`
-         * represents area representing values.
+         * Create and position canvas items in the value space.
          */
-        protected abstract void update_content (int               available_width,
-                                                int               available_height,
-                                                out Gdk.Rectangle working_area);
+        public abstract void update_canvas (Pomodoro.Canvas canvas);
+
+        public abstract void measure_canvas (Pomodoro.Canvas canvas,
+                                             Gtk.Orientation orientation,
+                                             int             for_size,
+                                             out int         minimum,
+                                             out int         natural);
+
+        /**
+         * A method for calculating items size before allocation. It's expected that you update
+         * items origin point for the widgets.
+         *
+         * At this point canvas scale is not calculated yet, nor we know items final positions
+         * at the pixel-level.
+         *
+         * If size exceeds `available_width`, the content will be scrolled horizontally. The
+         * `working_area` represents area available for drawing values.
+         */
+        public abstract void measure_working_area (Pomodoro.Canvas   canvas,
+                                                   int               available_width,
+                                                   int               available_height,
+                                                   out Gdk.Rectangle working_area);
+
+        protected void queue_update ()
+        {
+            this.queue_resize ();
+        }
+
+        protected virtual void zoom_begin (double x_value,
+                                           double y_value,
+                                           double x,
+                                           double y)
+        {
+            this.zoom_x_value = x_value;
+            this.zoom_y_value = y_value;
+            this.zoom_x       = x;
+            this.zoom_y       = y;
+            this.zooming      = true;
+        }
+
+        protected virtual void zoom_end (double x_value,
+                                         double y_value,
+                                         double x,
+                                         double y)
+        {
+            // Convert point from value coordinates to chart coordinates
+            var contents_point = Graphene.Point ();
+            contents_point.init ((float) x_value, (float) y_value);
+            contents_point = this.contents.canvas.transform_point_inv (contents_point);
+
+            var point = Graphene.Point ();
+
+            if (this.contents.compute_point (this, contents_point, out point))
+            {
+                // Adjust scroll, so that anchor point is preserved
+                var hadjustment = this.scrolled_window.hadjustment;
+                hadjustment.value = (hadjustment.value + point.x - x).clamp (
+                        hadjustment.lower, hadjustment.upper);
+                // TODO: vadjustment
+            }
+
+            this.zooming = false;
+        }
 
         public override Gtk.SizeRequestMode get_request_mode ()
         {
@@ -482,127 +384,111 @@ namespace Pomodoro
                                       out int         minimum_baseline,
                                       out int         natural_baseline)
         {
+            this.scrolled_window.measure (orientation,
+                                          for_size,
+                                          out minimum,
+                                          out natural,
+                                          null,
+                                          null);
+
             if (orientation == Gtk.Orientation.HORIZONTAL) {
-                minimum = MIN_WIDTH;
+                minimum = int.max (MIN_WIDTH, minimum);
                 natural = int.max (minimum, this.width_request);
             }
             else {
-                minimum = MIN_HEIGHT;
+                minimum = int.max (MIN_HEIGHT, minimum);
                 natural = int.max (minimum, this.height_request);
+
+                // Grow the hight to met the requested aspect ratio
+                if (for_size > 0 && this.aspect_ratio > 0.0f) {
+                    natural = int.max (
+                            (int) Math.roundf ((float) for_size / this.aspect_ratio),
+                            minimum);
+                }
             }
 
             minimum_baseline = -1;
             natural_baseline = -1;
         }
 
+        /**
+         * Calculate chart layout
+         *
+         * Base class allocates axes, handles content sizing. Content may be scrolled horizontally
+         * if there is not enough space.
+         */
         public override void size_allocate (int width,
                                             int height,
                                             int baseline)
         {
-            // TODO: handle RTL
-            // var is_ltr = this.get_direction () != Gtk.TextDirection.RTL;
+            this.update_canvas (this.contents.canvas);
 
-            double        x_value_from, x_value_to, y_value_from, y_value_to;
-            int           viewport_width, viewport_height;
-            Gdk.Rectangle working_area;
+            this.contents.configure_axes (width, height);
 
-            // Prepare axes
-            // Axes serve as main guides. Estimate tick label size and the number of ticks needed.
-            // After this step we can estimate axes size.
-            this.calculate_values_range (out x_value_from,
-                                         out x_value_to,
-                                         out y_value_from,
-                                         out y_value_to);
-
-            this.x_axis.set_range (x_value_from,
-                                   x_value_to,
-                                   this._x_tick_spacing);
-            this.y_axis.set_range (y_value_from,
-                                   y_value_to,
-                                   this._y_tick_spacing);
-
-            viewport_width  = width - this.y_axis.width;
-            viewport_height = height - this.x_axis.height;
-
-            // Update canvas content
-            this.update_content (viewport_width,
-                                 viewport_height,
-                                 out working_area);
-
-            debug ("x_value_from = %g", x_value_from);
-            debug ("x_value_to   = %g", x_value_to);
-            debug ("y_value_from = %g", y_value_from);
-            debug ("y_value_to   = %g isNan=%s", y_value_to, y_value_to.is_nan ().to_string ());
-
-            // if (x_scale.is_nan ()) {
-            //     x_scale = 0.0;
-            // }
-
-            // if (y_scale.is_nan ()) {
-            //     y_scale = 0.0;
-            // }
-
-            var x_scale = x_value_to != x_value_from
-                    ? (double) working_area.width / (x_value_to - x_value_from)
-                    : 0.0;
-            var y_scale = y_value_to != y_value_from
-                    ? (double) working_area.height / (y_value_to - y_value_from)
-                    : 0.0;
-
-            this.canvas.x_scale = (float) x_scale;
-            this.canvas.y_scale = (float) y_scale;
-
-            // Update ticks and calculate scale
-            this.x_axis.update (working_area.width,
-                                viewport_height - working_area.y - working_area.height,
-                                x_scale);
-            this.y_axis.update (working_area.height,
-                                0,
-                                y_scale);
-
-            // Allocate direct children
-            var guides_allocation = Gtk.Allocation () {
-                width  = width,
-                height = height
-            };
-            this.guides.measure (Gtk.Orientation.HORIZONTAL,
-                                 guides_allocation.height,
-                                 null,
-                                 out guides_allocation.width,
-                                 null,
-                                 null);
-            this.guides.measure (Gtk.Orientation.VERTICAL,
-                                 guides_allocation.width,
-                                 null,
-                                 out guides_allocation.height,
-                                 null,
-                                 null);
-            this.guides.allocate_size (guides_allocation, -1);
-
+            var y_axis_width = this.y_axis != null ? this.y_axis.label_width : 0;
             var scrolled_window_allocation = Gtk.Allocation () {
-                width  = viewport_width,
+                x      = y_axis_width,
+                y      = 0,
+                width  = width - y_axis_width,
                 height = height
             };
-            scrolled_window_allocation.x = width - scrolled_window_allocation.width;
             this.scrolled_window.allocate_size (scrolled_window_allocation, -1);
 
-            // Align y-origin of y-axis and canvas, so they are at the same level
-            // TODO: make preallocation in Canvas to figure out y_origin earlier; Canvas.size_allocate do not use width and height anyway
-            guides_allocation.y = this.canvas.y_origin - this.guides.y_origin;
-            this.guides.allocate_size (guides_allocation, -1);
+            if (this.y_axis != null)
+            {
+                var y_axis_allocation = Gtk.Allocation () {
+                    x = 0,
+                    y = this.contents.y_origin - this.y_axis.origin
+                };
+                this.y_axis.measure (Gtk.Orientation.HORIZONTAL,
+                                     -1,
+                                     null,
+                                     out y_axis_allocation.width,
+                                     null,
+                                     null);
+                this.y_axis.measure (Gtk.Orientation.VERTICAL,
+                                     -1,
+                                     null,
+                                     out y_axis_allocation.height,
+                                     null,
+                                     null);
+                this.y_axis.allocate_size (y_axis_allocation, -1);
+            }
+
+            if (this.zooming) {
+                this.zoom_end (this.zoom_x_value, this.zoom_y_value, this.zoom_x, this.zoom_y);
+            }
         }
 
         public override void snapshot (Gtk.Snapshot snapshot)
         {
-            this.snapshot_child (this.guides, snapshot);
             this.snapshot_child (this.scrolled_window, snapshot);
+
+            if (this.y_axis != null) {
+                this.snapshot_child (this.y_axis, snapshot);
+            }
         }
+
+        public signal void zoom_in ();
+
+        public signal void zoom_out ();
 
         public override void dispose ()
         {
-            this.x_axis            = null;
-            this.y_axis            = null;
+            if (this.y_axis != null) {
+                this.y_axis.unparent ();
+                this.y_axis = null;
+            }
+
+            this.@ref ();
+            this.contents.x_axis.set_format_value_func (null);
+            this.contents.y_axis.set_format_value_func (null);
+
+            this.scrolled_window.child = null;
             this.format_value_func = null;
+
+            // HACK: Without this `GtkScrolledWindow` does not get disposed properly
+            this.dispose_template (typeof (Pomodoro.Chart));
 
             base.dispose ();
         }

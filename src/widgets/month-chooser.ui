@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="gnome-pomodoro">
+  <template class="PomodoroMonthChooser" parent="AdwBin">
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+        <child>
+          <object class="GtkBox">
+            <property name="css-name">header</property>
+            <property name="orientation">horizontal</property>
+            <property name="spacing">12</property>
+            <property name="width-request">32</property>
+            <property name="height-request">32</property>
+            <child>
+              <object class="GtkButton" id="previous_button">
+                <property name="icon-name">pan-start-custom-symbolic</property>
+                <style>
+                  <class name="flat"/>
+                  <class name="circular"/>
+                </style>
+                <signal name="clicked" handler="on_previous_button_clicked"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="header_label">
+                <property name="hexpand">true</property>
+                <property name="halign">center</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="next_button">
+                <property name="icon-name">pan-end-custom-symbolic</property>
+                <property name="width-request">32</property>
+                <property name="height-request">32</property>
+                <style>
+                  <class name="flat"/>
+                  <class name="circular"/>
+                </style>
+                <signal name="clicked" handler="on_next_button_clicked"/>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkGrid" id="grid">
+            <property name="row-homogeneous">true</property>
+            <property name="column-homogeneous">true</property>
+            <property name="row-spacing">4</property>
+            <property name="column-spacing">4</property>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>

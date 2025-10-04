@@ -147,4 +147,18 @@ namespace Pomodoro
 
         return "";
     }
+
+
+    internal void normalize_rectangle (ref Gdk.Rectangle rect)
+    {
+        if (rect.width < 0) {
+            rect.x += rect.width;
+            rect.width = rect.width.abs ();
+        }
+
+        if (rect.height < 0) {
+            rect.y += rect.height;
+            rect.height = rect.height.abs ();
+        }
+    }
 }

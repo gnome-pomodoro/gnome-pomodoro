@@ -35,7 +35,7 @@ namespace Pomodoro
             set {
                 this._unit = value;
 
-                this.schedule_update ();
+                this.update ();
             }
         }
 
@@ -46,30 +46,15 @@ namespace Pomodoro
             set {
                 this._value = value;
 
-                this.schedule_update ();
-            }
-        }
-
-        public double reference_value {
-            get {
-                return this._reference_value;
-            }
-            set {
-                this._reference_value = value;
-
-                this.schedule_update ();
+                this.update ();
             }
         }
 
         [GtkChild]
         private unowned Gtk.Label value_label;
-        [GtkChild]
-        private unowned Gtk.Label value_difference_label;
 
         private Pomodoro.Unit _unit = Pomodoro.Unit.AMOUNT;
-        private double        _value;
-        private double        _reference_value = double.NAN;
-        private uint          update_idle_id = 0;
+        private double        _value = double.NAN;
 
         static construct
         {
@@ -79,56 +64,6 @@ namespace Pomodoro
         private void update ()
         {
             this.value_label.label = this._unit.format (this._value);
-
-            if (this._reference_value.is_finite () && this._reference_value != 0.0)
-            {
-                var difference         = this._value - this._reference_value;
-                var difference_value   = this._unit.format (difference.abs ());
-                var difference_percent = (int) Math.floor (
-                        100.0 * (difference / this._reference_value).abs ());
-                var difference_sign    = difference >= 0 ? "+" : "-";
-
-                this.value_difference_label.label = @"$(difference_sign)$(difference_value)" +
-                                                    @" ($(difference_sign)$(difference_percent)%)";
-                this.value_difference_label.remove_css_class ("positive");
-                this.value_difference_label.remove_css_class ("negative");
-                this.value_difference_label.visible = true;
-
-                if (difference > 0.0) {
-                    this.value_difference_label.add_css_class ("positive");
-                }
-                else if (difference < 0.0) {
-                    this.value_difference_label.add_css_class ("negative");
-                }
-            }
-            else {
-                this.value_difference_label.label = "";
-                this.value_difference_label.visible = false;
-            }
-        }
-
-        private void schedule_update ()
-        {
-            if (this.update_idle_id != 0) {
-                return;
-            }
-
-            this.update_idle_id = this.add_tick_callback (() => {
-                this.update_idle_id = 0;
-                this.update ();
-
-                return GLib.Source.REMOVE;
-            });
-        }
-
-        public override void dispose ()
-        {
-            if (this.update_idle_id != 0) {
-                this.remove_tick_callback (this.update_idle_id);
-                this.update_idle_id = 0;
-            }
-
-            base.dispose ();
         }
     }
 }

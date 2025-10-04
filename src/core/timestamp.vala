@@ -76,36 +76,51 @@ namespace Pomodoro.Interval
         return ((double) interval) / ((double) Pomodoro.Interval.SECOND);
     }
 
-    public string format_short (int64 interval)
+    public string format_short (int64 interval,
+                                int64 unit = -1)
     {
-        if (interval < 0) {
-            // It's ambiguous. We could say for example "2h ago", but in most cases a negative
-            // value doesn't make sense.
-            interval = -interval;
+        var seconds = (int) (interval / Pomodoro.Interval.SECOND);
+        var hours = 0;
+        var minutes = 0;
+        var show_hours = false;
+        var show_minutes = false;
+        var result = new GLib.StringBuilder ();
+
+        if (unit == Pomodoro.Interval.HOUR) {
+            hours = seconds / 3600;
+            show_hours = true;
         }
-
-        var seconds = (uint) (interval / Pomodoro.Interval.SECOND);
-        var hours = seconds / 3600;
-        var minutes = (seconds % 3600) / 60;
-        var str = "";
-
-        if (hours > 0)
-        {
-            /* translators: Short form for number of hours */
-            str = _("%uh").printf (hours);
+        else if (unit == Pomodoro.Interval.MINUTE) {
+            minutes = seconds / 60;
+            show_minutes = true;
         }
+        else {
+            hours = seconds / 3600;
 
-        if (minutes > 0 || hours == 0)
-        {
-            if (str != "") {
-                str += " ";  // TODO: use non breaking space
+            if (hours < 0) {
+                seconds = seconds.abs ();
             }
 
-            /* translators: Short form for number of minutes */
-            str += _("%um").printf (minutes);
+            minutes = (seconds % 3600) / 60;
+            show_hours = hours != 0;
+            show_minutes = minutes != 0 || hours == 0;
         }
 
-        return str;
+        if (show_hours) {
+            /* translators: Short form for number of hours */
+            result.append_printf (_("%uh"), hours);
+        }
+
+        if (show_hours && show_minutes) {
+            result.append ("\u00A0");  // non-breaking space
+        }
+
+        if (show_minutes) {
+            /* translators: Short form for number of minutes */
+            result.append_printf (_("%um"), minutes);
+        }
+
+        return result.str;
     }
 }
 

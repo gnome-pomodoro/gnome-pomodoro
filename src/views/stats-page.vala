@@ -26,20 +26,32 @@ namespace Pomodoro
     public enum StatsCategory
     {
         POMODORO = 0,
-        SCREEN_TIME = 1
-    }
+        BREAK = 1,
+        INTERRUPTION = 2,
+        INVALID = -1;
 
+        public static int from_string (string category)
+        {
+            switch (category)
+            {
+                case "pomodoro":
+                    return POMODORO;
 
-    public enum StatsReference
-    {
-        NONE,
-        PREVIOUS,
-        WEEK,
-        MONTH
+                case "break":
+                    return BREAK;
+
+                case "interruption":
+                    return INTERRUPTION;
+
+                default:
+                    return INVALID;
+            }
+        }
     }
 
 
     public interface StatsPage : Gtk.Widget
     {
+        public abstract GLib.Date date { get; construct; }
     }
 }

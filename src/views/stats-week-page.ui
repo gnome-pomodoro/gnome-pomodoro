@@ -1,38 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="gnome-pomodoro">
-  <template class="PomodoroStatsWeekPage" parent="GtkBox">
-    <property name="orientation">vertical</property>
-    <property name="spacing">10</property>
-    <child>
-      <object class="PomodoroHistogram" id="histogram">
-        <property name="stacked">false</property>
-        <style>
-          <class name="small-text"/>
-          <class name="numeric"/>
-        </style>
-      </object>
-    </child>
-    <child>
-      <object class="GtkFlowBox">
-        <property name="orientation">horizontal</property>
-        <property name="selection-mode">none</property>
-        <property name="column-spacing">10</property>
-        <property name="row-spacing">10</property>
-        <property name="homogeneous">true</property>
-        <property name="max-children-per-line">2</property>
+  <template class="PomodoroStatsWeekPage" parent="AdwBin">
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
         <child>
-          <object class="PomodoroStatsCard" id="pomodoro_card">
-            <property name="label" translatable="yes">Pomodoro</property>
-            <property name="unit">interval</property>
+          <object class="PomodoroBarChart" id="histogram">
+            <property name="stacked">true</property>
+            <property name="show-empty-bars">false</property>
+            <property name="activate-on-click">true</property>
+            <property name="aspect-ratio">2.0</property>
+            <property name="y-spacing">3600</property><!-- 1 hour -->
+            <property name="reference-value">3600</property><!-- 1 hour -->
+            <style>
+              <class name="small-text"/>
+              <class name="numeric"/>
+            </style>
+            <signal name="bar-activated" handler="on_bar_activated"/>
           </object>
         </child>
         <child>
-          <object class="PomodoroStatsCard" id="screen_time_card">
-            <property name="label" translatable="yes">Screen Time</property>
-            <property name="unit">interval</property>
+          <object class="GtkFlowBox">
+            <property name="orientation">horizontal</property>
+            <property name="selection-mode">none</property>
+            <property name="column-spacing">6</property>
+            <property name="row-spacing">6</property>
+            <property name="homogeneous">true</property>
+            <property name="max-children-per-line">3</property>
+            <property name="min-children-per-line">2</property>
+            <property name="margin-top">12</property>
+            <property name="margin-bottom">12</property>
+            <child>
+              <object class="PomodoroStatsCard" id="pomodoro_card">
+                <property name="label" translatable="yes">Pomodoro</property>
+                <property name="value">0</property>
+                <property name="unit">interval</property>
+              </object>
+            </child>
+            <child>
+              <object class="PomodoroStatsCard" id="breaks_card">
+                <property name="label" translatable="yes">Breaks</property>
+                <property name="value">0</property>
+                <property name="unit">interval</property>
+              </object>
+            </child>
+            <child>
+              <object class="PomodoroStatsCard" id="interruptions_card">
+                <property name="label" translatable="yes">Interruptions</property>
+                <property name="value">0</property>
+                <property name="unit">amount</property>
+              </object>
+            </child>
+            <child>
+              <object class="PomodoroStatsCard" id="break_ratio_card">
+                <property name="label" translatable="yes">Break Ratio</property>
+                <property name="unit">percent</property>
+              </object>
+            </child>
           </object>
         </child>
-      </object>
-    </child>
+      </object><!-- box -->
+    </property>
   </template>
 </interface>

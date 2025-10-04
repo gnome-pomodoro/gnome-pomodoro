@@ -24,42 +24,98 @@ using GLib;
 namespace Pomodoro
 {
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/stats-day-page.ui")]
-    public class StatsDayPage : Gtk.Box, Pomodoro.StatsPage
+    public class StatsDayPage : Adw.Bin, Pomodoro.StatsPage
     {
-        private const int64 BUCKET_INTERVAL = 2 * Pomodoro.Interval.HOUR;
+        private const int64 DEFAULT_INTERVAL = 1 * Pomodoro.Interval.HOUR;
+        private const int64 MIN_INTERVAL = 15 * Pomodoro.Interval.MINUTE;
+        private const int64 MAX_INTERVAL = 2 * Pomodoro.Interval.HOUR;
 
-        private struct Data
-        {
-            int64[] histogram_data;
-        }
+        // Default display hours for histogram x-axis
+        private const int BASE_START_HOUR = 9;
+        private const int BASE_END_HOUR = 17;
+
+        // Minimum number of bars displayed
+        private const int MIN_HISTOGRAM_BAR_COUNT = 8;
+
+        // Minimum duration threshold for range expansion
+        private const int64 MIN_SIGNIFICANT_DURATION = Pomodoro.Interval.MINUTE;
 
         public GLib.Date date { get; construct; }
 
+        [CCode (notify = false)]
+        public int64 interval {
+            get {
+                return this._interval;
+            }
+            set {
+                value = value.clamp (MIN_INTERVAL, MAX_INTERVAL);
+
+                if (this._interval == value) {
+                    return;
+                }
+
+                this._interval = value;
+
+                this.on_interval_notify ();
+                this.notify_property ("interval");
+            }
+        }
+
         [GtkChild]
-        private unowned Pomodoro.Histogram histogram;
+        private unowned Gtk.Revealer toolbar_revealer;
+        [GtkChild]
+        private unowned Gtk.Button zoom_in_button;
+        [GtkChild]
+        private unowned Gtk.Button zoom_out_button;
+        [GtkChild]
+        private unowned Pomodoro.BarChart histogram;
         [GtkChild]
         private unowned Pomodoro.StatsCard pomodoro_card;
         [GtkChild]
-        private unowned Pomodoro.StatsCard screen_time_card;
+        private unowned Pomodoro.StatsCard breaks_card;
+        [GtkChild]
+        private unowned Pomodoro.StatsCard interruptions_card;
+        [GtkChild]
+        private unowned Pomodoro.StatsCard break_ratio_card;
 
+        private int64                     _interval = DEFAULT_INTERVAL;
         private Pomodoro.StatsManager?    stats_manager;
         private Pomodoro.TimezoneHistory? timezone_history;
+        private GLib.DateTime?            datetime;
+        private int64                     timestamp;
         private int64                     start_time;
         private int64                     end_time;
-        private Data                      data;
+        private int64                     entries_start_time = Pomodoro.Timestamp.UNDEFINED;
+        private int64                     entries_end_time = Pomodoro.Timestamp.UNDEFINED;
+        private string                    time_format;
+        private Pomodoro.Matrix?          histogram_data;
 
         construct
         {
             this.stats_manager    = new Pomodoro.StatsManager ();
             this.timezone_history = new Pomodoro.TimezoneHistory ();
+            this.datetime         = this.stats_manager.get_midnight (this.date);
+            this.timestamp        = Pomodoro.Timestamp.from_datetime (this.datetime);
 
-            this.histogram.set_category_label (Pomodoro.StatsCategory.POMODORO, _("Pomodoro"));
-            this.histogram.set_category_label (Pomodoro.StatsCategory.SCREEN_TIME, _("Screen Time"));
-            this.histogram.reference_value = 3600.0;  // 1 hour (same as bucket size)
-            this.histogram.y_spacing = 1800.0;  // 30 minutes
-            this.histogram.set_format_value_func (
-                (value) => {
-                    return Pomodoro.Interval.format_short (Pomodoro.Interval.from_seconds (value));
+            this.histogram.set_category_label (
+                    Pomodoro.StatsCategory.POMODORO, _("Pomodoro"));
+            this.histogram.set_category_unit (
+                    Pomodoro.StatsCategory.POMODORO, Pomodoro.Unit.INTERVAL);
+
+            this.histogram.set_category_label (
+                    Pomodoro.StatsCategory.BREAK, _("Breaks"));
+            this.histogram.set_category_unit (
+                    Pomodoro.StatsCategory.BREAK, Pomodoro.Unit.INTERVAL);
+
+            this.update_time_format ();
+            this.update_histogram_y_spacing ();
+
+            this.stats_manager.entry_saved.connect (this.on_entry_saved);
+            this.stats_manager.entry_deleted.connect (this.on_entry_deleted);
+
+            this.populate.begin (
+                (obj, res) => {
+                    this.populate.end (res);
                 });
         }
 
@@ -71,89 +127,138 @@ namespace Pomodoro
         }
 
         /**
-         * Update timeline. It may change when user changes timezones.
+         * Create data container sampled at `MIN_INTERVAL` for the whole day.
+         * `this.histogram` by comparison is holding displayed time range only.
          */
+        private Pomodoro.Matrix create_histogram_data ()
+        {
+            // Add a buffer of 12h for potential timezone changes or other edge cases
+            var bucket_count = (uint)(36 * Pomodoro.Interval.HOUR / MIN_INTERVAL);
+
+            return new Pomodoro.Matrix (bucket_count, this.histogram.get_categories_count ());
+        }
+
+        private static string format_hours (double value)
+        {
+            return Pomodoro.Interval.format_short (Pomodoro.Interval.from_seconds (value),
+                                                   Pomodoro.Interval.HOUR);
+        }
+
+        private static string format_minutes (double value)
+        {
+            return Pomodoro.Interval.format_short (Pomodoro.Interval.from_seconds (value),
+                                                   Pomodoro.Interval.MINUTE);
+        }
+
+        private inline string format_time (GLib.DateTime datetime)
+        {
+            var time_string = datetime.format (this.time_format);
+
+            if (time_string.has_prefix ("0")) {
+                time_string = time_string.substring (1);
+            }
+
+            return time_string;
+        }
+
+        private void ensure_histogram_data ()
+        {
+            if (this.histogram_data == null) {
+                this.histogram_data = this.create_histogram_data ();
+            }
+        }
+
+        private void update_category_colors ()
+        {
+            var foreground_color = get_foreground_color (this.histogram);
+            var background_color = get_background_color (this.histogram);
+
+            foreground_color = blend_colors (background_color, foreground_color);
+
+            var pomodoro_color = foreground_color;
+            var break_color = mix_colors (background_color, foreground_color, 0.2f);
+
+            this.histogram.set_category_color (Pomodoro.StatsCategory.POMODORO, pomodoro_color);
+            this.histogram.set_category_color (Pomodoro.StatsCategory.BREAK, break_color);
+        }
+
+        private void update_time_format ()
+        {
+            var use_12h_format = Pomodoro.Locale.use_12h_format ();
+            var time_format = "%H";
+
+            if (this._interval < Pomodoro.Interval.HOUR || !use_12h_format) {
+                time_format += ":%M";
+            }
+
+            if (use_12h_format) {
+                time_format = time_format.replace ("%H", "%I") + " %p";
+            }
+
+            this.time_format = time_format;
+        }
+
+        private void update_histogram_y_spacing ()
+        {
+            var y_spacing = this._interval <= Pomodoro.Interval.HOUR
+                    ? (float) Pomodoro.Interval.to_seconds (this._interval) / 3.0f
+                    : 3600.0f;
+
+            this.histogram.y_spacing = y_spacing;
+            this.histogram.reference_value = (float) Pomodoro.Interval.to_seconds (this._interval);
+
+            if (y_spacing >= 3600.0f) {
+                this.histogram.set_format_value_func (format_hours);
+            }
+            else {
+                this.histogram.set_format_value_func (format_minutes);
+            }
+        }
+
         private void update_histogram_buckets ()
         {
-            debug ("### update_histogram_buckets");
-            // var buckets_count = this.histogram.get_buckets_count ();
-
-            var buckets_count = (uint) Math.ceil ((double)(this.end_time - this.start_time) /
-                                                  (double) BUCKET_INTERVAL);
-            var bucket_index = 0U;
-            var bucket_timestamp = this.start_time;
-
-            // this.histogram.clear ();
-            // var index = int.max ((int) this.histogram.get_buckets_count () - 1, 0);
-
-            var use_am_pm = false;  // TODO: fetch from locale or settings
+            var datetimes = new GLib.DateTime[0];
+            var timestamp = this.start_time;
 
             this.timezone_history.scan (
                 this.start_time,
-                this.end_time,
+                this.end_time + this._interval,
                 (start_time, end_time, timezone) => {
-                    while (bucket_timestamp < end_time)
-                    {
-                        var datetime = Pomodoro.Timestamp.to_datetime (bucket_timestamp, timezone);
-
-                        GLib.debug ("### bucket %u %s", bucket_index, datetime.to_string ());
-
-
-                        this.histogram.set_bucket_label (bucket_index, datetime.format (use_am_pm ? "%l:%M %p" : "%k:%M"));
-                        //this.histogram.set_bucket_label (bucket_index, datetime.format (use_am_pm ? "%i:%M %p" : "%H:%M"));
-
-                        bucket_index++;
-                        bucket_timestamp += BUCKET_INTERVAL;
+                    while (timestamp < end_time) {
+                        datetimes += Pomodoro.Timestamp.to_datetime (timestamp, timezone);
+                        timestamp += this._interval;
                     }
                 });
 
-            // TODO: remove unnecessary buckets
+            // Update bar labels
+            this.histogram.remove_all_bars ();
+
+            for (var bar_index = 0; bar_index < datetimes.length - 1; bar_index++)
+            {
+                var bar_label = this.format_time (datetimes[bar_index]);
+                var tooltip_label = "%s － %s".printf (
+                        bar_label,
+                        this.format_time (datetimes[bar_index + 1]));
+
+                this.histogram.set_bar_label (bar_index, bar_label, tooltip_label);
+            }
         }
 
-        // private void update_buckets ()
-        // {
-            // this.timezone_history.scan (
-            //     this.start_time,
-            //     this.end_time,
-            //     (start_time, end_time, timezone) => {
-            //         var datetime = this.transform_timestamp (start_time);
-            //     });
+        /**
+         * Set a transform from `bar_index` to `bucket_index`
+         */
+        private void update_histogram_transform ()
+        {
+            var bars_per_bucket = this._interval / MIN_INTERVAL;
+            var bucket_start_index = (this.start_time - this.timestamp) / MIN_INTERVAL;
 
-            // var hour_start = Pomodoro.StatsManager.MIDNIGHT_OFFSET / Pomodoro.Interval.HOUR;
-            // var hour_end = 22;
-            // var bucket_interval = BUCKET_INTERVAL / Pomodoro.Interval.HOUR;
-            // var bucket_index = 0;
-
-            // for (var hour = hour_start; hour <= hour_end; hour += bucket_interval)
-            // {
-            //     var hour_value = GLib.Value (typeof (uint));
-            //     hour_value.set_uint (hour);
-
-            //     this.histogram.add_bucket ("%d:00".printf (hour), hour_value);
-            // }
-        // }
-
-        // private void ensure_bucket (uint bucket_index)
-        // {
-        //     var index = int.max ((int) this.histogram.get_buckets_count () - 1, 0);
-
-        //     for (; index <= bucket_index; index++)
-        //     {
-        //         var timestamp = this.start_time + index * BUCKET_INTERVAL;
-        //         var timezone  = this.timezone_history.search (timestamp);
-        //         var datetime  = Pomodoro.Timestamp.to_datetime (timestamp, timezone);
-
-                // TODO
-                // this.histogram.set_bucket_label (
-                //     datetime. (),
-                // );
-        //     }
-        // }
+            this.histogram.set_transform (
+                    (double) bars_per_bucket,
+                    (double) bucket_start_index);
+        }
 
         private async Gom.ResourceGroup? fetch_entries ()
         {
-            debug ("### fetch_entries begin");
-
             var repository = Pomodoro.Database.get_repository ();
 
             var date_value = GLib.Value (typeof (string));
@@ -171,148 +276,352 @@ namespace Pomodoro
                 var entries = yield repository.find_sorted_async (typeof (Pomodoro.StatsEntry),
                                                                   date_filter,
                                                                   sorting);
-                debug ("### found entries: %u", entries.count);
                 yield entries.fetch_async (0U, entries.count);
 
-                debug ("### fetch_entries end");
                 return entries;
             }
             catch (GLib.Error error) {
-                GLib.critical ("Error while populating daily stats: %s", error.message);
+                GLib.critical ("Error while fetching daily stats: %s", error.message);
 
                 return null;
             }
         }
 
-        // private async Data fetch_reference_data (GLib.Date start_date,
-        //                                          GLib.Date end_date)
-        // {
-            // TODO: use aggregated entries
-        // }
+        private void extend_time_range (int64 entry_start_time,
+                                        int64 entry_end_time)
+        {
+            var changed = false;
+
+            if (this.entries_start_time > entry_start_time) {
+                this.entries_start_time = entry_start_time;
+                changed = true;
+            }
+
+            if (this.entries_end_time < entry_end_time) {
+                this.entries_end_time = entry_end_time;
+                changed = true;
+            }
+
+            if (changed) {
+                this.update_time_range ();
+                this.update_histogram_transform ();
+                this.update_histogram_buckets ();
+            }
+        }
 
         private void process_entry (Pomodoro.StatsEntry entry,
                                     int                 sign = 1)
                                     requires (sign == 1 || sign == -1)
         {
-            // if (entry.time < this.start_time ||
-            //     entry.time >= this.end_time)
-            // {
-            //     return;
-            // }
-            if (entry.date != Pomodoro.Database.serialize_date (this.date)) {
-                GLib.debug ("Skipping entry with date '%s'", entry.date);
+            GLib.return_if_fail (this.histogram_data != null);
+
+            var entry_category = Pomodoro.StatsCategory.from_string (entry.category);
+            var entry_time     = entry.time;
+            var entry_duration = entry.duration;
+
+            // Validate if entry is relevant
+            if (entry_category == Pomodoro.StatsCategory.INVALID) {
                 return;
             }
 
-            var category_index = 0U;
+            if (entry.date != Pomodoro.Database.serialize_date (this.date)) {
+                return;
+            }
 
-            switch (entry.category)
+            // Validate time range
+            if (entry_time < this.timestamp) {
+                entry_duration -= this.timestamp - entry_time;
+                entry_time = this.timestamp;
+            }
+
+            if (entry_category != Pomodoro.StatsCategory.INTERRUPTION &&
+                entry_duration >= MIN_SIGNIFICANT_DURATION)
             {
-                case "pomodoro":
-                    category_index = Pomodoro.StatsCategory.POMODORO;
+                this.extend_time_range (entry_time, entry_time + entry_duration);
+            }
+
+            // Update histogram
+            // Quantize entry range into buckets
+            var bucket_index       = (int) ((entry_time - this.timestamp) / MIN_INTERVAL);
+            var category_index     = (int) entry_category;
+            var bars_per_bucket    = (int) (this._interval / MIN_INTERVAL);
+            var bucket_start_index = (int) ((this.start_time - this.timestamp) / MIN_INTERVAL);
+            var remaining_duration = entry_duration;
+            var remaining_offset   = entry_time - (this.timestamp + bucket_index * MIN_INTERVAL);
+
+            while (remaining_duration > 0 &&
+                   bucket_index < this.histogram_data.shape[0] &&
+                   category_index < this.histogram_data.shape[1] &&
+                   category_index != Pomodoro.StatsCategory.INTERRUPTION)
+            {
+                var consumed_duration = int64.min (remaining_duration,
+                                                   MIN_INTERVAL - remaining_offset);
+                var bucket_value = Pomodoro.Interval.to_seconds (sign * consumed_duration);
+
+                this.histogram_data.add_value (bucket_index, category_index, bucket_value);
+
+                if (bucket_index >= bucket_start_index)
+                {
+                    var bar_index = (bucket_index - bucket_start_index) / bars_per_bucket;
+
+                    this.histogram.add_value (bar_index, category_index, bucket_value);
+                }
+
+                remaining_duration -= consumed_duration;
+                remaining_offset = 0;
+                bucket_index++;
+            }
+
+            // Update cards
+            switch (entry_category)
+            {
+                case Pomodoro.StatsCategory.POMODORO:
+                    this.pomodoro_card.value += Pomodoro.Interval.to_seconds (sign * entry_duration);
                     break;
 
-                case "screen-time":
-                    category_index = Pomodoro.StatsCategory.SCREEN_TIME;
+                case Pomodoro.StatsCategory.BREAK:
+                    this.breaks_card.value += Pomodoro.Interval.to_seconds (sign * entry_duration);
+                    break;
+
+                case Pomodoro.StatsCategory.INTERRUPTION:
+                    this.interruptions_card.value += (double) sign;
                     break;
 
                 default:
-                    return;
+                    // no matching card in UI
+                    break;
             }
 
-            var bucket_index = (uint) ((entry.time - this.start_time) / BUCKET_INTERVAL);
-            // this.ensure_bucket (bucket_index);
+            var total = this.pomodoro_card.value + this.breaks_card.value;
 
-            this.histogram.add_value (bucket_index,
-                                      category_index,
-                                      Pomodoro.Interval.to_seconds (sign * entry.duration));
-        }
-
-        private void update_cards ()
-        {
-            // this.pomodoro_card.value = this.histogram.get_category_total (Pomodoro.StatsCategory.POMODORO);
-            // this.pomodoro_card.reference_value = random.double_range (0.0, 8.0 * 3600.0);  // TODO
-
-            // this.screen_time_card.value = this.histogram.get_category_total (Pomodoro.StatsCategory.SCREEN_TIME);
-            // this.screen_time_card.reference_value = this.pomodoro_card.reference_value + random.double_range (0.0, 3.0 * 3600.0);  // TODO
+            this.break_ratio_card.value = total >= 3600.0
+                    ? this.breaks_card.value / total
+                    : double.NAN;
         }
 
         /**
-         * Update `this.data` and `this.reference_data`
+         * Fill histogram with aggregated data
          */
-        private async void populate ()
+        private void aggregate_data ()
         {
-            debug ("### populate begin");
+            this.histogram.fill (0.0);
 
-            // TODO: handle loader?
+            if (this.histogram_data == null) {
+                return;
+            }
 
-            var entries        = yield this.fetch_entries ();
-            var start_datetime = this.stats_manager.get_midnight (this.date);
-            var end_datetime   = start_datetime.add_days (1);
+            assert (this.start_time >= this.timestamp);
 
-            this.start_time = Pomodoro.Timestamp.from_datetime (start_datetime);
-            this.end_time   = Pomodoro.Timestamp.from_datetime (end_datetime);
-            // this.data       = Data () {
-                // buckets = new int64[0,2]
-            // };
+            var bucket_start_index = (int) ((this.start_time - this.timestamp) / MIN_INTERVAL);
+            var bucket_end_index   = (int) ((this.end_time - this.timestamp) / MIN_INTERVAL);
+            var buckets_per_bar    = (int) (this._interval / MIN_INTERVAL);
+            var categories_count   = (int) this.histogram_data.shape[1];
 
-            this.update_histogram_buckets ();
+            if (bucket_start_index < 0) {
+                bucket_start_index = 0;
+            }
+
+            for (var category_index = 0; category_index < categories_count; category_index++)
+            {
+                for (var bucket_index = bucket_start_index;
+                     bucket_index < bucket_end_index;  // XXX: is it correct?
+                     bucket_index++)
+                {
+                    var bar_index = (bucket_index - bucket_start_index) / buckets_per_bar;
+
+                    this.histogram.add_value (
+                            bar_index,
+                            category_index,
+                            this.histogram_data.@get (bucket_index, category_index));
+                }
+            }
+        }
+
+        /**
+         * Calculate time range for given entries
+         */
+        private void update_entries_time_range (Gom.ResourceGroup? entries)
+        {
+            this.entries_start_time = Pomodoro.Timestamp.UNDEFINED;
+            this.entries_end_time = Pomodoro.Timestamp.UNDEFINED;
+
+            if (entries == null) {
+                return;
+            }
 
             for (var index = 0U; index < entries.count; index++)
             {
-                this.process_entry ((Pomodoro.StatsEntry) entries.get_index (index));
+                var entry = (Pomodoro.StatsEntry) entries.get_index (index);
+                var entry_start_time = entry.time;
+                var entry_end_time = entry.time + entry.duration;
+
+                if (entry.duration < MIN_SIGNIFICANT_DURATION) {
+                    continue;
+                }
+
+                // XXX: we do not validate category here
+
+                if (entry_start_time < this.entries_start_time ||
+                    Pomodoro.Timestamp.is_undefined (this.entries_start_time))
+                {
+                    this.entries_start_time = entry_start_time;
+                }
+
+                if (entry_end_time > this.entries_end_time ||
+                    Pomodoro.Timestamp.is_undefined (this.entries_end_time))
+                {
+                    this.entries_end_time = entry_end_time;
+                }
+            }
+        }
+
+        /**
+         * Calculate display time range based on default work hours and entries
+         */
+        private void update_time_range ()
+        {
+            var midnight_hour = (int)(
+                    Pomodoro.StatsManager.MIDNIGHT_OFFSET / Pomodoro.Interval.HOUR);
+
+            // Ensure time range includes working hours
+            var start_time = Pomodoro.Timestamp.from_datetime (
+                    this.datetime.add_hours (BASE_START_HOUR - midnight_hour));
+            var end_time = Pomodoro.Timestamp.from_datetime (
+                    this.datetime.add_hours (BASE_END_HOUR - midnight_hour));
+
+            // Extend time range to entries
+            if (Pomodoro.Timestamp.is_defined (this.entries_start_time) &&
+                start_time > this.entries_start_time)
+            {
+                start_time = this.entries_start_time;
             }
 
-            // this.update_cards ();
+            if (Pomodoro.Timestamp.is_defined (this.entries_end_time) &&
+                end_time < this.entries_end_time)
+            {
+                end_time = this.entries_end_time;
+            }
 
-            debug ("### populate end");
+            // Round time range to `this._interval`
+            start_time = this.timestamp + this._interval * (
+                    (start_time - this.timestamp) / this._interval);
+            end_time = (end_time - start_time) % this._interval != 0
+                    ? start_time + this._interval * ((end_time - start_time) / this._interval + 1)
+                    : start_time + this._interval * ((end_time - start_time) / this._interval);
+
+            // Ensure minimum number of bars when zoomed out
+            var bar_count = (int)((end_time - start_time) / this._interval);
+
+            if (bar_count < MIN_HISTOGRAM_BAR_COUNT)
+            {
+                start_time = int64.max (
+                        this.timestamp,
+                        start_time - ((MIN_HISTOGRAM_BAR_COUNT - bar_count) / 2) * this._interval);
+                end_time = int64.max (
+                        end_time,
+                        start_time + MIN_HISTOGRAM_BAR_COUNT * this._interval);
+            }
+
+            this.start_time = start_time;
+            this.end_time = end_time;
+        }
+
+        private void reset ()
+        {
+            this.ensure_histogram_data ();
+
+            this.histogram_data.fill (0.0);
+            this.histogram.fill (0.0);
+            this.pomodoro_card.value = 0.0;
+            this.breaks_card.value = 0.0;
+            this.interruptions_card.value = 0.0;
+            this.break_ratio_card.value = double.NAN;
+        }
+
+        private async void populate ()
+        {
+            var entries = yield this.fetch_entries ();
+
+            this.update_entries_time_range (entries);
+            this.update_time_range ();
+            this.update_histogram_y_spacing ();
+            this.update_histogram_transform ();
+            this.update_histogram_buckets ();
+
+            this.reset ();
+
+            for (var index = 0U; index < entries.count; index++) {
+                this.process_entry ((Pomodoro.StatsEntry) entries.get_index (index));
+            }
+        }
+
+        private void invalidate_histogram_data ()
+        {
+            this.histogram_data = null;
+        }
+
+        private void on_interval_notify ()
+        {
+            this.update_time_format ();
+            this.update_time_range ();
+            this.update_histogram_y_spacing ();
+            this.update_histogram_transform ();
+            this.update_histogram_buckets ();
+            this.aggregate_data ();
+
+            this.zoom_in_button.sensitive = this._interval > MIN_INTERVAL;
+            this.zoom_out_button.sensitive = this._interval < MAX_INTERVAL;
         }
 
         private void on_entry_saved (Pomodoro.StatsEntry entry)
         {
-            debug ("### on_entry_saved");
-
-            if (entry.get_data<bool> ("updated")) {
-                // if (entry.date != Pomodoro.Database.serialize_date (this.date)) {
-                //     return;
-                // }
-                assert_not_reached ();  // TODO: schedule populate
+            if (this.histogram_data != null) {
+                this.process_entry (entry, 1);
             }
-
-            this.process_entry (entry);
         }
 
         private void on_entry_deleted (Pomodoro.StatsEntry entry)
         {
-            debug ("### on_entry_deleted");
-
-            this.process_entry (entry, -1);
+            if (this.histogram_data != null) {
+                this.process_entry (entry, -1);
+            }
         }
 
         private void on_timezone_history_changed ()
         {
-            if (!this.get_mapped ()) {
-                return;
+            if (this.get_mapped ()) {
+                this.populate.begin (
+                    (obj, res) => {
+                        this.populate.end (res);
+                    });
             }
-
-            this.populate.begin (
-                (obj, res) => {
-                    this.populate.end (res);
-                });
+            else {
+                this.invalidate_histogram_data ();
+            }
         }
 
-        private void update_category_colors ()
+        [GtkCallback]
+        private void on_zoom_in ()
         {
-            var foreground_color = get_foreground_color (this.histogram);
-            var background_color = get_background_color (this.histogram);
+            this.interval = (this._interval / 2).clamp (MIN_INTERVAL, MAX_INTERVAL);
+        }
 
-            foreground_color = blend_colors (background_color, foreground_color);
+        [GtkCallback]
+        private void on_zoom_out ()
+        {
+            this.interval = (this._interval * 2).clamp (MIN_INTERVAL, MAX_INTERVAL);
+        }
 
-            var pomodoro_color = foreground_color;
-            var screen_time_color = mix_colors (background_color, foreground_color, 0.2f);
+        [GtkCallback]
+        private void on_histogram_enter ()
+        {
+            this.toolbar_revealer.reveal_child = true;
+        }
 
-            this.histogram.set_category_color (Pomodoro.StatsCategory.POMODORO, pomodoro_color);
-            this.histogram.set_category_color (Pomodoro.StatsCategory.SCREEN_TIME, screen_time_color);
+        [GtkCallback]
+        private void on_histogram_leave ()
+        {
+            this.toolbar_revealer.reveal_child = false;
         }
 
         public override void css_changed (Gtk.CssStyleChange change)
@@ -322,70 +631,20 @@ namespace Pomodoro
             this.update_category_colors ();
         }
 
-        public override void map ()
+        public override void dispose ()
         {
-            this.populate.begin (
-                (obj, res) => {
-                    this.populate.end (res);
-
-                    this.stats_manager.entry_saved.connect (this.on_entry_saved);
-                    this.stats_manager.entry_deleted.connect (this.on_entry_deleted);
-                    this.timezone_history.changed.connect (this.on_timezone_history_changed);
-                });
-
-            base.map ();
-        }
-
-        public override void unmap ()
-        {
+            this.histogram.set_format_value_func (null);
             this.stats_manager.entry_saved.disconnect (this.on_entry_saved);
             this.stats_manager.entry_deleted.disconnect (this.on_entry_deleted);
             this.timezone_history.changed.disconnect (this.on_timezone_history_changed);
 
-            base.unmap ();
+            this.stats_manager = null;
+            this.timezone_history = null;
+            this.datetime = null;
+            this.histogram_data = null;
+
+            base.dispose ();
         }
     }
 }
 
-
-            // SELECT category, SUM(duration) AS total_duration
-            //     FROM your_table_name
-            //     GROUP BY category;
-
-
-            /*
-            var adapter = Pomodoro.Database.get_repository ().get_adapter ();
-            var elapsed = (int64) 0;
-
-            adapter.queue_read (() => {
-                Gom.Cursor? cursor = null;
-
-                var command = (Gom.Command) GLib.Object.@new (typeof (Gom.Command),
-                                                              adapter: adapter);
-                command.set_sql ("""
-                    SELECT """ + group_by_sql + """ AS "group", SUM("elapsed") AS "elapsed-sum"
-                        FROM "aggregated-entries"
-                        GROUP BY "group"
-                        ORDER BY "elapsed-sum" DESC
-                        LIMIT 1;
-                    """);
-
-                try {
-                    command.execute (out cursor);
-
-                    if (cursor != null && cursor.next ()) {
-                        elapsed = cursor.get_column_int64 (1);
-                    }
-                    else {
-                        GLib.assert_not_reached ();
-                    }
-                }
-                catch (GLib.Error error) {
-                    GLib.critical ("%s", error.message);
-                }
-
-                GLib.Idle.add (get_max_elapsed_sum.callback);
-            });
-
-            yield;
-            */

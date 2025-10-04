@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="gnome-pomodoro">
+  <template class="PomodoroStatsDatePopover" parent="GtkPopover">
+    <property name="halign">start</property>
+    <property name="has-arrow">false</property>
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">10</property>
+        <property name="width-request">260</property>
+        <child>
+          <object class="AdwToggleGroup" id="timeframe_toggle_group">
+            <property name="homogeneous">true</property>
+            <style>
+              <class name="flat"/>
+              <class name="round"/>
+            </style>
+            <child>
+              <object class="AdwToggle">
+                <property name="label" translatable="yes">Day</property>
+                <property name="name">day</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwToggle">
+                <property name="label" translatable="yes">Week</property>
+                <property name="name">week</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwToggle">
+                <property name="label" translatable="yes">Month</property>
+                <property name="name">month</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStack" id="stack">
+            <property name="hhomogeneous">true</property>
+            <property name="vhomogeneous">false</property>
+            <property name="interpolate-size">false</property>
+            <property name="transition-type">none</property>
+            <property name="visible-child-name" bind-source="timeframe_toggle_group" bind-property="active-name" bind-flags="sync-create"/>
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">day</property>
+                <property name="title"></property>
+                <property name="child">
+                  <object class="PomodoroDayChooser" id="day_chooser">
+                    <signal name="selected" handler="on_day_selected"/>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">week</property>
+                <property name="title"></property>
+                <property name="child">
+                  <object class="PomodoroWeekChooser" id="week_chooser">
+                    <signal name="selected" handler="on_week_selected"/>
+                    <signal name="display-changed" handler="on_week_display_changed"/>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkStackPage">
+                <property name="name">month</property>
+                <property name="title"></property>
+                <property name="child">
+                  <object class="PomodoroMonthChooser" id="month_chooser">
+                    <signal name="selected" handler="on_month_selected"/>
+                  </object>
+                </property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>
