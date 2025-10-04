@@ -39,7 +39,7 @@ test_names = [
   'command',
   'action-manager',
   'matrix',
-  # 'utils',
+  'utils',
 ]
 
 # Compile schemas for unit tests

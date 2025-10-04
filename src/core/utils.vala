@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2024 gnome-pomodoro contributors
+ * Copyright (c) 2013, 2025 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -179,8 +179,7 @@ namespace Pomodoro
 
 
     /**
-     * Convenience class for waiting until an internal counter reaches zero / the number of holds
-     * reaches zero.
+     * Convenience class for waiting until an internal counter (the number of holds) reaches zero.
      *
      * Unlike promises in JavaScript, it is reusable and does not transfer result value.
      */
@@ -219,7 +218,7 @@ namespace Pomodoro
          *
          * @return the current counter value
          */
-        public int get_counter()
+        public int get_counter ()
         {
             this.mutex.lock ();
             var value = this.counter;
@@ -298,6 +297,133 @@ namespace Pomodoro
                         this.cond.wait (this.mutex);
                     }
 
+                    this.mutex.unlock ();
+
+                    // Schedule the callback in the main loop
+                    GLib.Idle.add ((owned) callback);
+
+                    return true;
+                });
+
+            this.mutex.lock ();
+            this.waiting_threads.add (thread);
+            this.mutex.unlock ();
+
+            // Wait for the callback
+            yield;
+
+            this.mutex.lock ();
+            this.waiting_threads.remove_fast (thread);
+            this.mutex.unlock ();
+        }
+    }
+
+
+    /**
+     * A convenience wrapper around GLib.Queue that provides an async wait()
+     * which resolves in the main loop once the queue becomes empty.
+     */
+    public class AsyncQueue<T>
+    {
+        private GLib.Queue<T>                        queue;
+        private GLib.Mutex                           mutex;
+        private GLib.Cond                            cond;
+        private bool                                 in_dispose = false;
+        private GLib.GenericArray<GLib.Thread<bool>> waiting_threads;
+
+        public AsyncQueue ()
+        {
+            this.queue = new GLib.Queue<T> ();
+            this.mutex = GLib.Mutex ();
+            this.cond = GLib.Cond ();
+            this.waiting_threads = new GLib.GenericArray<GLib.Thread<bool>> ();
+        }
+
+        ~AsyncQueue ()
+        {
+            this.mutex.lock ();
+            this.in_dispose = true;
+            this.cond.broadcast ();
+            this.mutex.unlock ();
+
+            foreach (var thread in this.waiting_threads) {
+                thread.join ();
+            }
+        }
+
+        /**
+         * Push an item to the tail of the queue.
+         */
+        public void push (owned T item)
+        {
+            this.mutex.lock ();
+            this.queue.push_tail ((owned) item);
+            this.mutex.unlock ();
+        }
+
+        /**
+         * Try to pop an item without blocking. Returns null if empty.
+         */
+        public T? pop ()
+        {
+            this.mutex.lock ();
+            T? item = null;
+
+            if (this.queue.get_length () > 0)
+            {
+                item = this.queue.pop_head ();
+
+                if (this.queue.get_length () == 0) {
+                    this.cond.broadcast ();
+                }
+            }
+
+            this.mutex.unlock ();
+
+            return item;
+        }
+
+        /**
+         * Current length of the queue.
+         */
+        public uint length ()
+        {
+            this.mutex.lock ();
+            var length = this.queue.get_length ();
+            this.mutex.unlock ();
+
+            return length;
+        }
+
+        /**
+         * Asynchronously waits until the queue becomes empty.
+         *
+         * The completion is dispatched back to the main loop.
+         */
+        public async void wait ()
+        {
+            if (this.in_dispose) {
+                return;
+            }
+
+            // Fast-path: already empty
+            this.mutex.lock ();
+            var already_empty = this.queue.get_length () == 0;
+            this.mutex.unlock ();
+
+            if (already_empty) {
+                return;
+            }
+
+            SourceFunc callback = this.wait.callback;
+
+            var thread = new GLib.Thread<bool> (
+                "async-queue-wait",
+                () => {
+                    this.mutex.lock ();
+                    while (this.queue.get_length () > 0 && !this.in_dispose) {
+                        this.cond.wait (this.mutex);
+                    }
                     this.mutex.unlock ();
 
                     // Schedule the callback in the main loop

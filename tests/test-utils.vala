@@ -20,46 +20,81 @@
 
 namespace Tests
 {
-    public class UtilsTest : Tests.TestSuite
+    public class AsyncQueueTest : Tests.MainLoopTestSuite
     {
-        public UtilsTest ()
+        public AsyncQueueTest ()
         {
-            this.add_test ("build_tmp_path",
-                           this.test_build_tmp_path);
+            this.add_test ("push", this.test_push);
+            this.add_test ("pop", this.test_pop);
+            this.add_test ("length", this.test_length);
+            this.add_test ("wait", this.test_wait);
         }
 
-        public override void setup ()
+        public void test_push ()
         {
+            var queue = new Pomodoro.AsyncQueue<string> ();
+            assert_cmpuint (queue.length (), GLib.CompareOperator.EQ, 0U);
+
+            queue.push ("a");
+            assert_cmpuint (queue.length (), GLib.CompareOperator.EQ, 1U);
+
+            queue.push ("b");
+            assert_cmpuint (queue.length (), GLib.CompareOperator.EQ, 2U);
         }
 
-        public override void teardown ()
+        public void test_pop ()
         {
+            var queue = new Pomodoro.AsyncQueue<string> ();
+
+            var item = queue.pop ();
+            assert_null (item);
+
+            queue.push ("x");
+            item = queue.pop ();
+            assert_nonnull (item);
+            assert_cmpstr (item, GLib.CompareOperator.EQ, "x");
+            assert_cmpuint (queue.length (), GLib.CompareOperator.EQ, 0U);
         }
 
-        /**
-         * Unit test for build_tmp_path() function.
-         */
-        public void test_build_tmp_path ()
+        public void test_length ()
         {
-            var prefix_dir = File.new_for_path (
-                GLib.Environment.get_tmp_dir ()
-            );
+            var queue = new Pomodoro.AsyncQueue<string> ();
+            assert_cmpuint (queue.length (), GLib.CompareOperator.EQ, 0U);
 
-            for (var seed=1; seed < 100; seed++) {
-                var dir = File.new_for_path (
-                    Pomodoro.build_tmp_path ("gnome-pomodoro-XXXXXX", seed)
-                );
-                assert (dir.has_prefix (prefix_dir));
+            queue.push ("a");
+            queue.push ("b");
+            queue.push ("c");
+            assert_cmpuint (queue.length (), GLib.CompareOperator.EQ, 3U);
 
-                var basename = dir.get_basename ();
-                assert (basename.substring (0, 15) == "gnome-pomodoro-");
+            var item = queue.pop ();
+            assert_cmpstr (item, GLib.CompareOperator.EQ, "a");
+            assert_cmpuint (queue.length (), GLib.CompareOperator.EQ, 2U);
+        }
 
-                int index = 15;
-                unichar character;
-                while (basename.get_next_char (ref index, out character)) {
-                    assert (character.validate () && character.isalnum ());
-                }
-            }
+        public void test_wait ()
+        {
+            var queue = new Pomodoro.AsyncQueue<string> ();
+            var completed = false;
+
+            // Fill queue, then wait for it to become empty
+            queue.push ("a");
+            queue.push ("b");
+
+            queue.wait.begin ((obj, res) => {
+                queue.wait.end (res);
+                completed = true;
+                this.quit_main_loop ();
+            });
+
+            // Drain the queue asynchronously to trigger completion
+            GLib.Timeout.add (10, () => {
+                assert_nonnull (queue.pop ());
+                assert_nonnull (queue.pop ());
+                return GLib.Source.REMOVE;
+            });
+
+            assert_true (this.run_main_loop (1000));
+            assert_true (completed);
         }
     }
 }
@@ -70,6 +105,6 @@ public static int main (string[] args)
     Tests.init (args);
 
     return Tests.run (
-        new Tests.UtilsTest ()
+        new Tests.AsyncQueueTest ()
     );
 }
