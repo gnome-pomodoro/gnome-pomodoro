@@ -12,6 +12,7 @@ namespace Pomodoro
         private const float  ASPECT_RATIO = 1.66f;
         private const float  BAR_HIT_ZONE_PADDING = 10.0f;
         private const double EPSILON = 0.00001;
+        private const double DEFAULT_VALUE = 0.0;
 
         public bool stacked {
             get {
@@ -193,7 +194,7 @@ namespace Pomodoro
             if (this.data.shape[0] != bucket_count ||
                 this.data.shape[1] != category_count)
             {
-                this.data.resize (bucket_count, category_count);
+                this.data.resize (bucket_count, category_count, DEFAULT_VALUE);
             }
         }
 
@@ -204,7 +205,7 @@ namespace Pomodoro
 
             for (var category_index = 0; category_index < category_count; category_index++)
             {
-                var category_value = this.data.@get ((int) bucket_index, category_index);
+                var category_value = this.get_value (bucket_index, category_index);
 
                 if (category_value.is_finite ()) {
                     total_abs_value += category_value.abs ();
@@ -336,16 +337,14 @@ namespace Pomodoro
                                  uint category_index)
         {
             return this.data != null
-                    ? this.data.@get ((int) bar_index, (int) category_index)
-                    : 0.0;
+                    ? this.data.@get ((int) bar_index, (int) category_index, DEFAULT_VALUE)
+                    : DEFAULT_VALUE;
         }
 
         public void set_value (uint   bar_index,
                                uint   category_index,
                                double value)
         {
-            assert (value.is_finite ());  // TODO: remove
-
             this.grow_data (bar_index + 1, category_index + 1);
 
             this.data.@set ((int) bar_index, (int) category_index, value);
@@ -408,7 +407,7 @@ namespace Pomodoro
             for (var category_index = category_count - 1; category_index >= 0; category_index--)
             {
                 var category = this.categories[category_index];
-                var category_value = this.data.@get ((int) bar_index, category_index);
+                var category_value = this.get_value (bar_index, category_index);
 
                 var category_label = new Gtk.Label (@"$(category.label):");
                 category_label.halign = Gtk.Align.START;
@@ -617,7 +616,7 @@ namespace Pomodoro
             {
                 for (var category_index = 0; category_index < category_count; category_index++)
                 {
-                    var category_value = this.data.@get ((int) bar_index, category_index);
+                    var category_value = this.get_value (bar_index, category_index);
 
                     if (category_value.is_finite ()) {
                         base_value += category_value;
@@ -627,7 +626,7 @@ namespace Pomodoro
 
             for (var category_index = category_count - 1; category_index >= 0; category_index--)
             {
-                var category_value = this.data.@get ((int) bar_index, category_index);
+                var category_value = this.get_value (bar_index, category_index);
                 var category_color = this.categories[category_index].color;
 
                 if (!category_value.is_finite ()) {

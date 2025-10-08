@@ -7,6 +7,7 @@ namespace Tests
             this.add_test ("get", this.test_get);
             this.add_test ("set", this.test_set);
             this.add_test ("resize", this.test_resize);
+            this.add_test ("resize__default_value", this.test_resize__default_value);
             this.add_test ("add", this.test_add);
             this.add_test ("min", this.test_min);
             this.add_test ("max", this.test_max);
@@ -73,6 +74,25 @@ namespace Tests
             matrix.resize (1, 2);
             // GLib.debug ("result = %s", matrix.to_representation ());
             assert_true (matrix.equals (expected_result));
+        }
+
+        public void test_resize__default_value ()
+        {
+            var matrix = new Pomodoro.Matrix.from_array ({
+                { 4.0, 1.0, 3.0 },
+                { 2.0, 7.0, 8.0 }
+            });
+            matrix.resize (3, 5, 5.5);
+
+            // Original values are preserved
+            assert_cmpfloat (matrix.@get (0, 0), GLib.CompareOperator.EQ, 4.0);
+            assert_cmpfloat (matrix.@get (1, 2), GLib.CompareOperator.EQ, 8.0);
+
+            // Newly created cells are initialized with default_value (5.5)
+            assert_cmpfloat (matrix.@get (0, 3), GLib.CompareOperator.EQ, 5.5);
+            assert_cmpfloat (matrix.@get (0, 4), GLib.CompareOperator.EQ, 5.5);
+            assert_cmpfloat (matrix.@get (2, 0), GLib.CompareOperator.EQ, 5.5);
+            assert_cmpfloat (matrix.@get (2, 4), GLib.CompareOperator.EQ, 5.5);
         }
 
         public void test_add ()
@@ -150,6 +170,7 @@ namespace Tests
             this.add_test ("get", this.test_get);
             this.add_test ("set", this.test_set);
             this.add_test ("resize", this.test_resize);
+            this.add_test ("resize__default_value", this.test_resize__default_value);
             this.add_test ("min", this.test_min);
             this.add_test ("max", this.test_max);
             this.add_test ("sum", this.test_sum);
@@ -239,6 +260,33 @@ namespace Tests
                            expected_result.shape[1],
                            expected_result.shape[2]);
             assert_true (matrix.equals (expected_result));
+        }
+
+        public void test_resize__default_value ()
+        {
+            var matrix = new Pomodoro.Matrix3D.from_array ({
+                {
+                    { 4.0, -1.0 },
+                    { 1.0, 0.0 },
+                    { 3.0, 9.0 }
+                },
+                {
+                    { 2.0, 3.0 },
+                    { 7.0, 1.0 },
+                    { 8.0, 0.0 }
+                }
+            });
+	        matrix.resize (3, 3, 4, 2.5);
+
+	        // Preserved original values
+	        assert_cmpfloat (matrix.@get (0, 0, 0), GLib.CompareOperator.EQ, 4.0);
+	        assert_cmpfloat (matrix.@get (1, 2, 0), GLib.CompareOperator.EQ, 8.0);
+
+	        // Newly created cells are initialized with default_value (2.5)
+	        assert_cmpfloat (matrix.@get (0, 0, 2), GLib.CompareOperator.EQ, 2.5);
+	        assert_cmpfloat (matrix.@get (0, 2, 3), GLib.CompareOperator.EQ, 2.5);
+	        assert_cmpfloat (matrix.@get (2, 0, 0), GLib.CompareOperator.EQ, 2.5);
+	        assert_cmpfloat (matrix.@get (2, 2, 3), GLib.CompareOperator.EQ, 2.5);
         }
 
         public void test_min ()

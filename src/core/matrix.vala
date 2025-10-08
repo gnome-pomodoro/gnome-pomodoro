@@ -225,12 +225,23 @@ namespace Pomodoro
             return index < (int) this.shape[axis];
         }
 
-        public void resize (uint shape_0,
-                            uint shape_1)
+        public void resize (uint   shape_0,
+                            uint   shape_1,
+                            double default_value = 0.0)
         {
             var intersect_0 = uint.min (shape_0, this.shape[0]);
             var intersect_1 = uint.min (shape_1, this.shape[1]);
             var data        = new double[shape_0, shape_1];
+
+            if (default_value != 0.0)
+            {
+                for (var i = 0; i < shape_0; i++)
+                {
+                    for (var j = 0; j < shape_1; j++) {
+                        data[i, j] = default_value;
+                    }
+                }
+            }
 
             for (var i = 0; i < intersect_0; i++)
             {
@@ -545,14 +556,28 @@ namespace Pomodoro
             return index < (int) this.shape[axis];
         }
 
-        public void resize (uint shape_0,
-                            uint shape_1,
-                            uint shape_2)
+        public void resize (uint   shape_0,
+                            uint   shape_1,
+                            uint   shape_2,
+                            double default_value = 0.0)
         {
             var intersect_0 = uint.min (shape_0, this.shape[0]);
             var intersect_1 = uint.min (shape_1, this.shape[1]);
             var intersect_2 = uint.min (shape_2, this.shape[2]);
             var data        = new double[shape_0, shape_1, shape_2];
+
+            if (default_value != 0.0)
+            {
+                for (var i = 0; i < shape_0; i++)
+                {
+                    for (var j = 0; j < shape_1; j++)
+                    {
+                        for (var k = 0; k < shape_2; k++) {
+                            data[i, j, k] = default_value;
+                        }
+                    }
+                }
+            }
 
             for (var i = 0; i < intersect_0; i++)
             {

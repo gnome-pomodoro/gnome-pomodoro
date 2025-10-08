@@ -424,15 +424,13 @@ namespace Pomodoro
             for (var category_index = 0; category_index < categories_count; category_index++)
             {
                 for (var bucket_index = bucket_start_index;
-                     bucket_index < bucket_end_index;  // XXX: is it correct?
+                     bucket_index < bucket_end_index;
                      bucket_index++)
                 {
                     var bar_index = (bucket_index - bucket_start_index) / buckets_per_bar;
+                    var bucket_value = this.histogram_data.@get (bucket_index, category_index, 0.0);
 
-                    this.histogram.add_value (
-                            bar_index,
-                            category_index,
-                            this.histogram_data.@get (bucket_index, category_index));
+                    this.histogram.add_value (bar_index, category_index, bucket_value);
                 }
             }
         }

@@ -26,12 +26,13 @@ namespace Pomodoro
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/bubble-chart.ui")]
     public class BubbleChart : Gtk.Widget
     {
-        private const int   MIN_BUBBLE_SIZE = 16;
-        private const int   MAX_BUBBLE_SIZE = 42;
-        private const float BUBBLE_SPACING = 0.2f;
-        private const float MIN_BUBBLE_RADIUS = 0.01f;
-        private const float MIN_BUBBLE_VALUE = 60.0f;
-        private const float BASE_RADIUS = 4.0f;
+        private const int    MIN_BUBBLE_SIZE = 16;
+        private const int    MAX_BUBBLE_SIZE = 42;
+        private const float  BUBBLE_SPACING = 0.2f;
+        private const float  MIN_BUBBLE_RADIUS = 0.01f;
+        private const float  MIN_BUBBLE_VALUE = 60.0f;
+        private const float  BASE_RADIUS = 4.0f;
+        private const double DEFAULT_VALUE = 0.0;
 
         /**
          * Value that should be visible on the chart.
@@ -300,7 +301,7 @@ namespace Pomodoro
                 this.data.shape[1] != column_count ||
                 this.data.shape[2] != category_count)
             {
-                this.data.resize (row_count, column_count, category_count);
+                this.data.resize (row_count, column_count, category_count, DEFAULT_VALUE);
                 this.queue_update ();
 
                 return true;
@@ -552,8 +553,6 @@ namespace Pomodoro
                     row + 1U,
                     this.data != null ? this.data.shape[0] : 0U));
 
-            assert (row < this.rows_labels.length);
-
             this.rows_labels[row] = label;
 
             this.queue_update ();
@@ -565,8 +564,6 @@ namespace Pomodoro
             this.ensure_columns (uint.max (
                     column + 1U,
                     this.data != null ? this.data.shape[1] : 0U));
-
-            assert (column < this.columns_labels.length);
 
             this.columns_labels[column] = label;
 
@@ -609,8 +606,8 @@ namespace Pomodoro
                                  uint category_index)
         {
             return this.data != null
-                    ? this.data.@get ((int) row, (int) column, (int) category_index)
-                    : 0.0;
+                    ? this.data.@get ((int) row, (int) column, (int) category_index, DEFAULT_VALUE)
+                    : DEFAULT_VALUE;
         }
 
         public void set_value (uint   row,
@@ -654,7 +651,7 @@ namespace Pomodoro
             for (var category_index = category_count - 1; category_index >= 0; category_index--)
             {
                 var category = this.categories[category_index];
-                var category_value = this.data.@get ((int) row, (int) column, (int) category_index);
+                var category_value = this.get_value (row, column, category_index);
 
                 var category_label = new Gtk.Label (@"$(category.label):");
                 category_label.halign = Gtk.Align.START;
@@ -686,10 +683,10 @@ namespace Pomodoro
         private void snapshot_bubble (Pomodoro.Gizmo gizmo,
                                       Gtk.Snapshot   snapshot)
         {
-            var row            = (int) gizmo.get_data<uint> ("row");
-            var column         = (int) gizmo.get_data<uint> ("column");
-            var category_index = (int) this.category;
-            var bubble_value   = this.data.@get (row, column, category_index, 0.0);
+            var row            = gizmo.get_data<uint> ("row");
+            var column         = gizmo.get_data<uint> ("column");
+            var category_index = (uint) this.category;
+            var bubble_value   = this.get_value (row, column, category_index);
             var bubble_radius  = this.calculate_bubble_radius (bubble_value);
 
             var bubble_origin  = Graphene.Point () {
@@ -893,7 +890,7 @@ namespace Pomodoro
                 return;
             }
 
-            var bubble_value = self.data.@get ((int) row, (int) column, (int) self.category);
+            var bubble_value = self.get_value (row, column, (uint) self.category);
 
             if (!bubble_value.is_nan () && bubble_value > 0.0) {
                 self.bubble_activated (row, column);
