@@ -745,6 +745,10 @@ namespace Pomodoro
                 return;  // showing placeholder
             }
 
+            if (!this.get_mapped ()) {
+                return;
+            }
+
             var page      = this.get_or_create_page (this.model.timeframe, this.model.date);
             var page_name = this.pages.get_page (page).name;
 
@@ -1168,6 +1172,8 @@ namespace Pomodoro
         {
             this.model.update_date_range ();
 
+            base.map ();
+
             if (this.model.min_date.valid ())
             {
                 this.update_placeholder ();
@@ -1179,8 +1185,6 @@ namespace Pomodoro
                     this.mark_user_active ();
                 }
             }
-
-            base.map ();
 
             this.schedule_navigate_to_today ();
         }
