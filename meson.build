@@ -109,8 +109,9 @@ package_name = meson.project_name()
 package_datadir = get_option('prefix') / get_option('datadir') / meson.project_name()
 package_string = package_name + ' ' + meson.project_version()
 package_version = meson.project_version()
-package_bugreport = 'https://github.com/gnome-pomodoro/gnome-pomodoro/issues'
-package_url = 'https://gnomepomodoro.org'
+package_website = 'https://gnomepomodoro.org'
+package_issue_url = 'https://github.com/gnome-pomodoro/gnome-pomodoro/issues'
+package_support_url = 'https://github.com/gnome-pomodoro/gnome-pomodoro/discussions'
 gettext_package = package_name
 extension_uuid = 'pomodoro@gnomepomodoro.org'
 package_localedir = get_option('prefix') / get_option('datadir') / 'locale'
@@ -170,12 +171,16 @@ conf.set_quoted(
   package_version,
 )
 conf.set_quoted(
-  'PACKAGE_URL',
-  package_url,
+  'PACKAGE_WEBSITE',
+  package_website,
 )
 conf.set_quoted(
-  'PACKAGE_BUGREPORT',
-  package_bugreport,
+  'PACKAGE_ISSUE_URL',
+  package_issue_url,
+)
+conf.set_quoted(
+  'PACKAGE_SUPPORT_URL',
+  package_support_url,
 )
 conf.set(
   'HAVE_ALTMON',

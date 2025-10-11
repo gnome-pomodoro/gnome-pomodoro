@@ -492,6 +492,18 @@ shortcut label.keycap {
 
 
 /*
+ * About dialog
+ */
+
+dialog.about .icon-dropshadow {
+   -gtk-icon-shadow: 0px 1px rgba(0, 0, 0, 0.02),
+                     0px -1px rgba(0, 0, 0, 0.02),
+                     1px 0px rgba(0, 0, 0, 0.02),
+                     -1px 0px rgba(0, 0, 0, 0.02);
+}
+
+
+/*
  * Common
  */
 

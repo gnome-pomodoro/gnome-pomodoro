@@ -6,8 +6,9 @@ namespace Config
     public const string PACKAGE_NAME;
     public const string PACKAGE_STRING;
     public const string PACKAGE_VERSION;
-    public const string PACKAGE_BUGREPORT;
-    public const string PACKAGE_URL;
+    public const string PACKAGE_WEBSITE;
+    public const string PACKAGE_ISSUE_URL;
+    public const string PACKAGE_SUPPORT_URL;
     public const string PACKAGE_DATA_DIR;
     public const string PACKAGE_LIB_DIR;
     public const string PACKAGE_LOCALE_DIR;

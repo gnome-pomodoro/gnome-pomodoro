@@ -28,17 +28,26 @@ namespace Pomodoro
         var about_dialog = new Adw.AboutDialog ();
         about_dialog.application_icon = Config.APPLICATION_ID;
         about_dialog.application_name = _("Pomodoro");
-        about_dialog.comments = _("A simple time management utility");
         about_dialog.version = Config.PACKAGE_VERSION;
-        about_dialog.website = Config.PACKAGE_URL;
-        about_dialog.issue_url = Config.PACKAGE_BUGREPORT;
+        about_dialog.website = Config.PACKAGE_WEBSITE;
+        about_dialog.issue_url = Config.PACKAGE_ISSUE_URL;
+        about_dialog.support_url = Config.PACKAGE_SUPPORT_URL;
+        about_dialog.developer_name = "Kamil Prusko";
         about_dialog.developers = {
-            "Arun Mahapatra <pratikarun@gmail.com>",
-            "Kamil Prusko <kamilprusko@gmail.com>"
+            "Kamil Prusko <kamilprusko@gmail.com>",
+            "Arun Mahapatra <pratikarun@gmail.com>"
         };
-        about_dialog.translator_credits = _("translator-credits");
         about_dialog.copyright = "\xc2\xa9 2011-2025 Arun Mahapatra, Kamil Prusko";
         about_dialog.license_type = Gtk.License.GPL_3_0;
+
+        var translator_credits = _("translator-credits");
+
+        if (translator_credits != "translator-credits") {
+            about_dialog.translator_credits = translator_credits;
+        }
+
+        // XXX: `add_link` doesn't work
+        // about_dialog.add_link (_("Donate"), Config.PACKAGE_URL);
 
         return about_dialog;
     }

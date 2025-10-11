@@ -368,7 +368,7 @@ namespace Pomodoro
                                              GLib.Variant?     parameter)
         {
             try {
-                string[] spawn_args = { "xdg-open", Config.PACKAGE_URL };
+                string[] spawn_args = { "xdg-open", Config.PACKAGE_WEBSITE };
                 string[] spawn_env = GLib.Environ.get ();
 
                 GLib.Process.spawn_async (null,
@@ -387,7 +387,7 @@ namespace Pomodoro
                                             GLib.Variant?     parameter)
         {
             try {
-                string[] spawn_args = { "xdg-open", Config.PACKAGE_BUGREPORT };
+                string[] spawn_args = { "xdg-open", Config.PACKAGE_ISSUE_URL };
                 string[] spawn_env = GLib.Environ.get ();
 
                 GLib.Process.spawn_async (null,
