@@ -300,7 +300,8 @@ namespace Pomodoro
                     this.mutex.unlock ();
 
                     // Schedule the callback in the main loop
-                    GLib.Idle.add ((owned) callback);
+                    var idle_id = GLib.Idle.add ((owned) callback);
+                    GLib.Source.set_name_by_id (idle_id, "Pomodoro.Promise.wait");
 
                     return true;
                 });
@@ -427,7 +428,8 @@ namespace Pomodoro
                     this.mutex.unlock ();
 
                     // Schedule the callback in the main loop
-                    GLib.Idle.add ((owned) callback);
+                    var idle_id = GLib.Idle.add ((owned) callback);
+                    GLib.Source.set_name_by_id (idle_id, "Pomodoro.AsyncQueue.wait");
 
                     return true;
                 });

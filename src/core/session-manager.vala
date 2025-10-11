@@ -469,6 +469,8 @@ namespace Pomodoro
                 },
                 GLib.Priority.HIGH_IDLE
             );
+            GLib.Source.set_name_by_id (this.reschedule_idle_id,
+                                        "Pomodoro.SessionManager.reschedule");
         }
 
         /**
@@ -1336,6 +1338,8 @@ namespace Pomodoro
                 //     },
                 //     GLib.Priority.HIGH
                 // );
+                // GLib.Source.set_name_by_id (this.session_changed_idle_id,
+                //                             "Pomodoro.Promise.thaw_current_session_changed");
             }
         }
 
@@ -1871,7 +1875,7 @@ namespace Pomodoro
         {
             weak Pomodoro.SessionManager session_manager = (Pomodoro.SessionManager) session_manager_ptr;
 
-            return GLib.Timeout.add_seconds (seconds,
+            var timeout_id = GLib.Timeout.add_seconds (seconds,
                 () => {
                     session_manager.expiry_timeout_id = 0;
                     session_manager.expire_current_session ();
@@ -1879,6 +1883,10 @@ namespace Pomodoro
                     return GLib.Source.REMOVE;
                 }
             );
+            GLib.Source.set_name_by_id (timeout_id,
+                                        "Pomodoro.SessionManager.expire_current_session");
+
+            return timeout_id;
         }
 
         private void on_current_session_notify_expiry_time ()

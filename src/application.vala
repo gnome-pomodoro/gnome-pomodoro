@@ -1019,6 +1019,7 @@ namespace Pomodoro
 
                 return GLib.Source.REMOVE;
             });
+            GLib.Source.set_name_by_id (timeout_source, "Pomodoro.Application.setup_plugins");
 
             this.extensions = new Peas.ExtensionSet (engine, typeof (Pomodoro.ApplicationExtension));
             this.extensions.extension_added.connect ((extension_set,

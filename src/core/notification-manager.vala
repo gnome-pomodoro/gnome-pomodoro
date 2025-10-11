@@ -289,7 +289,7 @@ namespace Pomodoro
                 }
             );
             GLib.Source.set_name_by_id (this.withdraw_timeout_id,
-                                        "Pomodoro.NotificationManager.schedule_withdraw_notifications");
+                                        "Pomodoro.NotificationManager.withdraw_notifications");
         }
 
         private GLib.Notification create_notification (string title,

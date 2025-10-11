@@ -2,7 +2,7 @@ namespace Pomodoro
 {
     public abstract class TimerProgress : Gtk.Widget
     {
-        protected const uint   MIN_TIMEOUT_INTERVAL = 50;
+        protected const uint   MIN_TIMEOUT_INTERVAL = 50;  // 20Hz
         protected const uint   FADE_IN_DURATION = 500;
         protected const uint   FADE_OUT_DURATION = 500;
         protected const float  DEFAULT_LINE_WIDTH = 6.0f;
@@ -452,13 +452,15 @@ namespace Pomodoro
                 this.stop_timeout ();
             }
 
-            if (this.timeout_id == 0 && this.timeout_interval > 0) {
+            if (this.timeout_id == 0 && this.timeout_interval > 0)
+            {
                 this.timeout_id = GLib.Timeout.add (this.timeout_interval, () => {
                     this.invalidate_value ();
 
                     return GLib.Source.CONTINUE;
                 });
-                GLib.Source.set_name_by_id (this.timeout_id, "Pomodoro.TimerProgressBar.on_timeout");
+                GLib.Source.set_name_by_id (this.timeout_id,
+                                            "Pomodoro.TimerProgressBar.invalidate_value");
             }
         }
 
@@ -598,7 +600,7 @@ namespace Pomodoro
         }
 
         protected override uint calculate_timeout_interval ()
-                                                       requires (this._timer != null)
+                                                            requires (this._timer != null)
         {
             var length = (int64) this.get_width ();
 

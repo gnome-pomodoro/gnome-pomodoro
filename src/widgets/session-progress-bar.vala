@@ -5,7 +5,7 @@ namespace Pomodoro
         private const uint  FADE_IN_DURATION = 500;
         private const uint  FADE_OUT_DURATION = 500;
         private const float DEFAULT_LINE_WIDTH = 6.0f;
-        private const uint  MIN_TIMEOUT_INTERVAL = 50;
+        private const uint  MIN_TIMEOUT_INTERVAL = 50;  // 20Hz
         private const int   MIN_WIDTH = 100;
         private const uint  VALUE_ANIMATION_DURATION = 300;
         private const uint  NORM_ANIMATION_DURATION = 700;
@@ -278,7 +278,8 @@ namespace Pomodoro
 
                         return GLib.Source.CONTINUE;
                     });
-                    GLib.Source.set_name_by_id (this.timeout_id, "Pomodoro.SessionProgressBar.Block.on_timeout");
+                    GLib.Source.set_name_by_id (this.timeout_id,
+                                                "Pomodoro.SessionProgressBar.Block.queue_draw");
                 }
             }
 

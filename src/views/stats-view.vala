@@ -1136,6 +1136,7 @@ namespace Pomodoro
 
                     return GLib.Source.REMOVE;
                 });
+            GLib.Source.set_name_by_id (this.timeout_id, "Pomodoro.StatsView.navigate_to_today");
         }
 
         private void update_placeholder ()

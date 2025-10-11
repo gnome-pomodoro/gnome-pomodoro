@@ -282,6 +282,7 @@ namespace Pomodoro
 
             if (this.idle_id == 0) {
                 this.idle_id = GLib.Idle.add (this.on_idle, GLib.Priority.DEFAULT);
+                GLib.Source.set_name_by_id (this.idle_id, "Pomodoro.EventProducer.trigger_queued_events");
             }
         }
 

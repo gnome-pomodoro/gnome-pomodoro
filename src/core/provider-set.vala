@@ -459,6 +459,8 @@ namespace Pomodoro
 
                     return GLib.Source.REMOVE;
                 });
+            GLib.Source.set_name_by_id (this.update_selection_idle_id,
+                                        "Pomodoro.ProviderSet.update_selection");
         }
 
         private unowned Pomodoro.ProviderInfo? lookup_info (Pomodoro.Provider instance)
