@@ -6,7 +6,6 @@
     "command" : "gnome-pomodoro",
     "tags" : [],
     "finish-args" : [
-        "--background",
         "--share=ipc",
         "--socket=x11",
         "--socket=fallback-x11",
