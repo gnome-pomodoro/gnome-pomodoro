@@ -32,6 +32,11 @@ namespace Pomodoro
          */
         private float INNER_RELATIVE_WIDTH = 0.70f;
 
+        /**
+         * Relative height limit of the progress ring.
+         */
+        private float MAX_PROGRESSRING_RELATIVE_HEIGHT = 0.618f;
+
         [GtkChild]
         private unowned Gtk.MenuButton state_menubutton;
         [GtkChild]
@@ -476,14 +481,15 @@ namespace Pomodoro
                                             int height,
                                             int baseline)
         {
-            var is_ltr = this.get_direction () != Gtk.TextDirection.RTL;
-
             // Determine width of the outer bounds.
             var allocation = Gtk.Allocation () {
                 width = this.calculate_padding_inv (width).clamp (MIN_WIDTH, MAX_WIDTH),
                 height = height - BOTTOM_PADDING
             };
-            var tmp_minimum_height = 0;
+            allocation.width = int.min (
+                    allocation.width,
+                    (int) Math.floorf (MAX_PROGRESSRING_RELATIVE_HEIGHT * (float) height));
+
             var tmp_natural_height = 0;
             var tmp_minimum_width = 0;
             var tmp_natural_width = 0;
