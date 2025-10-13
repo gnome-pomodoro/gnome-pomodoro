@@ -187,36 +187,38 @@ namespace Pomodoro
                                      double          offset_y)
         {
             double start_x, start_y;
-            double window_x, window_y;
             double native_x, native_y;
 
-            if (Gtk.drag_check_threshold (this, 0, 0, (int) offset_x, (int) offset_y))
+            if (!Gtk.drag_check_threshold (this, 0, 0, (int) offset_x, (int) offset_y)) {
+                return;
+            }
+
+            gesture.set_state (Gtk.EventSequenceState.CLAIMED);
+            gesture.get_start_point (out start_x, out start_y);
+
+            var widget_point = Graphene.Point ();
+            widget_point.init ((float) start_x, (float) start_x);
+
+            var native_point = Graphene.Point ();
+
+            var native = this.get_native ();
+            var toplevel = native.get_surface () as Gdk.Toplevel;
+
+            if (toplevel != null &&
+                gesture.widget.compute_point (native, widget_point, out native_point))
             {
-                gesture.set_state (Gtk.EventSequenceState.CLAIMED);
-                gesture.get_start_point (out start_x, out start_y);
-
-                var native = this.get_native ();
-                gesture.widget.translate_coordinates (
-                    native,
-                    start_x, start_y,
-                    out window_x, out window_y);
-
                 native.get_surface_transform (out native_x, out native_y);
-                window_x += native_x;
-                window_y += native_y;
 
-                var toplevel = native.get_surface () as Gdk.Toplevel;
-                if (toplevel != null) {
-                    toplevel.begin_move (
+                toplevel.begin_move (
                         gesture.get_device (),
                         (int) gesture.get_current_button (),
-                        window_x, window_y,
+                        native_x + (double) native_point.x,
+                        native_y + (double) native_point.y,
                         gesture.get_current_event_time ());
-                }
-
-                this.drag_gesture.reset ();
-                this.click_gesture.reset ();
             }
+
+            this.drag_gesture.reset ();
+            this.click_gesture.reset ();
         }
 
         /**
