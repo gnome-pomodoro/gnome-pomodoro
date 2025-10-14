@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016,2024 gnome-pomodoro contributors
+ * Copyright (c) 2016,2025 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,14 +29,13 @@ namespace Pomodoro
     {
         public Pomodoro.ActionListModel model { get; construct; }
 
-        private Pomodoro.Logger?   logger = null;
+        private Pomodoro.Logger? logger = null;
 
         construct
         {
             this.model = new Pomodoro.ActionListModel ();
             this.model.action_added.connect (this.on_action_added);
             this.model.action_removed.connect (this.on_action_removed);
-            this.model.action_replaced.connect (this.on_action_replaced);
 
             this.logger = new Pomodoro.Logger ();
 
@@ -45,6 +44,10 @@ namespace Pomodoro
 
         private void foreach_action (GLib.Func<Pomodoro.Action> func)
         {
+            if (this.model == null) {
+                return;
+            }
+
             var model = this.model;
             var n_items = model.n_items;
 
@@ -217,32 +220,22 @@ namespace Pomodoro
                             .withdraw_notification (@"action:$(action.uuid)");
         }
 
-        private void on_action_replaced (Pomodoro.Action action,
-                                         Pomodoro.Action previous_action)
-        {
-            this.unbind_action (previous_action);
-            this.bind_action (action);
-
-            GLib.Application.get_default ()?
-                            .withdraw_notification (@"action:$(previous_action.uuid)");
-        }
-
         public void destroy ()
         {
-            // TODO
+            this.unbind_actions ();
+
+            if (this.model != null)
+            {
+                this.model.action_added.disconnect (this.on_action_added);
+                this.model.action_removed.disconnect (this.on_action_removed);
+            }
         }
 
         public override void dispose ()
         {
-            if (this.model != null)
-            {
-                this.unbind_actions ();
+            this.destroy ();
 
-                this.model.action_added.disconnect (this.on_action_added);
-                this.model.action_removed.disconnect (this.on_action_removed);
-                this.model.action_replaced.disconnect (this.on_action_replaced);
-            }
-
+            // this.model = null;
             this.logger = null;
 
             base.dispose ();

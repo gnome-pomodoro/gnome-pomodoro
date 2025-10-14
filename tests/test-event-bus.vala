@@ -17,6 +17,8 @@ namespace Tests
             this.add_test ("remove_event_watch", this.test_remove_event_watch);
 
             this.add_test ("add_condition_watch", this.test_add_condition_watch);
+
+            this.add_test ("destroy", this.test_destroy);
         }
 
         public override void setup ()
@@ -225,6 +227,53 @@ namespace Tests
             });
             assert_true (paused_called);
             assert_true (resumed_called);
+        }
+
+        /**
+         * Test that destroy calls leave on active watches.
+         */
+        public void test_destroy ()
+        {
+            var start_timestamp = Pomodoro.Timestamp.peek ();
+            var destroy_timestamp = start_timestamp + Pomodoro.Interval.MINUTE;
+            var signals = new string[0];
+
+            this.bus.add_condition_watch (
+                    new Pomodoro.Comparison.is_true (new Pomodoro.Variable ("is-started")),
+                    (context) => {
+                        signals += "enter-condition";
+
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (context.timestamp),
+                            new GLib.Variant.int64 (start_timestamp)
+                        );
+                    },
+                    (context) => {
+                        signals += "leave-condition";
+
+                        assert_cmpvariant (
+                            new GLib.Variant.int64 (context.timestamp),
+                            new GLib.Variant.int64 (destroy_timestamp)
+                        );
+                    });
+
+            // Activate the condition so the watch becomes active.
+            Pomodoro.Timestamp.freeze_to (start_timestamp);
+            this.timer.start ();
+
+            // Destroy should call leave on active watches with current context.
+            Pomodoro.Timestamp.freeze_to (destroy_timestamp);
+            this.bus.destroy ();
+
+            // Ensure no duplicate leave after a subsequent reset.
+            var after_destroy_timestamp = destroy_timestamp + Pomodoro.Interval.SECOND;
+            Pomodoro.Timestamp.freeze_to (after_destroy_timestamp);
+            this.timer.reset ();
+
+            assert_cmpstrv (signals, {
+                "enter-condition",
+                "leave-condition"
+            });
         }
     }
 }
