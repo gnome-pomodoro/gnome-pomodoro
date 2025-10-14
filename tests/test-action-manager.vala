@@ -156,42 +156,202 @@ namespace Tests
 
     public class ActionListModelTest : Tests.TestSuite
     {
+        private GLib.Settings? settings;
+
         public ActionListModelTest ()
         {
-            // this.add_test ("save_action", this.test_save_action);
-            this.add_test ("update_action", this.test_update_action);
+            this.add_test ("save_action__create", this.test_save_action__create);
+            this.add_test ("save_action__update", this.test_save_action__update);
+            this.add_test ("delete_action", this.test_delete_action);
+            this.add_test ("move_action", this.test_move_action);
         }
 
         public override void setup ()
         {
+            this.settings = new GLib.Settings ("org.gnomepomodoro.Pomodoro.actions");
+            this.settings.set_strv ("actions", {});
         }
 
         public override void teardown ()
         {
+            this.settings = null;
         }
 
-        public void test_update_action ()
+        public void test_save_action__create ()
         {
-            var session_manager = Pomodoro.SessionManager.get_default ();
+            var model = new Pomodoro.ActionListModel ();
+
+            assert_true (model.get_item_type () == typeof (Pomodoro.Action));
+            assert_cmpuint (model.get_n_items (), GLib.CompareOperator.EQ, 0U);
+            assert_cmpuint (model.n_items, GLib.CompareOperator.EQ, 0U);
+            assert_null (model.get_item (0));
+
+            var observed_position = 999U;
+            var observed_removed = 999U;
+            var observed_added = 999U;
+            var signals_count = 0U;
+            model.items_changed.connect ((position, removed, added) => {
+                observed_position = position;
+                observed_removed = removed;
+                observed_added = added;
+                signals_count++;
+            });
+
+            var action = new Pomodoro.EventAction (null);
+            action.display_name = "Action";
+            action.command = new Pomodoro.Command ("echo Action");
+            action.event_names = {"start"};
+
+            model.save_action (action);
+
+            assert_cmpuint (signals_count, GLib.CompareOperator.EQ, 1U);
+            assert_cmpuint (observed_position, GLib.CompareOperator.EQ, 0U);
+            assert_cmpuint (observed_removed, GLib.CompareOperator.EQ, 0U);
+            assert_cmpuint (observed_added, GLib.CompareOperator.EQ, 1U);
+
+            assert_cmpuint (model.get_n_items (), GLib.CompareOperator.EQ, 1U);
+            assert_nonnull (model.get_item (0));
+            assert_null (model.get_item (1));
+
+            // index and lookup must be consistent
+            var uuid = action.uuid;
+            assert_true (uuid != null && uuid != "");
+            assert_cmpint (model.index (uuid), GLib.CompareOperator.EQ, 0);
+            assert (model.lookup (uuid) == action);
+
+            // After first get_item, subsequent calls should return same instance
+            var item_0 = (Pomodoro.Action) model.get_item (0);
+            var item_0_again = (Pomodoro.Action) model.get_item (0);
+            assert (item_0 == item_0_again);
+        }
+
+        public void test_save_action__update ()
+        {
+            var model = new Pomodoro.ActionListModel ();
 
             var action_1 = new Pomodoro.EventAction ("00000000-0000-0000-0000-000000000000");
-            action_1.display_name = "Sample Action";
-            action_1.command = new Pomodoro.Command ("echo Started");
+            action_1.display_name = "Action 1";
+            action_1.command = new Pomodoro.Command ("echo 1");
             action_1.event_names = {"start"};
 
+            model.save_action (action_1);
+
+            var observed_position = 999U;
+            var observed_removed = 999U;
+            var observed_added = 999U;
+            var signals_count = 0U;
+            model.items_changed.connect ((position, removed, added) => {
+                observed_position = position;
+                observed_removed = removed;
+                observed_added = added;
+                signals_count++;
+            });
+
             var action_2 = new Pomodoro.EventAction (action_1.uuid);
-            action_2.display_name = "Changed Action";
-            action_2.command = new Pomodoro.Command ("echo Resumed");
+            action_2.display_name = "Action 2";
+            action_2.command = new Pomodoro.Command ("echo 2");
             action_2.event_names = {"resume"};
 
-            var manager = new Pomodoro.ActionManager ();
-            manager.model.save_action (action_1);
-            manager.model.save_action (action_2);
+            model.save_action (action_2);
 
-            var action = (Pomodoro.EventAction?) manager.model.lookup (action_1.uuid);
+            // Updating should not change length, but should notify 1 removed, 1 added at same position
+            assert_cmpuint (signals_count, GLib.CompareOperator.EQ, 1U);
+            assert_cmpuint (observed_position, GLib.CompareOperator.EQ, 0U);
+            assert_cmpuint (observed_removed, GLib.CompareOperator.EQ, 1U);
+            assert_cmpuint (observed_added, GLib.CompareOperator.EQ, 1U);
+            assert_cmpuint (model.get_n_items (), GLib.CompareOperator.EQ, 1U);
+
+            var action = (Pomodoro.EventAction?) model.lookup (action_1.uuid);
             assert_cmpstr (action.display_name, GLib.CompareOperator.EQ, action_2.display_name);
             assert_cmpstr (action.command.line, GLib.CompareOperator.EQ, action_2.command.line);
             assert_cmpstrv (action.event_names, action_2.event_names);
+        }
+
+        public void test_delete_action ()
+        {
+            var model = new Pomodoro.ActionListModel ();
+
+            var action = new Pomodoro.EventAction (null);
+            action.display_name = "Action";
+            action.command = new Pomodoro.Command ("echo Action");
+            action.event_names = {"start"};
+            model.save_action (action);
+
+            var observed_position = 999U;
+            var observed_removed = 999U;
+            var observed_added = 999U;
+            var signals_count = 0U;
+            model.items_changed.connect ((position, removed, added) => {
+                observed_position = position;
+                observed_removed = removed;
+                observed_added = added;
+                signals_count++;
+            });
+
+            model.delete_action (action.uuid);
+
+            assert_cmpuint (signals_count, GLib.CompareOperator.EQ, 1U);
+            assert_cmpuint (observed_position, GLib.CompareOperator.GE, 0U);
+            assert_cmpuint (observed_removed, GLib.CompareOperator.EQ, 1U);
+            assert_cmpuint (observed_added, GLib.CompareOperator.EQ, 0U);
+            assert_cmpuint (model.get_n_items (), GLib.CompareOperator.EQ, 0U);
+            assert_null (model.lookup (action.uuid));
+        }
+
+        public void test_move_action ()
+        {
+            var model = new Pomodoro.ActionListModel ();
+
+            var action_1 = new Pomodoro.EventAction (null);
+            action_1.display_name = "Action 1";
+            action_1.command = new Pomodoro.Command ("echo 1");
+            action_1.event_names = {"start"};
+            model.save_action (action_1);
+
+            var action_2 = new Pomodoro.EventAction (null);
+            action_2.display_name = "Action 2";
+            action_2.command = new Pomodoro.Command ("echo 2");
+            action_2.event_names = {"start"};
+            model.save_action (action_2);
+
+            var action_3 = new Pomodoro.EventAction (null);
+            action_3.display_name = "Action 3";
+            action_3.command = new Pomodoro.Command ("echo 3");
+            action_3.event_names = {"start"};
+            model.save_action (action_3);
+
+            assert_cmpuint (model.get_n_items (), GLib.CompareOperator.EQ, 3U);
+            assert_cmpint (model.index (action_1.uuid), GLib.CompareOperator.EQ, 0);
+            assert_cmpint (model.index (action_2.uuid), GLib.CompareOperator.EQ, 1);
+            assert_cmpint (model.index (action_3.uuid), GLib.CompareOperator.EQ, 2);
+
+            var observed_position = 999U;
+            var observed_removed = 999U;
+            var observed_added = 999U;
+            var signals_count = 0U;
+            model.items_changed.connect ((position, removed, added) => {
+                observed_position = position;
+                observed_removed = removed;
+                observed_added = added;
+                signals_count++;
+            });
+
+            // Move first to last
+            model.move_action (action_1.uuid, 2U);
+
+            assert_cmpuint (signals_count, GLib.CompareOperator.EQ, 1U);
+            assert_cmpuint (observed_position, GLib.CompareOperator.EQ, 0U);
+            assert_cmpuint (observed_removed, GLib.CompareOperator.EQ, 2U);
+            assert_cmpuint (observed_added, GLib.CompareOperator.EQ, 2U);
+
+            assert_cmpint (model.index (action_2.uuid), GLib.CompareOperator.EQ, 0);
+            assert_cmpint (model.index (action_3.uuid), GLib.CompareOperator.EQ, 1);
+            assert_cmpint (model.index (action_1.uuid), GLib.CompareOperator.EQ, 2);
+
+            // Verify get_item ordering
+            assert ((Pomodoro.Action) model.get_item (0) == model.lookup (action_2.uuid));
+            assert ((Pomodoro.Action) model.get_item (1) == model.lookup (action_3.uuid));
+            assert ((Pomodoro.Action) model.get_item (2) == model.lookup (action_1.uuid));
         }
     }
 

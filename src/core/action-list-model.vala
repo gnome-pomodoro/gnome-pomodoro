@@ -252,7 +252,8 @@ namespace Pomodoro
                 this.items_changed (position, 0U, 1U);
             }
             else {
-                this.action_replaced (action, previous_action);
+                this.action_removed (previous_action);
+                this.action_added (action);
 
                 this.items_changed (position, 1U, 1U);
             }
@@ -338,9 +339,6 @@ namespace Pomodoro
         public signal void action_added (Pomodoro.Action action);
 
         public signal void action_removed (Pomodoro.Action action);
-
-        public signal void action_replaced (Pomodoro.Action action,
-                                            Pomodoro.Action previous_action);
 
         public override void dispose ()
         {
