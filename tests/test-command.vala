@@ -141,27 +141,20 @@ namespace Tests
                                                          Pomodoro.Context context)
                                                          throws Pomodoro.CommandError
         {
-            Pomodoro.CommandError?     error = null;
             Pomodoro.CommandExecution? execution = null;
 
             command.execute_async.begin (
                 context,
                 (obj, res) => {
-                    this.quit_main_loop ();
+                    execution = command.execute_async.end (res);
 
-                    try {
-                        execution = command.execute_async.end (res);
-                    }
-                    catch (Pomodoro.CommandError _error) {
-                        GLib.warning ("Execute error: %s", error.message);
-                        error = _error;
-                    }
+                    this.quit_main_loop ();
                 });
 
             assert_true (this.run_main_loop ());
 
-            if (error != null) {
-                throw error;
+            if (execution != null && execution.error != null) {
+                throw execution.error;
             }
 
             return (owned) execution;

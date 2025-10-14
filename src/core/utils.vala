@@ -123,7 +123,9 @@ namespace Pomodoro
 
     internal bool is_test ()
     {
-        return GLib.Environment.get_variable ("G_TEST_ROOT_PROCESS") != null;
+        return GLib.Environment.get_variable ("G_TEST_ROOT_PROCESS") != null ||
+               GLib.Environment.get_variable ("G_TEST_BUILDDIR") != null ||
+               GLib.Environment.get_variable ("MESON_TEST_ITERATION") != null;
     }
 
 

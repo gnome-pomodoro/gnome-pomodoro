@@ -3487,7 +3487,7 @@ namespace Tests
                 var results = repository.find_sync (typeof (Pomodoro.GapEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1);
 
-                var remaining_gap_entry = (Pomodoro.TimeBlockEntry?) repository.find_one_sync (
+                var remaining_gap_entry = (Pomodoro.GapEntry?) repository.find_one_sync (
                         typeof (Pomodoro.GapEntry), null);
                 assert_cmpvariant (
                     new GLib.Variant.int64 (remaining_gap_entry.id),
