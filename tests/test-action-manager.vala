@@ -358,55 +358,220 @@ namespace Tests
 
     public class ActionManagerTest : Tests.TestSuite
     {
+        private class DummyEventAction : Pomodoro.EventAction
+        {
+            public uint bind_count { get; private set; default = 0U; }
+            public uint unbind_count { get; private set; default = 0U; }
+
+            public DummyEventAction (string? uuid = null)
+            {
+                base (uuid);
+            }
+
+            public override void bind ()
+            {
+                this.bind_count++;
+                base.bind ();
+            }
+
+            public override void unbind ()
+            {
+                this.unbind_count++;
+                base.unbind ();
+            }
+        }
+
+        private class DummyConditionAction : Pomodoro.ConditionAction
+        {
+            public uint bind_count { get; private set; default = 0U; }
+            public uint unbind_count { get; private set; default = 0U; }
+
+            public DummyConditionAction (string? uuid = null)
+            {
+                base (uuid);
+            }
+
+            public override void bind ()
+            {
+                this.bind_count++;
+                base.bind ();
+            }
+
+            public override void unbind ()
+            {
+                this.unbind_count++;
+                base.unbind ();
+            }
+        }
+
+        private GLib.Settings? settings;
+
         public ActionManagerTest ()
         {
-            // TODO
-            // this.add_test ("action_added", this.test_action_added);
-            // this.add_test ("action_removed", this.test_action_removed);
-            // this.add_test ("action_replaced", this.test_action_replaced);
-            // this.add_test ("action_disabled", this.test_action_disabled);
-
-            // this.add_test ("event_action", this.test_event_action);
-            // this.add_test ("condition_action", this.test_condition_action);
+            this.add_test ("save_event_action", this.test_save_event_action);
+            this.add_test ("delete_event_action", this.test_delete_event_action);
+            this.add_test ("save_condition_action", this.test_save_condition_action);
+            this.add_test ("delete_condition_action", this.test_delete_condition_action);
+            this.add_test ("destroy", this.test_destroy);
         }
 
         public override void setup ()
         {
+            this.settings = new GLib.Settings ("org.gnomepomodoro.Pomodoro.actions");
+            this.settings.set_strv ("actions", {});
         }
 
         public override void teardown ()
         {
+            this.settings = null;
         }
 
-        public void test_event_action ()
+        public void test_save_event_action ()
         {
-            var session_manager = Pomodoro.SessionManager.get_default ();
-            var timer           = session_manager.timer;
-
-            var action = new Pomodoro.EventAction ();
-            action.display_name = "Sample Action";
-            action.command = new Pomodoro.Command ("echo -en '\\007'");
-            // action.add_event ();
-
-            // action.command.execute
-
-            // try {
-            //     action.command.validate ();
-            // }
-            // catch (Pomodoro.ExecutionError error) {
-            // }
-
-
             var manager = new Pomodoro.ActionManager ();
+
+            var action = new DummyEventAction (null);
+            action.display_name = "Action";
+            action.command = new Pomodoro.Command ("echo Action");
+            action.event_names = {"start"};
+
             manager.model.save_action (action);
 
+            // Manager should bind newly added enabled action
+            assert_cmpuint (action.bind_count, GLib.CompareOperator.EQ, 1U);
 
-            timer.start ();
-            //
+            // Toggling enabled should sync to settings and call unbind/bind
+            assert_true (action.settings.get_boolean ("enabled"));
 
-            timer.pause ();
+            action.enabled = false;
+            assert_false (action.settings.get_boolean ("enabled"));
+            assert_cmpuint (action.unbind_count, GLib.CompareOperator.EQ, 1U);
 
+            action.enabled = true;
+            assert_true (action.settings.get_boolean ("enabled"));
+            assert_cmpuint (action.bind_count, GLib.CompareOperator.EQ, 2U);
+        }
 
+        public void test_delete_event_action ()
+        {
+            var manager = new Pomodoro.ActionManager ();
+
+            var action = new DummyEventAction (null);
+            action.display_name = "Action";
+            action.command = new Pomodoro.Command ("echo Action");
+            action.event_names = {"start"};
+
+            manager.model.save_action (action);
+
+            // Flip to false once to verify sync while connected
+            action.enabled = false;
+            assert_false (action.settings.get_boolean ("enabled"));
+
+            // Delete should unbind and disconnect property handler
+            manager.model.delete_action (action.uuid);
+            assert_cmpuint (action.unbind_count, GLib.CompareOperator.GE, 1U);
+
+            // After removal, toggling enabled should not sync to settings anymore
+            var enabled_before = action.settings.get_boolean ("enabled");
+            action.enabled = !enabled_before;
+            assert_cmpint ((int) action.settings.get_boolean ("enabled"),
+                           GLib.CompareOperator.EQ,
+                           (int) enabled_before);
+        }
+
+        public void test_save_condition_action ()
+        {
+            var manager = new Pomodoro.ActionManager ();
+
+            var action = new DummyConditionAction (null);
+            action.display_name = "Condition";
+            action.condition = new Pomodoro.Variable ("is-running");
+            action.enter_command = new Pomodoro.Command ("echo Enter");
+            action.exit_command = new Pomodoro.Command ("echo Exit");
+
+            manager.model.save_action (action);
+
+            // With condition set and enabled, manager should bind the action
+            assert_cmpuint (action.bind_count, GLib.CompareOperator.EQ, 1U);
+
+            // Toggling enabled should sync and unbind/bind
+            assert_true (action.settings.get_boolean ("enabled"));
+
+            action.enabled = false;
+            assert_false (action.settings.get_boolean ("enabled"));
+            assert_cmpuint (action.unbind_count, GLib.CompareOperator.EQ, 1U);
+
+            action.enabled = true;
+            assert_true (action.settings.get_boolean ("enabled"));
+            assert_cmpuint (action.bind_count, GLib.CompareOperator.EQ, 2U);
+        }
+
+        public void test_delete_condition_action ()
+        {
+            var manager = new Pomodoro.ActionManager ();
+
+            var action = new DummyConditionAction (null);
+            action.display_name = "Condition";
+            action.condition = new Pomodoro.Variable ("is-running");
+            action.enter_command = new Pomodoro.Command ("echo Enter");
+            action.exit_command = new Pomodoro.Command ("echo Exit");
+
+            manager.model.save_action (action);
+
+            action.enabled = false;
+            assert_false (action.settings.get_boolean ("enabled"));
+
+            manager.model.delete_action (action.uuid);
+            assert_cmpuint (action.unbind_count, GLib.CompareOperator.GE, 1U);
+
+            var enabled_before = action.settings.get_boolean ("enabled");
+            action.enabled = !enabled_before;
+            assert_cmpint ((int) action.settings.get_boolean ("enabled"),
+                           GLib.CompareOperator.EQ,
+                           (int) enabled_before);
+        }
+
+        public void test_destroy ()
+        {
+            var manager = new Pomodoro.ActionManager ();
+
+            var e = new DummyEventAction (null);
+            e.display_name = "E";
+            e.command = new Pomodoro.Command ("echo E");
+            e.event_names = {"start"};
+
+            var c = new DummyConditionAction (null);
+            c.display_name = "C";
+            c.condition = new Pomodoro.Variable ("is-running");
+            c.enter_command = new Pomodoro.Command ("echo Enter");
+            c.exit_command = new Pomodoro.Command ("echo Exit");
+
+            manager.model.save_action (e);
+            manager.model.save_action (c);
+
+            // Sanity: initially bound
+            assert_cmpuint (e.bind_count, GLib.CompareOperator.EQ, 1U);
+            assert_cmpuint (c.bind_count, GLib.CompareOperator.EQ, 1U);
+
+            manager.destroy ();
+
+            // Destroy should unbind actions
+            assert_cmpuint (e.unbind_count, GLib.CompareOperator.GE, 1U);
+            assert_cmpuint (c.unbind_count, GLib.CompareOperator.GE, 1U);
+
+            // Toggling enabled should NOT sync to settings after destroy (handlers disconnected)
+            var e_settings_enabled = e.settings.get_boolean ("enabled");
+            var c_settings_enabled = c.settings.get_boolean ("enabled");
+
+            e.enabled = !e_settings_enabled;
+            c.enabled = !c_settings_enabled;
+
+            assert_cmpint ((int) e.settings.get_boolean ("enabled"),
+                           GLib.CompareOperator.EQ,
+                           (int) e_settings_enabled);
+            assert_cmpint ((int) c.settings.get_boolean ("enabled"),
+                           GLib.CompareOperator.EQ,
+                           (int) c_settings_enabled);
         }
     }
 }
