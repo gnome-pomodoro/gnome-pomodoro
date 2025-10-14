@@ -126,6 +126,7 @@ namespace Pomodoro
         private GLib.Queue<unowned Pomodoro.EventSpec>     queue = null;
         private uint                                       idle_id = 0;
         private int64                                      event_source_timestamp = Pomodoro.Timestamp.UNDEFINED;
+        private bool                                       destroying = false;
 
         private Pomodoro.Trigger[]                         timer_state_change_triggers;
         private Pomodoro.Trigger[]                         session_manager_confirm_advancement_triggers;
@@ -248,6 +249,10 @@ namespace Pomodoro
         private void trigger_event (Pomodoro.EventSpec event_spec,
                                     int64              timestamp)
         {
+            if (this.destroying) {
+                return;
+            }
+
             var context = new Pomodoro.Context.build (timestamp);
 
             this.trigger_queued_events (context);
@@ -275,6 +280,10 @@ namespace Pomodoro
 
         private void queue_event (Pomodoro.EventSpec event_spec)
         {
+            if (this.destroying) {
+                return;
+            }
+
             // TODO: preserve event current timestamp, for the context
             this.queue.push_tail (event_spec);
 
@@ -389,6 +398,12 @@ namespace Pomodoro
                     this.queue_event (trigger.event_spec);
                 }
             }
+        }
+
+        public void destroy ()
+        {
+            this.destroying = true;
+            this.trigger_queued_events (new Pomodoro.Context.build ());
         }
 
         [Signal (run = "first")]

@@ -24,14 +24,9 @@ namespace Pomodoro
             this.queue = new GLib.AsyncQueue<Pomodoro.Job> ();
         }
 
-        private void pop (bool may_block)
+        private void run_job (Pomodoro.Job job)
+                              requires (!this.running)
         {
-            var job = may_block ? this.queue.pop () : this.queue.try_pop ();
-
-            if (job == null) {
-                return;
-            }
-
             this.running = true;
 
             job.run.begin (
@@ -43,12 +38,26 @@ namespace Pomodoro
                         assert (job.error != null);
                     }
 
-                    assert (job.completed);
+                    if (!job.completed) {
+                        GLib.warning ("Job %s did not complete", job.get_type ().name ());
+                    }
 
                     this.running = false;
-
                     this.pop (false);
+
+                    if (!this.running && this.queue.length () == 0) {
+                        this.drained ();
+                    }
                 });
+        }
+
+        private void pop (bool may_block)
+        {
+            var job = may_block ? this.queue.pop () : this.queue.try_pop ();
+
+            if (job != null) {
+                this.run_job (job);
+            }
         }
 
         public void push (Pomodoro.Job job)
@@ -61,11 +70,34 @@ namespace Pomodoro
         }
 
         /**
-         * Wait for the worker thread to finish.
+         * Wait until all jobs are completed.
          */
-        public void wait ()
+        public async void wait ()
         {
-            // TODO: either do work in a thread, or make wait async
+            ulong drained_id = 0;
+
+            if (!this.running && this.queue.length () == 0) {
+                return;
+            }
+
+            drained_id = this.drained.connect (() => {
+                this.disconnect (drained_id);
+                wait.callback ();
+            });
+
+            yield;
+        }
+
+        /*
+         * Emitted when the queue is empty and all jobs have completed.
+         */
+        public signal void drained ();
+
+        public override void dispose ()
+        {
+            this.queue = null;
+
+            base.dispose ();
         }
     }
 }

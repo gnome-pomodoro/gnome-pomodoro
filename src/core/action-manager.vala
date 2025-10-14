@@ -227,6 +227,11 @@ namespace Pomodoro
                             .withdraw_notification (@"action:$(previous_action.uuid)");
         }
 
+        public void destroy ()
+        {
+            // TODO
+        }
+
         public override void dispose ()
         {
             if (this.model != null)

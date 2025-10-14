@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 gnome-pomodoro contributors
+ * Copyright (c) 2013-2025 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -141,6 +141,7 @@ namespace Pomodoro
         private Pomodoro.StatsManager?       stats_manager;
         private Pomodoro.EventProducer?      event_producer;
         private Pomodoro.EventBus?           event_bus;
+        private Pomodoro.JobQueue?           job_queue;
         private Pomodoro.ActionManager?      action_manager;
         private Pomodoro.BackgroundManager?  background_manager;
         private Pomodoro.ApplicationService? service;
@@ -150,6 +151,7 @@ namespace Pomodoro
         private int                          background_holds_count = 0;
         private bool                         has_background_hold = false;
         private bool                         _can_background = false;
+        private uint                         save_idle_id = 0;
 
         public Application ()
         {
@@ -615,6 +617,7 @@ namespace Pomodoro
             this.stats_manager      = new Pomodoro.StatsManager ();
             this.event_producer     = new Pomodoro.EventProducer ();
             this.event_bus          = this.event_producer.bus;
+            this.job_queue          = new Pomodoro.JobQueue ();
             this.action_manager     = new Pomodoro.ActionManager ();
             this.logger             = new Pomodoro.Logger ();
             this.background_manager = new Pomodoro.BackgroundManager ();
@@ -623,12 +626,10 @@ namespace Pomodoro
             this.setup_database ();
             this.setup_capabilities ();
             this.setup_actions ();
+            this.update_color_scheme ();
 
             this.settings.changed.connect (this.on_settings_changed);
-            this.session_manager.advanced.connect (this.on_advanced);
             this.event_bus.event.connect (this.on_event);
-
-            this.update_color_scheme ();
 
             this.mark_busy ();
 
@@ -640,6 +641,10 @@ namespace Pomodoro
                     catch (GLib.Error error) {
                         GLib.warning ("Failed to restore session: %s", error.message);
                     }
+
+                    this.session_manager.enter_time_block.connect (this.on_enter_time_block);
+                    this.session_manager.leave_time_block.connect (this.on_leave_time_block);
+                    this.session_manager.advanced.connect (this.on_advanced);
 
                     this.unmark_busy ();
                     this.release ();
@@ -716,38 +721,76 @@ namespace Pomodoro
          */
         public override void shutdown ()
         {
-            this.hold ();
+            if (this.save_idle_id != 0) {
+                GLib.Source.remove (this.save_idle_id);
+                this.save_idle_id = 0;
+            }
 
-            Pomodoro.Context.set_event_source ("app.quit");
-            this.timer.pause ();
+            this.settings.changed.disconnect (this.on_settings_changed);
+            this.event_bus.event.disconnect (this.on_event);
+            this.keyboard_manager.shortcut_activated.disconnect (this.on_shortcut_activated);
 
             base.shutdown ();
 
-            var queue = new Pomodoro.JobQueue ();
-            queue.wait ();
-
-            this.capability_manager.destroy ();
+            // Stop emitting new events
+            this.event_producer.destroy ();
             this.event_bus.destroy ();
+            this.action_manager.destroy ();
+            this.capability_manager.destroy ();
+            this.session_manager.enter_time_block.disconnect (this.on_enter_time_block);
+            this.session_manager.leave_time_block.disconnect (this.on_leave_time_block);
+            this.session_manager.advanced.disconnect (this.on_advanced);
 
+            if (this.session_manager.current_time_block != null) {
+                this.session_manager.current_time_block.changed.disconnect (
+                        this.on_current_time_block_changed);
+            }
+
+            // Disable plugins
             // var engine = Peas.Engine.get_default ();
 
             // foreach (var plugin_info in engine.get_plugin_list ()) {
             //     engine.try_unload_plugin (plugin_info);
             // }
 
+            // Pause the timer before saving the session
+            this.timer.pause ();
+
+            // Wait until all async jobs are completed
+            var main_context = GLib.MainContext.@default ();
+            var remaining = 2;
+
+            this.job_queue.wait.begin (
+                (obj, res) => {
+                    this.job_queue.wait.end (res);
+                    remaining--;
+                });
+
+            this.session_manager.save.begin (
+                (obj, res) => {
+                    this.session_manager.save.end (res);
+                    remaining--;
+                });
+
+            while (remaining > 0 && main_context.iteration (false));
+
+            // Cleanup
             Pomodoro.Database.close ();
             Pomodoro.SessionManager.set_default (null);
             Pomodoro.Timer.set_default (null);
 
             this.event_producer = null;
             this.event_bus = null;
+            this.job_queue = null;
+            this.action_manager = null;
+            this.logger = null;
             this.background_manager = null;
+            this.keyboard_manager = null;
             this.capability_manager = null;
             this.stats_manager = null;
             this.session_manager = null;
             this.timer = null;
-
-            this.release ();
+            this.settings = null;
         }
 
         /* Emitted on the primary instance when an activation occurs.
@@ -816,9 +859,9 @@ namespace Pomodoro
                 Options.set_defaults ();
             }
 
-            this.release ();
-
             base.activate ();
+
+            this.release ();
         }
 
         public override bool dbus_register (GLib.DBusConnection connection,
@@ -890,21 +933,24 @@ namespace Pomodoro
 
         private void schedule_save ()
         {
+            if (this.save_idle_id != 0) {
+                return;
+            }
+
             this.hold ();
 
-            // TODO: deduplicate calls / track when saving is in-progress
-            // TODO: schedule task with GLib.Priority.LOW
+            this.save_idle_id = GLib.Idle.add (() => {
+                this.save_idle_id = 0;
 
-            this.session_manager.save.begin ((obj, res) => {
-                try {
+                this.session_manager.save.begin ((obj, res) => {
                     this.session_manager.save.end (res);
-                }
-                catch (GLib.Error error) {
-                    GLib.warning ("Error while saving session: %s", error.message);
-                }
 
-                this.release ();
+                    this.release ();
+                });
+
+                return GLib.Source.REMOVE;
             });
+            GLib.Source.set_name_by_id (this.save_idle_id, "Pomodoro.Application.schedule_save");
         }
 
         private void on_enter_time_block (Pomodoro.TimeBlock time_block)
@@ -964,6 +1010,13 @@ namespace Pomodoro
             }
 
             action_group.activate_action (parts[1], null);
+        }
+
+        public override void dispose ()
+        {
+            assert (this.save_idle_id == 0);
+
+            base.dispose ();
         }
 
         /*
@@ -1061,7 +1114,5 @@ namespace Pomodoro
             }
         }
         */
-
     }
 }
-

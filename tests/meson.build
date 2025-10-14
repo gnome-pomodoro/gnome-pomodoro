@@ -21,6 +21,7 @@ test_names = [
   'capability-manager',
   'event-bus',
   'event-producer',
+  'job-queue',
   'expression',
   'expression-parser',
   'provider-set',

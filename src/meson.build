@@ -44,7 +44,7 @@ libgnome_pomodoro_sources = files(
   'core/gap.vala',
   'core/gap-entry.vala',
   'core/idle-monitor.vala',
-  'core/job.vala',
+  'core/job-queue.vala',
   'core/keyboard-manager.vala',
   'core/locale.vala',
   'core/lock-screen.vala',
