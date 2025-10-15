@@ -59,6 +59,13 @@ namespace Pomodoro
                 this.description = description;
                 this.default_accelerator = default_accelerator;
             }
+
+            ~Shortcut ()
+            {
+                this.name = null;
+                this.description = null;
+                this.default_accelerator = null;
+            }
         }
 
         public bool global_shortcuts_supported {

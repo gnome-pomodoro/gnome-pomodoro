@@ -107,6 +107,13 @@ namespace Pomodoro
             public Pomodoro.UserActiveFunc?              active_callback = null;
             public unowned Pomodoro.IdleMonitorProvider? provider = null;
             public bool                                  invalid = false;
+
+            ~Watch ()
+            {
+                this.idle_callback = null;
+                this.active_callback = null;
+                this.provider = null;
+            }
         }
 
         private GLib.HashTable<int64?, Watch> watches = null;

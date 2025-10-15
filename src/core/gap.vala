@@ -285,5 +285,13 @@ namespace Pomodoro
          */
 
         public signal void changed ();
+
+        public override void dispose ()
+        {
+            this.time_block = null;
+            this.entry = null;
+
+            base.dispose ();
+        }
     }
 }

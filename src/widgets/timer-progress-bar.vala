@@ -115,11 +115,11 @@ namespace Pomodoro
         /* Equivalent with intended opacity. */
         private double last_opacity = 0.0;
 
-        private weak Pomodoro.Gizmo   through;
-        private weak Pomodoro.Gizmo   highlight;
-        private ulong                 timer_state_changed_id = 0;
-        private uint                  timeout_id = 0;
-        private uint                  timeout_interval = 0;
+        private unowned Pomodoro.Gizmo through;
+        private unowned Pomodoro.Gizmo highlight;
+        private ulong                  timer_state_changed_id = 0;
+        private uint                   timeout_id = 0;
+        private uint                   timeout_interval = 0;
 
 
         static construct
@@ -581,9 +581,20 @@ namespace Pomodoro
 
         public override void dispose ()
         {
+            unowned Gtk.Widget? child;
+
             this.disconnect_signals ();
             this.stop_value_animation ();
             this.stop_opacity_animation ();
+
+            while ((child = this.get_first_child ()) != null)
+            {
+                child.unparent ();
+            }
+
+            this.through = null;
+            this.highlight = null;
+            this._timer = null;
 
             base.dispose ();
         }

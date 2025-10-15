@@ -35,6 +35,16 @@ namespace Pomodoro
         public uint        precedence = 0U;
         public weak Token? matching_token;
 
+        ~Token ()
+        {
+            this.text = null;
+            this.prev = null;
+            this.next = null;
+            this.parent = null;
+            this.children = null;
+            this.matching_token = null;
+        }
+
         public uint n_children ()
         {
             unowned var child = this.children;
@@ -128,6 +138,11 @@ namespace Pomodoro
                 (operator) => {
                     operators.insert (operator.to_string (), operator);
                 });
+        }
+
+        ~ExpressionParser ()
+        {
+            this.operators = null;
         }
 
         private static string format_error_context (string text,

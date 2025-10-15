@@ -147,7 +147,7 @@ namespace Pomodoro
 
         internal void set_selected_date_full (GLib.Date      value,
                                               GLib.DateMonth display_month,
-                                              GLib.DateMonth display_year)
+                                              GLib.DateYear  display_year)
         {
             this._selected_date = value.copy ();
 
@@ -195,12 +195,18 @@ namespace Pomodoro
             button.halign = Gtk.Align.FILL;
             button.valign = Gtk.Align.FILL;
             button.height_request = 32;
+            button.child = box;
             button.add_css_class ("week");
             button.add_css_class ("pill");
             button.add_css_class ("flat");
-            button.set_data ("calendar-date", date.copy ());
-            button.child = box;
-            button.clicked.connect (this.on_week_button_clicked);
+
+            unowned var self = this;
+            var date_copy = date.copy ();
+
+            button.clicked.connect (
+                () => {
+                    self.select (date_copy);
+                });
 
             return button;
         }
@@ -390,15 +396,6 @@ namespace Pomodoro
             }
 
             this.set_display_month_year (month, year);
-        }
-
-        private void on_week_button_clicked (Gtk.Button button)
-        {
-            var date = button.get_data<GLib.Date?> ("calendar-date");
-
-            if (date != null) {
-                this.select (date);
-            }
         }
 
         private bool select (GLib.Date date)

@@ -1212,6 +1212,8 @@ namespace Pomodoro
                 this.timeout_id = 0;
             }
 
+            this.clear_pages ();
+
             this.previous_action = null;
             this.next_action = null;
             this.today_action = null;

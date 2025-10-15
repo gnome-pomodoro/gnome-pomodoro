@@ -33,6 +33,7 @@
                 <property name="name">month</property>
               </object>
             </child>
+            <signal name="notify::active-name" handler="on_notify_active_name"/>
           </object>
         </child>
         <child>

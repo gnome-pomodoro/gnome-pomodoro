@@ -118,8 +118,13 @@ namespace Pomodoro
             button.add_css_class ("flat");
             button.add_css_class ("month");
 
-            button.set_data ("calendar-date", date.copy ());
-            button.clicked.connect (this.on_month_button_clicked);
+            unowned var self = this;
+            var date_copy = date.copy ();
+
+            button.clicked.connect (
+                () => {
+                    self.select (date_copy);
+                });
 
             return button;
         }
@@ -237,15 +242,6 @@ namespace Pomodoro
         private void on_next_button_clicked ()
         {
             this.set_display_year (this._display_year + 1);
-        }
-
-        private void on_month_button_clicked (Gtk.Button button)
-        {
-            var date = button.get_data<GLib.Date?> ("calendar-date");
-
-            if (date != null) {
-                this.select (date);
-            }
         }
 
         private bool select (GLib.Date date)

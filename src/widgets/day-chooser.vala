@@ -143,8 +143,13 @@ namespace Pomodoro
             button.width_request = 32;
             button.height_request = 32;
 
-            button.set_data ("calendar-date", date.copy ());
-            button.clicked.connect (this.on_day_button_clicked);
+            unowned var self = this;
+            var date_copy = date.copy ();
+
+            button.clicked.connect (
+                () => {
+                    self.select (date_copy);
+                });
 
             return button;
         }
@@ -341,15 +346,6 @@ namespace Pomodoro
             }
 
             this.set_display_month_year (month, year);
-        }
-
-        private void on_day_button_clicked (Gtk.Button button)
-        {
-            var date = button.get_data<GLib.Date?> ("calendar-date");
-
-            if (date != null) {
-                this.select (date);
-            }
         }
 
         private bool select (GLib.Date date)

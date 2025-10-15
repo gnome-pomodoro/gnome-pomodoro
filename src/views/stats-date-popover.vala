@@ -106,17 +106,6 @@ namespace Pomodoro
                     GLib.BindingFlags.SYNC_CREATE,
                     transform_from_timeframe,
                     transform_to_timeframe);
-
-            this.timeframe_toggle_group.notify["active-name"].connect (
-                (pspec) => {
-                    // Detect user selection
-                    var timeframe = Pomodoro.Timeframe.from_string (
-                            this.timeframe_toggle_group.active_name);
-
-                    if (timeframe != this._timeframe) {
-                        this.timeframe_selected (timeframe);
-                    }
-                });
         }
 
         private static bool transform_from_timeframe (GLib.Binding   binding,
@@ -367,6 +356,19 @@ namespace Pomodoro
             }
 
             return refined_date;
+        }
+
+        [GtkCallback]
+        private void on_notify_active_name (GLib.Object    object,
+                                            GLib.ParamSpec pspec)
+        {
+            // Detect user selection
+            var timeframe = Pomodoro.Timeframe.from_string (
+                    this.timeframe_toggle_group.active_name);
+
+            if (timeframe != this._timeframe) {
+                this.timeframe_selected (timeframe);
+            }
         }
 
         [GtkCallback]

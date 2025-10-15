@@ -24,10 +24,17 @@ namespace Pomodoro
             this.data = array;
         }
 
+        ~Vector ()
+        {
+            this.data = null;
+        }
+
         public Pomodoro.Vector copy ()
         {
             var result = new Pomodoro.Vector (this.data.length);
-            result.data = this.data;
+            for (var i = 0; i < this.data.length; i++) {
+                result.data[i] = this.data[i];
+            }
 
             return result;
         }
@@ -179,10 +186,21 @@ namespace Pomodoro
             this.data  = array;
         }
 
+        ~Matrix ()
+        {
+            this.shape = null;
+            this.data  = null;
+        }
+
         public Pomodoro.Matrix copy ()
         {
             var result = new Pomodoro.Matrix (this.shape[0], this.shape[1]);
-            result.data = this.data;
+            for (var i = 0; i < this.shape[0]; i++)
+            {
+                for (var j = 0; j < this.shape[1]; j++) {
+                    result.data[i, j] = this.data[i, j];
+                }
+            }
 
             return result;
         }
@@ -433,16 +451,6 @@ namespace Pomodoro
         {
             assert (this.validate_axis (ref axis));
 
-            for (var index = 0; index < DIMENSIONS; index++)
-            {
-                if (index < axis) {
-                    shape[index] = this.shape[index];
-                }
-                else if (index > axis) {
-                    shape[index - 1] = this.shape[index];
-                }
-            }
-
             var result = new Vector[this.shape[axis]];
 
             for (var index = 0; index < this.shape[axis]; index++)
@@ -510,6 +518,12 @@ namespace Pomodoro
         {
             this.shape = { array.length[0], array.length[1], array.length[2] };
             this.data  = array;
+        }
+
+        ~Matrix3D ()
+        {
+            this.shape = null;
+            this.data  = null;
         }
 
         private inline bool validate_axis (ref int axis)

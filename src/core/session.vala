@@ -869,5 +869,14 @@ namespace Pomodoro
             this.update_time_range ();
             this.invalidate_cycles ();
         }
+
+        public override void dispose ()
+        {
+            this.time_blocks = null;
+            this.entry = null;
+            this.cycles = null;
+
+            base.dispose ();
+        }
     }
 }

@@ -15,6 +15,11 @@ namespace Pomodoro
             this.timestamp = timestamp;
             this.timezone  = timezone;
         }
+
+        ~TimezoneMarker ()
+        {
+            this.timezone = null;
+        }
     }
 
 

@@ -18,6 +18,13 @@ namespace Pomodoro
             public Pomodoro.Expression?   condition;
             public Pomodoro.EventCallback callback;
 
+            ~EventWatch ()
+            {
+                this.event_name = null;
+                this.condition = null;
+                this.callback = null;
+            }
+
             public bool check_condition (Pomodoro.Context context)
             {
                 if (this.condition == null) {
@@ -44,6 +51,13 @@ namespace Pomodoro
             public Pomodoro.ConditionCallback? enter_callback;
             public Pomodoro.ConditionCallback? leave_callback;
             public bool                        active = false;
+
+            ~ConditionWatch ()
+            {
+                this.condition = null;
+                this.enter_callback = null;
+                this.leave_callback = null;
+            }
 
             public void check_condition (Pomodoro.Context context)
             {

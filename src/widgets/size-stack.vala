@@ -672,6 +672,11 @@ namespace Pomodoro
                 }
             }
 
+            this.children = null;
+            this.transition_animation = null;
+            this._visible_child = null;
+            this.last_visible_child = null;
+
             base.dispose ();
         }
     }

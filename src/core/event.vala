@@ -234,13 +234,19 @@ namespace Pomodoro
     public class Event
     {
         public Pomodoro.EventSpec spec;
-        public Pomodoro.Context           context;
+        public Pomodoro.Context   context;
 
         public Event (Pomodoro.EventSpec spec,
                       Pomodoro.Context   context)
         {
             this.spec = spec;
             this.context = context;
+        }
+
+        ~Event ()
+        {
+            this.spec = null;
+            this.context = null;
         }
     }
 

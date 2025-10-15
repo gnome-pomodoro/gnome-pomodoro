@@ -62,26 +62,48 @@ namespace Pomodoro.Locale
     {
         if (!first_day_of_week.valid ())
         {
-            // `Posix.NLTime.WEEK_1STDAY.to_string()` underneath calls `nl_langinfo()`.
-            // `nl_langinfo()` produces a string pointer whose address is the number we want.
-            // Using the result as a string will cause segfault.
-            var week_origin = (long) Posix.NLTime.WEEK_1STDAY.to_string ();
+            // `nl_langinfo(_NL_TIME_WEEK_1STDAY)` returns a pointer whose VALUE encodes
+            // the date. GTK uses a union to extract the lower 32 bits. We do the same via casting.
+            unowned string week_origin_ptr = Posix.NLTime.WEEK_1STDAY.to_string ();
             var week_1stday = 0;
 
-            if (week_origin == 19971130) {  // Sunday
-                week_1stday = 0;
-            }
-            else if (week_origin == 19971201) {  // Monday
-                week_1stday = 1;
-            }
-            else {
-                GLib.warning ("Unknown value of _NL_TIME_WEEK_1STDAY: %ld", week_origin);
+            if (week_origin_ptr != null)
+            {
+                // Extract lower 32 bits of the pointer value (like GTK's union trick)
+                // The pointer value itself encodes the date on little-endian systems
+                var ptr_value = (size_t) ((void*) week_origin_ptr);
+                var week_origin = (uint32) (ptr_value & 0xFFFFFFFF);
+
+                if (week_origin == 19971130) {  // Sunday
+                    week_1stday = 0;
+                }
+                else if (week_origin == 19971201) {  // Monday
+                    week_1stday = 1;
+                }
+                else {
+                    GLib.warning ("Unknown value of _NL_TIME_WEEK_1STDAY: %u", week_origin);
+                }
             }
 
-            var first_weekday = (int) Posix.NLTime.FIRST_WEEKDAY.to_string ().data[0];
-            var first_day_of_week_int = (week_1stday + first_weekday - 1) % 7;
+            // FIRST_WEEKDAY is different from WEEK_1STDAY - it returns a pointer to a string
+            // containing a byte value (1-7)
+            unowned string first_weekday_str = Posix.NLTime.FIRST_WEEKDAY.to_string ();
+            var first_weekday = 1;
 
-            first_day_of_week = first_day_of_week_int == 0
+            if (first_weekday_str != null && first_weekday_str.length > 0)
+            {
+                // Read the first byte (like GTK does with langinfo.string[0])
+                var weekday_byte = (uint8) first_weekday_str[0];
+
+                if (weekday_byte >= 1 && weekday_byte <= 7) {
+                    first_weekday = (int) weekday_byte;
+                }
+                else {
+                    GLib.warning ("Unexpected _NL_TIME_FIRST_WEEKDAY byte value: %u", weekday_byte);
+                }
+            }
+
+            first_day_of_week = (week_1stday + first_weekday - 1) % 7 == 0
                     ? GLib.DateWeekday.SUNDAY
                     : GLib.DateWeekday.MONDAY;
         }
@@ -103,8 +125,11 @@ namespace Pomodoro.Locale
      */
     public bool use_12h_format ()
     {
-        // return true;
-        return Posix.NLItem.T_FMT.to_string ().ascii_casecmp ("%I") == 0;
+        unowned string t_fmt_ptr = Posix.NLItem.T_FMT.to_string ();
+
+        return t_fmt_ptr != null
+                ? t_fmt_ptr.ascii_casecmp ("%I") == 0
+                : false;
     }
 }
 

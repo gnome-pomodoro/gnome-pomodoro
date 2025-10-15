@@ -850,8 +850,13 @@ namespace Pomodoro
                     ? session.create_or_update_entry ()
                     : session.entry;
             var keep_time_block_ids = new GLib.Array<int64> ();
-            var keep_gap_ids = new GLib.HashTable<int64?, GLib.Array> (GLib.direct_hash,
-                                                                       GLib.direct_equal);
+            var keep_gap_ids = new GLib.HashTable<int64?, GLib.Array>.full (
+                    GLib.direct_hash,
+                    GLib.direct_equal,
+                    null,
+                    (arr) => {
+                        ((GLib.Array) arr).data = null;
+                    });
             var time_block_mapping = new GLib.HashTable
                     <unowned Pomodoro.TimeBlock, unowned Pomodoro.TimeBlockEntry>
                     (GLib.direct_hash, GLib.direct_equal);

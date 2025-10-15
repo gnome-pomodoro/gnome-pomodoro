@@ -618,12 +618,16 @@ namespace Pomodoro
                 this.settings_changed_id = 0;
             }
 
+            this.session_expired_toast = null;
             this.state_menu = null;
             this.uniform_state_menu = null;
             this.current_time_block = null;
             this.session_manager = null;
             this.timer = null;
             this.settings = null;
+
+            // HACK: Without this children do not get disposed properly
+            this.dispose_template (typeof (Pomodoro.TimerView));
 
             base.dispose ();
         }
