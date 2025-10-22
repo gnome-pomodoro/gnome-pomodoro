@@ -15,6 +15,18 @@ namespace Tests
             this.add_test ("calculate_progress__completed", this.test_calculate_progress__completed);
             this.add_test ("calculate_progress__uncompleted", this.test_calculate_progress__uncompleted);
             this.add_test ("calculate_progress__with_gaps", this.test_calculate_progress__with_gaps);
+
+            this.add_test ("is_visible__empty", this.test_is_visible__empty);
+            this.add_test ("is_visible__only_uncompleted", this.test_is_visible__only_uncompleted);
+            this.add_test ("is_visible__only_zero_weight", this.test_is_visible__only_zero_weight);
+            this.add_test ("is_visible__scheduled_non_extra", this.test_is_visible__scheduled_non_extra);
+            this.add_test ("is_visible__in_progress_non_extra", this.test_is_visible__in_progress_non_extra);
+            this.add_test ("is_visible__completed_non_extra", this.test_is_visible__completed_non_extra);
+            this.add_test ("is_visible__scheduled_extra", this.test_is_visible__scheduled_extra);
+            this.add_test ("is_visible__in_progress_extra", this.test_is_visible__in_progress_extra);
+            this.add_test ("is_visible__completed_extra", this.test_is_visible__completed_extra);
+            this.add_test ("is_visible__mixed_uncompleted_then_scheduled", this.test_is_visible__mixed_uncompleted_then_scheduled);
+            this.add_test ("is_visible__mixed_zero_weight_then_weighted", this.test_is_visible__mixed_zero_weight_then_weighted);
         }
 
         public override void setup ()
@@ -379,6 +391,202 @@ namespace Tests
             assert_cmpfloat_with_epsilon (cycle.calculate_progress (gap.start_time + Pomodoro.Interval.MINUTE),
                                           0.25,
                                           0.0001);
+        }
+
+        public void test_is_visible__empty ()
+        {
+            var cycle = new Pomodoro.Cycle ();
+
+            assert_false (cycle.is_visible ());
+        }
+
+        public void test_is_visible__only_uncompleted ()
+        {
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.UNCOMPLETED,
+                    weight = 1.0,
+                }
+            );
+
+            var cycle = new Pomodoro.Cycle ();
+            cycle.append (time_block);
+
+            assert_false (cycle.is_visible ());
+        }
+
+        public void test_is_visible__only_zero_weight ()
+        {
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            time_block.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                    weight = 0.0,
+                }
+            );
+
+            var cycle = new Pomodoro.Cycle ();
+            cycle.append (time_block);
+
+            assert_false (cycle.is_visible ());
+        }
+
+        public void test_is_visible__scheduled_non_extra ()
+        {
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                    weight = 1.0,
+                    is_extra = false,
+                }
+            );
+
+            var cycle = new Pomodoro.Cycle ();
+            cycle.append (time_block);
+
+            assert_true (cycle.is_visible ());
+        }
+
+        public void test_is_visible__in_progress_non_extra ()
+        {
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.IN_PROGRESS,
+                    weight = 1.0,
+                    is_extra = false,
+                }
+            );
+
+            var cycle = new Pomodoro.Cycle ();
+            cycle.append (time_block);
+
+            assert_true (cycle.is_visible ());
+        }
+
+        public void test_is_visible__completed_non_extra ()
+        {
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.COMPLETED,
+                    weight = 1.0,
+                    is_extra = false,
+                }
+            );
+
+            var cycle = new Pomodoro.Cycle ();
+            cycle.append (time_block);
+
+            assert_true (cycle.is_visible ());
+        }
+
+        public void test_is_visible__scheduled_extra ()
+        {
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                    weight = 1.0,
+                    is_extra = true,
+                }
+            );
+
+            var cycle = new Pomodoro.Cycle ();
+            cycle.append (time_block);
+
+            // Extra cycles that haven't started yet should not be visible
+            assert_false (cycle.is_visible ());
+        }
+
+        public void test_is_visible__in_progress_extra ()
+        {
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.IN_PROGRESS,
+                    weight = 1.0,
+                    is_extra = true,
+                }
+            );
+
+            var cycle = new Pomodoro.Cycle ();
+            cycle.append (time_block);
+
+            assert_true (cycle.is_visible ());
+        }
+
+        public void test_is_visible__completed_extra ()
+        {
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.COMPLETED,
+                    weight = 1.0,
+                    is_extra = true,
+                }
+            );
+
+            var cycle = new Pomodoro.Cycle ();
+            cycle.append (time_block);
+
+            assert_true (cycle.is_visible ());
+        }
+
+        public void test_is_visible__mixed_uncompleted_then_scheduled ()
+        {
+            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block_1.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.UNCOMPLETED,
+                    weight = 1.0,
+                }
+            );
+
+            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block_2.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                    weight = 1.0,
+                    is_extra = false,
+                }
+            );
+
+            var cycle = new Pomodoro.Cycle ();
+            cycle.append (time_block_1);
+            cycle.append (time_block_2);
+
+            // Should be visible because second block is scheduled with weight > 0
+            assert_true (cycle.is_visible ());
+        }
+
+        public void test_is_visible__mixed_zero_weight_then_weighted ()
+        {
+            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            time_block_1.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.COMPLETED,
+                    weight = 0.0,
+                }
+            );
+
+            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block_2.set_meta (
+                Pomodoro.TimeBlockMeta () {
+                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                    weight = 1.0,
+                    is_extra = false,
+                }
+            );
+
+            var cycle = new Pomodoro.Cycle ();
+            cycle.append (time_block_1);
+            cycle.append (time_block_2);
+
+            // Should be visible because second block has weight > 0 and is scheduled
+            assert_true (cycle.is_visible ());
         }
     }
 }

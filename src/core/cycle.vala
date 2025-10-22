@@ -291,8 +291,8 @@ namespace Pomodoro
                     link.data.get_weight () > 0.0)
                 {
                     return link.data.get_is_extra ()
-                        ? link.data.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED
-                        : true;
+                            ? link.data.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED
+                            : true;
                 }
 
                 link = link.next;
