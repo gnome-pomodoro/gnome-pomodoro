@@ -243,14 +243,14 @@ namespace Pomodoro
 
         private Pomodoro.Session initialize_next_session (int64 timestamp)
         {
-            var session = new Pomodoro.Session ();
+            var next_session = new Pomodoro.Session ();
 
-            this._scheduler.reschedule_session (session, null, timestamp);
+            this._scheduler.reschedule_session (next_session, null, timestamp);
 
-            return session;
+            return next_session;
         }
 
-        private Pomodoro.TimeBlock initialize_next_time_block (int64 timestamp)
+        private Pomodoro.TimeBlock? initialize_next_time_block (int64 timestamp)
         {
             Pomodoro.TimeBlock? next_time_block = null;
             Pomodoro.Session? next_session = null;
@@ -317,8 +317,9 @@ namespace Pomodoro
             assert (next_time_block != null);
             assert (next_time_block.session == next_session);
 
-            this.next_time_block = next_time_block;
+            // Store `this.next_session` only to increase session ref count
             this.next_session = next_session;
+            this.next_time_block = next_time_block;
 
             return next_time_block;
         }
@@ -330,21 +331,35 @@ namespace Pomodoro
                                              int64                   timestamp)
         {
             var current_time_block = this._current_time_block;
+            var current_gap = this._current_gap;
+
+            if (current_gap != null) {
+                timestamp = int64.min (timestamp, current_gap.start_time);
+            }
 
             // Adjust timer state according to current-time-block.
             if (current_time_block != null)
             {
-                state.duration     = current_time_block.duration;
-                state.user_data    = current_time_block;
+                var elapsed = current_time_block.calculate_elapsed (timestamp);
 
-                if (this.active_watch_id == 0) {
-                    state.offset       = current_time_block.calculate_elapsed (timestamp);
+                if (!this.is_waiting_for_activity () || current_gap != null)
+                {
+                    state.duration     = current_time_block.get_last_gap () == null
+                            ? current_time_block.duration
+                            : current_time_block.get_intended_duration ();
+                    state.offset       = timestamp - current_time_block.start_time - elapsed;
                     state.started_time = current_time_block.start_time;
+                    state.paused_time  = current_gap != null
+                            ? current_gap.start_time : Pomodoro.Timestamp.UNDEFINED;
                 }
                 else {
+                    state.duration     = current_time_block.duration;
                     state.offset       = 0;
                     state.started_time = Pomodoro.Timestamp.UNDEFINED;
+                    state.paused_time  = Pomodoro.Timestamp.UNDEFINED;
                 }
+
+                state.user_data = current_time_block;
             }
             else {
                 state = Pomodoro.TimerState ();
@@ -483,6 +498,7 @@ namespace Pomodoro
                                                   int64               timestamp = Pomodoro.Timestamp.UNDEFINED)
         {
             if (session == this._current_session && time_block == this._current_time_block) {
+                // XXX: Handle `gap`?
                 return;
             }
 
@@ -497,6 +513,11 @@ namespace Pomodoro
             var previous_gap        = this._current_gap;
             var previous_state      = this._current_state;
             var state               = time_block != null ? time_block.state : Pomodoro.State.STOPPED;
+            var gap                 = time_block?.get_last_gap ();
+
+            if (gap != null && Pomodoro.Timestamp.is_defined (gap.end_time)) {
+                gap = null;
+            }
 
             this.freeze_current_session_changed ();
 
@@ -546,12 +567,11 @@ namespace Pomodoro
                 }
             }
 
-            // Run rescheduling to make sure the next time-block is up to date.
-            // Skip rescheduling if time-block if session appears to be just populated.
-            if (session != null && time_block != null && time_block.start_time != timestamp) {
-                this.reschedule (session, time_block, timestamp);
+            if (session != null && time_block == null) {
+                // FIXME: remove scheduled time-blocks leading to time_block?
+                this.reschedule (session, null, timestamp);
             }
-            else if (session != null && time_block == null) {
+            else if (session != null && time_block != null && time_block.start_time != timestamp) {
                 this.reschedule (session, time_block, timestamp);
             }
 
@@ -586,7 +606,7 @@ namespace Pomodoro
             {
                 this.previous_time_block = previous_time_block;
                 this._current_time_block = time_block;
-                this._current_gap        = null;
+                this._current_gap        = gap;
                 this._current_state      = state;
 
                 this.notify_property ("current-time-block");
@@ -1043,16 +1063,205 @@ namespace Pomodoro
             return success;
         }
 
+        private async Pomodoro.Session? restore_session (Gom.Repository        repository,
+                                                         Pomodoro.SessionEntry session_entry)
+                                                         throws GLib.Error
+        {
+            // Load time blocks for this session
+            var session_id_value = GLib.Value (typeof (int64));
+            session_id_value.set_int64 (session_entry.id);
+            var time_block_filter = new Gom.Filter.eq (
+                    typeof (Pomodoro.TimeBlockEntry),
+                    "session-id",
+                    session_id_value);
+
+            var time_block_sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
+            time_block_sorting.add (
+                    typeof (Pomodoro.TimeBlockEntry),
+                    "start-time",
+                    Gom.SortingMode.ASCENDING);
+
+            var time_block_results = yield repository.find_sorted_async (
+                    typeof (Pomodoro.TimeBlockEntry),
+                    time_block_filter,
+                    time_block_sorting);
+
+            if (time_block_results.count == 0) {
+                return null;
+            }
+
+            yield time_block_results.fetch_async (0, time_block_results.count);
+
+            // Reconstruct the session
+            var session = new Pomodoro.Session ();
+            session.entry = session_entry;
+
+            // Reconstruct time blocks (only in-progress ones for now)
+            for (var i = 0; i < time_block_results.count; i++)
+            {
+                var time_block_entry = (Pomodoro.TimeBlockEntry) time_block_results.get_index (i);
+
+                var time_block = new Pomodoro.TimeBlock (Pomodoro.State.from_string (time_block_entry.state));
+                time_block.set_time_range (time_block_entry.start_time, time_block_entry.end_time);
+                time_block.set_status (Pomodoro.TimeBlockStatus.from_string (time_block_entry.status));
+                time_block.set_intended_duration (time_block_entry.intended_duration);
+                time_block.entry = time_block_entry;
+
+                // Load gaps for this time block
+                var time_block_id_value = GLib.Value (typeof (int64));
+                time_block_id_value.set_int64 (time_block_entry.id);
+                var gap_filter = new Gom.Filter.eq (
+                        typeof (Pomodoro.GapEntry),
+                        "time-block-id",
+                        time_block_id_value);
+
+                var gap_sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
+                gap_sorting.add (
+                        typeof (Pomodoro.GapEntry),
+                        "start-time",
+                        Gom.SortingMode.ASCENDING);
+
+                var gap_results = yield repository.find_sorted_async (
+                        typeof (Pomodoro.GapEntry),
+                        gap_filter,
+                        gap_sorting);
+
+                if (gap_results.count > 0)
+                {
+                    yield gap_results.fetch_async (0, gap_results.count);
+
+                    for (var j = 0; j < gap_results.count; j++)
+                    {
+                        var gap_entry = (Pomodoro.GapEntry) gap_results.get_index (j);
+
+                        var gap = new Pomodoro.Gap (Pomodoro.GapFlags.from_string (gap_entry.flags));
+                        gap.set_time_range (gap_entry.start_time, gap_entry.end_time);
+                        gap.entry = gap_entry;
+
+                        time_block.add_gap (gap);
+                    }
+                }
+
+                session.append (time_block);
+            }
+
+            this._scheduler.ensure_meta (session);
+
+            return session;
+        }
+
         /**
          * Restore session from database.
          */
-        public async void restore () throws GLib.Error
+        public async bool restore (int64 timestamp)
         {
+            Pomodoro.SessionEntry? session_entry = null;
+            Pomodoro.Session?      current_session = null;
+            Pomodoro.TimeBlock?    current_time_block = null;
+            Pomodoro.Gap?          current_gap = null;
+
+            Pomodoro.ensure_timestamp (ref timestamp);
+
+            var repository = Pomodoro.Database.get_repository ();
+            var success    = true;
+
+            assert (repository != null);
+
             // XXX: We're trying to write a timezone entry at first opportunity after the
             //      database is ready. Not the best place to do that.
-            this.mark_timezone (this.timezone_monitor.timezone);
+            this.mark_timezone (this.timezone_monitor.timezone, timestamp);
 
-            // TODO
+            // Query the most recent session
+            var end_time_value = GLib.Value (typeof (int64));
+            end_time_value.set_int64 (timestamp - SESSION_EXPIRY_TIMEOUT);
+            var session_filter = new Gom.Filter.gte (
+                    typeof (Pomodoro.SessionEntry),
+                    "end-time",
+                    end_time_value);
+
+            var session_sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
+            session_sorting.add (
+                    typeof (Pomodoro.SessionEntry),
+                    "start-time",
+                    Gom.SortingMode.DESCENDING);
+
+            try {
+                var session_results = yield repository.find_sorted_async (
+                        typeof (Pomodoro.SessionEntry),
+                        session_filter,
+                        session_sorting);
+
+                if (session_results.count > 0) {
+                    yield session_results.fetch_async (0, 1);
+
+                    session_entry = (Pomodoro.SessionEntry) session_results.get_index (0);
+                }
+            }
+            catch (GLib.Error error) {
+                GLib.warning ("Unable to fetch last session: %s", error.message);
+                success = false;
+            }
+
+            if (session_entry != null)
+            {
+                try {
+                    current_session = yield this.restore_session (repository, session_entry);
+                }
+                catch (GLib.Error error) {
+                    GLib.warning ("Unable to restore session #%s: %s",
+                                  session_entry.id.to_string (), error.message);
+                    success = false;
+                }
+            }
+
+            if (current_session != null)
+            {
+                // Rely on pausing the timer when shutting down the app
+                var last_active_time = current_session.start_time;
+
+                current_session.@foreach (
+                    (time_block) => {
+                        if (time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED) {
+                            return;
+                        }
+
+                        if (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS) {
+                            current_time_block = time_block;
+                            last_active_time = int64.max (time_block.start_time, last_active_time);
+                        }
+                        else {
+                            last_active_time = int64.max (time_block.end_time, last_active_time);
+                        }
+                    });
+
+                current_time_block?.foreach_gap (
+                    (gap) => {
+                        if (Pomodoro.Timestamp.is_undefined (gap.end_time)) {
+                            current_gap = gap;
+                            last_active_time = int64.max (gap.start_time, last_active_time);
+                        }
+                        else {
+                            last_active_time = int64.max (gap.end_time, last_active_time);
+                        }
+                    });
+
+                if (current_time_block != null && current_gap != null) {
+                    GLib.warning ("Restoring a time-block that hasn't been paused");
+                }
+
+                current_session.expiry_time = last_active_time + SESSION_EXPIRY_TIMEOUT;
+            }
+
+            if (current_session != null &&
+                !current_session.is_completed () &&
+                !current_session.is_expired ())
+            {
+                this.set_current_time_block_full (current_session, current_time_block, timestamp);
+
+                // TODO: emit confirm_advancement?
+            }
+
+            return success;
         }
 
         /**
@@ -1162,6 +1371,11 @@ namespace Pomodoro
             this._scheduler.build_scheduler_context (this._current_session, timestamp, out context, null);
 
             return context.needs_long_break;
+        }
+
+        private inline bool is_waiting_for_activity ()
+        {
+            return this.active_watch_id != 0;
         }
 
         /**
@@ -2033,7 +2247,8 @@ namespace Pomodoro
         public signal void enter_time_block (Pomodoro.TimeBlock time_block)
         {
             assert (time_block == this._current_time_block);
-            assert (time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
+            assert (time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED ||
+                    time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
 
             if (this.current_time_block_changed_id != 0) {
                 GLib.warning ("`TimeBlock.changed` signal handler has not been disconnected properly");

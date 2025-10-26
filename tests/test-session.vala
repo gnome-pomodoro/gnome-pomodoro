@@ -79,7 +79,6 @@ namespace Tests
             this.add_test ("remove_before", this.test_remove_before);
             this.add_test ("remove_after", this.test_remove_after);
 
-            // this.add_test ("get_time_block_meta", this.test_get_time_block_meta);
             this.add_test ("set_time_block_status__completed", this.test_set_time_block_status__completed);
             this.add_test ("set_time_block_status__uncompleted", this.test_set_time_block_status__uncompleted);
             this.add_test ("is_expired", this.test_is_expired);
@@ -165,26 +164,25 @@ namespace Tests
             for (uint index=0; index < time_blocks.length; index++)
             {
                 var time_block = time_blocks[index];
-                var time_block_meta = time_block.get_meta ();
 
                 if ((index & 1) == 0) {
                     assert_true (time_block.state == Pomodoro.State.POMODORO);
                     assert_cmpvariant (
-                        new GLib.Variant.int64 (time_block_meta.intended_duration),
+                        new GLib.Variant.int64 (time_block.duration),
                         new GLib.Variant.int64 (template.pomodoro_duration)
                     );
                 }
                 else if (index < time_blocks.length - 1) {
                     assert_true (time_block.state == Pomodoro.State.SHORT_BREAK);
                     assert_cmpvariant (
-                        new GLib.Variant.int64 (time_block_meta.intended_duration),
+                        new GLib.Variant.int64 (time_block.duration),
                         new GLib.Variant.int64 (template.short_break_duration)
                     );
                 }
                 else {
                     assert_true (time_block.state == Pomodoro.State.LONG_BREAK);
                     assert_cmpvariant (
-                        new GLib.Variant.int64 (time_block_meta.intended_duration),
+                        new GLib.Variant.int64 (time_block.duration),
                         new GLib.Variant.int64 (template.long_break_duration)
                     );
                 }
@@ -196,7 +194,7 @@ namespace Tests
                 assert_true (time_block.session == session);
                 // assert_cmpuint (meta.cycle, GLib.CompareOperator.EQ, 1 + (index >> 1));
 
-                expected_start_time += time_block_meta.intended_duration;
+                expected_start_time += time_block.duration;
             }
 
             assert_cmpvariant (
@@ -741,29 +739,6 @@ namespace Tests
             assert_cmpuint (removed_emitted, GLib.CompareOperator.EQ, 7);
             assert_cmpuint (weak_notify_emitted, GLib.CompareOperator.EQ, 1);
         }
-
-        // public void test_get_time_block_meta ()
-        // {
-        //     var session = new Pomodoro.Session.from_template (this.session_template);
-
-        //     var first_time_block = session.get_first_time_block ();
-        //     var first_time_block_meta = first_time_block.get_meta ();
-        //     assert_cmpvariant (
-        //         new GLib.Variant.int64 (first_time_block_meta.intended_duration),
-        //         new GLib.Variant.int64 (this.session_template.pomodoro_duration)
-        //     );
-            // assert_cmpuint (first_time_block_meta.cycle, GLib.CompareOperator.EQ, 1);
-        //     assert_cmpuint (first_time_block_meta.status, GLib.CompareOperator.EQ, Pomodoro.TimeBlockStatus.SCHEDULED);
-
-        //     var last_time_block = session.get_last_time_block ();
-        //     var last_time_block_meta = last_time_block.get_meta ();
-        //     assert_cmpvariant (
-        //         new GLib.Variant.int64 (last_time_block_meta.intended_duration),
-        //         new GLib.Variant.int64 (this.session_template.long_break_duration)
-        //     );
-            // assert_cmpuint (last_time_block_meta.cycle, GLib.CompareOperator.EQ, this.session_template.cycles);
-        //     assert_cmpuint (first_time_block_meta.status, GLib.CompareOperator.EQ, Pomodoro.TimeBlockStatus.SCHEDULED);
-        // }
 
         public void test_set_time_block_status__completed ()
         {

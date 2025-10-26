@@ -634,13 +634,10 @@ namespace Pomodoro
             this.mark_busy ();
 
             this.session_manager.restore.begin (
+                Pomodoro.Timestamp.UNDEFINED,
                 (obj, res) => {
-                    try {
-                        this.session_manager.restore.end (res);
-                    }
-                    catch (GLib.Error error) {
-                        GLib.warning ("Failed to restore session: %s", error.message);
-                    }
+                    this.session_manager.restore.end (res);
+                    this.session_manager.ensure_session ();
 
                     this.session_manager.enter_time_block.connect (this.on_enter_time_block);
                     this.session_manager.leave_time_block.connect (this.on_leave_time_block);

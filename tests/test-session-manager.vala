@@ -48,6 +48,10 @@ namespace Tests
                            this.test_set_current_time_block__with_new_session);
             // this.add_test ("set_current_time_block__without_session",
             //                this.test_set_current_time_block__without_session);
+            this.add_test ("set_current_time_block__in_progress",
+                           this.test_set_current_time_block__in_progress);
+            this.add_test ("set_current_time_block__in_progress_with_gaps",
+                           this.test_set_current_time_block__in_progress_with_gaps);
 
             this.add_test ("set_scheduler",
                            this.test_set_scheduler);
@@ -716,30 +720,6 @@ namespace Tests
             assert_cmpint (notify_current_session_emitted, GLib.CompareOperator.EQ, 0);
         }
 
-        public void test_set_current_time_block__with_new_session ()
-        {
-            var timer           = new Pomodoro.Timer ();
-            var session_manager = new Pomodoro.SessionManager.with_timer (timer);
-            var session         = new Pomodoro.Session.from_template (this.session_template);
-            var time_block      = session.get_first_time_block ();
-
-            session_manager.current_time_block = time_block;
-
-            assert_true (session_manager.current_session == session);
-            assert_true (session_manager.current_time_block == time_block);
-        }
-
-        // public void test_set_current_time_block__without_session ()
-        // {
-        //     var timer           = new Pomodoro.Timer ();
-        //     var session_manager = new Pomodoro.SessionManager.with_timer (timer);
-        //
-        //     session_manager.current_time_block = new Pomodoro.TimeBlock (Pomodoro.State.UNDEFINED);
-        //
-        //     assert_null (session_manager.current_session);
-        //     assert_null (session_manager.current_time_block);
-        // }
-
         public void test_set_current_time_block__null ()
         {
             var timer           = new Pomodoro.Timer ();
@@ -772,6 +752,138 @@ namespace Tests
             assert_false (timer.is_started ());
         }
 
+        public void test_set_current_time_block__with_new_session ()
+        {
+            var timer           = new Pomodoro.Timer ();
+            var session_manager = new Pomodoro.SessionManager.with_timer (timer);
+            var session         = new Pomodoro.Session.from_template (this.session_template);
+            var time_block      = session.get_first_time_block ();
+
+            session_manager.current_time_block = time_block;
+
+            assert_true (session_manager.current_session == session);
+            assert_true (session_manager.current_time_block == time_block);
+        }
+
+        // public void test_set_current_time_block__without_session ()
+        // {
+        //     var timer           = new Pomodoro.Timer ();
+        //     var session_manager = new Pomodoro.SessionManager.with_timer (timer);
+        //
+        //     session_manager.current_time_block = new Pomodoro.TimeBlock (Pomodoro.State.UNDEFINED);
+        //
+        //     assert_null (session_manager.current_session);
+        //     assert_null (session_manager.current_time_block);
+        // }
+
+        /**
+         * Allow setting an in-progress time-block, as it's used by restore
+         */
+        public void test_set_current_time_block__in_progress ()
+        {
+            var timer           = new Pomodoro.Timer ();
+            var session_manager = new Pomodoro.SessionManager.with_timer (timer);
+
+            var session = new Pomodoro.Session.from_template (this.session_template);
+            var time_block = session.get_first_time_block ();
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.notify["start-time"].connect (
+                () => {
+                    assert_not_reached ();
+                });
+
+            var timestamp = time_block.start_time + Pomodoro.Interval.MINUTE;
+            Pomodoro.Timestamp.freeze_to (timestamp);
+
+            var expected_start_time = time_block.start_time;
+            var expected_elapsed = time_block.calculate_elapsed (timestamp);
+            var expected_timer_state = Pomodoro.TimerState () {
+                duration = time_block.duration,
+                offset = 0,
+                started_time = time_block.start_time,
+                paused_time = Pomodoro.Timestamp.UNDEFINED,
+                finished_time = Pomodoro.Timestamp.UNDEFINED,
+                user_data = time_block
+            };
+
+            session_manager.current_time_block = time_block;
+
+            assert_true (session_manager.current_session == session);
+            assert_true (session_manager.current_time_block == time_block);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (time_block.start_time),
+                new GLib.Variant.int64 (expected_start_time)
+            );
+            assert_true (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            assert_null (time_block.get_last_gap ());
+            assert_cmpvariant (
+                timer.state.to_variant (),
+                expected_timer_state.to_variant ()
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (timer.calculate_elapsed (timestamp)),
+                new GLib.Variant.int64 (expected_elapsed)
+            );
+        }
+
+        public void test_set_current_time_block__in_progress_with_gaps ()
+        {
+            var timer           = new Pomodoro.Timer ();
+            var session_manager = new Pomodoro.SessionManager.with_timer (timer);
+
+            var session = new Pomodoro.Session.from_template (this.session_template);
+            var time_block = session.get_first_time_block ();
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.set_intended_duration (time_block.duration);
+
+            var gap_1 = new Pomodoro.Gap ();
+            gap_1.set_time_range (time_block.start_time + Pomodoro.Interval.MINUTE,
+                                  time_block.start_time + 3 * Pomodoro.Interval.MINUTE);
+            time_block.add_gap (gap_1);
+
+            var gap_2 = new Pomodoro.Gap.with_start_time (gap_1.end_time + Pomodoro.Interval.MINUTE);
+            time_block.add_gap (gap_2);
+
+            var timestamp = gap_2.start_time + 5 * Pomodoro.Interval.MINUTE;
+
+            var expected_start_time = time_block.start_time;
+            var expected_elapsed = 2 * Pomodoro.Interval.MINUTE;
+            var expected_timer_state = Pomodoro.TimerState () {
+                duration = time_block.get_intended_duration (),
+                offset = gap_2.start_time - expected_start_time - expected_elapsed,
+                started_time = expected_start_time,
+                paused_time = gap_2.start_time,
+                finished_time = Pomodoro.Timestamp.UNDEFINED,
+                user_data = time_block
+            };
+
+            Pomodoro.Timestamp.freeze_to (timestamp);
+            session_manager.current_time_block = time_block;
+
+            assert_true (session_manager.current_session == session);
+            assert_true (session_manager.current_time_block == time_block);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (time_block.start_time),
+                new GLib.Variant.int64 (expected_start_time)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (time_block.calculate_elapsed (timestamp)),
+                new GLib.Variant.int64 (expected_elapsed)
+            );
+            assert_true (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            assert_true (time_block.get_last_gap () == gap_2);
+            assert_true (Pomodoro.Timestamp.is_undefined (gap_2.end_time));
+
+            assert_cmpvariant (
+                timer.state.to_variant (),
+                expected_timer_state.to_variant ()
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (timer.calculate_elapsed (timestamp)),
+                new GLib.Variant.int64 (expected_elapsed)
+            );
+        }
+
 
         /*
          * Tests for scheduler property
@@ -782,6 +894,8 @@ namespace Tests
             var timer           = new Pomodoro.Timer ();
             var session_manager = new Pomodoro.SessionManager.with_timer (timer);
 
+            session_manager.ensure_session ();
+
             var signals = new string[0];
             var session = new Pomodoro.Session.from_template (this.session_template);
             session_manager.current_time_block = session.get_first_time_block ();
@@ -789,23 +903,35 @@ namespace Tests
             session_manager.enter_time_block.connect (() => { signals += "enter-time-block"; });
             session_manager.leave_session.connect (() => { signals += "leave-session"; });
             session_manager.leave_time_block.connect (() => { signals += "leave-time-block"; });
+            session_manager.notify["scheduler"].connect (() => { signals += "notify::scheduler"; });
 
             var scheduler_1 = session_manager.scheduler;
-            scheduler_1.populated_session.connect (() => { signals += "scheduler_1:populated-session"; });;
-            scheduler_1.rescheduled_session.connect (() => { signals += "scheduler_1:rescheduled-session"; });;
+            scheduler_1.populated_session.connect (() => { signals += "scheduler_1:populated-session"; });
+            scheduler_1.rescheduled_session.connect (() => { signals += "scheduler_1:rescheduled-session"; });
 
-            var scheduler_2 = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            scheduler_2.populated_session.connect (() => { signals += "scheduler_2:populated-session"; });;
-            scheduler_2.rescheduled_session.connect (() => { signals += "scheduler_2:rescheduled-session"; });;
+            session_manager.scheduler = scheduler_1;
+            assert_true (session_manager.scheduler == scheduler_1);
+            assert_cmpstrv (signals, {});
 
+            var scheduler_2 = new Pomodoro.SimpleScheduler.with_template (
+                Pomodoro.SessionTemplate () {
+                    pomodoro_duration = 30 * Pomodoro.Interval.MINUTE,
+                    short_break_duration = 5 * Pomodoro.Interval.MINUTE,
+                    long_break_duration = 20 * Pomodoro.Interval.MINUTE,
+                    cycles = 4
+                }
+            );
+            scheduler_2.populated_session.connect (() => { signals += "scheduler_2:populated-session"; });
+            scheduler_2.rescheduled_session.connect (() => { signals += "scheduler_2:rescheduled-session"; });
+
+            var expected_session = session_manager.current_session;
             var expected_time_block = session_manager.current_time_block;
-            session_manager.scheduler = scheduler_2;
 
+            session_manager.scheduler = scheduler_2;
             assert_true (session_manager.scheduler == scheduler_2);
+            assert_true (session_manager.current_session == expected_session);
             assert_true (session_manager.current_time_block == expected_time_block);
-            assert_cmpstrv (signals, {
-                "scheduler_2:rescheduled-session",
-            });
+            assert_cmpstrv (signals, { "scheduler_2:rescheduled-session", "notify::scheduler" });
         }
 
 
@@ -3079,8 +3205,8 @@ namespace Tests
 
         public SessionManagerDatabaseTest ()
         {
-            this.add_test ("save__ensure_session", this.test_save__ensure_session);
-            this.add_test ("save__update_status", this.test_save__update_status);
+            this.add_test ("save__empty_session", this.test_save__empty_session);
+            this.add_test ("save__update_time_block_status", this.test_save__update_time_block_status);
             this.add_test ("save__update_time_range", this.test_save__update_time_range);
             this.add_test ("save__delete_extra_time_blocks", this.test_save__delete_extra_time_blocks);
             this.add_test ("save__delete_extra_gaps", this.test_save__delete_extra_gaps);
@@ -3089,6 +3215,15 @@ namespace Tests
             this.add_test ("save__timer_start", this.test_save__timer_start);
             this.add_test ("save__timer_pause", this.test_save__timer_pause);
             this.add_test ("save__timer_rewind", this.test_save__timer_rewind);
+
+            this.add_test ("restore__empty_database", this.test_restore__empty_database);
+            this.add_test ("restore__empty_session", this.test_restore__empty_session);
+            this.add_test ("restore__in_progress_time_block", this.test_restore__in_progress_time_block);
+            this.add_test ("restore__multiple_time_blocks", this.test_restore__multiple_time_blocks);
+            this.add_test ("restore__with_gaps", this.test_restore__with_gaps);
+            this.add_test ("restore__most_recent_session", this.test_restore__most_recent_session);
+            this.add_test ("restore__completed_session", this.test_restore__completed_session);
+            this.add_test ("restore__expired_session", this.test_restore__expired_session);
         }
 
         public override void setup ()
@@ -3174,11 +3309,33 @@ namespace Tests
             this.main_loop.quit ();
         }
 
-        private void run_save ()
+        private void run_save (Pomodoro.SessionManager? session_manager = null)
         {
-            this.session_manager.save.begin (
+            if (session_manager == null) {
+                session_manager = this.session_manager;
+            }
+
+            session_manager.save.begin (
                 (obj, res) => {
-                    assert_true (this.session_manager.save.end (res));
+                    assert_true (session_manager.save.end (res));
+
+                    this.quit_main_loop ();
+                });
+
+            assert_true (this.run_main_loop ());
+        }
+
+        private void run_restore (Pomodoro.SessionManager? session_manager = null,
+                                  int64                    timestamp = Pomodoro.Timestamp.UNDEFINED)
+        {
+            if (session_manager == null) {
+                session_manager = this.session_manager;
+            }
+
+            session_manager.restore.begin (
+                timestamp,
+                (obj, res) => {
+                    assert_true (session_manager.restore.end (res));
 
                     this.quit_main_loop ();
                 });
@@ -3187,11 +3344,13 @@ namespace Tests
         }
 
         /**
-         * After `ensure_session()` no time-block is in-progress, so expect nothing to be saved.
+         * If session hasn't started yet, expect nothing to be saved.
          */
-        public void test_save__ensure_session ()
+        public void test_save__empty_session ()
         {
             this.session_manager.ensure_session ();
+            assert_true (this.session_manager.current_session.is_scheduled ());
+
             this.run_save ();
 
             var repository = Pomodoro.Database.get_repository ();
@@ -3210,7 +3369,7 @@ namespace Tests
             }
         }
 
-        public void test_save__update_status ()
+        public void test_save__update_time_block_status ()
         {
             var repository = Pomodoro.Database.get_repository ();
 
@@ -3500,7 +3659,7 @@ namespace Tests
         }
 
         /**
-         * If session becomes empty, expect database entry to be removed.
+         * If session is modified and becomes empty, expect database entry to be removed.
          *
          * It's a hypothetical scenario in practice.
          */
@@ -3535,6 +3694,7 @@ namespace Tests
             }
 
             time_block.set_status (Pomodoro.TimeBlockStatus.SCHEDULED);
+            assert_true (session.is_scheduled ());
             this.run_save ();
 
             try {
@@ -3833,7 +3993,315 @@ namespace Tests
             }
         }
 
-        // TODO: test restore
+        /**
+         * Restoring from an empty database should not crash or set any session.
+         */
+        public void test_restore__empty_database ()
+        {
+            this.run_restore ();
+
+            assert_null (this.session_manager.current_session);
+            assert_null (this.session_manager.current_time_block);
+        }
+
+        /**
+         * We delete sessions that are empty from database. However, expect an empty session
+         * not to break things.
+         */
+        public void test_restore__empty_session ()
+        {
+            var session_entry = new Pomodoro.SessionEntry ();
+            session_entry.repository = Pomodoro.Database.get_repository ();
+            session_entry.start_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            session_entry.end_time = Pomodoro.Timestamp.advance (25 * Pomodoro.Interval.MINUTE);
+
+            try {
+                session_entry.save_sync ();
+            }
+            catch (GLib.Error error) {
+                assert_no_error (error);
+            }
+
+            this.run_restore ();
+
+            assert_null (this.session_manager.current_session);
+            assert_null (this.session_manager.current_time_block);
+        }
+
+        /**
+         * Restore a session with a single in-progress time block.
+         */
+        public void test_restore__in_progress_time_block ()
+        {
+            var timestamp = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+
+            // Save a single time-block. Imitate pausing the timer before shutdown
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_time_range (timestamp, timestamp + 25 * Pomodoro.Interval.MINUTE);
+            time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.notify["start-time"].connect (
+                () => {
+                    assert_not_reached ();
+                });
+
+            var gap_1 = new Pomodoro.Gap ();
+            gap_1.set_time_range (time_block.start_time + Pomodoro.Interval.MINUTE,
+                                  time_block.start_time + 3 * Pomodoro.Interval.MINUTE);
+            time_block.add_gap (gap_1);
+
+            var gap_2 = new Pomodoro.Gap.with_start_time (gap_1.end_time + Pomodoro.Interval.MINUTE);
+            time_block.add_gap (gap_2);
+
+            var session = new Pomodoro.Session ();
+            session.append (time_block);
+
+            timestamp = gap_2.start_time;
+            Pomodoro.Timestamp.freeze_to (timestamp);
+
+            this.session_manager.current_time_block = time_block;
+            assert_true (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (time_block.calculate_elapsed (timestamp)),
+                new GLib.Variant.int64 (2 * Pomodoro.Interval.MINUTE)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (this.timer.calculate_elapsed (timestamp)),
+                new GLib.Variant.int64 (2 * Pomodoro.Interval.MINUTE)
+            );
+
+            this.run_save ();
+
+            // Create a new session manager to test restore
+            var new_timer = new Pomodoro.Timer ();
+            var new_session_manager = new Pomodoro.SessionManager.with_timer (new_timer);
+
+            timestamp = Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            this.run_restore (new_session_manager, timestamp);
+
+            var new_session = new_session_manager.current_session;
+            var new_time_block = new_session_manager.current_time_block;
+            var new_gap = new_time_block?.get_last_gap ();
+            assert_nonnull (new_session);
+            assert_nonnull (new_time_block);
+            assert_nonnull (new_gap);
+
+            assert_cmpvariant (
+                new GLib.Variant.int64 (new_session.start_time),
+                new GLib.Variant.int64 (session.start_time)
+            );
+            assert_cmpuint (
+                new_session.count_visible_cycles (),
+                GLib.CompareOperator.EQ,
+                session.count_visible_cycles ()
+            );
+
+            assert_true (new_time_block.state == Pomodoro.State.POMODORO);
+            assert_true (new_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (new_time_block.start_time),
+                new GLib.Variant.int64 (time_block.start_time)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (new_time_block.get_intended_duration ()),
+                new GLib.Variant.int64 (time_block.get_intended_duration ())
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (new_time_block.calculate_elapsed (timestamp)),
+                new GLib.Variant.int64 (time_block.calculate_elapsed (timestamp))
+            );
+
+            var expected_timer_state = Pomodoro.TimerState () {
+                duration = 25 * Pomodoro.Interval.MINUTE,
+                offset = gap_2.start_time - time_block.start_time - time_block.calculate_elapsed (timestamp),
+                started_time = time_block.start_time,
+                paused_time = gap_2.start_time,
+                finished_time = Pomodoro.Timestamp.UNDEFINED,
+                user_data = new_time_block
+            };
+            assert_cmpvariant (
+                timer.state.to_variant (),
+                expected_timer_state.to_variant ()
+            );
+        }
+
+        /**
+         * Restore a session with multiple time blocks (only in-progress ones are restored).
+         */
+        public void test_restore__multiple_time_blocks ()
+        {
+            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block_1.start_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            time_block_1.end_time = Pomodoro.Timestamp.advance (25 * Pomodoro.Interval.MINUTE);
+            time_block_1.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
+            time_block_1.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+
+            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            time_block_2.start_time = time_block_1.end_time;
+            time_block_2.end_time = Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            time_block_2.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
+            time_block_2.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+
+            var session = new Pomodoro.Session ();
+            session.append (time_block_1);
+            session.append (time_block_2);
+
+            this.session_manager.current_session = session;
+            this.run_save ();
+
+            // Create a new session manager to test restore
+            var new_timer = new Pomodoro.Timer ();
+            var new_session_manager = new Pomodoro.SessionManager.with_timer (new_timer);
+
+            this.run_restore (new_session_manager);
+            assert_nonnull (new_session_manager.current_session);
+            assert_nonnull (new_session_manager.current_time_block);
+
+            var restored_time_block = new_session_manager.current_time_block;
+            assert_true (restored_time_block.state == Pomodoro.State.SHORT_BREAK);
+            assert_true (restored_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
+        }
+
+        /**
+         * Restore a session with gaps in time blocks.
+         */
+        public void test_restore__with_gaps ()
+        {
+            var gap = new Pomodoro.Gap ();
+            gap.start_time = Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            gap.end_time = Pomodoro.Timestamp.advance (2 * Pomodoro.Interval.MINUTE);
+            gap.flags = Pomodoro.GapFlags.INTERRUPTION;
+
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.start_time = Pomodoro.Timestamp.peek ();
+            time_block.end_time = Pomodoro.Timestamp.advance (20 * Pomodoro.Interval.MINUTE);
+            time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.add_gap (gap);
+
+            var session = new Pomodoro.Session ();
+            session.append (time_block);
+
+            this.session_manager.current_session = session;
+            this.run_save ();
+
+            // Create a new session manager to test restore
+            var new_timer = new Pomodoro.Timer ();
+            var new_session_manager = new Pomodoro.SessionManager.with_timer (new_timer);
+
+            this.run_restore (new_session_manager);
+            assert_nonnull (new_session_manager.current_session);
+            assert_nonnull (new_session_manager.current_time_block);
+
+            // Gaps should be restored with their flags
+            var restored_gap = new_session_manager.current_time_block.get_last_gap ();
+            assert_nonnull (restored_gap);
+            assert_true (restored_gap.has_flag (Pomodoro.GapFlags.INTERRUPTION));
+            assert_true (Pomodoro.Timestamp.is_defined (restored_gap.start_time));
+            assert_true (Pomodoro.Timestamp.is_defined (restored_gap.end_time));
+        }
+
+        /**
+         * When multiple sessions exist, restore should load the most recent one.
+         */
+        public void test_restore__most_recent_session ()
+        {
+            // Create and save first session (older)
+            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block_1.start_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            time_block_1.end_time = Pomodoro.Timestamp.advance (25 * Pomodoro.Interval.MINUTE);
+            time_block_1.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
+            time_block_1.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+
+            var session_1 = new Pomodoro.Session ();
+            session_1.append (time_block_1);
+
+            this.session_manager.current_session = session_1;
+            this.run_save ();
+
+            // Create and save second session (more recent)
+            Pomodoro.Timestamp.advance (1 * Pomodoro.Interval.HOUR);
+
+            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            time_block_2.start_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            time_block_2.end_time = Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            time_block_2.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
+            time_block_2.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+
+            var session_2 = new Pomodoro.Session ();
+            session_2.append (time_block_2);
+
+            this.session_manager.current_session = session_2;
+            this.run_save ();
+
+            // Create a new session manager to test restore
+            var new_timer = new Pomodoro.Timer ();
+            var new_session_manager = new Pomodoro.SessionManager.with_timer (new_timer);
+
+            this.run_restore (new_session_manager);
+            assert_nonnull (new_session_manager.current_session);
+            assert_nonnull (new_session_manager.current_time_block);
+
+            // Should restore the more recent session (session_2) with its state
+            assert_true (new_session_manager.current_time_block.state == Pomodoro.State.SHORT_BREAK);
+            assert_true (new_session_manager.current_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
+        }
+
+        public void test_restore__completed_session ()
+        {
+            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block_1.start_time = Pomodoro.Timestamp.peek ();
+            time_block_1.end_time = Pomodoro.Timestamp.advance (25 * Pomodoro.Interval.MINUTE);
+            time_block_1.set_intended_duration (time_block_1.duration);
+            time_block_1.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+
+            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.LONG_BREAK);
+            time_block_2.start_time = Pomodoro.Timestamp.peek ();
+            time_block_2.end_time = Pomodoro.Timestamp.advance (15 * Pomodoro.Interval.MINUTE);
+            time_block_2.set_intended_duration (time_block_2.duration);
+            time_block_2.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+
+            var session = new Pomodoro.Session ();
+            session.append (time_block_1);
+            session.append (time_block_2);
+            assert_true (session.is_completed ());
+
+            this.session_manager.current_session = session;
+            this.run_save ();
+
+            // Create a new session manager to test restore
+            var new_timer = new Pomodoro.Timer ();
+            var new_session_manager = new Pomodoro.SessionManager.with_timer (new_timer);
+
+            this.run_restore (new_session_manager);
+            assert_null (new_session_manager.current_session);
+            assert_null (new_session_manager.current_time_block);
+        }
+
+        public void test_restore__expired_session ()
+        {
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.start_time = Pomodoro.Timestamp.peek ();
+            time_block.end_time = Pomodoro.Timestamp.advance (25 * Pomodoro.Interval.MINUTE);
+            time_block.set_intended_duration (time_block.duration);
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+
+            var session = new Pomodoro.Session ();
+            session.append (time_block);
+            assert_false (session.is_completed ());
+
+            this.session_manager.current_session = session;
+            this.run_save ();
+
+            // Create a new session manager to test restore
+            var new_timer = new Pomodoro.Timer ();
+            var new_session_manager = new Pomodoro.SessionManager.with_timer (new_timer);
+
+            Pomodoro.Timestamp.advance (Pomodoro.SessionManager.SESSION_EXPIRY_TIMEOUT);
+            this.run_restore (new_session_manager);
+            assert_null (new_session_manager.current_session);
+            assert_null (new_session_manager.current_time_block);
+        }
     }
 }
 

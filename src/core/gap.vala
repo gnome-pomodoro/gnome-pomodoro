@@ -19,6 +19,9 @@ namespace Pomodoro
             {
                 switch (part.strip ())
                 {
+                    case "default":
+                        break;
+
                     case "interruption":
                         result |= INTERRUPTION;
                         break;

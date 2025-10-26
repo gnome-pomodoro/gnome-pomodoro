@@ -35,6 +35,24 @@ namespace Pomodoro
                     assert_not_reached ();
             }
         }
+
+        public static Pomodoro.TimeBlockStatus from_string (string? status)
+        {
+            switch (status)
+            {
+                case "in-progress":
+                    return IN_PROGRESS;
+
+                case "completed":
+                    return COMPLETED;
+
+                case "uncompleted":
+                    return UNCOMPLETED;
+
+                default:
+                    return SCHEDULED;
+            }
+        }
     }
 
 
@@ -332,29 +350,30 @@ namespace Pomodoro
 
             var range_start = this._start_time;
             var range_end   = Pomodoro.Timestamp.is_defined (this._end_time)
-                ? int64.min (this._end_time, timestamp)
-                : timestamp;
+                    ? int64.min (this._end_time, timestamp)
+                    : timestamp;
             var elapsed     = Pomodoro.Timestamp.subtract (range_end, range_start);
 
-            this.gaps.@foreach ((gap) => {
-                if (Pomodoro.Timestamp.is_undefined (gap.end_time)) {
-                    range_start = range_end;
-                    return;
-                }
+            this.gaps.@foreach (
+                (gap) => {
+                    var gap_start_time = gap.start_time.clamp (range_start, range_end);
+                    var gap_end_time = gap.end_time;
 
-                if (gap.end_time <= gap.start_time) {
-                    return;
-                }
+                    if (Pomodoro.Timestamp.is_undefined (gap_end_time)) {
+                        gap_end_time = range_end;
+                    }
+                    else if (gap_end_time > gap_start_time) {
+                        gap_end_time = gap_end_time.clamp (range_start, range_end);
+                    }
+                    else {
+                        return;
+                    }
 
-                elapsed = Pomodoro.Interval.subtract (
-                    elapsed,
-                    Pomodoro.Timestamp.subtract (
-                        gap.end_time.clamp (range_start, range_end),
-                        gap.start_time.clamp (range_start, range_end)
-                    )
-                );
-                range_start = gap.end_time.clamp (range_start, range_end);
-            });
+                    elapsed = Pomodoro.Interval.subtract (
+                            elapsed,
+                            Pomodoro.Timestamp.subtract (gap_end_time, gap_start_time));
+                    range_start = gap_end_time;
+                });
 
             return elapsed;
         }
@@ -367,7 +386,7 @@ namespace Pomodoro
             Pomodoro.ensure_timestamp (ref timestamp);
 
             if (Pomodoro.Timestamp.is_undefined (this._end_time)) {
-                return 0;  // Result won't make sense if block has no `start`.
+                return 0;  // Result won't make sense if block has no `end`.
             }
 
             if (timestamp >= this._end_time || this._start_time >= this._end_time) {
@@ -378,20 +397,24 @@ namespace Pomodoro
             var range_end   = this._end_time;
             var remaining   = Pomodoro.Timestamp.subtract (range_end, range_start);
 
-            this.gaps.@foreach ((gap) => {
-                if (gap.end_time <= gap.start_time) {
-                    return;
-                }
+            this.gaps.@foreach (
+                (gap) => {
+                    var gap_start_time = gap.start_time.clamp (range_start, range_end);
+                    var gap_end_time = gap.end_time;
 
-                remaining = Pomodoro.Interval.subtract (
-                    remaining,
-                    Pomodoro.Timestamp.subtract (
-                        gap.end_time.clamp (range_start, range_end),
-                        gap.start_time.clamp (range_start, range_end)
-                    )
-                );
-                range_start = gap.end_time.clamp (range_start, range_end);
-            });
+                    if (Pomodoro.Timestamp.is_undefined (gap_end_time) ||
+                        gap_end_time <= gap_start_time)
+                    {
+                        return;
+                    }
+
+                    gap_end_time = gap_end_time.clamp (range_start, range_end);
+
+                    remaining = Pomodoro.Interval.subtract (
+                            remaining,
+                            Pomodoro.Timestamp.subtract (gap_end_time, gap_start_time));
+                    range_start = gap_end_time.clamp (range_start, range_end);
+                });
 
             return remaining;
         }

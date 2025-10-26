@@ -279,10 +279,17 @@ namespace Pomodoro
             this.cycles_need_update = false;
         }
 
+        private void update_cycles_if_queued ()
+        {
+            if (this.cycles_need_update) {
+                this.update_cycles ();
+            }
+        }
+
         internal void emit_added (Pomodoro.TimeBlock time_block)
         {
             time_block.session = this;
-            time_block.set_intended_duration (time_block.duration);
+
             time_block.changed.connect (this.on_time_block_changed);
 
             this.added (time_block);
@@ -745,18 +752,14 @@ namespace Pomodoro
          */
         public GLib.List<unowned Pomodoro.Cycle> get_cycles ()
         {
-            if (this.cycles_need_update) {
-                this.update_cycles ();
-            }
+            this.update_cycles_if_queued ();
 
             return this.cycles.copy ();
         }
 
         public uint count_visible_cycles ()
         {
-            if (this.cycles_need_update) {
-                this.update_cycles ();
-            }
+            this.update_cycles_if_queued ();
 
             unowned GLib.List<Pomodoro.Cycle> link = this.cycles.first ();
             uint visible_cycles = 0;
@@ -775,6 +778,8 @@ namespace Pomodoro
 
         public bool has_completed_cycle ()
         {
+            this.update_cycles_if_queued ();
+
             unowned GLib.List<Pomodoro.Cycle> link = this.cycles.first ();
 
             while (link != null)
