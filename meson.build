@@ -1,7 +1,7 @@
 project(
   'gnome-pomodoro',
   ['vala', 'c'],
-  version: '0.28.1',
+  version: '1.0-alpha',
   meson_version: '>=0.59.0',
   default_options: [
     'buildtype=debugoptimized',
