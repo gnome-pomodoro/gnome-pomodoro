@@ -378,13 +378,11 @@ namespace Pomodoro
         {
             var width           = (float) gizmo.get_width ();
             var height          = (float) gizmo.get_height ();
-            var style_context   = gizmo.get_style_context ();
             var border_radius   = 8.0f;
             var padding = LINE_WIDTH / 2.0f;
             var x = width / 2.0f;
             var y = border_radius + padding;
-
-            var color    = style_context.get_color ();
+            var color = gizmo.get_color ();
             color.alpha *= 0.2f;
 
             var path_builder = new Gsk.PathBuilder ();

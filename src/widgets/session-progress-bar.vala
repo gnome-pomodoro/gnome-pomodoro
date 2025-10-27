@@ -352,8 +352,6 @@ namespace Pomodoro
                     return;
                 }
 
-                var style_context     = this.get_style_context ();
-                var color             = style_context.get_color ();
                 var width             = (float) this.get_width ();
                 var height            = (float) this.get_height ();
                 var block_x           = this._span_start * width;
@@ -361,6 +359,7 @@ namespace Pomodoro
                 var block_bounds      = Graphene.Rect ();
                 var block_outline     = Gsk.RoundedRect ();
                 var display_value     = this.calculate_display_value ();
+                var color             = this.get_color ();
 
                 if (this._backfill_set) {
                     display_value = (this._backfill + display_value).clamp (0.0, 1.0);
@@ -368,6 +367,8 @@ namespace Pomodoro
                 else {
                     this.start_value_animation (ref display_value);
                 }
+
+                var style_context = this.get_style_context ();
 
                 Gdk.RGBA trough_color;
                 style_context.lookup_color ("unfocused_borders", out trough_color);
