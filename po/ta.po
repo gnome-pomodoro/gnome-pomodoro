@@ -1,0 +1,472 @@
+# Tamil translation for gnome-pomodoro
+# Copyright (c) 2012 gnome-pomodoro contributors
+# This file is distributed under the same license as the gnome-pomodoro package.
+# Killersparrow1 <github.com/Killersparrow1>, 2025
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-pomodoro\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-24 15:30+0100\n"
+"PO-Revision-Date: 2025-10-30 22:00+0530\n"
+"Last-Translator: Killersparrow1 <github.com/Killersparrow1>\n"
+"Language-Team: ta <>\n"
+"Language: ta\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"X-Generator: Poedit 3.1.1\n"
+
+#: data/org.gnome.Pomodoro.appdata.xml:8 data/org.gnome.Pomodoro.desktop.in:3
+#: data/resources/menus.ui:28 data/resources/window.ui:382
+#: plugins/actions/enums.vala:92 plugins/gnome/extension/indicator.js:77
+#: plugins/gnome/extension/indicator.js:729
+#: plugins/gnome/extension/notifications.js:281
+#: plugins/gnome/extension/timer.js:41 src/about-dialog.vala:31
+#: src/main.vala:50 src/notifications-capability.vala:129
+#: src/stats-page.vala:527 src/window.vala:44
+msgid "Pomodoro"
+msgstr "பொமோடோரோ"
+
+#: data/org.gnome.Pomodoro.appdata.xml:9
+msgid "A time management utility for GNOME"
+msgstr "GNOME-க்கான ஒரு நேர நிர்வாக செயலி"
+
+#: data/org.gnome.Pomodoro.appdata.xml:11
+msgid ""
+"A GNOME utility that helps managing time according to Pomodoro Technique. It "
+"intends to improve productivity and focus by taking short breaks after every "
+"25 minutes of work."
+msgstr ""
+"பொமோடோரோ நுட்பத்தின்படி நேரத்தை நிர்வகிக்க உதவும் ஒரு GNOME செயலி. இது "
+"ஒவ்வொரு 25 நிமிட வேலைக்குப் பிறகும் ஒரு சிறிய இடைவெளி எடுப்பதன் மூலம் "
+"உற்பத்தித்திறன் மற்றும் கவனத்தை மேம்படுத்த உதவுகிறது."
+
+#: data/org.gnome.Pomodoro.appdata.xml:23
+msgid "Timer window"
+msgstr "நேரங்காட்டி சாளரம்"
+
+#: data/org.gnome.Pomodoro.appdata.xml:27
+#: plugins/gnome/extension/indicator.js:83 src/preferences-dialog.vala:800
+msgid "Preferences"
+msgstr "விருப்பத்தேர்வுகள்"
+
+#: data/org.gnome.Pomodoro.appdata.xml:31
+msgid "Indicator for GNOME Shell"
+msgstr "GNOME ஷெல்லுக்கான காட்டொளி"
+
+#: data/org.gnome.Pomodoro.desktop.in:4 src/about-dialog.vala:32
+msgid "A simple time management utility"
+msgstr "ஒரு எளிய நேர நிர்வாக பயன்பாடு"
+
+#: data/org.gnome.Pomodoro.desktop.in:5
+msgid "timer;"
+msgstr "நேரங்காட்டி;"
+
+#: data/resources/menus.ui:6 plugins/actions/enums.vala:188
+#: plugins/actions/resources/action-page.ui:155 src/application.vala:90
+msgid "Start"
+msgstr "தொடங்கு"
+
+#: data/resources/menus.ui:11 data/resources/window.ui:180
+#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:200
+#: src/application.vala:99
+msgid "Pause"
+msgstr "இடைநிறுத்து"
+
+#: data/resources/menus.ui:16 plugins/actions/enums.vala:200
+#: plugins/actions/resources/action-page.ui:215 src/application.vala:102
+msgid "Resume"
+msgstr "மீண்டும் தொடங்கு"
+
+#: data/resources/menus.ui:21 data/resources/window.ui:207
+#: plugins/gnome/extension/indicator.js:221 src/application.vala:93
+#: src/window.vala:163 src/window.vala:176
+msgid "Stop"
+msgstr "நிறுத்து"
+
+#: data/resources/menus.ui:33 data/resources/window.ui:398
+#: plugins/actions/enums.vala:95 plugins/gnome/extension/indicator.js:78
+#: plugins/gnome/extension/timer.js:44 src/window.vala:45
+msgid "Short Break"
+msgstr "சிறு இடைவெளி"
+
+#: data/resources/menus.ui:38 data/resources/window.ui:414
+#: plugins/actions/enums.vala:98 plugins/gnome/extension/indicator.js:79
+#: plugins/gnome/extension/timer.js:47 src/window.vala:46
+msgid "Long Break"
+msgstr "நீண்ட இடைவெளி"
+
+#: data/resources/menus.ui:45
+msgid "_Timer"
+msgstr "_நேரங்காட்டி"
+
+#: data/resources/menus.ui:49 data/resources/window.ui:309
+msgid "_Preferences"
+msgstr "_விருப்பத்தேர்வுகள்"
+
+#: data/resources/menus.ui:53 data/resources/window.ui:348
+msgid "_Quit"
+msgstr "_வெளியேறு"
+
+#: data/resources/preferences-keyboard-shortcut-page.ui:29
+msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
+msgstr "நேரங்காட்டியைக் கட்டுப்படுத்த விசைப்பலகை குறுக்குவழி. மாற்ற புதிய குறுக்குவழியை உள்ளிடவும்."
+
+#: data/resources/preferences-keyboard-shortcut-page.ui:83
+#: plugins/actions/enums.vala:206 plugins/actions/resources/action-page.ui:245
+msgid "Disable"
+msgstr "முடக்கு"
+
+#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:247
+msgid "Timer"
+msgstr "நேரங்காட்டி"
+
+#: data/resources/preferences-main-page.ui:108
+msgid "Pomodoro duration"
+msgstr "பொமோடோரோ நேரம்"
+
+#: data/resources/preferences-main-page.ui:160
+msgid "Break duration"
+msgstr "சிறு இடைவெளி நேரம்"
+
+#: data/resources/preferences-main-page.ui:213
+msgid "Long break duration"
+msgstr "நீண்ட இடைவெளி நேரம்"
+
+#: data/resources/preferences-main-page.ui:245
+msgid "Pomodoros before a long break"
+msgstr "நீண்ட இடைவெளிக்கு முன் பொமோடோரோக்களின் எண்ணிக்கை"
+
+#: data/resources/preferences-main-page.ui:294
+msgid "Keyboard shortcut"
+msgstr "விசைப்பலகை குறுக்குவழி"
+
+#: data/resources/preferences-main-page.ui:357
+msgid "Notifications"
+msgstr "அறிவிப்புகள்"
+
+#: data/resources/preferences-main-page.ui:400
+msgid "Screen notifications"
+msgstr "திரை அறிவிப்புகள்"
+
+#: data/resources/preferences-main-page.ui:460
+msgid "Desktop"
+msgstr "டெஸ்க்டாப்"
+
+#: data/resources/preferences-main-page.ui:509
+msgid "Wait for activity after a break"
+msgstr "இடைவெளிக்குப் பிறகு செயல்பாட்டிற்காக காத்திரு"
+
+#: data/resources/preferences-main-page.ui:573
+msgid "Plugins…"
+msgstr "பிளக்-இன்கள்..."
+
+#: data/resources/preferences.ui:8 src/preferences-dialog.vala:804
+msgid "Plugins"
+msgstr "பிளக்-இன்கள்"
+
+#: data/resources/preferences.ui:47
+msgid "Back"
+msgstr "பின்செல்"
+
+#: data/resources/screen-notification.ui:89
+#: plugins/gnome/extension/dialogs.js:1002
+msgid "It's time to take a break"
+msgstr "இடைவெளி எடுக்க வேண்டிய நேரம்"
+
+#: data/resources/stats-view.ui:28
+msgid "Nothing to see yet"
+msgstr "பார்க்க எதுவும் இல்லை"
+
+#: data/resources/stats-view.ui:45
+msgid "Complete a few sessions"
+msgstr "சில அமர்வுகளை முடிக்கவும்"
+
+#: data/resources/stats-view.ui:86 data/resources/stats-view.ui:343
+msgid "Day"
+msgstr "நாள்"
+
+#: data/resources/stats-view.ui:109 data/resources/stats-view.ui:356
+msgid "Week"
+msgstr "வாரம்"
+
+#: data/resources/stats-view.ui:133 data/resources/stats-view.ui:369
+msgid "Month"
+msgstr "மாதம்"
+
+#: data/resources/stats-view.ui:161
+msgid "Previous (Alt+Left)"
+msgstr "முந்தையது (Alt+Left)"
+
+#: data/resources/stats-view.ui:188
+msgid "Next (Alt+Right)"
+msgstr "அடுத்தது (Alt+Right)"
+
+#: data/resources/stats-view.ui:216 data/resources/stats-view.ui:319
+#: src/stats-day-page.vala:62
+msgid "Today"
+msgstr "இன்று"
+
+#: data/resources/window.ui:36 plugins/gnome/extension/indicator.js:214
+#: src/window.vala:180
+msgid "Start Pomodoro"
+msgstr "பொமோடோரோ தொடங்கு"
+
+#: data/resources/window.ui:323
+msgid "_About"
+msgstr "_பற்றி"
+
+#: plugins/actions/actions.vala:423
+msgid "Actions"
+msgstr "செயல்கள்"
+
+#: plugins/actions/actions.vala:427
+msgid "Action"
+msgstr "செயல்"
+
+#: plugins/actions/actions.vala:452
+msgid "Custom actions…"
+msgstr "தனிப்பயன் செயல்கள்..."
+
+#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:170
+msgid "Complete"
+msgstr "முடிப்பது"
+
+#: plugins/actions/enums.vala:194 plugins/actions/resources/action-page.ui:185
+msgid "Skip"
+msgstr "தவிர்"
+
+#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:230
+msgid "Enable"
+msgstr "இயக்கு"
+
+#: plugins/actions/resources/action-page.ui:28
+msgid "Command"
+msgstr "கட்டளை"
+
+#: plugins/actions/resources/action-page.ui:41
+#: plugins/actions/resources/menus.ui:29
+msgid "Triggers"
+msgstr "தூண்டுகள்"
+
+#: plugins/actions/resources/action-page.ui:54
+msgid "Name"
+msgstr "பெயர்"
+
+#: plugins/actions/resources/action-page.ui:88
+msgid "_Pomodoro"
+msgstr "_பொமோடோரோ"
+
+#: plugins/actions/resources/action-page.ui:102
+msgid "_Short Break"
+msgstr "_சிறு இடைவெளி"
+
+#: plugins/actions/resources/action-page.ui:116
+msgid "_Long Break"
+msgstr "_நீண்ட இடைவெளி"
+
+#: plugins/actions/resources/action-page.ui:299
+msgid "Add"
+msgstr "சேர்"
+
+#: plugins/actions/resources/menus.ui:6
+msgid "Remove"
+msgstr "நீக்கு"
+
+#: plugins/actions/resources/menus.ui:14
+msgid "State"
+msgstr "நிலை"
+
+#: plugins/actions/resources/menus.ui:19
+msgid "State Duration"
+msgstr "நிலை நேரம்"
+
+#: plugins/actions/resources/menus.ui:24
+msgid "Elapsed Time"
+msgstr "கடந்துபோன நேரம்"
+
+#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
+#: plugins/gnome/extension/indicator.js:84 src/window.vala:101
+msgid "Stats"
+msgstr "புள்ளிவிவரங்கள்"
+
+#: plugins/gnome/extension/indicator.js:85
+msgid "Quit"
+msgstr "வெளியேறு"
+
+#: plugins/gnome/extension/indicator.js:123
+#: plugins/gnome/extension/notifications.js:128
+#: plugins/gnome/extension/notifications.js:549
+msgid "Pomodoro Timer"
+msgstr "பொமோடோரோ நேரங்காட்டி"
+
+#: plugins/gnome/extension/indicator.js:129
+msgid "Start Timer"
+msgstr "நேரங்காட்டியைத் தொடங்கு"
+
+#: plugins/gnome/extension/indicator.js:162
+msgid "Pause Timer"
+msgstr "நேரங்காட்டியை இடைநிறுத்து"
+
+#: plugins/gnome/extension/indicator.js:174
+msgid "Stop Timer"
+msgstr "நேரங்காட்டியை நிறுத்து"
+
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:179
+msgid "Pause break"
+msgstr "இடைவெளியை இடைநிறுத்து"
+
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:166
+msgid "Pause Pomodoro"
+msgstr "பொமோடோரோவை இடைநிறுத்து"
+
+#: plugins/gnome/extension/indicator.js:214
+#: src/notifications-capability.vala:141 src/notifications-capability.vala:162
+#: src/window.vala:167
+msgid "Take a break"
+msgstr "ஓர் இடைவெளி எடு"
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:175
+msgid "Resume break"
+msgstr "இடைவெளியை மீண்டும் தொடங்கு"
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:162
+msgid "Resume Pomodoro"
+msgstr "பொமோடோரோவை மீண்டும் தொடங்கு"
+
+#: plugins/gnome/extension/notifications.js:89
+#, javascript-format
+msgid "%d minute remaining"
+msgid_plural "%d minutes remaining"
+msgstr[0] "இன்னும் %d நிமிடம் உள்ளது"
+msgstr[1] "இன்னும் %d நிமிடங்கள் உள்ளன"
+
+#: plugins/gnome/extension/notifications.js:97
+#, javascript-format
+msgid "%d second remaining"
+msgid_plural "%d seconds remaining"
+msgstr[0] "இன்னும் %d வினாடி உள்ளது"
+msgstr[1] "இன்னும் %d வினாடிகள் உள்ளன"
+
+#: plugins/gnome/extension/notifications.js:289
+msgid "Pomodoro is about to end"
+msgstr "பொமோடோரோ விரைவில் முடிவடைகிறது"
+
+#: plugins/gnome/extension/notifications.js:295
+msgid "Take a long break"
+msgstr "ஒரு நீண்ட இடைவெளி எடு"
+
+#: plugins/gnome/extension/notifications.js:296
+msgid "Take a short break"
+msgstr "ஒரு சிறு இடைவெளி எடு"
+
+#: plugins/gnome/extension/notifications.js:304
+msgid "Break is about to end"
+msgstr "இடைவெளி விரைவில் முடிவடைகிறது"
+
+#: plugins/gnome/extension/notifications.js:308
+msgid "Break is over"
+msgstr "இடைவெளி முடிந்தது"
+
+#. body = _("Get ready for Pomodoro");
+#: plugins/gnome/extension/notifications.js:336
+msgid "Get ready…"
+msgstr "தயாராகுங்கள்..."
+
+#: plugins/gnome/extension/notifications.js:362
+msgid "Skip Break"
+msgstr "இடைவெளியைத் தவிர்"
+
+#: plugins/gnome/extension/notifications.js:365
+msgid "+1 Minute"
+msgstr "+1 நிமிடம்"
+
+#: plugins/gnome/extension/notifications.js:557
+msgid "Report issue"
+msgstr "பிரச்சினையை புகாரளி"
+
+#: plugins/gnome/extension/timer.js:248
+#, javascript-format
+msgid "Failed to run <i>%s</i> service"
+msgstr "<i>%s</i> சேவையை இயக்க முடியவில்லை"
+
+#: plugins/gnome/gnome-plugin.vala:290
+msgid "Hide other notifications"
+msgstr "பிற அறிவிப்புகளை மறை"
+
+#: plugins/sounds/resources/preferences-sound-page.ui:33
+msgid "Volume:"
+msgstr "ஒலியளவு:"
+
+#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:410
+msgid "Clock Ticking"
+msgstr "கடிகார இடித்தல்"
+
+#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:411
+msgid "Timer Ticking"
+msgstr "நேரங்காட்டி இடித்தல்"
+
+#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:412
+msgid "Woodland Birds"
+msgstr "காட்டுப் பறவைகள்"
+
+#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:472
+#: plugins/sounds/sounds-plugin.vala:511
+msgid "Bell"
+msgstr "மணி"
+
+#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:473
+#: plugins/sounds/sounds-plugin.vala:512
+msgid "Loud Bell"
+msgstr "சத்தமான மணி"
+
+#: plugins/sounds/sounds-plugin.vala:334
+msgid "Select Custom Sound"
+msgstr "தனிப்பயன் ஒலியைத் தேர்ந்தெடு"
+
+#: plugins/sounds/sounds-plugin.vala:337
+msgid "_Cancel"
+msgstr "_ரத்துசெய்"
+
+#: plugins/sounds/sounds-plugin.vala:339
+msgid "_Select"
+msgstr "_தேர்ந்தெடு"
+
+#: plugins/sounds/sounds-plugin.vala:568
+msgid "Ticking Sound"
+msgstr "இடிக்கும் ஒலி"
+
+#: plugins/sounds/sounds-plugin.vala:572
+msgid "End of Break Sound"
+msgstr "இடைவெளி முடியும் ஒலி"
+
+#: plugins/sounds/sounds-plugin.vala:576
+msgid "Start of Break Sound"
+msgstr "இடைவெளி தொடங்கும் ஒலி"
+
+#: plugins/sounds/sounds-plugin.vala:604 src/preferences-dialog.vala:590
+msgid "Off"
+msgstr "அணை"
+
+#: plugins/sounds/sounds-plugin.vala:744
+msgid "Ticking sound"
+msgstr "இடிக்கும் ஒலி"
+
+#: plugins/sounds/sounds-plugin.vala:749
+msgid "Start of break sound"
+msgstr "இடைவெளி தொடங்கும் ஒலி"
+
+#: plugins/sounds/sounds-plugin.vala:754
+msgid "End of break sound"
+msgstr "இடைவெளி முடியும் ஒலி"
+
+#: src/about-dialog.vala:34
+msgid "translator-credits"
+msgstr "Killersparrow1 <github.com/Killersparrow1>, 2025"
+
+#: src/main.vala:52
+msgid "A time management utility for GNOME."
+msgstr "GNOME-க்கான நேர மேலாண்மை பயன்பாடு."
+
