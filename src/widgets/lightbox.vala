@@ -791,6 +791,24 @@ namespace Pomodoro
                                 baseline);
         }
 
+        // public override void realize ()
+        // {
+        //     base.realize ();
+        //
+        //     var surface = this.get_surface ();
+        //     var display = surface?.get_display ();
+        //
+        //     #if HAVE_GDK_X11
+        //     if (display is Gdk.X11.Display)
+        //     {
+        //         var x11_surface = surface as Gdk.X11.Surface;
+        //
+        //         x11_surface.set_skip_pager_hint (true);
+        //         x11_surface.set_skip_taskbar_hint (true);
+        //     }
+        //     #endif
+        // }
+
         public override void map ()
         {
             var toplevel = (Gdk.Toplevel) this.get_surface ();

@@ -611,7 +611,8 @@ namespace Pomodoro
         }
 
         [GtkCallback]
-        private void on_histogram_enter ()
+        private void on_histogram_enter (double x,
+                                         double y)
         {
             this.toolbar_revealer.reveal_child = true;
         }

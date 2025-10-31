@@ -98,6 +98,11 @@ namespace Pomodoro
                             modifiers |= Gdk.ModifierType.CONTROL_MASK;
                             break;
 
+                        case "⌘":
+                        case "meta":
+                            modifiers |= Gdk.ModifierType.META_MASK;
+                            break;
+
                         case "alt":
                             modifiers |= Gdk.ModifierType.ALT_MASK;
                             break;
@@ -258,8 +263,12 @@ namespace Pomodoro
                 labels += "Ctrl";
             }
 
+            if (Gdk.ModifierType.META_MASK in this.modifiers) {
+                labels += "⌘";  // aka. Command key
+            }
+
             if (Gdk.ModifierType.ALT_MASK in this.modifiers) {
-                labels += "Alt";
+                labels += "Alt";  // aka. Option key / ⌥
             }
 
             if (Gdk.ModifierType.SUPER_MASK in this.modifiers) {

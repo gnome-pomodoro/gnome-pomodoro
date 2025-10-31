@@ -27,6 +27,7 @@
             <property name="min-children-per-line">2</property>
             <property name="margin-top">6</property>
             <property name="margin-bottom">12</property>
+            <property name="can-focus">false</property>
             <child>
               <object class="PomodoroStatsCard" id="pomodoro_card">
                 <property name="label" translatable="yes">Pomodoro</property>

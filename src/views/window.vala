@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 gnome-pomodoro contributors
+ * Copyright (c) 2016-2025 gnome-pomodoro contributors
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -175,8 +175,6 @@ namespace Pomodoro
 
             this.update_title ();
             this.update_timer_indicator ();
-
-            // this.layout_manager = null;
         }
 
         private void update_title ()

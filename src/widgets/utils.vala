@@ -124,26 +124,25 @@ namespace Pomodoro
                 }
 
                 return handle != null
-                    ? @"wayland:$(handle)"
-                    : "";
+                        ? @"wayland:$(handle)"
+                        : "";
             }
         }
         #endif
 
-        /* TODO: test this
-        if HAVE_GDK_X11
+        // TODO: test this
+        #if HAVE_GDK_X11
         if (display is Gdk.X11.Display)
         {
             var x11_surface = surface as Gdk.X11.Surface;
 
             if (x11_surface != null) {
-                var xid = x11_surface.get_xid ();
+                var xid = (int) x11_surface.get_xid ();
 
-                return "x11:" + xid.to_string ();
+                return @"x11:$(xid)";
             }
         }
-        endif
-        */
+        #endif
 
         return "";
     }

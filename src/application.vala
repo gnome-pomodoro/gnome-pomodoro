@@ -501,16 +501,16 @@ namespace Pomodoro
             action.activate.connect (this.activate_extend);
             this.add_action (action);
 
-            this.set_accels_for_action ("app.preferences", {"<Primary>comma"});
-            this.set_accels_for_action ("app.log", {"<Primary>l"});
-            this.set_accels_for_action ("app.quit", {"<Primary>q"});
-            this.set_accels_for_action ("window.close", {"<Primary>w"});
+            this.set_accels_for_action ("app.preferences", {"<Control>comma"});
+            this.set_accels_for_action ("app.log", {"<Control>l"});
+            this.set_accels_for_action ("app.quit", {"<Control>q"});
+            this.set_accels_for_action ("window.close", {"<Control>w"});
             this.set_accels_for_action ("win.toggle-compact-size", {"F9"});
 
             this.keyboard_manager = new Pomodoro.KeyboardManager ();
             this.keyboard_manager.add_shortcut ("timer.start-stop",
                                                 _("Start or Stop"),
-                                                "<Ctrl><Alt>p");
+                                                "<Control><Alt>p");
             this.keyboard_manager.add_shortcut ("timer.start-pause-resume",
                                                 _("Start, Pause or Resume"));
             this.keyboard_manager.add_shortcut ("timer.start",
@@ -527,7 +527,7 @@ namespace Pomodoro
                                                 _("Rewind"));
             this.keyboard_manager.add_shortcut ("app.toggle-window",
                                                 _("Bring to Focus"),
-                                                "<Ctrl><Alt><Shift>p");
+                                                "<Control><Alt><Shift>p");
             this.keyboard_manager.shortcut_activated.connect (this.on_shortcut_activated);
         }
 
