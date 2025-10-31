@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="gnome-pomodoro">
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroStatsDayPage" parent="AdwBin">
     <property name="child">
       <object class="GtkBox">
@@ -15,7 +17,7 @@
                 <property name="valign">center</property>
                 <property name="margin-bottom">20</property>
                 <property name="can-target" bind-source="toolbar_revealer" bind-property="child-revealed" bind-flags="sync-create"/>
-                <child>
+                <property name="child">
                   <object class="GtkBox">
                     <property name="orientation">vertical</property>
                     <style>
@@ -55,7 +57,7 @@
                       </object>
                     </child>
                   </object>
-                </child>
+                </property>
               </object>
             </child>
             <child>
@@ -81,7 +83,6 @@
         </child>
         <child>
           <object class="GtkFlowBox">
-            <property name="orientation">horizontal</property>
             <property name="selection-mode">none</property>
             <property name="column-spacing">6</property>
             <property name="row-spacing">6</property>

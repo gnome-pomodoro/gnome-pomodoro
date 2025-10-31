@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="gnome-pomodoro">
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroWeekChooser" parent="AdwBin">
     <property name="child">
       <object class="GtkBox">
@@ -8,7 +10,6 @@
         <child>
           <object class="GtkBox">
             <property name="css-name">header</property>
-            <property name="orientation">horizontal</property>
             <property name="spacing">12</property>
             <property name="width-request">32</property>
             <property name="height-request">32</property>
@@ -44,7 +45,6 @@
         </child>
         <child>
           <object class="GtkBox" id="weekdays_box">
-            <property name="orientation">horizontal</property>
             <property name="spacing">12</property>
             <property name="homogeneous">true</property>
             <style>

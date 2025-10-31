@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
-  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroConditionWidget" parent="GtkBox">
-    <property name="orientation">horizontal</property>
     <property name="spacing">6</property>
-    <property name="halign">fill</property>
     <style>
       <class name="card"/>
     </style>
     <child>
       <object class="GtkFlowBox" id="fields">
-        <property name="halign">fill</property>
         <property name="hexpand">true</property>
         <property name="row-spacing">3</property>
         <property name="column-spacing">3</property>
@@ -19,7 +15,6 @@
         <property name="selection-mode">none</property>
         <child>
           <object class="GtkDropDown" id="field_dropdown">
-            <property name="enable-search">false</property>
             <signal name="notify::selected-item" handler="on_field_notify_selected_item"/>
           </object>
         </child>

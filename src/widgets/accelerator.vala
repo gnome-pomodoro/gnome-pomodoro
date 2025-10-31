@@ -17,9 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authors: Kamil Prusko <kamilprusko@gmail.com>
- *          Thomas Wood <thomas.wood@intel.com>
- *          Rodrigo Moya <rodrigo@gnome.org>
+ * Authors:
+ *     Kamil Prusko <kamilprusko@gmail.com>
+ *
+ * Original Authors:
+ *     Thomas Wood <thomas.wood@intel.com>
+ *     Rodrigo Moya <rodrigo@gnome.org>
  */
 
 using GLib;

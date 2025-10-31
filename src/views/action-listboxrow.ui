@@ -4,9 +4,8 @@
   <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroActionListBoxRow" parent="GtkListBoxRow">
     <property name="activatable">true</property>
-    <child>
+    <property name="child">
       <object class="GtkBox">
-        <property name="orientation">horizontal</property>
         <property name="spacing">12</property>
         <property name="margin-start">12</property>
         <property name="margin-end">12</property>
@@ -26,7 +25,6 @@
             <property name="margin-bottom">12</property>
             <child>
               <object class="GtkBox">
-                <property name="orientation">horizontal</property>
                 <child>
                   <object class="GtkLabel" id="display_name_label">
                     <property name="hexpand">true</property>
@@ -50,7 +48,7 @@
           </object>
         </child>
       </object>
-    </child>
+    </property>
     <child>
       <object class="GtkDragSource">
         <property name="actions">move</property>

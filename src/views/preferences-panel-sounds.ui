@@ -37,15 +37,15 @@
                         <child>
                           <object class="AdwActionRow">
                             <property name="title" translatable="yes">Pomodoro Finished Sound</property>
-                            <property name="activatable">True</property>
+                            <property name="activatable">true</property>
                             <child type="suffix">
                               <object class="GtkLabel" id="pomodoro_finished_sound_label">
                                 <property name="ellipsize">end</property>
                                 <property name="max-width-chars">25</property>
-                                <property name="can-focus">False</property>
+                                <property name="can-focus">false</property>
                                 <property name="halign">end</property>
                                 <property name="valign">center</property>
-                                <property name="hexpand">True</property>
+                                <property name="hexpand">true</property>
                               </object>
                             </child>
                             <child type="suffix">
@@ -62,15 +62,15 @@
                         <child>
                           <object class="AdwActionRow">
                             <property name="title" translatable="yes">Break Finished Sound</property>
-                            <property name="activatable">True</property>
+                            <property name="activatable">true</property>
                             <child type="suffix">
                               <object class="GtkLabel" id="break_finished_sound_label">
                                 <property name="ellipsize">end</property>
                                 <property name="max-width-chars">25</property>
-                                <property name="can-focus">False</property>
+                                <property name="can-focus">false</property>
                                 <property name="halign">end</property>
                                 <property name="valign">center</property>
-                                <property name="hexpand">True</property>
+                                <property name="hexpand">true</property>
                               </object>
                             </child>
                             <child type="suffix">
@@ -92,15 +92,15 @@
                         <child>
                           <object class="AdwActionRow">
                             <property name="title" translatable="yes">Background Sound</property>
-                            <property name="activatable">True</property>
+                            <property name="activatable">true</property>
                             <child type="suffix">
                               <object class="GtkLabel" id="background_sound_label">
                                 <property name="ellipsize">end</property>
                                 <property name="max-width-chars">25</property>
-                                <property name="can-focus">False</property>
+                                <property name="can-focus">false</property>
                                 <property name="halign">end</property>
                                 <property name="valign">center</property>
-                                <property name="hexpand">True</property>
+                                <property name="hexpand">true</property>
                               </object>
                             </child>
                             <child type="suffix">
@@ -121,7 +121,7 @@
               </object><!-- stack-page -->
             </child>
           </object><!-- stack -->
-       </property>
+        </property>
       </object>
     </property>
   </template>

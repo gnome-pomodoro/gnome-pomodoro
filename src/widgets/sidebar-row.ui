@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroSidebarRow" parent="GtkBox">
-    <property name="orientation">horizontal</property>
     <property name="spacing">10</property>
     <child>
       <object class="GtkImage" id="icon">
@@ -12,7 +13,6 @@
       <object class="GtkLabel">
         <property name="label" bind-source="PomodoroSidebarRow" bind-property="title" bind-flags="sync-create"/>
         <property name="single-line-mode">true</property>
-        <property name="wrap">false</property>
         <property name="xalign">0.0</property>
         <style>
           <class name="sidebar-label"/>

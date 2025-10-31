@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroLogScaleRow" parent="AdwActionRow">
     <property name="child">
       <object class="GtkGrid">
@@ -9,8 +11,8 @@
         <child>
           <object class="GtkLabel" id="title_label">
             <property name="halign">start</property>
-            <property name="valign">baseline</property>
-            <property name="hexpand">True</property>
+            <property name="valign">baseline-fill</property>
+            <property name="hexpand">true</property>
             <style>
               <class name="title"/>
             </style>
@@ -23,8 +25,7 @@
         <child>
           <object class="GtkLabel" id="value_label">
             <property name="halign">end</property>
-            <property name="valign">baseline</property>
-            <property name="label"></property>
+            <property name="valign">baseline-fill</property>
             <property name="width-request">250</property>
             <property name="xalign">1.0</property>
             <layout>
@@ -36,7 +37,7 @@
         <child>
           <object class="PomodoroLogScale" id="scale">
             <property name="halign">fill</property>
-            <property name="show-fill-level">True</property>
+            <property name="show-fill-level">true</property>
             <layout>
               <property name="column">0</property>
               <property name="column-span">2</property>

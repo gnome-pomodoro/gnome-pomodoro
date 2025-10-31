@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <menu id="state_menu">
     <section>
       <item>
@@ -19,30 +21,24 @@
       </item>
     </section>
   </menu>
-
   <template class="PomodoroCompactTimerView" parent="AdwBin">
     <property name="width-request">300</property>
     <child>
       <object class="GtkGrid">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
+        <property name="can-focus">false</property>
         <property name="row-spacing">5</property>
         <property name="column-spacing">5</property>
         <child>
           <object class="GtkBox">
-            <property name="orientation">horizontal</property>
-            <property name="can-focus">False</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
+            <property name="can-focus">false</property>
+            <property name="hexpand">true</property>
+            <property name="vexpand">true</property>
             <property name="spacing">20</property>
             <property name="height-request">50</property>
             <child>
               <object class="GtkMenuButton" id="state_menubutton">
-                <property name="receives-default">0</property>
                 <property name="halign">start</property>
-                <property name="has-frame">0</property>
-                <property name="use-underline">0</property>
-                <property name="direction">down</property>
+                <property name="has-frame">false</property>
                 <property name="menu-model">state_menu</property>
                 <style>
                   <class name="title-3"/>
@@ -52,10 +48,10 @@
             </child>
             <child>
               <object class="PomodoroTimerLabel" id="timer_label">
-                <property name="can-focus">False</property>
+                <property name="can-focus">false</property>
                 <property name="halign">end</property>
                 <property name="valign">center</property>
-                <property name="hexpand">True</property>
+                <property name="hexpand">true</property>
                 <style>
                   <class name="title-3"/>
                 </style>
@@ -71,7 +67,7 @@
           <object class="PomodoroTimerProgressBar">
             <property name="line-width">5</property>
             <property name="halign">fill</property>
-            <property name="hexpand">True</property>
+            <property name="hexpand">true</property>
             <layout>
               <property name="column">0</property>
               <property name="row">1</property>
@@ -80,13 +76,13 @@
         </child>
         <child>
           <object class="GtkBox">
-            <property name="hexpand">True</property>
+            <property name="hexpand">true</property>
             <child type="center">
               <object class="PomodoroTimerControlButtons">
                 <property name="halign">center</property>
-                <property name="hexpand">True</property>
+                <property name="hexpand">true</property>
                 <property name="spacing">5</property>
-                <property name="circular">True</property>
+                <property name="circular">true</property>
               </object>
             </child>
             <layout>
@@ -106,7 +102,6 @@
         </child>
         <child>
           <object class="GtkButton">
-            <property name="receives-default">False</property>
             <property name="halign">center</property>
             <property name="valign">center</property>
             <property name="action-name">win.normal-size</property>
@@ -129,7 +124,7 @@
             </layout>
           </object>
         </child>
-      </object><!-- grid -->
+      </object>
     </child>
   </template>
 </interface>

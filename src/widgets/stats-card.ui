@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="gnome-pomodoro">
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroStatsCard" parent="AdwBin">
     <property name="focusable">false</property>
     <property name="child">

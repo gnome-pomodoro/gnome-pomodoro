@@ -116,7 +116,6 @@
                     <property name="visible" bind-source="event_radio" bind-property="active" bind-flags="sync-create"/>
                     <property name="header-suffix">
                       <object class="GtkBox">
-                        <property name="orientation">horizontal</property>
                         <property name="spacing">3</property>
                         <child>
                           <object class="GtkMenuButton" id="add_event_button">
@@ -235,7 +234,7 @@
                     <child>
                       <object class="AdwSwitchRow" id="use_subshell_switchrow">
                         <property name="title" translatable="yes">Use Subshell</property>
-                        <property name="subtitle" translatable="yes">Run the program from a subshell such as sh -c ''</property>
+                        <property name="subtitle" translatable="yes"><![CDATA[Run the program from a subshell such as sh -c '']]></property>
                       </object>
                     </child>
                     <child>

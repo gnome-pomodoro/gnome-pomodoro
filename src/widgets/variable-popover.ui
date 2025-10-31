@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroVariablePopover" parent="GtkPopover">
     <style>
       <class name="menu"/>
@@ -18,11 +20,10 @@
             <property name="child">
               <object class="GtkScrolledWindow">
                 <property name="hscrollbar-policy">never</property>
-                <property name="vscrollbar-policy">automatic</property>
                 <property name="max-content-height">400</property>
                 <property name="propagate-natural-width">true</property>
                 <property name="propagate-natural-height">true</property>
-                <child>
+                <property name="child">
                   <object class="GtkBox">
                     <property name="orientation">vertical</property>
                     <property name="margin-top">5</property>
@@ -31,7 +32,7 @@
                     <property name="margin-end">5</property>
                     <child>
                       <object class="GtkLabel">
-                        <property name="label" bind-source="list_page" bind-property="title" bind-flags="sync-create" />
+                        <property name="label" bind-source="list_page" bind-property="title" bind-flags="sync-create"/>
                         <property name="margin-bottom">3</property>
                         <style>
                           <class name="title"/>
@@ -41,8 +42,6 @@
                     </child>
                     <child>
                       <object class="GtkListView" id="variables_listview">
-                        <property name="show-separators">false</property>
-                        <property name="single-click-activate">false</property>
                         <property name="vexpand">true</property>
                         <property name="factory">
                           <object class="GtkBuilderListItemFactory">
@@ -72,7 +71,7 @@
                       </object>
                     </child>
                   </object>
-                </child>
+                </property>
               </object>
             </property>
           </object>
@@ -123,7 +122,6 @@
                         <property name="margin-start">10</property>
                         <property name="margin-end">10</property>
                         <property name="wrap">true</property>
-                        <property name="wrap-mode">word</property>
                         <attributes>
                           <attribute name="scale" value="0.9"/>
                         </attributes>
@@ -138,13 +136,11 @@
                           <class name="title"/>
                           <class name="no-padding"/>
                         </style>
-                        <property name="visible" bind-source="formats_listview" bind-property="visible" bind-flags="sync-create" />
+                        <property name="visible" bind-source="formats_listview" bind-property="visible" bind-flags="sync-create"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkListView" id="formats_listview">
-                        <property name="show-separators">false</property>
-                        <property name="single-click-activate">false</property>
                         <property name="factory">
                           <object class="GtkSignalListItemFactory">
                             <signal name="setup" handler="setup_format_item"/>

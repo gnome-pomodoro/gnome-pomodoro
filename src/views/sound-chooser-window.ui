@@ -6,14 +6,14 @@
     <property name="default-width">400</property>
     <property name="width-request">400</property>
     <property name="height-request">420</property>
-    <property name="modal">True</property>
+    <property name="modal">true</property>
     <property name="content">
       <object class="AdwToastOverlay" id="toast_overlay">
         <property name="child">
           <object class="AdwToolbarView">
             <child type="top">
               <object class="AdwHeaderBar">
-                <property name="show-title">True</property>
+                <property name="show-title">true</property>
               </object>
             </child>
             <property name="content">
@@ -23,12 +23,12 @@
                     <child>
                       <object class="AdwActionRow" id="none_row">
                         <property name="title" translatable="yes">None</property>
-                        <property name="activatable">True</property>
+                        <property name="activatable">true</property>
                         <property name="activatable-widget">radio_group</property>
                         <child type="suffix">
                           <object class="GtkCheckButton" id="radio_group">
                             <property name="valign">center</property>
-                            <property name="active">True</property>
+                            <property name="active">true</property>
                             <signal name="toggled" handler="on_radio_toggled"/>
                           </object>
                         </child>
@@ -55,7 +55,6 @@
                         <property name="maximum-size">400</property>
                         <child>
                           <object class="GtkBox">
-                            <property name="orientation">horizontal</property>
                             <property name="spacing">12</property>
                             <property name="margin-start">12</property>
                             <property name="margin-end">12</property>

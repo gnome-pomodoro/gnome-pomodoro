@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="gnome-pomodoro">
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroStatsDatePopover" parent="GtkPopover">
     <property name="halign">start</property>
     <property name="has-arrow">false</property>
@@ -38,10 +40,7 @@
         </child>
         <child>
           <object class="GtkStack" id="stack">
-            <property name="hhomogeneous">true</property>
             <property name="vhomogeneous">false</property>
-            <property name="interpolate-size">false</property>
-            <property name="transition-type">none</property>
             <property name="visible-child-name" bind-source="timeframe_toggle_group" bind-property="active-name" bind-flags="sync-create"/>
             <child>
               <object class="GtkStackPage">

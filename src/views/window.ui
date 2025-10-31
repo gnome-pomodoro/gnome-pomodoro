@@ -112,7 +112,6 @@
             <property name="resizable">false</property>
             <property name="child">
               <object class="GtkWindowHandle">
-                <property name="halign">fill</property>
                 <property name="valign">start</property>
                 <property name="child">
                   <object class="PomodoroCompactTimerView">

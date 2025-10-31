@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="gnome-pomodoro">
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <menu id="stats_menu">
     <section>
       <item>
@@ -26,7 +28,6 @@
       <object class="GtkStack" id="stack">
         <property name="hhomogeneous">false</property>
         <property name="vhomogeneous">false</property>
-        <property name="interpolate-size">false</property>
         <property name="transition-duration">300</property>
         <property name="transition-type">crossfade</property>
         <child>
@@ -47,7 +48,6 @@
             <property name="child">
               <object class="GtkScrolledWindow">
                 <property name="hscrollbar-policy">never</property>
-                <property name="vscrollbar-policy">automatic</property>
                 <child>
                   <object class="AdwClamp">
                     <property name="width-request">300</property>
@@ -66,7 +66,6 @@
                         <property name="margin-end">10</property>
                         <child>
                           <object class="GtkBox">
-                            <property name="orientation">horizontal</property>
                             <property name="spacing">6</property>
                             <property name="height-request">60</property>
                             <child>
@@ -74,7 +73,6 @@
                                 <property name="name">title</property>
                                 <property name="hexpand">true</property>
                                 <property name="halign">start</property>
-                                <property name="valign">fill</property>
                                 <style>
                                   <class name="flat"/>
                                 </style>
@@ -94,7 +92,6 @@
                                         <property name="halign">start</property>
                                         <property name="hexpand">true</property>
                                         <property name="single-line-mode">true</property>
-                                        <property name="wrap">false</property>
                                         <property name="xalign">0.0</property>
                                         <property name="ellipsize">end</property>
                                         <style>
@@ -107,7 +104,6 @@
                                         <property name="halign">start</property>
                                         <property name="hexpand">true</property>
                                         <property name="single-line-mode">true</property>
-                                        <property name="wrap">false</property>
                                         <property name="xalign">0.0</property>
                                         <property name="ellipsize">end</property>
                                         <style>
@@ -122,11 +118,10 @@
                             <child>
                               <object class="GtkBox">
                                 <property name="name">navigation</property>
-                                <property name="orientation">horizontal</property>
                                 <property name="spacing">3</property>
                                 <child>
                                   <object class="GtkButton" id="up_button">
-                                    <property name="valign">baseline</property>
+                                    <property name="valign">baseline-fill</property>
                                     <property name="action-name">stats.up</property>
                                     <style>
                                       <class name="flat"/>
@@ -143,7 +138,7 @@
                                 </child>
                                 <child>
                                   <object class="GtkButton">
-                                    <property name="valign">baseline</property>
+                                    <property name="valign">baseline-fill</property>
                                     <property name="action-name">stats.previous</property>
                                     <style>
                                       <class name="flat"/>
@@ -160,7 +155,7 @@
                                 </child>
                                 <child>
                                   <object class="GtkButton">
-                                    <property name="valign">baseline</property>
+                                    <property name="valign">baseline-fill</property>
                                     <property name="action-name">stats.next</property>
                                     <style>
                                       <class name="flat"/>
@@ -178,7 +173,7 @@
                                 <child>
                                   <object class="GtkButton" id="today_button">
                                     <property name="action-name">stats.today</property>
-                                    <property name="valign">baseline</property>
+                                    <property name="valign">baseline-fill</property>
                                     <property name="margin-end">6</property>
                                     <style>
                                       <class name="flat"/>
@@ -199,12 +194,9 @@
                         </child>
                         <child>
                           <object class="GtkStack" id="pages">
-                            <property name="hhomogeneous">true</property>
                             <property name="vhomogeneous">false</property>
                             <property name="vexpand">true</property>
-                            <property name="interpolate-size">false</property>
                             <property name="transition-duration">300</property>
-                            <property name="transition-type">none</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                           </object>

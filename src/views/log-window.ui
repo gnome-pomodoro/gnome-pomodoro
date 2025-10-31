@@ -18,9 +18,6 @@
     </child>
     <property name="content">
       <object class="GtkStack" id="stack">
-        <property name="hhomogeneous">true</property>
-        <property name="vhomogeneous">true</property>
-        <property name="interpolate-size">false</property>
         <property name="transition-duration">300</property>
         <property name="transition-type">crossfade</property>
         <child>
@@ -69,11 +66,8 @@
                         <property name="content">
                           <object class="GtkScrolledWindow">
                             <property name="hscrollbar-policy">never</property>
-                            <property name="vscrollbar-policy">automatic</property>
-                            <child>
+                            <property name="child">
                               <object class="GtkListView" id="listview">
-                                <property name="show-separators">false</property>
-                                <property name="single-click-activate">false</property>
                                 <property name="vexpand">true</property>
                                 <property name="factory">
                                   <object class="GtkSignalListItemFactory">
@@ -110,7 +104,7 @@
                                   <class name="navigation-sidebar"/>
                                 </style>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </property>
                       </object>
@@ -132,7 +126,6 @@
                         <property name="content">
                           <object class="GtkScrolledWindow">
                             <property name="hscrollbar-policy">never</property>
-                            <property name="vscrollbar-policy">automatic</property>
                             <property name="min-content-height">300</property>
                             <child>
                               <object class="AdwClamp">
@@ -147,9 +140,7 @@
                                     <property name="margin-bottom">20</property>
                                     <child>
                                       <object class="GtkLabel" id="header_label">
-                                        <property name="label"></property>
                                         <property name="single-line-mode">true</property>
-                                        <property name="wrap">false</property>
                                         <property name="xalign">0.0</property>
                                         <style>
                                           <class name="title"/>
@@ -160,7 +151,6 @@
                                     <child>
                                       <object class="GtkLabel" id="datetime_label">
                                         <property name="single-line-mode">true</property>
-                                        <property name="wrap">false</property>
                                         <property name="xalign">0.0</property>
                                         <attributes>
                                           <attribute name="scale" value="0.8"/>
@@ -174,7 +164,6 @@
                                       <object class="GtkLabel">
                                         <property name="label" translatable="yes">Context</property>
                                         <property name="single-line-mode">true</property>
-                                        <property name="wrap">false</property>
                                         <property name="xalign">0.0</property>
                                         <style>
                                           <class name="title"/>
@@ -187,7 +176,6 @@
                                       <object class="GtkLabel" id="context_label">
                                         <property name="selectable">true</property>
                                         <property name="wrap">true</property>
-                                        <property name="wrap-mode">word</property>
                                         <property name="xalign">0.0</property>
                                         <attributes>
                                           <attribute name="scale" value="0.8"/>
@@ -201,7 +189,6 @@
                                       <object class="GtkLabel" id="command_line_header_label">
                                         <property name="label" translatable="yes">Command</property>
                                         <property name="single-line-mode">true</property>
-                                        <property name="wrap">false</property>
                                         <property name="xalign">0.0</property>
                                         <style>
                                           <class name="title"/>
@@ -213,7 +200,6 @@
                                       <object class="GtkLabel" id="command_line_label">
                                         <property name="selectable">true</property>
                                         <property name="wrap">true</property>
-                                        <property name="wrap-mode">word</property>
                                         <property name="xalign">0.0</property>
                                         <attributes>
                                           <attribute name="scale" value="0.8"/>
@@ -227,7 +213,6 @@
                                       <object class="GtkLabel" id="command_output_header_label">
                                         <property name="label" translatable="yes">Output</property>
                                         <property name="single-line-mode">true</property>
-                                        <property name="wrap">false</property>
                                         <property name="xalign">0.0</property>
                                         <style>
                                           <class name="title"/>
@@ -239,7 +224,6 @@
                                       <object class="GtkLabel" id="command_output_label">
                                         <property name="selectable">true</property>
                                         <property name="wrap">true</property>
-                                        <property name="wrap-mode">word</property>
                                         <property name="xalign">0.0</property>
                                         <attributes>
                                           <attribute name="scale" value="0.8"/>
@@ -253,7 +237,6 @@
                                       <object class="GtkLabel" id="command_error_header_label">
                                         <property name="label" translatable="yes">Error</property>
                                         <property name="single-line-mode">true</property>
-                                        <property name="wrap">false</property>
                                         <property name="xalign">0.0</property>
                                         <style>
                                           <class name="title"/>
@@ -265,7 +248,6 @@
                                       <object class="GtkLabel" id="command_error_message_label">
                                         <property name="selectable">true</property>
                                         <property name="wrap">true</property>
-                                        <property name="wrap-mode">word</property>
                                         <property name="xalign">0.0</property>
                                         <attributes>
                                           <attribute name="scale" value="0.8"/>
@@ -277,7 +259,6 @@
                                     </child>
                                     <child>
                                       <object class="GtkBox" id="command_exit_code_box">
-                                        <property name="orientation">horizontal</property>
                                         <property name="spacing">10</property>
                                         <property name="halign">start</property>
                                         <property name="margin-top">20</property>

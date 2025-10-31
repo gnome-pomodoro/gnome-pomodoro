@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="gnome-pomodoro">
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroStatsMonthPage" parent="AdwBin">
     <property name="child">
       <object class="GtkBox">
@@ -18,7 +20,6 @@
         </child>
         <child>
           <object class="GtkFlowBox">
-            <property name="orientation">horizontal</property>
             <property name="selection-mode">none</property>
             <property name="column-spacing">6</property>
             <property name="row-spacing">6</property>

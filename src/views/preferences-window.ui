@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroPreferencesWindow" parent="AdwApplicationWindow">
     <property name="title" translatable="yes">Preferences</property>
     <property name="default_width">900</property>
@@ -26,7 +28,7 @@
                   <object class="AdwToolbarView">
                     <child type="top">
                       <object class="AdwHeaderBar">
-                        <property name="show-title">True</property>
+                        <property name="show-title">true</property>
                       </object>
                     </child>
                     <property name="content">

@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroTimerView" parent="GtkWidget">
-    <property name="halign">fill</property>
-    <property name="valign">fill</property>
     <child>
       <object class="GtkBox" id="header_box">
-        <property name="orientation">horizontal</property>
-        <property name="halign">fill</property>
         <property name="spacing">10</property>
-        <property name="receives-default">0</property>
         <child>
           <object class="GtkMenuButton" id="state_menubutton">
             <property name="halign">start</property>
-            <property name="hexpand">True</property>
-            <property name="has-frame">0</property>
-            <property name="use-underline">0</property>
-            <property name="direction">down</property>
+            <property name="hexpand">true</property>
+            <property name="has-frame">false</property>
             <style>
               <class name="title-1"/>
               <class name="pomodoro-state-menu"/>
@@ -54,7 +49,6 @@
             <property name="reveal-child">true</property>
             <property name="transition-type">slide-up</property>
             <property name="transition-duration">500</property>
-            <property name="overflow">visible</property>
             <property name="reveal-child" bind-source="session_progressbar" bind-property="reveal" bind-flags="sync-create"/>
             <child>
               <object class="PomodoroSessionProgressBar" id="session_progressbar">
@@ -74,8 +68,8 @@
     </child>
     <child>
       <object class="PomodoroTimerControlButtons" id="timer_control_buttons">
-        <property name="has-suggested-action">True</property>
-        <property name="circular">True</property>
+        <property name="has-suggested-action">true</property>
+        <property name="circular">true</property>
         <property name="spacing">30</property>
       </object>
     </child>

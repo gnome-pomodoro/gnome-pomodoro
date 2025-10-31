@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+  <requires lib="gtk" version="4.0"/>
   <template class="PomodoroVolumeSlider" parent="GtkBox">
-    <property name="orientation">horizontal</property>
     <property name="spacing">10</property>
     <child>
       <object class="GtkButton" id="mute_button">
@@ -32,7 +32,7 @@
             <signal name="value-changed" handler="on_adjustment_value_changed" swapped="no"/>
           </object>
         </property>
-        <property name="hexpand">True</property>
+        <property name="hexpand">true</property>
       </object>
     </child>
   </template>

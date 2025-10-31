@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
 <interface domain="gnome-pomodoro">
-  <requires lib="gtk+" version="3.16"/>
+  <requires lib="gtk+" version="3.16"/><!-- FIXME port file to gtk4 -->
   <template class="PomodoroInstallExtensionDialog" parent="GtkDialog">
-    <property name="can-focus">False</property>
+    <property name="can-focus">false</property>
     <property name="type-hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkBox">
-        <property name="can-focus">False</property>
+        <property name="can-focus">false</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox">
-            <property name="can-focus">False</property>
+            <property name="can-focus">false</property>
             <property name="layout-style">end</property>
             <child>
               <object class="GtkButton" id="done_button">
                 <property name="label" translatable="yes">_Done</property>
                 <property name="name">done</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-underline">True</property>
+                <property name="receives-default">true</property>
+                <property name="use-underline">true</property>
                 <style>
                   <class name="suggested-action"/>
                 </style>
               </object>
               <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
+                <property name="expand">true</property>
+                <property name="fill">true</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -35,13 +33,12 @@
               <object class="GtkButton" id="close_button">
                 <property name="label" translatable="yes">_Close</property>
                 <property name="name">close</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-underline">True</property>
+                <property name="receives-default">true</property>
+                <property name="use-underline">true</property>
               </object>
               <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
+                <property name="expand">true</property>
+                <property name="fill">true</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -49,13 +46,11 @@
               <object class="GtkButton" id="report_button">
                 <property name="label" translatable="yes">_Report issue</property>
                 <property name="name">report-issue</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">False</property>
-                <property name="use-underline">True</property>
+                <property name="use-underline">true</property>
               </object>
               <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
+                <property name="expand">true</property>
+                <property name="fill">true</property>
                 <property name="position">2</property>
               </packing>
             </child>
@@ -63,13 +58,11 @@
               <object class="GtkButton" id="manage_extensions_button">
                 <property name="label" translatable="yes">_Manage extensions</property>
                 <property name="name">manage-extensions</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">False</property>
-                <property name="use-underline">True</property>
+                <property name="use-underline">true</property>
               </object>
               <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
+                <property name="expand">true</property>
+                <property name="fill">true</property>
                 <property name="position">3</property>
               </packing>
             </child>
@@ -77,31 +70,30 @@
               <object class="GtkButton" id="cancel_button">
                 <property name="label" translatable="yes">_Cancel</property>
                 <property name="name">cancel</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-underline">True</property>
+                <property name="receives-default">true</property>
+                <property name="use-underline">true</property>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
+                <property name="expand">false</property>
+                <property name="fill">true</property>
                 <property name="position">4</property>
               </packing>
             </child>
           </object>
           <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
+            <property name="expand">false</property>
+            <property name="fill">false</property>
             <property name="position">0</property>
           </packing>
         </child>
         <child>
           <object class="GtkStack" id="stack">
-            <property name="can-focus">False</property>
-            <property name="vhomogeneous">False</property>
+            <property name="can-focus">false</property>
+            <property name="vhomogeneous">false</property>
             <property name="transition-type">crossfade</property>
             <child>
               <object class="GtkBox">
-                <property name="can-focus">False</property>
+                <property name="can-focus">false</property>
                 <property name="margin-left">24</property>
                 <property name="margin-right">24</property>
                 <property name="margin-start">24</property>
@@ -113,23 +105,23 @@
                 <child>
                   <object class="GtkSpinner" id="spinner">
                     <property name="height-request">32</property>
-                    <property name="can-focus">False</property>
-                    <property name="active">True</property>
+                    <property name="can-focus">false</property>
+                    <property name="active">true</property>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="expand">false</property>
+                    <property name="fill">true</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkLabel">
-                    <property name="can-focus">False</property>
+                    <property name="can-focus">false</property>
                     <property name="label" translatable="yes">Installing extension…</property>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="expand">false</property>
+                    <property name="fill">true</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
@@ -140,7 +132,7 @@
             </child>
             <child>
               <object class="GtkBox">
-                <property name="can-focus">False</property>
+                <property name="can-focus">false</property>
                 <property name="margin-left">24</property>
                 <property name="margin-right">24</property>
                 <property name="margin-start">24</property>
@@ -151,7 +143,7 @@
                 <property name="spacing">10</property>
                 <child>
                   <object class="GtkLabel">
-                    <property name="can-focus">False</property>
+                    <property name="can-focus">false</property>
                     <property name="label" translatable="yes">Extension has been installed</property>
                     <property name="max-width-chars">60</property>
                     <style>
@@ -159,23 +151,23 @@
                     </style>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
+                    <property name="expand">false</property>
+                    <property name="fill">false</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkLabel">
-                    <property name="can-focus">False</property>
+                    <property name="can-focus">false</property>
                     <property name="margin-bottom">2</property>
                     <property name="label" translatable="yes">If you change your mind, you can uninstall it using &lt;i&gt;Extensions&lt;/i&gt; app.</property>
-                    <property name="use-markup">True</property>
-                    <property name="wrap">True</property>
+                    <property name="use-markup">true</property>
+                    <property name="wrap">true</property>
                     <property name="max-width-chars">60</property>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="expand">false</property>
+                    <property name="fill">true</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
@@ -187,7 +179,7 @@
             </child>
             <child>
               <object class="GtkBox">
-                <property name="can-focus">False</property>
+                <property name="can-focus">false</property>
                 <property name="margin-left">24</property>
                 <property name="margin-right">24</property>
                 <property name="margin-start">24</property>
@@ -198,7 +190,7 @@
                 <property name="spacing">10</property>
                 <child>
                   <object class="GtkLabel">
-                    <property name="can-focus">False</property>
+                    <property name="can-focus">false</property>
                     <property name="label" translatable="yes">Could not enable the extension</property>
                     <property name="max-width-chars">60</property>
                     <style>
@@ -206,51 +198,49 @@
                     </style>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
+                    <property name="expand">false</property>
+                    <property name="fill">false</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkLabel">
-                    <property name="can-focus">False</property>
+                    <property name="can-focus">false</property>
                     <property name="margin-bottom">2</property>
                     <property name="label" translatable="yes">Extension has been installed but there is trouble enabling it. You may try logging out.</property>
-                    <property name="use-markup">True</property>
-                    <property name="wrap">True</property>
+                    <property name="use-markup">true</property>
+                    <property name="wrap">true</property>
                     <property name="max-width-chars">60</property>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="expand">false</property>
+                    <property name="fill">true</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkExpander">
-                    <property name="can-focus">True</property>
                     <property name="margin-left">24</property>
                     <property name="margin-right">24</property>
                     <property name="margin-start">24</property>
                     <property name="margin-end">24</property>
-                    <property name="resize-toplevel">True</property>
+                    <property name="resize-toplevel">true</property>
                     <child>
                       <object class="GtkTextView" id="error_enabling_textview">
-                        <property name="can-focus">True</property>
-                        <property name="editable">False</property>
-                        <property name="monospace">True</property>
+                        <property name="editable">false</property>
+                        <property name="monospace">true</property>
                       </object>
                     </child>
                     <child type="label">
                       <object class="GtkLabel">
-                        <property name="can-focus">False</property>
+                        <property name="can-focus">false</property>
                         <property name="label" translatable="yes">Technical Details</property>
                       </object>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="expand">false</property>
+                    <property name="fill">true</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
@@ -262,7 +252,7 @@
             </child>
             <child>
               <object class="GtkBox">
-                <property name="can-focus">False</property>
+                <property name="can-focus">false</property>
                 <property name="margin-left">24</property>
                 <property name="margin-right">24</property>
                 <property name="margin-start">24</property>
@@ -273,7 +263,7 @@
                 <property name="spacing">10</property>
                 <child>
                   <object class="GtkLabel">
-                    <property name="can-focus">False</property>
+                    <property name="can-focus">false</property>
                     <property name="label" translatable="yes">Could not install the extension</property>
                     <property name="max-width-chars">60</property>
                     <style>
@@ -281,51 +271,49 @@
                     </style>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
+                    <property name="expand">false</property>
+                    <property name="fill">false</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkLabel">
-                    <property name="can-focus">False</property>
+                    <property name="can-focus">false</property>
                     <property name="margin-bottom">2</property>
                     <property name="label" translatable="yes">There was an issue installing the extension.</property>
-                    <property name="use-markup">True</property>
-                    <property name="wrap">True</property>
+                    <property name="use-markup">true</property>
+                    <property name="wrap">true</property>
                     <property name="max-width-chars">60</property>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="expand">false</property>
+                    <property name="fill">true</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkExpander">
-                    <property name="can-focus">True</property>
                     <property name="margin-left">24</property>
                     <property name="margin-right">24</property>
                     <property name="margin-start">24</property>
                     <property name="margin-end">24</property>
-                    <property name="resize-toplevel">True</property>
+                    <property name="resize-toplevel">true</property>
                     <child>
                       <object class="GtkTextView" id="error_installing_textview">
-                        <property name="can-focus">True</property>
-                        <property name="editable">False</property>
-                        <property name="monospace">True</property>
+                        <property name="editable">false</property>
+                        <property name="monospace">true</property>
                       </object>
                     </child>
                     <child type="label">
                       <object class="GtkLabel">
-                        <property name="can-focus">False</property>
+                        <property name="can-focus">false</property>
                         <property name="label" translatable="yes">Details</property>
                       </object>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">true</property>
+                    <property name="fill">true</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
@@ -337,8 +325,8 @@
             </child>
           </object>
           <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
+            <property name="expand">true</property>
+            <property name="fill">true</property>
             <property name="position">1</property>
           </packing>
         </child>

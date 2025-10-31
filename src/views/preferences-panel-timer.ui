@@ -69,17 +69,15 @@
                     <child>
                       <object class="GtkLabel" id="session_stats_label">
                         <property name="halign">start</property>
-                        <property name="label"></property>
-                        <property name="use-markup">True</property>
-                        <property name="single-line-mode">True</property>
+                        <property name="use-markup">true</property>
+                        <property name="single-line-mode">true</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkLabel" id="breaks_stats_label">
                         <property name="halign">start</property>
-                        <property name="label"></property>
-                        <property name="use-markup">True</property>
-                        <property name="single-line-mode">True</property>
+                        <property name="use-markup">true</property>
+                        <property name="single-line-mode">true</property>
                       </object>
                     </child>
                     <style>

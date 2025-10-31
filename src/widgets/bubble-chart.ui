@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+  <requires lib="gtk" version="4.0"/>
   <template class="PomodoroBubbleChart" parent="GtkWidget">
     <property name="accessible-role">img</property>
     <child>
@@ -10,7 +11,6 @@
         <property name="vexpand">true</property>
         <child>
           <object class="GtkBox" id="columns_box">
-            <property name="orientation">horizontal</property>
             <property name="hexpand">true</property>
             <property name="vexpand">false</property>
             <property name="homogeneous">true</property>

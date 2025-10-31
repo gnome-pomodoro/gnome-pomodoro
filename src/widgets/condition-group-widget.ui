@@ -20,7 +20,6 @@
         <property name="spacing">12</property>
         <child>
           <object class="GtkBox" id="buttons_box">
-            <property name="orientation">horizontal</property>
             <property name="spacing">3</property>
             <child>
               <object class="GtkButton">

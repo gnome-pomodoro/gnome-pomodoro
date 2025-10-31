@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+  <requires lib="gtk" version="4.0"/>
   <template class="PomodoroScreenOverlay" parent="PomodoroLightbox">
     <property name="title" translatable="yes">Take a Break</property>
     <property name="icon-name">gnome-pomodoro</property>
     <property name="startup-id">gnome-pomodoro-screen-overlay</property>
-    <property name="can-focus">True</property>
+    <property name="can-focus">true</property>
     <property name="contents">
       <object class="GtkBox">
         <property name="orientation">vertical</property>
-        <property name="halign">fill</property>
-        <property name="valign">fill</property>
-        <property name="vexpand">True</property>
-        <property name="can-focus">False</property>
+        <property name="vexpand">true</property>
+        <property name="can-focus">false</property>
         <child>
           <object class="GtkBox">
-            <property name="orientation">horizontal</property>
             <property name="halign">end</property>
             <property name="spacing">10</property>
             <child>
@@ -54,7 +52,7 @@
             <property name="orientation">vertical</property>
             <property name="halign">center</property>
             <property name="valign">center</property>
-            <property name="vexpand">True</property>
+            <property name="vexpand">true</property>
             <property name="spacing">6</property>
             <property name="margin-bottom">50</property>
             <child>
