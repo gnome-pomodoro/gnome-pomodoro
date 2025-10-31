@@ -47,9 +47,7 @@
       <object class="GtkBox" id="inner_box">
         <property name="orientation">vertical</property>
         <child>
-          <object class="PomodoroTimerLabel" id="timer_label">
-            <property name="halign">fill</property>
-          </object>
+          <object class="PomodoroTimerLabel" id="timer_label"/>
         </child>
         <child>
           <object class="GtkRevealer" id="session_progressbar_revealer">

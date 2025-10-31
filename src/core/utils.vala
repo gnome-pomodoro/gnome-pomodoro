@@ -44,6 +44,7 @@ namespace Pomodoro
      *
      * Its intended for displaying rough estimation of duration.
      */
+    // XXX: rename, name conflicts with Interval.round_seconds
     public double round_seconds (double seconds)
     {
         if (seconds < 10.0) {
@@ -67,6 +68,7 @@ namespace Pomodoro
      *
      * If hours are present, seconds are omitted.
      */
+    // XXX: rename to `format_seconds` ?
     public string format_time (uint seconds)  // TODO: rename to format_interval
     {
         var hours = seconds / 3600;
@@ -194,6 +196,7 @@ namespace Pomodoro
      *
      * Unlike promises in JavaScript, it is reusable and does not transfer result value.
      */
+    // XXX: remove
     public class Promise
     {
         private int counter = 0;

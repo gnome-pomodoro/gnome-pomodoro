@@ -36,8 +36,9 @@ namespace Gnome
 
         private inline int64 from_milliseconds (uint64 milliseconds)
         {
-            return (int64) milliseconds.clamp (0, int64.MAX / Pomodoro.Interval.MILLISECOND)
-                    * Pomodoro.Interval.MILLISECOND;
+            return milliseconds < int64.MAX / Pomodoro.Interval.MILLISECOND
+                    ? (int64) milliseconds * Pomodoro.Interval.MILLISECOND
+                    : int64.MAX;
         }
 
         private inline uint64 to_milliseconds (int64 interval)
@@ -338,7 +339,6 @@ namespace Gnome
 
         public void remove_active_watch () throws GLib.Error
                                          requires (this.active_watch_use_count > 0)
-                                         ensures (this.active_watch_use_count >= 0)
         {
             if (this.active_watch_use_count > 1) {
                 this.active_watch_use_count--;

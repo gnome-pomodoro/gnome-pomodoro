@@ -672,14 +672,14 @@ namespace Pomodoro
         public unowned Pomodoro.Cycle? get_current_cycle ()
         {
             var current_time_block = this._current_time_block != null
-                ? this._current_time_block
-                : this.previous_time_block;
+                    ? this._current_time_block
+                    : this.previous_time_block;
 
             if (current_time_block == null || this._current_session == null) {
                 return null;
             }
 
-            var cycles = this._current_session.get_cycles ();
+            var cycles = this._current_session.get_cycles ();  // XXX: makes list copy
             unowned GLib.List<unowned Pomodoro.Cycle> link = cycles.first ();
 
             while (link != null)

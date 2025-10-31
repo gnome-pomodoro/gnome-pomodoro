@@ -474,8 +474,10 @@ namespace Pomodoro
                     break;
 
                 case Pomodoro.Timeframe.MONTH:
-                    skipped = (uint) (((date.get_year () - current_date.get_year ()) * 12 +
-                                        date.get_month () - current_date.get_month ()).abs ());
+                    var skipped_int =
+                            ((int) date.get_year () - (int) current_date.get_year ()) * 12 +
+                            ((int) date.get_month () - (int) current_date.get_month ());
+                    skipped = (uint) (skipped_int.abs ());
                     break;
 
                 default:

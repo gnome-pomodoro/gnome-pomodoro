@@ -23,7 +23,8 @@
         "--talk-name=org.gnome.Shell",
         "--talk-name=org.gtk.vfs.*",
         "--filesystem=home:ro",
-        "--filesystem=xdg-run/gvfsd"
+        "--filesystem=xdg-run/gvfsd",
+        "--env=G_ENABLE_DIAGNOSTIC=1"
     ],
     "build-options" : {
         "cflags" : "-O2 -g",

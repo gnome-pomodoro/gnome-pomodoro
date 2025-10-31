@@ -49,15 +49,6 @@ namespace Tests
                            this.test_calculate_progress__with_gaps);
             this.add_test ("calculate_progress__with_ongoing_gap",
                            this.test_calculate_progress__with_ongoing_gap);
-            this.add_test ("calculate_progress__with_gaps_overlapping",
-                           this.test_calculate_progress__with_gaps_overlapping);
-
-            // this.add_test ("calculate_progress_inv__without_gaps",
-            //                this.test_calculate_progress_inv__without_gaps);
-            // this.add_test ("calculate_progress_inv__with_gaps",
-            //                this.test_calculate_progress_inv__with_gaps);
-            // this.add_test ("calculate_progress_inv__with_gaps_overlapping",
-            //                this.test_calculate_progress_inv__with_gaps_overlapping);
 
             // this.add_test ("state", this.test_state);
             // this.add_test ("start_time", this.test_start_time);
@@ -1014,76 +1005,6 @@ namespace Tests
                                           0.25,
                                           0.0001);
         }
-
-        public void test_calculate_progress__with_gaps_overlapping ()
-        {
-            // TODO
-        }
-
-        // public void test_calculate_progress_inv__without_gaps ()
-        // {
-        //     var time_block = new Pomodoro.TimeBlock ();
-        //     time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
-
-        //     assert_cmpvariant (
-        //         new GLib.Variant.int64 (time_block.calculate_progress_inv (0.0)),
-        //         new GLib.Variant.int64 (time_block.start_time)
-        //     );
-        //     assert_cmpvariant (
-        //         new GLib.Variant.int64 (time_block.calculate_progress_inv (1.0)),
-        //         new GLib.Variant.int64 (time_block.end_time)
-        //     );
-        //     assert_cmpvariant (
-        //         new GLib.Variant.int64 (time_block.calculate_progress_inv (0.2)),
-        //         new GLib.Variant.int64 (time_block.start_time + 5 * Pomodoro.Interval.MINUTE)
-        //     );
-        // }
-
-        // public void test_calculate_progress_inv__with_gaps ()
-        // {
-        //     var time_block = new Pomodoro.TimeBlock (Pomodoro.State.STOPPED);
-        //     time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
-
-        //     var gap_1 = new Pomodoro.Gap ();
-        //     gap_1.set_time_range (2 * Pomodoro.Interval.MINUTE, 6 * Pomodoro.Interval.MINUTE);  // 1 minutes
-
-        //     var gap_2 = new Pomodoro.Gap ();
-        //     gap_2.set_time_range (15 * Pomodoro.Interval.MINUTE, 17 * Pomodoro.Interval.MINUTE);  // 2 minutes
-
-        //     var gap_3 = new Pomodoro.Gap ();
-        //     gap_3.set_time_range (28 * Pomodoro.Interval.MINUTE, 40 * Pomodoro.Interval.MINUTE);  // 2 minutes
-
-        //     time_block.add_gap (gap_1);
-        //     time_block.add_gap (gap_2);
-        //     time_block.add_gap (gap_3);
-
-        //     assert_cmpvariant (
-        //         new GLib.Variant.int64 (time_block.calculate_progress_inv (0.0)),
-        //         new GLib.Variant.int64 (gap_1.end_time)
-        //     );
-        //     assert_cmpvariant (
-        //         new GLib.Variant.int64 (time_block.calculate_progress_inv (0.25)),
-        //         new GLib.Variant.int64 (time_block.start_time + (1 + 5) * Pomodoro.Interval.MINUTE)
-        //     );
-        //     assert_cmpvariant (
-        //         new GLib.Variant.int64 (time_block.calculate_progress_inv (0.5)),
-        //         new GLib.Variant.int64 (time_block.start_time + (1 + 9 + 2 + 1) * Pomodoro.Interval.MINUTE)
-        //     );
-        //     assert_cmpvariant (
-        //         new GLib.Variant.int64 (time_block.calculate_progress_inv (0.75)),
-        //         new GLib.Variant.int64 (time_block.start_time + (1 + 9 + 2 + 6) * Pomodoro.Interval.MINUTE)
-        //     );
-        //     assert_cmpvariant (
-        //         new GLib.Variant.int64 (time_block.calculate_progress_inv (1.0)),
-        //         new GLib.Variant.int64 (gap_3.start_time)
-        //     );
-        // }
-
-        // public void test_calculate_progress_inv__with_gaps_overlapping ()
-        // {
-            // TODO
-        // }
-
 
         // public void test_changed_signal ()
         // {

@@ -113,18 +113,6 @@ namespace Pomodoro
             return current_state.get_label ();
         }
 
-        private void update_css_classes ()
-        {
-            if (this.timer.is_running ()) {
-                this.state_menubutton.add_css_class ("timer-running");
-                this.session_progressbar.add_css_class ("timer-running");
-            }
-            else {
-                this.state_menubutton.remove_css_class ("timer-running");
-                this.session_progressbar.add_css_class ("timer-running");
-            }
-        }
-
         private void update_buttons ()
         {
             var current_state = this.current_time_block != null
@@ -149,7 +137,6 @@ namespace Pomodoro
 
         private void update ()
         {
-            this.update_css_classes ();
             this.update_buttons ();
             this.update_timer_label_placeholder ();
 
