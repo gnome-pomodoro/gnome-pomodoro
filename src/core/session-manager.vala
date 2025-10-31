@@ -1524,23 +1524,21 @@ namespace Pomodoro
 
         private void expire_current_session (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
         {
-            if (this._current_session == null) {
+            if (this._current_session == null || this._current_session.is_scheduled ()) {
                 return;
             }
 
-            if (Pomodoro.Timestamp.is_undefined (timestamp)) {
-                timestamp = this._current_session.expiry_time;
-            }
+            Pomodoro.ensure_timestamp (ref timestamp);
 
-            var previous_session = this._current_session;
+            var current_session = this._current_session;
 
             this.session_expired (this._current_session, timestamp);
 
-            if (this._current_session != previous_session) {
-                GLib.debug ("The session was changed during `session-expired` emission.");
+            if (this._current_session == current_session) {
+                this.reset (timestamp);
             }
             else {
-                this.reset (timestamp);
+                GLib.debug ("The session was changed during `session-expired` emission.");
             }
         }
 
@@ -1981,7 +1979,7 @@ namespace Pomodoro
                 this._current_gap.has_flag (Pomodoro.GapFlags.SLEEP) &&
                 !this.auto_paused)
             {
-                this._current_gap.end_time = end_time;
+                this.mark_gap_end (this._current_gap, end_time);
                 this._current_gap = null;
             }
         }
@@ -2067,22 +2065,22 @@ namespace Pomodoro
         /**
          * A wrapper for `Timeout.add_seconds`.
          *
-         * We don't want expiry callback to increment the `SessionManager` reference counter, hence the static method
-         * and the use of pointer.
+         * We don't want expiry callback to increment the `SessionManager` reference counter,
+         * hence the static method and the use of pointer.
          */
         private static uint setup_expiry_timeout (uint  seconds,
                                                   void* session_manager_ptr)
         {
             weak Pomodoro.SessionManager session_manager = (Pomodoro.SessionManager) session_manager_ptr;
 
-            var timeout_id = GLib.Timeout.add_seconds (seconds,
+            var timeout_id = GLib.Timeout.add_seconds (
+                seconds,
                 () => {
                     session_manager.expiry_timeout_id = 0;
-                    session_manager.expire_current_session ();
+                    session_manager.expire_current_session (session_manager.current_session.expiry_time);
 
                     return GLib.Source.REMOVE;
-                }
-            );
+                });
             GLib.Source.set_name_by_id (timeout_id,
                                         "Pomodoro.SessionManager.expire_current_session");
 
@@ -2179,6 +2177,9 @@ namespace Pomodoro
             }
         }
 
+        /**
+         * Check and expire session if needed. Used in tests.
+         */
         public void check_current_session_expired ()
         {
             var timestamp = Pomodoro.Timestamp.from_now ();
