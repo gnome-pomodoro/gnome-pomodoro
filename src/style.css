@@ -1,3 +1,25 @@
+/*
+ * Colors
+ *
+ * Most of custom widgets require that colors are opaque, so we can't rely on
+ * theme variables unfortunately.
+ */
+@define-color pomodoro_primary_color color-mix(in srgb, @window_fg_color 97.5%, @window_bg_color);
+@define-color pomodoro_unfocused_primary_color color-mix(in srgb, @window_fg_color 49.5%, @window_bg_color);
+@define-color pomodoro_insensitive_primary_color color-mix(in srgb, @window_fg_color 30%, @window_bg_color);
+
+@define-color pomodoro_secondary_color color-mix(in srgb, @pomodoro_primary_color 50%, @window_bg_color);
+@define-color pomodoro_unfocused_secondary_color color-mix(in srgb, @pomodoro_unfocused_primary_color 50%, @window_bg_color);
+@define-color pomodoro_insensitive_secondary_color color-mix(in srgb, @pomodoro_insensitive_primary_color 50%, @window_bg_color);
+
+@define-color pomodoro_support_color color-mix(in srgb, @pomodoro_primary_color 13.5%, @window_bg_color);
+@define-color pomodoro_unfocused_support_color color-mix(in srgb, @pomodoro_support_color 50%, @window_bg_color);
+@define-color pomodoro_insensitive_support_color color-mix(in srgb, @pomodoro_support_color 50%, @window_bg_color);
+
+
+/*
+ * Misc
+ */
 .pomodoro-header-bar viewswitcher.wide image {
     opacity: 0.001;  /* setting opacity to 0 causes errors */
     margin-right: -16px;
@@ -56,7 +78,12 @@ timercontrolbuttons.circular button {
 /**
  * PomodoroProgressBar widget
  */
-progressbar {
+progressbar .highlight {
+    color: @pomodoro_color;
+}
+
+progressbar .trough {
+    color: @through_color;
 }
 
 
@@ -231,19 +258,29 @@ statsview .osd.toolbar > button {
     min-width: 20px;
 }
 
-statsview chart,
+statsview chart label,
+statsview chart chartaxis,
 statsview statscard label.heading {
    color: alpha(@theme_fg_color, 0.7);
 }
 
 statsview:backdrop #navigation image,
 statsview:backdrop label.heading,
-statsview:backdrop chart {
+statsview:backdrop chart label,
+statsview:backdrop chart chartaxis {
    color: @insensitive_fg_color;
 }
 
 statsview:backdrop canvas {
    opacity: 0.95;
+}
+
+
+/**
+ * ChartGrid widget
+ */
+chartgrid {
+    color: @unfocused_borders;
 }
 
 

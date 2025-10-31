@@ -115,18 +115,15 @@ namespace Pomodoro
 
         public override void snapshot (Gtk.Snapshot snapshot)
         {
-            var style_context = this.get_style_context ();
-            var width         = (float) this.get_width ();
-            var height        = (float) this.get_height ();
-            var stroke        = new Gsk.Stroke (this._line_width);
-            var path_builder  = new Gsk.PathBuilder ();
+            var width        = (float) this.get_width ();
+            var height       = (float) this.get_height ();
+            var stroke       = new Gsk.Stroke (this._line_width);
+            var path_builder = new Gsk.PathBuilder ();
 
-            // offset rounds line positions to full pixels
-            var line_offset   = ((this._line_width - 1.0f) % 2.0f - 1.0f).abs () * 0.5f;
+            // round line positions to full pixels
+            var line_offset = ((this._line_width - 1.0f) % 2.0f - 1.0f).abs () * 0.5f;
 
-            Gdk.RGBA color;
-            style_context.lookup_color ("unfocused_borders", out color);
-
+            var color = this.get_color ();
             color.alpha *= 0.5f;
 
             if (this.horizontal && this._y_axis != null)

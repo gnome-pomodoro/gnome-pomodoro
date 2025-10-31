@@ -138,6 +138,7 @@ namespace Pomodoro
                                               null,
                                               null);
             through.focusable = false;
+            through.add_css_class ("trough");
             through.set_parent (this);
 
             var highlight = new Pomodoro.Gizmo (TimerProgress.measure_child_cb,
@@ -147,6 +148,7 @@ namespace Pomodoro
                                                 null,
                                                 null);
             highlight.focusable = false;
+            through.add_css_class ("highlight");
             highlight.set_parent (this);
 
             this.highlight = highlight;
@@ -262,8 +264,8 @@ namespace Pomodoro
         {
             var displayed_value = this._value;
             var opacity         = this.opacity_animation != null
-                ? this.opacity_animation.value
-                : this.last_opacity;
+                    ? this.opacity_animation.value
+                    : this.last_opacity;
 
             if (this.opacity_animation != null && this.opacity_animation.value_to == 0.0) {
                 displayed_value = this.last_value;
@@ -669,12 +671,10 @@ namespace Pomodoro
         {
             var style_context = gizmo.get_style_context ();
             var width         = (float) gizmo.get_width ();
+            var line_width    = this._line_width;
+            var color         = gizmo.get_color ();
             var bounds        = Graphene.Rect ();
             var outline       = Gsk.RoundedRect ();
-            var line_width    = this._line_width;
-
-            Gdk.RGBA color;
-            style_context.lookup_color ("unfocused_borders", out color);
 
             bounds.init (0.0f,
                          0.0f,
@@ -696,16 +696,12 @@ namespace Pomodoro
                 return;
             }
 
-            var width           = (float) gizmo.get_width ();
-            var line_width      = this._line_width;
-            var bounds          = Graphene.Rect ();
-            var outline         = Gsk.RoundedRect ();
-            var color           = gizmo.get_color ();
+            var width      = (float) gizmo.get_width ();
+            var line_width = this._line_width;
+            var bounds     = Graphene.Rect ();
+            var outline    = Gsk.RoundedRect ();
+            var color      = gizmo.get_color ();
 
-            Gdk.RGBA background_color;
-            var style_context = gizmo.get_style_context ();
-            style_context.lookup_color ("theme_bg_color", out background_color);
-            color = blend_colors (background_color, color);
             color.alpha *= (float) opacity;
 
             var highlight_bounds  = Graphene.Rect ();
@@ -800,20 +796,12 @@ namespace Pomodoro
         protected override void snapshot_through (Pomodoro.Gizmo gizmo,
                                                   Gtk.Snapshot   snapshot)
         {
-            var style_context = gizmo.get_style_context ();
-            var width         = (float) gizmo.get_width ();
-            var height        = (float) gizmo.get_height ();
-            var radius        = float.min (width, height) / 2.0f;
-            var bounds        = Graphene.Rect ();
-            var outline       = Gsk.RoundedRect ();
-
-            Gdk.RGBA color;
-            style_context.lookup_color ("unfocused_borders", out color);
-
-            // Ensure that color is non-transparent. Rendering of arcs is glitchy.
-            Gdk.RGBA background_color;
-            style_context.lookup_color ("theme_bg_color", out background_color);
-            color = blend_colors (background_color, color);
+            var width   = (float) gizmo.get_width ();
+            var height  = (float) gizmo.get_height ();
+            var radius  = float.min (width, height) / 2.0f;
+            var color   = gizmo.get_color ();
+            var bounds  = Graphene.Rect ();
+            var outline = Gsk.RoundedRect ();
 
             bounds.init (0.5f * width - radius,
                          0.5f * height - radius,
@@ -835,16 +823,12 @@ namespace Pomodoro
                 return;
             }
 
-            var width         = (float) gizmo.get_width ();
-            var height        = (float) gizmo.get_height ();
-            var radius        = float.min (width, height) / 2.0f;
-            var bounds        = Graphene.Rect ();
-            var color         = gizmo.get_color ();
+            var width  = (float) gizmo.get_width ();
+            var height = (float) gizmo.get_height ();
+            var radius = float.min (width, height) / 2.0f;
+            var bounds = Graphene.Rect ();
+            var color  = gizmo.get_color ();
 
-            Gdk.RGBA background_color;
-            var style_context = gizmo.get_style_context ();
-            style_context.lookup_color ("theme_bg_color", out background_color);
-            color = blend_colors (background_color, color);
             color.alpha *= (float) opacity;
 
             bounds.init (0.5f * width - radius,

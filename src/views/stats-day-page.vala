@@ -170,13 +170,9 @@ namespace Pomodoro
 
         private void update_category_colors ()
         {
-            var foreground_color = get_foreground_color (this.histogram);
-            var background_color = get_background_color (this.histogram);
-
-            foreground_color = blend_colors (background_color, foreground_color);
-
-            var pomodoro_color = foreground_color;
-            var break_color = mix_colors (background_color, foreground_color, 0.2f);
+            var foreground_color = this.histogram.get_color ();
+            var pomodoro_color = Pomodoro.get_chart_primary_color (foreground_color);
+            var break_color = Pomodoro.get_chart_secondary_color (foreground_color);
 
             this.histogram.set_category_color (Pomodoro.StatsCategory.POMODORO, pomodoro_color);
             this.histogram.set_category_color (Pomodoro.StatsCategory.BREAK, break_color);

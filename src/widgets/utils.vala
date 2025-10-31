@@ -1,49 +1,74 @@
 namespace Pomodoro
 {
-    internal Gdk.RGBA blend_colors (Gdk.RGBA base_color,
-                                    Gdk.RGBA overlay_color)
+    internal Gdk.RGBA blend_colors (Gdk.RGBA background_color,
+                                    Gdk.RGBA foreground_color)
     {
+        var alpha = foreground_color.alpha;
+
         return Gdk.RGBA () {
-            red   = (1.0f - overlay_color.alpha) * base_color.red   + overlay_color.alpha * overlay_color.red,
-            green = (1.0f - overlay_color.alpha) * base_color.green + overlay_color.alpha * overlay_color.green,
-            blue  = (1.0f - overlay_color.alpha) * base_color.blue  + overlay_color.alpha * overlay_color.blue,
-            alpha = base_color.alpha + (1.0f - base_color.alpha) * overlay_color.alpha,
+            red   = (1.0f - alpha) * background_color.red   + alpha * foreground_color.red,
+            green = (1.0f - alpha) * background_color.green + alpha * foreground_color.green,
+            blue  = (1.0f - alpha) * background_color.blue  + alpha * foreground_color.blue,
+            alpha = background_color.alpha + (1.0f - background_color.alpha) * alpha,
         };
     }
 
 
-    internal Gdk.RGBA mix_colors (Gdk.RGBA color_1,
-                                  Gdk.RGBA color_2,
-                                  float    factor)
+    /**
+     * Calculate relative luminance of a color according to WCAG 2.0
+     * https://www.w3.org/TR/WCAG20/#relativeluminancedef
+     */
+    internal float get_color_luminance (Gdk.RGBA color)
     {
+        var r = color.red <= 0.03928f ? color.red / 12.92f : (float) Math.pow ((color.red + 0.055f) / 1.055f, 2.4);
+        var g = color.green <= 0.03928f ? color.green / 12.92f : (float) Math.pow ((color.green + 0.055f) / 1.055f, 2.4);
+        var b = color.blue <= 0.03928f ? color.blue / 12.92f : (float) Math.pow ((color.blue + 0.055f) / 1.055f, 2.4);
+
+        return 0.2126f * r + 0.7152f * g + 0.0722f * b;
+    }
+
+
+    /**
+     * Deduce background color from foreground color based on luminance.
+     *
+     * If foreground is dark (luminance < 0.5), assume light background (98% luminance).
+     * If foreground is bright, assume darker background (20% luminance).
+     */
+    internal Gdk.RGBA get_background_color (Gdk.RGBA foreground_color)
+    {
+        var foreground_luminance = get_color_luminance (foreground_color);
+        var background_luminance = foreground_luminance < 0.5f ? 0.98f : 0.20f;
+
         return Gdk.RGBA () {
-            red   = (1.0f - factor) * color_1.red   + factor * color_2.red,
-            green = (1.0f - factor) * color_1.green + factor * color_2.green,
-            blue  = (1.0f - factor) * color_1.blue  + factor * color_2.blue,
-            alpha = (1.0f - factor) * color_1.alpha + factor * color_2.alpha,
+            red   = background_luminance,
+            green = background_luminance,
+            blue  = background_luminance,
+            alpha = 1.0f
         };
     }
 
 
-    internal Gdk.RGBA get_foreground_color (Gtk.Widget widget)
+    /**
+     * Compute primary color for charts from a foreground color.
+     * The primary color is basically a foreground color with no alpha.
+     */
+    internal Gdk.RGBA get_chart_primary_color (Gdk.RGBA foreground_color)
     {
-        var style_context = widget.get_style_context ();
+        var background_color = get_background_color (foreground_color);
 
-        Gdk.RGBA color;
-        style_context.lookup_color ("theme_fg_color", out color);
-
-        return color;
+        return blend_colors (background_color, foreground_color);
     }
 
 
-    internal Gdk.RGBA get_background_color (Gtk.Widget widget)
+    /**
+     * Compute secondary color for charts from a foreground color.
+     */
+    internal Gdk.RGBA get_chart_secondary_color (Gdk.RGBA foreground_color)
     {
-        var style_context = widget.get_style_context ();
+        var secondary_color = get_chart_primary_color (foreground_color);
+        secondary_color.alpha *= 0.2f;
 
-        Gdk.RGBA color;
-        style_context.lookup_color ("theme_bg_color", out color);
-
-        return color;
+        return secondary_color;
     }
 
 
