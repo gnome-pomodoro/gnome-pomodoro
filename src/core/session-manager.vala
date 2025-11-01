@@ -559,7 +559,7 @@ namespace Pomodoro
             // Leave previous session.
             if (previous_session != null && session != previous_session)
             {
-                this.mark_session_end (previous_session);
+                this.mark_session_end (previous_session, timestamp);
 
                 if (this.current_session_entered) {
                     this.leave_session (previous_session);
@@ -664,6 +664,13 @@ namespace Pomodoro
             else if (this._current_session != null)
             {
                 next_time_block = this._current_session.get_next_time_block (this._current_time_block);
+            }
+
+            // Jump to the first scheduled time-block. Used for restoring.
+            while (next_time_block != null &&
+                   next_time_block.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED)
+            {
+                next_time_block = this._current_session.get_next_time_block (next_time_block);
             }
 
             return next_time_block != null ? next_time_block : this.next_time_block;
@@ -1098,6 +1105,7 @@ namespace Pomodoro
 
             // Reconstruct the session
             var session = new Pomodoro.Session ();
+            session.expiry_time = session_entry.expiry_time;
             session.entry = session_entry;
 
             // Reconstruct time blocks (only in-progress ones for now)
@@ -1160,9 +1168,9 @@ namespace Pomodoro
         public async bool restore (int64 timestamp)
         {
             Pomodoro.SessionEntry? session_entry = null;
-            Pomodoro.Session?      current_session = null;
-            Pomodoro.TimeBlock?    current_time_block = null;
-            Pomodoro.Gap?          current_gap = null;
+            Pomodoro.Session?      restored_session = null;
+            Pomodoro.TimeBlock?    restored_time_block = null;
+            Pomodoro.Gap?          restored_gap = null;
 
             Pomodoro.ensure_timestamp (ref timestamp);
 
@@ -1209,7 +1217,7 @@ namespace Pomodoro
             if (session_entry != null)
             {
                 try {
-                    current_session = yield this.restore_session (repository, session_entry);
+                    restored_session = yield this.restore_session (repository, session_entry);
                 }
                 catch (GLib.Error error) {
                     GLib.warning ("Unable to restore session #%s: %s",
@@ -1218,51 +1226,36 @@ namespace Pomodoro
                 }
             }
 
-            if (current_session != null)
+            if (restored_session != null)
             {
                 // Rely on pausing the timer when shutting down the app
-                var last_active_time = current_session.start_time;
 
-                current_session.@foreach (
+                restored_session.@foreach (
                     (time_block) => {
-                        if (time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED) {
-                            return;
-                        }
-
                         if (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS) {
-                            current_time_block = time_block;
-                            last_active_time = int64.max (time_block.start_time, last_active_time);
-                        }
-                        else {
-                            last_active_time = int64.max (time_block.end_time, last_active_time);
+                            restored_time_block = time_block;
                         }
                     });
-
-                current_time_block?.foreach_gap (
+                restored_time_block?.foreach_gap (
                     (gap) => {
                         if (Pomodoro.Timestamp.is_undefined (gap.end_time)) {
-                            current_gap = gap;
-                            last_active_time = int64.max (gap.start_time, last_active_time);
-                        }
-                        else {
-                            last_active_time = int64.max (gap.end_time, last_active_time);
+                            restored_gap = gap;
                         }
                     });
 
-                if (current_time_block != null && current_gap != null) {
+                if (restored_time_block != null && restored_gap != null) {
                     GLib.warning ("Restoring a time-block that hasn't been paused");
                 }
 
-                current_session.expiry_time = last_active_time + SESSION_EXPIRY_TIMEOUT;
-            }
+                if (!restored_session.is_completed () &&
+                    !restored_session.is_expired (timestamp))
+                {
+                    this.set_current_time_block_full (restored_session,
+                                                      restored_time_block,
+                                                      timestamp);
 
-            if (current_session != null &&
-                !current_session.is_completed () &&
-                !current_session.is_expired ())
-            {
-                this.set_current_time_block_full (current_session, current_time_block, timestamp);
-
-                // TODO: emit confirm_advancement?
+                    // TODO: emit confirm_advancement?
+                }
             }
 
             return success;
@@ -1339,9 +1332,10 @@ namespace Pomodoro
 
         /**
          * Discard time-blocks that were not marked as ended.
-         * Time block that was in-progress should be marked
+         * Ensure there is no in-progress time block.
          */
-        private void mark_session_end (Pomodoro.Session session)
+        private void mark_session_end (Pomodoro.Session session,
+                                       int64            timestamp)
         {
             session.freeze_changed ();
             session.remove_scheduled ();
@@ -1352,6 +1346,8 @@ namespace Pomodoro
                 // Time-block should be marked as ended earlier, and leave-time-block should be already emitted.
                 assert (last_time_block.get_status () != Pomodoro.TimeBlockStatus.IN_PROGRESS);
             }
+
+            session.expiry_time = timestamp;
 
             session.thaw_changed ();
         }
@@ -1393,6 +1389,9 @@ namespace Pomodoro
         private void advance_to_time_block (Pomodoro.TimeBlock? time_block,
                                             int64               timestamp = Pomodoro.Timestamp.UNDEFINED)
         {
+            assert (time_block == null ||
+                    time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
+
             Pomodoro.ensure_timestamp (ref timestamp);
 
             var session = time_block != null ? time_block.session : this._current_session;
@@ -1494,30 +1493,21 @@ namespace Pomodoro
 
             if (this._current_session != null && !this._current_session.is_scheduled ())
             {
-                var expiry_time = Pomodoro.Timestamp.UNDEFINED;
-                var current_or_previous_time_block = this._current_time_block != null
-                    ? this._current_time_block
-                    : this.previous_time_block;
+                var expiry_time = this._timer.is_running ()
+                        ? Pomodoro.Timestamp.UNDEFINED
+                        : this._timer.get_last_state_changed_time () + timeout;
 
-                if (this._timer.is_finished ()) {
-                    expiry_time = this.timer.state.finished_time + timeout;
-                }
-                else if (this._timer.is_paused ()) {
-                    expiry_time = this._timer.state.paused_time + timeout;
-                }
-                else if (this._timer.is_started ()) {
-                    expiry_time = this._timer.state.started_time + this._timer.state.duration + timeout;
-                }
-                else if (current_or_previous_time_block != null &&
-                         current_or_previous_time_block.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED) {
-                    expiry_time = current_or_previous_time_block.end_time + timeout;
-                }
+                GLib.SignalHandler.block (
+                        this._current_session,
+                        this.current_session_notify_expiry_time_id);
 
-                GLib.SignalHandler.block (this._current_session, this.current_session_notify_expiry_time_id);
                 this._current_session.expiry_time = expiry_time;
-                GLib.SignalHandler.unblock (this._current_session, this.current_session_notify_expiry_time_id);
 
-                // Notify signal may not kick in if there is no change. Therefore we trigger it manually.
+                GLib.SignalHandler.unblock (
+                        this._current_session,
+                        this.current_session_notify_expiry_time_id);
+
+                // Call notify signal handler even if there is no change.
                 this.on_current_session_notify_expiry_time ();
             }
         }

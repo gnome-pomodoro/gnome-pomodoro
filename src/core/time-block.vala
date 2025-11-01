@@ -722,9 +722,9 @@ namespace Pomodoro
                                                   GLib.BindingFlags.SYNC_CREATE);
             }
 
-            this.entry.start_time = this.start_time;
-            this.entry.end_time = this.end_time;
-            this.entry.state = this.state.to_string ();
+            this.entry.start_time = this._start_time;
+            this.entry.end_time = this._end_time;
+            this.entry.state = this._state.to_string ();
             this.entry.status = this.meta.status.to_string ();
             this.entry.intended_duration = this.meta.intended_duration;
             this.entry.version = this.version;

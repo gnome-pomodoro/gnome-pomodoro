@@ -2,6 +2,7 @@ CREATE TABLE "sessions" (
     "id"                    INTEGER PRIMARY KEY AUTOINCREMENT,
     "start-time"            INTEGER NOT NULL UNIQUE,  -- Unix timestamp in microseconds, UTC
     "end-time"              INTEGER NOT NULL,         -- Unix timestamp in microseconds, UTC
+    "expiry-time"           INTEGER NOT NULL,         -- Unix timestamp in microseconds, UTC
     CHECK ("end-time" >= "start-time" OR "end-time" < 0)
 );
 CREATE INDEX "sessions-start-time" ON "sessions" ("start-time");

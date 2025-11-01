@@ -5,6 +5,7 @@ namespace Pomodoro
         public int64 id { get; set; }
         public int64 start_time { get; set; }
         public int64 end_time { get; set; }
+        public int64 expiry_time { get; set; }
 
         internal ulong version = 0;
 
@@ -14,6 +15,7 @@ namespace Pomodoro
             set_primary_key ("id");
             set_notnull ("start-time");
             set_notnull ("end-time");
+            set_notnull ("expiry-time");
             set_unique ("start-time");
         }
     }

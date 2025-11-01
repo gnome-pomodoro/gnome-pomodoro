@@ -151,6 +151,7 @@ namespace Pomodoro
                 }
 
                 this._expiry_time = value;
+                this.version++;
 
                 this.notify_property ("expiry-time");
             }
@@ -830,8 +831,9 @@ namespace Pomodoro
                 this.entry.repository = Pomodoro.Database.get_repository ();
             }
 
-            this.entry.start_time = this.start_time;
-            this.entry.end_time = this.end_time;
+            this.entry.start_time = this._start_time;
+            this.entry.end_time = this._end_time;
+            this.entry.expiry_time = this._expiry_time;
             this.entry.version = this.version;
 
             return this.entry;
