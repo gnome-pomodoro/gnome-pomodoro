@@ -58,8 +58,8 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Stack right_image_stack;
 
-        private Pomodoro.SessionManager       session_manager;
-        private Pomodoro.Timer                timer;
+        private Pomodoro.SessionManager?      session_manager;
+        private Pomodoro.Timer?               timer;
         private ulong                         timer_state_changed_id = 0;
         private ulong                         session_manager_notify_current_session_id = 0;
         private GLib.List<Adw.TimedAnimation> animations;
@@ -227,12 +227,12 @@ namespace Pomodoro
             var is_paused = this.timer.is_paused ();
             var is_finished = this.timer.is_finished ();
             var is_break = current_time_block != null
-                ? current_time_block.state.is_break ()
-                : true;
+                    ? current_time_block.state.is_break ()
+                    : true;
             var is_waiting_for_activity = !is_started && this.timer.user_data != null;
             var can_reset = current_session != null
-                ? !current_session.is_scheduled () && !is_waiting_for_activity
-                : false;
+                    ? !current_session.is_scheduled () && !is_waiting_for_activity
+                    : false;
 
             Gtk.StackPage? left_page = null;
             Gtk.StackPage? center_page = null;
@@ -241,13 +241,13 @@ namespace Pomodoro
             if (is_stopped)
             {
                 left_page = can_reset
-                    ? get_stack_page_by_name (this.left_image_stack, "reset")
-                    : null;
+                        ? get_stack_page_by_name (this.left_image_stack, "reset")
+                        : null;
                 center_page = get_stack_page_by_name (this.center_image_stack, "start");
 
                 assert (center_page != null);
 
-                if (can_reset) {
+                if (left_page != null) {
                     this.fade_in (this.left_button, animate);
                     this.fade_out (this.right_button, animate);
                 }
@@ -281,38 +281,43 @@ namespace Pomodoro
                 this.fade_in (this.right_button, animate);
             }
 
-            if (left_page != null) {
+            if (left_page != null)
+            {
                 if (this.left_button.opacity > 0.0) {
                     this.left_image_stack.visible_child = left_page.child;
                 }
                 else {
-                    this.left_image_stack.set_visible_child_full (left_page.name, Gtk.StackTransitionType.NONE);
+                    this.left_image_stack.set_visible_child_full (left_page.name,
+                                                                  Gtk.StackTransitionType.NONE);
                 }
 
                 this.left_button.action_name = this.get_action_name (left_page.name);
                 this.left_button.tooltip_text = left_page.title;
             }
 
-            if (center_page != null) {
+            if (center_page != null)
+            {
                 this.center_image_stack.visible_child = center_page.child;
                 this.center_button.action_name = this.get_action_name (center_page.name);
                 this.center_button.tooltip_text = center_page.name == "advance"
-                    ? (is_break ? _("Start Pomodoro") : _("Take a break"))
-                    : center_page.title;
+                        ? (is_break ? _("Start Pomodoro") : _("Take a break"))
+                        : center_page.title;
             }
 
-            if (right_page != null) {
+            if (right_page != null)
+            {
                 if (this.right_button.opacity > 0.0) {
                     this.right_image_stack.visible_child = right_page.child;
                 }
                 else {
-                    this.right_image_stack.set_visible_child_full (right_page.name, Gtk.StackTransitionType.NONE);
+                    this.right_image_stack.set_visible_child_full (right_page.name,
+                                                                   Gtk.StackTransitionType.NONE);
                 }
 
                 this.right_button.action_name = this.get_action_name (right_page.name);
                 this.right_button.tooltip_text = right_page.name == "skip"
-                    ? (is_break ? _("Start Pomodoro") : _("Take a break"))
-                    : right_page.title;
+                        ? (is_break ? _("Start Pomodoro") : _("Take a break"))
+                        : right_page.title;
             }
 
             this.left_button.can_focus = is_started || can_reset;
@@ -330,7 +335,10 @@ namespace Pomodoro
          */
         private void on_session_manager_notify_current_session ()
         {
-            this.update_buttons (this.timer.user_data != null);
+            var animate = this.session_manager.current_session != null &&
+                         !this.session_manager.current_session.is_scheduled ();
+
+            this.update_buttons (animate);
         }
 
         private void connect_signals ()
@@ -360,7 +368,6 @@ namespace Pomodoro
         public override void map ()
         {
             this.update_buttons (false);
-
             this.connect_signals ();
 
             base.map ();
@@ -369,7 +376,6 @@ namespace Pomodoro
         public override void unmap ()
         {
             this.stop_animations ();
-
             this.disconnect_signals ();
 
             base.unmap ();
@@ -377,7 +383,12 @@ namespace Pomodoro
 
         public override void dispose ()
         {
+            this.stop_animations ();
             this.disconnect_signals ();
+
+            this.session_manager = null;
+            this.timer           = null;
+            this.animations      = null;
 
             base.dispose ();
         }
