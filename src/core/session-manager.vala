@@ -1980,10 +1980,9 @@ namespace Pomodoro
         }
 
         private void on_timer_finished (Pomodoro.TimerState state)
-                                        requires (this.idle_monitor != null)
-
         {
             this.freeze_current_session_changed ();
+            this.enable_idle_monitor ();
 
             var timestamp        = state.finished_time;
             var next_time_block  = this.initialize_next_time_block (timestamp);
