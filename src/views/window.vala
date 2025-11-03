@@ -337,14 +337,17 @@ namespace Pomodoro
         {
             var application = this.application as Pomodoro.BackgroundApplication;
 
-            if (application.should_run_in_background ())
+            if (application.should_run_in_background () && !this.timer.is_paused ())
             {
                 this.show_close_confirmation_dialog ();
 
                 return true;
             }
+            else {
+                application.quit ();
 
-            return false;
+                return false;
+            }
         }
 
         /*
