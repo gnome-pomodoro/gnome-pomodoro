@@ -266,7 +266,7 @@ namespace Pomodoro
                 !this._scheduler.is_time_block_completed (this._current_time_block, timestamp))
             {
                 // Continue current session.
-                // We don't have next pomodoro yet. It needs to be added by scheduler.
+                // We don't have next time-block yet. It needs to be added by scheduler.
                 next_time_block = null;
                 next_session = this._current_session;
             }
@@ -302,7 +302,7 @@ namespace Pomodoro
                     next_time_block.set_state_internal (next_state);
                 }
 
-                this.reschedule (next_session, next_time_block, timestamp);
+                this.reschedule (next_session, next_time_block, true, timestamp);
 
                 next_session.thaw_changed ();
 
@@ -427,18 +427,15 @@ namespace Pomodoro
          */
         private void reschedule (Pomodoro.Session?   session = null,
                                  Pomodoro.TimeBlock? next_time_block = null,
+                                 bool                immediate = false,
                                  int64               timestamp = Pomodoro.Timestamp.UNDEFINED)
         {
             if (session == null) {
                 session = this._current_session;
             }
 
-            if (Pomodoro.Timestamp.is_undefined (timestamp))
-            {
-                var now = this.get_current_time ();
-                timestamp = this._current_time_block != null
-                        ? int64.max (now, this._current_time_block.end_time)
-                        : now;
+            if (Pomodoro.Timestamp.is_undefined (timestamp)) {
+                timestamp = this.get_current_time ();
             }
 
             if (this.reschedule_idle_id != 0) {
@@ -446,11 +443,14 @@ namespace Pomodoro
                 this.reschedule_idle_id = 0;
             }
 
-            var last_gap = this._current_session == session && this._current_time_block != null
-                    ? this._current_time_block.get_last_gap ()
-                    : null;
+            if (this._current_time_block != null && !immediate) {
+                timestamp = int64.max (this._current_time_block.end_time, timestamp);
+            }
 
-            if (last_gap != null && Pomodoro.Timestamp.is_undefined (last_gap.end_time)) {
+            if (this._current_session == session &&
+                this._current_gap != null &&
+                Pomodoro.Timestamp.is_undefined (this._current_gap.end_time))
+            {
                 return;  // Reschedule once user resumes the timer.
             }
 
@@ -573,10 +573,10 @@ namespace Pomodoro
 
             if (session != null && time_block == null) {
                 // FIXME: remove scheduled time-blocks leading to time_block?
-                this.reschedule (session, null, timestamp);
+                this.reschedule (session, null, true, timestamp);
             }
             else if (session != null && time_block != null && time_block.start_time != timestamp) {
-                this.reschedule (session, time_block, timestamp);
+                this.reschedule (session, time_block, true, timestamp);
             }
 
             // Enter session.
@@ -876,10 +876,8 @@ namespace Pomodoro
             }
 
             // Collect session data.
-            var is_updating_session_entry = session.should_update_entry ();
-            var session_entry = is_updating_session_entry
-                    ? session.create_or_update_entry ()
-                    : session.entry;
+            var session_entry_needs_update = session.should_update_entry ();
+            var session_entry = session.create_or_update_entry ();
             var keep_time_block_ids = new GLib.Array<int64> ();
             var keep_gap_ids = new GLib.HashTable<int64?, GLib.Array>.full (
                     GLib.direct_hash,
@@ -894,6 +892,12 @@ namespace Pomodoro
             var gap_mapping = new GLib.HashTable
                     <unowned Pomodoro.Gap, unowned Pomodoro.GapEntry>
                     (GLib.direct_hash, GLib.direct_equal);
+
+            // Ensure expiry time is defined.
+            if (Pomodoro.Timestamp.is_undefined (session_entry.expiry_time)) {
+                session_entry.expiry_time = this.get_current_time () + SESSION_EXPIRY_TIMEOUT;
+                session_entry_needs_update = true;
+            }
 
             session.@foreach (
                 (time_block) => {
@@ -939,7 +943,7 @@ namespace Pomodoro
 
             // Commit updates.
             try {
-                if (is_updating_session_entry) {
+                if (session_entry_needs_update) {
                     yield session_entry.save_async ();
                 }
 
@@ -1228,8 +1232,6 @@ namespace Pomodoro
 
             if (restored_session != null)
             {
-                // Rely on pausing the timer when shutting down the app
-
                 restored_session.@foreach (
                     (time_block) => {
                         if (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS) {
@@ -1243,8 +1245,19 @@ namespace Pomodoro
                         }
                     });
 
-                if (restored_time_block != null && restored_gap != null) {
-                    GLib.warning ("Restoring a time-block that hasn't been paused");
+                if (restored_time_block != null && restored_gap == null)
+                {
+                    GLib.warning ("Restoring a time-block that hasn't been paused. Rewinding to last known position...");
+
+                    restored_gap = restored_time_block.get_last_gap ();
+
+                    if (restored_gap != null) {
+                        restored_gap.end_time = Pomodoro.Timestamp.UNDEFINED;
+                    }
+                    else {
+                        restored_time_block.set_status (Pomodoro.TimeBlockStatus.SCHEDULED);
+                        restored_time_block = null;
+                    }
                 }
 
                 if (!restored_session.is_completed () &&
@@ -1255,6 +1268,9 @@ namespace Pomodoro
                                                       timestamp);
 
                     // TODO: emit confirm_advancement?
+                }
+                else {
+                    // TODO: set `end-time` for an uncompleted gap
                 }
             }
 

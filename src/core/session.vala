@@ -231,12 +231,11 @@ namespace Pomodoro
             var old_duration = this._end_time - this._start_time;
 
             var start_time = first_time_block != null
-                ? first_time_block.start_time
-                : Pomodoro.Timestamp.UNDEFINED;
-
+                    ? first_time_block.start_time
+                    : Pomodoro.Timestamp.UNDEFINED;
             var end_time = last_time_block != null
-                ? last_time_block.end_time
-                : Pomodoro.Timestamp.UNDEFINED;
+                    ? last_time_block.end_time
+                    : Pomodoro.Timestamp.UNDEFINED;
 
             if (this._start_time != start_time) {
                 this._start_time = start_time;
@@ -253,7 +252,7 @@ namespace Pomodoro
             }
         }
 
-        private void invalidate_cycles ()
+        internal void invalidate_cycles ()
         {
             this.cycles_need_update = true;
         }
@@ -276,6 +275,19 @@ namespace Pomodoro
 
                 link = link.next;
             }
+
+
+            var total_cycles = 0;
+            var visible_cycles = 0;
+
+            this.cycles.@foreach (
+                (cycle) => {
+                    total_cycles++;
+
+                    if (cycle.is_visible ()) {
+                        visible_cycles++;
+                    }
+                });
 
             this.cycles_need_update = false;
         }
@@ -851,7 +863,6 @@ namespace Pomodoro
 
             this.entry = null;
         }
-
 
         /*
          * Signals

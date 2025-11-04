@@ -68,11 +68,13 @@ namespace Pomodoro
                     return;
                 }
 
-                if (value < this._end_time || Pomodoro.Timestamp.is_undefined (this._end_time)) {
+                if (Pomodoro.Timestamp.is_undefined (value) ||
+                    Pomodoro.Timestamp.is_undefined (this._end_time) ||
+                    value <= this._end_time)
+                {
                     this.set_time_range (value, this._end_time);
                 }
                 else {
-                    // TODO: log warning that change of `start-time` will affect `end-time`
                     this.set_time_range (value, value);
                 }
             }
@@ -88,11 +90,13 @@ namespace Pomodoro
                     return;
                 }
 
-                if (value >= this._start_time || Pomodoro.Timestamp.is_undefined (this._start_time)) {
+                if (Pomodoro.Timestamp.is_undefined (value) ||
+                    Pomodoro.Timestamp.is_undefined (this._start_time) ||
+                    value >= this._start_time)
+                {
                     this.set_time_range (this._start_time, value);
                 }
                 else {
-                    // TODO: log warning that change of `end-time` will affect `start-time`
                     this.set_time_range (value, value);
                 }
             }

@@ -206,10 +206,15 @@ namespace Pomodoro
             {
                 var time_block = link.data;
 
-                if (time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED)
-                {
+                if (time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED) {
                     first_scheduled_link = link;
                     break;
+                }
+
+                if (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS &&
+                    time_block.state != Pomodoro.State.LONG_BREAK)
+                {
+                    timestamp = int64.max (timestamp, time_block.end_time);
                 }
 
                 this.resolve_context (time_block, timestamp, ref context);
@@ -318,7 +323,10 @@ namespace Pomodoro
                 }
 
                 this.reschedule_time_block (next_time_block, timestamp);
-                this.resolve_context (next_time_block, timestamp, ref context);
+
+                if (next_time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED) {
+                    this.resolve_context (next_time_block, timestamp, ref context);
+                }
 
                 link = link?.next;
             }
@@ -402,6 +410,7 @@ namespace Pomodoro
                     time_block.set_weight (this.calculate_time_block_weight (time_block));
                 }
             );
+            session.invalidate_cycles ();
         }
 
         public signal void populated_session (Pomodoro.Session session);
@@ -495,8 +504,6 @@ namespace Pomodoro
                     break;
 
                 case Pomodoro.TimeBlockStatus.SCHEDULED:
-                    // Treat scheduled block as if it was completed according to plan.
-
                 case Pomodoro.TimeBlockStatus.COMPLETED:
                     context.score += this.calculate_time_block_weight (time_block);
 

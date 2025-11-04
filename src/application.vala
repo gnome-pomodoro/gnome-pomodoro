@@ -200,15 +200,10 @@ namespace Pomodoro
                 return;
             }
 
-            this.hold ();
-
             this.save_idle_id = GLib.Idle.add (() => {
                 this.save_idle_id = 0;
-
                 this.session_manager.save.begin ((obj, res) => {
                     this.session_manager.save.end (res);
-
-                    this.release ();
                 });
 
                 return GLib.Source.REMOVE;
@@ -637,9 +632,11 @@ namespace Pomodoro
                     this.session_manager.restore.end (res);
                     this.session_manager.ensure_session ();
 
-                    this.session_manager.enter_time_block.connect (this.on_enter_time_block);
-                    this.session_manager.leave_time_block.connect (this.on_leave_time_block);
+                    this.session_manager.enter_session.connect (this.on_enter_session);
+                    this.session_manager.leave_session.connect (this.on_leave_session);
                     this.session_manager.advanced.connect (this.on_advanced);
+
+                    this.on_enter_session (this.session_manager.current_session);
 
                     this.unmark_busy ();
                     this.release ();
@@ -732,13 +729,13 @@ namespace Pomodoro
             this.event_bus.destroy ();
             this.action_manager.destroy ();
             this.capability_manager.destroy ();
-            this.session_manager.enter_time_block.disconnect (this.on_enter_time_block);
-            this.session_manager.leave_time_block.disconnect (this.on_leave_time_block);
+            this.session_manager.enter_session.disconnect (this.on_enter_session);
+            this.session_manager.leave_session.disconnect (this.on_leave_session);
             this.session_manager.advanced.disconnect (this.on_advanced);
 
-            if (this.session_manager.current_time_block != null) {
-                this.session_manager.current_time_block.changed.disconnect (
-                        this.on_current_time_block_changed);
+            if (this.session_manager.current_session != null) {
+                this.session_manager.current_session.changed.disconnect (
+                        this.on_current_session_changed);
             }
 
             // Disable plugins
@@ -918,19 +915,19 @@ namespace Pomodoro
             }
         }
 
-        private void on_enter_time_block (Pomodoro.TimeBlock time_block)
-        {
-            time_block.changed.connect (this.on_current_time_block_changed);
-        }
-
-        private void on_leave_time_block (Pomodoro.TimeBlock time_block)
-        {
-            time_block.changed.disconnect (this.on_current_time_block_changed);
-        }
-
-        private void on_current_time_block_changed ()
+        private void on_current_session_changed ()
         {
             this.schedule_save ();
+        }
+
+        private void on_enter_session (Pomodoro.Session session)
+        {
+            session.changed.connect (this.on_current_session_changed);
+        }
+
+        private void on_leave_session (Pomodoro.Session session)
+        {
+            session.changed.disconnect (this.on_current_session_changed);
         }
 
         private void on_advanced (Pomodoro.Session?   current_session,
