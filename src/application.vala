@@ -1073,6 +1073,7 @@ namespace Pomodoro
 
             if (timeout_source != 0) {
                 GLib.Source.remove (timeout_source);
+                timeout_source = 0;
             }
         }
         */
