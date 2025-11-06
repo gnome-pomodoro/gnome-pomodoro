@@ -122,17 +122,6 @@ namespace Pomodoro
             }
         }
 
-        public bool can_background {
-            get {
-                return this._can_background;
-            }
-            set {
-                this._can_background = value;
-
-                this.update_background_hold ();
-            }
-        }
-
         public Pomodoro.Timer?               timer;
         public Pomodoro.SessionManager?      session_manager;
         public Pomodoro.CapabilityManager?   capability_manager;
@@ -148,9 +137,6 @@ namespace Pomodoro
         private Pomodoro.TimerService?       timer_service;
         private Pomodoro.Logger?             logger;
         private GLib.Settings?               settings;
-        private int                          background_holds_count = 0;
-        private bool                         has_background_hold = false;
-        private bool                         _can_background = false;
         private uint                         save_idle_id = 0;
 
         public Application ()
@@ -538,40 +524,13 @@ namespace Pomodoro
             }
         }
 
-        private void update_background_hold ()
-        {
-            var should_hold = this._can_background && this.background_holds_count > 0;
-
-            if (!this.has_background_hold && should_hold)
-            {
-                this.has_background_hold = true;
-                this.hold ();
-            }
-
-            if (this.has_background_hold && !should_hold)
-            {
-                this.has_background_hold = false;
-                this.release ();
-            }
-        }
-
-        public void hold_background ()
-        {
-            this.background_holds_count++;
-
-            this.update_background_hold ();
-        }
-
-        public void release_background ()
-        {
-            this.background_holds_count--;
-
-            this.update_background_hold ();
-        }
-
         public bool should_run_in_background ()
         {
-            return this._can_background && this.background_holds_count > 0;
+            // TODO: if indicator is present, allow running in background but silently
+
+            return this.background_manager != null
+                    ? this.background_manager.active && !this.timer.is_paused ()
+                    : false;
         }
 
         private void parse_command_line (ref unowned string[] arguments) throws GLib.OptionError

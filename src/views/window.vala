@@ -337,7 +337,7 @@ namespace Pomodoro
         {
             var application = this.application as Pomodoro.BackgroundApplication;
 
-            if (application.should_run_in_background () && !this.timer.is_paused ())
+            if (application.should_run_in_background ())
             {
                 this.show_close_confirmation_dialog ();
 
