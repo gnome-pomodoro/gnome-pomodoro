@@ -764,7 +764,7 @@ namespace Pomodoro
                     remaining--;
                 });
 
-            while (remaining > 0 && main_context.iteration (false));
+            while (remaining > 0 && main_context.iteration (true));
 
             // Cleanup
             Pomodoro.Database.close ();
