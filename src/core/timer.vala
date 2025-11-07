@@ -1068,7 +1068,6 @@ namespace Pomodoro
         /**
          * Emitted on any state related changes. Default handler acknowledges the change.
          */
-        // [Signal (run = "first")]  TODO: consider this
         public signal void state_changed (Pomodoro.TimerState current_state,
                                           Pomodoro.TimerState previous_state)
         {

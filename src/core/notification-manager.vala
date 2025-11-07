@@ -50,7 +50,7 @@ namespace Pomodoro
             construct {
                 this._timer = value;
 
-                this.timer_state_changed_id = this._timer.state_changed.connect_after (this.on_timer_state_changed);
+                this.timer_state_changed_id = this._timer.state_changed.connect (this.on_timer_state_changed);
 
                 var idle_id = GLib.Idle.add (() => {
                     this.update (true);

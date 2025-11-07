@@ -294,8 +294,6 @@ namespace Tests
                            this.test_finished_signal__0s);
             this.add_test ("finished_signal__1s",
                            this.test_finished_signal__1s);
-            this.add_test ("finished_signal__3s",
-                           this.test_finished_signal__3s);
         }
 
         public override void setup ()
@@ -1756,11 +1754,30 @@ namespace Tests
         {
             Pomodoro.Timestamp.thaw ();
 
-            var timer = new Pomodoro.Timer (0);
+            var timer = new Pomodoro.Timer (0 * Pomodoro.Interval.SECOND);
 
             var finished_emitted = 0;
-            timer.finished.connect (() => {
+            var state_changed_emitted = 0;
+            var finished_time_in_state_changed = Pomodoro.Timestamp.UNDEFINED;
+            var finished_time_in_finished = Pomodoro.Timestamp.UNDEFINED;
+
+            timer.state_changed.connect ((current_state, previous_state) => {
+                state_changed_emitted++;
+                finished_time_in_state_changed = current_state.finished_time;
+            });
+
+            // Expect finished signal to be emitted AFTER state_changed
+            // and the state should already have finished_time set
+            timer.finished.connect ((state) => {
                 finished_emitted++;
+                finished_time_in_finished = state.finished_time;
+
+                assert_cmpint (state_changed_emitted, GLib.CompareOperator.GT, 0);
+                assert_true (Pomodoro.Timestamp.is_defined (finished_time_in_state_changed));
+                assert_cmpvariant (
+                    new GLib.Variant.int64 (finished_time_in_finished),
+                    new GLib.Variant.int64 (finished_time_in_state_changed)
+                );
             });
 
             timer.start ();
@@ -1768,11 +1785,13 @@ namespace Tests
             assert_true (timer.is_finished ());
             assert_true (run_timer (timer));
             assert_cmpint (finished_emitted, GLib.CompareOperator.EQ, 1);
+            assert_cmpint (state_changed_emitted, GLib.CompareOperator.EQ, 2);
 
             timer.start ();
             assert_false (timer.is_running ());
             assert_true (timer.is_finished ());
             assert_cmpint (finished_emitted, GLib.CompareOperator.EQ, 1);
+            assert_cmpint (state_changed_emitted, GLib.CompareOperator.EQ, 2);
         }
 
         public void test_finished_signal__1s ()
@@ -1782,8 +1801,27 @@ namespace Tests
             var timer = new Pomodoro.Timer (1 * Pomodoro.Interval.SECOND);
 
             var finished_emitted = 0;
-            timer.finished.connect (() => {
+            var state_changed_emitted = 0;
+            var finished_time_in_state_changed = Pomodoro.Timestamp.UNDEFINED;
+            var finished_time_in_finished = Pomodoro.Timestamp.UNDEFINED;
+
+            timer.state_changed.connect ((current_state, previous_state) => {
+                state_changed_emitted++;
+                finished_time_in_state_changed = current_state.finished_time;
+            });
+
+            // Expect finished signal to be emitted AFTER state_changed
+            // and the state should already have finished_time set
+            timer.finished.connect ((state) => {
                 finished_emitted++;
+                finished_time_in_finished = state.finished_time;
+
+                assert_cmpint (state_changed_emitted, GLib.CompareOperator.GT, 0);
+                assert_true (Pomodoro.Timestamp.is_defined (finished_time_in_state_changed));
+                assert_cmpvariant (
+                    new GLib.Variant.int64 (finished_time_in_finished),
+                    new GLib.Variant.int64 (finished_time_in_state_changed)
+                );
             });
 
             timer.start ();
@@ -1791,34 +1829,13 @@ namespace Tests
             assert_false (timer.is_finished ());
             assert_true (run_timer (timer));
             assert_cmpint (finished_emitted, GLib.CompareOperator.EQ, 1);
+            assert_cmpint (state_changed_emitted, GLib.CompareOperator.EQ, 2);
 
             timer.start ();
             assert_false (timer.is_running ());
             assert_true (timer.is_finished ());
             assert_cmpint (finished_emitted, GLib.CompareOperator.EQ, 1);
-        }
-
-        public void test_finished_signal__3s ()
-        {
-            Pomodoro.Timestamp.thaw ();
-
-            var timer = new Pomodoro.Timer (3 * Pomodoro.Interval.SECOND);
-
-            var finished_emitted = 0;
-            timer.finished.connect (() => {
-                finished_emitted++;
-            });
-
-            timer.start ();
-            assert_true (timer.is_running ());
-            assert_false (timer.is_finished ());
-            assert_true (run_timer (timer));
-            assert_cmpint (finished_emitted, GLib.CompareOperator.EQ, 1);
-
-            timer.start ();
-            assert_false (timer.is_running ());
-            assert_true (timer.is_finished ());
-            assert_cmpint (finished_emitted, GLib.CompareOperator.EQ, 1);
+            assert_cmpint (state_changed_emitted, GLib.CompareOperator.EQ, 2);
         }
 
         public void test_tick_signal ()
