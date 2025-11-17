@@ -46,7 +46,7 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Box inner_box;
         [GtkChild]
-        private unowned Pomodoro.TimerProgressRing timer_progressring;
+        private unowned Pomodoro.TimerProgressBar timer_progressbar;
         [GtkChild]
         private unowned Pomodoro.SessionProgressBar session_progressbar;
         [GtkChild]
@@ -330,12 +330,12 @@ namespace Pomodoro
             minimum_height += tmp_minimum_height;
             natural_height += tmp_natural_height;
 
-            this.timer_progressring.measure (Gtk.Orientation.VERTICAL,
-                                             avaliable_width,
-                                             out tmp_minimum_height,
-                                             out tmp_natural_height,
-                                             null,
-                                             null);
+            this.timer_progressbar.measure (Gtk.Orientation.VERTICAL,
+                                            avaliable_width,
+                                            out tmp_minimum_height,
+                                            out tmp_natural_height,
+                                            null,
+                                            null);
             minimum_height += tmp_minimum_height;
             natural_height += tmp_natural_height;
 
@@ -387,12 +387,12 @@ namespace Pomodoro
                                                 null);
             avaliable_height -= tmp_natural_height;
 
-            this.timer_progressring.measure (Gtk.Orientation.HORIZONTAL,
-                                             avaliable_height,
-                                             null,
-                                             out tmp_natural_width,
-                                             null,
-                                             null);
+            this.timer_progressbar.measure (Gtk.Orientation.HORIZONTAL,
+                                            avaliable_height,
+                                            null,
+                                            out tmp_natural_width,
+                                            null,
+                                            null);
             natural_width = int.max (natural_width, tmp_natural_width);
 
             if (natural_width > MAX_WIDTH) {
@@ -511,8 +511,8 @@ namespace Pomodoro
                     null,
                     null);
 
-            // Determine timer_progressring size.
-            var timer_progressring_allocation = Gtk.Allocation () {
+            // Determine timer_progressbar size.
+            var timer_progressbar_allocation = Gtk.Allocation () {
                 width = allocation.width,
                 height = allocation.width
             };
@@ -520,7 +520,7 @@ namespace Pomodoro
             // Determine inner_box size.
             var inner_box_allocation = Gtk.Allocation () {
                 width = (int) Math.roundf (
-                        timer_progressring_allocation.width * INNER_RELATIVE_WIDTH / 2.0f) * 2,
+                        timer_progressbar_allocation.width * INNER_RELATIVE_WIDTH / 2.0f) * 2,
                 height = 0
             };
             this.inner_box.measure (
@@ -554,23 +554,23 @@ namespace Pomodoro
             // Position children horizontally.
             allocation.x = (width - allocation.width) / 2;
             header_box_allocation.x = allocation.x;
-            timer_progressring_allocation.x = allocation.x;
+            timer_progressbar_allocation.x = allocation.x;
             inner_box_allocation.x = (width - inner_box_allocation.width) / 2;
             timer_control_buttons_allocation.x = (width - timer_control_buttons_allocation.width) / 2;
 
             // Position children vertically.
             tmp_natural_height = header_box_allocation.height +
-                                 timer_progressring_allocation.height +
+                                 timer_progressbar_allocation.height +
                                  timer_control_buttons_allocation.height;
             var spacing = ((height - tmp_natural_height) / 4).clamp (MIN_SPACING, MAX_SPACING);
             allocation.y = (height - tmp_natural_height - 2 * spacing) / 2 - BOTTOM_PADDING;
             header_box_allocation.y = allocation.y;
-            timer_progressring_allocation.y = header_box_allocation.y + header_box_allocation.height + spacing;
-            inner_box_allocation.y = timer_progressring_allocation.y + (timer_progressring_allocation.height - inner_box_allocation.height) / 2;
-            timer_control_buttons_allocation.y = timer_progressring_allocation.y + timer_progressring_allocation.height + spacing;
+            timer_progressbar_allocation.y = header_box_allocation.y + header_box_allocation.height + spacing;
+            inner_box_allocation.y = timer_progressbar_allocation.y + (timer_progressbar_allocation.height - inner_box_allocation.height) / 2;
+            timer_control_buttons_allocation.y = timer_progressbar_allocation.y + timer_progressbar_allocation.height + spacing;
 
             this.header_box.allocate_size (header_box_allocation, -1);
-            this.timer_progressring.allocate_size (timer_progressring_allocation, -1);
+            this.timer_progressbar.allocate_size (timer_progressbar_allocation, -1);
             this.inner_box.allocate_size (inner_box_allocation, -1);
             this.timer_control_buttons.allocate_size (timer_control_buttons_allocation, -1);
         }

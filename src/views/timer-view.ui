@@ -37,6 +37,13 @@
       </object>
     </child>
     <child>
+      <object class="PomodoroTimerProgressBar" id="timer_progressbar">
+        <property name="shape">ring</property>
+        <property name="valign">center</property>
+        <property name="can_focus">false</property>
+      </object>
+    </child>
+    <child>
       <object class="GtkBox" id="inner_box">
         <property name="orientation">vertical</property>
         <child>
@@ -53,17 +60,11 @@
             <property name="overflow">visible</property>
             <child>
               <object class="PomodoroSessionProgressBar" id="session_progressbar">
-                <property name="line-width" bind-source="timer_progressring" bind-property="line-width" bind-flags="sync-create"/>
+                <property name="line-width" bind-source="timer_progressbar" bind-property="line-width" bind-flags="sync-create"/>
               </object>
             </child>
           </object>
         </child>
-      </object>
-    </child>
-    <child>
-      <object class="PomodoroTimerProgressRing" id="timer_progressring">
-        <property name="halign">fill</property>
-        <property name="valign">center</property>
       </object>
     </child>
     <child>

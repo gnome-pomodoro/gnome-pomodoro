@@ -1,61 +1,96 @@
 namespace Pomodoro
 {
-    public abstract class TimerProgress : Gtk.Widget
+    public enum TimerProgressShape
     {
-        protected const uint   MIN_TIMEOUT_INTERVAL = 50;  // 20Hz
-        protected const uint   FADE_IN_DURATION = 500;
-        protected const uint   FADE_OUT_DURATION = 500;
-        protected const float  DEFAULT_LINE_WIDTH = 6.0f;
-        protected const int    MIN_WIDTH = 16;
-        protected const double EPSILON = 0.00001;
+        BAR,
+        RING
+    }
 
-        [CCode (notify = false)]
-        public double value {
+
+    public sealed class TimerProgressBar : Gtk.Widget
+    {
+        private const float  MIN_LINE_WIDTH = 6.0f;
+        private const float  MAX_LINE_WIDTH = 8.0f;
+        private const int    MIN_WIDTH = 100;
+        private const uint   TIMEOUT_RESOLUTION = 2U;
+        private const uint   MIN_TIMEOUT_INTERVAL = 25;  // 40Hz
+        private const uint   FADE_IN_DURATION = 500;
+        private const uint   FADE_OUT_DURATION = 500;
+
+        public Pomodoro.Timer timer {
             get {
-                return this._value;
+                return this._timer;
             }
-            set {
-                if (this._value == value) {
-                    return;
-                }
-
-                var was_value_set = this._value_set;
-
-                this._value = value;
-                this._value_set = true;
-
-                this.notify_property ("value");
-
-                if (!was_value_set) {
-                    this.notify_property ("value-set");
-                }
-
-                this.queue_draw_highlight ();
+            construct {
+                this._timer = value != null
+                        ? value
+                        : Pomodoro.Timer.get_default ();
             }
         }
 
         [CCode (notify = false)]
-        public bool value_set {
+        public Pomodoro.TimerProgressShape shape {
             get {
-                return this._value_set;
+                return this._shape;
             }
-            set {
-                if (this._value_set == value) {
-                    return;
+            construct {
+                Pomodoro.Gizmo through;
+                Pomodoro.Gizmo highlight;
+
+                this._shape = value;
+
+                switch (this._shape)
+                {
+                    case Pomodoro.TimerProgressShape.BAR:
+                        through = new Pomodoro.Gizmo (
+                                TimerProgressBar.measure_bar_cb,
+                                null,
+                                TimerProgressBar.snapshot_bar_through_cb,
+                                null,
+                                null,
+                                null);
+                        highlight = new Pomodoro.Gizmo (
+                                TimerProgressBar.measure_bar_cb,
+                                null,
+                                TimerProgressBar.snapshot_bar_highlight_cb,
+                                null,
+                                null,
+                                null);
+                        break;
+
+                    case Pomodoro.TimerProgressShape.RING:
+                        through = new Pomodoro.Gizmo (
+                                TimerProgressBar.measure_ring_cb,
+                                null,
+                                TimerProgressBar.snapshot_ring_through_cb,
+                                null,
+                                null,
+                                null);
+                        highlight = new Pomodoro.Gizmo (
+                                TimerProgressBar.measure_ring_cb,
+                                null,
+                                TimerProgressBar.snapshot_ring_highlight_cb,
+                                null,
+                                null,
+                                null);
+                        break;
+
+                    default:
+                        assert_not_reached ();
                 }
 
-                this._value_set = value;
+                through.focusable = false;
+                through.add_css_class ("through");
+                through.set_parent (this);
 
-                this.invalidate_value ();
+                highlight.focusable = false;
+                highlight.add_css_class ("highlight");
+                highlight.set_parent (this);
 
-                this.notify_property ("value-set");
+                this.through = through;
+                this.highlight = highlight;
 
-                if (!this._value_set) {
-                    this._value = this.resolve_value ();
-                    this.notify_property ("value");
-                }
-
-                this.queue_draw_highlight ();
+                this.queue_resize ();
             }
         }
 
@@ -65,128 +100,552 @@ namespace Pomodoro
                 return this._line_width;
             }
             set {
-                if (this._line_width == value) {
-                    return;
+                if (this._line_width != value) {
+                    this._line_width = value;
+                    this.line_width_set = true;
+                    this.notify_property ("line-width");
+                    this.queue_allocate ();
                 }
-
-                this._line_width = value;
-
-                this.notify_property ("line-width");
-
-                this.through.queue_resize ();
-                this.highlight.queue_resize ();
             }
         }
 
-        public unowned Pomodoro.Timer timer {
+        [CCode (notify = false)]
+        public bool line_width_set {
             get {
-                return this._timer;
+                return this._line_width_set;
             }
             set {
-                if (value == this._timer) {
-                    return;
-                }
-
-                this.disconnect_signals ();
-
-                this._timer = value;
-
-                if (this.get_mapped ()) {
-                    this.connect_signals ();
+                if (this._line_width_set != value) {
+                    this._line_width_set = value;
+                    this.notify_property ("line-width-set");
+                    this.queue_allocate ();
                 }
             }
         }
 
-        protected float               _line_width = DEFAULT_LINE_WIDTH;
-        protected double              _value = double.NAN;
-        protected bool                _value_set = false;
-        protected Pomodoro.Timer      _timer;
+        public float display_value {
+            get {
+                return (float) this._display_value;
+            }
+        }
 
-        /* Animation for interpolating from `value_animation_start_value` to `_value`. */
-        private Adw.TimedAnimation? value_animation;
-        private double              value_animation_start_value;
-
-        /* Animation for highlight`s color. */
-        private Adw.TimedAnimation? opacity_animation = null;
-
-        /* Preserved value in case we're fading out. */
-        private double last_value = double.NAN;
-
-        /* Equivalent with intended opacity. */
-        private double last_opacity = 0.0;
-
-        private unowned Pomodoro.Gizmo through;
-        private unowned Pomodoro.Gizmo highlight;
-        private ulong                  timer_state_changed_id = 0;
-        private uint                   timeout_id = 0;
-        private uint                   timeout_interval = 0;
-
+        private Pomodoro.TimerProgressShape _shape = Pomodoro.TimerProgressShape.BAR;
+        private Pomodoro.Timer              _timer;
+        private float                       _line_width = MIN_LINE_WIDTH;
+        private bool                        _line_width_set = false;
+        private double                      _display_value = 0.0;
+        private double                      display_value_from = 0.0;
+        private double                      display_value_to = 0.0;
+        private Adw.TimedAnimation?         value_animation = null;
+        private Adw.TimedAnimation?         opacity_animation = null;
+        private unowned Pomodoro.Gizmo      through = null;
+        private unowned Pomodoro.Gizmo      highlight = null;
+        private ulong                       tick_id = 0U;
+        private uint                        tick_callback_id = 0U;
+        private uint                        timeout_id = 0U;
+        private uint                        timeout_interval = 0U;
+        private uint                        timeout_inhibit_count = 0U;
+        private float                       radius;
+        private float                       line_cap_radius;
+        private float                       line_cap_angle;
 
         static construct
         {
-            set_css_name ("progressbar");
+            set_css_name ("timerprogressbar");
         }
 
-        construct
+        private inline int64 get_current_time ()
         {
-            this._timer = Pomodoro.Timer.get_default ();
-
-            var through = new Pomodoro.Gizmo (TimerProgress.measure_child_cb,
-                                              null,
-                                              TimerProgress.snapshot_through_cb,
-                                              null,
-                                              null,
-                                              null);
-            through.focusable = false;
-            through.add_css_class ("trough");
-            through.set_parent (this);
-
-            var highlight = new Pomodoro.Gizmo (TimerProgress.measure_child_cb,
-                                                null,
-                                                TimerProgress.snapshot_highlight_internal_cb,
-                                                null,
-                                                null,
-                                                null);
-            highlight.focusable = false;
-            through.add_css_class ("highlight");
-            highlight.set_parent (this);
-
-            this.highlight = highlight;
-            this.through = through;
-
-            this.notify["value"].connect (this.on_value_notify);
+            return this._timer.is_running ()
+                    ? this._timer.get_current_time (this.get_frame_clock ().get_frame_time ())
+                    : this._timer.get_last_state_changed_time ();
         }
 
-        private static Pomodoro.TimerProgress? from_gizmo (Pomodoro.Gizmo gizmo)
+        private void inhibit_timeout ()
         {
-            Gtk.Widget? widget = gizmo;
+            this.timeout_inhibit_count++;
 
-            while (widget != null)
+            this.stop_timeout ();
+        }
+
+        private void uninhibit_timeout ()
+        {
+            if (this.timeout_inhibit_count > 0)
             {
-                var progress = widget as Pomodoro.TimerProgress;
+                this.timeout_inhibit_count--;
 
-                if (progress != null) {
-                    return progress;
+                if (this.timeout_inhibit_count == 0 && this._timer.is_running ()) {
+                    this.start_timeout ();
                 }
+            }
+        }
 
-                widget = widget.get_parent ();
+        private void start_timeout ()
+        {
+            if (this.timeout_inhibit_count > 0) {
+                return;
             }
 
-            return null;
+            var timeout_interval = this.calculate_timeout_interval ();
+
+            if (timeout_interval < MIN_TIMEOUT_INTERVAL) {
+                timeout_interval = 0U;
+            }
+
+            if (this.timeout_interval != timeout_interval) {
+                this.timeout_interval = timeout_interval;
+                this.stop_timeout ();
+            }
+
+            if (this.tick_id == 0 && timeout_interval > 0 && timeout_interval > 500) {
+                this.tick_id = this._timer.tick.connect (
+                    (timestamp) => {
+                        this.highlight.queue_draw ();
+                    });
+            }
+            else if (this.timeout_id == 0 && timeout_interval > 0)
+            {
+                this.timeout_id = GLib.Timeout.add (
+                    timeout_interval,
+                    () => {
+                        this.highlight.queue_draw ();
+
+                        return GLib.Source.CONTINUE;
+                    });
+                GLib.Source.set_name_by_id (this.timeout_id,
+                                            "Pomodoro.TimerProgressBar.queue_draw");
+            }
+            else if (this.tick_callback_id == 0 && timeout_interval == 0)
+            {
+                this.tick_callback_id = this.add_tick_callback (
+                    () => {
+                        this.highlight.queue_draw ();
+
+                        return GLib.Source.CONTINUE;
+                    });
+            }
         }
 
-        private static void measure_child_cb (Pomodoro.Gizmo  gizmo,
-                                              Gtk.Orientation orientation,
-                                              int             for_size,
-                                              out int         minimum,
-                                              out int         natural,
-                                              out int         minimum_baseline,
-                                              out int         natural_baseline)
+        private void stop_timeout ()
         {
-            var self = TimerProgress.from_gizmo (gizmo);
+            if (this.tick_id != 0) {
+                this._timer.disconnect (this.tick_id);
+                this.tick_id = 0;
+            }
+
+            if (this.timeout_id != 0) {
+                GLib.Source.remove (this.timeout_id);
+                this.timeout_id = 0;
+            }
+
+            if (this.tick_callback_id != 0) {
+                this.remove_tick_callback (this.tick_callback_id);
+                this.tick_callback_id = 0;
+            }
+        }
+
+        private void on_timer_state_changed (Pomodoro.TimerState current_state,
+                                             Pomodoro.TimerState previous_state)
+        {
+            var timestamp = this._timer.get_last_state_changed_time ();
+            var is_ring = this._shape == Pomodoro.TimerProgressShape.RING;
+
+            if (!current_state.is_started () && previous_state.is_finished () && is_ring) {
+                this.fade_in ();
+            }
+            else if (current_state.user_data != null && previous_state.user_data == null) {
+                this.fade_in ();
+            }
+            else if (!current_state.is_started () && previous_state.is_started ()) {
+                this.fade_out ();
+            }
+
+            if (this.opacity_animation == null)
+            {
+                var value_from = this._display_value;
+                var value_to = this._timer.calculate_progress (timestamp);
+
+                this.animate_value (value_from, value_to);
+            }
+
+            if (current_state.is_running ()) {
+                this.start_timeout ();
+            }
+            else {
+                this.stop_timeout ();
+            }
+        }
+
+        private void on_opacity_animation_done ()
+        {
+            this.opacity_animation = null;
+            this.uninhibit_timeout ();
+        }
+
+        private void on_value_animation_done ()
+        {
+            this.value_animation = null;
+            this.uninhibit_timeout ();
+        }
+
+        private float calculate_line_width (int size)
+        {
+            // HACK: sizing is hard-coded for the TimerView; perhaps it's not the best place
+            var size_float = (float) Math.roundf ((float) size);
+            var min_size   = 300.0f;
+            var max_size   = 450.0f;
+            var t          = ((size_float - min_size) / (max_size - min_size)).clamp (0.0f, 1.0f);
+
+            return Math.roundf (lerpf (MIN_LINE_WIDTH, MAX_LINE_WIDTH, t));
+        }
+
+        private uint calculate_timeout_interval ()
+        {
+            int64 distance;
+
+            switch (this._shape)
+            {
+                case Pomodoro.TimerProgressShape.BAR:
+                    distance = (int64) this.get_width ();
+                    break;
+
+                case Pomodoro.TimerProgressShape.RING:
+                    distance = (int64) Math.ceil (2.0 * Math.PI * (double) this.radius);
+                    break;
+
+                default:
+                    assert_not_reached ();
+            }
+
+            distance *= TIMEOUT_RESOLUTION;
+
+            return distance > 0
+                    ? Pomodoro.Timestamp.to_milliseconds_uint (this._timer.duration / distance)
+                    : 0;
+        }
+
+        private uint calculate_animation_duration (double value_from,
+                                                   double value_to)
+        {
+            switch (this._shape)
+            {
+                case Pomodoro.TimerProgressShape.BAR:
+                    return (uint)(Math.sqrt ((value_to - value_from).abs ()) * 500.0);
+
+                case Pomodoro.TimerProgressShape.RING:
+                    return (uint)(Math.sqrt ((value_to - value_from).abs ()) * 1000.0);
+
+                default:
+                    assert_not_reached ();
+            }
+        }
+
+        private void fade_in ()
+        {
+            var opacity_from = this.opacity_animation != null
+                    ? this.opacity_animation.value
+                    : 0.0;
+            var opacity_to = 1.0;
+
+            if (this.opacity_animation != null) {
+                this.opacity_animation.pause ();
+                this.opacity_animation = null;
+                this.uninhibit_timeout ();
+            }
+
+            if (this.get_mapped ())
+            {
+                this.inhibit_timeout ();
+
+                var animation_target = new Adw.CallbackAnimationTarget (this.highlight.queue_draw);
+
+                this.opacity_animation = new Adw.TimedAnimation (this.highlight,
+                                                                 opacity_from,
+                                                                 opacity_to,
+                                                                 FADE_IN_DURATION,
+                                                                 animation_target);
+                this.opacity_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
+                this.opacity_animation.done.connect (this.on_opacity_animation_done);
+                this.opacity_animation.play ();
+            }
+        }
+
+        private void fade_out ()
+        {
+            var opacity_from = this.opacity_animation != null
+                    ? this.opacity_animation.value
+                    : 1.0;
+            var opacity_to = 0.0;
+
+            if (this.opacity_animation != null) {
+                this.opacity_animation.pause ();
+                this.opacity_animation = null;
+                this.uninhibit_timeout ();
+            }
+
+            if (this.get_mapped ())
+            {
+                this.inhibit_timeout ();
+
+                var animation_target = new Adw.CallbackAnimationTarget (this.highlight.queue_draw);
+
+                this.opacity_animation = new Adw.TimedAnimation (this.highlight,
+                                                                 opacity_from,
+                                                                 opacity_to,
+                                                                 FADE_OUT_DURATION,
+                                                                 animation_target);
+                this.opacity_animation.set_easing (Adw.Easing.EASE_IN_OUT_CUBIC);
+                this.opacity_animation.done.connect (this.on_opacity_animation_done);
+                this.opacity_animation.play ();
+            }
+        }
+
+        private void animate_value (double value_from,
+                                    double value_to)
+                                    requires (value_from.is_finite ())
+                                    requires (value_to.is_finite ())
+        {
+            if ((value_from - value_to).abs () < 0.01) {
+                return;
+            }
+
+            if (this.value_animation != null) {
+                this.value_animation.pause ();
+                this.value_animation = null;
+                this.uninhibit_timeout ();
+            }
+
+            if (this.get_mapped ())
+            {
+                this.inhibit_timeout ();
+
+                var animation_duration = this.calculate_animation_duration (value_from, value_to);
+                var animation_target = new Adw.CallbackAnimationTarget (this.highlight.queue_draw);
+
+                this.value_animation = new Adw.TimedAnimation (this.highlight,
+                                                               0.0,
+                                                               1.0,
+                                                               animation_duration,
+                                                               animation_target);
+                this.value_animation.set_easing (this._timer.is_paused ()
+                                                 ? Adw.Easing.EASE_IN_OUT_CUBIC
+                                                 : Adw.Easing.EASE_OUT_QUAD);
+                this.value_animation.done.connect (this.on_value_animation_done);
+                this.value_animation.play ();
+
+                this.display_value_from = value_from;
+                this.display_value_to = value_to;
+            }
+        }
+
+
+        /*
+         * Bar shape
+         */
+
+        private static void measure_bar_cb (Pomodoro.Gizmo  gizmo,
+                                            Gtk.Orientation orientation,
+                                            int             for_size,
+                                            out int         minimum,
+                                            out int         natural,
+                                            out int         minimum_baseline,
+                                            out int         natural_baseline)
+        {
+            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
 
             if (self != null) {
-                self.measure_child (gizmo,
+                self.measure_bar (gizmo,
+                                  orientation,
+                                  for_size,
+                                  out minimum,
+                                  out natural,
+                                  out minimum_baseline,
+                                  out natural_baseline);
+            }
+            else {
+                minimum = 0;
+                natural = 0;
+                minimum_baseline = -1;
+                natural_baseline = -1;
+            }
+        }
+
+        private static void snapshot_bar_through_cb (Pomodoro.Gizmo gizmo,
+                                                     Gtk.Snapshot   snapshot)
+        {
+            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
+
+            if (self != null) {
+                self.snapshot_bar_through (gizmo, snapshot);
+            }
+        }
+
+        private static void snapshot_bar_highlight_cb (Pomodoro.Gizmo gizmo,
+                                                       Gtk.Snapshot   snapshot)
+        {
+            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
+
+            if (self != null) {
+                self.snapshot_bar_highlight (gizmo, snapshot);
+            }
+        }
+
+        private void measure_bar (Pomodoro.Gizmo  gizmo,
+                                  Gtk.Orientation orientation,
+                                  int             for_size,
+                                  out int         minimum,
+                                  out int         natural,
+                                  out int         minimum_baseline,
+                                  out int         natural_baseline)
+        {
+            if (orientation == Gtk.Orientation.VERTICAL)
+            {
+                minimum = (int) Math.ceilf (this._line_width);
+                natural = minimum;
+            }
+            else {
+                minimum = MIN_WIDTH;
+                natural = minimum;
+            }
+
+            minimum_baseline = -1;
+            natural_baseline = -1;
+        }
+
+        private void snapshot_bar_through (Pomodoro.Gizmo gizmo,
+                                           Gtk.Snapshot   snapshot)
+        {
+            var width  = (float) gizmo.get_width ();
+            var height = (float) gizmo.get_height ();
+            var color  = gizmo.get_color ();
+
+            var through_width   = width;
+            var through_height  = this._line_width;
+            var through_x       = 0.0f;
+            var through_y       = (height - through_height) / 2.0f;
+            var through_bounds  = Graphene.Rect ();
+            var through_outline = Gsk.RoundedRect ();
+
+            through_bounds.init (through_x,
+                                 through_y,
+                                 through_width,
+                                 through_height);
+            through_outline.init_from_rect (through_bounds, through_height / 2.0f);
+
+            snapshot.push_rounded_clip (through_outline);
+            snapshot.append_color (color, through_bounds);
+            snapshot.pop ();
+        }
+
+        private void snapshot_bar_highlight (Pomodoro.Gizmo gizmo,
+                                             Gtk.Snapshot   snapshot)
+        {
+            double display_value;
+
+            var opacity = this.opacity_animation != null
+                    ? this.opacity_animation.value
+                    : 1.0;
+
+            if (this.opacity_animation == null ||
+                this.opacity_animation.value_to > 0.0)
+            {
+                display_value = this._timer.user_data != null
+                        ? this._timer.calculate_progress (this.get_current_time ())
+                        : 0.0;
+            }
+            else {
+                display_value = this._display_value;
+            }
+
+            if (this.value_animation != null) {
+                display_value = lerp (this.display_value_from,
+                                      display_value,
+                                      this.value_animation.value);
+            }
+
+            if (display_value <= 0.0 || opacity == 0.0)
+            {
+                this._display_value = 0.0;
+
+                return;  // Nothing to draw
+            }
+
+            var width           = (float) gizmo.get_width ();
+            var height          = (float) gizmo.get_height ();
+            var color           = gizmo.get_color ();
+            var clip_applied    = false;
+            var opacity_applied = false;
+
+            if (opacity < 1.0) {
+                snapshot.push_opacity (this.opacity_animation.value);
+                opacity_applied = true;
+            }
+
+            var highlight_width   = width * float.min ((float) display_value, 1.0f);
+            var highlight_height  = this._line_width;
+            var highlight_x       = 0.0f;
+            var highlight_y       = (height - highlight_height) / 2.0f;
+            var highlight_bounds  = Graphene.Rect ();
+            var highlight_outline = Gsk.RoundedRect ();
+
+            if (this.get_direction () == Gtk.TextDirection.RTL) {
+                highlight_x = width - highlight_x - highlight_width;
+            }
+
+            if (highlight_width < highlight_height)
+            {
+                var clip_bounds  = Graphene.Rect ();
+                var clip_outline = Gsk.RoundedRect ();
+                clip_bounds.init (0.0f,
+                                  highlight_y,
+                                  width,
+                                  highlight_height);
+                clip_outline.init_from_rect (clip_bounds, highlight_height / 2.0f);
+                snapshot.push_rounded_clip (clip_outline);
+
+                highlight_x    -= highlight_height - highlight_width;
+                highlight_width = highlight_height;
+                clip_applied    = true;
+            }
+
+            highlight_bounds.init (highlight_x,
+                                   highlight_y,
+                                   highlight_width,
+                                   highlight_height);
+            highlight_outline.init_from_rect (highlight_bounds, highlight_height / 2.0f);
+
+            snapshot.push_rounded_clip (highlight_outline);
+            snapshot.append_color (color, highlight_bounds);
+            snapshot.pop ();
+
+            if (clip_applied) {
+                snapshot.pop ();
+            }
+
+            if (opacity_applied) {
+                snapshot.pop ();
+            }
+
+            this._display_value = display_value;
+        }
+
+
+        /*
+         * Ring shape
+         */
+
+        private static void measure_ring_cb (Pomodoro.Gizmo  gizmo,
+                                             Gtk.Orientation orientation,
+                                             int             for_size,
+                                             out int         minimum,
+                                             out int         natural,
+                                             out int         minimum_baseline,
+                                             out int         natural_baseline)
+        {
+            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
+
+            if (self != null) {
+                self.measure_ring (gizmo,
                                     orientation,
                                     for_size,
                                     out minimum,
@@ -202,322 +661,172 @@ namespace Pomodoro
             }
         }
 
-        private static void snapshot_through_cb (Pomodoro.Gizmo gizmo,
-                                                 Gtk.Snapshot   snapshot)
+        private static void snapshot_ring_through_cb (Pomodoro.Gizmo gizmo,
+                                                      Gtk.Snapshot   snapshot)
         {
-            var self = TimerProgress.from_gizmo (gizmo);
+            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
 
             if (self != null) {
-                self.snapshot_through (gizmo, snapshot);
+                self.snapshot_ring_through (gizmo, snapshot);
             }
         }
 
-        private static void snapshot_highlight_internal_cb (Pomodoro.Gizmo gizmo,
-                                                             Gtk.Snapshot   snapshot)
+        private static void snapshot_ring_highlight_cb (Pomodoro.Gizmo gizmo,
+                                                        Gtk.Snapshot   snapshot)
         {
-            var self = TimerProgress.from_gizmo (gizmo);
+            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
 
             if (self != null) {
-                self.snapshot_highlight_internal (gizmo, snapshot);
+                self.snapshot_ring_highlight (gizmo, snapshot);
             }
         }
 
-        protected virtual uint calculate_timeout_interval ()
+        private void measure_ring (Pomodoro.Gizmo  gizmo,
+                                   Gtk.Orientation orientation,
+                                   int             for_size,
+                                   out int         minimum,
+                                   out int         natural,
+                                   out int         minimum_baseline,
+                                   out int         natural_baseline)
         {
-            return 0;
+            minimum = int.max (for_size, MIN_WIDTH);
+            natural = minimum;
+            minimum_baseline = -1;
+            natural_baseline = -1;
         }
 
-        protected virtual uint calculate_animation_duration (double current_value,
-                                                             double previous_value)
+        private void snapshot_ring_through (Pomodoro.Gizmo gizmo,
+                                            Gtk.Snapshot   snapshot)
         {
-            return 0;
+            var color = gizmo.get_color ();
+            var origin = Graphene.Point () {
+                x = (float) gizmo.get_width () / 2.0f,
+                y = (float) gizmo.get_height () / 2.0f
+            };
+
+            var path_builder = new Gsk.PathBuilder ();
+            path_builder.add_circle (origin, this.radius);
+
+            var stroke = new Gsk.Stroke (this._line_width);
+            snapshot.append_stroke (path_builder.to_path (), stroke, color);
         }
 
-        protected virtual void measure_child (Pomodoro.Gizmo  gizmo,
-                                              Gtk.Orientation orientation,
-                                              int             for_size,
-                                              out int         minimum,
-                                              out int         natural,
-                                              out int         minimum_baseline,
-                                              out int         natural_baseline)
+        private void snapshot_ring_highlight (Pomodoro.Gizmo gizmo,
+                                              Gtk.Snapshot   snapshot)
         {
-            minimum = 0;
-            natural = 0;
-            minimum_baseline = 0;
-            natural_baseline = 0;
-        }
+            double display_value;
 
-        protected virtual void snapshot_through (Pomodoro.Gizmo gizmo,
-                                                 Gtk.Snapshot   snapshot)
-        {
-        }
-
-        protected virtual void snapshot_highlight (Pomodoro.Gizmo gizmo,
-                                                   Gtk.Snapshot   snapshot,
-                                                   double         displayed_value,
-                                                   double         opacity)
-        {
-        }
-
-        protected void snapshot_highlight_internal (Pomodoro.Gizmo gizmo,
-                                                    Gtk.Snapshot   snapshot)
-        {
-            var displayed_value = this._value;
-            var opacity         = this.opacity_animation != null
+            var opacity = this.opacity_animation != null
                     ? this.opacity_animation.value
-                    : this.last_opacity;
+                    : 1.0;
 
-            if (this.opacity_animation != null && this.opacity_animation.value_to == 0.0) {
-                displayed_value = this.last_value;
+            if (this.opacity_animation == null ||
+                this.opacity_animation.value_to > 0.0)
+            {
+                display_value = this._timer.user_data != null
+                        ? this._timer.calculate_progress (this.get_current_time ())
+                        : 1.0;
             }
             else {
-                if (!this._value_set) {
-                    displayed_value = this.resolve_value ();
-                    this._value = displayed_value;
-                    this.notify_property ("value");
+                display_value = this._display_value;
+            }
+
+            if (this.value_animation != null) {
+                display_value = lerp (this.display_value_from,
+                                      display_value,
+                                      this.value_animation.value);
+            }
+
+            if (display_value >= 1.0 || opacity == 0.0)
+            {
+                this._display_value = 1.0;
+
+                return;  // Nothing to draw
+            }
+
+            var color = gizmo.get_color ();
+            var origin = Graphene.Point () {
+                x = (float) gizmo.get_width () / 2.0f,
+                y = (float) gizmo.get_height () / 2.0f
+            };
+            var path_builder = new Gsk.PathBuilder ();
+            var clip_applied = false;
+            var opacity_applied = false;
+
+            if (opacity < 1.0) {
+                snapshot.push_opacity (opacity);
+                opacity_applied = true;
+            }
+
+            // Draw a circular arc representing remaining time. The arc starts at the top
+            // of the circle (-90°) and sweeps counter-clockwise as time progresses.
+            // For edge cases (sweep > 360° or < 0°), we apply clipping and adjust the starting
+            // point to handle line cap rendering correctly. `svg_arc_to ()` requires an arc
+            // endpoint, so we do some trigonometry.
+            if (display_value < 0.001) {
+                path_builder.add_circle (origin, this.radius);
+            }
+            else if (display_value < 0.999)
+            {
+                var sweep_angle = (2.0 * Math.PI + this.line_cap_angle) * (1.0 - display_value) -
+                                  this.line_cap_angle;
+
+                if (sweep_angle > 2.0 * Math.PI) {
+                    path_builder.move_to (origin.x + this.radius, origin.y);
+                    clip_applied = true;
+                }
+                else if (sweep_angle < 0.0) {
+                    path_builder.move_to (origin.x - this.radius, origin.y);
+                    clip_applied = true;
+                }
+                else {
+                    path_builder.move_to (origin.x, origin.y - this.radius);
                 }
 
-                if (this.value_animation != null) {
-                    displayed_value = Adw.lerp (this.value_animation_start_value,
-                                                displayed_value,
-                                                this.value_animation.value);
+                if (clip_applied)
+                {
+                    var clip_bounds  = Graphene.Rect ();
+                    var clip_outline = Gsk.RoundedRect ();
+                    clip_bounds.init (origin.x - this._line_width / 2.0f,
+                                      origin.y - this.radius - this._line_width / 2.0f,
+                                      this._line_width,
+                                      this._line_width);
+                    clip_outline.init_from_rect (clip_bounds, this._line_width / 2.0f);
+                    snapshot.push_rounded_clip (clip_outline);
                 }
 
-                this.last_value = this._value;
+                float sin_angle, cos_angle;
+                Math.sincosf ((float)(-Math.PI_2 + sweep_angle), out sin_angle, out cos_angle);
+
+                path_builder.svg_arc_to (this.radius,
+                                         this.radius,
+                                         0.0f,
+                                         sweep_angle > Math.PI,
+                                         true,
+                                         origin.x + this.radius * cos_angle,
+                                         origin.y + this.radius * sin_angle);
             }
 
-            if (displayed_value.is_nan ()) {
-                return;
+            var stroke = new Gsk.Stroke (this._line_width);
+            stroke.set_line_cap (Gsk.LineCap.ROUND);
+
+            snapshot.append_stroke (path_builder.to_path (), stroke, color);
+
+            if (clip_applied) {
+                snapshot.pop ();
             }
 
-            this.snapshot_highlight (gizmo, snapshot, displayed_value, opacity);
+            if (opacity_applied) {
+                snapshot.pop ();
+            }
+
+            this._display_value = display_value;
         }
 
-        private void queue_draw_highlight ()
-        {
-            this.highlight.queue_draw ();
-        }
 
-        private void start_value_animation ()
-        {
-            if (this.value_animation != null || this.last_value.is_nan ()) {
-                return;
-            }
-
-            var animation_duration = this.calculate_animation_duration (this._value,
-                                                                        this.last_value);
-            if (animation_duration > 0)
-            {
-                var animation_target = new Adw.CallbackAnimationTarget (this.queue_draw_highlight);
-
-                this.value_animation = new Adw.TimedAnimation (this,
-                                                               0.0,
-                                                               1.0,
-                                                               animation_duration,
-                                                               animation_target);
-                this.value_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
-                // this.value_animation.set_easing (timer.is_running ()
-                //                                  ? Adw.Easing.EASE_IN_OUT_CUBIC
-                //                                  : Adw.Easing.EASE_OUT_QUAD);
-                this.value_animation.done.connect (this.stop_value_animation);
-                this.value_animation.play ();
-                this.value_animation_start_value = last_value;
-            }
-        }
-
-        private void stop_value_animation ()
-        {
-            if (this.value_animation != null)
-            {
-                this.value_animation.pause ();
-                this.value_animation = null;
-                this.value_animation_start_value = double.NAN;
-            }
-        }
-
-        private void update_value_animation ()
-        {
-            if (this.get_mapped () && this.opacity_animation == null) {
-                this.start_value_animation ();
-            }
-            else {
-                this.stop_value_animation ();
-            }
-        }
-
-        private void stop_opacity_animation ()
-        {
-            if (this.opacity_animation != null)
-            {
-                this.opacity_animation.pause ();
-                this.opacity_animation = null;
-            }
-        }
-
-        private void fade_in ()
-        {
-            var last_opacity = this.last_opacity;
-
-            if (this.opacity_animation != null && this.opacity_animation.value_to == 1.0) {
-                return;
-            }
-
-            if (last_opacity == 1.0) {
-                return;
-            }
-
-            if (this.opacity_animation != null) {
-                last_opacity = this.opacity_animation.value;
-                this.stop_opacity_animation ();
-            }
-
-            if (this.get_mapped ()) {
-                var animation_target = new Adw.CallbackAnimationTarget (this.queue_draw_highlight);
-                this.opacity_animation = new Adw.TimedAnimation (this,
-                                                                 last_opacity,
-                                                                 1.0,
-                                                                 FADE_IN_DURATION,
-                                                                 animation_target);
-                this.opacity_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
-                this.opacity_animation.done.connect (this.stop_opacity_animation);
-                this.opacity_animation.play ();
-            }
-
-            this.last_opacity = 1.0;
-        }
-
-        private void fade_out ()
-        {
-            var last_opacity = this.last_opacity;
-
-            if (this.opacity_animation != null && this.opacity_animation.value_to == 0.0) {
-                return;
-            }
-
-            if (this.last_opacity == 0.0) {
-                return;
-            }
-
-            if (this.opacity_animation != null) {
-                last_opacity = this.opacity_animation.value;
-                this.stop_opacity_animation ();
-            }
-
-            if (this.get_mapped ()) {
-                var animation_target = new Adw.CallbackAnimationTarget (this.queue_draw_highlight);
-                this.opacity_animation = new Adw.TimedAnimation (this,
-                                                                 last_opacity,
-                                                                 0.0,
-                                                                 FADE_OUT_DURATION,
-                                                                 animation_target);
-                this.opacity_animation.set_easing (Adw.Easing.EASE_IN_OUT_CUBIC);
-                this.opacity_animation.done.connect (this.stop_opacity_animation);
-                this.opacity_animation.play ();
-            }
-
-            this.last_opacity = 0.0;
-        }
-
-        private void on_value_notify ()
-        {
-            if (this._value.is_nan ()) {
-                this.fade_out ();
-            }
-            else {
-                this.fade_in ();
-            }
-
-            this.update_value_animation ();
-        }
-
-        protected double resolve_value ()
-        {
-            var timestamp = this._timer.is_running ()
-                ? this._timer.get_current_time (this.get_frame_clock ().get_frame_time ())
-                : this._timer.get_last_state_changed_time ();
-
-            return this._timer.is_started ()
-                ? this._timer.calculate_progress (timestamp)
-                : double.NAN;
-        }
-
-        private void invalidate_value ()
-        {
-            if (!this._value_set) {
-                this._value = this.resolve_value ();
-                this.notify_property ("value");
-            }
-
-            this.queue_draw_highlight ();
-        }
-
-        private void start_timeout ()
-        {
-            var timeout_interval = uint.max (this.calculate_timeout_interval (),
-                                             MIN_TIMEOUT_INTERVAL);
-
-            if (this.timeout_interval != timeout_interval) {
-                this.timeout_interval = timeout_interval;
-                this.stop_timeout ();
-            }
-
-            if (this.timeout_id == 0 && this.timeout_interval > 0)
-            {
-                this.timeout_id = GLib.Timeout.add (
-                    this.timeout_interval,
-                    () => {
-                        this.invalidate_value ();
-
-                        return GLib.Source.CONTINUE;
-                    });
-                GLib.Source.set_name_by_id (
-                        this.timeout_id,
-                        @"Pomodoro.$(this.get_type().name()).invalidate_value");
-            }
-        }
-
-        private void stop_timeout ()
-        {
-            if (this.timeout_id != 0) {
-                GLib.Source.remove (this.timeout_id);
-                this.timeout_id = 0;
-            }
-        }
-
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
-        {
-            if (this._timer.is_running ()) {
-                this.start_timeout ();
-            }
-            else {
-                this.stop_timeout ();
-            }
-
-            this.invalidate_value ();
-        }
-
-        private void connect_signals ()
-        {
-            if (this.timer_state_changed_id == 0) {
-                this.timer_state_changed_id = this._timer.state_changed.connect (
-                        this.on_timer_state_changed);
-            }
-
-            if (this._timer.is_running ()) {
-                this.start_timeout ();
-            }
-        }
-
-        private void disconnect_signals ()
-        {
-            this.stop_timeout ();
-
-            if (this.timer_state_changed_id != 0) {
-                this._timer.disconnect (this.timer_state_changed_id);
-                this.timer_state_changed_id = 0;
-            }
-        }
+        /*
+         * Widget
+         */
 
         public override Gtk.SizeRequestMode get_request_mode ()
         {
@@ -554,6 +863,39 @@ namespace Pomodoro
                                             int height,
                                             int baseline)
         {
+            float line_width;
+
+            if (!this._line_width_set)
+            {
+                switch (this._shape)
+                {
+                    case Pomodoro.TimerProgressShape.BAR:
+                        line_width = this.calculate_line_width (width);
+                        break;
+
+                    case Pomodoro.TimerProgressShape.RING:
+                        var size = int.min (width, height);
+                        line_width = this.calculate_line_width (size);
+
+                        this.radius = ((float) size - line_width) / 2.0f;
+                        this.line_cap_radius = line_width / 2.0f;
+                        this.line_cap_angle = Math.atan2f (2.0f * this.line_cap_radius,
+                                                           this.radius);
+                        break;
+
+                    default:
+                        assert_not_reached ();
+                }
+            }
+            else {
+                line_width = this._line_width;
+            }
+
+            if (this._line_width != line_width) {
+                this._line_width = line_width;
+                this.notify_property ("line-width");
+            }
+
             this.through.allocate (width, height, baseline, null);
             this.highlight.allocate (width, height, baseline, null);
         }
@@ -566,318 +908,57 @@ namespace Pomodoro
 
         public override void map ()
         {
-            this.last_value = double.NAN;
-
             base.map ();
 
-            this.connect_signals ();
+            this._timer.state_changed.connect (this.on_timer_state_changed);
+            this.timeout_inhibit_count = 0;
+
+            if (this._timer.is_running ()) {
+                this.start_timeout ();
+            }
         }
 
         public override void unmap ()
         {
-            this.disconnect_signals ();
-            this.stop_value_animation ();
-            this.stop_opacity_animation ();
+            this.stop_timeout ();
+
+            this._timer.state_changed.disconnect (this.on_timer_state_changed);
+
+            if (this.value_animation != null) {
+                this.value_animation.pause ();
+                this.value_animation = null;
+            }
+
+            if (this.opacity_animation != null) {
+                this.opacity_animation.pause ();
+                this.opacity_animation = null;
+            }
 
             base.unmap ();
         }
 
-        public override bool focus (Gtk.DirectionType direction)
-        {
-            return false;
-        }
-
-        public override bool grab_focus ()
-        {
-            return false;
-        }
-
         public override void dispose ()
         {
-            unowned Gtk.Widget? child;
+            this.stop_timeout ();
 
-            this.disconnect_signals ();
-            this.stop_value_animation ();
-            this.stop_opacity_animation ();
-
-            while ((child = this.get_first_child ()) != null)
-            {
-                child.unparent ();
+            if (this.value_animation != null) {
+                this.value_animation.pause ();
+                this.value_animation = null;
             }
+
+            if (this.opacity_animation != null) {
+                this.opacity_animation.pause ();
+                this.opacity_animation = null;
+            }
+
+            this.through.unparent ();
+            this.highlight.unparent ();
 
             this.through = null;
             this.highlight = null;
             this._timer = null;
 
             base.dispose ();
-        }
-    }
-
-
-    public class TimerProgressBar : Pomodoro.TimerProgress
-    {
-        public TimerProgressBar ()
-        {
-            GLib.Object (
-                can_focus: false
-            );
-        }
-
-        protected override uint calculate_timeout_interval ()
-                                                            requires (this._timer != null)
-        {
-            var length = (int64) this.get_width ();
-
-            return length > 0
-                ? Pomodoro.Timestamp.to_milliseconds_uint (this._timer.duration / (2 * length))
-                : 0;
-        }
-
-        protected override uint calculate_animation_duration (double current_value,
-                                                              double previous_value)
-        {
-            var value_diff = ((current_value.is_nan () ? 0.0 : current_value) - previous_value).abs ();
-
-            return value_diff >= 0.01
-                ? (uint) (Math.sqrt (value_diff) * 300.0)
-                : 0;
-        }
-
-        protected override void measure_child (Pomodoro.Gizmo  gizmo,
-                                               Gtk.Orientation orientation,
-                                               int             for_size,
-                                               out int         minimum,
-                                               out int         natural,
-                                               out int         minimum_baseline,
-                                               out int         natural_baseline)
-        {
-            var line_width = (int) Math.ceilf (this.line_width);
-
-            if (orientation == Gtk.Orientation.HORIZONTAL) {
-                minimum = int.max (line_width, MIN_WIDTH);
-                natural = minimum;
-            }
-            else {
-                minimum = line_width;
-                natural = minimum;
-            }
-
-            minimum_baseline = -1;
-            natural_baseline = -1;
-        }
-
-        protected override void snapshot_through (Pomodoro.Gizmo gizmo,
-                                                  Gtk.Snapshot   snapshot)
-        {
-            var style_context = gizmo.get_style_context ();
-            var width         = (float) gizmo.get_width ();
-            var line_width    = this._line_width;
-            var color         = gizmo.get_color ();
-            var bounds        = Graphene.Rect ();
-            var outline       = Gsk.RoundedRect ();
-
-            bounds.init (0.0f,
-                         0.0f,
-                         width,
-                         line_width);
-            outline.init_from_rect (bounds, 0.5f * line_width);
-
-            snapshot.push_rounded_clip (outline);
-            snapshot.append_color (color, bounds);
-            snapshot.pop ();
-        }
-
-        protected override void snapshot_highlight (Pomodoro.Gizmo gizmo,
-                                                    Gtk.Snapshot   snapshot,
-                                                    double         displayed_value,
-                                                    double         opacity)
-        {
-            if (displayed_value <= EPSILON) {
-                return;
-            }
-
-            var width      = (float) gizmo.get_width ();
-            var line_width = this._line_width;
-            var bounds     = Graphene.Rect ();
-            var outline    = Gsk.RoundedRect ();
-            var color      = gizmo.get_color ();
-
-            color.alpha *= (float) opacity;
-
-            var highlight_bounds  = Graphene.Rect ();
-            var highlight_outline = Gsk.RoundedRect ();
-            var highlight_x = 0.0f;
-            var highlight_width = width * (float) displayed_value.clamp (0.0, 1.0);
-
-            if (highlight_width < line_width)
-            {
-                highlight_x = highlight_width - line_width;
-
-                bounds.init (0.0f, 0.0f, width, line_width);
-                outline.init_from_rect (bounds, 0.5f * line_width);
-                snapshot.push_rounded_clip (outline);
-
-                highlight_bounds.init (this.get_direction () == Gtk.TextDirection.RTL
-                                       ? width - highlight_width - highlight_x : highlight_x,
-                                       0.0f,
-                                       line_width,
-                                       line_width);
-                highlight_outline.init_from_rect (highlight_bounds, 0.5f * line_width);
-
-                snapshot.push_rounded_clip (highlight_outline);
-                snapshot.append_color (color, highlight_bounds);
-                snapshot.pop ();
-                snapshot.pop ();
-            }
-            else {
-                highlight_bounds.init (this.get_direction () == Gtk.TextDirection.RTL
-                                       ? width - highlight_width : 0.0f,
-                                       0.0f,
-                                       highlight_width,
-                                       line_width);
-                highlight_outline.init_from_rect (highlight_bounds, 0.5f * line_width);
-
-                snapshot.push_rounded_clip (highlight_outline);
-                snapshot.append_color (color, highlight_bounds);
-                snapshot.pop ();
-            }
-        }
-    }
-
-
-    public class TimerProgressRing : Pomodoro.TimerProgress
-    {
-        private float  radius;
-        private double cap_radius;
-        private double cap_angle;
-
-
-        public TimerProgressRing ()
-        {
-            GLib.Object (
-                can_focus: false
-            );
-        }
-
-        protected override uint calculate_timeout_interval ()
-                                                            requires (this._timer != null)
-        {
-            var length = (int64) Math.ceil (2.0 * Math.PI * double.min (this.get_width (), this.get_height ()));
-
-            return length > 0
-                ? Pomodoro.Timestamp.to_milliseconds_uint (this._timer.duration / (2 * length))
-                : 0;
-        }
-
-        protected override uint calculate_animation_duration (double current_value,
-                                                              double previous_value)
-        {
-            var value_diff = ((current_value.is_nan () ? 0.0 : current_value) - previous_value).abs ();
-
-            return value_diff >= 0.01
-                ? (uint) (Math.sqrt (value_diff) * 600.0)
-                : 0;
-        }
-
-        protected override void measure_child (Pomodoro.Gizmo  gizmo,
-                                               Gtk.Orientation orientation,
-                                               int             for_size,
-                                               out int         minimum,
-                                               out int         natural,
-                                               out int         minimum_baseline,
-                                               out int         natural_baseline)
-        {
-            minimum          = int.max (for_size, MIN_WIDTH);
-            natural          = minimum;
-            minimum_baseline = -1;
-            natural_baseline = -1;
-        }
-
-        protected override void snapshot_through (Pomodoro.Gizmo gizmo,
-                                                  Gtk.Snapshot   snapshot)
-        {
-            var width   = (float) gizmo.get_width ();
-            var height  = (float) gizmo.get_height ();
-            var radius  = float.min (width, height) / 2.0f;
-            var color   = gizmo.get_color ();
-            var bounds  = Graphene.Rect ();
-            var outline = Gsk.RoundedRect ();
-
-            bounds.init (0.5f * width - radius,
-                         0.5f * height - radius,
-                         2.0f * radius,
-                         2.0f * radius);
-            outline.init_from_rect (bounds, radius);
-
-            snapshot.append_border (outline,
-                                    { this._line_width, this._line_width, this._line_width, this._line_width },
-                                    { color, color, color, color });
-        }
-
-        protected override void snapshot_highlight (Pomodoro.Gizmo gizmo,
-                                                    Gtk.Snapshot   snapshot,
-                                                    double         displayed_value,
-                                                    double         opacity)
-        {
-            if (displayed_value >= 1.0 - EPSILON) {
-                return;
-            }
-
-            var width  = (float) gizmo.get_width ();
-            var height = (float) gizmo.get_height ();
-            var radius = float.min (width, height) / 2.0f;
-            var bounds = Graphene.Rect ();
-            var color  = gizmo.get_color ();
-
-            color.alpha *= (float) opacity;
-
-            bounds.init (0.5f * width - radius,
-                         0.5f * height - radius,
-                         2.0f * radius,
-                         2.0f * radius);
-
-            if (this.radius != radius) {
-                this.radius = radius;
-                this.cap_radius = this._line_width / 2.0;
-                this.cap_angle  = Math.atan2 (this.cap_radius, (double) radius);
-            }
-
-            var context    = snapshot.append_cairo (bounds);
-            var angle_from = - 0.5 * Math.PI - (2.0 * Math.PI + this.cap_angle) * displayed_value.clamp (EPSILON, 1.0);
-            var angle_to   = - 0.5 * Math.PI;
-
-            if (angle_from <= angle_to - 2.0 * Math.PI) {
-                context.arc (0.5 * width, this.cap_radius, this.cap_radius, 0.0, 2.0 * Math.PI);
-                context.clip ();
-                angle_to -= this.cap_angle;
-            }
-
-            context.set_line_width (this._line_width);
-            context.set_line_cap (Cairo.LineCap.ROUND);
-            context.set_source_rgba (color.red,
-                                     color.green,
-                                     color.blue,
-                                     color.alpha);
-            context.arc_negative (0.5 * width,
-                                  0.5 * height,
-                                  (double) radius - this.cap_radius,
-                                  angle_from,
-                                  angle_to);
-            context.stroke ();
-        }
-
-        public override void size_allocate (int width,
-                                            int height,
-                                            int baseline)
-        {
-            // HACK: Scale line-width according to size.
-            var min_size = 300.0;
-            var max_size = 450.0;
-            var line_width = Adw.lerp (6.0, 8.0, ((double) width - min_size) / (max_size - min_size));
-
-            this.line_width = (float) Math.round (line_width);
-
-            base.size_allocate (width, height, baseline);
         }
     }
 }

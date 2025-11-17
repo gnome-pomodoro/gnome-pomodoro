@@ -100,6 +100,30 @@ sessionprogressbar:backdrop .highlight {
 
 
 /**
+ * PomodoroTimerProgressBar widget
+ */
+timerprogressbar .through {
+    color: @pomodoro_support_color;
+}
+
+timerprogressbar:backdrop .through {
+    color: @pomodoro_unfocused_support_color;
+}
+
+timerprogressbar:disabled .through {
+    color: @pomodoro_insensitive_support_color;
+}
+
+timerprogressbar .highlight {
+    color: @pomodoro_primary_color;
+}
+
+timerprogressbar:backdrop .highlight {
+    color: @pomodoro_unfocused_primary_color;
+}
+
+
+/**
  * PomodoroTimerLabel widget
  */
 timerlabel .placeholder {
@@ -167,10 +191,8 @@ timerview .pomodoro-state-menu arrow {
 }
 
 timerview timerlabel:backdrop,
-timerview timerstatemenu label:backdrop,
-timerview progressbar:backdrop,
-timerview sessionprogressbar:backdrop {
-    color: @insensitive_fg_color;
+timerview timerstatemenu label:backdrop {
+    color: @pomodoro_unfocused_primary_color;
 }
 
 timerview:dir(rtl) .pomodoro-state-menu > button {
@@ -210,9 +232,8 @@ compacttimerview timerlabel {
     font-weight: 600;
 }
 
-compacttimerview progressbar {
-    padding: 0;
-    padding-left: 9px;
+compacttimerview timerprogressbar {
+    padding: 0 0 0 9px;
 }
 
 compacttimerview timercontrolbuttons button {
@@ -233,9 +254,12 @@ compacttimerview:dir(rtl) .pomodoro-state-menu arrow {
     margin-right: -16px;
 }
 
-compacttimerview:dir(rtl) progressbar {
-    padding: 0;
-    padding-right: 9px;
+compacttimerview:dir(rtl) timerprogressbar {
+    padding: 0 9px 0 0;
+}
+
+compacttimerview:backdrop timerprogressbar .highlight {
+    color: @pomodoro_primary_color;
 }
 
 
