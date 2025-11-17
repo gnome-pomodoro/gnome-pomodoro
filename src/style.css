@@ -76,14 +76,26 @@ timercontrolbuttons.circular button {
 
 
 /**
- * PomodoroProgressBar widget
+ * PomodoroSessionProgressBar widget
  */
-progressbar .highlight {
-    color: @pomodoro_color;
+sessionprogressbar .through {
+    color: @pomodoro_support_color;
 }
 
-progressbar .trough {
-    color: @through_color;
+sessionprogressbar:backdrop .through {
+    color: @pomodoro_unfocused_support_color;
+}
+
+sessionprogressbar:disabled .through {
+    color: @pomodoro_insensitive_support_color;
+}
+
+sessionprogressbar .highlight {
+    color: @pomodoro_primary_color;
+}
+
+sessionprogressbar:backdrop .highlight {
+    color: @pomodoro_unfocused_primary_color;
 }
 
 
@@ -110,7 +122,7 @@ timerview timerlabel {
 
 timerview sessionprogressbar {
     padding: 12px 0;
-    margin: 0 6px;
+    margin: 0 3px;
 }
 
 timerview timercontrolbuttons button {

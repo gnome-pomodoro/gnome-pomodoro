@@ -10,6 +10,7 @@ namespace Tests
             this.add_test ("get_completion_time", this.test_get_completion_time);
             this.add_test ("get_completion_time__with_gaps", this.test_get_completion_time__with_gaps);
 
+            this.add_test ("calculate_progress__empty", this.test_calculate_progress__empty);
             this.add_test ("calculate_progress__scheduled", this.test_calculate_progress__scheduled);
             this.add_test ("calculate_progress__in_progress", this.test_calculate_progress__in_progress);
             this.add_test ("calculate_progress__completed", this.test_calculate_progress__completed);
@@ -197,6 +198,19 @@ namespace Tests
             );
         }
 
+        public void test_calculate_progress__empty ()
+        {
+            var now = Pomodoro.Timestamp.peek ();
+
+            var cycle = new Pomodoro.Cycle ();
+
+            assert_cmpfloat (
+                cycle.calculate_progress (now),
+                GLib.CompareOperator.EQ,
+                0.0
+            );
+        }
+
         public void test_calculate_progress__scheduled ()
         {
             var now = Pomodoro.Timestamp.peek ();
@@ -225,9 +239,21 @@ namespace Tests
             cycle.append (time_block_1);
             cycle.append (time_block_2);
 
-            assert_true (cycle.calculate_progress (time_block_1.start_time).is_nan ());
-            assert_true (cycle.calculate_progress (time_block_1.end_time).is_nan ());
-            assert_true (cycle.calculate_progress (time_block_2.end_time).is_nan ());
+            assert_cmpfloat (
+                cycle.calculate_progress (time_block_1.start_time),
+                GLib.CompareOperator.EQ,
+                0.0
+            );
+            assert_cmpfloat (
+                cycle.calculate_progress (time_block_1.end_time),
+                GLib.CompareOperator.EQ,
+                0.0
+            );
+            assert_cmpfloat (
+                cycle.calculate_progress (time_block_2.end_time),
+                GLib.CompareOperator.EQ,
+                0.0
+            );
         }
 
         public void test_calculate_progress__in_progress ()
@@ -330,7 +356,7 @@ namespace Tests
             time_block_1.set_meta (
                 Pomodoro.TimeBlockMeta () {
                     status = Pomodoro.TimeBlockStatus.UNCOMPLETED,
-                    weight = 1.0,
+                    weight = 0.0,
                     completion_time = now + 20 * Pomodoro.Interval.MINUTE,
                     intended_duration = 25 * Pomodoro.Interval.MINUTE,
                 }
@@ -351,8 +377,16 @@ namespace Tests
             cycle.append (time_block_1);
             cycle.append (time_block_2);
 
-            assert_true (cycle.calculate_progress (time_block_1.end_time).is_nan ());
-            assert_true (cycle.calculate_progress (time_block_2.end_time).is_nan ());
+            assert_cmpfloat (
+                cycle.calculate_progress (time_block_2.end_time),
+                GLib.CompareOperator.EQ,
+                0.0
+            );
+            assert_cmpfloat (
+                cycle.calculate_progress (time_block_2.end_time),
+                GLib.CompareOperator.EQ,
+                0.0
+            );
         }
 
         public void test_calculate_progress__with_gaps ()
@@ -363,7 +397,7 @@ namespace Tests
             time_block_1.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
             time_block_1.set_meta (
                 Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.COMPLETED,
+                    status = Pomodoro.TimeBlockStatus.IN_PROGRESS,
                     weight = 1.0,
                     completion_time = now + 20 * Pomodoro.Interval.MINUTE,
                     intended_duration = 25 * Pomodoro.Interval.MINUTE,
@@ -374,10 +408,11 @@ namespace Tests
             time_block_1.add_gap (gap);
 
             var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block_2.set_time_range (now + 25 * Pomodoro.Interval.MINUTE, now + 30 * Pomodoro.Interval.MINUTE);
+            time_block_2.set_time_range (now + 25 * Pomodoro.Interval.MINUTE,
+                                         now + 30 * Pomodoro.Interval.MINUTE);
             time_block_2.set_meta (
                 Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.COMPLETED,
+                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
                     weight = 0.0,
                     completion_time = now + 29 * Pomodoro.Interval.MINUTE,
                     intended_duration = 5 * Pomodoro.Interval.MINUTE,
@@ -388,9 +423,10 @@ namespace Tests
             cycle.append (time_block_1);
             cycle.append (time_block_2);
 
-            assert_cmpfloat_with_epsilon (cycle.calculate_progress (gap.start_time + Pomodoro.Interval.MINUTE),
-                                          0.25,
-                                          0.0001);
+            assert_cmpfloat_with_epsilon (
+                    cycle.calculate_progress (gap.start_time + Pomodoro.Interval.MINUTE),
+                    0.25,
+                    0.0001);
         }
 
         public void test_is_visible__empty ()

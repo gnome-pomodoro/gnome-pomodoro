@@ -1287,7 +1287,7 @@ namespace Tests
             assert_cmpuint (session_changed_emitted, GLib.CompareOperator.EQ, 1);
 
             var cycle = session_manager.get_current_cycle ();
-            assert_true (cycle.calculate_progress (now).is_nan ());
+            assert_cmpfloat (cycle.calculate_progress (now), GLib.CompareOperator.EQ, 0.0);
         }
 
         public void test_advance_to_state__undefined ()

@@ -931,6 +931,7 @@ namespace Tests
         {
             var time_block = new Pomodoro.TimeBlock ();
             time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
 
             assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.start_time),
                                           0.0,
@@ -953,6 +954,7 @@ namespace Tests
         {
             var time_block = new Pomodoro.TimeBlock (Pomodoro.State.STOPPED);
             time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
 
             var gap_1 = new Pomodoro.Gap ();
             gap_1.set_time_range (2 * Pomodoro.Interval.MINUTE, 9 * Pomodoro.Interval.MINUTE);  // 4 minutes
@@ -998,6 +1000,7 @@ namespace Tests
             var time_block = new Pomodoro.TimeBlock (Pomodoro.State.STOPPED);
             time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
             time_block.set_completion_time (25 * Pomodoro.Interval.MINUTE);
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
 
             var gap = new Pomodoro.Gap ();
             gap.set_time_range (10 * Pomodoro.Interval.MINUTE, Pomodoro.Timestamp.UNDEFINED);

@@ -432,6 +432,16 @@ namespace Pomodoro
         {
             Pomodoro.ensure_timestamp (ref timestamp);
 
+            if (this.meta.status == Pomodoro.TimeBlockStatus.SCHEDULED ||
+                this.meta.status == Pomodoro.TimeBlockStatus.UNCOMPLETED)
+            {
+                return 0.0;
+            }
+
+            if (this.meta.status == Pomodoro.TimeBlockStatus.COMPLETED) {
+                return 1.0;
+            }
+
             if (Pomodoro.Timestamp.is_undefined (this._start_time) ||
                 Pomodoro.Timestamp.is_undefined (this._end_time))
             {
@@ -637,6 +647,8 @@ namespace Pomodoro
         public void set_meta (Pomodoro.TimeBlockMeta meta)
         {
             this.meta = meta;
+            this.version++;
+            // this.emit_changed ();  // TODO
         }
 
         /**
@@ -655,6 +667,7 @@ namespace Pomodoro
             if (this.meta.status != status) {
                 this.meta.status = status;
                 this.version++;
+                // this.emit_changed ();  // TODO
             }
         }
 
@@ -667,7 +680,7 @@ namespace Pomodoro
         {
             if (this.meta.intended_duration != intended_duration) {
                 this.meta.intended_duration = intended_duration;
-                this.version++;
+                this.emit_changed ();
             }
         }
 
@@ -678,7 +691,10 @@ namespace Pomodoro
 
         public void set_weight (double weight)
         {
-            this.meta.weight = weight;
+            if (this.meta.weight != weight) {
+                this.meta.weight = weight;
+                this.emit_changed ();
+            }
         }
 
         public int64 get_completion_time ()
@@ -688,7 +704,10 @@ namespace Pomodoro
 
         public void set_completion_time (int64 completion_time)
         {
-            this.meta.completion_time = completion_time;
+            if (this.meta.completion_time != completion_time) {
+                this.meta.completion_time = completion_time;
+                this.emit_changed ();
+            }
         }
 
         public bool get_is_extra ()
@@ -698,7 +717,10 @@ namespace Pomodoro
 
         public void set_is_extra (bool is_extra)
         {
-            this.meta.is_extra = is_extra;
+            if (this.meta.is_extra != is_extra) {
+                this.meta.is_extra = is_extra;
+                // this.emit_changed ();  // TODO
+            }
         }
 
 

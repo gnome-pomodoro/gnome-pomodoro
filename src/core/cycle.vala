@@ -42,10 +42,9 @@ namespace Pomodoro
         private int64                         _end_time = Pomodoro.Timestamp.UNDEFINED;
         private int                           changed_freeze_count = 0;
         private bool                          changed_is_pending = false;
+        private double                        progress_value = double.NAN;
         private int64                         progress_reference_start_time = Pomodoro.Timestamp.UNDEFINED;
         private int64                         progress_reference_end_time = Pomodoro.Timestamp.UNDEFINED;
-        private int64                         progress_paused_time = Pomodoro.Timestamp.UNDEFINED;
-        private bool                          progress_empty = true;
 
         // Metadata
         private double                        weight = double.NAN;
@@ -305,86 +304,99 @@ namespace Pomodoro
         {
             unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
             var progress = 0.0;
-            var total_progress = 0.0;
-            var paused_time = Pomodoro.Timestamp.UNDEFINED;
+            var total_weight = 0.0;
+            var in_progress = false;
 
             while (link != null)
             {
                 var time_block_weight = link.data.get_weight ();
                 var last_gap = link.data.get_last_gap ();
 
-                if (link.data.get_status () != Pomodoro.TimeBlockStatus.UNCOMPLETED &&
-                    link.data.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED &&
-                    time_block_weight != 0.0)
-                {
-                    progress += time_block_weight * link.data.calculate_progress (timestamp);
-                    total_progress += time_block_weight;
+                if (link.data.get_status () != Pomodoro.TimeBlockStatus.UNCOMPLETED) {
+                    total_weight += time_block_weight;
+                }
+
+                if (link.data.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS) {
+                    in_progress = true;
                 }
 
                 if (last_gap != null && Pomodoro.Timestamp.is_undefined (last_gap.end_time)) {
-                    paused_time = last_gap.start_time;
+                    in_progress = false;
                 }
+
+                progress += time_block_weight * link.data.calculate_progress (timestamp);
 
                 link = link.next;
             }
 
-            this.progress_reference_end_time = this.get_completion_time ();
-            this.progress_paused_time = paused_time;
-
-            if (Pomodoro.Timestamp.is_defined (paused_time)) {
-                timestamp = paused_time;
+            if (total_weight != 0.0) {
+                progress /= total_weight;
             }
 
-            if (progress < total_progress) {
-                this.progress_reference_start_time = (int64) (
-                    ((total_progress * (double) timestamp) - (progress * (double) this.progress_reference_end_time)) /
-                    (total_progress - progress));
-                this.progress_empty = false;
+            if (!in_progress || progress >= 1.0)
+            {
+                this.progress_value = progress.clamp (0.0, 1.0);
+                this.progress_reference_start_time = Pomodoro.Timestamp.UNDEFINED;
+                this.progress_reference_end_time = Pomodoro.Timestamp.UNDEFINED;
             }
             else {
-                this.progress_reference_start_time = this.progress_reference_end_time;
-                this.progress_empty = total_progress == 0.0;
+                var completion_time = this.get_completion_time ();
+
+                this.progress_value = double.NAN;
+                this.progress_reference_start_time = (int64)(
+                        ((double) timestamp - progress * (double) completion_time) /
+                        (1.0 - progress));
+                this.progress_reference_end_time = completion_time;
+
+                if (this.progress_reference_start_time >= this.progress_reference_end_time)
+                {
+                    this.progress_value = progress.clamp (0.0, 1.0);
+                    this.progress_reference_start_time = Pomodoro.Timestamp.UNDEFINED;
+                    this.progress_reference_end_time = Pomodoro.Timestamp.UNDEFINED;
+                }
             }
         }
 
         /**
-         * Calculate cycle progress. It may go out of range 0.0-1.0.
+         * Calculate cycle progress.
          *
-         * Time-blocks marked as UNCOMPLETED are ignored. Uses cache to make following calls cheaper to estimate.
-         * Calculating progress
+         * Uses cache to make following calls cheaper to estimate.
          */
         public double calculate_progress (int64 timestamp)
         {
             Pomodoro.ensure_timestamp (ref timestamp);
 
             if (Pomodoro.Timestamp.is_undefined (this._end_time) ||
-                Pomodoro.Timestamp.is_undefined (this._start_time) ||
-                timestamp < this._start_time)
+                Pomodoro.Timestamp.is_undefined (this._start_time))
             {
-                return double.NAN;
+                return 0.0;
             }
 
-            if (Pomodoro.Timestamp.is_undefined (this.progress_reference_start_time)) {
+            if (Pomodoro.Timestamp.is_undefined (this.progress_reference_start_time) &&
+                this.progress_value.is_nan ())
+            {
                 this.prepare_progress (timestamp);
             }
 
-            if (this.progress_empty) {
-                return double.NAN;
+            if (!this.progress_value.is_nan ()) {
+                return this.progress_value;
             }
 
-            if (this.progress_reference_start_time >= this.progress_reference_end_time) {
+            if (this.progress_reference_start_time >= timestamp) {
+                return 0.0;
+            }
+
+            if (this.progress_reference_end_time <= timestamp) {
                 return 1.0;
             }
 
-            if (Pomodoro.Timestamp.is_defined (this.progress_paused_time)) {
-                timestamp = this.progress_paused_time;
-            }
-
-            return ((double) (timestamp - this.progress_reference_start_time) /
-                    (double) (this.progress_reference_end_time - this.progress_reference_start_time)).clamp (0.0, 1.0);
+            return (
+                (double)(timestamp - this.progress_reference_start_time) /
+                (double)(this.progress_reference_end_time - this.progress_reference_start_time)
+            ).clamp (0.0, 1.0);
         }
 
-        public int64 calculate_progress_duration (int64 timestamp)
+        public int64 calculate_progress_duration (int64 timestamp)  // XXX: bad name
         {
             if (Pomodoro.Timestamp.is_undefined (this.progress_reference_start_time))
             {
@@ -392,7 +404,8 @@ namespace Pomodoro
                 this.prepare_progress (timestamp);
             }
 
-            return Pomodoro.Timestamp.subtract (this.progress_reference_end_time, this.progress_reference_start_time);
+            return Pomodoro.Timestamp.subtract (this.progress_reference_end_time,
+                                                this.progress_reference_start_time);
         }
 
         /**
@@ -404,9 +417,9 @@ namespace Pomodoro
         {
             this.weight = double.NAN;
             this.completion_time = Pomodoro.Timestamp.UNDEFINED;
+            this.progress_value = double.NAN;
             this.progress_reference_start_time = Pomodoro.Timestamp.UNDEFINED;
             this.progress_reference_end_time = Pomodoro.Timestamp.UNDEFINED;
-            this.progress_paused_time = Pomodoro.Timestamp.UNDEFINED;
         }
 
         public bool is_scheduled ()

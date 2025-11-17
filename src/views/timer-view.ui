@@ -50,9 +50,9 @@
             <property name="transition-type">slide-up</property>
             <property name="transition-duration">500</property>
             <property name="reveal-child" bind-source="session_progressbar" bind-property="reveal" bind-flags="sync-create"/>
+            <property name="overflow">visible</property>
             <child>
               <object class="PomodoroSessionProgressBar" id="session_progressbar">
-                <property name="halign">fill</property>
                 <property name="line-width" bind-source="timer_progressring" bind-property="line-width" bind-flags="sync-create"/>
               </object>
             </child>

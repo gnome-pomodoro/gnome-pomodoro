@@ -109,6 +109,15 @@ namespace Pomodoro
         return value_from + (value_to - value_from) * t;
     }
 
+
+    public inline float lerpf (float value_from,
+                               float value_to,
+                               float t)
+    {
+        return value_from + (value_to - value_from) * t;
+    }
+
+
     public bool is_flatpak ()
     {
         if (_is_flatpak < 0) {

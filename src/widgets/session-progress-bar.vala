@@ -1,23 +1,19 @@
 namespace Pomodoro
 {
-    public class SessionProgressBar : Gtk.Widget
+    public sealed class SessionProgressBar : Gtk.Widget
     {
+        private const float DEFAULT_LINE_WIDTH = 6.0f;
+        private const float SEGMENT_SPACING = 0.17f;
+        private const int   MIN_WIDTH = 100;
+        private const uint  TIMEOUT_RESOLUTION = 3U;
+        private const uint  MIN_TIMEOUT_INTERVAL = 25;  // 40Hz
         private const uint  FADE_IN_DURATION = 500;
         private const uint  FADE_OUT_DURATION = 500;
-        private const float DEFAULT_LINE_WIDTH = 6.0f;
-        private const uint  MIN_TIMEOUT_INTERVAL = 50;  // 20Hz
-        private const int   MIN_WIDTH = 100;
-        private const uint  VALUE_ANIMATION_DURATION = 300;
-        private const uint  NORM_ANIMATION_DURATION = 700;
-        private const uint  OPACITY_ANIMATION_DURATION = 500;
-
-        /**
-         * Spacing is relative the block size.
-         */
-        private const float SPACING_SPAN = 0.17f;
+        private const uint  VALUE_ANIMATION_DURATION = 500;
+        private const uint  SCALE_ANIMATION_DURATION = 700;
 
 
-        class Block : Gtk.Widget
+        sealed class Segment : Gtk.Widget
         {
             public Pomodoro.Timer timer {
                 get {
@@ -49,96 +45,96 @@ namespace Pomodoro
                     }
 
                     this.on_cycle_changed ();
+                    this.queue_draw_all ();
                 }
             }
 
-            [CCode (notify = false)]
             public float span_start {
                 get {
                     return this._span_start;
                 }
-                set {
-                    if (this._span_start == value) {
-                        return;
-                    }
-
-                    this._span_start = value;
-
-                    this.queue_draw ();
-                }
             }
 
-            [CCode (notify = false)]
             public float span_end {
                 get {
                     return this._span_end;
                 }
-                set {
-                    if (this._span_end == value) {
-                        return;
-                    }
-
-                    this._span_end = value;
-
-                    this.queue_draw ();
-                }
             }
 
-            public double weight {
+            public float weight {
                 get {
                     return this._weight;
                 }
             }
 
             [CCode (notify = false)]
-            public double backfill {
+            public float line_width
+            {
                 get {
-                    return this._backfill;
+                    return this._line_width;
                 }
                 set {
-                    if (this._backfill == value) {
-                        return;
+                    if (this._line_width != value) {
+                        this._line_width = value;
+                        this.notify_property ("line-width");
+                        this.queue_draw_all ();
                     }
-
-                    this._backfill = value;
-                    this.backfill_set = true;
-
-                    this.queue_draw ();
                 }
             }
 
-            [CCode (notify = false)]
-            public bool backfill_set {
+            public float display_value {
                 get {
-                    return this._backfill_set;
-                }
-                set {
-                    if (this._backfill_set == value) {
-                        return;
-                    }
-
-                    this._backfill_set = value;
-
-                    this.update_timeout ();
-                    this.queue_draw ();
+                    return this._display_value;
                 }
             }
 
-            private Pomodoro.Cycle      _cycle;
-            private Pomodoro.Timer      _timer;
-            private float               _span_start = 0.0f;
-            private float               _span_end = 1.0f;
-            private double              _weight = 0.0;
-            private double              _backfill = 0.0;
-            private bool                _backfill_set = false;
-            private double              last_display_value = 0.0;
-            private ulong               cycle_changed_id = 0;
-            private uint                timeout_id = 0;
-            private uint                timeout_interval = 0;
-            private Adw.TimedAnimation? value_animation;
-            private double              value_animation_start_value = double.NAN;
+            private Pomodoro.Cycle?        _cycle = null;
+            private Pomodoro.Timer?        _timer = null;
+            private float                  _line_width;
+            private float                  _span_start = 0.0f;
+            private float                  _span_end = 0.0f;
+            private float                  _weight = 0.0f;
+            private float                  _display_value = 0.0f;
+            private ulong                  cycle_changed_id = 0U;
+            private ulong                  tick_id = 0U;
+            private uint                   tick_callback_id = 0U;
+            private uint                   timeout_id = 0U;
+            private uint                   timeout_interval = 0U;
+            private unowned Pomodoro.Gizmo through = null;
+            private unowned Pomodoro.Gizmo highlight = null;
+            private Graphene.Rect          bounds;
+            private Gsk.RoundedRect        outline;
+            internal float                 display_value_from = 0.0f;
+            internal float                 display_value_to = 0.0f;
+            private float                  value_animation_progress = 1.0f;
 
-            public Block (Pomodoro.Cycle cycle)
+            construct
+            {
+                var through = new Pomodoro.Gizmo (Segment.measure_child_cb,
+                                                  null,
+                                                  Segment.snapshot_through_cb,
+                                                  null,
+                                                  null,
+                                                  null);
+                through.focusable = false;
+                through.add_css_class ("through");
+                through.set_parent (this);
+
+                var highlight = new Pomodoro.Gizmo (Segment.measure_child_cb,
+                                                    null,
+                                                    Segment.snapshot_highlight_cb,
+                                                    null,
+                                                    null,
+                                                    null);
+                highlight.focusable = false;
+                highlight.add_css_class ("highlight");
+                highlight.insert_after (this, through);
+
+                this.highlight = highlight;
+                this.through = through;
+            }
+
+            public Segment (Pomodoro.Cycle cycle)
             {
                 GLib.Object (
                     timer: Pomodoro.Timer.get_default (),
@@ -146,118 +142,192 @@ namespace Pomodoro
                 );
             }
 
+            internal void prepare_value_animation (float display_value_from,
+                                                   float display_value_to)
+            {
+                this.display_value_from = display_value_from;
+                this.display_value_to = display_value_to;
+                this.value_animation_progress = display_value_to != this._display_value
+                        ? 0.0f
+                        : 1.0f;
+            }
+
+            internal void finish_value_animation ()
+            {
+                if (this.value_animation_progress != 1.0f) {
+                    this.value_animation_progress = 1.0f;
+                    this.highlight.queue_draw ();
+                }
+            }
+
+            internal void set_value_animation_progress (float progress)
+            {
+                if (this.value_animation_progress != progress) {
+                    this.value_animation_progress = progress;
+                    this.highlight.queue_draw ();
+                }
+            }
+
+            private inline void queue_draw_all ()
+            {
+                this.queue_draw ();
+                this.through.queue_draw ();
+                this.highlight.queue_draw ();
+            }
+
+            private static void measure_child_cb (Pomodoro.Gizmo  gizmo,
+                                                  Gtk.Orientation orientation,
+                                                  int             for_size,
+                                                  out int         minimum,
+                                                  out int         natural,
+                                                  out int         minimum_baseline,
+                                                  out int         natural_baseline)
+            {
+                // `SessionProgressBar` dictates the size. Gizmos fill available space.
+                minimum          = 0;
+                natural          = 0;
+                minimum_baseline = -1;
+                natural_baseline = -1;
+            }
+
+            private static void snapshot_through_cb (Pomodoro.Gizmo gizmo,
+                                                     Gtk.Snapshot   snapshot)
+            {
+                var self = (Segment) gizmo.parent;
+
+                if (self != null) {
+                    self.snapshot_through (gizmo, snapshot);
+                }
+            }
+
+            private static void snapshot_highlight_cb (Pomodoro.Gizmo gizmo,
+                                                       Gtk.Snapshot   snapshot)
+            {
+                var self = (Segment) gizmo.parent;
+
+                if (self != null) {
+                    self.snapshot_highlight (gizmo, snapshot);
+                }
+            }
+
+            private void snapshot_through (Pomodoro.Gizmo gizmo,
+                                           Gtk.Snapshot   snapshot)
+            {
+                snapshot.push_rounded_clip (this.outline);
+                snapshot.append_color (gizmo.get_color (), this.bounds);
+                snapshot.pop ();
+            }
+
+            private void snapshot_highlight (Pomodoro.Gizmo gizmo,
+                                             Gtk.Snapshot   snapshot)
+            {
+                var timestamp = this.get_current_time ();
+                var display_value = this._cycle != null
+                        ? (float) this._cycle.calculate_progress (timestamp)
+                        : 0.0f;
+                var color = gizmo.get_color ();
+
+                if (this.value_animation_progress < 1.0f) {
+                    display_value = lerpf (this.display_value_from,
+                                           display_value,
+                                           this.value_animation_progress);
+                }
+
+                if (display_value > 0.0f && display_value < 1.0f)
+                {
+                    var width  = (float) this.get_width ();
+                    var height = (float) this.get_height ();
+
+                    var highlight_width   = (this._span_end - this._span_start) * display_value * width;
+                    var highlight_height  = this._line_width;
+                    var highlight_x       = this._span_start * width;
+                    var highlight_y       = (height - highlight_height) / 2.0f;
+                    var highlight_bounds  = Graphene.Rect ();
+                    var highlight_outline = Gsk.RoundedRect ();
+                    var clip_applied      = false;
+
+                    if (highlight_width < highlight_height)
+                    {
+                        highlight_x -= highlight_height - highlight_width;
+                        highlight_width = highlight_height;
+
+                        snapshot.push_rounded_clip (this.outline);
+                        clip_applied = true;
+                    }
+
+                    if (this.get_direction () == Gtk.TextDirection.RTL) {
+                        highlight_x = width - highlight_x - highlight_width;
+                    }
+
+                    highlight_bounds.init (highlight_x,
+                                           highlight_y,
+                                           highlight_width,
+                                           highlight_height);
+                    highlight_outline.init_from_rect (highlight_bounds, highlight_height / 2.0f);
+
+                    snapshot.push_rounded_clip (highlight_outline);
+                    snapshot.append_color (color, highlight_bounds);
+                    snapshot.pop ();
+
+                    if (clip_applied) {
+                        snapshot.pop ();
+                    }
+                }
+                else if (display_value == 1.0f)
+                {
+                    snapshot.push_rounded_clip (this.outline);
+                    snapshot.append_color (color, this.bounds);
+                    snapshot.pop ();
+                }
+
+                this._display_value = display_value;
+            }
+
             private inline int64 get_current_time ()
             {
                 return this._timer.is_running ()
-                    ? this._timer.get_current_time (this.get_frame_clock ().get_frame_time ())
-                    : this._timer.get_last_state_changed_time ();
+                        ? this._timer.get_current_time (this.get_frame_clock ().get_frame_time ())
+                        : this._timer.get_last_state_changed_time ();
             }
 
-            public void set_span_range (float start,
-                                        float end)
+            public void set_span_range (float span_start,
+                                        float span_end)
             {
-                this._span_start = start;
-                this._span_end = end;
+                var changed = false;
 
-                this.queue_draw ();
-            }
-
-            public double get_last_display_value ()
-            {
-                return this.last_display_value;
-            }
-
-            public float transform_value (double display_value,
-                                          float  span_start = float.NAN,
-                                          float  span_end = float.NAN)
-            {
-                if (span_start.is_nan ()) {
-                    span_start = this._span_start;
+                if (span_end < span_start) {
+                    var tmp = span_start;
+                    span_start = span_end;
+                    span_end = tmp;
                 }
 
-                if (span_end.is_nan ()) {
-                    span_end = this._span_end;
+                if (this._span_start != span_start) {
+                    this._span_start = span_start;
+                    changed = true;
                 }
 
-                return (float) Adw.lerp ((double) span_start,
-                                         (double) span_end,
-                                         display_value);
-            }
-
-            public double transform_position (double position)
-            {
-                return (position - this._span_start) / (this._span_end - this._span_start);
-            }
-
-            public double calculate_display_value ()
-            {
-                var timestamp = this.get_current_time ();
-                var display_value = this._cycle != null ? this._cycle.calculate_progress (timestamp) : 0.0;
-
-                if (display_value.is_nan ()) {
-                    display_value = 0.0;
+                if (this._span_end != span_end) {
+                    this._span_end = span_end;
+                    changed = true;
                 }
 
-                if (this.value_animation != null) {
-                    display_value = Adw.lerp (this.value_animation_start_value,
-                                              display_value,
-                                              this.value_animation.value);
+                if (changed) {
+                    this.queue_draw_all ();
                 }
-
-                return display_value;
-            }
-
-            private void stop_value_animation ()
-            {
-                if (this.value_animation != null)
-                {
-                    this.value_animation.pause ();
-                    this.value_animation = null;
-                    this.value_animation_start_value = double.NAN;
-                }
-            }
-
-            private void start_value_animation (ref double display_value)
-            {
-                if (this.value_animation != null) {
-                    return;
-                }
-
-                var value_diff = (display_value - this.last_display_value).abs ();
-                if (value_diff < 0.05) {
-                    return;
-                }
-
-                var animation_duration = (uint) (Math.sqrt (value_diff) * (double) VALUE_ANIMATION_DURATION);
-                var animation_target = new Adw.CallbackAnimationTarget (this.queue_draw);
-
-                this.value_animation = new Adw.TimedAnimation (this,
-                                                               0.0,
-                                                               1.0,
-                                                               animation_duration,
-                                                               animation_target);
-                this.value_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
-                // this.value_animation.set_easing (this._timer.is_running ()
-                //                                  ? Adw.Easing.EASE_IN_OUT_CUBIC
-                //                                  : Adw.Easing.EASE_OUT_QUAD);
-                this.value_animation.done.connect (this.stop_value_animation);
-                this.value_animation.play ();
-                this.value_animation_start_value = this.last_display_value;
-
-                // Revert display_value.
-                display_value = this.last_display_value;
             }
 
             private uint calculate_timeout_interval ()
                                                      requires (this._cycle != null)
             {
                 var timestamp = this.get_current_time ();
-                var width = (double) (this._span_end - this._span_start) * this.get_width ();
-                var duration = (double) this._cycle.calculate_progress_duration (timestamp);
+                var distance  = (float) (this._span_end - this._span_start) * (float) this.get_width ();
+                var duration  = (float) this._cycle.calculate_progress_duration (timestamp);
 
-                return width > 0.0
-                    ? Pomodoro.Timestamp.to_milliseconds_uint ((int64) Math.round (duration / (2.0 * width)))
-                    : 0;
+                distance *= (float) TIMEOUT_RESOLUTION;
+
+                return distance > 0.0
+                        ? Pomodoro.Timestamp.to_milliseconds_uint ((int64) Math.roundf (duration / distance))
+                        : 0;
             }
 
             private void start_timeout ()
@@ -265,29 +335,60 @@ namespace Pomodoro
                                         requires (this.get_mapped ())
             {
                 var timeout_interval = this.calculate_timeout_interval ();
-                timeout_interval = uint.max (timeout_interval, MIN_TIMEOUT_INTERVAL);
+
+                if (timeout_interval < MIN_TIMEOUT_INTERVAL) {
+                    timeout_interval = 0U;
+                }
 
                 if (this.timeout_interval != timeout_interval) {
                     this.timeout_interval = timeout_interval;
                     this.stop_timeout ();
                 }
 
-                if (this.timeout_id == 0 && this.timeout_interval > 0) {
-                    this.timeout_id = GLib.Timeout.add (this.timeout_interval, () => {
-                        this.queue_draw ();
+                if (this.tick_id == 0 && timeout_interval > 0 && timeout_interval > 500) {
+                    this.tick_id = this._timer.tick.connect (
+                        (timestamp) => {
+                            this.highlight.queue_draw ();
+                        });
+                }
+                else if (this.timeout_id == 0 && timeout_interval > 0)
+                {
+                    this.timeout_id = GLib.Timeout.add (
+                        timeout_interval,
+                        () => {
+                            this.highlight.queue_draw ();
 
-                        return GLib.Source.CONTINUE;
-                    });
+                            return GLib.Source.CONTINUE;
+                        });
                     GLib.Source.set_name_by_id (this.timeout_id,
-                                                "Pomodoro.SessionProgressBar.Block.queue_draw");
+                                                "Pomodoro.SessionProgressBar.Segment.queue_draw");
+                }
+                else if (this.tick_callback_id == 0 && timeout_interval == 0)
+                {
+                    this.tick_callback_id = this.add_tick_callback (
+                        () => {
+                            this.highlight.queue_draw ();
+
+                            return GLib.Source.CONTINUE;
+                        });
                 }
             }
 
             private void stop_timeout ()
             {
+                if (this.tick_id != 0) {
+                    this._timer.disconnect (this.tick_id);
+                    this.tick_id = 0;
+                }
+
                 if (this.timeout_id != 0) {
                     GLib.Source.remove (this.timeout_id);
                     this.timeout_id = 0;
+                }
+
+                if (this.tick_callback_id != 0) {
+                    this.remove_tick_callback (this.tick_callback_id);
+                    this.tick_callback_id = 0;
                 }
             }
 
@@ -295,7 +396,7 @@ namespace Pomodoro
             {
                 this.stop_timeout ();
 
-                if (!this.get_mapped () || this._cycle == null || this._backfill_set) {
+                if (!this.get_mapped () || this._cycle == null) {
                     return;
                 }
 
@@ -320,18 +421,24 @@ namespace Pomodoro
 
             private void on_cycle_changed ()
             {
-                if (this._cycle != null) {
-                    this._weight = this._cycle.get_weight ();
+                if (this._cycle == null) {
+                    return;  // retain last weight
                 }
 
-                this.queue_draw ();
+                var weight = (float) this._cycle.get_weight ();
+
+                if (weight <= 0.0f) {
+                    return;  // retain last weight
+                }
+
+                if (this._weight != weight) {
+                    // TODO: animate weight
+                    this._weight = weight;
+                }
             }
 
             public override void map ()
             {
-                // Update value to avoid animation at next redraw.
-                this.last_display_value = this.calculate_display_value ();
-
                 base.map ();
 
                 this.update_timeout ();
@@ -339,100 +446,77 @@ namespace Pomodoro
 
             public override void unmap ()
             {
-                this.stop_value_animation ();
                 this.stop_timeout ();
 
                 base.unmap ();
             }
 
-            public override void snapshot (Gtk.Snapshot snapshot)
-                                           requires (!this._span_start.is_nan () && !this._span_end.is_nan ())
+            public override Gtk.SizeRequestMode get_request_mode ()
             {
-                if (this._span_start >= 1.0f) {
+                return Gtk.SizeRequestMode.HEIGHT_FOR_WIDTH;
+            }
+
+            public override void measure (Gtk.Orientation orientation,
+                                          int             for_size,
+                                          out int         minimum,
+                                          out int         natural,
+                                          out int         minimum_baseline,
+                                          out int         natural_baseline)
+            {
+                minimum = orientation == Gtk.Orientation.HORIZONTAL
+                        ? MIN_WIDTH
+                        : (int) Math.ceilf (this._line_width);
+                natural = minimum;
+                minimum_baseline = -1;
+                natural_baseline = -1;
+            }
+
+            public override void size_allocate (int width,
+                                                int height,
+                                                int baseline)
+            {
+                this.through.allocate (width, height, baseline, null);
+                this.highlight.allocate (width, height, baseline, null);
+            }
+
+            public override void snapshot (Gtk.Snapshot snapshot)
+            {
+                var width          = (float) this.get_width ();
+                var height         = (float) this.get_height ();
+                var segment_x      = float.max (this._span_start, 0.0f) * width;
+                var segment_y      = (height - this._line_width) / 2.0f;
+                var segment_width  = float.min (this._span_end, 1.0f) * width - segment_x;
+                var segment_height = this._line_width;
+
+                if (segment_width <= 0.0f) {
                     return;
                 }
 
-                var width             = (float) this.get_width ();
-                var height            = (float) this.get_height ();
-                var block_x           = this._span_start * width;
-                var block_width       = this._span_end.clamp (0.0f, 1.0f) * width - block_x;
-                var block_bounds      = Graphene.Rect ();
-                var block_outline     = Gsk.RoundedRect ();
-                var display_value     = this.calculate_display_value ();
-                var color             = this.get_color ();
-
-                if (this._backfill_set) {
-                    display_value = (this._backfill + display_value).clamp (0.0, 1.0);
-                }
-                else {
-                    this.start_value_animation (ref display_value);
-                }
-
-                var style_context = this.get_style_context ();
-
-                Gdk.RGBA trough_color;
-                style_context.lookup_color ("unfocused_borders", out trough_color);
-
-                Gdk.RGBA background_color;
-                style_context.lookup_color ("theme_bg_color", out background_color);
-
-                color = blend_colors (background_color, color);
-
                 if (this.get_direction () == Gtk.TextDirection.RTL) {
-                    var transform_matrix = Graphene.Matrix ();
-                    transform_matrix.init_from_2d (-1.0, 0.0, 0.0, 1.0, width, 0.0);
-                    snapshot.transform_matrix (transform_matrix);
+                    segment_x = width - segment_x - segment_width;
                 }
 
-                block_bounds.init (block_x,
-                                   0.0f,
-                                   block_width,
-                                   height);
-                block_outline.init_from_rect (block_bounds, 0.5f * height);
+                this.bounds = Graphene.Rect ();
+                this.bounds.init (segment_x, segment_y, segment_width, segment_height);
 
-                snapshot.push_rounded_clip (block_outline);
-                snapshot.append_color (display_value >= 1.0 ? color : trough_color, block_bounds);
+                this.outline = Gsk.RoundedRect ();
+                this.outline.init_from_rect (bounds, 0.5f * segment_height);
 
-                if (display_value > 0.0 && display_value < 1.0)
-                {
-                    var highlight_bounds  = Graphene.Rect ();
-                    var highlight_outline = Gsk.RoundedRect ();
-                    var highlight_width = block_width * (float) display_value;
-
-                    if (highlight_width < height)
-                    {
-                        highlight_bounds.init (block_x + highlight_width - height,
-                                               0.0f,
-                                               height,
-                                               height);
-                        highlight_outline.init_from_rect (highlight_bounds, 0.5f * height);
-                        snapshot.push_rounded_clip (highlight_outline);
-
-                        snapshot.append_color (color, highlight_bounds);
-                        snapshot.pop ();
-                    }
-                    else {
-                        highlight_bounds.init (block_x,
-                                               0.0f,
-                                               highlight_width,
-                                               height);
-                        highlight_outline.init_from_rect (highlight_bounds, 0.5f * height);
-
-                        snapshot.push_rounded_clip (highlight_outline);
-                        snapshot.append_color (color, highlight_bounds);
-                        snapshot.pop ();
-                    }
-                }
-
-                snapshot.pop ();
-
-                this.last_display_value = display_value;
+                this.snapshot_child (this.through, snapshot);
+                this.snapshot_child (this.highlight, snapshot);
             }
 
             public override void dispose ()
             {
-                this.stop_value_animation ();
                 this.stop_timeout ();
+
+                this.through.unparent ();
+                this.highlight.unparent ();
+
+                this.through = null;
+                this.highlight = null;
+                this._timer = null;
+                this._cycle = null;
 
                 base.dispose ();
             }
@@ -444,7 +528,9 @@ namespace Pomodoro
                 return this._timer;
             }
             construct {
-                this._timer = value;
+                this._timer = value != null
+                        ? value
+                        : Pomodoro.Timer.get_default ();
             }
         }
 
@@ -453,7 +539,9 @@ namespace Pomodoro
                 return this._session_manager;
             }
             construct {
-                this._session_manager = value;
+                this._session_manager = value != null
+                        ? value
+                        : Pomodoro.SessionManager.get_default ();
             }
         }
 
@@ -467,16 +555,15 @@ namespace Pomodoro
                     return;
                 }
 
-                if (this.session_changed_id != 0) {
-                    this._session.disconnect (this.session_changed_id);
-                    this.session_changed_id = 0;
+                if (this._session != null) {
+                    this._session.changed.disconnect (this.on_session_changed);
                 }
 
                 this._session = value;
                 this.update ();
 
                 if (this._session != null) {
-                    this.session_changed_id = this._session.changed.connect (this.on_session_changed);
+                    this._session.changed.connect (this.on_session_changed);
                 }
 
                 this.notify_property ("session");
@@ -501,30 +588,26 @@ namespace Pomodoro
             }
         }
 
-        [CCode (notify = false)]
         public bool reveal
         {
             get {
-                return this._opacity > 0.0;
+                return this._reveal;
             }
         }
 
-        private float                             _line_width = DEFAULT_LINE_WIDTH;
-        private Pomodoro.Timer                    _timer;
-        private Pomodoro.SessionManager           _session_manager;
-        private Pomodoro.Session?                 _session;
-        private weak Block?                       current_block;
-        private double                            norm = double.NAN;
-        private double                            _opacity = 1.0;
-        private Adw.TimedAnimation?               norm_animation;
-        private Adw.TimedAnimation?               backfill_animation;
-        private Adw.TimedAnimation?               opacity_animation;
-        private int64                             long_break_time = Pomodoro.Timestamp.UNDEFINED;
-        private int64                             long_break_timeout = Pomodoro.Timestamp.UNDEFINED;
-        private uint                              update_idle_id = 0;
-        private int                               update_freeze_count = 0;
-        private ulong                             timer_tick_id = 0;
-        private ulong                             session_changed_id = 0;
+        private Pomodoro.Timer?          _timer = null;
+        private Pomodoro.SessionManager? _session_manager = null;
+        private Pomodoro.Session?        _session = null;
+        private float                    _line_width = DEFAULT_LINE_WIDTH;
+        private bool                     _reveal = true;
+        private bool                     revealing = false;
+        private unowned Segment?         current_segment = null;
+        private float                    scale = float.NAN;
+        private Adw.TimedAnimation?      scale_animation = null;
+        private Adw.TimedAnimation?      opacity_animation = null;
+        private Adw.TimedAnimation?      value_animation = null;
+        private int64                    long_break_time = Pomodoro.Timestamp.UNDEFINED;
+        private uint                     tick_callback_id = 0;
 
         static construct
         {
@@ -533,335 +616,265 @@ namespace Pomodoro
 
         construct
         {
-            this._session_manager = Pomodoro.SessionManager.get_default ();
-            this._timer           = Pomodoro.Timer.get_default ();
+            this.has_tooltip = true;
         }
 
-        private void remove_blocks ()
+        private void remove_segments ()
         {
-            unowned Gtk.Widget? child = this.get_first_child ();
+            unowned Gtk.Widget? child;
 
             while ((child = this.get_first_child ()) != null)
             {
                 child.unparent ();
             }
 
-            this.current_block = null;
+            this.current_segment = null;
+            this.scale = float.NAN;
         }
 
         /**
-         * Remove blocks that are not in the view.
+         * Remove segments that are not in the view.
          */
-        private void remove_invisible_blocks ()
-                                              requires (this.norm_animation == null)
+        private void remove_invisible_segments ()
+                                                requires (this.scale_animation == null)
         {
-            var block = (Block?) this.get_last_child ();
+            unowned var segment = (Segment?) this.get_first_child ();
 
-            while (block != null)
+            while (segment != null)
             {
-                var prev_block = (Block?) block.get_prev_sibling ();
+                unowned var next_segment = (Segment?) segment.get_next_sibling ();
 
-                if (this.current_block == block) {
+                if (segment.span_start >= 1.0f && segment.cycle == null) {
+                    segment.unparent ();
+                }
+
+                segment = next_segment;
+            }
+        }
+
+        private inline void snapshot_segments (Gtk.Snapshot snapshot)
+        {
+            unowned var child = this.get_first_child ();
+
+            while (child != null)
+            {
+                this.snapshot_child (child, snapshot);
+
+                child = child.get_next_sibling ();
+            }
+        }
+
+        private float calculate_scale (double total_weight,
+                                       uint   cycles_count)
+        {
+            var norm = total_weight + (cycles_count - 1) * (double) SEGMENT_SPACING;
+
+            return norm > 0.0
+                    ? (float)(1.0 / norm)
+                    : 0.0f;
+        }
+
+        private float get_current_scale ()
+        {
+            return this.scale_animation != null
+                    ? (float) this.scale_animation.value
+                    : this.scale;
+        }
+
+        private float get_target_scale ()
+        {
+            unowned var segment = (Segment?) this.get_first_child ();
+            var cycles_count = 0;
+            var total_weight = 0.0;
+
+            while (segment != null)
+            {
+                unowned var cycle = segment.cycle;
+
+                if (cycle != null) {
+                    total_weight += cycle.get_weight ();
+                    cycles_count++;
+                }
+
+                segment = (Segment?) segment.get_next_sibling ();
+            }
+
+            return this.calculate_scale (total_weight, cycles_count);
+        }
+
+        private unowned Segment? get_current_segment ()
+        {
+            unowned var segment = (Segment?) this.get_last_child ();
+
+            while (segment != null)
+            {
+                if (segment.display_value > 0.0f) {
                     break;
                 }
 
-                if (block.span_start >= 1.0f) {
-                    block.unparent ();
+                segment = (Segment?) segment.get_prev_sibling ();
+            }
+
+            return segment;
+        }
+
+        private float get_current_position ()
+        {
+            unowned var segment = (Segment?) this.get_first_child ();
+            var position = 0.0f;
+
+            while (segment != null)
+            {
+                var display_value = segment.display_value;
+
+                if (display_value < 1.0f) {
+                    position = lerpf (segment.span_start, segment.span_end, display_value);
+                    break;
                 }
 
-                block = prev_block;
+                position = segment.span_end;
+                segment = (Segment?) segment.get_next_sibling ();
             }
+
+            return position;
         }
 
-        private double calculate_norm (double total_weight,
-                                       uint   cycles_count)
+        private float get_target_position ()
         {
-            return total_weight > 0.0
-                ? 1.0 / (total_weight + (double) (cycles_count - 1) * (double) SPACING_SPAN)
-                : 0.0;
-        }
+            unowned var segment = (Segment?) this.get_first_child ();
+            var position = 0.0f;
 
-        private void update_blocks_span ()
-                                         requires (!this.norm.is_nan ())
-        {
-            var block = (Block?) this.get_first_child ();
-            var norm = this.norm_animation != null ? this.norm_animation.value : this.norm;
-            var position = 0.0;
-            var spacing = SPACING_SPAN * norm;
+            var timestamp = this._timer.is_running ()
+                    ? this._timer.get_current_time ()
+                    : this._timer.get_last_state_changed_time ();
 
-            while (block != null)
+            while (segment != null)
             {
-                block.set_span_range ((float) position, (float) (position + block.weight * norm));
-                position = block.span_end + spacing;
+                var segment_progress = segment.cycle != null
+                        ? (float) segment.cycle.calculate_progress (timestamp)
+                        : 0.0f;
 
-                block = (Block?) block.get_next_sibling ();
+                if (segment_progress <= 0.0f) {
+                    break;
+                }
+
+                if (segment_progress < 1.0f) {
+                    position = lerpf (segment.span_start, segment.span_end, segment_progress);
+                    break;
+                }
+
+                position = segment.span_end;
+                segment = (Segment?) segment.get_next_sibling ();
             }
+
+            return position;
         }
 
-        private void stop_norm_animation ()
+        private void update_segments_span ()
         {
-            if (this.norm_animation != null) {
-                this.norm_animation.pause ();
-                this.norm_animation = null;
-            }
+            var scale = this.scale_animation != null
+                    ? (float) this.scale_animation.value
+                    : this.scale;
+            var position = 0.0f;
+            var spacing = (float)(SEGMENT_SPACING * scale);
 
-            this.remove_invisible_blocks ();
-        }
+            unowned var segment = (Segment?) this.get_first_child ();
 
-        private void start_norm_animation (double previous_norm)
-        {
-            if (this.norm_animation != null) {
-                this.norm_animation.pause ();
-                this.norm_animation = null;
-            }
-
-            if (this.get_mapped () && !previous_norm.is_nan () && !this.norm.is_nan ())
+            while (segment != null)
             {
-                var animation_target = new Adw.CallbackAnimationTarget (this.update_blocks_span);
+                segment.set_span_range (position, position + segment.weight * scale);
 
-                this.norm_animation = new Adw.TimedAnimation (this,
-                                                              previous_norm,
-                                                              this.norm,
-                                                              NORM_ANIMATION_DURATION,
-                                                              animation_target);
-                this.norm_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
-                this.norm_animation.done.connect (this.stop_norm_animation);
-                this.norm_animation.play ();
-            }
-            else {
-                this.remove_invisible_blocks ();
-            }
-        }
-
-        private void stop_opacity_animation ()
-        {
-            if (this.opacity_animation != null) {
-                this.opacity_animation.pause ();
-                this.opacity_animation = null;
-            }
-        }
-
-        private void start_opacity_animation (double previous_opacity)
-        {
-            if (this.opacity_animation != null) {
-                this.opacity_animation.pause ();
-                this.opacity_animation = null;
+                position = segment.span_end + spacing;
+                segment  = (Segment?) segment.get_next_sibling ();
             }
 
-            if (this.get_mapped () && this._opacity != previous_opacity)
-            {
-                var animation_target = new Adw.CallbackAnimationTarget (this.queue_draw);
-
-                this.opacity_animation = new Adw.TimedAnimation (this,
-                                                                 previous_opacity,
-                                                                 this._opacity,
-                                                                 OPACITY_ANIMATION_DURATION,
-                                                                 animation_target);
-                this.opacity_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
-                this.opacity_animation.done.connect (this.stop_opacity_animation);
-                this.opacity_animation.play ();
-            }
-        }
-
-        private void update_blocks_backfill (double position)
-        {
-            var block = (Block?) this.get_first_child ();
-
-            while (block != null)
-            {
-                block.backfill = block.transform_position (position).clamp (0.0, 1.0);
-
-                block = (Block?) block.get_next_sibling ();
-            }
-        }
-
-        private void stop_backfill_animation ()
-        {
-            if (this.backfill_animation != null) {
-                this.backfill_animation.pause ();
-                this.backfill_animation = null;
-            }
-
-            var block = (Block?) this.get_first_child ();
-
-            while (block != null) {
-                block.backfill_set = false;
-                block = (Block?) block.get_next_sibling ();
-            }
+            this.queue_draw ();
         }
 
         /**
-         * Setup backfill animation spanning several blocks.
+         * Synchronise segments according to cycles.
          */
-        private void start_backfill_animation (Block previous_block,
-                                               Block current_block)
-        {
-            if (this.backfill_animation != null) {
-                this.backfill_animation.pause ();
-                this.backfill_animation = null;
-            }
-
-            var animation_target = new Adw.CallbackAnimationTarget (this.update_blocks_backfill);
-            var position = previous_block.transform_value (previous_block.get_last_display_value ());
-
-            if (this.get_mapped () && position > 0.0)
-            {
-                this.backfill_animation = new Adw.TimedAnimation (this,
-                                                                  position,
-                                                                  0.0,
-                                                                  FADE_OUT_DURATION,
-                                                                  animation_target);
-                this.backfill_animation.set_easing (this._timer.is_running ()
-                                                    ? Adw.Easing.EASE_IN_OUT_CUBIC
-                                                    : Adw.Easing.EASE_OUT_QUAD);
-                this.backfill_animation.done.connect (this.stop_backfill_animation);
-                this.backfill_animation.play ();
-
-                // Set `Block.backfill_set` early to inhibit value animation within blocks.
-                this.update_blocks_backfill (position);
-            }
-        }
-
-        /**
-         * Synchronise blocks according to cycles.
-         */
-        private void update_blocks ()
+        private void update_segments ()
         {
             if (this._session == null) {
                 this._session_manager.ensure_session ();
                 this._session = this._session_manager.current_session;
+                this.notify_property ("session");
             }
 
             var cycles = this._session.get_cycles ();
-            var cycles_count = 0;
-            var current_cycle_index = cycles.index (this._session_manager.get_current_cycle ());
-            var total_weight = 0.0;
-            var previous_norm = this.norm;
-            var previous_opacity = this._opacity;
-            var previous_reveal = this.reveal;
+            var cycles_count = 0U;
 
-            // Associate blocks with cycle. Create more blocks if needed.
             unowned GLib.List<unowned Pomodoro.Cycle> link = cycles.first ();
-            unowned Block? block = (Block?) this.get_first_child ();
-            unowned Block? previous_block = this.current_block;
-            unowned Block? current_block = block;
+            unowned var segment = (Segment?) this.get_first_child ();
+            unowned var current_cycle = this._session_manager.get_current_cycle ();
+            unowned Segment? current_segment = null;
 
             while (link != null)
             {
                 var cycle = link.data;
 
-                assert (cycle != null);
-
                 if (link.data.is_visible ())
                 {
-                    if (block != null) {
-                        block.cycle = cycle;
+                    if (segment != null) {
+                        segment.cycle = cycle;
                     }
                     else {
-                        var tmp = new Block (cycle);
-                        tmp.insert_before (this, null);  // append child
-                        block = tmp;
+                        var new_segment = new Segment (cycle);
+                        this.bind_property ("line-width",
+                                            new_segment,
+                                            "line-width",
+                                            GLib.BindingFlags.SYNC_CREATE);
+                        new_segment.insert_before (this, null);
+                        segment = new_segment;
                     }
 
-                    block.update ();
-
-                    if (cycles_count <= current_cycle_index) {
-                        current_block = block;
+                    if (cycle == current_cycle) {
+                        current_segment = segment;
                     }
+
+                    segment.update ();
 
                     cycles_count++;
-                    total_weight += cycle.get_weight ();
-                    block = (Block?) block.get_next_sibling ();
+                    segment = (Segment?) segment.get_next_sibling ();
                 }
 
                 link = link.next;
             }
 
-            this.current_block = current_block;
+            this.current_segment = current_segment;
 
-            // Update blocks without associated cycles.
-            while (block != null)
+            // Update segments without associated cycles.
+            while (segment != null)
             {
-                block.cycle = null;
-                block.update ();
+                segment.cycle = null;
+                segment.update ();
 
-                block = (Block?) block.get_next_sibling ();
+                segment = (Segment?) segment.get_next_sibling ();
             }
 
-            // Update blocks span and opacity.
-            var norm = this.calculate_norm (total_weight, cycles_count);
-            var opacity = norm > 0.0 && norm < 1.0 ? 1.0 : 0.0;
+            // Update segments span and opacity.
+            var scale_from    = this.get_current_scale ();
+            var scale_to      = this.get_target_scale ();
+            var position_from = this.get_current_position ();
+            var position_to   = this.get_target_position ();
 
-            if (this._opacity != opacity)
-            {
-                this._opacity = opacity;
-                this.start_opacity_animation (previous_opacity);
-            }
-
-            if (this.norm != norm)
-            {
-                this.norm = norm;
-
-                if (previous_opacity > 0.0 && opacity > 0.0) {
-                    this.start_norm_animation (previous_norm);
-                }
-            }
-
-            if (opacity != 0.0) {
-                this.update_blocks_span ();
-            }
-
-            if (this.norm_animation == null) {
-                this.remove_invisible_blocks ();
-            }
-
-            if (this.reveal != previous_reveal) {
-                this.notify_property ("reveal");
-            }
-
-            // Animate value.
-            if (this.backfill_animation != null)
-            {
-                // Let ongoing animation finish.
-            }
-            else if (previous_block == null ||
-                     previous_block == current_block ||
-                     previous_block.get_next_sibling () == current_block)
-            {
-                // Let the block handle value animation.
+            if (cycles_count > 1U) {
+                this.fade_in ();
             }
             else {
-                this.start_backfill_animation (previous_block, current_block);
-            }
-        }
-
-        private void update_tooltip (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
-        {
-            if (Pomodoro.Timestamp.is_undefined (timestamp)) {
-                timestamp = int64.max (this._timer.get_last_state_changed_time (),
-                                       this._timer.get_last_tick_time ());
+                this.fade_out ();
             }
 
-            var long_break_timeout = this._timer.is_running () && Pomodoro.Timestamp.is_defined (this.long_break_time)
-                ? Pomodoro.Timestamp.round (Pomodoro.Timestamp.subtract (this.long_break_time, timestamp),
-                                            Pomodoro.Interval.MINUTE)
-                : Pomodoro.Timestamp.UNDEFINED;
-
-            if (this.long_break_timeout == long_break_timeout) {
-                return;
+            if (this._reveal) {
+                // this.animate_weights ();  TODO
+                this.animate_scale (scale_from, scale_to);
+                this.animate_value (position_from, position_to);
             }
 
-            if (long_break_timeout >= 0) {
-                var seconds = Pomodoro.Timestamp.to_seconds (long_break_timeout);
-                var seconds_uint = (uint) Pomodoro.round_seconds (seconds);
-
-                this.set_tooltip_text (_("Long break due in %s").printf (Pomodoro.format_time (seconds_uint)));
+            if (this.scale_animation == null) {
+                this.remove_invisible_segments ();
             }
-            else {
-                this.set_tooltip_text (null);
-            }
-
-            this.long_break_timeout = long_break_timeout;
         }
 
         /**
@@ -871,7 +884,7 @@ namespace Pomodoro
         {
             var long_break_time = Pomodoro.Timestamp.UNDEFINED;
 
-            session.@foreach (
+            this._session?.@foreach (
                 (time_block) => {
                     if (time_block.state == Pomodoro.State.LONG_BREAK &&
                         time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED &&
@@ -887,132 +900,340 @@ namespace Pomodoro
 
         private void update ()
         {
-            if (this.update_idle_id != 0) {
-                this.remove_tick_callback (this.update_idle_id);
-                this.update_idle_id = 0;
+            if (this.tick_callback_id != 0) {
+                this.remove_tick_callback (this.tick_callback_id);
+                this.tick_callback_id = 0;
             }
 
-            if (this.update_freeze_count > 0) {
-                return;
-            }
-
-            this.update_blocks ();
-            this.update_tooltip ();
+            this.update_long_break_time ();
+            this.update_segments ();
         }
 
         private void queue_update ()
         {
-            if (this.update_idle_id != 0) {
+            if (this._reveal && !this.get_mapped ()) {
                 return;
             }
 
-            this.update_idle_id = this.add_tick_callback (() => {
-                this.update_idle_id = 0;
-                this.update ();
-
-                return GLib.Source.REMOVE;
-            });
-        }
-
-        public void freeze_update ()
-        {
-            this.update_freeze_count++;
-
-            if (this.norm_animation != null) {
-                this.norm_animation.pause ();
+            if (this.tick_callback_id != 0) {
+                return;
             }
 
-            unowned Block? block = (Block?) this.get_first_child ();
+            this.tick_callback_id = this.add_tick_callback (
+                () => {
+                    this.tick_callback_id = 0;
+                    this.update ();
 
-            while (block != null)
+                    return GLib.Source.REMOVE;
+                });
+        }
+
+
+        /*
+         * Scale animation
+         */
+
+        private void on_scale_animation_done ()
+        {
+            this.scale_animation = null;
+
+            this.update_segments_span ();
+            this.remove_invisible_segments ();
+        }
+
+        private void animate_scale (float scale_from,
+                                    float scale_to)
+        {
+            if (scale_to == scale_from) {
+                return;
+            }
+
+            this.scale = scale_to;
+
+            if (this.scale_animation != null) {
+                this.scale_animation.pause ();
+                this.scale_animation = null;
+            }
+
+            if (this.get_mapped () && !scale_from.is_nan () && !scale_to.is_nan ())
             {
-                block.backfill_set = true;
-                block = (Block?) block.get_next_sibling ();
+                var animation_target = new Adw.CallbackAnimationTarget (this.update_segments_span);
+
+                this.scale_animation = new Adw.TimedAnimation (this,
+                                                               (double) scale_from,
+                                                               (double) scale_to,
+                                                               SCALE_ANIMATION_DURATION,
+                                                               animation_target);
+                this.scale_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
+                this.scale_animation.done.connect (this.on_scale_animation_done);
+                this.scale_animation.play ();
+            }
+            else if (!scale_to.is_nan ()) {
+                this.on_scale_animation_done ();
             }
         }
 
-        public void thaw_update ()
-                                 ensures (this.update_freeze_count >= 0)
+
+        /*
+         * Value animation
+         */
+
+        private void prepare_value_animation (float position_from,
+                                              float position_to)
         {
-            this.update_freeze_count--;
+            unowned var segment = (Segment?) this.get_first_child ();
 
-            unowned Block? block = (Block?) this.get_first_child ();
-
-            while (block != null)
+            while (segment != null)
             {
-                block.backfill_set = false;
-                block = (Block?) block.get_next_sibling ();
-            }
+                var display_value_from = (
+                        (position_from - segment.span_start) /
+                        (segment.span_end - segment.span_start)).clamp (0.0f, 1.0f);
+                var display_value_to = (
+                        (position_to - segment.span_start) /
+                        (segment.span_end - segment.span_start)).clamp (0.0f, 1.0f);
 
-            if (this.norm_animation != null) {
-                this.norm_animation.resume ();
-            }
+                segment.prepare_value_animation (display_value_from, display_value_to);
 
-            if (this.update_freeze_count == 0) {
-                this.update ();
+                segment = (Segment?) segment.get_next_sibling ();
             }
         }
 
-        private void on_timer_tick (int64 timestamp)
+        private void finish_value_animation ()
         {
-            this.update_tooltip (timestamp);
+            unowned var segment = (Segment?) this.get_first_child ();
+
+            while (segment != null)
+            {
+                segment.finish_value_animation ();
+
+                segment = (Segment?) segment.get_next_sibling ();
+            }
         }
+
+        private void on_value_animation_done ()
+        {
+            this.value_animation = null;
+
+            this.finish_value_animation ();
+        }
+
+        private void animate_value (float position_from,
+                                    float position_to)
+                                    requires (position_from.is_finite ())
+                                    requires (position_to.is_finite ())
+        {
+            if (!this.get_mapped () || (position_to - position_from).abs () < 0.01f) {
+                return;
+            }
+
+            if (this.value_animation != null) {
+                this.value_animation.pause ();
+                this.value_animation = null;
+            }
+
+            var segment = this.get_current_segment ();
+            var scale = this.get_current_scale ();
+            var is_forward = position_from < position_to;
+
+            if (segment == null) {
+                GLib.debug ("Unable to animate value from %.3f to %.3f",
+                            position_from,
+                            position_to);
+                return;
+            }
+
+            var animation_duration = (uint)(
+                    Math.sqrt ((double)(position_to - position_from).abs () / (double) scale) *
+                    (double) VALUE_ANIMATION_DURATION);
+
+            var animation_target = new Adw.CallbackAnimationTarget (
+                (position) => {
+                    while (segment != null)
+                    {
+                        if (!is_forward && position < segment.span_start) {
+                            segment.set_value_animation_progress (1.0f);
+                            segment = (Segment?) segment.get_prev_sibling ();
+                            continue;
+                        }
+
+                        if (is_forward && position > segment.span_end) {
+                            segment.set_value_animation_progress (1.0f);
+                            segment = (Segment?) segment.get_next_sibling ();
+                            continue;
+                        }
+
+                        if (segment.display_value_from == segment.display_value_to) {
+                            segment.set_value_animation_progress (1.0f);
+                            break;
+                        }
+
+                        var segment_position_from = lerpf (
+                                segment.span_start,
+                                segment.span_end,
+                                segment.display_value_from);
+                        var segment_position_to = lerpf (
+                                segment.span_start,
+                                segment.span_end,
+                                segment.display_value_to);
+
+                        var progress = ((float) position - segment_position_from) /
+                                        (segment_position_to - segment_position_from);
+
+                        segment.set_value_animation_progress (progress.clamp (0.0f, 1.0f));
+                        break;
+                    }
+                });
+
+            this.prepare_value_animation (position_from, position_to);
+
+            this.value_animation = new Adw.TimedAnimation (this,
+                                                           (double) position_from,
+                                                           (double) position_to,
+                                                           animation_duration,
+                                                           animation_target);
+            this.value_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
+            this.value_animation.done.connect (this.on_value_animation_done);
+            this.value_animation.play ();
+        }
+
+
+        /*
+         * Opacity animation (fade-in / fade-out)
+         */
+
+        private void on_opacity_animation_done ()
+        {
+            this.opacity_animation = null;
+            this.revealing = false;
+        }
+
+        private void fade_in_internal ()
+        {
+            var opacity_from = this.opacity_animation != null
+                    ? this.opacity_animation.value
+                    : 0.0;
+            var opacity_to = 1.0;
+
+            if (!this._reveal) {
+                return;
+            }
+
+            if (this.opacity_animation != null) {
+                this.opacity_animation.pause ();
+                this.opacity_animation = null;
+            }
+
+            var animation_target = new Adw.CallbackAnimationTarget (this.queue_draw);
+
+            this.opacity_animation = new Adw.TimedAnimation (this,
+                                                             opacity_from,
+                                                             opacity_to,
+                                                             FADE_IN_DURATION,
+                                                             animation_target);
+            this.opacity_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
+            this.opacity_animation.done.connect (this.on_opacity_animation_done);
+            this.opacity_animation.play ();
+        }
+
+        private void fade_in ()
+        {
+            if (this._reveal) {
+                return;
+            }
+
+            this._reveal = true;
+            this.revealing = true;
+            this.notify_property ("reveal");
+
+            if (this.get_mapped ()) {
+                this.fade_in_internal ();
+            }
+        }
+
+        private void fade_out ()
+        {
+            if (!this._reveal) {
+                return;
+            }
+
+            var opacity_from = this.opacity_animation != null
+                    ? this.opacity_animation.value
+                    : 1.0;
+            var opacity_to = 0.0;
+
+            this._reveal = false;
+            this.revealing = false;
+            this.notify_property ("reveal");
+
+            if (this.opacity_animation != null) {
+                this.opacity_animation.pause ();
+                this.opacity_animation = null;
+            }
+
+            if (this.get_mapped ())
+            {
+                var animation_target = new Adw.CallbackAnimationTarget (this.queue_draw);
+
+                this.opacity_animation = new Adw.TimedAnimation (this,
+                                                                 opacity_from,
+                                                                 opacity_to,
+                                                                 FADE_OUT_DURATION,
+                                                                 animation_target);
+                this.opacity_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
+                this.opacity_animation.done.connect (this.on_opacity_animation_done);
+                this.opacity_animation.play ();
+            }
+            else {
+                this.on_opacity_animation_done ();
+            }
+        }
+
+
+        /*
+         *
+         */
 
         private void on_session_changed (Pomodoro.Session session)
         {
-            this.update_long_break_time ();
-
-            // Wait with update until next session will be available.
             this.queue_update ();
         }
 
-        private void connect_signals ()
-        {
-            if (this.timer_tick_id == 0) {
-                this.timer_tick_id = this._timer.tick.connect (this.on_timer_tick);
-            }
-        }
 
-        private void disconnect_signals ()
-        {
-            if (this.update_idle_id != 0) {
-                this.remove_tick_callback (this.update_idle_id);
-                this.update_idle_id = 0;
-            }
-
-            if (this.timer_tick_id != 0) {
-                this._timer.disconnect (this.timer_tick_id);
-                this.timer_tick_id = 0;
-            }
-        }
+        /*
+         * Widget
+         */
 
         public override void map ()
         {
-            var previous_opacity = this._opacity;
-
-            this.update_blocks ();
-            this.update_tooltip ();
+            this.update ();
 
             base.map ();
 
-            this.connect_signals ();
-
-            if (previous_opacity == 0.0 && this._opacity > 0.0) {
-                this.start_opacity_animation (previous_opacity);
+            if (this.revealing) {
+                this.fade_in_internal ();
             }
         }
 
         public override void unmap ()
         {
-            this.disconnect_signals ();
-            this.stop_backfill_animation ();
-            this.stop_norm_animation ();
-            this.stop_opacity_animation ();
-            this.remove_blocks ();
-
-            this.norm = double.NAN;
-
             base.unmap ();
+
+            if (this.scale_animation != null) {
+                this.scale_animation.pause ();
+                this.scale_animation = null;
+            }
+
+            if (this.opacity_animation != null) {
+                this.opacity_animation.pause ();
+                this.opacity_animation = null;
+            }
+
+            if (this.tick_callback_id != 0) {
+                this.remove_tick_callback (this.tick_callback_id);
+                this.tick_callback_id = 0;
+            }
+
+            this.remove_segments ();
         }
 
         public override Gtk.SizeRequestMode get_request_mode ()
@@ -1050,12 +1271,12 @@ namespace Pomodoro
                                             int baseline)
         {
             var allocation = Gtk.Allocation () {
-                x = 0,
-                y = 0,
-                width = width,
+                x      = 0,
+                y      = 0,
+                width  = width,
                 height = height
             };
-            var child = this.get_first_child ();
+            unowned var child = this.get_first_child ();
 
             while (child != null)
             {
@@ -1067,49 +1288,120 @@ namespace Pomodoro
 
         public override void snapshot (Gtk.Snapshot snapshot)
         {
-            var opacity = this.opacity_animation != null
-                ? this.opacity_animation.value
-                : this._opacity;
-            var child = this.get_first_child ();
+            var width        = (float) this.get_width ();
+            var height       = (float) this.get_height ();
+            var fade_applied = false;
 
-            snapshot.push_opacity (opacity);
-
-            while (child != null)
+            if (this.scale_animation != null)
             {
-                this.snapshot_child (child, snapshot);
+                var scale         = this.scale_animation.value;
+                var norm          = 1.0 / this.scale_animation.value;
+                var norm_from     = 1.0 / this.scale_animation.value_from;
+                var norm_to       = 1.0 / this.scale_animation.value_to;
+                var fade_x        = width * (float)(double.min (norm_from, norm_to) * scale);
+                var fade_progress = (norm - norm_from) / (norm_to - norm_from);
+                var fade_opacity  = norm_from >= norm_to
+                        ? (float) fade_progress
+                        : (float)(1.0 - fade_progress);
 
-                child = child.get_next_sibling ();
+                if (fade_x < width)
+                {
+                    var fade_bounds = Graphene.Rect ();
+                    fade_bounds.init (fade_x,
+                                      0.0f,
+                                      width - fade_x,
+                                      height);
+
+                    snapshot.push_mask (Gsk.MaskMode.INVERTED_ALPHA);
+                    snapshot.append_linear_gradient (
+                            fade_bounds,
+                            { width, 0.0f },
+                            { fade_x, 0.0f },
+                            {
+                                { 0.0f, { 0.0f, 0.0f, 0.0f, fade_opacity }},
+                                { 1.0f, { 0.0f, 0.0f, 0.0f, 0.0f }},
+                            });
+                    snapshot.pop ();
+
+                    fade_applied = true;
+                }
             }
 
-            snapshot.pop ();
+            if (this.opacity_animation != null) {
+                snapshot.push_opacity (this.opacity_animation.value);
+                this.snapshot_segments (snapshot);
+                snapshot.pop ();
+            }
+            else if (this._reveal) {
+                this.snapshot_segments (snapshot);
+            }
+
+            if (fade_applied) {
+                snapshot.pop ();
+            }
         }
 
-        public override bool focus (Gtk.DirectionType direction)
+        public override bool query_tooltip (int         x,
+                                            int         y,
+                                            bool        keyboard_tooltip,
+                                            Gtk.Tooltip tooltip)
         {
-            return false;
-        }
+            var timestamp = int64.max (this._timer.get_last_state_changed_time (),
+                                       this._timer.get_last_tick_time ());
+            var remaining = this._timer.is_running () &&
+                            Pomodoro.Timestamp.is_defined (this.long_break_time)
+                    ? Pomodoro.Timestamp.subtract (this.long_break_time, timestamp)
+                    : 0;
 
-        public override bool grab_focus ()
-        {
-            return false;
+            if (remaining > 0)
+            {
+                var seconds = Pomodoro.Timestamp.to_seconds (remaining);
+                var seconds_uint = (uint) Pomodoro.round_seconds (seconds);
+
+                tooltip.set_markup (_("Long break due in <b>%s</b>").printf (
+                        Pomodoro.format_time (seconds_uint)));
+
+                // TODO: connect to the timer tick to update the tooltip
+
+                return true;
+            }
+            else {
+                return base.query_tooltip (x, y, keyboard_tooltip, tooltip);
+            }
         }
 
         public override void dispose ()
         {
-            if (this.session_changed_id != 0) {
-                this._session.disconnect (this.session_changed_id);
-                this.session_changed_id = 0;
+            if (this.scale_animation != null) {
+                this.scale_animation.pause ();
+                this.scale_animation = null;
             }
 
-            this.disconnect_signals ();
-            this.stop_backfill_animation ();
-            this.stop_norm_animation ();
-            this.stop_opacity_animation ();
-            this.remove_blocks ();
+            if (this.opacity_animation != null) {
+                this.opacity_animation.pause ();
+                this.opacity_animation = null;
+            }
+
+            if (this.value_animation != null) {
+                this.value_animation.pause ();
+                this.value_animation = null;
+            }
+
+            if (this.tick_callback_id != 0) {
+                this.remove_tick_callback (this.tick_callback_id);
+                this.tick_callback_id = 0;
+            }
+
+            if (this._session != null) {
+                this._session.changed.disconnect (this.on_session_changed);
+            }
+
+            this.remove_segments ();
 
             this._session_manager = null;
             this._timer = null;
             this._session = null;
+            this.current_segment = null;
 
             base.dispose ();
         }
