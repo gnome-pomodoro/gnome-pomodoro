@@ -151,7 +151,7 @@
               <object class="GtkStackPage">
                 <property name="name">skip</property>
                 <property name="child">
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="skip_image">
                     <property name="icon-name">timer-skip-symbolic</property>
                     <style>
                       <class name="symbolic"/>

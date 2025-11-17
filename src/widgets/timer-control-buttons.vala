@@ -8,7 +8,7 @@ namespace Pomodoro
     }
 
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/timer-control-buttons.ui")]
-    public class TimerControlButtons : Gtk.Box, Gtk.Buildable
+    public sealed class TimerControlButtons : Gtk.Box, Gtk.Buildable
     {
         private const uint FADE_IN_DURATION = 500;
         private const uint FADE_OUT_DURATION = 500;
@@ -57,6 +57,8 @@ namespace Pomodoro
         private unowned Gtk.Stack center_image_stack;
         [GtkChild]
         private unowned Gtk.Stack right_image_stack;
+        [GtkChild]
+        private unowned Gtk.Image skip_image;
 
         private Pomodoro.SessionManager?      session_manager;
         private Pomodoro.Timer?               timer;
@@ -74,6 +76,8 @@ namespace Pomodoro
         {
             this.session_manager = Pomodoro.SessionManager.get_default ();
             this.timer           = Pomodoro.Timer.get_default ();
+
+            this.update_images ();
         }
 
         private void add_animation (Adw.TimedAnimation animation)
@@ -324,6 +328,15 @@ namespace Pomodoro
             this.right_button.can_focus = is_started;
         }
 
+        private void update_images ()
+        {
+            var is_rtl = this.get_direction () == Gtk.TextDirection.RTL;
+
+            this.skip_image.icon_name = is_rtl
+                    ? "timer-skip-symbolic-rtl"
+                    : "timer-skip-symbolic";
+        }
+
         private void on_timer_state_changed (Pomodoro.TimerState current_state,
                                              Pomodoro.TimerState previous_state)
         {
@@ -363,6 +376,13 @@ namespace Pomodoro
                 this.session_manager.disconnect (this.session_manager_notify_current_session_id);
                 this.session_manager_notify_current_session_id = 0;
             }
+        }
+
+        public override void direction_changed (Gtk.TextDirection previous_direction)
+        {
+            base.direction_changed (previous_direction);
+
+            this.update_images ();
         }
 
         public override void map ()
