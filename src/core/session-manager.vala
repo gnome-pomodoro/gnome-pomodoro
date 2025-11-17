@@ -421,9 +421,6 @@ namespace Pomodoro
 
         /**
          * Try reschedule current session.
-         *
-         * Passing the `timestamp` implies that we want to skip the current time-block. Not passing, implies
-         * the current time-block will be finished according to schedule.
          */
         private void reschedule (Pomodoro.Session?   session = null,
                                  Pomodoro.TimeBlock? next_time_block = null,
@@ -445,13 +442,6 @@ namespace Pomodoro
 
             if (this._current_time_block != null && !immediate) {
                 timestamp = int64.max (this._current_time_block.end_time, timestamp);
-            }
-
-            if (this._current_session == session &&
-                this._current_gap != null &&
-                Pomodoro.Timestamp.is_undefined (this._current_gap.end_time))
-            {
-                return;  // Reschedule once user resumes the timer.
             }
 
             if (this._scheduler != null && session != null) {
