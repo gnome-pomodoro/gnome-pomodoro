@@ -79,6 +79,7 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/lock-screen-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/pan-end-custom-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/pan-start-custom-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/plugin-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/preferences-appearance-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/preferences-keyboard-shortcuts-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/preferences-notifications-symbolic.svg</file>
@@ -86,6 +87,7 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/screen-overlay-close-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/screen-overlay-open-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/stats-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/take-break-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/timer-pause-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/timer-reset-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/timer-rewind-symbolic.svg</file>

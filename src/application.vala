@@ -130,6 +130,7 @@ namespace Pomodoro
         private Pomodoro.StatsManager?       stats_manager;
         private Pomodoro.EventProducer?      event_producer;
         private Pomodoro.EventBus?           event_bus;
+        private Pomodoro.Extension?          extension;
         private Pomodoro.JobQueue?           job_queue;
         private Pomodoro.ActionManager?      action_manager;
         private Pomodoro.BackgroundManager?  background_manager;
@@ -512,6 +513,14 @@ namespace Pomodoro
             this.keyboard_manager.shortcut_activated.connect (this.on_shortcut_activated);
         }
 
+        private void setup_extension ()
+        {
+            this.extension = new Pomodoro.Extension ();
+
+            // TODO
+            // this.capabilities.register_many (this.extension.capabilities);
+        }
+
         private void update_color_scheme ()
         {
             var style_manager = Adw.StyleManager.get_default ();
@@ -577,6 +586,7 @@ namespace Pomodoro
             this.setup_resources ();
             this.setup_database ();
             this.setup_capabilities ();
+            this.setup_extension ();
             this.setup_actions ();
             this.update_color_scheme ();
 
@@ -732,6 +742,7 @@ namespace Pomodoro
 
             this.event_producer = null;
             this.event_bus = null;
+            this.extension = null;
             this.job_queue = null;
             this.action_manager = null;
             this.logger = null;
@@ -961,19 +972,6 @@ namespace Pomodoro
             //         engine.try_unload_plugin (plugin_info);
             //     }
             // }
-        }
-
-        private void setup_desktop_extension ()
-        {
-            try {
-                this.desktop_extension = new Pomodoro.DesktopExtension ();
-
-                this.capabilities.add_group (this.desktop_extension.capabilities, Pomodoro.Priority.HIGH);
-            }
-            catch (GLib.Error error) {
-                GLib.warning ("Error while initializing desktop extension: %s",
-                              error.message);
-            }
         }
 
         private async void setup_plugins ()

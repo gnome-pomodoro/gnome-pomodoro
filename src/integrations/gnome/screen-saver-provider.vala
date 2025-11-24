@@ -1,3 +1,6 @@
+using GLib;
+
+
 namespace Gnome
 {
     public class ScreenSaverProvider : Pomodoro.Provider, Pomodoro.ScreenSaverProvider

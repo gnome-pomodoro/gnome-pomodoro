@@ -1,343 +1,444 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<interface domain="gnome-pomodoro">
-  <requires lib="gtk+" version="3.16"/><!-- FIXME port file to gtk4 -->
-  <template class="PomodoroInstallExtensionDialog" parent="GtkDialog">
-    <property name="can-focus">false</property>
-    <property name="type-hint">dialog</property>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can-focus">false</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can-focus">false</property>
-            <property name="layout-style">end</property>
-            <child>
-              <object class="GtkButton" id="done_button">
-                <property name="label" translatable="yes">_Done</property>
-                <property name="name">done</property>
-                <property name="receives-default">true</property>
-                <property name="use-underline">true</property>
-                <style>
-                  <class name="suggested-action"/>
-                </style>
-              </object>
-              <packing>
-                <property name="expand">true</property>
-                <property name="fill">true</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="close_button">
-                <property name="label" translatable="yes">_Close</property>
-                <property name="name">close</property>
-                <property name="receives-default">true</property>
-                <property name="use-underline">true</property>
-              </object>
-              <packing>
-                <property name="expand">true</property>
-                <property name="fill">true</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="report_button">
-                <property name="label" translatable="yes">_Report issue</property>
-                <property name="name">report-issue</property>
-                <property name="use-underline">true</property>
-              </object>
-              <packing>
-                <property name="expand">true</property>
-                <property name="fill">true</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="manage_extensions_button">
-                <property name="label" translatable="yes">_Manage extensions</property>
-                <property name="name">manage-extensions</property>
-                <property name="use-underline">true</property>
-              </object>
-              <packing>
-                <property name="expand">true</property>
-                <property name="fill">true</property>
-                <property name="position">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="cancel_button">
-                <property name="label" translatable="yes">_Cancel</property>
-                <property name="name">cancel</property>
-                <property name="receives-default">true</property>
-                <property name="use-underline">true</property>
-              </object>
-              <packing>
-                <property name="expand">false</property>
-                <property name="fill">true</property>
-                <property name="position">4</property>
-              </packing>
-            </child>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <template class="PomodoroInstallExtensionDialog" parent="AdwDialog">
+    <property name="title" translatable="yes">GNOME Shell Extension</property>
+    <property name="follows-content-size">true</property>
+    <property name="width-request">300</property>
+    <property name="height-request">200</property>
+    <style>
+      <class name="extension-dialog"/>
+    </style>
+    <property name="child">
+      <object class="GtkStack" id="stack">
+        <property name="hhomogeneous">true</property>
+        <property name="vhomogeneous">true</property>
+        <property name="transition-duration">100</property>
+        <property name="transition-type">crossfade</property>
+        <child>
+          <object class="GtkStackPage">
+            <property name="name">default</property>
+            <property name="child">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar">
+                    <property name="show-title">true</property>
+                    <property name="title-widget">
+                      <object class="AdwCarouselIndicatorDots">
+                        <property name="carousel">carousel</property>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+                <property name="content">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="AdwCarousel" id="carousel">
+                        <property name="allow-long-swipes">true</property>
+                        <property name="hexpand">true</property>
+                        <property name="vexpand">true</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <property name="hexpand">true</property>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="icon-name">plugin-symbolic</property>
+                                <property name="pixel-size">32</property>
+                                <style>
+                                  <class name="icon"/>
+                                </style>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label" translatable="yes">Get the best experience!</property>
+                                <property name="wrap">true</property>
+                                <property name="justify">center</property>
+                                <style>
+                                  <class name="title-1"/>
+                                  <class name="title"/>
+                                </style>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label" translatable="yes"><![CDATA[Enable <b>GNOME Shell extension</b> for seamless desktop integration]]></property>
+                                <property name="use-markup">true</property>
+                                <property name="wrap">true</property>
+                                <property name="justify">center</property>
+                                <property name="max-width-chars">50</property>
+                                <style>
+                                  <class name="description"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <property name="hexpand">true</property>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="icon-name">timer-symbolic</property>
+                                <property name="pixel-size">32</property>
+                                <style>
+                                  <class name="icon"/>
+                                </style>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label" translatable="yes">Always within reach</property>
+                                <property name="wrap">true</property>
+                                <property name="justify">center</property>
+                                <style>
+                                  <class name="title-2"/>
+                                  <class name="title"/>
+                                </style>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label" translatable="yes">Control timer directly from the top bar without opening the app</property>
+                                <property name="wrap">true</property>
+                                <property name="justify">center</property>
+                                <property name="max-width-chars">50</property>
+                                <style>
+                                  <class name="description"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <property name="hexpand">true</property>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="icon-name">preferences-notifications-symbolic</property>
+                                <property name="pixel-size">32</property>
+                                <style>
+                                  <class name="icon"/>
+                                </style>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label" translatable="yes">Less distractions</property>
+                                <property name="wrap">true</property>
+                                <property name="justify">center</property>
+                                <style>
+                                  <class name="title-2"/>
+                                  <class name="title"/>
+                                </style>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label" translatable="yes"><![CDATA[Let <b>Pomodoro</b> manage system notifications while the timer is running]]></property>
+                                <property name="use-markup">true</property>
+                                <property name="wrap">true</property>
+                                <property name="justify">center</property>
+                                <property name="max-width-chars">50</property>
+                                <style>
+                                  <class name="description"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <property name="hexpand">true</property>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="icon-name">take-break-symbolic</property>
+                                <property name="pixel-size">32</property>
+                                <style>
+                                  <class name="icon"/>
+                                </style>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label" translatable="yes">Refined break reminders</property>
+                                <property name="wrap">true</property>
+                                <property name="justify">center</property>
+                                <style>
+                                  <class name="title-2"/>
+                                  <class name="title"/>
+                                </style>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label" translatable="yes">Elegant full-screen overlay that make taking breaks a more pleasant experience</property>
+                                <property name="wrap">true</property>
+                                <property name="justify">center</property>
+                                <property name="max-width-chars">50</property>
+                                <style>
+                                  <class name="description"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <!-- translators: "It" refers to installing GNOME Shell extension -->
+                            <property name="label" translatable="yes">Ready to try it?</property>
+                            <property name="wrap">true</property>
+                            <property name="justify">center</property>
+                            <property name="hexpand">true</property>
+                            <property name="vexpand">true</property>
+                            <style>
+                              <class name="title-1"/>
+                              <class name="title"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox" id="response_box_vertical">
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">12</property>
+                        <property name="homogeneous">true</property>
+                        <property name="visible">false</property>
+                        <style>
+                          <class name="response-area"/>
+                        </style>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">_Install Extension</property>
+                            <property name="use-underline">true</property>
+                            <style>
+                              <class name="suggested-action"/>
+                            </style>
+                            <signal name="clicked" handler="on_install_clicked"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">_Not Now</property>
+                            <property name="use-underline">true</property>
+                            <signal name="clicked" handler="on_cancel_clicked"/>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox" id="response_box_horizontal">
+                        <property name="spacing">12</property>
+                        <property name="homogeneous">true</property>
+                        <style>
+                          <class name="response-area"/>
+                        </style>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">_Not Now</property>
+                            <property name="use-underline">true</property>
+                            <signal name="clicked" handler="on_cancel_clicked"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">_Install Extension</property>
+                            <property name="use-underline">true</property>
+                            <style>
+                              <class name="suggested-action"/>
+                            </style>
+                            <signal name="clicked" handler="on_install_clicked"/>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object><!-- box -->
+                </property>
+              </object><!-- toolbar_view -->
+            </property>
           </object>
-          <packing>
-            <property name="expand">false</property>
-            <property name="fill">false</property>
-            <property name="position">0</property>
-          </packing>
         </child>
         <child>
-          <object class="GtkStack" id="stack">
-            <property name="can-focus">false</property>
-            <property name="vhomogeneous">false</property>
-            <property name="transition-type">crossfade</property>
-            <child>
-              <object class="GtkBox">
-                <property name="can-focus">false</property>
-                <property name="margin-left">24</property>
-                <property name="margin-right">24</property>
-                <property name="margin-start">24</property>
-                <property name="margin-end">24</property>
-                <property name="margin-top">24</property>
-                <property name="margin-bottom">48</property>
-                <property name="orientation">vertical</property>
-                <property name="spacing">10</property>
-                <child>
-                  <object class="GtkSpinner" id="spinner">
-                    <property name="height-request">32</property>
-                    <property name="can-focus">false</property>
-                    <property name="active">true</property>
-                  </object>
-                  <packing>
-                    <property name="expand">false</property>
-                    <property name="fill">true</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="can-focus">false</property>
-                    <property name="label" translatable="yes">Installing extension…</property>
-                  </object>
-                  <packing>
-                    <property name="expand">false</property>
-                    <property name="fill">true</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
+          <object class="GtkStackPage">
+            <property name="name">spinner</property>
+            <property name="child">
+              <object class="AdwSpinner">
+                <property name="halign">center</property>
+                <property name="valign">center</property>
+                <property name="width-request">32</property>
+                <property name="height-request">32</property>
               </object>
-              <packing>
-                <property name="name">in-progress</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkBox">
-                <property name="can-focus">false</property>
-                <property name="margin-left">24</property>
-                <property name="margin-right">24</property>
-                <property name="margin-start">24</property>
-                <property name="margin-end">24</property>
-                <property name="margin-top">24</property>
-                <property name="margin-bottom">48</property>
-                <property name="orientation">vertical</property>
-                <property name="spacing">10</property>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="can-focus">false</property>
-                    <property name="label" translatable="yes">Extension has been installed</property>
-                    <property name="max-width-chars">60</property>
-                    <style>
-                      <class name="title"/>
-                    </style>
-                  </object>
-                  <packing>
-                    <property name="expand">false</property>
-                    <property name="fill">false</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="can-focus">false</property>
-                    <property name="margin-bottom">2</property>
-                    <property name="label" translatable="yes">If you change your mind, you can uninstall it using &lt;i&gt;Extensions&lt;/i&gt; app.</property>
-                    <property name="use-markup">true</property>
-                    <property name="wrap">true</property>
-                    <property name="max-width-chars">60</property>
-                  </object>
-                  <packing>
-                    <property name="expand">false</property>
-                    <property name="fill">true</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="name">success</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkBox">
-                <property name="can-focus">false</property>
-                <property name="margin-left">24</property>
-                <property name="margin-right">24</property>
-                <property name="margin-start">24</property>
-                <property name="margin-end">24</property>
-                <property name="margin-top">24</property>
-                <property name="margin-bottom">48</property>
-                <property name="orientation">vertical</property>
-                <property name="spacing">10</property>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="can-focus">false</property>
-                    <property name="label" translatable="yes">Could not enable the extension</property>
-                    <property name="max-width-chars">60</property>
-                    <style>
-                      <class name="title"/>
-                    </style>
-                  </object>
-                  <packing>
-                    <property name="expand">false</property>
-                    <property name="fill">false</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="can-focus">false</property>
-                    <property name="margin-bottom">2</property>
-                    <property name="label" translatable="yes">Extension has been installed but there is trouble enabling it. You may try logging out.</property>
-                    <property name="use-markup">true</property>
-                    <property name="wrap">true</property>
-                    <property name="max-width-chars">60</property>
-                  </object>
-                  <packing>
-                    <property name="expand">false</property>
-                    <property name="fill">true</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkExpander">
-                    <property name="margin-left">24</property>
-                    <property name="margin-right">24</property>
-                    <property name="margin-start">24</property>
-                    <property name="margin-end">24</property>
-                    <property name="resize-toplevel">true</property>
-                    <child>
-                      <object class="GtkTextView" id="error_enabling_textview">
-                        <property name="editable">false</property>
-                        <property name="monospace">true</property>
-                      </object>
-                    </child>
-                    <child type="label">
-                      <object class="GtkLabel">
-                        <property name="can-focus">false</property>
-                        <property name="label" translatable="yes">Technical Details</property>
-                      </object>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">false</property>
-                    <property name="fill">true</property>
-                    <property name="position">2</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="name">error-enabling</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkBox">
-                <property name="can-focus">false</property>
-                <property name="margin-left">24</property>
-                <property name="margin-right">24</property>
-                <property name="margin-start">24</property>
-                <property name="margin-end">24</property>
-                <property name="margin-top">24</property>
-                <property name="margin-bottom">48</property>
-                <property name="orientation">vertical</property>
-                <property name="spacing">10</property>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="can-focus">false</property>
-                    <property name="label" translatable="yes">Could not install the extension</property>
-                    <property name="max-width-chars">60</property>
-                    <style>
-                      <class name="title"/>
-                    </style>
-                  </object>
-                  <packing>
-                    <property name="expand">false</property>
-                    <property name="fill">false</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="can-focus">false</property>
-                    <property name="margin-bottom">2</property>
-                    <property name="label" translatable="yes">There was an issue installing the extension.</property>
-                    <property name="use-markup">true</property>
-                    <property name="wrap">true</property>
-                    <property name="max-width-chars">60</property>
-                  </object>
-                  <packing>
-                    <property name="expand">false</property>
-                    <property name="fill">true</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkExpander">
-                    <property name="margin-left">24</property>
-                    <property name="margin-right">24</property>
-                    <property name="margin-start">24</property>
-                    <property name="margin-end">24</property>
-                    <property name="resize-toplevel">true</property>
-                    <child>
-                      <object class="GtkTextView" id="error_installing_textview">
-                        <property name="editable">false</property>
-                        <property name="monospace">true</property>
-                      </object>
-                    </child>
-                    <child type="label">
-                      <object class="GtkLabel">
-                        <property name="can-focus">false</property>
-                        <property name="label" translatable="yes">Details</property>
-                      </object>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">true</property>
-                    <property name="fill">true</property>
-                    <property name="position">2</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="name">error-installing</property>
-                <property name="position">3</property>
-              </packing>
-            </child>
+            </property>
           </object>
-          <packing>
-            <property name="expand">true</property>
-            <property name="fill">true</property>
-            <property name="position">1</property>
-          </packing>
+        </child>
+        <child>
+          <object class="GtkStackPage">
+            <property name="name">success</property>
+            <property name="child">
+              <object class="PomodoroCheckmark">
+                <property name="pixel-size">32</property>
+                <property name="halign">center</property>
+                <property name="valign">center</property>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStackPage">
+            <property name="name">failure</property>
+            <property name="child">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar">
+                    <property name="show-title">false</property>
+                  </object>
+                </child>
+                <property name="content">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">12</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <property name="vexpand">true</property>
+                        <property name="valign">center</property>
+                        <style>
+                          <class name="body"/>
+                        </style>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label" translatable="yes">Something went wrong</property>
+                            <style>
+                              <class name="title-1"/>
+                              <class name="title"/>
+                            </style>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="error_message_label">
+                            <property name="wrap">true</property>
+                            <property name="justify">center</property>
+                            <property name="max-width-chars">50</property>
+                            <style>
+                              <class name="description"/>
+                            </style>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="visible" bind-source="error_message_label" bind-property="visible" bind-flags="invert-boolean | sync-create"/>
+                            <style>
+                              <class name="linked"/>
+                              <class name="error-message"/>
+                            </style>
+                            <child>
+                              <object class="GtkScrolledWindow">
+                                <property name="hexpand">true</property>
+                                <property name="min-content-height">50</property>
+                                <property name="propagate-natural-height">true</property>
+                                <style>
+                                  <class name="view"/>
+                                </style>
+                                <property name="child">
+                                  <object class="GtkTextView" id="error_text_view">
+                                    <property name="editable">false</property>
+                                    <property name="cursor-visible">false</property>
+                                    <property name="wrap-mode">word-char</property>
+                                    <style>
+                                      <class name="monospace"/>
+                                    </style>
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkButton">
+                                <property name="icon-name">edit-copy-symbolic</property>
+                                <property name="tooltip-text" translatable="yes">Copy to clipboard</property>
+                                <signal name="clicked" handler="on_copy_to_clipboard_clicked"/>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox" id="failure_response_box_vertical">
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">12</property>
+                        <property name="homogeneous">true</property>
+                        <property name="visible">false</property>
+                        <style>
+                          <class name="response-area"/>
+                        </style>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">_Try Again</property>
+                            <property name="use-underline">true</property>
+                            <style>
+                              <class name="suggested-action"/>
+                            </style>
+                            <signal name="clicked" handler="on_install_clicked"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">_Abort</property>
+                            <property name="use-underline">true</property>
+                            <signal name="clicked" handler="on_abort_clicked"/>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox" id="failure_response_box_horizontal">
+                        <property name="spacing">12</property>
+                        <property name="homogeneous">true</property>
+                        <style>
+                          <class name="response-area"/>
+                        </style>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">_Abort</property>
+                            <property name="use-underline">true</property>
+                            <signal name="clicked" handler="on_abort_clicked"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">_Try Again</property>
+                            <property name="use-underline">true</property>
+                            <style>
+                              <class name="suggested-action"/>
+                            </style>
+                            <signal name="clicked" handler="on_install_clicked"/>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </property>
+          </object>
         </child>
       </object>
+    </property>
+    <child>
+      <object class="AdwBreakpoint">
+        <condition>max-width: 450sp</condition>
+        <setter object="response_box_horizontal" property="visible">false</setter>
+        <setter object="response_box_vertical" property="visible">true</setter>
+        <setter object="failure_response_box_horizontal" property="visible">false</setter>
+        <setter object="failure_response_box_vertical" property="visible">true</setter>
+      </object>
     </child>
-    <action-widgets>
-      <action-widget response="1">done_button</action-widget>
-      <action-widget response="1">close_button</action-widget>
-      <action-widget response="3">report_button</action-widget>
-      <action-widget response="2">manage_extensions_button</action-widget>
-      <action-widget response="0">cancel_button</action-widget>
-    </action-widgets>
   </template>
 </interface>

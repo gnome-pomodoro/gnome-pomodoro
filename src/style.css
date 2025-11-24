@@ -565,6 +565,91 @@ shortcut label.keycap {
 
 
 /*
+ * PomodoroExtensionDialog widget
+ */
+
+.extension-dialog carouselindicatordots {
+    margin: 0px;
+}
+
+.extension-dialog carousel > box {
+    padding: 18px 24px 24px 24px;
+}
+
+.extension-dialog .icon {
+    color: alpha(currentColor, 0.9);
+    margin-bottom: 24px;
+}
+
+.extension-dialog .title-1 {
+    font-size: 160%;
+    margin-bottom: 20px;
+}
+
+.extension-dialog .title-2 {
+    font-size: 130%;
+    margin-top: 6px;
+    margin-bottom: 16px;
+}
+
+.extension-dialog .description {
+    margin-bottom: 20px;
+}
+
+.extension-dialog .response-area {
+    margin: 0 24px 24px 24px;
+}
+
+.extension-dialog .response-area button {
+    padding: 10px 20px;
+    border-radius: 12px;
+}
+
+.extension-dialog .linked *:first-child {
+   border-radius: 9px 0 0 9px;
+}
+
+.extension-dialog .linked *:last-child {
+   border-radius: 0 9px 9px 0;
+}
+
+.extension-dialog .body {
+   padding: 24px;
+}
+
+.extension-dialog .body .title {
+   padding: 0;
+   margin-bottom: 12px;
+}
+
+.extension-dialog .body .error-message {
+   margin-bottom: 12px;
+}
+
+.extension-dialog textview.monospace {
+    padding: 12px;
+    font-size: inherit;
+}
+
+
+/*
+ * PomodoroCheckmark widget
+ */
+
+checkmark {
+    background: @pomodoro_primary_color;
+    color: @window_bg_color;
+    border-radius: 50%;
+    padding: 16px;
+    outline: none;
+}
+
+checkmark:backdrop {
+    background: @pomodoro_unfocused_primary_color;
+}
+
+
+/*
  * About dialog
  */
 

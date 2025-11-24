@@ -8,8 +8,7 @@ namespace Pomodoro
                 return _available;
             }
             private set {
-                if (this._available != value)
-                {
+                if (this._available != value) {
                     this._available = value;
                     this.notify_property ("available");
                 }
@@ -22,8 +21,7 @@ namespace Pomodoro
                 return _enabled;
             }
             private set {
-                if (this._enabled != value)
-                {
+                if (this._enabled != value) {
                     this._enabled = value;
                     this.notify_property ("enabled");
                 }
@@ -80,10 +78,10 @@ namespace Pomodoro
                                                    GLib.ParamSpec pspec)
 
         {
-            var _provider = (Pomodoro.Provider) provider;
+            var provider = (Pomodoro.Provider) object;
 
-            if (this._provider == _provider) {
-                this.available = _provider.available;
+            if (this._provider == provider) {
+                this.available = provider.available;
             }
         }
 
@@ -132,7 +130,7 @@ namespace Pomodoro
         public override void dispose ()
         {
             if (this._provider != null) {
-                ((GLib.Object) this._provider).notify["available"].disconnect (this.on_provider_notify_available);
+                this._provider.notify["available"].disconnect (this.on_provider_notify_available);
             }
 
             if (this.provider_selected_id != 0) {

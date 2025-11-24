@@ -153,6 +153,9 @@ namespace Pomodoro
         private Pomodoro.Timer          timer;
         private Pomodoro.WindowSize     _size = Pomodoro.WindowSize.NORMAL;
         private Pomodoro.WindowView     _view = Pomodoro.WindowView.DEFAULT;
+        private Pomodoro.Extension?     extension = null;
+        private Adw.Toast?              install_extension_toast = null;
+        private static bool             install_extension_toast_dismissed = false;
 
         construct
         {
@@ -175,6 +178,9 @@ namespace Pomodoro
 
             this.update_title ();
             this.update_timer_indicator ();
+
+            this.extension = new Pomodoro.Extension ();
+            this.extension.notify["available"].connect (this.on_extension_notify_available);
         }
 
         private void update_title ()
@@ -193,6 +199,23 @@ namespace Pomodoro
 
             timer_page.needs_attention = this.view_stack.visible_child != timer_page.child &&
                                          timer.is_started ();
+        }
+
+        private void update_install_extension_toast ()
+        {
+            if (!this.get_mapped ()) {
+                return;
+            }
+
+            if (this.extension.available && !this.extension.is_installed ()) {
+                this.show_install_extension_toast ();
+            }
+            else if (this.install_extension_toast != null) {
+                this.install_extension_toast.dismissed.disconnect (
+                        this.on_install_extension_toast_dismissed);
+                this.install_extension_toast.dismiss ();
+                this.install_extension_toast = null;
+            }
         }
 
         public Pomodoro.WindowView get_default_view ()
@@ -252,42 +275,30 @@ namespace Pomodoro
             this.toast_overlay.add_toast (toast);
         }
 
-        [GtkCallback]
-        private void on_size_stack_visible_child_notify (GLib.Object    object,
-                                                         GLib.ParamSpec pspec)
+        private void show_install_extension_toast ()
         {
-            this.size = Pomodoro.WindowSize.from_string (this.size_stack.visible_child_name);
-        }
-
-        [GtkCallback]
-        private void on_view_stack_visible_child_notify (GLib.Object    object,
-                                                         GLib.ParamSpec pspec)
-        {
-            var view = Pomodoro.WindowView.from_string (this.view_stack.visible_child_name);
-
-            this._view = this._view == Pomodoro.WindowView.DEFAULT && this.get_default_view () == view
-                ? Pomodoro.WindowView.DEFAULT
-                : view;
-
-            this.update_title ();
-            this.update_timer_indicator ();
-        }
-
-        [GtkCallback]
-        private void on_gesture_click_pressed (Gtk.GestureClick gesture,
-                                               int              n_press,
-                                               double           x,
-                                               double           y)
-        {
-            if (gesture.get_current_button () == Gdk.BUTTON_PRIMARY &&
-                n_press == 2)
+            if (Pomodoro.Window.install_extension_toast_dismissed ||
+                this.install_extension_toast != null)
             {
-                this.size = this.size != Pomodoro.WindowSize.COMPACT
-                    ? Pomodoro.WindowSize.COMPACT
-                    : Pomodoro.WindowSize.NORMAL;
-
-                gesture.set_state (Gtk.EventSequenceState.CLAIMED);
+                return;
             }
+
+            var toast = new Adw.Toast (_("GNOME Shell extension available"));
+            toast.button_label = _("Learn More");
+            toast.priority = Adw.ToastPriority.HIGH;
+            toast.timeout = 0;
+            toast.button_clicked.connect (
+                () => {
+                    var dialog = new Pomodoro.InstallExtensionDialog ();
+
+                    dialog.present (this);
+                    this.install_extension_toast = null;
+                });
+            toast.dismissed.connect (this.on_install_extension_toast_dismissed);
+
+            this.install_extension_toast = toast;
+
+            this.add_toast (toast);
         }
 
         private void show_close_confirmation_dialog ()
@@ -333,6 +344,44 @@ namespace Pomodoro
         }
 
         [GtkCallback]
+        private void on_size_stack_visible_child_notify (GLib.Object    object,
+                                                         GLib.ParamSpec pspec)
+        {
+            this.size = Pomodoro.WindowSize.from_string (this.size_stack.visible_child_name);
+        }
+
+        [GtkCallback]
+        private void on_view_stack_visible_child_notify (GLib.Object    object,
+                                                         GLib.ParamSpec pspec)
+        {
+            var view = Pomodoro.WindowView.from_string (this.view_stack.visible_child_name);
+
+            this._view = this._view == Pomodoro.WindowView.DEFAULT && this.get_default_view () == view
+                ? Pomodoro.WindowView.DEFAULT
+                : view;
+
+            this.update_title ();
+            this.update_timer_indicator ();
+        }
+
+        [GtkCallback]
+        private void on_gesture_click_pressed (Gtk.GestureClick gesture,
+                                               int              n_press,
+                                               double           x,
+                                               double           y)
+        {
+            if (gesture.get_current_button () == Gdk.BUTTON_PRIMARY &&
+                n_press == 2)
+            {
+                this.size = this.size != Pomodoro.WindowSize.COMPACT
+                    ? Pomodoro.WindowSize.COMPACT
+                    : Pomodoro.WindowSize.NORMAL;
+
+                gesture.set_state (Gtk.EventSequenceState.CLAIMED);
+            }
+        }
+
+        [GtkCallback]
         private bool on_close_request ()
         {
             var application = this.application as Pomodoro.BackgroundApplication;
@@ -350,41 +399,18 @@ namespace Pomodoro
             }
         }
 
-        /*
-        [GtkCallback]
-        private void on_in_app_notification_install_extension_install_button_clicked (Gtk.Button button)
+        private void on_extension_notify_available (GLib.Object    object,
+                                                    GLib.ParamSpec pspec)
         {
-            this.in_app_notification_install_extension.set_reveal_child (false);
-
-            if (install_extension_callback != null) {
-                this.install_extension_callback ();
-            }
+            this.update_install_extension_toast ();
         }
 
-        [GtkCallback]
-        private void on_in_app_notification_install_extension_close_button_clicked (Gtk.Button button)
+        private void on_install_extension_toast_dismissed (Adw.Toast toast)
         {
-            this.in_app_notification_install_extension.set_reveal_child (false);
+            this.install_extension_toast = null;
 
-            if (install_extension_dismissed_callback != null) {
-                this.install_extension_dismissed_callback ();
-            }
+            Pomodoro.Window.install_extension_toast_dismissed = true;
         }
-
-        public void show_in_app_notification_install_extension (GLib.Callback? callback,
-                                                                GLib.Callback? dismissed_callback = null)
-        {
-            this.install_extension_callback = callback;
-            this.install_extension_dismissed_callback = dismissed_callback;
-
-            this.in_app_notification_install_extension.set_reveal_child (true);
-        }
-
-        public void hide_in_app_notification_install_extension ()
-        {
-            this.in_app_notification_install_extension.set_reveal_child (false);
-        }
-        */
 
         private void on_compact_size_activate (GLib.SimpleAction action,
                                                GLib.Variant?     parameter)
@@ -433,117 +459,22 @@ namespace Pomodoro
         {
             this.setup_actions ();
         }
-    }
 
-    /*
-    public enum InstallExtensionDialogResponse
-    {
-        CANCEL = 0,
-        CLOSE = 1,
-        MANAGE_EXTENSIONS = 2,
-        REPORT_ISSUE = 3
-    }
-
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/install-extension-dialog.ui")]
-    public class InstallExtensionDialog : Gtk.Dialog
-    {
-        private delegate void ForeachChildFunc (Gtk.Widget child);
-
-        [GtkChild]
-        private unowned Gtk.Spinner spinner;
-        [GtkChild]
-        private unowned Gtk.Stack stack;
-        [GtkChild]
-        private unowned Gtk.TextView error_installing_textview;
-        [GtkChild]
-        private unowned Gtk.TextView error_enabling_textview;
-        [GtkChild]
-        private unowned Gtk.Button cancel_button;
-        [GtkChild]
-        private unowned Gtk.Button manage_extensions_button;
-        [GtkChild]
-        private unowned Gtk.Button report_button;
-        [GtkChild]
-        private unowned Gtk.Button close_button;
-        [GtkChild]
-        private unowned Gtk.Button done_button;
-
-        construct
+        public override void map ()
         {
-            this.show_in_progress_page ();
+            base.map ();
+
+            this.update_install_extension_toast ();
         }
 
-        private void foreach_button (ForeachChildFunc func)
+        public override void dispose ()
         {
-            func (this.cancel_button);
-            func (this.manage_extensions_button);
-            func (this.report_button);
-            func (this.close_button);
-            func (this.done_button);
-        }
+            this.extension.notify["available"].disconnect (this.on_extension_notify_available);
 
-        public void show_in_progress_page ()
-        {
-            this.foreach_button ((button) => {
-                if (button.name == "cancel") {
-                    button.show ();
-                }
-                else {
-                    button.hide ();
-                }
-            });
+            this.extension = null;
+            this.install_extension_toast = null;
 
-            this.stack.set_visible_child_name ("in-progress");
-        }
-
-        public void show_success_page ()
-        {
-            this.foreach_button ((button) => {
-                if (button.name == "manage-extensions" || button.name == "done") {
-                    button.show ();
-                }
-                else {
-                    button.hide ();
-                }
-            });
-
-            this.spinner.spinning = false;
-            this.stack.set_visible_child_name ("success");
-        }
-
-        public void show_error_page (string error_message)
-        {
-            this.foreach_button ((button) => {
-                if (button.name == "report-issue" || button.name == "close") {
-                    button.show ();
-                }
-                else {
-                    button.hide ();
-                }
-            });
-
-            this.error_installing_textview.buffer.text = error_message;
-
-            this.spinner.spinning = false;
-            this.stack.set_visible_child_name ("error-installing");
-        }
-
-        public void show_enabling_error_page (string error_message)
-        {
-            this.foreach_button ((button) => {
-                if (button.name == "report-issue" || button.name == "close") {
-                    button.show ();
-                }
-                else {
-                    button.hide ();
-                }
-            });
-
-            this.error_installing_textview.buffer.text = error_message;
-
-            this.spinner.spinning = false;
-            this.stack.set_visible_child_name ("error-enabling");
+            base.dispose ();
         }
     }
-    */
 }
