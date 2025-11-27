@@ -95,26 +95,16 @@ if gtk_wayland_dep.found()
   add_project_arguments(['-D', 'HAVE_GDK_WAYLAND'], language: 'vala')
 endif
 
-# We are going to use these variables later on for the plugins
-gschema_dir = get_option('prefix') / get_option('datadir') / 'glib-2.0' / 'schemas'
-plugin_libdir = get_option('prefix') / get_option('libdir') / meson.project_name() / 'plugins'
-extension_dir = get_option('prefix') / get_option('datadir') / 'gnome-shell' / 'extensions' / 'pomodoro@gnomepomodoro.org'
-
-# TODO: Remove the double quotes from plugins/indicator/extension/config.js.in.
-# Right now we have to set the below config values twice because of that,
-# the C/Vala code needs these to be quoted (done via `set_quoted`), but
-# config.js.in needs them to be unquoted
 application_id = 'org.gnomepomodoro.Pomodoro'
 package_name = meson.project_name()
-package_datadir = get_option('prefix') / get_option('datadir') / meson.project_name()
-package_string = package_name + ' ' + meson.project_version()
 package_version = meson.project_version()
 package_website = 'https://gnomepomodoro.org'
 package_issue_url = 'https://github.com/gnome-pomodoro/gnome-pomodoro/issues'
 package_support_url = 'https://github.com/gnome-pomodoro/gnome-pomodoro/discussions'
-gettext_package = package_name
-extension_uuid = 'pomodoro@gnomepomodoro.org'
+package_datadir = get_option('prefix') / get_option('datadir') / meson.project_name()
 package_localedir = get_option('prefix') / get_option('datadir') / 'locale'
+gschema_dir = get_option('prefix') / get_option('datadir') / 'glib-2.0' / 'schemas'
+gettext_package = package_name
 
 conf = configuration_data()
 
@@ -123,48 +113,16 @@ conf.set_quoted(
   application_id,
 )
 conf.set_quoted(
-  'GETTEXT_PACKAGE',
-  gettext_package,
-)
-conf.set_quoted(
-  'GSETTINGS_SCHEMA_DIR',
-  gschema_dir,
-)
-conf.set_quoted(
-  'EXTENSION_UUID',
-  extension_uuid,
-)
-conf.set_quoted(
-  'EXTENSION_DIR',
-  extension_dir,
-)
-conf.set_quoted(
   'PACKAGE_LOCALE_DIR',
   package_localedir,
-)
-conf.set_quoted(
-  'PACKAGE_LIB_DIR',
-  get_option('prefix') / get_option('libdir') / 'gnome-pomodoro',
 )
 conf.set_quoted(
   'PACKAGE_DATA_DIR',
   package_datadir,
 )
 conf.set_quoted(
-  'PLUGIN_DATA_DIR',
-  package_datadir / 'plugins',
-)
-conf.set_quoted(
-  'PLUGIN_LIB_DIR',
-  plugin_libdir,
-)
-conf.set_quoted(
   'PACKAGE_NAME',
   package_name,
-)
-conf.set_quoted(
-  'PACKAGE_STRING',
-  package_string
 )
 conf.set_quoted(
   'PACKAGE_VERSION',
@@ -181,6 +139,14 @@ conf.set_quoted(
 conf.set_quoted(
   'PACKAGE_SUPPORT_URL',
   package_support_url,
+)
+conf.set_quoted(
+  'GETTEXT_PACKAGE',
+  gettext_package,
+)
+conf.set_quoted(
+  'GSETTINGS_SCHEMA_DIR',
+  gschema_dir,
 )
 conf.set(
   'HAVE_ALTMON',
@@ -199,7 +165,6 @@ config_h_dir = include_directories('.')
 subdir('po')
 subdir('data')
 subdir('src')
-# subdir('plugins')
 subdir('tests')
 
 gnome.post_install(

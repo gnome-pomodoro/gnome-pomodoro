@@ -547,8 +547,6 @@ namespace Pomodoro
             var option_context = new GLib.OptionContext ();
             option_context.add_main_entries (Options.ENTRIES, Config.GETTEXT_PACKAGE);
 
-            // TODO: add options from plugins
-
             option_context.parse (ref arguments);
         }
 
@@ -706,13 +704,6 @@ namespace Pomodoro
                 this.session_manager.current_session.changed.disconnect (
                         this.on_current_session_changed);
             }
-
-            // Disable plugins
-            // var engine = Peas.Engine.get_default ();
-
-            // foreach (var plugin_info in engine.get_plugin_list ()) {
-            //     engine.try_unload_plugin (plugin_info);
-            // }
 
             // Pause the timer before saving the session
             this.timer.pause ();
@@ -950,89 +941,5 @@ namespace Pomodoro
 
             base.dispose ();
         }
-
-        /*
-        private void load_plugins ()
-        {
-            // var engine          = Peas.Engine.get_default ();
-            // var enabled_plugins = this.settings.get_strv ("enabled-plugins");
-            // var enabled_hash    = new GLib.HashTable<string, bool> (str_hash, str_equal);
-
-            // foreach (var name in enabled_plugins)
-            // {
-            //     enabled_hash.insert (name, true);
-            // }
-
-            // foreach (var plugin_info in engine.get_plugin_list ())
-            // {
-            //     if (plugin_info.is_hidden () || enabled_hash.contains (plugin_info.get_module_name ())) {
-            //         engine.try_load_plugin (plugin_info);
-            //     }
-            //     else {
-            //         engine.try_unload_plugin (plugin_info);
-            //     }
-            // }
-        }
-
-        private async void setup_plugins ()
-        {
-            var engine = Peas.Engine.get_default ();
-            engine.add_search_path (Config.PLUGIN_LIB_DIR, Config.PLUGIN_DATA_DIR);
-
-            var timeout_cancellable = new GLib.Cancellable ();
-            var timeout_source = (uint) 0;
-            var wait_count = 0;
-
-            timeout_source = GLib.Timeout.add (SETUP_PLUGINS_TIMEOUT, () => {
-                GLib.debug ("Timeout reached while setting up plugins");
-
-                timeout_source = 0;
-                timeout_cancellable.cancel ();
-
-                return GLib.Source.REMOVE;
-            });
-            GLib.Source.set_name_by_id (timeout_source, "Pomodoro.Application.setup_plugins");
-
-            this.extensions = new Peas.ExtensionSet (engine, typeof (Pomodoro.ApplicationExtension));
-            this.extensions.extension_added.connect ((extension_set,
-                                                      info,
-                                                      extension_object) => {
-                var extension = extension_object as GLib.AsyncInitable;
-
-                if (extension != null)
-                {
-                    extension.init_async.begin (GLib.Priority.DEFAULT, timeout_cancellable, (obj, res) => {
-                        try {
-                            extension.init_async.end (res);
-                        }
-                        catch (GLib.Error error) {
-                            GLib.warning ("Failed to initialize plugin \"%s\": %s",
-                                          info.get_module_name (),
-                                          error.message);
-                        }
-
-                        wait_count--;
-
-                        this.setup_plugins.callback ();
-                    });
-
-                    wait_count++;
-                }
-            });
-
-            this.load_plugins ();
-
-            while (wait_count > 0) {
-                yield;
-            }
-
-            timeout_cancellable = null;
-
-            if (timeout_source != 0) {
-                GLib.Source.remove (timeout_source);
-                timeout_source = 0;
-            }
-        }
-        */
     }
 }
