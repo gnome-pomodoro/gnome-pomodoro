@@ -1,7 +1,7 @@
 using GLib;
 
 
-namespace Freedesktop
+namespace Portal
 {
     public class BackgroundProvider : Pomodoro.Provider, Pomodoro.BackgroundProvider
     {
@@ -10,11 +10,11 @@ namespace Freedesktop
          */
         private const uint COMAPTIBLE_VERSION = 2U;
 
-        private GLib.DBusConnection?                      connection = null;
-        private Freedesktop.Background?                   proxy = null;
-        private GLib.Cancellable?                         cancellable = null;
-        private GLib.HashTable<uint, Freedesktop.Request> requests = null;
-        private uint                                      dbus_watcher_id = 0U;
+        private GLib.DBusConnection?                 connection = null;
+        private Portal.Background?                   proxy = null;
+        private GLib.Cancellable?                    cancellable = null;
+        private GLib.HashTable<uint, Portal.Request> requests = null;
+        private uint                                 dbus_watcher_id = 0U;
 
         private void on_name_appeared (GLib.DBusConnection connection,
                                        string              name,
@@ -33,8 +33,8 @@ namespace Freedesktop
 
         public override async void initialize (GLib.Cancellable? cancellable) throws GLib.Error
         {
-            this.requests  = new GLib.HashTable<uint, Freedesktop.Request> (GLib.direct_hash,
-                                                                            GLib.direct_equal);
+            this.requests = new GLib.HashTable<uint, Portal.Request> (GLib.direct_hash,
+                                                                      GLib.direct_equal);
 
             if (this.dbus_watcher_id == 0) {
                 this.dbus_watcher_id = GLib.Bus.watch_name (GLib.BusType.SESSION,
@@ -56,7 +56,7 @@ namespace Freedesktop
                 : new GLib.Cancellable ();
 
             try {
-                this.proxy = yield GLib.Bus.get_proxy<Freedesktop.Background>
+                this.proxy = yield GLib.Bus.get_proxy<Portal.Background>
                                     (GLib.BusType.SESSION,
                                      "org.freedesktop.portal.Desktop",
                                      "/org/freedesktop/portal/desktop",
@@ -101,7 +101,7 @@ namespace Freedesktop
             var allowed = false;
 
             try {
-                handle_token = yield Freedesktop.create_request (
+                handle_token = yield Portal.create_request (
                     this.connection,
                     (response, results) => {
                         if (results != null)

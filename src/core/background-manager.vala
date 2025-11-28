@@ -82,7 +82,7 @@ namespace Pomodoro
         protected override void setup_providers ()
         {
             // TODO: Providers should register themselves in a static constructors, but can't make it work...
-            this.providers.add (new Freedesktop.BackgroundProvider ());
+            this.providers.add (new Portal.BackgroundProvider ());
         }
 
         protected override void provider_enabled (Pomodoro.BackgroundProvider provider)

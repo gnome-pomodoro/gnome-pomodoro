@@ -91,7 +91,7 @@ namespace Pomodoro
             this.providers.provider_unselected.connect (this.on_provider_unselected);
             this.providers.provider_enabled.connect (this.on_provider_enabled);
             this.providers.provider_disabled.connect (this.on_provider_disabled);
-            this.providers.add (new Freedesktop.GlobalShortcutsProvider ());
+            this.providers.add (new Portal.GlobalShortcutsProvider ());
         }
 
         private void populate_provider ()

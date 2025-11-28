@@ -1,4 +1,7 @@
-namespace Freedesktop
+using GLib;
+
+
+namespace Portal
 {
     private errordomain GlobalShortcutsError
     {
@@ -17,15 +20,15 @@ namespace Freedesktop
          */
         private const uint COMAPTIBLE_VERSION = 0;
 
-        private GLib.DBusConnection?                      connection = null;
-        private Freedesktop.GlobalShortcuts?              proxy = null;
-        private Freedesktop.Shortcut[]                    shortcuts = null;
-        private GLib.Cancellable?                         cancellable = null;
-        private GLib.ObjectPath?                          session_handle = null;
-        private GLib.HashTable<string, string>?           accelerators = null;
-        private uint                                      dbus_watcher_id = 0U;
-        private uint                                      bind_shortcuts_idle_id = 0U;
-        private bool                                      is_configured = false;
+        private GLib.DBusConnection?            connection = null;
+        private Portal.GlobalShortcuts?         proxy = null;
+        private Portal.Shortcut[]               shortcuts = null;
+        private GLib.Cancellable?               cancellable = null;
+        private GLib.ObjectPath?                session_handle = null;
+        private GLib.HashTable<string, string>? accelerators = null;
+        private uint                            dbus_watcher_id = 0U;
+        private uint                            bind_shortcuts_idle_id = 0U;
+        private bool                            is_configured = false;
 
         private void mark_as_configured ()
         {
@@ -43,7 +46,7 @@ namespace Freedesktop
             var timestamp = Pomodoro.Timestamp.to_seconds_uint32 (Pomodoro.Timestamp.from_now ());
 
             try {
-                var handle_token = yield Freedesktop.create_request (
+                var handle_token = yield Portal.create_request (
                     this.connection,
                     (response, results) => {
                         if (results != null)
@@ -93,11 +96,11 @@ namespace Freedesktop
             return "";
         }
 
-        private Freedesktop.Shortcut[] parse_shortcuts (GLib.Variant shortcuts_variant)
+        private Portal.Shortcut[] parse_shortcuts (GLib.Variant shortcuts_variant)
         {
             GLib.debug ("Parsing shortcuts... %s", shortcuts_variant.print (false));
 
-            var shortcuts = new Freedesktop.Shortcut[0];
+            var shortcuts = new Portal.Shortcut[0];
             var shortcuts_iterator = shortcuts_variant.iterator ();
             GLib.Variant? tuple_variant;
 
@@ -117,7 +120,7 @@ namespace Freedesktop
                     properties.insert (key, variant);
                 }
 
-                shortcuts += Freedesktop.Shortcut () {
+                shortcuts += Portal.Shortcut () {
                     id         = shortcut_id,
                     properties = properties
                 };
@@ -185,7 +188,7 @@ namespace Freedesktop
             GLib.Variant? shortcuts_variant = null;
 
             try {
-                handle_token = yield Freedesktop.create_request (
+                handle_token = yield Portal.create_request (
                     this.connection,
                     (response, results) => {
                         shortcuts_variant = results != null ? results.lookup ("shortcuts") : null;
@@ -219,7 +222,7 @@ namespace Freedesktop
             string handle_token;
 
             try {
-                handle_token = yield Freedesktop.create_request (
+                handle_token = yield Portal.create_request (
                     this.connection,
                     (response, results) => {
                         this.bind_shortcuts.callback ();
@@ -273,14 +276,14 @@ namespace Freedesktop
                     return GLib.Source.REMOVE;
                 });
             GLib.Source.set_name_by_id (this.bind_shortcuts_idle_id,
-                                        "Freedesktop.GlobalShortcutsProvider.bind_shortcuts");
+                                        "Portal.GlobalShortcutsProvider.bind_shortcuts");
         }
 
         /**
          * `BindShortcuts` only displays a dialog if there are new entries. To force display
          * a dialog we add an "Unsed" shortcut.
          */
-        private Freedesktop.Shortcut[] mutulate_shortcuts ()
+        private Portal.Shortcut[] mutulate_shortcuts ()
         {
             var timestamp = Pomodoro.Timestamp.to_seconds_uint32 (Pomodoro.Timestamp.from_now ());
             var shortcut_id = @"unused-$(timestamp)";
@@ -290,7 +293,7 @@ namespace Freedesktop
 
             var shortcuts = this.shortcuts.copy ();
 
-            shortcuts += Freedesktop.Shortcut () {
+            shortcuts += Portal.Shortcut () {
                 id         = shortcut_id,
                 properties = shortcut_properties
             };
@@ -311,7 +314,7 @@ namespace Freedesktop
             yield this.create_session ();
 
             try {
-                handle_token = yield Freedesktop.create_request (
+                handle_token = yield Portal.create_request (
                     this.connection,
                     (response, results) => {
                         this.open_global_shortcuts_dialog_async.callback ();
@@ -373,8 +376,8 @@ namespace Freedesktop
             this.shortcut_activated (shortcut_id);
         }
 
-        private void on_shortcuts_changed (GLib.ObjectPath        session_handle,
-                                           Freedesktop.Shortcut[] shortcuts)
+        private void on_shortcuts_changed (GLib.ObjectPath   session_handle,
+                                           Portal.Shortcut[] shortcuts)
         {
             if (this.accelerators != null)
             {
@@ -396,7 +399,7 @@ namespace Freedesktop
 
         public override async void initialize (GLib.Cancellable? cancellable) throws GLib.Error
         {
-            this.shortcuts = new Freedesktop.Shortcut[0];
+            this.shortcuts = new Portal.Shortcut[0];
 
             if (this.dbus_watcher_id == 0) {
                 this.dbus_watcher_id = GLib.Bus.watch_name (GLib.BusType.SESSION,
@@ -420,7 +423,7 @@ namespace Freedesktop
             this.is_configured = Pomodoro.get_settings ().get_boolean ("global-shortcuts-configured");
 
             try {
-                this.proxy = yield GLib.Bus.get_proxy<Freedesktop.GlobalShortcuts>
+                this.proxy = yield GLib.Bus.get_proxy<Portal.GlobalShortcuts>
                                     (GLib.BusType.SESSION,
                                      "org.freedesktop.portal.Desktop",
                                      "/org/freedesktop/portal/desktop",
@@ -488,7 +491,7 @@ namespace Freedesktop
                                             new GLib.Variant.string (default_accelerator));
             }
 
-            var shortcut = Freedesktop.Shortcut () {
+            var shortcut = Portal.Shortcut () {
                 id         = name,
                 properties = shortcut_properties
             };
