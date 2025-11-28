@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 namespace Freedesktop
 {
     public class TimeZoneMonitorProvider : Pomodoro.Provider, Pomodoro.TimeZoneMonitorProvider

@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2022-2025 gnome-pomodoro contributors
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Pomodoro
 {
     private inline Gtk.Orientation get_opposite_orientation (Gtk.Orientation orientation)

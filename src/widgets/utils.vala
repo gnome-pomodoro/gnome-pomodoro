@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 namespace Pomodoro
 {
     internal Gdk.RGBA blend_colors (Gdk.RGBA background_color,

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2025 gnome-pomodoro contributors
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 [CCode (cprefix = "")]
 namespace Pomodoro.DateUtils
 {

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2025 gnome-pomodoro contributors
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 using GLib;
 
 

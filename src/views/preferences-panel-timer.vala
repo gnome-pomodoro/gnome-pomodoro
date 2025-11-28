@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 namespace Pomodoro
 {
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences-panel-timer.ui")]

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022-2025 gnome-pomodoro contributors
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 
 namespace Pomodoro
 {
@@ -6,6 +12,7 @@ namespace Pomodoro
     {
         return stack.get_page (stack.get_child_by_name (name));
     }
+
 
     [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/timer-control-buttons.ui")]
     public sealed class TimerControlButtons : Gtk.Box, Gtk.Buildable
