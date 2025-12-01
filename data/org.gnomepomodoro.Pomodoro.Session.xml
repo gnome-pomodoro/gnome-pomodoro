@@ -1,0 +1,278 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+                      "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+
+  <!--
+      org.gnomepomodoro.Pomodoro.Session:
+      @short_description: Session management interface
+
+      The session interface provides access to the current pomodoro session,
+      including time blocks, cycles, and session state. A session represents
+      a continuous period of pomodoro work and breaks until a long break.
+  -->
+  <interface name="org.gnomepomodoro.Pomodoro.Session">
+
+    <!--
+        Advance:
+
+        Advance to the next state.
+
+        This method moves the session forward to the next time block in the
+        pomodoro cycle.
+    -->
+    <method name="Advance"/>
+
+    <!--
+        AdvanceToState:
+        @state: The target state to advance to
+
+        Advance the session to a specific state.
+
+        This method advances the session to the specified @state. Common
+        state values:
+
+        <simplelist>
+          <member>"stopped"</member>
+          <member>"pomodoro"</member>
+          <member>"short-break"</member>
+          <member>"long-break"</member>
+          <member>"break"</member>
+        </simplelist>
+    -->
+    <method name="AdvanceToState">
+      <arg type="s" name="state" direction="in"/>
+    </method>
+
+    <!--
+        Reset:
+
+        Reset the session.
+
+        This method resets the entire session, clearing all time blocks
+        and starting fresh.
+    -->
+    <method name="Reset"/>
+
+    <!--
+        GetCurrentTimeBlock:
+        @result: A dictionary containing time block information
+
+        Get the current time block.
+
+        Returns a dictionary with information about the current time block.
+        The returned @result dictionary contains the following keys:
+
+        <variablelist>
+          <varlistentry>
+            <term>state s</term>
+            <listitem>
+              <para>
+                The state of the time block. Possible values:
+                <simplelist>
+                  <member>"stopped"</member>
+                  <member>"pomodoro"</member>
+                  <member>"short-break"</member>
+                  <member>"long-break"</member>
+                  <member>"break"</member>
+                </simplelist>
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>status s</term>
+            <listitem>
+              <para>
+                The status of the time block. Possible values:
+                <simplelist>
+                  <member>"scheduled"</member>
+                  <member>"in-progress"</member>
+                  <member>"completed"</member>
+                  <member>"uncompleted"</member>
+                </simplelist>
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>start_time x</term>
+            <listitem><para>Unix timestamp (in milliseconds) when the time block started</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>end_time x</term>
+            <listitem><para>Unix timestamp (in milliseconds) when the time block will end</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>gaps aa{sv}</term>
+            <listitem><para>Array of gap dictionaries representing pauses in the time block</para></listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <method name="GetCurrentTimeBlock">
+      <arg type="a{sv}" name="result" direction="out"/>
+    </method>
+
+    <!--
+        GetCurrentGap:
+        @result: A dictionary containing gap information
+
+        Get the current gap (pause) in the time block.
+
+        Returns a dictionary with information about the current gap if the
+        timer is paused. The returned @result dictionary contains the following keys:
+
+        <variablelist>
+          <varlistentry>
+            <term>start_time x</term>
+            <listitem><para>Unix timestamp (in milliseconds) when the gap started</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>end_time x</term>
+            <listitem><para>Unix timestamp (in milliseconds) when the gap ended</para></listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <method name="GetCurrentGap">
+      <arg type="a{sv}" name="result" direction="out"/>
+    </method>
+
+    <!--
+        ListTimeBlocks:
+        @result: An array of time block dictionaries
+
+        Get a list of all time blocks in the current session.
+
+        Returns an array of dictionaries, each containing information about
+        a time block. See GetCurrentTimeBlock() for the structure of each
+        time block dictionary.
+    -->
+    <method name="ListTimeBlocks">
+      <arg type="a{sv}" name="result" direction="out"/>
+    </method>
+
+    <!--
+        ListCycles:
+        @result: An array of cycle dictionaries
+
+        Get a list of all pomodoro cycles in the current session.
+
+        Returns an array of dictionaries, each containing information about
+        a completed or in-progress pomodoro cycle. The returned @result array
+        contains dictionaries with the following keys:
+
+        <variablelist>
+          <varlistentry>
+            <term>start_time x</term>
+            <listitem><para>Unix timestamp (in milliseconds) when the cycle started</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>end_time x</term>
+            <listitem><para>Unix timestamp (in milliseconds) when the cycle ended</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>completion_time x</term>
+            <listitem><para>Unix timestamp (in milliseconds) of actual completion</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>weight d</term>
+            <listitem><para>Weight of the cycle - it may exceed 1.0 when user skips breaks or extends pomodoro</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>is_completed b</term>
+            <listitem><para>Whether the cycle was completed</para></listitem>
+          </varlistentry>
+        </variablelist>
+    -->
+    <method name="ListCycles">
+      <arg type="a{sv}" name="result" direction="out"/>
+    </method>
+
+    <!--
+        EnterTimeBlock:
+        @time_block: The time block being entered
+
+        Emitted when entering a new time block.
+
+        This signal is emitted when the session transitions into a new time
+        block. The @time_block parameter contains a dictionary with time block
+        information (see GetCurrentTimeBlock() for structure).
+    -->
+    <signal name="EnterTimeBlock">
+      <arg type="v" name="time_block"/>
+    </signal>
+
+    <!--
+        LeaveTimeBlock:
+        @time_block: The time block being left
+
+        Emitted when leaving a time block.
+
+        This signal is emitted when the session transitions out of a time
+        block. The @time_block parameter contains a dictionary with time block
+        information (see GetCurrentTimeBlock() for structure).
+    -->
+    <signal name="LeaveTimeBlock">
+      <arg type="v" name="time_block"/>
+    </signal>
+
+    <!--
+        ConfirmAdvancement:
+        @current_time_block: The current time block
+        @next_time_block: The next time block
+
+        Emitted when advancement needs confirmation.
+
+        This signal is emitted when the session is about to advance to the
+        next time block and requires user confirmation. Both parameters
+        contain dictionaries with time block information (see GetCurrentTimeBlock()
+        for structure).
+    -->
+    <signal name="ConfirmAdvancement">
+      <arg type="v" name="current_time_block"/>
+      <arg type="v" name="next_time_block"/>
+    </signal>
+
+    <!--
+        Changed:
+
+        Emitted when the session changes.
+
+        This signal is emitted when session properties or state change.
+    -->
+    <signal name="Changed"/>
+
+    <!--
+        StartTime:
+        The session start time
+
+        Unix timestamp (in milliseconds) indicating when the current session started.
+    -->
+    <property type="x" name="StartTime" access="read"/>
+
+    <!--
+        EndTime:
+        The session end time
+
+        Unix timestamp (in milliseconds) indicating when the current session will end.
+    -->
+    <property type="x" name="EndTime" access="read"/>
+
+    <!--
+        HasUniformBreaks:
+        Whether the session uses uniform breaks
+
+        A boolean indicating whether all breaks in the session have the same
+        duration. When true, all short breaks have the same length; when false,
+        break durations may vary.
+    -->
+    <property type="b" name="HasUniformBreaks" access="read"/>
+
+  </interface>
+</node>

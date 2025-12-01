@@ -12,6 +12,13 @@ configure_file(
   install_dir: get_option('datadir') / 'dbus-1' / 'services',
 )
 
+install_data(
+  'org.gnomepomodoro.Pomodoro.xml',
+  'org.gnomepomodoro.Pomodoro.Session.xml',
+  'org.gnomepomodoro.Pomodoro.Timer.xml',
+  install_dir: get_option('datadir') / 'dbus-1' / 'interfaces',
+)
+
 desktop_file = i18n.merge_file(
   input: 'org.gnomepomodoro.Pomodoro.desktop.in',
   output: '@BASENAME@',

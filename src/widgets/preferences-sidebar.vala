@@ -20,6 +20,7 @@ namespace Pomodoro
 
                 if (this._model != null) {
                     this._model.items_changed.disconnect (this.on_model_items_changed);
+                    this._model.selection_changed.disconnect (this.on_selection_changed);
                 }
 
                 this.clear ();
@@ -30,6 +31,7 @@ namespace Pomodoro
 
                 if (this._model != null) {
                     this._model.items_changed.connect (this.on_model_items_changed);
+                    this._model.selection_changed.connect (this.on_selection_changed);
                 }
 
                 this.notify_property ("model");
@@ -55,6 +57,7 @@ namespace Pomodoro
 
         private Gtk.SingleSelection? _model;
         private Gtk.ListBox?         list;
+        private ulong                row_selected_id;
 
         construct
         {
@@ -71,7 +74,7 @@ namespace Pomodoro
                                        -1);
             scrolled_window.set_child (this.list);
 
-            this.list.row_selected.connect (this.on_row_selected);
+            this.row_selected_id = this.list.row_selected.connect (this.on_row_selected);
             this.list.row_activated.connect (this.on_row_activated);
 
             this.add_css_class ("sidebar");
@@ -155,10 +158,33 @@ namespace Pomodoro
             this.populate ();
         }
 
+        private void on_selection_changed (uint position,
+                                           uint n_items)
+        {
+            GLib.SignalHandler.block (this.list, this.row_selected_id);
+
+            for (var i = position; i < position + n_items; i++)
+            {
+                var row = this.list.get_row_at_index ((int) i);
+
+                if (row != null) {
+                    if (this._model.is_selected (i)) {
+                        this.list.select_row (row);
+                    }
+                    else {
+                        this.list.unselect_row (row);
+                    }
+                }
+            }
+
+            GLib.SignalHandler.unblock (this.list, this.row_selected_id);
+        }
+
         public override void dispose ()
         {
             if (this._model != null) {
                 this._model.items_changed.disconnect (this.on_model_items_changed);
+                this._model.selection_changed.disconnect (this.on_selection_changed);
                 this._model = null;
             }
 

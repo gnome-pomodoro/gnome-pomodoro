@@ -114,19 +114,23 @@ namespace Pomodoro
         public Pomodoro.SessionManager?      session_manager;
         public Pomodoro.CapabilityManager?   capability_manager;
 
-        private Pomodoro.KeyboardManager?    keyboard_manager;
-        private Pomodoro.StatsManager?       stats_manager;
-        private Pomodoro.EventProducer?      event_producer;
-        private Pomodoro.EventBus?           event_bus;
-        private Pomodoro.Extension?          extension;
-        private Pomodoro.JobQueue?           job_queue;
-        private Pomodoro.ActionManager?      action_manager;
-        private Pomodoro.BackgroundManager?  background_manager;
-        private Pomodoro.ApplicationService? service;
-        private Pomodoro.TimerService?       timer_service;
-        private Pomodoro.Logger?             logger;
-        private GLib.Settings?               settings;
-        private uint                         save_idle_id = 0;
+        private Pomodoro.KeyboardManager?        keyboard_manager;
+        private Pomodoro.StatsManager?           stats_manager;
+        private Pomodoro.EventProducer?          event_producer;
+        private Pomodoro.EventBus?               event_bus;
+        private Pomodoro.Extension?              extension;
+        private Pomodoro.JobQueue?               job_queue;
+        private Pomodoro.ActionManager?          action_manager;
+        private Pomodoro.BackgroundManager?      background_manager;
+        private Pomodoro.Logger?                 logger;
+        private GLib.Settings?                   settings;
+        private uint                             save_idle_id = 0;
+        private Pomodoro.ApplicationDBusService? dbus_service;
+        private uint                             dbus_service_id;
+        private Pomodoro.TimerDBusService?       timer_dbus_service;
+        private uint                             timer_dbus_service_id;
+        private Pomodoro.SessionDBusService?     session_dbus_service;
+        private uint                             session_dbus_service_id;
 
         public Application ()
         {
@@ -216,7 +220,7 @@ namespace Pomodoro
             // }
         }
 
-        public void show_preferences ()
+        public void show_preferences (string panel_name = "")
         {
             var preferences_window = this.get_window<Pomodoro.PreferencesWindow> ();
 
@@ -224,6 +228,10 @@ namespace Pomodoro
             {
                 preferences_window = new Pomodoro.PreferencesWindow ();
                 this.add_window (preferences_window);
+            }
+
+            if (panel_name != "") {
+                preferences_window.select_panel (panel_name);
             }
 
             preferences_window.present ();
@@ -554,6 +562,9 @@ namespace Pomodoro
          */
         public override void startup ()
         {
+            var dbus_connection = this.get_dbus_connection ();
+            var dbus_object_path = this.get_dbus_object_path ();
+
             this.hold ();
 
             base.startup ();
@@ -596,6 +607,43 @@ namespace Pomodoro
                     this.unmark_busy ();
                     this.release ();
                 });
+
+            if (this.timer_dbus_service == null)
+            {
+                try {
+                    this.timer_dbus_service = new Pomodoro.TimerDBusService (
+                            dbus_connection,
+                            dbus_object_path,
+                            this.timer,
+                            this.session_manager);
+                    this.timer_dbus_service_id = dbus_connection.register_object (
+                            dbus_object_path,
+                            this.timer_dbus_service);
+                }
+                catch (GLib.IOError error) {
+                    GLib.warning ("Error while initializing timer dbus service: %s",
+                                  error.message);
+                    this.timer_dbus_service = null;
+                }
+            }
+
+            if (this.session_dbus_service == null)
+            {
+                try {
+                    this.session_dbus_service = new Pomodoro.SessionDBusService (
+                            dbus_connection,
+                            dbus_object_path,
+                            this.session_manager);
+                    this.session_dbus_service_id = dbus_connection.register_object (
+                            dbus_object_path,
+                            this.session_dbus_service);
+                }
+                catch (GLib.IOError error) {
+                    GLib.warning ("Error while initializing session dbus service: %s",
+                                  error.message);
+                    this.session_dbus_service = null;
+                }
+            }
         }
 
         /**
@@ -806,28 +854,26 @@ namespace Pomodoro
         }
 
         public override bool dbus_register (GLib.DBusConnection connection,
-                                            string              object_path) throws GLib.Error
+                                            string              object_path)
+                                            throws GLib.Error
         {
             if (!base.dbus_register (connection, object_path)) {
                 return false;
             }
 
-            /*
-            if (this.service == null || this.timer_service == null) {
-                this.hold ();
-                this.service = new Pomodoro.ApplicationService (connection, this);
-                this.timer_service = new Pomodoro.TimerService (connection, this.timer);
-
+            if (this.dbus_service == null)
+            {
                 try {
-                    connection.register_object ("/org/gnomepomodoro/Pomodoro", this.service);
-                    connection.register_object ("/org/gnomepomodoro/Pomodoro/Timer", this.timer_service);
+                    this.dbus_service = new Pomodoro.ApplicationDBusService (this);
+                    this.dbus_service_id = connection.register_object (object_path, dbus_service);
                 }
                 catch (GLib.IOError error) {
-                    GLib.warning ("%s", error.message);
+                    GLib.warning ("Error while initializing application dbus service: %s",
+                                  error.message);
+                    this.dbus_service = null;
                     return false;
                 }
             }
-            */
 
             return true;
         }
@@ -835,13 +881,25 @@ namespace Pomodoro
         public override void dbus_unregister (GLib.DBusConnection connection,
                                               string              object_path)
         {
-            base.dbus_unregister (connection, object_path);
-
-            if (this.service != null) {
-                this.service = null;
-
-                this.release ();
+            if (this.timer_dbus_service != null) {
+                connection.unregister_object (this.timer_dbus_service_id);
+                this.timer_dbus_service = null;
+                this.timer_dbus_service_id = 0U;
             }
+
+            if (this.session_dbus_service != null) {
+                connection.unregister_object (this.session_dbus_service_id);
+                this.session_dbus_service = null;
+                this.session_dbus_service_id = 0U;
+            }
+
+            if (this.dbus_service != null) {
+                connection.unregister_object (this.dbus_service_id);
+                this.dbus_service = null;
+                this.dbus_service_id = 0U;
+            }
+
+            base.dbus_unregister (connection, object_path);
         }
 
         private void on_settings_changed (GLib.Settings settings,

@@ -122,8 +122,8 @@ libgnome_pomodoro_dep = declare_dependency(
 # The gnome-pomodoro binary
 gnome_pomodoro_vala_sources = files(
   'application.vala',
+  'dbus-services.vala',
   'main.vala',
-  'service.vala',
   'capabilities/global-shortcuts.vala',
   'capabilities/notifications.vala',
   'capabilities/sounds.vala',

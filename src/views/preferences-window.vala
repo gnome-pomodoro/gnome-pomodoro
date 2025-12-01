@@ -184,6 +184,23 @@ namespace Pomodoro
             this.update_split_view_content ();
         }
 
+        public bool select_panel (string panel_name)
+        {
+            var n_items = this._model.get_n_items ();
+
+            for (var position = 0U; position < n_items; position++)
+            {
+                var panel_info = (Pomodoro.PreferencesPanelInfo?) this._model.get_item (position);
+
+                if (panel_info.name == panel_name) {
+                    this._model.select_item (position, true);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void add_toast (owned Adw.Toast toast)
         {
             this.toast_overlay.add_toast (toast);

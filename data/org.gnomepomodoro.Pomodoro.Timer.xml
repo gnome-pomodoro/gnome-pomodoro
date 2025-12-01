@@ -1,0 +1,254 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+                      "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+
+  <!--
+      org.gnomepomodoro.Pomodoro.Timer:
+      @short_description: Timer control interface
+
+      The timer interface provides functionality for controlling the pomodoro timer.
+      It has most of the information needed to display the current state of the timer.
+  -->
+  <interface name="org.gnomepomodoro.Pomodoro.Timer">
+
+    <!--
+        State:
+        The current timer state
+
+        The state of the timer as a string. Reading this property returns the
+        current state. Writing to this property advances the session to the
+        specified state.
+
+        Common state values:
+
+        <simplelist>
+          <member>"stopped"</member>
+          <member>"pomodoro"</member>
+          <member>"short-break"</member>
+          <member>"long-break"</member>
+          <member>"break"</member>
+        </simplelist>
+    -->
+    <property type="s" name="State" access="readwrite"/>
+
+    <!--
+        Duration:
+        The timer duration in microseconds
+
+        The total duration of the current timer in microseconds. This property
+        can be modified while the timer is running.
+    -->
+    <property type="x" name="Duration" access="readwrite"/>
+
+    <!--
+        Offset:
+        The timer offset in microseconds
+
+        The offset applied to the timer in microseconds. This represents time
+        adjustments made to the timer, or time spent on gaps.
+    -->
+    <property type="x" name="Offset" access="read"/>
+
+    <!--
+        StartedTime:
+        Timestamp when the timer was started
+
+        Unix timestamp (in microseconds) indicating when the timer was started.
+        Returns -1 if the timer is not currently started - waiting for confirmation.
+    -->
+    <property type="x" name="StartedTime" access="read"/>
+
+    <!--
+        PausedTime:
+        Timestamp when the timer was paused
+
+        Unix timestamp (in microseconds) indicating when the timer was paused.
+        Returns -1 if the timer is not currently paused.
+    -->
+    <property type="x" name="PausedTime" access="read"/>
+
+    <!--
+        FinishedTime:
+        Timestamp when the timer finished
+
+        Unix timestamp (in microseconds) indicating when the timer finished.
+        Returns -1 if the timer has not finished.
+    -->
+    <property type="x" name="FinishedTime" access="read"/>
+
+    <!--
+        IsStarted:
+        @result: True if the timer has been started
+
+        Check whether the timer has been started.
+    -->
+    <method name="IsStarted">
+      <arg type="b" name="result" direction="out"/>
+    </method>
+
+    <!--
+        IsRunning:
+        @result: True if the timer is currently running
+
+        Check whether the timer is currently running (counting down time).
+    -->
+    <method name="IsRunning">
+      <arg type="b" name="result" direction="out"/>
+    </method>
+
+    <!--
+        IsPaused:
+        @result: True if the timer is currently paused
+
+        Check whether the timer is currently paused.
+    -->
+    <method name="IsPaused">
+      <arg type="b" name="result" direction="out"/>
+    </method>
+
+    <!--
+        IsFinished:
+        @result: True if the timer has finished
+
+        Check whether the timer has finished counting down.
+    -->
+    <method name="IsFinished">
+      <arg type="b" name="result" direction="out"/>
+    </method>
+
+    <!--
+        GetElapsed:
+        @timestamp: Reference timestamp in microseconds, or -1 for current time
+        @result: Elapsed time in microseconds
+
+        Get the amount of time that has elapsed since the timer started.
+
+        The @timestamp parameter allows querying elapsed time at a specific
+        point in time. Pass -1 to use the current time.
+    -->
+    <method name="GetElapsed">
+      <arg type="x" name="timestamp" direction="in"/>
+      <arg type="x" name="result" direction="out"/>
+    </method>
+
+    <!--
+        GetRemaining:
+        @timestamp: Reference timestamp in microseconds, or -1 for current time
+        @result: Remaining time in microseconds
+
+        Get the amount of time remaining on the timer.
+
+        The @timestamp parameter allows querying remaining time at a specific
+        point in time. Pass -1 to use the current time.
+    -->
+    <method name="GetRemaining">
+      <arg type="x" name="timestamp" direction="in"/>
+      <arg type="x" name="result" direction="out"/>
+    </method>
+
+    <!--
+        GetProgress:
+        @timestamp: Reference timestamp in microseconds, or -1 for current time
+        @result: Progress as a value between 0.0 and 1.0
+
+        Get the progress of the timer as a decimal value between 0.0 (started)
+        and 1.0 (finished).
+
+        The @timestamp parameter allows querying progress at a specific
+        point in time. Pass -1 to use the current time.
+    -->
+    <method name="GetProgress">
+      <arg type="x" name="timestamp" direction="in"/>
+      <arg type="d" name="result" direction="out"/>
+    </method>
+
+    <!--
+        Start:
+
+        Start the timer.
+
+        This method starts the timer from the beginning . It does nothing
+        if the timer is already started.
+    -->
+    <method name="Start"/>
+
+    <!--
+        Stop:
+
+        Stop the timer.
+
+        This method stops and resets the timer. The session progress will be preserved.
+    -->
+    <method name="Stop"/>
+
+    <!--
+        Pause:
+
+        Pause the timer.
+
+        This method pauses the timer marking an interruption. Use Resume() to continue.
+    -->
+    <method name="Pause"/>
+
+    <!--
+        Resume:
+
+        Resume the timer.
+
+        This method resumes a paused timer from where it was paused.
+    -->
+    <method name="Resume"/>
+
+    <!--
+        Rewind:
+        @interval: Time to rewind in microseconds
+
+        Rewind the timer by the specified interval.
+
+        This method winds back the elapsed time by the given @interval. I places an intteruption in
+        the past without stopping the timer.
+    -->
+    <method name="Rewind">
+      <arg type="x" name="interval" direction="in"/>
+    </method>
+
+    <!--
+        Skip:
+
+        Skip to the next state.
+
+        This method advances the session to the next state in the pomodoro cycle.
+    -->
+    <method name="Skip"/>
+
+    <!--
+        Reset:
+
+        Reset the session.
+
+        This method resets the entire pomodoro session to its initial state.
+    -->
+    <method name="Reset"/>
+
+    <!--
+        Changed:
+
+        Emitted when timer properties change.
+
+        This signal is emitted whenever the timer state changes, such as
+        when the timer is started, paused, resumed, or its properties are modified.
+    -->
+    <signal name="Changed"/>
+
+    <!--
+        Finished:
+
+        Emitted when the timer finishes.
+
+        This signal is emitted when the timer completes its countdown and
+        reaches zero.
+    -->
+    <signal name="Finished"/>
+
+  </interface>
+</node>
