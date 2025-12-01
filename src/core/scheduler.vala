@@ -111,7 +111,7 @@ namespace Pomodoro
         private const uint MAX_ITERATIONS = 100;
 
 
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public Pomodoro.SessionTemplate session_template {
             get {
                 return this._session_template;

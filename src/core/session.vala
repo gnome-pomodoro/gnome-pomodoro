@@ -777,12 +777,31 @@ namespace Pomodoro
             return this.cycles.copy ();
         }
 
+        public uint count_completed_cycles ()
+        {
+            this.update_cycles_if_queued ();
+
+            unowned GLib.List<Pomodoro.Cycle> link = this.cycles.first ();
+            var completed_cycles = 0U;
+
+            while (link != null)
+            {
+                if (link.data.is_visible () && link.data.is_completed ()) {
+                    completed_cycles++;
+                }
+
+                link = link.next;
+            }
+
+            return completed_cycles;
+        }
+
         public uint count_visible_cycles ()
         {
             this.update_cycles_if_queued ();
 
             unowned GLib.List<Pomodoro.Cycle> link = this.cycles.first ();
-            uint visible_cycles = 0;
+            var visible_cycles = 0U;
 
             while (link != null)
             {

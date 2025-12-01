@@ -216,7 +216,7 @@ namespace Pomodoro
          *
          * You should not change its fields directly.
          */
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public Pomodoro.TimerState state {
             get {
                 return this._state;
@@ -229,7 +229,7 @@ namespace Pomodoro
         /**
          * The intended duration of the state, not counting gaps/interruptions.
          */
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public int64 duration {
             get {
                 return this._state.duration;
@@ -259,7 +259,7 @@ namespace Pomodoro
         /**
          * Time when timer has been initialized/started.
          */
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public int64 started_time {
             get {
                 return this._state.started_time;
@@ -269,7 +269,7 @@ namespace Pomodoro
         /**
          * Time lost during previous pauses. If pause is ongoing its not counted here yet.
          */
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public int64 offset {
             get {
                 return this._state.offset;
@@ -279,7 +279,7 @@ namespace Pomodoro
         /**
          * Extra data associated with current state
          */
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public void* user_data {
             get {
                 return this._state.user_data;

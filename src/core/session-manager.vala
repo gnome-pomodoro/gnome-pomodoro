@@ -57,7 +57,7 @@ namespace Pomodoro
             }
         }
 
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public Pomodoro.Scheduler scheduler {
             get {
                 return this._scheduler;
@@ -96,7 +96,7 @@ namespace Pomodoro
          * To correct the timing use `advance_*` methods. After selecting session manually, the current time-block
          * is null and the timer is stopped.
          */
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public unowned Pomodoro.Session current_session {
             get {
                 return this._current_session;
@@ -119,7 +119,7 @@ namespace Pomodoro
          * Time-block must be assigned to a session beforehand. Setting a time-block with a different session will
          * also switch to a new session. All blocks within new session preceding given `time-block` will be removed.
          */
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public unowned Pomodoro.TimeBlock current_time_block {
             get {
                 return this._current_time_block;
@@ -132,7 +132,7 @@ namespace Pomodoro
         /**
          * Convenience property to track current state.
          */
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public Pomodoro.State current_state {
             get {
                 return this._current_state;
@@ -153,7 +153,7 @@ namespace Pomodoro
          *
          * It equivalent to whether a session has short breaks.
          */
-        [CCode(notify = false)]
+        [CCode (notify = false)]
         public bool has_uniform_breaks {
             get {
                 return this._has_uniform_breaks;

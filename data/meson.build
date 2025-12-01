@@ -41,7 +41,7 @@ appdata = i18n.merge_file(
   input: 'org.gnomepomodoro.Pomodoro.appdata.xml.in',
   output: '@BASENAME@',
   install: true,
-  install_dir:  get_option('datadir') / 'metainfo',
+  install_dir: get_option('datadir') / 'metainfo',
   po_dir: '..' / 'po',
 )
 
@@ -72,23 +72,6 @@ endif
 compiled_schemas = gnome.compile_schemas(
   depend_files: 'org.gnomepomodoro.Pomodoro.gschema.xml'
 )
-
-# compiled_schemas = custom_target(
-#   'gschemas.compiled',
-#   input: 'org.gnomepomodoro.Pomodoro.gschema.xml',
-#   output: 'gschemas.compiled',
-#   command: [compile_schemas, meson.current_source_dir()],
-#   build_by_default: false
-# )
-
-#compiled_schemas = custom_target(
-#  'gschemas.compiled',
-#  input: 'org.gnomepomodoro.Pomodoro.gschema.xml',
-#  output: 'gschemas.compiled',
-#  command: [compile_schemas, meson.current_build_dir()],
-#  # depends: enums_xml
-#  build_by_default: false
-#)
 
 subdir('icons')
 subdir('sounds')

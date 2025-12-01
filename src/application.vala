@@ -208,16 +208,7 @@ namespace Pomodoro
                 window.view = view;
             }
 
-            // if (window.visible && !window.is_active)
-            // {
-            //     var timestamp = (uint32) (Pomodoro.Timestamp.from_now () / Pomodoro.Interval.MILLISECOND);
-            //
-            //     var toplevel = window.get_surface () as Gdk.Toplevel;
-            //     toplevel.focus (timestamp);
-            // }
-            // else {
-                window.present ();
-            // }
+            window.present ();
         }
 
         public void show_preferences (string panel_name = "")
@@ -374,19 +365,6 @@ namespace Pomodoro
 
             this.timer.duration += seconds * Pomodoro.Interval.SECOND;
         }
-
-        // TODO: rename to swap_state?
-        // private void activate_timer_switch_state (GLib.SimpleAction action,
-        //                                           GLib.Variant?     parameter)
-        // {
-        //     try {
-        //         // this.service.set_state (parameter.get_string (),
-        //         //                         this.timer.state.timestamp);
-        //     }
-        //     catch (GLib.Error error) {
-        //         // TODO: log warning
-        //     }
-        // }
 
         private void setup_resources ()
         {

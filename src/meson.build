@@ -53,7 +53,6 @@ libgnome_pomodoro_sources = files(
   'core/logger.vala',
   'core/matrix.vala',
   'core/notification-manager.vala',
-  'core/presence.vala',
   'core/priority.vala',
   'core/provided-object.vala',
   'core/provider.vala',
