@@ -14,12 +14,6 @@ namespace Pomodoro
     }
 
 
-    public interface BackgroundApplication : GLib.Application
-    {
-        public abstract bool should_run_in_background ();
-    }
-
-
     [SingleInstance]
     public class BackgroundManager : Pomodoro.ProvidedObject<Pomodoro.BackgroundProvider>
     {
@@ -30,29 +24,29 @@ namespace Pomodoro
         }
 
         private unowned GLib.Application?        application;
-        private unowned Pomodoro.SessionManager? session_manager;
         private bool                             has_application_hold = false;
         private bool                             request_granted = false;
+        private GLib.GenericSet<uint>            holds = null;
+        private static uint                      next_hold_id = 1U;
 
         construct
         {
             this.application = GLib.Application.get_default ();
-
-            this.session_manager = Pomodoro.SessionManager.get_default ();
-            this.session_manager.notify["current-time-block"].connect (this.on_current_time_block_notify);
+            this.holds = new GLib.GenericSet<uint> (GLib.direct_hash, GLib.direct_equal);
         }
 
-        private void request_background (string parent_window = "")
-                                         requires (this.provider != null)
+        private async void request_background (string parent_window = "")
         {
-            var provider = this.provider;
+            // Ask for request each time when trying to acquire `application_hold`.
+            // It's doesn't seem to be required, but just in case.
+            if (this.provider != null && !this.has_application_hold)
+            {
+                this.application.hold ();
+                this.request_granted = yield this.provider.request_background (parent_window);
 
-            provider.request_background.begin (
-                parent_window,
-                (obj, res) => {
-                    this.request_granted = provider.request_background.end (res);
-                    this.update_application_hold ();
-                });
+                this.update_application_hold ();
+                this.application.release ();
+            }
         }
 
         private void hold_application ()
@@ -73,7 +67,7 @@ namespace Pomodoro
 
         private void update_application_hold ()
         {
-            if (this.session_manager.current_time_block != null && this.request_granted) {
+            if (this.holds.length > 0U && this.request_granted) {
                 this.hold_application ();
             }
             else {
@@ -81,10 +75,24 @@ namespace Pomodoro
             }
         }
 
-        private void on_current_time_block_notify (GLib.Object    object,
-                                                   GLib.ParamSpec pspec)
+        public async uint hold (string parent_window = "")
         {
-            this.update_application_hold ();
+            var hold_id = Pomodoro.BackgroundManager.next_hold_id;
+            BackgroundManager.next_hold_id++;
+
+            this.holds.add (hold_id);
+            yield this.request_background (parent_window);
+
+            return hold_id;
+        }
+
+        public void release (uint hold_id)
+        {
+            var removed = this.holds.remove (hold_id);
+
+            if (removed) {
+                this.update_application_hold ();
+            }
         }
 
         protected override void setup_providers ()
@@ -95,7 +103,9 @@ namespace Pomodoro
 
         protected override void provider_enabled (Pomodoro.BackgroundProvider provider)
         {
-            this.request_background ();
+            if (this.holds.length > 0U) {
+                this.request_background.begin ();
+            }
         }
 
         protected override void provider_disabled (Pomodoro.BackgroundProvider provider)
@@ -110,10 +120,8 @@ namespace Pomodoro
         {
             this.release_application ();
 
-            this.session_manager.notify["current-time-block"].disconnect (this.on_current_time_block_notify);
-
             this.application = null;
-            this.session_manager = null;
+            this.holds = null;
 
             base.dispose ();
         }

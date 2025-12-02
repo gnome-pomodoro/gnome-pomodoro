@@ -134,13 +134,15 @@ namespace Pomodoro
         [GtkChild]
         private unowned Pomodoro.TimerView timer_view;
 
-        private Pomodoro.SessionManager session_manager;
-        private Pomodoro.Timer          timer;
-        private Pomodoro.WindowSize     _size = Pomodoro.WindowSize.NORMAL;
-        private Pomodoro.WindowView     _view = Pomodoro.WindowView.DEFAULT;
-        private Pomodoro.Extension?     extension = null;
-        private Adw.Toast?              install_extension_toast = null;
-        private static bool             install_extension_toast_dismissed = false;
+        private Pomodoro.WindowSize         _size = Pomodoro.WindowSize.NORMAL;
+        private Pomodoro.WindowView         _view = Pomodoro.WindowView.DEFAULT;
+        private Pomodoro.SessionManager?    session_manager = null;
+        private Pomodoro.Timer?             timer = null;
+        private Pomodoro.BackgroundManager? background_manager = null;
+        private Pomodoro.Extension?         extension = null;
+        private Adw.Toast?                  install_extension_toast = null;
+        private static bool                 install_extension_toast_dismissed = false;
+        private static uint                 background_hold_id = 0U;
 
         construct
         {
@@ -161,11 +163,15 @@ namespace Pomodoro
                 this.size = Pomodoro.WindowSize.COMPACT;
             }
 
-            this.update_title ();
-            this.update_timer_indicator ();
+            this.background_manager = new Pomodoro.BackgroundManager ();
 
             this.extension = new Pomodoro.Extension ();
             this.extension.notify["available"].connect (this.on_extension_notify_available);
+
+            this.notify["is-active"].connect (this.on_notify_is_active);
+
+            this.update_title ();
+            this.update_timer_indicator ();
         }
 
         private void update_title ()
@@ -207,6 +213,25 @@ namespace Pomodoro
                                                      ensures (result != Pomodoro.WindowView.DEFAULT)
         {
             return Pomodoro.WindowView.TIMER;
+        }
+
+        private async void close_to_background_internal ()
+        {
+            var window_id = yield Pomodoro.get_window_identifier (this);
+
+            Pomodoro.Window.background_hold_id = yield this.background_manager.hold (window_id);
+
+            if (Pomodoro.Window.background_hold_id != 0U) {
+                this.close ();
+            }
+            else {
+                this.minimize ();  // fallback
+            }
+        }
+
+        public void close_to_background ()
+        {
+            this.close_to_background_internal.begin ();
         }
 
         /**
@@ -288,7 +313,7 @@ namespace Pomodoro
 
         private void show_close_confirmation_dialog ()
         {
-            var parent = this;
+            unowned var self = this;
 
             var dialog = new Adw.AlertDialog (
                 _("Keep timer running?"),
@@ -309,11 +334,11 @@ namespace Pomodoro
                     switch (response)
                     {
                         case "run-in-background":
-                            parent.destroy ();
+                            self.close_to_background ();
                             break;
 
                         case "quit":
-                            parent.application.quit ();
+                            self.application.quit ();
                             break;
 
                         case "cancel":
@@ -325,7 +350,7 @@ namespace Pomodoro
                     }
                 });
 
-            dialog.present (parent);
+            dialog.present (self);
         }
 
         [GtkCallback]
@@ -369,18 +394,29 @@ namespace Pomodoro
         [GtkCallback]
         private bool on_close_request ()
         {
-            var application = this.application as Pomodoro.BackgroundApplication;
+            if (this.background_manager.active) {
+                return false;
+            }
 
-            if (application.should_run_in_background ())
+            if (this.timer.is_running ())
             {
                 this.show_close_confirmation_dialog ();
 
                 return true;
             }
             else {
-                application.quit ();
+                this.application.quit ();
 
                 return false;
+            }
+        }
+
+        private void on_notify_is_active (GLib.Object    object,
+                                          GLib.ParamSpec pspec)
+        {
+            if (this.is_active && Pomodoro.Window.background_hold_id != 0U) {
+                this.background_manager.release (Pomodoro.Window.background_hold_id);
+                Pomodoro.Window.background_hold_id = 0U;
             }
         }
 
@@ -456,6 +492,7 @@ namespace Pomodoro
         {
             this.extension.notify["available"].disconnect (this.on_extension_notify_available);
 
+            this.background_manager = null;
             this.extension = null;
             this.install_extension_toast = null;
 

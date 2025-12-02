@@ -11,7 +11,7 @@ using GLib;
 
 namespace Pomodoro
 {
-    public class Application : Adw.Application, Pomodoro.BackgroundApplication
+    public class Application : Adw.Application
     {
         private enum ExitStatus
         {
@@ -257,7 +257,7 @@ namespace Pomodoro
                 this.show_window (Pomodoro.WindowView.TIMER);
             }
             else {
-                window.destroy ();
+                window.close_to_background ();
             }
         }
 
@@ -505,15 +505,6 @@ namespace Pomodoro
             else {
                 style_manager.set_color_scheme (Adw.ColorScheme.DEFAULT);
             }
-        }
-
-        public bool should_run_in_background ()
-        {
-            // TODO: if indicator is present, allow running in background but silently
-
-            return this.background_manager != null
-                    ? this.background_manager.active && !this.timer.is_paused ()
-                    : false;
         }
 
         private void parse_command_line (ref unowned string[] arguments) throws GLib.OptionError
