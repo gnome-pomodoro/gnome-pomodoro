@@ -424,11 +424,14 @@ namespace Pomodoro
         private void on_timer_state_changed (Pomodoro.TimerState current_state,
                                              Pomodoro.TimerState previous_state)
         {
-            var timestamp = this._timer.get_last_tick_time ();
+            var timestamp = this._timer.get_last_state_changed_time ();
 
             if (this._timer.user_data != null)
             {
-                if (this._timer.is_paused () || this._timer.is_finished () || !this._timer.is_started ()) {
+                if (current_state.is_paused () ||
+                    current_state.is_finished () ||
+                    !current_state.is_started ())
+                {
                     this.start_blinking_animation ();
                 }
                 else {

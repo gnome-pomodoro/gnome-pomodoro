@@ -282,6 +282,8 @@ namespace Pomodoro
             else {
                 this.stop_timeout ();
             }
+
+            this.highlight.queue_draw ();
         }
 
         private void on_opacity_animation_done ()
@@ -731,7 +733,7 @@ namespace Pomodoro
             if (this.opacity_animation == null ||
                 this.opacity_animation.value_to > 0.0)
             {
-                display_value = this._timer.user_data != null
+                display_value = this._timer.user_data != null && !this._timer.is_finished ()
                         ? this._timer.calculate_progress (this.get_current_time ())
                         : 1.0;
             }
