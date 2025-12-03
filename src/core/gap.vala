@@ -169,7 +169,7 @@ namespace Pomodoro
 
         public inline bool has_flag (Pomodoro.GapFlags flag)
         {
-            return (this.flags & flag) == flag;
+            return (this._flags & flag) == flag;
         }
 
         public inline void set_flag (Pomodoro.GapFlags flag)
@@ -179,7 +179,7 @@ namespace Pomodoro
 
         public inline void unset_flag (Pomodoro.GapFlags flag)
         {
-            this.flags = this.flags & (~flag);
+            this.flags = this._flags & (~flag);
         }
 
         private void emit_changed ()

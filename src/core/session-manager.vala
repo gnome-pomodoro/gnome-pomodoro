@@ -67,15 +67,15 @@ namespace Pomodoro
                     return;
                 }
 
-                if (this._scheduler != null && this.scheduler_notify_session_template_id != 0) {
-                    this._scheduler.disconnect (this.scheduler_notify_session_template_id);
+                if (this._scheduler != null) {
+                    this._scheduler.notify["session-template"].disconnect (
+                            this.on_scheduler_notify_session_template);
                 }
 
                 this._scheduler = value;
 
-                if (this._scheduler != null)
-                {
-                    this.scheduler_notify_session_template_id = this._scheduler.notify["session-template"].connect (
+                if (this._scheduler != null) {
+                    this._scheduler.notify["session-template"].connect (
                             this.on_scheduler_notify_session_template);
                 }
 
@@ -187,7 +187,6 @@ namespace Pomodoro
         private ulong                            timer_suspending_id = 0;
         private ulong                            timer_suspended_id = 0;
         private uint                             expiry_timeout_id = 0;
-        private ulong                            scheduler_notify_session_template_id = 0;
         private uint                             reschedule_idle_id = 0;
         private uint                             active_watch_id = 0;
         private uint                             session_changed_idle_id = 0;
@@ -1461,7 +1460,10 @@ namespace Pomodoro
                 return false;
             }
 
-            this._scheduler.build_scheduler_context (this._current_session, timestamp, out context, null);
+            this._scheduler.build_scheduler_context (this._current_session,
+                                                     timestamp,
+                                                     out context,
+                                                     null);
 
             return context.needs_long_break;
         }
@@ -1518,7 +1520,9 @@ namespace Pomodoro
             // Determine the type of break if Pomodoro.State.BREAK is given.
             // It's not efficient, as we build scheduler context again later.
             if (state == Pomodoro.State.BREAK && !this._has_uniform_breaks) {
-                state = this.is_long_break_needed (timestamp) ? Pomodoro.State.LONG_BREAK : Pomodoro.State.SHORT_BREAK;
+                state = this.is_long_break_needed (timestamp)
+                        ? Pomodoro.State.LONG_BREAK
+                        : Pomodoro.State.SHORT_BREAK;
             }
 
             // Extend current time-block if possible.
@@ -2443,12 +2447,9 @@ namespace Pomodoro
                 }
             }
 
-            if (this._scheduler != null)
-            {
-                if (this.scheduler_notify_session_template_id != 0) {
-                    this._scheduler.disconnect (this.scheduler_notify_session_template_id);
-                    this.scheduler_notify_session_template_id = 0;
-                }
+            if (this._scheduler != null) {
+                this._scheduler.notify["session-template"].disconnect (
+                        this.on_scheduler_notify_session_template);
             }
 
             if (this.settings != null) {
@@ -2473,19 +2474,19 @@ namespace Pomodoro
             this.disable_auto_pause ();
             this.disable_idle_monitor ();
 
-            this.settings = null;
             this._current_gap = null;
             this._current_time_block = null;
             this._current_session = null;
-            this.next_time_block = null;
-            this.next_session = null;
             this._timer = null;
             this._scheduler = null;
+            this.next_time_block = null;
+            this.next_session = null;
             this.idle_monitor = null;
             this.timezone_monitor = null;
             this.timezone_history = null;
             this.lockscreen = null;
             this.screensaver = null;
+            this.settings = null;
 
             base.dispose ();
         }
