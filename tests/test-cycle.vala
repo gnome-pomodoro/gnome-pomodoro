@@ -533,8 +533,7 @@ namespace Tests
             var cycle = new Pomodoro.Cycle ();
             cycle.append (time_block);
 
-            // Extra cycles that haven't started yet should not be visible
-            assert_false (cycle.is_visible ());
+            assert_true (cycle.is_visible ());
         }
 
         public void test_is_visible__in_progress_extra ()

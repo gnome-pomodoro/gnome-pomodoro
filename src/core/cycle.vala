@@ -269,13 +269,20 @@ namespace Pomodoro
             return this.completion_time;
         }
 
+        /**
+         * Return whether cycle has an extra pomodoro.
+         *
+         * Used in tests.
+         */
         public bool is_extra ()
         {
             unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
 
             while (link != null)
             {
-                if (link.data.get_is_extra () && link.data.get_weight () > 0.0) {
+                if (link.data.get_is_extra () &&
+                    link.data.get_weight () > 0.0)
+                {
                     return true;
                 }
 
@@ -286,7 +293,7 @@ namespace Pomodoro
         }
 
         /**
-         * Hide cycles that were uncompleted or extra cycles that hasn't started yet.
+         * Hide cycles that were uncompleted.
          */
         public bool is_visible ()
         {
@@ -297,9 +304,7 @@ namespace Pomodoro
                 if (link.data.get_status () != Pomodoro.TimeBlockStatus.UNCOMPLETED &&
                     link.data.get_weight () > 0.0)
                 {
-                    return link.data.get_is_extra ()
-                            ? link.data.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED
-                            : true;
+                    return true;
                 }
 
                 link = link.next;
