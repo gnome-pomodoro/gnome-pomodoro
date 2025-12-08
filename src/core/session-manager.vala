@@ -1317,25 +1317,44 @@ namespace Pomodoro
         /**
          * Extend current time-block, as if it was started from scratch.
          */
-        private void extend_current_time_block (int64 timestamp)
+        private void extend_current_time_block (bool  resume,
+                                                int64 timestamp)
                                                 requires (this._current_time_block != null)
                                                 requires (this._current_time_block == this._timer.user_data)
         {
-            var current_time_block_meta = this._current_time_block.get_meta ();
-            var started_time = this._timer.started_time;
+            var duration = this._timer.calculate_elapsed (timestamp) +
+                           this._current_time_block.get_intended_duration ();
+            // TODO: use scheduler to determine `duration`
 
-            if (Pomodoro.Timestamp.is_undefined (started_time)) {
-                started_time = timestamp;
+            if (resume && this._timer.is_paused ())
+            {
+                var new_state = this._timer.state.copy ();
+                new_state.duration = duration;
+                new_state.offset += timestamp - new_state.paused_time;
+                new_state.paused_time = Pomodoro.Timestamp.UNDEFINED;
+
+                this._timer.set_state_full (new_state, timestamp);
             }
+            else {
+                this._timer.set_duration_full (duration, timestamp);
+            }
+        }
 
-            this._timer.state = Pomodoro.TimerState () {
-                duration      = current_time_block_meta.intended_duration,
-                offset        = Pomodoro.Timestamp.subtract (timestamp, started_time),
-                started_time  = started_time,
-                paused_time   = Pomodoro.Timestamp.UNDEFINED,
-                finished_time = Pomodoro.Timestamp.UNDEFINED,
-                user_data     = this._current_time_block
-            };
+        private void swap_current_state (Pomodoro.State new_state,
+                                         int64          timestamp)
+                                         requires (this._current_time_block != null)
+                                         requires (this._current_state.is_break ())
+        {
+            var time_block = this._current_time_block;
+            time_block.freeze_changed ();
+            time_block.set_state_internal (new_state);
+            time_block.set_intended_duration (
+                    this._scheduler.session_template.get_duration (time_block.state));
+            time_block.set_completion_time (
+                    this._scheduler.calculate_time_block_completion_time (time_block));
+
+            this.extend_current_time_block (true, timestamp);
+            time_block.thaw_changed ();
         }
 
         private void mark_gap_end (Pomodoro.Gap gap,
@@ -1492,7 +1511,16 @@ namespace Pomodoro
             if (this._current_time_block != null &&
                 this._current_time_block.state == state)
             {
-                this.extend_current_time_block (timestamp);
+                this.extend_current_time_block (true, timestamp);
+                return;
+            }
+
+            // Swap break state.
+            if (this._current_time_block != null &&
+                this._current_time_block.state.is_break () &&
+                state.is_break ())
+            {
+                this.swap_current_state (state, timestamp);
                 return;
             }
 

@@ -1398,6 +1398,9 @@ namespace Tests
             });
         }
 
+        /**
+         * Advance to pomodoro during ongoing pomodoro. Expect the time-block to be extended.
+         */
         public void test_advance_to_state__extend_pomodoro ()
         {
             var timer           = new Pomodoro.Timer ();
@@ -1430,7 +1433,7 @@ namespace Tests
                 new GLib.Variant.int64 (expected_start_time)
             );
             assert_true (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
-            // assert_null (time_block.get_last_gap ());
+            assert_null (time_block.get_last_gap ());
             assert_cmpuint (
                 session.count_visible_cycles (),
                 GLib.CompareOperator.EQ,
@@ -1446,6 +1449,26 @@ namespace Tests
                 "session-rescheduled",
                 "state-changed",
             });
+
+            // Extend once more. Expect it to increase cycle weight.
+            now = time_block.end_time - 10 * Pomodoro.Interval.SECOND;
+            Pomodoro.Timestamp.freeze_to (now);
+            session_manager.advance_to_state (Pomodoro.State.POMODORO, now);
+            assert_null (time_block.get_last_gap ());
+            assert_cmpfloat (
+                session_manager.get_current_cycle ().get_weight (),
+                GLib.CompareOperator.EQ,
+                2.0
+            );
+            assert_cmpuint (
+                session.count_visible_cycles (),
+                GLib.CompareOperator.EQ,
+                this.session_template.cycles - 1U
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (timer.calculate_remaining (now)),
+                new GLib.Variant.int64 (expected_remaining_time)
+            );
         }
 
         public void test_advance_to_state__extend_short_break ()
@@ -1480,7 +1503,7 @@ namespace Tests
                 new GLib.Variant.int64 (expected_start_time)
             );
             assert_true (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
-            // assert_null (time_block.get_last_gap ());
+            assert_null (time_block.get_last_gap ());
             assert_cmpuint (
                 session.count_visible_cycles (),
                 GLib.CompareOperator.EQ,
@@ -1546,7 +1569,7 @@ namespace Tests
                 new GLib.Variant.int64 (expected_start_time)
             );
             assert_true (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
-            // assert_null (time_block.get_last_gap ());
+            assert_null (time_block.get_last_gap ());
             assert_cmpuint (
                 session.count_visible_cycles (),
                 GLib.CompareOperator.EQ,
@@ -1559,42 +1582,31 @@ namespace Tests
             );
             assert_cmpstrv (signals, {
                 "resolve-state",
-                // "session-rescheduled",
                 "state-changed",
             });
         }
 
-        /**
-         * Expect to append new time-blocks when changing break states.
-         */
         public void test_advance_to_state__switch_breaks ()
         {
             var timer           = new Pomodoro.Timer ();
             var session_manager = new Pomodoro.SessionManager.with_timer (timer);
+            session_manager.ensure_session ();
 
-            var now = Pomodoro.Timestamp.peek ();
+            var session = session_manager.current_session;
+            var time_block_1 = session.get_nth_time_block (0);  // Pomodoro
+            var time_block_2 = session.get_nth_time_block (1);  // Short break
+
+            time_block_1.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+
+            Pomodoro.Timestamp.freeze_to (time_block_2.start_time);
+            session_manager.current_time_block = time_block_2;
+            assert_cmpuint (
+                session.count_completed_cycles (),
+                GLib.CompareOperator.EQ,
+                1U
+            );
+
             var signals = new string[0];
-
-            // Start a short break.
-            session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK, now);
-
-            assert_true (session_manager.current_time_block.state == Pomodoro.State.SHORT_BREAK);
-            assert_cmpint (session_manager.current_session.index (session_manager.current_time_block),
-                           GLib.CompareOperator.EQ, 0);
-            assert_cmpvariant (
-                new GLib.Variant.int64 (session_manager.current_time_block.start_time),
-                new GLib.Variant.int64 (now)
-            );
-            assert_cmpvariant (
-                new GLib.Variant.int64 (timer.duration),
-                new GLib.Variant.int64 (5 * Pomodoro.Interval.MINUTE)
-            );
-            assert_cmpvariant (
-                new GLib.Variant.int64 (timer.offset),
-                new GLib.Variant.int64 (0)
-            );
-
-            // Switch to a long break.
             timer.resolve_state.connect (() => { signals += "resolve-state"; });
             timer.state_changed.connect (() => { signals += "state-changed"; });
             session_manager.enter_session.connect (() => { signals += "enter-session"; });
@@ -1603,30 +1615,31 @@ namespace Tests
             session_manager.leave_time_block.connect (() => { signals += "leave-time-block"; });
             session_manager.session_rescheduled.connect (() => { signals += "session-rescheduled"; });
 
-            now = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            // Switch to a long break
+            var now = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            var expected_start_time = time_block_2.start_time;
+
             session_manager.advance_to_state (Pomodoro.State.LONG_BREAK, now);
 
             assert_true (session_manager.current_time_block.state == Pomodoro.State.LONG_BREAK);
-            assert_cmpint (session_manager.current_session.index (session_manager.current_time_block),
-                           GLib.CompareOperator.EQ, 1);
+            assert_true (session_manager.current_time_block == time_block_2);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_manager.current_time_block.start_time),
-                new GLib.Variant.int64 (now)
+                new GLib.Variant.int64 (expected_start_time)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (timer.duration),
-                new GLib.Variant.int64 (15 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (timer.calculate_remaining (now)),
+                new GLib.Variant.int64 (this.session_template.long_break_duration)
             );
-            assert_cmpvariant (
-                new GLib.Variant.int64 (timer.offset),
-                new GLib.Variant.int64 (0)
+            assert_cmpuint (
+                session.count_visible_cycles (),
+                GLib.CompareOperator.EQ,
+                1U
             );
             assert_cmpstrv (signals, {
-                "leave-time-block",
-                "session-rescheduled",
-                "enter-time-block",
                 "resolve-state",
-                "state-changed"
+                "state-changed",
+                "session-rescheduled"
             });
 
             // Switch back to a short break.
@@ -1635,28 +1648,29 @@ namespace Tests
             session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK, now);
 
             assert_true (session_manager.current_time_block.state == Pomodoro.State.SHORT_BREAK);
-            assert_cmpint (session_manager.current_session.index (session_manager.current_time_block),
-                           GLib.CompareOperator.EQ, 0);
+            assert_true (session_manager.current_time_block == time_block_2);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_manager.current_time_block.start_time),
-                new GLib.Variant.int64 (now)
+                new GLib.Variant.int64 (expected_start_time)
+            );
+            assert_cmpuint (
+                session.count_visible_cycles (),
+                GLib.CompareOperator.EQ,
+                this.session_template.cycles
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (timer.duration),
-                new GLib.Variant.int64 (5 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (timer.calculate_remaining (now)),
+                new GLib.Variant.int64 (this.session_template.short_break_duration)
             );
-            assert_cmpvariant (
-                new GLib.Variant.int64 (timer.offset),
-                new GLib.Variant.int64 (0)
+            assert_cmpuint (
+                session.count_visible_cycles (),
+                GLib.CompareOperator.EQ,
+                4U
             );
             assert_cmpstrv (signals, {
-                "leave-time-block",
-                "leave-session",
-                "session-rescheduled",
-                "enter-session",
-                "enter-time-block",
                 "resolve-state",
-                "state-changed"
+                "state-changed",
+                "session-rescheduled"
             });
         }
 

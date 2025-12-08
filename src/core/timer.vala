@@ -235,24 +235,7 @@ namespace Pomodoro
                 return this._state.duration;
             }
             set {
-                if (value < 0) {
-                    GLib.debug ("Trying to set a negative timer duration (%.1fs).",
-                                Pomodoro.Timestamp.to_seconds (value));
-                    value = 0;
-                }
-
-                if (value == this._state.duration) {
-                    return;
-                }
-
-                var new_state = this._state.copy ();
-                new_state.duration = value;
-
-                if (new_state.duration > this._state.duration) {
-                    new_state.finished_time = Pomodoro.Timestamp.UNDEFINED;
-                }
-
-                this.state = new_state;
+                this.set_duration_full (value);
             }
         }
 
@@ -424,6 +407,29 @@ namespace Pomodoro
             this.state_changed (this._state, previous_state);
 
             this.changing_state--;
+        }
+
+        public void set_duration_full (int64 duration,
+                                       int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        {
+            if (duration < 0) {
+                GLib.debug ("Trying to set a negative timer duration (%.1fs).",
+                            Pomodoro.Timestamp.to_seconds (duration));
+                duration = 0;
+            }
+
+            if (duration == this._state.duration) {
+                return;
+            }
+
+            var new_state = this._state.copy ();
+            new_state.duration = duration;
+
+            if (new_state.duration > this._state.duration) {
+                new_state.finished_time = Pomodoro.Timestamp.UNDEFINED;
+            }
+
+            this.set_state_full (new_state, timestamp);
         }
 
         /**
