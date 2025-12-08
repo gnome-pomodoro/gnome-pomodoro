@@ -1704,6 +1704,28 @@ namespace Pomodoro
             return true;
         }
 
+        private bool should_auto_advance ()
+        {
+            if (!this._timer.is_finished () ||
+                this._current_time_block == null ||
+                this._current_time_block.state != Pomodoro.State.POMODORO ||
+                this.next_time_block == null ||
+                !this.next_time_block.state.is_break ())
+            {
+                return false;
+            }
+
+            if (this.lockscreen != null && this.lockscreen.enabled && this.lockscreen.active) {
+                return true;
+            }
+
+            if (this.screensaver != null && this.screensaver.enabled && this.screensaver.active) {
+                return true;
+            }
+
+            return false;
+        }
+
         private void pause ()
         {
             if (!this.auto_paused)
@@ -1792,26 +1814,17 @@ namespace Pomodoro
 
             this.freeze_current_session_changed ();
 
-            // Handle waiting for an activity and overdue time after confirmation.
-            var waiting_for_activity = current_state.user_data == previous_state.user_data &&
-                                       current_state.is_started () &&
-                                       !previous_state.is_started ();
-
-            var confirmed_advance = current_state.user_data != previous_state.user_data &&
-                                       current_state.is_started () &&
-                                       previous_state.is_finished ();
-            if (waiting_for_activity || confirmed_advance)
+            // Handle waiting for an activity.
+            if (current_state.user_data == previous_state.user_data &&
+                current_state.is_started () &&
+                !previous_state.is_started ())
             {
-                if (previous_time_block != null) {
-                    previous_time_block.end_time += int64.min (
-                                        current_state.started_time - previous_time_block.end_time,
-                                        OVERDUE_TIMEOUT);
-                }
-                else {
-                    GLib.warning ("Unable to extend the duration of previous time-block.");
+                var overdue = current_state.started_time - previous_time_block.end_time;
+
+                if (previous_time_block != null && overdue < OVERDUE_TIMEOUT) {
+                    this.mark_time_block_end (previous_time_block, timestamp);
                 }
 
-                // TODO: add gap in between?
                 current_time_block.move_to (current_state.started_time);
             }
 
@@ -2121,6 +2134,9 @@ namespace Pomodoro
             else if (this.should_auto_resume ()) {
                 this.resume ();
             }
+            else if (this.should_auto_advance ()) {
+                this.advance ();
+            }
 
             if (!this.lockscreen.active) {
                 this.handle_became_active ();
@@ -2135,6 +2151,9 @@ namespace Pomodoro
             }
             else if (this.should_auto_resume ()) {
                 this.resume ();
+            }
+            else if (this.should_auto_advance ()) {
+                this.advance ();
             }
 
             if (!this.screensaver.active) {

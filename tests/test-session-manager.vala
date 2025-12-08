@@ -1745,28 +1745,35 @@ namespace Tests
             var timer           = new Pomodoro.Timer ();
             var session_manager = new Pomodoro.SessionManager.with_timer (timer);
 
+            // Confirm after 1 minute.
             session_manager.advance_to_state (Pomodoro.State.POMODORO);
 
+            var session = session_manager.current_session;
             var time_block_1 = session_manager.current_time_block;
+            time_block_1.notify["end-time"].connect (
+                () => {
+                    assert_true (
+                        time_block_1.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS
+                    );
+                });
 
-            var finished_time = session_manager.current_time_block.end_time;
-            Pomodoro.Timestamp.freeze_to (finished_time);
-            timer.finish (finished_time);
+            var finished_time_1 = time_block_1.end_time;
+            Pomodoro.Timestamp.freeze_to (finished_time_1);
+            timer.finish (finished_time_1);
             assert_true (timer.user_data == time_block_1);
             assert_true (timer.is_finished ());
+            assert_true (timer.state.finished_time == finished_time_1);
 
-            // Confirm after 1 minute.
-            var activity_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
-            session_manager.advance (activity_time);
+            var confirmation_time_1 = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            session_manager.advance (confirmation_time_1);
 
             var time_block_2 = session_manager.current_time_block;
             assert_true (timer.user_data == time_block_2);
             assert_true (timer.is_started ());
 
-            // Expect previous time-block to be extended by the inactivity time.
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.started_time),
-                new GLib.Variant.int64 (activity_time)
+                new GLib.Variant.int64 (confirmation_time_1)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.offset),
@@ -1774,11 +1781,64 @@ namespace Tests
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block_1.end_time),
-                new GLib.Variant.int64 (activity_time)
+                new GLib.Variant.int64 (confirmation_time_1)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block_2.start_time),
-                new GLib.Variant.int64 (activity_time)
+                new GLib.Variant.int64 (confirmation_time_1)
+            );
+            assert_cmpuint (
+                session.count_visible_cycles (),
+                GLib.CompareOperator.EQ,
+                4U
+            );
+
+            // Confirm after 30 minutes.
+            session_manager.advance_to_state (Pomodoro.State.POMODORO);
+
+            var time_block_3 = session_manager.current_time_block;
+            time_block_3.notify["end-time"].connect (
+                () => {
+                    assert_true (
+                        time_block_3.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS
+                    );
+                });
+
+            var finished_time_2 = time_block_3.end_time;
+            Pomodoro.Timestamp.freeze_to (finished_time_2);
+            timer.finish (finished_time_2);
+            assert_true (timer.user_data == time_block_3);
+            assert_true (timer.is_finished ());
+
+            var confirmation_time_2 = Pomodoro.Timestamp.advance (30 * Pomodoro.Interval.MINUTE);
+            session_manager.advance (confirmation_time_2);
+
+            var time_block_4 = session_manager.current_time_block;
+            assert_true (timer.user_data == time_block_4);
+            assert_true (timer.is_started ());
+
+            assert_cmpvariant (
+                new GLib.Variant.int64 (timer.state.started_time),
+                new GLib.Variant.int64 (confirmation_time_2)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (timer.state.offset),
+                new GLib.Variant.int64 (0)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (time_block_3.end_time),
+                new GLib.Variant.int64 (confirmation_time_2)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (time_block_4.start_time),
+                new GLib.Variant.int64 (confirmation_time_2)
+            );
+
+            // Because we extended previous pomodoro, expect one less cycle
+            assert_cmpuint (
+                session.count_visible_cycles (),
+                GLib.CompareOperator.EQ,
+                3U
             );
         }
 
@@ -1793,6 +1853,12 @@ namespace Tests
             session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK);
 
             var time_block_1 = session_manager.current_time_block;
+            time_block_1.notify["end-time"].connect (
+                () => {
+                    assert_true (
+                        time_block_1.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS
+                    );
+                });
 
             var finished_time = session_manager.current_time_block.end_time;
             Pomodoro.Timestamp.freeze_to (finished_time);
@@ -1801,18 +1867,17 @@ namespace Tests
             assert_true (timer.is_finished ());
 
             // Confirm after 1 minute.
-            var activity_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
-            session_manager.advance (activity_time);
+            var confirmation_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            session_manager.advance (confirmation_time);
 
             var time_block_2 = session_manager.current_time_block;
             assert_true (time_block_2.state == Pomodoro.State.POMODORO);
             assert_true (timer.user_data == time_block_2);
             assert_true (timer.is_started ());
 
-            // Expect previous time-block to be extended by the inactivity time.
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.started_time),
-                new GLib.Variant.int64 (activity_time)
+                new GLib.Variant.int64 (confirmation_time)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.offset),
@@ -1820,11 +1885,11 @@ namespace Tests
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block_1.end_time),
-                new GLib.Variant.int64 (activity_time)
+                new GLib.Variant.int64 (confirmation_time)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block_2.start_time),
-                new GLib.Variant.int64 (activity_time)
+                new GLib.Variant.int64 (confirmation_time)
             );
         }
 
@@ -3409,6 +3474,9 @@ namespace Tests
             );
         }
 
+        /**
+         * Test for `AdvancementMode.MANUAL`
+         */
         public void test_timer_finished__manual ()
         {
             var settings = Pomodoro.get_settings ();
@@ -3434,21 +3502,20 @@ namespace Tests
             assert_true (timer.state.is_finished ());
 
             // Confirm after 1 minute.
-            var activity_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            var confirmation_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
 
             // Note that timer.start() can't be used interchangeably with session_manager.advance(),
             // as the timer has already started.
-            session_manager.advance (activity_time);
+            session_manager.advance (confirmation_time);
 
             var time_block_2 = session_manager.current_time_block;
             assert_true (time_block_2.state.is_break ());
             assert_true (timer.user_data == time_block_2);
             assert_true (timer.is_started ());
 
-            // Expect previous time-block to be extended by the inactivity time.
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.started_time),
-                new GLib.Variant.int64 (activity_time)
+                new GLib.Variant.int64 (confirmation_time)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.offset),
@@ -3456,13 +3523,17 @@ namespace Tests
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block_1.end_time),
-                new GLib.Variant.int64 (activity_time)
+                new GLib.Variant.int64 (confirmation_time)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block_2.start_time),
-                new GLib.Variant.int64 (activity_time)
+                new GLib.Variant.int64 (confirmation_time)
             );
-            assert_cmpuint (confirm_advancement_call_count, GLib.CompareOperator.EQ, 1);
+            assert_cmpuint (
+                confirm_advancement_call_count,
+                GLib.CompareOperator.EQ,
+                1U
+            );
         }
     }
 
