@@ -12,6 +12,9 @@ namespace Pomodoro
     private static int _is_flatpak = -1;
 
 
+    public delegate bool FilterFunc<T> (T item);
+
+
     public inline void ensure_timestamp (ref int64 timestamp)
     {
         if (Pomodoro.Timestamp.is_undefined (timestamp)) {

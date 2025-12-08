@@ -224,7 +224,7 @@ namespace Pomodoro
             var timestamp = Pomodoro.Timestamp.from_now ();
 
             // Skip the toast if the timer was stopped and no cycle was completed.
-            if (!this.timer.is_started () && !session.has_completed_cycle ()) {
+            if (!this.timer.is_started () && session.count_completed_cycles () == 0U) {
                 return;
             }
 

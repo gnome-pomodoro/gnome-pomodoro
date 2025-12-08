@@ -777,60 +777,58 @@ namespace Pomodoro
             return this.cycles.copy ();
         }
 
-        public uint count_completed_cycles ()
+        public uint count_time_blocks (Pomodoro.FilterFunc<Pomodoro.TimeBlock>? func = null)
         {
-            this.update_cycles_if_queued ();
+            if (func == null) {
+                return this.time_blocks.length ();
+            }
 
-            unowned GLib.List<Pomodoro.Cycle> link = this.cycles.first ();
-            var completed_cycles = 0U;
+            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            var count = 0U;
 
             while (link != null)
             {
-                if (link.data.is_visible () && link.data.is_completed ()) {
-                    completed_cycles++;
+                if (func (link.data)) {
+                    count++;
                 }
 
                 link = link.next;
             }
 
-            return completed_cycles;
+            return count;
         }
 
-        public uint count_visible_cycles ()
+        public uint count_cycles (Pomodoro.FilterFunc<Pomodoro.Cycle>? func = null)
         {
             this.update_cycles_if_queued ();
 
+            if (func == null) {
+                return this.cycles.length ();
+            }
+
             unowned GLib.List<Pomodoro.Cycle> link = this.cycles.first ();
-            var visible_cycles = 0U;
+            var count = 0U;
 
             while (link != null)
             {
-                if (link.data.is_visible ()) {
-                    visible_cycles++;
+                if (func (link.data)) {
+                    count++;
                 }
 
                 link = link.next;
             }
 
-            return visible_cycles;
+            return count;
         }
 
-        public bool has_completed_cycle ()
+        public inline uint count_completed_cycles ()
         {
-            this.update_cycles_if_queued ();
+            return this.count_cycles ((cycle) => cycle.is_completed ());
+        }
 
-            unowned GLib.List<Pomodoro.Cycle> link = this.cycles.first ();
-
-            while (link != null)
-            {
-                if (link.data.is_completed ()) {
-                    return true;
-                }
-
-                link = link.next;
-            }
-
-            return false;
+        public inline uint count_visible_cycles ()
+        {
+            return this.count_cycles ((cycle) => cycle.is_visible ());
         }
 
 
