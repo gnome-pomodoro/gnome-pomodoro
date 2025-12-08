@@ -47,6 +47,8 @@ namespace Tests
             this.add_test ("calculate_time_block_completion_time__with_gaps", this.test_calculate_time_block_completion_time__with_gaps);
 
             this.add_test ("calculate_time_block_score__pomodoro", this.test_calculate_time_block_score__pomodoro);
+            this.add_test ("calculate_time_block_score__extended_pomodoro", this.test_calculate_time_block_score__extended_pomodoro);
+            this.add_test ("calculate_time_block_score__short_pomodoro", this.test_calculate_time_block_score__short_pomodoro);
             this.add_test ("calculate_time_block_score__short_break", this.test_calculate_time_block_score__short_break);
             this.add_test ("calculate_time_block_score__long_break", this.test_calculate_time_block_score__long_break);
             this.add_test ("calculate_time_block_score__uncompleted_pomodoro", this.test_calculate_time_block_score__uncompleted_pomodoro);
@@ -226,6 +228,82 @@ namespace Tests
             assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
 
             time_block.set_time_range (now, now + (25 + 20) * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
+            assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
+
+            // Uncompleted status should have a priority
+            time_block.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
+            assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
+        }
+
+        public void test_calculate_time_block_score__extended_pomodoro ()
+        {
+            var now = Pomodoro.Timestamp.peek ();
+            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var score = 0.0;
+
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_time_range (now, now + 50 * Pomodoro.Interval.MINUTE);
+            time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
+            time_block.set_completion_time (now + 20 * Pomodoro.Interval.MINUTE);
+
+            // At different timestamps
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+
+            score = scheduler.calculate_time_block_score (time_block, now + 44 * Pomodoro.Interval.MINUTE);
+            assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
+
+            score = scheduler.calculate_time_block_score (time_block, now + 45 * Pomodoro.Interval.MINUTE);
+            assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
+
+            score = scheduler.calculate_time_block_score (time_block, now + 50 * Pomodoro.Interval.MINUTE);
+            assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
+
+            // After marking time-block end time
+            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+
+            time_block.set_time_range (now, now + 44 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
+            assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
+
+            time_block.set_time_range (now, now + 45 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
+            assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
+
+            time_block.set_time_range (now, now + 50 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
+            assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
+
+            // Uncompleted status should have a priority
+            time_block.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
+            assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
+        }
+
+        public void test_calculate_time_block_score__short_pomodoro ()
+        {
+            var now = Pomodoro.Timestamp.peek ();
+            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var score = 0.0;
+
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_intended_duration (15 * Pomodoro.Interval.MINUTE);
+            time_block.set_completion_time (now + 20 * Pomodoro.Interval.MINUTE);
+
+            time_block.set_time_range (now, now + 11 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
+            assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
+
+            time_block.set_time_range (now, now + 12 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
+            assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
+
+            time_block.set_time_range (now, now + 30 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
+            assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
+
+            time_block.set_time_range (now, now + 40 * Pomodoro.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
         }
@@ -564,9 +642,9 @@ namespace Tests
             var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
 
             var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
-            time_block.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
             time_block.set_time_range (now, now + 9 * Pomodoro.Interval.MINUTE);
+            time_block.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
+            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
 
             var context = Pomodoro.SchedulerContext () {
                 state = Pomodoro.State.STOPPED,
@@ -575,7 +653,7 @@ namespace Tests
             var expected_context = Pomodoro.SchedulerContext () {
                 timestamp = time_block.end_time,
                 state = Pomodoro.State.POMODORO,
-                score = 2.0,
+                score = 1.0,
             };
             scheduler.resolve_context (time_block, time_block.end_time, ref context);
             assert_cmpvariant (
@@ -758,7 +836,7 @@ namespace Tests
             var expected_context = Pomodoro.SchedulerContext () {
                 timestamp = time_block.end_time,
                 state = Pomodoro.State.POMODORO,
-                score = 2.0,
+                score = 1.0,
             };
             scheduler.resolve_context (time_block, time_block.end_time, ref context);
             assert_cmpvariant (

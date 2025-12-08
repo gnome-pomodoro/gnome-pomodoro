@@ -379,6 +379,14 @@ namespace Pomodoro
 
     public class SimpleScheduler : Scheduler
     {
+        /* Score limit helps session progress bar looking sensible, also serves as a penalty for
+         * extending pomodoros too much
+         */
+        private double MAX_SCORE = 2.0;
+
+        /* Minimum intended-duration to consider scores above 1.0  */
+        private int64 SCORE_INTENDED_DURATION_THRESHOLD = 20 * Pomodoro.Interval.MINUTE;
+
         public SimpleScheduler.with_template (Pomodoro.SessionTemplate session_template)
         {
             GLib.Object (
@@ -393,6 +401,7 @@ namespace Pomodoro
                                     requires (time_block.end_time >= time_block.start_time)
         {
             var intended_duration = time_block.get_intended_duration ();
+            var score = 0.0;
 
             if (intended_duration == 0) {
                 intended_duration = this.session_template.get_duration (time_block.state);
@@ -402,7 +411,7 @@ namespace Pomodoro
                 time_block.get_status () == Pomodoro.TimeBlockStatus.UNCOMPLETED ||
                 intended_duration <= 0)
             {
-                return 0.0;
+                return score;
             }
 
             var elapsed = time_block.calculate_elapsed (timestamp);
@@ -417,12 +426,28 @@ namespace Pomodoro
                 elapsed += int64.min (timestamp, time_block.end_time) - last_gap.start_time;
             }
 
-            var base_score = elapsed / intended_duration;
-            var partial_score = (
-                    (double) (elapsed - base_score * intended_duration) /
-                    (COMPLETION_THRESHOLD * (double) intended_duration));
+            if (elapsed >= SCORE_INTENDED_DURATION_THRESHOLD) {
+                intended_duration = int64.max (intended_duration,
+                                               SCORE_INTENDED_DURATION_THRESHOLD);
+            }
 
-            var score = Math.floor ((double) base_score + partial_score);
+            if (intended_duration >= SCORE_INTENDED_DURATION_THRESHOLD)
+            {
+                var base_score = elapsed / intended_duration;
+                var partial_score = (
+                        (double) (elapsed - base_score * intended_duration) /
+                        (COMPLETION_THRESHOLD * (double) intended_duration));
+
+                score = Math.floor (
+                    (double) base_score + partial_score
+                ).clamp (0.0, MAX_SCORE);
+            }
+            else {
+                score = Math.floor (
+                    (double) elapsed / (COMPLETION_THRESHOLD * (double) intended_duration)
+                ).clamp (0.0, 1.0);
+            }
+
             assert (score.is_finite ());
 
             return score;
