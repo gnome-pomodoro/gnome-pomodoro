@@ -77,6 +77,28 @@ namespace Pomodoro
             return this.cycles == 1;
         }
 
+        public int64 get_duration (Pomodoro.State state)
+        {
+            switch (state)
+            {
+                case Pomodoro.State.POMODORO:
+                    return this.pomodoro_duration;
+
+                case Pomodoro.State.BREAK:
+                case Pomodoro.State.SHORT_BREAK:
+                    return this.short_break_duration;
+
+                case Pomodoro.State.LONG_BREAK:
+                    return this.long_break_duration;
+
+                case Pomodoro.State.STOPPED:
+                    return 0;
+
+                default:
+                    assert_not_reached ();
+            }
+        }
+
         public GLib.Variant to_variant ()
         {
             var builder = new GLib.VariantBuilder (new GLib.VariantType ("a{s*}"));
@@ -469,6 +491,8 @@ namespace Pomodoro
             }
 
             var time_block = link.data;
+            time_block.session = null;
+
             link.data = null;
             this.time_blocks.delete_link (link);
 

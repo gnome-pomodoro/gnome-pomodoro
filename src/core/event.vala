@@ -364,9 +364,9 @@ namespace Pomodoro
 
         event_spec = new Pomodoro.EventSpec ("reschedule",
                                              _("Rescheduled"),
-                                             _("Triggered on any change related to the session."),
+                                             _("Triggered when scheduled time-blocks have changed."),
                                              Pomodoro.EventCategory.SESSION);
-        event_spec.add_trigger (Pomodoro.TriggerHook.SCHEDULER_RESCHEDULED_SESSION,
+        event_spec.add_trigger (Pomodoro.TriggerHook.SESSION_MANAGER_SESSION_RESCHEDULED,
                                 (Pomodoro.TriggerFunc) trigger_reschedule_event);
         producer.install_event (event_spec);
 

@@ -636,9 +636,13 @@ namespace Pomodoro
          */
         internal void set_state_internal (Pomodoro.State state)
         {
-            this._state = state;
+            if (this._state == state) {
+                return;
+            }
 
+            this._state = state;
             this.notify_property ("state");
+
             this.emit_changed ();
         }
 

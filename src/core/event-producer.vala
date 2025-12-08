@@ -37,11 +37,11 @@ namespace Pomodoro
                                        Pomodoro.State previous_state);
 
     [CCode (has_target = false)]
-    public delegate bool SessionManagerSessionExpiredTriggerFunc (
-                                       Pomodoro.Session current_session);
+    public delegate bool SessionManagerSessionRescheduledTriggerFunc (
+                                       Pomodoro.Session session);
 
     [CCode (has_target = false)]
-    public delegate bool SchedulerRescheduledSessionTriggerFunc (
+    public delegate bool SessionManagerSessionExpiredTriggerFunc (
                                        Pomodoro.Session session);
 
 
@@ -52,8 +52,8 @@ namespace Pomodoro
         SESSION_MANAGER_CONFIRM_ADVANCEMENT,
         SESSION_MANAGER_ADVANCED,
         SESSION_MANAGER_NOTIFY_CURRENT_STATE,
-        SESSION_MANAGER_SESSION_EXPIRED,
-        SCHEDULER_RESCHEDULED_SESSION
+        SESSION_MANAGER_SESSION_RESCHEDULED,
+        SESSION_MANAGER_SESSION_EXPIRED
     }
 
 
@@ -84,6 +84,7 @@ namespace Pomodoro
                 this._session_manager.confirm_advancement.connect (this.on_session_manager_confirm_advancement);
                 this._session_manager.advanced.connect (this.on_session_manager_advanced);
                 this._session_manager.notify["current-state"].connect (this.on_session_manager_notify_current_state);
+                this._session_manager.session_rescheduled.connect (this.on_session_manager_session_rescheduled);
                 this._session_manager.session_expired.connect (this.on_session_manager_session_expired);
 
                 this.previous_state = this._session_manager.current_state;
@@ -102,18 +103,6 @@ namespace Pomodoro
             }
         }
 
-        public Pomodoro.Scheduler scheduler
-        {
-            get {
-                return this._scheduler;
-            }
-            construct
-            {
-                this._scheduler = value;
-                this._scheduler.rescheduled_session.connect (this.on_scheduler_rescheduled_session);
-            }
-        }
-
         public Pomodoro.EventBus bus
         {
             get {
@@ -126,7 +115,6 @@ namespace Pomodoro
 
         private Pomodoro.SessionManager?                   _session_manager = null;
         private Pomodoro.Timer?                            _timer = null;
-        private Pomodoro.Scheduler?                        _scheduler = null;
         private Pomodoro.EventBus?                         _bus = null;
         private Pomodoro.EventSpec[]                       event_specs = null;
         private GLib.HashTable<string, unowned Pomodoro.EventSpec> event_spec_by_name = null;
@@ -134,14 +122,15 @@ namespace Pomodoro
         private GLib.Queue<unowned Pomodoro.EventSpec>     queue = null;
         private uint                                       idle_id = 0;
         private int64                                      event_source_timestamp = Pomodoro.Timestamp.UNDEFINED;
+        private int64                                      last_session_rescheduled_time = Pomodoro.Timestamp.UNDEFINED;
         private bool                                       destroying = false;
 
         private Pomodoro.Trigger[]                         timer_state_change_triggers;
         private Pomodoro.Trigger[]                         session_manager_confirm_advancement_triggers;
         private Pomodoro.Trigger[]                         session_manager_advanced_triggers;
         private Pomodoro.Trigger[]                         session_manager_notify_current_state_triggers;
+        private Pomodoro.Trigger[]                         session_manager_session_rescheduled_triggers;
         private Pomodoro.Trigger[]                         session_manager_session_expired_triggers;
-        private Pomodoro.Trigger[]                         scheduler_rescheduled_session_triggers;
 
         construct
         {
@@ -153,21 +142,19 @@ namespace Pomodoro
             this.session_manager_confirm_advancement_triggers  = new Pomodoro.Trigger[0];
             this.session_manager_advanced_triggers             = new Pomodoro.Trigger[0];
             this.session_manager_notify_current_state_triggers = new Pomodoro.Trigger[0];
+            this.session_manager_session_rescheduled_triggers  = new Pomodoro.Trigger[0];
             this.session_manager_session_expired_triggers      = new Pomodoro.Trigger[0];
-            this.scheduler_rescheduled_session_triggers        = new Pomodoro.Trigger[0];
 
             Pomodoro.initialize_events (this);
         }
 
         public EventProducer ()
         {
-            var session_manager = Pomodoro.SessionManager.get_default ();
             var bus = new Pomodoro.EventBus ();
 
             GLib.Object (
-                session_manager: session_manager,
-                timer: session_manager.timer,
-                scheduler: session_manager.scheduler,
+                session_manager: Pomodoro.SessionManager.get_default (),
+                timer: Pomodoro.Timer.get_default (),
                 bus: bus
             );
         }
@@ -179,7 +166,6 @@ namespace Pomodoro
             GLib.Object (
                 session_manager: session_manager,
                 timer: session_manager.timer,
-                scheduler: session_manager.scheduler,
                 bus: bus
             );
         }
@@ -208,12 +194,12 @@ namespace Pomodoro
                         this.session_manager_notify_current_state_triggers += trigger;
                         break;
 
-                    case Pomodoro.TriggerHook.SESSION_MANAGER_SESSION_EXPIRED:
-                        this.session_manager_session_expired_triggers += trigger;
+                    case Pomodoro.TriggerHook.SESSION_MANAGER_SESSION_RESCHEDULED:
+                        this.session_manager_session_rescheduled_triggers += trigger;
                         break;
 
-                    case Pomodoro.TriggerHook.SCHEDULER_RESCHEDULED_SESSION:
-                        this.scheduler_rescheduled_session_triggers += trigger;
+                    case Pomodoro.TriggerHook.SESSION_MANAGER_SESSION_EXPIRED:
+                        this.session_manager_session_expired_triggers += trigger;
                         break;
 
                     default:
@@ -380,10 +366,32 @@ namespace Pomodoro
             }
         }
 
-        private void on_session_manager_session_expired (Pomodoro.Session session)
+        private void on_session_manager_session_rescheduled (Pomodoro.Session session,
+                                                             int64            timestamp)
         {
-            var timestamp = session.end_time;
+            // Workaround to filter-out redundant signals.
+            // Because we queue the event, there's little harm.
+            if (this.last_session_rescheduled_time == timestamp) {
+                return;
+            }
 
+            this.last_session_rescheduled_time = timestamp;
+
+            foreach (var trigger in this.session_manager_session_rescheduled_triggers)
+            {
+                var trigger_func = (Pomodoro.SessionManagerSessionRescheduledTriggerFunc) trigger.func;
+
+                if (trigger_func (session)) {
+                    // Reschedule is typically done as first thing before any action.
+                    // To capture timer context we need to to delay collecting the context.
+                    this.queue_event (trigger.event_spec);
+                }
+            }
+        }
+
+        private void on_session_manager_session_expired (Pomodoro.Session session,
+                                                         int64            timestamp)
+        {
             foreach (var trigger in this.session_manager_session_expired_triggers)
             {
                 var trigger_func = (Pomodoro.SessionManagerSessionExpiredTriggerFunc) trigger.func;
@@ -394,18 +402,9 @@ namespace Pomodoro
             }
         }
 
-        private void on_scheduler_rescheduled_session (Pomodoro.Session session)
+        public void flush ()
         {
-            foreach (var trigger in this.scheduler_rescheduled_session_triggers)
-            {
-                var trigger_func = (Pomodoro.SchedulerRescheduledSessionTriggerFunc) trigger.func;
-
-                if (trigger_func (session)) {
-                    // A reschedule is typically done as first thing before any action.
-                    // To capture timer context we need to to delay collecting the context.
-                    this.queue_event (trigger.event_spec);
-                }
-            }
+            this.trigger_queued_events (new Pomodoro.Context.build ());
         }
 
         public void destroy ()
@@ -440,13 +439,9 @@ namespace Pomodoro
                 this._session_manager.confirm_advancement.disconnect (this.on_session_manager_confirm_advancement);
                 this._session_manager.advanced.disconnect (this.on_session_manager_advanced);
                 this._session_manager.notify["current-state"].disconnect (this.on_session_manager_notify_current_state);
+                this._session_manager.session_rescheduled.disconnect (this.on_session_manager_session_rescheduled);
                 this._session_manager.session_expired.disconnect (this.on_session_manager_session_expired);
                 this._session_manager = null;
-            }
-
-            if (this._scheduler != null) {
-                this._scheduler.rescheduled_session.disconnect (this.on_scheduler_rescheduled_session);
-                this._scheduler = null;
             }
 
             this._bus = null;
@@ -459,8 +454,8 @@ namespace Pomodoro
             this.session_manager_confirm_advancement_triggers = null;
             this.session_manager_advanced_triggers = null;
             this.session_manager_notify_current_state_triggers = null;
+            this.session_manager_session_rescheduled_triggers = null;
             this.session_manager_session_expired_triggers = null;
-            this.scheduler_rescheduled_session_triggers = null;
 
             base.dispose ();
         }

@@ -77,12 +77,9 @@ namespace Pomodoro
                 {
                     this.scheduler_notify_session_template_id = this._scheduler.notify["session-template"].connect (
                             this.on_scheduler_notify_session_template);
-
-                    if (this._current_session != null) {
-                        this._scheduler.reschedule_session (this._current_session);
-                    }
                 }
 
+                this.reschedule ();
                 this.update_has_uniform_breaks ();
 
                 this.notify_property ("scheduler");
@@ -193,6 +190,7 @@ namespace Pomodoro
         private ulong                            scheduler_notify_session_template_id = 0;
         private uint                             reschedule_idle_id = 0;
         private uint                             active_watch_id = 0;
+        private uint                             session_changed_idle_id = 0;
 
         public SessionManager ()
         {
@@ -259,7 +257,7 @@ namespace Pomodoro
         {
             var next_session = new Pomodoro.Session ();
 
-            this._scheduler.reschedule_session (next_session, null, timestamp);
+            this.reschedule_session (next_session, null, timestamp);
 
             return next_session;
         }
@@ -291,7 +289,7 @@ namespace Pomodoro
                 next_session = null;
             }
 
-            // Reschedule - update time-blocks to given timestamp.
+            // Reschedule - update time-blocks according to given timestamp.
             if (next_session != null)
             {
                 next_session.freeze_changed ();
@@ -310,7 +308,7 @@ namespace Pomodoro
                     next_time_block.set_state_internal (next_state);
                 }
 
-                this.reschedule (next_session, next_time_block, true, timestamp);
+                this.reschedule_session (next_session, next_time_block, timestamp);
 
                 next_session.thaw_changed ();
 
@@ -427,33 +425,72 @@ namespace Pomodoro
             }
         }
 
-        /**
-         * Try reschedule current session.
-         */
-        private void reschedule (Pomodoro.Session?   session = null,
-                                 Pomodoro.TimeBlock? next_time_block = null,
-                                 bool                immediate = false,
-                                 int64               timestamp = Pomodoro.Timestamp.UNDEFINED)
+        private void reschedule_session (Pomodoro.Session?   session,
+                                         Pomodoro.TimeBlock? next_time_block = null,
+                                         int64               timestamp = Pomodoro.Timestamp.UNDEFINED)
         {
-            if (session == null) {
-                session = this._current_session;
+            if (session == null || this._scheduler == null) {
+                return;
             }
 
             if (Pomodoro.Timestamp.is_undefined (timestamp)) {
                 timestamp = this.get_current_time ();
             }
 
+            session.freeze_changed ();
+
+            if (next_time_block != null)
+            {
+                assert (next_time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
+                assert (session.contains (next_time_block));
+
+                next_time_block.move_to (timestamp);
+
+                // Remove scheduled time-blocks leading to `next_time_block`
+                while (true)
+                {
+                    var time_block = session.get_previous_time_block (next_time_block);
+
+                    if (time_block != null &&
+                        time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED)
+                    {
+                        session.remove (time_block);
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+
+            if (this._scheduler.reschedule_session (session, timestamp) &&
+                session == this._current_session)
+            {
+                this.emit_session_rescheduled (timestamp);
+            }
+
+            session.thaw_changed ();
+        }
+
+        /**
+         * Try reschedule current session.
+         */
+        private void reschedule ()
+        {
             if (this.reschedule_idle_id != 0) {
                 GLib.Source.remove (this.reschedule_idle_id);
                 this.reschedule_idle_id = 0;
             }
 
-            if (this._current_time_block != null && !immediate) {
-                timestamp = int64.max (this._current_time_block.end_time, timestamp);
+            if (this._current_session == null) {
+                return;
             }
 
-            if (this._scheduler != null && session != null) {
-                this._scheduler.reschedule_session (session, next_time_block, timestamp);
+            var timestamp = this._current_time_block != null
+                    ? this._current_time_block.end_time
+                    : this.get_current_time ();
+
+            if (this._scheduler.reschedule_session (this._current_session, timestamp)) {
+                this.emit_session_rescheduled (timestamp);
             }
         }
 
@@ -531,12 +568,11 @@ namespace Pomodoro
                     GLib.SignalHandler.block (previous_time_block, this.current_time_block_changed_id);
                 }
 
-                if (previous_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS)
-                {
-                    if (previous_gap != null) {
-                        this.mark_gap_end (previous_gap, timestamp);
-                    }
+                if (previous_gap != null) {
+                    this.mark_gap_end (previous_gap, timestamp);
+                }
 
+                if (previous_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS) {
                     this.mark_time_block_end (previous_time_block, timestamp);
                 }
 
@@ -569,12 +605,17 @@ namespace Pomodoro
                 }
             }
 
-            if (session != null && time_block == null) {
-                // FIXME: remove scheduled time-blocks leading to time_block?
-                this.reschedule (session, null, true, timestamp);
-            }
-            else if (session != null && time_block != null && time_block.start_time != timestamp) {
-                this.reschedule (session, time_block, true, timestamp);
+            if (session != null)
+            {
+                var next_time_block = time_block;
+
+                if (next_time_block != null &&
+                    next_time_block.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED)
+                {
+                    next_time_block = null;
+                }
+
+                this.reschedule_session (session, next_time_block, timestamp);
             }
 
             // Enter session.
@@ -1110,7 +1151,7 @@ namespace Pomodoro
             session.expiry_time = session_entry.expiry_time;
             session.entry = session_entry;
 
-            // Reconstruct time blocks (only in-progress ones for now)
+            // Reconstruct time blocks
             for (var i = 0; i < time_block_results.count; i++)
             {
                 var time_block_entry = (Pomodoro.TimeBlockEntry) time_block_results.get_index (i);
@@ -1139,27 +1180,25 @@ namespace Pomodoro
                         typeof (Pomodoro.GapEntry),
                         gap_filter,
                         gap_sorting);
+                yield gap_results.fetch_async (0, gap_results.count);
 
-                if (gap_results.count > 0)
+                for (var j = 0; j < gap_results.count; j++)
                 {
-                    yield gap_results.fetch_async (0, gap_results.count);
+                    var gap_entry = (Pomodoro.GapEntry) gap_results.get_index (j);
 
-                    for (var j = 0; j < gap_results.count; j++)
-                    {
-                        var gap_entry = (Pomodoro.GapEntry) gap_results.get_index (j);
+                    var gap = new Pomodoro.Gap (Pomodoro.GapFlags.from_string (gap_entry.flags));
+                    gap.set_time_range (gap_entry.start_time, gap_entry.end_time);
+                    gap.entry = gap_entry;
 
-                        var gap = new Pomodoro.Gap (Pomodoro.GapFlags.from_string (gap_entry.flags));
-                        gap.set_time_range (gap_entry.start_time, gap_entry.end_time);
-                        gap.entry = gap_entry;
-
-                        time_block.add_gap (gap);
-                    }
+                    time_block.add_gap (gap);
                 }
+
+                time_block.normalize_gaps ();
 
                 session.append (time_block);
             }
 
-            this._scheduler.ensure_meta (session);
+            this._scheduler.ensure_session_meta (session);
 
             return session;
         }
@@ -1301,7 +1340,7 @@ namespace Pomodoro
 
         private void mark_gap_end (Pomodoro.Gap gap,
                                    int64        timestamp)
-                                   ensures (gap.end_time <= timestamp)
+                                   requires (timestamp >= gap.start_time)
         {
             gap.end_time = timestamp;
 
@@ -1319,27 +1358,34 @@ namespace Pomodoro
          */
         private void mark_time_block_end (Pomodoro.TimeBlock time_block,
                                           int64              timestamp)
-                                          requires (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS)
-                                          ensures (time_block.end_time <= timestamp)
+                                          requires (time_block.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED)
+                                          requires (timestamp >= time_block.start_time)
         {
-            // TODO: allow to count overdue time - count beyond finished_time
-            var has_finished = this._timer.user_data == time_block && this._timer.is_finished ();
-            var end_time = has_finished ? this._timer.state.finished_time : timestamp;
-
             time_block.freeze_changed ();
-            time_block.end_time = end_time;
+
+            if (this._timer.is_finished () && this._timer.user_data == time_block)
+            {
+                // Count overdue time when confirming advancement
+                time_block.end_time = int64.min (
+                        this._timer.state.finished_time + OVERDUE_TIMEOUT,
+                        timestamp);
+            }
+            else {
+                time_block.end_time = timestamp;
+            }
+
             time_block.foreach_gap (
                 (gap) => {
                     gap.end_time = Pomodoro.Timestamp.is_undefined (gap.end_time)
-                            ? end_time
-                            : int64.min (gap.end_time, end_time);
-                }
-            );
+                            ? time_block.end_time
+                            : int64.min (gap.end_time, timestamp);
+                });
+            time_block.set_status (
+                    this._scheduler.is_time_block_completed (time_block, time_block.end_time)
+                    ? Pomodoro.TimeBlockStatus.COMPLETED
+                    : Pomodoro.TimeBlockStatus.UNCOMPLETED);
 
             this.update_time_block_meta (time_block);
-            time_block.set_status (this._scheduler.is_time_block_completed (time_block, time_block.end_time)
-                                   ? Pomodoro.TimeBlockStatus.COMPLETED
-                                   : Pomodoro.TimeBlockStatus.UNCOMPLETED);
 
             time_block.thaw_changed ();
         }
@@ -1450,6 +1496,8 @@ namespace Pomodoro
                 return;
             }
 
+            this.freeze_current_session_changed ();
+
             // Check whether session has expired and select upcoming time-block.
             var next_time_block = this.get_next_time_block ();
             var next_session = next_time_block != null ? next_time_block.session : null;
@@ -1459,23 +1507,20 @@ namespace Pomodoro
                 next_time_block = next_session.get_first_time_block ();
             }
 
-            next_session.freeze_changed ();
-
             // Create a time-block for given state.
             if (next_time_block != null && next_time_block.state != state) {
-                var time_block = new Pomodoro.TimeBlock (state);
+                var time_block = new Pomodoro.TimeBlock.with_start_time (timestamp, state);
                 next_session.insert_before (time_block, next_time_block);
                 next_time_block = time_block;
             }
             else if (next_time_block == null) {
-                var time_block = new Pomodoro.TimeBlock (state);
+                var time_block = new Pomodoro.TimeBlock.with_start_time (timestamp, state);
                 next_session.append (time_block);
                 next_time_block = time_block;
             }
 
             this.advance_to_time_block (next_time_block, timestamp);
-
-            next_session.thaw_changed ();
+            this.thaw_current_session_changed ();
         }
 
         /**
@@ -1490,6 +1535,7 @@ namespace Pomodoro
             var next_time_block = this.initialize_next_time_block (timestamp);
 
             this.advance_to_time_block (next_time_block, timestamp);
+            this.thaw_current_session_changed ();
         }
 
         /**
@@ -1553,29 +1599,43 @@ namespace Pomodoro
                 this.current_session_changed_frozen = true;
                 this._current_session.freeze_changed ();
 
-                // TODO schedule unfreeze; keep `Session.changed` signal frozen until session is rescheduled
-                // this.session_changed_idle_id = GLib.Idle.add (
-                //     () => {
-                //         this.session_changed_idle_id = 0;
-                //         this.thaw_current_session_changed ();
-                //
-                //         return GLib.Source.REMOVE;
-                //     },
-                //     GLib.Priority.HIGH
-                // );
-                // GLib.Source.set_name_by_id (this.session_changed_idle_id,
-                //                             "Pomodoro.Promise.thaw_current_session_changed");
+                this.session_changed_idle_id = GLib.Idle.add (
+                    () => {
+                        GLib.debug ("Calling `thaw_current_session_changed` late...");
+
+                        this.session_changed_idle_id = 0U;
+                        this.thaw_current_session_changed ();
+
+                        return GLib.Source.REMOVE;
+                    });
+                GLib.Source.set_name_by_id (this.session_changed_idle_id,
+                                            "Pomodoro.SessionManager.thaw_current_session_changed");
             }
         }
 
         private void thaw_current_session_changed ()
         {
-            if (this.current_session_changed_frozen)
-            {
+            if (this.session_changed_idle_id != 0U) {
+                GLib.Source.remove (this.session_changed_idle_id);
+                this.session_changed_idle_id = 0U;
+            }
+
+            if (this.current_session_changed_frozen) {
                 assert (this._current_session != null);
 
                 this.current_session_changed_frozen = false;
                 this._current_session.thaw_changed ();
+            }
+        }
+
+        private void emit_session_rescheduled (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        {
+            if (Pomodoro.Timestamp.is_undefined (timestamp)) {
+                timestamp = this.get_current_time ();
+            }
+
+            if (this._current_session != null) {
+                this.session_rescheduled (this._current_session, timestamp);
             }
         }
 
@@ -1991,7 +2051,7 @@ namespace Pomodoro
         private void on_current_time_block_changed (Pomodoro.TimeBlock time_block)
         {
             if (this.resolving_timer_state == 0) {
-                this._scheduler.reschedule_session (this._current_session, null, this.get_current_time ());
+                this.reschedule ();
             }
             else {
                 this.queue_reschedule ();
@@ -2206,6 +2266,7 @@ namespace Pomodoro
                     this.on_current_session_notify_expiry_time);
 
             this.update_has_uniform_breaks ();
+            this.emit_session_rescheduled ();
         }
 
         [Signal (run = "first")]
@@ -2258,6 +2319,9 @@ namespace Pomodoro
                 this.current_time_block_changed_id = 0;
             }
         }
+
+        public signal void session_rescheduled (Pomodoro.Session session,
+                                                int64            timestamp);
 
         public signal void session_expired (Pomodoro.Session session,
                                             int64            timestamp)
@@ -2334,6 +2398,11 @@ namespace Pomodoro
             if (this.reschedule_idle_id != 0) {
                 GLib.Source.remove (this.reschedule_idle_id);
                 this.reschedule_idle_id = 0;
+            }
+
+            if (this.session_changed_idle_id != 0) {
+                GLib.Source.remove (this.session_changed_idle_id);
+                this.session_changed_idle_id = 0;
             }
 
             if (this.expiry_timeout_id != 0) {

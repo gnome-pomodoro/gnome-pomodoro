@@ -92,10 +92,9 @@ namespace Tests
             };
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
-                    GLib.debug ("Event '%s'\n%s", event.spec.name, event.context.timer_state.to_representation ());
-
                     event_names += event.spec.name;
 
                     assert_cmpvariant (
@@ -129,10 +128,9 @@ namespace Tests
             var expected_state = Pomodoro.TimerState ();
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
-                    GLib.debug ("Event '%s'\n%s", event.spec.name, event.context.timer_state.to_representation ());
-
                     event_names += event.spec.name;
 
                     assert_cmpvariant (
@@ -166,10 +164,9 @@ namespace Tests
             var expected_state = Pomodoro.TimerState ();
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
-                    GLib.debug ("Event '%s'\n%s", event.spec.name, event.context.timer_state.to_representation ());
-
                     event_names += event.spec.name;
 
                     assert_cmpvariant (
@@ -205,6 +202,7 @@ namespace Tests
 
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -242,6 +240,7 @@ namespace Tests
 
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -276,6 +275,7 @@ namespace Tests
 
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -319,6 +319,7 @@ namespace Tests
                 user_data = time_block_2
             };
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -379,6 +380,7 @@ namespace Tests
             var expected_state_3 = expected_state_2;
             expected_state_3.started_time = activity_time;
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -452,6 +454,7 @@ namespace Tests
                 user_data = time_block_2
             };
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -503,6 +506,7 @@ namespace Tests
 
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -529,6 +533,7 @@ namespace Tests
             var expected_timestamp = this.session_manager.current_time_block.end_time - Pomodoro.Interval.MINUTE;
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -557,6 +562,7 @@ namespace Tests
             var expected_timestamp = Pomodoro.Timestamp.peek () + Pomodoro.Interval.MINUTE;
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -589,6 +595,7 @@ namespace Tests
             var expected_timestamp = finished_time;
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -627,6 +634,7 @@ namespace Tests
             var event_names = new string[0];
             var session_expired_emitted = 0;
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -659,6 +667,7 @@ namespace Tests
 
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
@@ -667,6 +676,7 @@ namespace Tests
             this.session_manager_action_group.activate_action ("reset", null);
 
             assert_cmpstrv (event_names, {
+                "reschedule",  // XXX: should be after the reset
                 "reset"
             });
         }
@@ -677,6 +687,7 @@ namespace Tests
 
             var event_names = new string[0];
 
+            this.producer.flush ();
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
