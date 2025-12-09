@@ -26,6 +26,10 @@ namespace Pomodoro
             this.woke_up ();
         }
 
+        protected override void initialize ()
+        {
+        }
+
         protected override void setup_providers ()
         {
             // TODO: Providers should register themselves in a static constructors, but can't make it work...

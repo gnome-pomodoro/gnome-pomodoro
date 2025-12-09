@@ -62,6 +62,10 @@ namespace Tests
             );
         }
 
+        protected override void initialize ()
+        {
+        }
+
         protected override void setup_providers ()
         {
             this.setup_count++;

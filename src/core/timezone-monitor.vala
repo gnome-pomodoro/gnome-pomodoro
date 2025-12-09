@@ -23,11 +23,6 @@ namespace Pomodoro
 
         private GLib.TimeZone? _timezone;
 
-        construct
-        {
-            this._timezone = new GLib.TimeZone.local ();
-        }
-
         private void update_timezone (string? timezone_identifier)
         {
             GLib.TimeZone? timezone = null;
@@ -64,6 +59,11 @@ namespace Pomodoro
             var provider = (Pomodoro.TimeZoneMonitorProvider) object;
 
             this.update_timezone (provider.identifier);
+        }
+
+        protected override void initialize ()
+        {
+            this._timezone = new GLib.TimeZone.local ();
         }
 
         protected override void setup_providers ()

@@ -29,12 +29,6 @@ namespace Pomodoro
         private GLib.GenericSet<uint>            holds = null;
         private static uint                      next_hold_id = 1U;
 
-        construct
-        {
-            this.application = GLib.Application.get_default ();
-            this.holds = new GLib.GenericSet<uint> (GLib.direct_hash, GLib.direct_equal);
-        }
-
         private async void request_background (string parent_window = "")
         {
             // Ask for request each time when trying to acquire `application_hold`.
@@ -93,6 +87,12 @@ namespace Pomodoro
             if (removed) {
                 this.update_application_hold ();
             }
+        }
+
+        protected override void initialize ()
+        {
+            this.application = GLib.Application.get_default ();
+            this.holds = new GLib.GenericSet<uint> (GLib.direct_hash, GLib.direct_equal);
         }
 
         protected override void setup_providers ()

@@ -77,6 +77,7 @@ namespace Pomodoro
             this.provider_enabled_id    = this.providers.provider_enabled.connect (this.on_provider_enabled);
             this.provider_disabled_id   = this.providers.provider_disabled.connect (this.on_provider_disabled);
 
+            this.initialize ();
             this.setup_providers ();
 
             this.providers.enable ();
@@ -128,6 +129,8 @@ namespace Pomodoro
 
             this.provider_disabled (provider);
         }
+
+        protected abstract void initialize ();
 
         protected abstract void setup_providers ();
 

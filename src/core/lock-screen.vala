@@ -43,6 +43,10 @@ namespace Pomodoro
             this.update_active ();
         }
 
+        protected override void initialize ()
+        {
+        }
+
         protected override void setup_providers ()
         {
             this.providers.add (new Freedesktop.LockScreenProvider ());

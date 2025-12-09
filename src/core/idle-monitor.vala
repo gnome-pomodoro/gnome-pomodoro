@@ -102,13 +102,13 @@ namespace Pomodoro
     [SingleInstance]
     public class IdleMonitor : Pomodoro.ProvidedObject<Pomodoro.IdleMonitorProvider>
     {
-        private static uint next_watch_id = 1;
+        private static uint next_watch_id = 1U;
 
         [Compact]
         private class Watch
         {
-            public uint                                  id = 0;
-            public uint32                                external_id = 0;
+            public uint                                  id = 0U;
+            public uint32                                external_id = 0U;
             public int64                                 timeout = 0;
             public int64                                 reference_time = Pomodoro.Timestamp.UNDEFINED;
             public Pomodoro.UserIdleFunc?                idle_callback = null;
@@ -126,22 +126,6 @@ namespace Pomodoro
 
         private GLib.HashTable<int64?, Watch> watches = null;
         private int64                         last_activity_time = Pomodoro.Timestamp.UNDEFINED;
-
-        /**
-         * Used for unittests not to setup providers.
-         */
-        public IdleMonitor.dummy ()
-        {
-            this.providers.remove_all ();
-            this.providers.add (new Pomodoro.DummyIdleMonitorProvider ());
-
-            this.providers.enable ();
-        }
-
-        construct
-        {
-            this.watches = new GLib.HashTable<int64?, Watch> (int64_hash, int64_equal);
-        }
 
         private void on_became_idle (uint32 id)
         {
@@ -199,8 +183,21 @@ namespace Pomodoro
                 });
         }
 
+        protected override void initialize ()
+        {
+            // Initialize here rather than in `construct` block, as base `construct` runs first
+            // and may trigger `provider_enabled()` which accesses `watches`.
+            this.watches = new GLib.HashTable<int64?, Watch> (GLib.int64_hash, GLib.int64_equal);
+        }
+
         protected override void setup_providers ()
         {
+            // XXX: this should be defined in tests
+            if (Pomodoro.is_test ()) {
+                this.providers.add (new Pomodoro.DummyIdleMonitorProvider (), Pomodoro.Priority.HIGH);
+                return;
+            }
+
             // TODO: Providers should register themselves in a static constructors, but can't make it work...
             this.providers.add (new Gnome.IdleMonitorProvider (), Pomodoro.Priority.HIGH);
         }

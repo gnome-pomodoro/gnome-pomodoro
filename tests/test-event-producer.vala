@@ -354,7 +354,7 @@ namespace Tests
 
         public void test_timer_finished__wait_for_activity ()
         {
-            var idle_monitor = new Pomodoro.IdleMonitor.dummy ();
+            var idle_monitor = new Pomodoro.IdleMonitor ();
             assert_true (idle_monitor.provider is Pomodoro.DummyIdleMonitorProvider);
 
             this.session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK);
