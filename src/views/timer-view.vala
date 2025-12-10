@@ -223,8 +223,13 @@ namespace Pomodoro
         {
             var timestamp = Pomodoro.Timestamp.from_now ();
 
-            // Skip the toast if the timer was stopped and no cycle was completed.
-            if (!this.timer.is_started () && session.count_completed_cycles () == 0U) {
+            // Skip the toast if the timer was stopped and no pomodoro has been completed.
+            var completed_time_blocks_count = session.count_time_blocks (
+                (time_block) => {
+                    return time_block.state == Pomodoro.State.POMODORO &&
+                           time_block.get_status () == Pomodoro.TimeBlockStatus.COMPLETED;
+                });
+            if (!this.timer.is_started () && completed_time_blocks_count == 0U) {
                 return;
             }
 

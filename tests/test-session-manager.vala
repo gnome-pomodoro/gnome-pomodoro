@@ -1604,11 +1604,6 @@ namespace Tests
 
             Pomodoro.Timestamp.freeze_to (time_block_2.start_time);
             session_manager.current_time_block = time_block_2;
-            assert_cmpuint (
-                session.count_completed_cycles (),
-                GLib.CompareOperator.EQ,
-                1U
-            );
 
             var signals = new string[0];
             timer.resolve_state.connect (() => { signals += "resolve-state"; });

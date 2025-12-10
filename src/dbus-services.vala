@@ -490,9 +490,6 @@ namespace Pomodoro
                 builder.add ("{sv}",
                              "weight",
                              new GLib.Variant.double (cycle.get_weight ()));
-                builder.add ("{sv}",
-                             "is_completed",
-                             new GLib.Variant.boolean (cycle.is_completed ()));
             }
 
             return builder.end ();

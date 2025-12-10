@@ -400,7 +400,14 @@ namespace Pomodoro
                 }
             }
 
-            private void update_timeout ()
+            internal bool has_timeout ()
+            {
+                return this.tick_id != 0 ||
+                       this.timeout_id != 0 ||
+                       this.tick_callback_id != 0;
+            }
+
+            internal void update_timeout ()
             {
                 this.stop_timeout ();
 
@@ -420,20 +427,14 @@ namespace Pomodoro
 
             public void update ()
             {
-                if (this._cycle != null) {
-                    this._cycle.invalidate_cache ();
-                }
-
                 this.update_timeout ();
             }
 
             private void on_cycle_changed ()
             {
-                if (this._cycle == null) {
-                    return;  // retain last weight
-                }
-
-                var weight = (float) this._cycle.get_weight ();
+                var weight = this._cycle != null
+                        ? (float) this._cycle.get_weight ()
+                        : 0.0f;
 
                 if (weight <= 0.0f) {
                     return;  // retain last weight
@@ -443,6 +444,8 @@ namespace Pomodoro
                     // TODO: animate weight
                     this._weight = weight;
                 }
+
+                this.update ();
             }
 
             public override void map ()
@@ -841,8 +844,6 @@ namespace Pomodoro
                         current_segment = segment;
                     }
 
-                    segment.update ();
-
                     cycles_count++;
                     segment = (Segment?) segment.get_next_sibling ();
                 }
@@ -856,7 +857,6 @@ namespace Pomodoro
             while (segment != null)
             {
                 segment.cycle = null;
-                segment.update ();
 
                 segment = (Segment?) segment.get_next_sibling ();
             }
@@ -1198,12 +1198,37 @@ namespace Pomodoro
 
 
         /*
-         *
+         * Timer / session change handlers
          */
 
         private void on_session_changed (Pomodoro.Session session)
         {
             this.queue_update ();
+        }
+
+        /**
+         * Timer state may change after rescheduling / updating segments,
+         * so only prod current segment if there's no timeout.
+         */
+        private void on_timer_state_changed (Pomodoro.TimerState current_state,
+                                             Pomodoro.TimerState previous_state)
+        {
+            unowned Segment? segment = (Segment?) this.get_first_child ();
+            unowned var current_time_block = (Pomodoro.TimeBlock?) current_state.user_data;
+
+            if (current_time_block == null) {
+                return;
+            }
+
+            while (segment != null)
+            {
+                if (segment.cycle?.contains (current_time_block) && !segment.has_timeout ()) {
+                    segment.update_timeout ();
+                    break;
+                }
+
+                segment = (Segment?) segment.get_next_sibling ();
+            }
         }
 
 
@@ -1214,6 +1239,8 @@ namespace Pomodoro
         public override void map ()
         {
             this.update ();
+
+            this._timer.state_changed.connect (this.on_timer_state_changed);
 
             base.map ();
 
@@ -1240,6 +1267,8 @@ namespace Pomodoro
                 this.remove_tick_callback (this.tick_callback_id);
                 this.tick_callback_id = 0;
             }
+
+            this._timer.state_changed.disconnect (this.on_timer_state_changed);
 
             this.remove_segments ();
         }
@@ -1405,6 +1434,8 @@ namespace Pomodoro
             }
 
             this.remove_segments ();
+
+            this._timer.state_changed.disconnect (this.on_timer_state_changed);
 
             this._session_manager = null;
             this._timer = null;

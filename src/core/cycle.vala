@@ -377,13 +377,13 @@ namespace Pomodoro
          */
         public double calculate_progress (int64 timestamp)
         {
-            Pomodoro.ensure_timestamp (ref timestamp);
-
             if (Pomodoro.Timestamp.is_undefined (this._end_time) ||
                 Pomodoro.Timestamp.is_undefined (this._start_time))
             {
                 return 0.0;
             }
+
+            Pomodoro.ensure_timestamp (ref timestamp);
 
             if (Pomodoro.Timestamp.is_undefined (this.progress_reference_start_time) &&
                 this.progress_value.is_nan ())
@@ -426,7 +426,7 @@ namespace Pomodoro
          *
          * You should call it on every time-block change or change of metadata.
          */
-        public void invalidate_cache ()
+        private void invalidate_cache ()
         {
             this.weight = double.NAN;
             this.completion_time = Pomodoro.Timestamp.UNDEFINED;
@@ -444,27 +444,6 @@ namespace Pomodoro
                 : Pomodoro.TimeBlockStatus.SCHEDULED;
 
             return first_status == Pomodoro.TimeBlockStatus.SCHEDULED;
-        }
-
-        public bool is_completed ()
-        {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
-            var progress = 0.0;
-
-            while (link != null)
-            {
-                if (link.data.get_status () == Pomodoro.TimeBlockStatus.COMPLETED) {
-                    progress += link.data.get_weight ();
-                }
-
-                if (progress >= 1.0) {
-                    return true;
-                }
-
-                link = link.next;
-            }
-
-            return false;
         }
 
         public override void dispose ()

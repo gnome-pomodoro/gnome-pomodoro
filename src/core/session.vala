@@ -845,11 +845,6 @@ namespace Pomodoro
             return count;
         }
 
-        public inline uint count_completed_cycles ()
-        {
-            return this.count_cycles ((cycle) => cycle.is_completed ());
-        }
-
         public inline uint count_visible_cycles ()
         {
             return this.count_cycles ((cycle) => cycle.is_visible ());
