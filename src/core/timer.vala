@@ -1065,15 +1065,16 @@ namespace Pomodoro
         public signal void state_changed (Pomodoro.TimerState current_state,
                                           Pomodoro.TimerState previous_state)
         {
-            if (this.is_running ()) {
+            if (current_state.is_running ()) {
                 this.start_timeout (this.last_state_changed_time);
             }
             else {
                 this.stop_timeout (this.last_state_changed_time);
             }
 
-            if (Pomodoro.Timestamp.is_defined (current_state.finished_time) &&
-                Pomodoro.Timestamp.is_undefined (previous_state.finished_time))
+            if (current_state.is_finished () &&
+                previous_state.is_started () &&
+                !previous_state.is_finished ())
             {
                 this.finished (current_state);
             }
@@ -1101,9 +1102,7 @@ namespace Pomodoro
          *
          * It's emitted even when timer is not running.
          */
-        public signal void suspending (int64 start_time)
-        {
-        }
+        public signal void suspending (int64 start_time);
 
         /**
          * Emitted right after system wakes up and the timer has been synchronised.

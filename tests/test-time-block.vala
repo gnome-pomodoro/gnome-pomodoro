@@ -844,45 +844,33 @@ namespace Tests
             time_block.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
 
             var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (now + 10 * Pomodoro.Interval.MINUTE,
-                                  Pomodoro.Timestamp.UNDEFINED);
+            gap_1.set_time_range (now + 1 * Pomodoro.Interval.MINUTE,
+                                  now + 5 * Pomodoro.Interval.MINUTE);
             time_block.add_gap (gap_1);
+            time_block.duration += gap_1.duration;
+
+            var gap_2 = new Pomodoro.Gap.with_start_time (now + 10 * Pomodoro.Interval.MINUTE);
+            time_block.add_gap (gap_2);
+
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (time_block.start_time)),
                 new GLib.Variant.int64 (25 * Pomodoro.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_1.start_time)),
-                new GLib.Variant.int64 (15 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (24 * Pomodoro.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.end_time)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
-            );
-
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (now + 1 * Pomodoro.Interval.MINUTE,
-                                  now + 5 * Pomodoro.Interval.MINUTE);
-            time_block.add_gap (gap_2);
-            assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.start_time)),
-                new GLib.Variant.int64 ((25 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_remaining (gap_1.end_time)),
+                new GLib.Variant.int64 (24 * Pomodoro.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_2.start_time)),
-                new GLib.Variant.int64 ((25 - 1 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (19 * Pomodoro.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (gap_2.end_time)),
-                new GLib.Variant.int64 ((25 - 1 - 4) * Pomodoro.Interval.MINUTE)
-            );
-            assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (gap_1.start_time)),
-                new GLib.Variant.int64 (15 * Pomodoro.Interval.MINUTE)
-            );
-            assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.end_time)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_remaining (gap_2.start_time + Pomodoro.Interval.HOUR)),
+                new GLib.Variant.int64 (19 * Pomodoro.Interval.MINUTE)
             );
         }
 

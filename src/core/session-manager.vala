@@ -346,37 +346,46 @@ namespace Pomodoro
             var current_time_block = this._current_time_block;
             var current_gap = this._current_gap;
 
-            if (current_gap != null) {
-                timestamp = int64.min (timestamp, current_gap.start_time);
+            if (current_time_block == null) {
+                state = Pomodoro.TimerState ();
+                return;
             }
 
-            // Adjust timer state according to current-time-block.
-            if (current_time_block != null)
+            var paused_time = current_gap != null &&
+                              Pomodoro.Timestamp.is_undefined (current_gap.end_time)
+                    ? current_gap.start_time
+                    : Pomodoro.Timestamp.UNDEFINED;
+            if (Pomodoro.Timestamp.is_defined (paused_time)) {
+                timestamp = paused_time;
+            }
+
+            timestamp = timestamp.clamp (current_time_block.start_time,
+                                         current_time_block.end_time);
+
+            // Adjust timer state according to the current-time-block.
+            if (!this.is_waiting_for_activity ())
             {
                 var elapsed = current_time_block.calculate_elapsed (timestamp);
 
-                if (!this.is_waiting_for_activity () || current_gap != null)
-                {
-                    state.duration     = current_time_block.get_last_gap () == null
-                            ? current_time_block.duration
-                            : current_time_block.get_intended_duration ();
-                    state.offset       = timestamp - current_time_block.start_time - elapsed;
-                    state.started_time = current_time_block.start_time;
-                    state.paused_time  = current_gap != null
-                            ? current_gap.start_time : Pomodoro.Timestamp.UNDEFINED;
-                }
-                else {
-                    state.duration     = current_time_block.duration;
-                    state.offset       = 0;
-                    state.started_time = Pomodoro.Timestamp.UNDEFINED;
-                    state.paused_time  = Pomodoro.Timestamp.UNDEFINED;
-                }
-
-                state.user_data = current_time_block;
+                state.offset        = timestamp - current_time_block.start_time - elapsed;
+                state.duration      = current_time_block.duration - state.offset;
+                state.started_time  = current_time_block.start_time;
+                state.paused_time   = paused_time;
+                state.finished_time = timestamp >= current_time_block.end_time
+                        ? current_time_block.end_time
+                        : Pomodoro.Timestamp.UNDEFINED;
             }
             else {
-                state = Pomodoro.TimerState ();
+                assert (current_gap == null);
+
+                state.offset        = 0;
+                state.duration      = current_time_block.duration;
+                state.started_time  = Pomodoro.Timestamp.UNDEFINED;
+                state.paused_time   = Pomodoro.Timestamp.UNDEFINED;
+                state.finished_time = Pomodoro.Timestamp.UNDEFINED;
             }
+
+            state.user_data = current_time_block;
         }
 
         private void update_session_template ()
@@ -1285,7 +1294,9 @@ namespace Pomodoro
                         }
                     });
 
-                if (restored_time_block != null && restored_gap == null)
+                if (restored_time_block != null &&
+                    restored_time_block.end_time > timestamp &&
+                    restored_gap == null)
                 {
                     GLib.warning ("Restoring a time-block that hasn't been paused. Rewinding to last known position...");
 

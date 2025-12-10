@@ -403,8 +403,10 @@ namespace Pomodoro
                 return 0;  // Result won't make sense if block has no `end`.
             }
 
-            if (timestamp >= this._end_time || this._start_time >= this._end_time) {
-                return 0;
+            var last_gap = this.get_last_gap ();
+
+            if (last_gap != null && Pomodoro.Timestamp.is_undefined (last_gap.end_time)) {
+                timestamp = int64.min (last_gap.start_time, timestamp);
             }
 
             var range_start = int64.max (this._start_time, timestamp);
@@ -417,7 +419,7 @@ namespace Pomodoro
                     var gap_end_time = gap.end_time;
 
                     if (Pomodoro.Timestamp.is_undefined (gap_end_time) ||
-                        gap_end_time <= gap_start_time)
+                        gap_start_time >= gap_end_time)
                     {
                         return;
                     }
@@ -430,7 +432,7 @@ namespace Pomodoro
                     range_start = gap_end_time.clamp (range_start, range_end);
                 });
 
-            return remaining;
+            return int64.max (remaining, 0);
         }
 
         /**

@@ -802,6 +802,7 @@ namespace Tests
 
             var expected_start_time = time_block.start_time;
             var expected_elapsed = time_block.calculate_elapsed (timestamp);
+            var expected_remaining = time_block.calculate_remaining (timestamp);
             var expected_timer_state = Pomodoro.TimerState () {
                 duration = time_block.duration,
                 offset = 0,
@@ -822,12 +823,16 @@ namespace Tests
             assert_true (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
             assert_null (time_block.get_last_gap ());
             assert_cmpvariant (
-                timer.state.to_variant (),
-                expected_timer_state.to_variant ()
-            );
-            assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed (timestamp)),
                 new GLib.Variant.int64 (expected_elapsed)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (timer.calculate_remaining (timestamp)),
+                new GLib.Variant.int64 (expected_remaining)
+            );
+            assert_cmpvariant (
+                timer.state.to_variant (),
+                expected_timer_state.to_variant ()
             );
         }
 
@@ -838,26 +843,29 @@ namespace Tests
 
             var session = new Pomodoro.Session.from_template (this.session_template);
             var time_block = session.get_first_time_block ();
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
             time_block.set_intended_duration (time_block.duration);
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
 
             var gap_1 = new Pomodoro.Gap ();
             gap_1.set_time_range (time_block.start_time + Pomodoro.Interval.MINUTE,
                                   time_block.start_time + 3 * Pomodoro.Interval.MINUTE);
             time_block.add_gap (gap_1);
+            time_block.end_time += gap_1.duration;
 
-            var gap_2 = new Pomodoro.Gap.with_start_time (gap_1.end_time + Pomodoro.Interval.MINUTE);
+            var gap_2 = new Pomodoro.Gap.with_start_time (
+                    time_block.start_time + 4 * Pomodoro.Interval.MINUTE);
             time_block.add_gap (gap_2);
 
             var timestamp = gap_2.start_time + 5 * Pomodoro.Interval.MINUTE;
 
             var expected_start_time = time_block.start_time;
             var expected_elapsed = 2 * Pomodoro.Interval.MINUTE;
+            var expected_remaining = time_block.get_intended_duration () - expected_elapsed;
             var expected_cycles = session_manager.scheduler.session_template.cycles;
             var expected_timer_state = Pomodoro.TimerState () {
                 duration = time_block.get_intended_duration (),
-                offset = gap_2.start_time - expected_start_time - expected_elapsed,
-                started_time = expected_start_time,
+                offset = gap_2.start_time - time_block.start_time - expected_elapsed,
+                started_time = time_block.start_time,
                 paused_time = gap_2.start_time,
                 finished_time = Pomodoro.Timestamp.UNDEFINED,
                 user_data = time_block
@@ -868,6 +876,7 @@ namespace Tests
 
             assert_true (session_manager.current_session == session);
             assert_true (session_manager.current_time_block == time_block);
+            assert_true (session_manager.current_gap == gap_2);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.start_time),
                 new GLib.Variant.int64 (expected_start_time)
@@ -876,22 +885,31 @@ namespace Tests
                 new GLib.Variant.int64 (time_block.calculate_elapsed (timestamp)),
                 new GLib.Variant.int64 (expected_elapsed)
             );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (time_block.calculate_remaining (timestamp)),
+                new GLib.Variant.int64 (expected_remaining)
+            );
             assert_true (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
-            assert_true (time_block.get_last_gap () == gap_2);
+            assert_true (time_block.get_nth_gap (0) == gap_1);
+            assert_true (time_block.get_nth_gap (1) == gap_2);
             assert_true (Pomodoro.Timestamp.is_undefined (gap_2.end_time));
-
             assert_cmpuint (
                 session.count_visible_cycles (),
                 GLib.CompareOperator.EQ,
                 expected_cycles
             );
-            assert_cmpvariant (
-                timer.state.to_variant (),
-                expected_timer_state.to_variant ()
-            );
+
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed (timestamp)),
                 new GLib.Variant.int64 (expected_elapsed)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (timer.calculate_remaining (timestamp)),
+                new GLib.Variant.int64 (expected_remaining)
+            );
+            assert_cmpvariant (
+                timer.state.to_variant (),
+                expected_timer_state.to_variant ()
             );
         }
 
@@ -1761,7 +1779,10 @@ namespace Tests
             timer.finish (finished_time_1);
             assert_true (timer.user_data == time_block_1);
             assert_true (timer.is_finished ());
-            assert_true (timer.state.finished_time == finished_time_1);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (timer.state.finished_time),
+                new GLib.Variant.int64 (finished_time_1)
+            );
 
             var confirmation_time_1 = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
             session_manager.advance (confirmation_time_1);
@@ -1769,6 +1790,7 @@ namespace Tests
             var time_block_2 = session_manager.current_time_block;
             assert_true (timer.user_data == time_block_2);
             assert_true (timer.is_started ());
+            assert_false (timer.is_finished ());
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.started_time),
@@ -3436,8 +3458,7 @@ namespace Tests
             session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK);
 
             var time_block_1 = session_manager.current_time_block;
-
-            var finished_time = session_manager.current_time_block.end_time;
+            var finished_time = time_block_1.end_time;
             Pomodoro.Timestamp.freeze_to (finished_time);
             timer.finish (finished_time);
 
@@ -3445,6 +3466,7 @@ namespace Tests
             assert_true (time_block_2.state == Pomodoro.State.POMODORO);
             assert_true (timer.user_data == time_block_2);
             assert_false (timer.is_started ());
+            assert_false (timer.is_finished ());
 
             // Simulate inactivity of 1 minute.
             var activity_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
@@ -3564,6 +3586,7 @@ namespace Tests
             this.add_test ("restore__empty_session", this.test_restore__empty_session);
             this.add_test ("restore__in_progress_time_block", this.test_restore__in_progress_time_block);
             this.add_test ("restore__uncompleted_time_block", this.test_restore__uncompleted_time_block);
+            this.add_test ("restore__completed_time_block", this.test_restore__completed_time_block);
             this.add_test ("restore__multiple_time_blocks", this.test_restore__multiple_time_blocks);
             this.add_test ("restore__with_gaps", this.test_restore__with_gaps);
             this.add_test ("restore__missing_ongoing_gap", this.test_restore__missing_ongoing_gap);
@@ -4387,7 +4410,6 @@ namespace Tests
         {
             var timestamp = Pomodoro.Timestamp.peek ();
 
-            // Save a single time-block. Imitate pausing the timer before shutdown
             var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
             time_block.set_time_range (timestamp, timestamp + 25 * Pomodoro.Interval.MINUTE);
             time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
@@ -4401,75 +4423,87 @@ namespace Tests
             gap_1.set_time_range (time_block.start_time + Pomodoro.Interval.MINUTE,
                                   time_block.start_time + 3 * Pomodoro.Interval.MINUTE);
             time_block.add_gap (gap_1);
+            time_block.end_time += gap_1.duration;
 
-            var gap_2 = new Pomodoro.Gap.with_start_time (gap_1.end_time + Pomodoro.Interval.MINUTE);
+            var gap_2 = new Pomodoro.Gap.with_start_time (
+                    time_block.start_time + 4 * Pomodoro.Interval.MINUTE);
             time_block.add_gap (gap_2);
 
             var session = new Pomodoro.Session ();
             session.append (time_block);
 
-            timestamp = gap_2.start_time;
-            Pomodoro.Timestamp.freeze_to (timestamp);
-
+            Pomodoro.Timestamp.freeze_to (gap_2.start_time);
             this.session_manager.current_time_block = time_block;
             assert_true (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
-            assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_elapsed (timestamp)),
-                new GLib.Variant.int64 (2 * Pomodoro.Interval.MINUTE)
-            );
-            assert_cmpvariant (
-                new GLib.Variant.int64 (this.timer.calculate_elapsed (timestamp)),
-                new GLib.Variant.int64 (2 * Pomodoro.Interval.MINUTE)
-            );
 
+            var save_time = gap_2.start_time + 5 * Pomodoro.Interval.MINUTE;
+            var restore_time = save_time + 30 * Pomodoro.Interval.MINUTE;
+
+            // Save
+            Pomodoro.Timestamp.freeze_to (save_time);
             this.run_save ();
 
-            // Create a new session manager to test restore
+            // Restore
             var new_timer = new Pomodoro.Timer ();
             var new_session_manager = new Pomodoro.SessionManager.with_timer (new_timer);
 
-            timestamp = Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
-            this.run_restore (new_session_manager, timestamp);
+            Pomodoro.Timestamp.freeze_to (restore_time);
+            this.run_restore (new_session_manager, restore_time);
 
-            var new_session = new_session_manager.current_session;
-            var new_time_block = new_session_manager.current_time_block;
-            var new_gap = new_time_block?.get_last_gap ();
-            assert_nonnull (new_session);
-            assert_nonnull (new_time_block);
-            assert_nonnull (new_gap);
+            var restored_session = new_session_manager.current_session;
+            var restored_time_block = new_session_manager.current_time_block;
+            var restored_gap = new_session_manager.current_gap;
+            assert_nonnull (restored_session);
+            assert_nonnull (restored_time_block);
+            assert_nonnull (restored_gap);
 
             assert_cmpvariant (
-                new GLib.Variant.int64 (new_session.start_time),
+                new GLib.Variant.int64 (restored_session.start_time),
                 new GLib.Variant.int64 (session.start_time)
             );
             assert_cmpuint (
-                new_session.count_visible_cycles (),
+                restored_session.count_visible_cycles (),
                 GLib.CompareOperator.EQ,
                 session.count_visible_cycles ()
             );
 
-            assert_true (new_time_block.state == Pomodoro.State.POMODORO);
-            assert_true (new_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            assert_true (restored_time_block.state == Pomodoro.State.POMODORO);
+            assert_true (restored_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
             assert_cmpvariant (
-                new GLib.Variant.int64 (new_time_block.start_time),
+                new GLib.Variant.int64 (restored_time_block.start_time),
                 new GLib.Variant.int64 (time_block.start_time)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (new_time_block.get_intended_duration ()),
+                new GLib.Variant.int64 (restored_time_block.get_intended_duration ()),
                 new GLib.Variant.int64 (time_block.get_intended_duration ())
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (new_time_block.calculate_elapsed (timestamp)),
-                new GLib.Variant.int64 (time_block.calculate_elapsed (timestamp))
+                new GLib.Variant.int64 (restored_time_block.calculate_elapsed (restore_time)),
+                new GLib.Variant.int64 (time_block.calculate_elapsed (save_time))
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (restored_time_block.calculate_remaining (restore_time)),
+                new GLib.Variant.int64 (time_block.calculate_remaining (save_time))
             );
 
+            assert_true (restored_gap.flags == gap_2.flags);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (restored_gap.start_time),
+                new GLib.Variant.int64 (gap_2.start_time)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (restored_gap.end_time),
+                new GLib.Variant.int64 (gap_2.end_time)
+            );
+
+            var expected_elapsed = time_block.calculate_elapsed ();
             var expected_timer_state = Pomodoro.TimerState () {
-                duration = 25 * Pomodoro.Interval.MINUTE,
-                offset = gap_2.start_time - time_block.start_time - time_block.calculate_elapsed (timestamp),
+                duration = time_block.get_intended_duration (),
+                offset = gap_2.start_time - time_block.start_time - expected_elapsed,
                 started_time = time_block.start_time,
                 paused_time = gap_2.start_time,
                 finished_time = Pomodoro.Timestamp.UNDEFINED,
-                user_data = new_time_block
+                user_data = restored_time_block
             };
             assert_cmpvariant (
                 timer.state.to_variant (),
@@ -4523,6 +4557,54 @@ namespace Tests
             new_timer.start ();
             assert_true (new_session_manager.current_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
             assert_true (restored_session.get_previous_time_block (new_session_manager.current_time_block) == restored_time_block);
+        }
+
+        /**
+         * Restore a session with in-progress time-block when the timer reached finish and we
+         * await advancement confirmation.
+         */
+        public void test_restore__completed_time_block ()
+        {
+            var settings = Pomodoro.get_settings ();
+            settings.set_boolean ("confirm-starting-break", true);
+
+            var timestamp = Pomodoro.Timestamp.peek ();
+
+            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            time_block.set_time_range (timestamp, timestamp + 25 * Pomodoro.Interval.MINUTE);
+            time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
+            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+
+            var session = new Pomodoro.Session ();
+            session.append (time_block);
+
+            Pomodoro.Timestamp.freeze_to (time_block.end_time);
+            this.session_manager.current_time_block = time_block;
+            assert_true (time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (time_block.start_time),
+                new GLib.Variant.int64 (timestamp)
+            );
+            assert_true (this.timer.is_finished ());
+
+            Pomodoro.Timestamp.freeze_to (time_block.end_time + 10 * Pomodoro.Interval.MINUTE);
+            this.run_save ();
+
+            // Create a new session manager to test restore
+            var new_timer = new Pomodoro.Timer ();
+            var new_session_manager = new Pomodoro.SessionManager.with_timer (new_timer);
+
+            Pomodoro.Timestamp.freeze_to (time_block.end_time + 20 * Pomodoro.Interval.MINUTE);
+            this.run_restore (new_session_manager);
+
+            var restored_session = new_session_manager.current_session;
+            var restored_time_block = new_session_manager.current_time_block;
+            var restored_gap = new_session_manager.current_gap;
+            assert_nonnull (restored_session);
+            assert_nonnull (restored_time_block);
+            assert_null (restored_gap);
+            assert_true (restored_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            assert_true (this.timer.is_finished ());
         }
 
         /**

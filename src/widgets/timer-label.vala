@@ -321,6 +321,17 @@ namespace Pomodoro
             this.seconds_label.text = "%02u".printf (remaining_uint % 60);
         }
 
+        private bool should_blink ()
+        {
+            if (this._timer.user_data == null) {
+                return false;
+            }
+
+            return this._timer.is_paused () ||
+                   this._timer.is_finished () ||
+                   !this._timer.is_started ();
+        }
+
         private void stop_blinking_animation ()
         {
             if (this.blink_animation == null) {
@@ -334,6 +345,7 @@ namespace Pomodoro
             if (this.get_mapped () && this.box.opacity != 1.0)
             {
                 var animation_target = new Adw.PropertyAnimationTarget (this.box, "opacity");
+
                 this.blink_animation = new Adw.TimedAnimation (this.box,
                                                                this.box.opacity,
                                                                1.0,
@@ -368,6 +380,7 @@ namespace Pomodoro
             }
 
             var animation_target = new Adw.PropertyAnimationTarget (this.box, "opacity");
+
             this.blink_animation = new Adw.TimedAnimation (this.box,
                                                            this.box.opacity,
                                                            BLINK_FADE_VALUE,
@@ -426,18 +439,8 @@ namespace Pomodoro
         {
             var timestamp = this._timer.get_last_state_changed_time ();
 
-            if (this._timer.user_data != null)
+            if (current_state.user_data != null)
             {
-                if (current_state.is_paused () ||
-                    current_state.is_finished () ||
-                    !current_state.is_started ())
-                {
-                    this.start_blinking_animation ();
-                }
-                else {
-                    this.stop_blinking_animation ();
-                }
-
                 // Prevent from displaying 00:00 while stopping the timer.
                 this.update_remaining_time (timestamp);
 
@@ -447,7 +450,15 @@ namespace Pomodoro
                 this.fade_out ();
             }
 
-            if (this.get_mapped ()) {
+            if (this.get_mapped ())
+            {
+                if (this.should_blink ()) {
+                    this.start_blinking_animation ();
+                }
+                else {
+                    this.stop_blinking_animation ();
+                }
+
                 this.queue_resize ();
             }
         }
@@ -656,9 +667,7 @@ namespace Pomodoro
 
             base.map ();
 
-            if (this._timer.user_data != null && (
-                this._timer.is_paused () || this._timer.is_finished () || !this._timer.is_started ()))
-            {
+            if (this.should_blink ()) {
                 this.start_blinking_animation ();
             }
         }
