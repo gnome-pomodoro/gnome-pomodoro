@@ -534,8 +534,6 @@ namespace Pomodoro
             var dbus_connection = this.get_dbus_connection ();
             var dbus_object_path = this.get_dbus_object_path ();
 
-            this.hold ();
-
             base.startup ();
 
             this.settings           = Pomodoro.get_settings ();
@@ -559,6 +557,7 @@ namespace Pomodoro
             this.settings.changed.connect (this.on_settings_changed);
             this.event_bus.event.connect (this.on_event);
 
+            this.hold ();
             this.mark_busy ();
 
             this.session_manager.restore.begin (
@@ -701,6 +700,7 @@ namespace Pomodoro
             this.event_bus.destroy ();
             this.action_manager.destroy ();
             this.capability_manager.destroy ();
+            this.background_manager.destroy ();
             this.session_manager.enter_session.disconnect (this.on_enter_session);
             this.session_manager.leave_session.disconnect (this.on_leave_session);
             this.session_manager.advanced.disconnect (this.on_advanced);

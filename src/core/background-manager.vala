@@ -23,7 +23,7 @@ namespace Pomodoro
             }
         }
 
-        private unowned GLib.Application?        application;
+        private unowned GLib.Application?        application = null;
         private bool                             has_application_hold = false;
         private bool                             request_granted = false;
         private GLib.GenericSet<uint>            holds = null;
@@ -116,9 +116,15 @@ namespace Pomodoro
             this.release_application ();
         }
 
+        public void destroy ()
+        {
+            this.holds?.remove_all ();
+            this.release_application ();
+        }
+
         public override void dispose ()
         {
-            this.release_application ();
+            this.destroy ();
 
             this.application = null;
             this.holds = null;
