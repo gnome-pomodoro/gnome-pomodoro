@@ -294,7 +294,8 @@ namespace Pomodoro
             {
                 next_session.freeze_changed ();
 
-                // Update break type. It's not done by scheduler, because we want to start a desired break at will.
+                // Update break type. It's not done by scheduler,
+                // because we want to start a desired break at will.
                 if (next_time_block != null && next_time_block.state.is_break ())
                 {
                     var next_state = Pomodoro.State.BREAK;
@@ -306,6 +307,8 @@ namespace Pomodoro
                     }
 
                     next_time_block.set_state_internal (next_state);
+                    next_time_block.duration =
+                            this.scheduler.session_template.get_duration (next_state);
                 }
 
                 this.reschedule_session (next_session, next_time_block, timestamp);

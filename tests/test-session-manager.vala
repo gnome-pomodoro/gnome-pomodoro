@@ -1100,6 +1100,10 @@ namespace Tests
             var scheduled_break = session_manager.current_time_block;
             assert_nonnull (scheduled_break);
             assert_true (scheduled_break.state == Pomodoro.State.SHORT_BREAK);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (scheduled_break.duration),
+                new GLib.Variant.int64 (this.session_template.short_break_duration)
+            );
 
             var scheduled_pomodoro = session.get_next_time_block (scheduled_break);
             assert_nonnull (scheduled_pomodoro);
