@@ -6,55 +6,56 @@
     <file compressed="true">migrations/version-2.sql</file>
     <file compressed="true">migrations/version-3.sql</file>
 
-    <!-- Views -->
-    <file alias="ui/action-edit-window.ui" compressed="true" preprocess="xml-stripblanks">views/action-edit-window.ui</file>
-    <file alias="ui/action-listboxrow.ui" compressed="true" preprocess="xml-stripblanks">views/action-listboxrow.ui</file>
-    <file alias="ui/compact-timer-view.ui" compressed="true" preprocess="xml-stripblanks">views/compact-timer-view.ui</file>
-    <file alias="ui/install-extension-dialog.ui" compressed="true" preprocess="xml-stripblanks">views/install-extension-dialog.ui</file>
-    <file alias="ui/log-window.ui" compressed="true" preprocess="xml-stripblanks">views/log-window.ui</file>
-    <file alias="ui/preferences-panel-appearance.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-appearance.ui</file>
-    <file alias="ui/preferences-panel-automation.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-automation.ui</file>
-    <file alias="ui/preferences-panel-keyboard-shortcuts.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-keyboard-shortcuts.ui</file>
-    <file alias="ui/preferences-panel-notifications.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-notifications.ui</file>
-    <file alias="ui/preferences-panel-sounds.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-sounds.ui</file>
-    <file alias="ui/preferences-panel-timer.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-panel-timer.ui</file>
-    <file alias="ui/preferences-window.ui" compressed="true" preprocess="xml-stripblanks">views/preferences-window.ui</file>
-    <file alias="ui/screen-overlay.ui" compressed="true" preprocess="xml-stripblanks">views/screen-overlay.ui</file>
-    <file alias="ui/sound-chooser-window.ui" compressed="true" preprocess="xml-stripblanks">views/sound-chooser-window.ui</file>
-    <file alias="ui/stats-date-popover.ui" compressed="true" preprocess="xml-stripblanks">views/stats-date-popover.ui</file>
-    <file alias="ui/stats-day-page.ui" compressed="true" preprocess="xml-stripblanks">views/stats-day-page.ui</file>
-    <file alias="ui/stats-week-page.ui" compressed="true" preprocess="xml-stripblanks">views/stats-week-page.ui</file>
-    <file alias="ui/stats-month-page.ui" compressed="true" preprocess="xml-stripblanks">views/stats-month-page.ui</file>
-    <file alias="ui/stats-view.ui" compressed="true" preprocess="xml-stripblanks">views/stats-view.ui</file>
-    <file alias="ui/timer-view.ui" compressed="true" preprocess="xml-stripblanks">views/timer-view.ui</file>
-    <file alias="ui/window.ui"  compressed="true" preprocess="xml-stripblanks">views/window.ui</file>
-    <file alias="ui/menus.ui" compressed="true" preprocess="xml-stripblanks">views/menus.ui</file>
+    <!-- UI -->
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/dialogs/install-extension-dialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/charts/bubble-chart.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/charts/chart.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/stats-day-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/stats-month-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/stats-view.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/stats-week-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/widgets/day-chooser.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/widgets/month-chooser.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/widgets/stats-card.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/widgets/stats-date-popover.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/widgets/week-chooser.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/compact-timer-view.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/menus.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/timer-view.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/widgets/timer-control-buttons.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/widgets/timer-label.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/window.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/overlays/lightbox.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/overlays/screen-overlay.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/appearance/preferences-panel-appearance.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/action/action-edit-window.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/action/action-listboxrow.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/action/command-entryrow.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/action/condition-group-widget.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/action/condition-widget.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/action/variable-popover.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/log-window.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/preferences-panel-automation.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/keyboard-shortcuts/accelerator-row.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/notifications/preferences-panel-notifications.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/preferences-window.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/sounds/preferences-panel-sounds.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/sounds/sound-chooser-window.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/sounds/volume-slider.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/timer/preferences-panel-timer.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/widgets/log-scale-row.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/widgets/sidebar-row.ui</file>
 
-    <!-- Widgets -->
-    <file alias="ui/accelerator-chooser-window.ui" compressed="true" preprocess="xml-stripblanks">widgets/accelerator-chooser-window.ui</file>
-    <file alias="ui/accelerator-row.ui" compressed="true" preprocess="xml-stripblanks">widgets/accelerator-row.ui</file>
-    <file alias="ui/bubble-chart.ui" compressed="true" preprocess="xml-stripblanks">widgets/bubble-chart.ui</file>
-    <file alias="ui/chart.ui" compressed="true" preprocess="xml-stripblanks">widgets/chart.ui</file>
-    <file alias="ui/command-entryrow.ui" compressed="true" preprocess="xml-stripblanks">widgets/command-entryrow.ui</file>
-    <file alias="ui/condition-group-widget.ui" compressed="true" preprocess="xml-stripblanks">widgets/condition-group-widget.ui</file>
-    <file alias="ui/condition-widget.ui" compressed="true" preprocess="xml-stripblanks">widgets/condition-widget.ui</file>
-    <file alias="ui/day-chooser.ui" compressed="true" preprocess="xml-stripblanks">widgets/day-chooser.ui</file>
-    <file alias="ui/lightbox.ui" compressed="true" preprocess="xml-stripblanks">widgets/lightbox.ui</file>
-    <file alias="ui/log-scale-row.ui" compressed="true" preprocess="xml-stripblanks">widgets/log-scale-row.ui</file>
-    <file alias="ui/month-chooser.ui" compressed="true" preprocess="xml-stripblanks">widgets/month-chooser.ui</file>
-    <file alias="ui/sidebar-row.ui" compressed="true" preprocess="xml-stripblanks">widgets/sidebar-row.ui</file>
-    <file alias="ui/stats-card.ui" compressed="true" preprocess="xml-stripblanks">widgets/stats-card.ui</file>
-    <file alias="ui/timer-control-buttons.ui" compressed="true" preprocess="xml-stripblanks">widgets/timer-control-buttons.ui</file>
-    <file alias="ui/timer-label.ui" compressed="true" preprocess="xml-stripblanks">widgets/timer-label.ui</file>
-    <file alias="ui/variable-popover.ui" compressed="true" preprocess="xml-stripblanks">widgets/variable-popover.ui</file>
-    <file alias="ui/volume-slider.ui" compressed="true" preprocess="xml-stripblanks">widgets/volume-slider.ui</file>
-    <file alias="ui/week-chooser.ui" compressed="true" preprocess="xml-stripblanks">widgets/week-chooser.ui</file>
+    <!-- Images -->
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/keyboard-shortcuts/enter-keyboard-shortcut.svg</file>
 
     <!-- CSS -->
-    <file>style.css</file>
-    <file>style-dark.css</file>
-    <file>style-hc.css</file>
-    <file>style-hc-dark.css</file>
+    <file alias="style.css" compressed="true">ui/style.css</file>
+    <file alias="style-dark.css" compressed="true">ui/style-dark.css</file>
+    <file alias="style-hc.css" compressed="true">ui/style-hc.css</file>
+    <file alias="style-hc-dark.css" compressed="true">ui/style-hc-dark.css</file>
 
     <!-- Icons -->
     <file preprocess="xml-stripblanks">icons/24x24/actions/timer-pause-symbolic.svg</file>
@@ -99,8 +100,5 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/variable-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/window-compact-size-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/window-normal-size-symbolic.svg</file>
-
-    <!-- Images -->
-    <file alias="ui/enter-keyboard-shortcut.svg" preprocess="xml-stripblanks">widgets/enter-keyboard-shortcut.svg</file>
   </gresource>
 </gresources>
