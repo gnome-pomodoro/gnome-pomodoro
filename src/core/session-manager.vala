@@ -1208,7 +1208,11 @@ namespace Pomodoro
             session.expiry_time = session_entry.expiry_time;
             session.entry = session_entry;
 
-            // Reconstruct time blocks
+            // Build mapping from time_block_entry.id to time_block
+            var time_blocks_by_id = new GLib.HashTable<int64?, Pomodoro.TimeBlock> (
+                    GLib.int64_hash, GLib.int64_equal);
+            Gom.Filter[] gap_filters = {};
+
             for (var i = 0; i < time_block_results.count; i++)
             {
                 var time_block_entry = (Pomodoro.TimeBlockEntry) time_block_results.get_index (i);
@@ -1219,29 +1223,39 @@ namespace Pomodoro
                 time_block.set_intended_duration (time_block_entry.intended_duration);
                 time_block.entry = time_block_entry;
 
-                // Load gaps for this time block
+                time_blocks_by_id.insert (time_block_entry.id, time_block);
+
+                // Build filter for this time block's gaps
                 var time_block_id_value = GLib.Value (typeof (int64));
                 time_block_id_value.set_int64 (time_block_entry.id);
-                var gap_filter = new Gom.Filter.eq (
-                        typeof (Pomodoro.GapEntry),
-                        "time-block-id",
-                        time_block_id_value);
+                gap_filters += new Gom.Filter.eq (typeof (Pomodoro.GapEntry),
+                                                  "time-block-id",
+                                                  time_block_id_value);
 
+                session.append (time_block);
+            }
+
+            // Load all gaps for this session
+            if (gap_filters.length > 0)
+            {
+                var gap_filter = gap_filters.length == 1
+                        ? gap_filters[0]
+                        : new Gom.Filter.or_full (gap_filters);
                 var gap_sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
-                gap_sorting.add (
-                        typeof (Pomodoro.GapEntry),
-                        "start-time",
-                        Gom.SortingMode.ASCENDING);
+                gap_sorting.add (typeof (Pomodoro.GapEntry),
+                                 "start-time",
+                                 Gom.SortingMode.ASCENDING);
 
-                var gap_results = yield repository.find_sorted_async (
-                        typeof (Pomodoro.GapEntry),
-                        gap_filter,
-                        gap_sorting);
+                var gap_results = yield repository.find_sorted_async (typeof (Pomodoro.GapEntry),
+                                                                      gap_filter,
+                                                                      gap_sorting);
                 yield gap_results.fetch_async (0, gap_results.count);
 
+                // Distribute gaps to their respective time blocks
                 for (var j = 0; j < gap_results.count; j++)
                 {
                     var gap_entry = (Pomodoro.GapEntry) gap_results.get_index (j);
+                    var time_block = time_blocks_by_id.lookup (gap_entry.time_block_id);
 
                     var gap = new Pomodoro.Gap (Pomodoro.GapFlags.from_string (gap_entry.flags));
                     gap.set_time_range (gap_entry.start_time, gap_entry.end_time);
@@ -1249,11 +1263,9 @@ namespace Pomodoro
 
                     time_block.add_gap (gap);
                 }
-
-                time_block.normalize_gaps ();
-
-                session.append (time_block);
             }
+
+            session.@foreach ((time_block) => time_block.normalize_gaps ());
 
             this._scheduler.ensure_session_meta (session);
 
