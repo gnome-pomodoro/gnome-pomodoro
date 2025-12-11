@@ -842,7 +842,7 @@ namespace Pomodoro
                     filter: filter);
             var command = command_builder.build_delete ();
 
-            command.@ref ();  // TODO: is it needed?
+            command.@ref ();
 
             adapter.queue_write (
                 () => {
@@ -908,6 +908,51 @@ namespace Pomodoro
                 });
         }
 
+        /**
+         * Delete a session entry by ID, working around a floating reference bug in Gom.
+         *
+         * Gom's `GomResource.delete_async()` has a bug where it creates a filter with a floating
+         * reference and unrefs it without sinking, causing a critical warning. This method
+         * implements the delete operation directly to avoid that issue.
+         *
+         * XXX: fix it upstream
+         */
+        private void delete_session (Gom.Repository repository,
+                                     int64          session_id)
+                                     requires (session_id != 0)
+        {
+            var adapter = repository.adapter;
+            assert (adapter != null);
+
+            var id_value = GLib.Value (typeof (int64));
+            id_value.set_int64 (session_id);
+
+            var filter = new Gom.Filter.eq (typeof (Pomodoro.SessionEntry),
+                                            "id",
+                                            id_value);
+
+            var command_builder = (Gom.CommandBuilder) GLib.Object.@new (
+                    typeof (Gom.CommandBuilder),
+                    resource_type: typeof (Pomodoro.SessionEntry),
+                    adapter: adapter,
+                    filter: filter);
+            var command = command_builder.build_delete ();
+
+            command.@ref ();
+
+            adapter.queue_write (
+                () => {
+                    try {
+                        command.execute (null);
+                    }
+                    catch (GLib.Error error) {
+                        GLib.warning ("Error while deleting session entry: %s", error.message);
+                    }
+
+                    command.@unref ();
+                });
+        }
+
         private async void save_session (Gom.Repository   repository,
                                          Pomodoro.Session session)
                                          throws GLib.Error
@@ -919,7 +964,8 @@ namespace Pomodoro
                     var session_entry = session.entry;
                     session.unset_entry ();
 
-                    yield session_entry.delete_async ();
+                    // yield session_entry.delete_async ();  // XXX: should be async
+                    this.delete_session (repository, session_entry.id);
                 }
 
                 return;
