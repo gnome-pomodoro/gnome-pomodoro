@@ -4791,8 +4791,8 @@ namespace Tests
 
         /**
          * Expect session to be paused when shutting down the app.
-         * As a fallback when the app hasn't closed properly, expect to rewind to the last known
-         * position. Reason behind this is not to over-report spent time.
+         * When the app hasn't closed properly, expect it to rewind to the last known
+         * position. It's better to under-report spent time.
          */
         public void test_restore__missing_ongoing_gap ()
         {
@@ -4821,15 +4821,15 @@ namespace Tests
 
             Pomodoro.Timestamp.freeze_to (gap.end_time + 5 * Pomodoro.Interval.MINUTE);
             this.run_restore (new_session_manager);
-            assert_nonnull (new_session_manager.current_session);
-            assert_nonnull (new_session_manager.current_time_block);
+
+            var restored_session = new_session_manager.current_session;
+            assert_nonnull (restored_session);
 
             var restored_time_block = new_session_manager.current_time_block;
             assert_nonnull (restored_time_block);
 
             var restored_gap = restored_time_block.get_last_gap ();
             assert_nonnull (restored_gap);
-
             assert_cmpvariant (
                 restored_gap.start_time,
                 gap.start_time
@@ -4882,12 +4882,18 @@ namespace Tests
             var new_session_manager = new Pomodoro.SessionManager.with_timer (new_timer);
 
             this.run_restore (new_session_manager);
-            assert_nonnull (new_session_manager.current_session);
-            assert_nonnull (new_session_manager.current_time_block);
 
-            // Should restore the more recent session (session_2) with its state
-            assert_true (new_session_manager.current_time_block.state == Pomodoro.State.SHORT_BREAK);
-            assert_true (new_session_manager.current_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var restored_session = new_session_manager.current_session;
+            assert_nonnull (restored_session);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (restored_session.start_time),
+                new GLib.Variant.int64 (session_2.start_time)
+            );
+
+            var restored_time_block = new_session_manager.current_time_block;
+            assert_nonnull (new_session_manager.current_time_block);
+            assert_true (restored_time_block.state == Pomodoro.State.SHORT_BREAK);
+            assert_true (restored_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS);
         }
 
         public void test_restore__completed_session ()

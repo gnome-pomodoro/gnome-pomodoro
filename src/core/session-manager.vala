@@ -364,15 +364,21 @@ namespace Pomodoro
             // Adjust timer state according to the current-time-block.
             if (!this.is_waiting_for_activity ())
             {
+                assert (Pomodoro.Timestamp.is_defined (current_time_block.start_time));
+
                 var elapsed = current_time_block.calculate_elapsed (timestamp);
 
                 state.offset        = timestamp - current_time_block.start_time - elapsed;
                 state.duration      = current_time_block.duration - state.offset;
                 state.started_time  = current_time_block.start_time;
                 state.paused_time   = paused_time;
-                state.finished_time = timestamp >= current_time_block.end_time
-                        ? current_time_block.end_time
-                        : Pomodoro.Timestamp.UNDEFINED;
+                state.finished_time = Pomodoro.Timestamp.UNDEFINED;
+
+                if (timestamp >= current_time_block.end_time &&
+                    Pomodoro.Timestamp.is_undefined (paused_time))
+                {
+                    state.finished_time = current_time_block.end_time;
+                }
             }
             else {
                 assert (current_gap == null);
