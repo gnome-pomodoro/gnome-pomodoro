@@ -1,0 +1,624 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-pomodoro package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-pomodoro\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-31 13:18+0200\n"
+"PO-Revision-Date: 2025-12-11 22:52+0200\n"
+"Last-Translator: Omer I.S. <omeritzicschwartz@gmail.com>\n"
+"Language-Team: \n"
+"Language: he\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : n==2 ? 1 : n>10 && n%10==0 ? "
+"2 : 3);\n"
+"X-Generator: Poedit 3.8\n"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:8
+#: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:28
+#: data/resources/window.ui:382 plugins/actions/enums.vala:92
+#: plugins/gnome/extension/indicator.js:77
+#: plugins/gnome/extension/indicator.js:729
+#: plugins/gnome/extension/notifications.js:281
+#: plugins/gnome/extension/timer.js:41 src/about-dialog.vala:31
+#: src/main.vala:50 src/notifications-capability.vala:129
+#: src/stats-page.vala:527 src/window.vala:44
+msgid "Pomodoro"
+msgstr "פומודורו"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:9
+msgid "A time management utility for GNOME"
+msgstr "כלי עזר לניהול זמן עבור GNOME"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:11
+msgid ""
+"A GNOME utility that helps managing time according to Pomodoro Technique. It "
+"intends to improve productivity and focus by taking short breaks after every "
+"25 minutes of work."
+msgstr ""
+"כלי עזר ל־GNOME שמסייע בניהול הזמן לפי שיטת פומודורו. הוא נועד לשפר את "
+"התפוקה והמיקוד בעזרת לקיחת הפסקות קצרות לאחר כל 25 דקות של עבודה."
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:23
+msgid "Timer window"
+msgstr "חלון קוצב הזמן"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:27
+#: plugins/gnome/extension/indicator.js:83 src/preferences-dialog.vala:800
+msgid "Preferences"
+msgstr "העדפות"
+
+#: data/org.gnome.Pomodoro.appdata.xml.in:31
+msgid "Indicator for GNOME Shell"
+msgstr "מחוון למעטפת GNOME"
+
+#: data/org.gnome.Pomodoro.desktop.in:4 src/about-dialog.vala:32
+msgid "A simple time management utility"
+msgstr "כלי עזר פשוט לניהול זמן"
+
+#: data/org.gnome.Pomodoro.desktop.in:5
+msgid "timer;"
+msgstr "timer;טיימר;קוצב;זמן;"
+
+#: data/resources/menus.ui:6 plugins/actions/enums.vala:188
+#: plugins/actions/resources/action-page.ui:155 src/application.vala:90
+msgid "Start"
+msgstr "התחלה"
+
+#: data/resources/menus.ui:11 data/resources/window.ui:180
+#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:200
+#: src/application.vala:99
+msgid "Pause"
+msgstr "השהיה"
+
+#: data/resources/menus.ui:16 plugins/actions/enums.vala:200
+#: plugins/actions/resources/action-page.ui:215 src/application.vala:102
+msgid "Resume"
+msgstr "המשך"
+
+#: data/resources/menus.ui:21 data/resources/window.ui:207
+#: plugins/gnome/extension/indicator.js:221 src/application.vala:93
+#: src/window.vala:163 src/window.vala:176
+msgid "Stop"
+msgstr "עצירה"
+
+#: data/resources/menus.ui:33 data/resources/window.ui:398
+#: plugins/actions/enums.vala:95 plugins/gnome/extension/indicator.js:78
+#: plugins/gnome/extension/timer.js:44 src/window.vala:45
+msgid "Short Break"
+msgstr "הפסקה קצרה"
+
+#: data/resources/menus.ui:38 data/resources/window.ui:414
+#: plugins/actions/enums.vala:98 plugins/gnome/extension/indicator.js:79
+#: plugins/gnome/extension/timer.js:47 src/window.vala:46
+msgid "Long Break"
+msgstr "הפסקה ארוכה"
+
+#: data/resources/menus.ui:45
+msgid "_Timer"
+msgstr "קוצב _זמן"
+
+#: data/resources/menus.ui:49 data/resources/window.ui:309
+msgid "_Preferences"
+msgstr "ה_עדפות"
+
+#: data/resources/menus.ui:53 data/resources/window.ui:348
+msgid "_Quit"
+msgstr "י_ציאה"
+
+#: data/resources/preferences-keyboard-shortcut-page.ui:29
+msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
+msgstr ""
+"קיצור מקשים להתחלה או עצירה של קוצב הזמן. לחיצה על צירוף מקשים חדש תשנה אותו."
+
+#: data/resources/preferences-keyboard-shortcut-page.ui:83
+#: plugins/actions/enums.vala:206 plugins/actions/resources/action-page.ui:245
+msgid "Disable"
+msgstr "השבתה"
+
+#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:247
+msgid "Timer"
+msgstr "קוצב זמן"
+
+#: data/resources/preferences-main-page.ui:108
+msgid "Pomodoro duration"
+msgstr "משך הזמן של הפומודורו"
+
+#: data/resources/preferences-main-page.ui:160
+msgid "Break duration"
+msgstr "משך הזמן של ההפסקה"
+
+#: data/resources/preferences-main-page.ui:213
+msgid "Long break duration"
+msgstr "משך הזמן של הפסקות ארוכות"
+
+#: data/resources/preferences-main-page.ui:245
+msgid "Pomodoros before a long break"
+msgstr "מספר סבבי פומודורו לפני הפסקה ארוכה"
+
+#: data/resources/preferences-main-page.ui:294
+msgid "Keyboard shortcut"
+msgstr "צירוף מקשים"
+
+#: data/resources/preferences-main-page.ui:357
+msgid "Notifications"
+msgstr "התרעות"
+
+#: data/resources/preferences-main-page.ui:400
+msgid "Screen notifications"
+msgstr "התרעות על גבי המסך"
+
+#: data/resources/preferences-main-page.ui:460
+msgid "Desktop"
+msgstr "שולחן העבודה"
+
+#: data/resources/preferences-main-page.ui:509
+msgid "Wait for activity after a break"
+msgstr "המתנה לפעילות לאחר הפסקה"
+
+#: data/resources/preferences-main-page.ui:573
+msgid "Plugins…"
+msgstr "תוספים…"
+
+#: data/resources/preferences.ui:8 src/preferences-dialog.vala:804
+msgid "Plugins"
+msgstr "תוספים"
+
+#: data/resources/preferences.ui:47
+msgid "Back"
+msgstr "חזרה"
+
+#: data/resources/screen-notification.ui:89
+#: plugins/gnome/extension/dialogs.js:1002
+msgid "It's time to take a break"
+msgstr "הגיע הזמן לקחת הפסקה"
+
+#: data/resources/stats-view.ui:28
+msgid "Nothing to see yet"
+msgstr "עדיין אין מה לראות כאן"
+
+#: data/resources/stats-view.ui:45
+msgid "Complete a few sessions"
+msgstr ""
+
+#: data/resources/stats-view.ui:86 data/resources/stats-view.ui:343
+msgid "Day"
+msgstr "יום"
+
+#: data/resources/stats-view.ui:109 data/resources/stats-view.ui:356
+msgid "Week"
+msgstr "שבוע"
+
+#: data/resources/stats-view.ui:133 data/resources/stats-view.ui:369
+msgid "Month"
+msgstr "חודש"
+
+#: data/resources/stats-view.ui:161
+msgid "Previous (Alt+Left)"
+msgstr "הקודם (Alt+Left)"
+
+#: data/resources/stats-view.ui:188
+msgid "Next (Alt+Right)"
+msgstr "הבא (Alt+Right)"
+
+#: data/resources/stats-view.ui:216 data/resources/stats-view.ui:319
+#: src/stats-day-page.vala:62
+msgid "Today"
+msgstr "היום"
+
+#: data/resources/window.ui:36 plugins/gnome/extension/indicator.js:214
+#: src/window.vala:180
+msgid "Start Pomodoro"
+msgstr "התחלת פומודורו"
+
+#: data/resources/window.ui:323
+msgid "_About"
+msgstr "על _אודות"
+
+#: plugins/actions/actions.vala:423
+msgid "Actions"
+msgstr "פעולות"
+
+#: plugins/actions/actions.vala:427
+msgid "Action"
+msgstr "פעולה"
+
+#: plugins/actions/actions.vala:452
+msgid "Custom actions…"
+msgstr "פעולות מותאמות אישית…"
+
+#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:170
+msgid "Complete"
+msgstr "הושלם"
+
+#: plugins/actions/enums.vala:194 plugins/actions/resources/action-page.ui:185
+msgid "Skip"
+msgstr "דילוג"
+
+#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:230
+msgid "Enable"
+msgstr "הפעלה"
+
+#: plugins/actions/resources/action-page.ui:28
+msgid "Command"
+msgstr "פקודה"
+
+#: plugins/actions/resources/action-page.ui:41
+#: plugins/actions/resources/menus.ui:29
+msgid "Triggers"
+msgstr ""
+
+#: plugins/actions/resources/action-page.ui:54
+msgid "Name"
+msgstr "שם"
+
+#: plugins/actions/resources/action-page.ui:88
+msgid "_Pomodoro"
+msgstr "_פומודורו"
+
+#: plugins/actions/resources/action-page.ui:102
+msgid "_Short Break"
+msgstr "הפסקה _קצרה"
+
+#: plugins/actions/resources/action-page.ui:116
+msgid "_Long Break"
+msgstr "הפסקה ארו_כה"
+
+#: plugins/actions/resources/action-page.ui:299
+msgid "Add"
+msgstr "הוספה"
+
+#: plugins/actions/resources/menus.ui:6
+msgid "Remove"
+msgstr "הסרה"
+
+#: plugins/actions/resources/menus.ui:14
+msgid "State"
+msgstr "מצב"
+
+#: plugins/actions/resources/menus.ui:19
+msgid "State Duration"
+msgstr ""
+
+#: plugins/actions/resources/menus.ui:24
+msgid "Elapsed Time"
+msgstr "הזמן שחלף"
+
+#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
+#: plugins/gnome/extension/indicator.js:84 src/window.vala:101
+msgid "Stats"
+msgstr "סטטיסטיקה"
+
+#: plugins/gnome/extension/indicator.js:85
+msgid "Quit"
+msgstr "יציאה"
+
+#: plugins/gnome/extension/indicator.js:123
+#: plugins/gnome/extension/notifications.js:128
+#: plugins/gnome/extension/notifications.js:549
+msgid "Pomodoro Timer"
+msgstr "קוצב זמן של פומודורו"
+
+#: plugins/gnome/extension/indicator.js:129
+msgid "Start Timer"
+msgstr "התחלת קוצב הזמן"
+
+#: plugins/gnome/extension/indicator.js:162
+msgid "Pause Timer"
+msgstr "השהיית קוצב הזמן"
+
+#: plugins/gnome/extension/indicator.js:174
+msgid "Stop Timer"
+msgstr "עצירת קוצב הזמן"
+
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:179
+msgid "Pause break"
+msgstr "השהיית הפסקה"
+
+#: plugins/gnome/extension/indicator.js:211 src/window.vala:166
+msgid "Pause Pomodoro"
+msgstr "השהיית פומודורו"
+
+#: plugins/gnome/extension/indicator.js:214
+#: src/notifications-capability.vala:141 src/notifications-capability.vala:162
+#: src/window.vala:167
+msgid "Take a break"
+msgstr "לקיחת הפסקה"
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:175
+msgid "Resume break"
+msgstr "המשך הפסקה"
+
+#: plugins/gnome/extension/indicator.js:218 src/window.vala:162
+msgid "Resume Pomodoro"
+msgstr "המשך פומודורו"
+
+#: plugins/gnome/extension/notifications.js:89
+#, javascript-format
+msgid "%d minute remaining"
+msgid_plural "%d minutes remaining"
+msgstr[0] "נותרה דקה אחת (%d)"
+msgstr[1] "נותרו %d דקות"
+msgstr[2] "נותרו %d דקות"
+msgstr[3] "נותרו %d דקות"
+
+#: plugins/gnome/extension/notifications.js:97
+#, javascript-format
+msgid "%d second remaining"
+msgid_plural "%d seconds remaining"
+msgstr[0] "נותרה שנייה אחת (%d)"
+msgstr[1] "נותרו %d שניות"
+msgstr[2] "נותרו %d שניות"
+msgstr[3] "נותרו %d שניות"
+
+#: plugins/gnome/extension/notifications.js:289
+msgid "Pomodoro is about to end"
+msgstr "הפומודורו עומד להסתיים"
+
+#: plugins/gnome/extension/notifications.js:295
+msgid "Take a long break"
+msgstr "לקיחת הפסקה ארוכה"
+
+#: plugins/gnome/extension/notifications.js:296
+msgid "Take a short break"
+msgstr "הגיע הזמן להפסקה קצרה"
+
+#: plugins/gnome/extension/notifications.js:304
+msgid "Break is about to end"
+msgstr "ההפסקה עומדת להסתיים"
+
+#: plugins/gnome/extension/notifications.js:308
+msgid "Break is over"
+msgstr "ההפסקה הסתיימה"
+
+#. body = _("Get ready for Pomodoro");
+#: plugins/gnome/extension/notifications.js:336
+msgid "Get ready…"
+msgstr "זמן להתכונן…"
+
+#: plugins/gnome/extension/notifications.js:362
+msgid "Skip Break"
+msgstr "דילוג על ההפסקה"
+
+#: plugins/gnome/extension/notifications.js:365
+msgid "+1 Minute"
+msgstr "הוספת דקה אחת"
+
+#: plugins/gnome/extension/notifications.js:557
+msgid "Report issue"
+msgstr "דיווח על בעיה"
+
+#: plugins/gnome/extension/timer.js:248
+#, javascript-format
+msgid "Failed to run <i>%s</i> service"
+msgstr "נכשלה הרצת שירות <i>%s</i>"
+
+#: plugins/gnome/gnome-plugin.vala:290
+msgid "Hide other notifications"
+msgstr "הסתרת התרעות אחרות"
+
+#: plugins/sounds/resources/preferences-sound-page.ui:33
+msgid "Volume:"
+msgstr "עוצמת שמע:"
+
+#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:410
+msgid "Clock Ticking"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:411
+msgid "Timer Ticking"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:412
+msgid "Woodland Birds"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:472
+#: plugins/sounds/sounds-plugin.vala:511
+msgid "Bell"
+msgstr "פעמון"
+
+#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:473
+#: plugins/sounds/sounds-plugin.vala:512
+msgid "Loud Bell"
+msgstr "פעמון חזק"
+
+#: plugins/sounds/sounds-plugin.vala:334
+msgid "Select Custom Sound"
+msgstr "בחירת צליל מותאם אישית"
+
+#: plugins/sounds/sounds-plugin.vala:337
+msgid "_Cancel"
+msgstr "בי_טול"
+
+#: plugins/sounds/sounds-plugin.vala:339
+msgid "_Select"
+msgstr "ב_חירה"
+
+#: plugins/sounds/sounds-plugin.vala:568
+msgid "Ticking Sound"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:572
+msgid "End of Break Sound"
+msgstr "צליל סיום הפסקה"
+
+#: plugins/sounds/sounds-plugin.vala:576
+msgid "Start of Break Sound"
+msgstr "צליל התחלת הפסקה"
+
+#: plugins/sounds/sounds-plugin.vala:604 src/preferences-dialog.vala:590
+msgid "Off"
+msgstr "כבוי"
+
+#: plugins/sounds/sounds-plugin.vala:744
+msgid "Ticking sound"
+msgstr ""
+
+#: plugins/sounds/sounds-plugin.vala:749
+msgid "Start of break sound"
+msgstr "צליל התחלת הפסקה"
+
+#: plugins/sounds/sounds-plugin.vala:754
+msgid "End of break sound"
+msgstr "צליל סיום הפסקה"
+
+#: src/about-dialog.vala:30
+msgid "About Pomodoro"
+msgstr "על אודות פומודורו"
+
+#: src/about-dialog.vala:41
+msgid "translator-credits"
+msgstr "עומר א״ש <omeritzicschwartz@gmail.com>"
+
+#: src/application.vala:87
+msgid "Start/Stop"
+msgstr "התחלה/עצירה"
+
+#: src/application.vala:96
+msgid "Pause/Resume"
+msgstr "השהיה/המשך"
+
+#: src/application.vala:105
+msgid "Skip to a pomodoro or to a break"
+msgstr "דילוג לפומודורו או להפסקה"
+
+#: src/application.vala:108
+msgid "Extend current pomodoro or break"
+msgstr "הארכת הפומודורו או ההפסקה הנוכחיים"
+
+#: src/application.vala:111
+msgid "Reset current session"
+msgstr "איפוס הסשן הנוכחי"
+
+#: src/application.vala:114
+msgid "Run as background service"
+msgstr "הפעלה בתור שירות רקע"
+
+#: src/application.vala:117
+msgid "Show preferences"
+msgstr "הצגת ההעדפות"
+
+#: src/application.vala:120
+msgid "Quit application"
+msgstr "יציאה מהיישום"
+
+#: src/application.vala:123
+msgid "Print version information and exit"
+msgstr "הצגת המידע על הגרסה ויציאה"
+
+#: src/notifications-capability.vala:130
+msgid "Focus on your task."
+msgstr "יש להתמקד במשימה שלך."
+
+#: src/notifications-capability.vala:156
+#, c-format
+msgid "You have %d minute"
+msgid_plural "You have %d minutes"
+msgstr[0] "נותרה לך שנייה אחת (%d)"
+msgstr[1] "נותרו לך %d דקות"
+msgstr[2] "נותרו לך %d דקות"
+msgstr[3] "נותרו לך %d דקות"
+
+#: src/notifications-capability.vala:158
+#, c-format
+msgid "You have %d second"
+msgid_plural "You have %d seconds"
+msgstr[0] "נותרה לך שנייה אחת (%d)"
+msgstr[1] "נותרו לך %d שניות"
+msgstr[2] "נותרו לך %d שניות"
+msgstr[3] "נותרו לך %d שניות"
+
+#: src/notifications-capability.vala:163
+msgid "Take a longer break"
+msgstr "הגיע הזמן להפסקה ארוכה"
+
+#: src/notifications-capability.vala:179
+msgid "Lengthen it"
+msgstr "להאריך"
+
+#: src/notifications-capability.vala:184
+msgid "Shorten it"
+msgstr "לקצר"
+
+#: src/notifications-capability.vala:189
+msgid "Start pomodoro"
+msgstr "התחלת פומודורו"
+
+#: src/preferences-dialog.vala:158
+#, c-format
+msgid ""
+"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
+"such as Control, Alt or Shift."
+msgstr ""
+
+#: src/preferences-dialog.vala:808
+msgid "Keyboard Shortcut"
+msgstr "קיצור מקשים"
+
+#: src/presence.vala:80
+msgid "Available"
+msgstr "זמין"
+
+#: src/presence.vala:83
+msgid "Busy"
+msgstr "עסוק"
+
+#: src/presence.vala:86
+msgid "Idle"
+msgstr "בהמתנה"
+
+#: src/presence.vala:89
+msgid "Invisible"
+msgstr "בלתי נראה"
+
+#: src/stats-day-page.vala:66
+msgid "Yesterday"
+msgstr "אתמול"
+
+#: src/stats-page.vala:87
+#, c-format
+msgid "%d m"
+msgstr "%d דק׳"
+
+#: src/stats-page.vala:93
+#, c-format
+msgid "%.0f h"
+msgstr "%.0f שע׳"
+
+#: src/stats-page.vala:96
+#, c-format
+msgid "%.1f h"
+msgstr "%.1f שע׳"
+
+#: src/stats-page.vala:573
+msgid "Break"
+msgstr "הפסקה"
+
+#: src/stats-week-page.vala:58
+msgid "This week"
+msgstr "השבוע"
+
+#: src/utils.vala:32
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "שעה אחת (%d)"
+msgstr[1] "שעתיים (%d)"
+msgstr[2] "%d שעות"
+msgstr[3] "%d שעות"
+
+#: src/utils.vala:41
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "דקה אחת (%d)"
+msgstr[1] "%d דקות"
+msgstr[2] "%d דקות"
+msgstr[3] "%d דקות"
