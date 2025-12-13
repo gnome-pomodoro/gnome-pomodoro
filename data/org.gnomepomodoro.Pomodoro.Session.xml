@@ -183,11 +183,6 @@
             <term>weight d</term>
             <listitem><para>Weight of the cycle - it may exceed 1.0 when user skips breaks or extends pomodoro</para></listitem>
           </varlistentry>
-
-          <varlistentry>
-            <term>is_completed b</term>
-            <listitem><para>Whether the cycle was completed</para></listitem>
-          </varlistentry>
         </variablelist>
     -->
     <method name="ListCycles">

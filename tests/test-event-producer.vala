@@ -20,9 +20,10 @@ namespace Tests
             this.add_test ("timer_finished__wait_for_activity", this.test_timer_finished__wait_for_activity);
             this.add_test ("timer_finished__manual", this.test_timer_finished__manual);
 
-            this.add_test ("session_manager_advance__uncompleted", this.test_session_manager_advance__uncompleted);
-            this.add_test ("session_manager_advance__completed", this.test_session_manager_advance__completed);
-            this.add_test ("session_manager_advance__paused", this.test_session_manager_advance__paused);
+            this.add_test ("session_manager_advance__uncompleted", this.test_session_manager_advance__completed);
+            this.add_test ("session_manager_advance__completed", this.test_session_manager_advance__uncompleted);
+            this.add_test ("session_manager_advance__uncompleted_paused_pomodoro", this.test_session_manager_advance__uncompleted_paused_pomodoro);
+            this.add_test ("session_manager_advance__completed_paused_pomodoro", this.test_session_manager_advance__completed_paused_pomodoro);
             this.add_test ("session_manager_confirm_advancement", this.test_session_manager_confirm_advancement);
             this.add_test ("session_manager_session_expired", this.test_session_manager_session_expired);
             this.add_test ("session_manager_reset", this.test_session_manager_reset);
@@ -544,6 +545,7 @@ namespace Tests
             Pomodoro.Timestamp.freeze_to (expected_timestamp);
             this.session_manager_action_group.activate_action ("advance", null);
 
+            // Expect no "skip" event, because time-block got completed
             assert_cmpstrv (event_names, {
                 "reschedule",
                 "state-change",
@@ -552,7 +554,7 @@ namespace Tests
             });
         }
 
-        public void test_session_manager_advance__paused ()
+        public void test_session_manager_advance__uncompleted_paused_pomodoro ()
         {
             this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
 
@@ -566,8 +568,6 @@ namespace Tests
             this.producer.event.connect (
                 (event) => {
                     event_names += event.spec.name;
-
-                    // TODO: check context
                 });
 
             Pomodoro.Timestamp.freeze_to (expected_timestamp);
@@ -578,6 +578,34 @@ namespace Tests
                 "state-change",
                 "change",
                 "skip",
+                "advance"
+            });
+        }
+
+        public void test_session_manager_advance__completed_paused_pomodoro ()
+        {
+            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+
+            Pomodoro.Timestamp.advance (24 * Pomodoro.Interval.MINUTE);
+            this.timer.pause ();
+
+            var expected_timestamp = Pomodoro.Timestamp.peek () + Pomodoro.Interval.MINUTE;
+            var event_names = new string[0];
+
+            this.producer.flush ();
+            this.producer.event.connect (
+                (event) => {
+                    event_names += event.spec.name;
+                });
+
+            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            this.session_manager_action_group.activate_action ("advance", null);
+
+            // Expect no "skip" event, because time-block got completed
+            assert_cmpstrv (event_names, {
+                "reschedule",
+                "state-change",
+                "change",
                 "advance"
             });
         }

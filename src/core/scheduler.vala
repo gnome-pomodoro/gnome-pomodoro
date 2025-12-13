@@ -175,6 +175,7 @@ namespace Pomodoro
          * The context will hold info about current state of the session.
          */
         public abstract void resolve_context (Pomodoro.TimeBlock            time_block,
+                                              bool                          resume,
                                               int64                         timestamp,
                                               ref Pomodoro.SchedulerContext context);
 
@@ -198,6 +199,7 @@ namespace Pomodoro
          * Build a scheduler context from completed/in-progress time-blocks.
          */
         internal void build_scheduler_context (Pomodoro.Session                          session,
+                                               bool                                      resume,
                                                int64                                     timestamp,
                                                out Pomodoro.SchedulerContext             context,
                                                out unowned GLib.List<Pomodoro.TimeBlock> first_scheduled_link)
@@ -222,11 +224,11 @@ namespace Pomodoro
 
                 if (!context.is_session_completed)
                 {
-                    var time_block_end_time =
+                    var time_block_timestamp =
                             time_block_status == Pomodoro.TimeBlockStatus.IN_PROGRESS
                             ? timestamp
                             : time_block.end_time;
-                    this.resolve_context (time_block, time_block_end_time, ref context);
+                    this.resolve_context (time_block, resume, time_block_timestamp, ref context);
                 }
 
                 link = link.next;
@@ -267,8 +269,10 @@ namespace Pomodoro
             time_block.set_weight (this.calculate_time_block_weight (time_block));
         }
 
-        public bool reschedule_session (Pomodoro.Session session,
-                                        int64            timestamp)
+        public bool reschedule_session (Pomodoro.Session    session,
+                                        Pomodoro.TimeBlock? next_time_block,
+                                        bool                resume,
+                                        int64               timestamp)
         {
             Pomodoro.ensure_timestamp (ref timestamp);
 
@@ -279,19 +283,30 @@ namespace Pomodoro
             session.freeze_changed ();
 
             this.ensure_session_meta (session);
-            this.build_scheduler_context (session, timestamp, out context, out link);
+            this.build_scheduler_context (session, resume, timestamp, out context, out link);
 
-            // Handle pre-selected time-block
-            var next_time_block = link?.data;
-
-            if (next_time_block != null &&
-                next_time_block.start_time == timestamp)
+            // Prepare next time-block
+            if (next_time_block != null)
             {
-                if (next_time_block.duration <= 0) {
+                assert (session.contains (next_time_block));
+                assert (next_time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
+
+                // Remove time-blocks leading to `next_time_block`
+                while (link != null && link.data != next_time_block)
+                {
+                    unowned var tmp = link.next;
+                    session.remove_link (link);
+                    link = tmp;
+                }
+
+                if (next_time_block.duration > 0) {
+                    next_time_block.move_to (timestamp);
+                }
+                else {
                     this.reschedule_time_block (next_time_block, timestamp);
                 }
 
-                this.resolve_context (next_time_block, timestamp, ref context);
+                this.resolve_context (next_time_block, false, timestamp, ref context);
 
                 link = link.next;
             }
@@ -321,7 +336,7 @@ namespace Pomodoro
                     link.data.set_time_range (time_block.start_time, time_block.end_time);
                     link.data.set_meta (time_block.get_meta ());
 
-                    this.resolve_context (link.data, timestamp, ref context);
+                    this.resolve_context (link.data, false, timestamp, ref context);
 
                     link = link.next;
                 }
@@ -336,7 +351,7 @@ namespace Pomodoro
 
                     session.emit_added (time_block);
 
-                    this.resolve_context (time_block, timestamp, ref context);
+                    this.resolve_context (time_block, false, timestamp, ref context);
                 }
             }
 
@@ -465,6 +480,7 @@ namespace Pomodoro
         }
 
         public override void resolve_context (Pomodoro.TimeBlock            time_block,
+                                              bool                          resume,
                                               int64                         timestamp,
                                               ref Pomodoro.SchedulerContext context)
         {
@@ -479,8 +495,11 @@ namespace Pomodoro
             if (status == Pomodoro.TimeBlockStatus.IN_PROGRESS)
             {
                 var last_gap = time_block.get_last_gap ();
+                var is_paused = last_gap != null &&
+                                Pomodoro.Timestamp.is_undefined (last_gap.end_time);
 
-                if (last_gap != null && Pomodoro.Timestamp.is_undefined (last_gap.end_time)) {
+                if (!is_resuming && is_paused)
+                {
                     status = Pomodoro.TimeBlockStatus.COMPLETED;
                 }
                 else {

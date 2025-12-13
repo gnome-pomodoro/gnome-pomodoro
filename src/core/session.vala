@@ -408,8 +408,9 @@ namespace Pomodoro
 
             while (link != null)
             {
-                if (link.data.state == Pomodoro.State.LONG_BREAK &&
-                    link.data.get_status () == Pomodoro.TimeBlockStatus.COMPLETED)
+                if (link.data.get_status () == Pomodoro.TimeBlockStatus.COMPLETED && (
+                    link.data.state == Pomodoro.State.LONG_BREAK ||
+                    link.data.state == Pomodoro.State.BREAK))
                 {
                     return true;
                 }
@@ -551,7 +552,7 @@ namespace Pomodoro
         {
             unowned GLib.List<Pomodoro.TimeBlock> sibling_link = this.time_blocks.find (sibling);
 
-            // time_block.move_to (sibling.start_time);
+            time_block.move_to (sibling.start_time);
 
             this.time_blocks.insert_before (sibling_link, time_block);
 
@@ -572,7 +573,7 @@ namespace Pomodoro
                 this.append (time_block);
             }
             else {
-                // time_block.move_to (sibling.end_time);
+                time_block.move_to (sibling.end_time);
 
                 this.time_blocks.insert_before (sibling_link.next, time_block);
 
