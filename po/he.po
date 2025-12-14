@@ -1,9 +1,8 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-pomodoro package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Omer I.S. <omeritzicschwartz@gmail.com>, 2025.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro\n"
