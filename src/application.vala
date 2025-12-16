@@ -110,6 +110,8 @@ namespace Pomodoro
             }
         }
 
+        public bool ready { get; private set; default = false; }
+
         public Pomodoro.Timer?               timer;
         public Pomodoro.SessionManager?      session_manager;
         public Pomodoro.CapabilityManager?   capability_manager;
@@ -208,7 +210,17 @@ namespace Pomodoro
                 window.view = view;
             }
 
-            window.present ();
+            if (this.ready) {
+                window.present ();
+            }
+            else {
+                ulong handler_id = 0;
+                handler_id = this.notify["ready"].connect (
+                    () => {
+                        this.disconnect (handler_id);
+                        this.show_window (view);
+                    });
+            }
         }
 
         public void show_preferences (string panel_name = "")
@@ -573,6 +585,8 @@ namespace Pomodoro
                     this.on_enter_session (this.session_manager.current_session);
 
                     this.unmark_busy ();
+                    this.ready = true;
+
                     this.release ();
                 });
 
