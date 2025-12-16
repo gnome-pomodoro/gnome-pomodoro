@@ -40,6 +40,17 @@ namespace Pomodoro
             public Segment[] segments;
         }
 
+        [Compact]
+        private class Callback
+        {
+            public GLib.SourceFunc func;
+
+            public Callback (owned GLib.SourceFunc func)
+            {
+                this.func = (owned) func;
+            }
+        }
+
         public unowned Pomodoro.SessionManager session_manager {
             get {
                 return this._session_manager;
@@ -54,13 +65,14 @@ namespace Pomodoro
         private Pomodoro.SessionManager?   _session_manager = null;
         private Pomodoro.TimezoneHistory?  timezone_history = null;
         private Pomodoro.AsyncQueue<Item?> queue = null;
-        private Pomodoro.Promise?          process_queue_promise = null;
+        private bool                       is_processing = false;
+        private Callback[]                 flush_callbacks;
 
         construct
         {
-            this.timezone_history      = new Pomodoro.TimezoneHistory ();
-            this.process_queue_promise = new Pomodoro.Promise ();
-            this.queue                 = new Pomodoro.AsyncQueue<Item?> ();
+            this.timezone_history = new Pomodoro.TimezoneHistory ();
+            this.queue            = new Pomodoro.AsyncQueue<Item?> ();
+            this.flush_callbacks  = {};
         }
 
         public StatsManager ()
@@ -387,11 +399,11 @@ namespace Pomodoro
 
         private async void process_queue ()
         {
-            if (this.process_queue_promise.get_counter () > 0) {
+            if (this.is_processing) {
                 return;
             }
 
-            this.process_queue_promise.hold ();
+            this.is_processing = true;
 
             Item? item;
 
@@ -405,7 +417,14 @@ namespace Pomodoro
                 }
             }
 
-            this.process_queue_promise.release ();
+            this.is_processing = false;
+
+            // Resume any waiting `flush()` calls
+            foreach (unowned var callback in this.flush_callbacks) {
+                callback.func ();
+            }
+
+            this.flush_callbacks = {};
         }
 
         private void track_internal (string          category,
@@ -590,7 +609,11 @@ namespace Pomodoro
         public async void flush ()
         {
             yield this.queue.wait ();
-            yield this.process_queue_promise.wait ();
+
+            if (this.is_processing) {
+                this.flush_callbacks += new Callback (this.flush.callback);
+                yield;
+            }
         }
 
         public GLib.DateTime get_midnight (GLib.Date date)
@@ -657,7 +680,7 @@ namespace Pomodoro
 
             this.timezone_history = null;
             this.queue = null;
-            this.process_queue_promise = null;
+            this.flush_callbacks = {};
 
             base.dispose ();
         }
