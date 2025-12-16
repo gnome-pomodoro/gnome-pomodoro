@@ -1210,7 +1210,6 @@ namespace Tests
             );
 
             var last_cycle = session.get_cycles ().last ().data;
-            assert_false (last_cycle.is_extra ());
             assert_true (last_cycle.is_visible ());
         }
 
@@ -1245,7 +1244,6 @@ namespace Tests
                 new GLib.Variant.int64 (now)
             );
             assert_true (extra_pomodoro.state == Pomodoro.State.POMODORO);
-            assert_true (extra_pomodoro.get_is_extra ());
             assert_true (extra_pomodoro.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
 
             var extra_long_break = session.get_next_time_block (extra_pomodoro);
@@ -1256,7 +1254,6 @@ namespace Tests
             );
             assert_true (extra_long_break.state == Pomodoro.State.LONG_BREAK);
             assert_true (extra_long_break.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
-            assert_false (extra_long_break.get_is_extra ());
 
             assert_cmpuint (
                 session.count_visible_cycles (),
@@ -1265,7 +1262,6 @@ namespace Tests
             );
 
             var extra_cycle = session.get_cycles ().last ().data;
-            assert_true (extra_cycle.is_extra ());
             assert_true (extra_cycle.is_visible ());
         }
 
@@ -1295,7 +1291,6 @@ namespace Tests
             extra_pomodoro.set_time_range (
                     long_break_1.end_time,
                     long_break_1.end_time + 25 * Pomodoro.Interval.MINUTE);
-            extra_pomodoro.set_is_extra (true);
             extra_pomodoro.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
 
             var long_break_2 = new Pomodoro.TimeBlock (Pomodoro.State.LONG_BREAK);
@@ -1353,7 +1348,6 @@ namespace Tests
             var extra_pomodoro = session.get_next_time_block (long_break_1);
             assert_nonnull (extra_pomodoro);
             assert_true (extra_pomodoro.state == Pomodoro.State.POMODORO);
-            assert_true (extra_pomodoro.get_is_extra ());
             assert_cmpvariant (
                 new GLib.Variant.int64 (extra_pomodoro.start_time),
                 new GLib.Variant.int64 (now)
@@ -1398,7 +1392,6 @@ namespace Tests
             extra_pomodoro.set_time_range (
                     long_break_1.end_time,
                     long_break_1.end_time + 25 * Pomodoro.Interval.MINUTE);
-            extra_pomodoro.set_is_extra (true);
             extra_pomodoro.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
 
             var long_break_2 = new Pomodoro.TimeBlock (Pomodoro.State.LONG_BREAK);

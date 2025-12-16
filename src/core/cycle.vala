@@ -270,29 +270,6 @@ namespace Pomodoro
         }
 
         /**
-         * Return whether cycle has an extra pomodoro.
-         *
-         * Used in tests.
-         */
-        public bool is_extra ()
-        {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
-
-            while (link != null)
-            {
-                if (link.data.get_is_extra () &&
-                    link.data.get_weight () > 0.0)
-                {
-                    return true;
-                }
-
-                link = link.next;
-            }
-
-            return false;
-        }
-
-        /**
          * Hide cycles that were uncompleted.
          */
         public bool is_visible ()

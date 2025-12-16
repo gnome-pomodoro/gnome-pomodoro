@@ -3030,7 +3030,6 @@ namespace Tests
             var extra_pomodoro = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
             extra_pomodoro.set_time_range (session.end_time,
                                            session.end_time + 25 * Pomodoro.Interval.MINUTE);
-            extra_pomodoro.set_is_extra (true);
             extra_pomodoro.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
             session.append (extra_pomodoro);
 
@@ -3048,7 +3047,6 @@ namespace Tests
             );
 
             var extra_cycle = session.get_cycles ().nth_data (4U);
-            assert_true (extra_cycle.is_extra ());
             assert_true (extra_cycle.is_visible ());
 
             Pomodoro.Timestamp.freeze_to (extra_pomodoro.start_time);
@@ -3095,7 +3093,6 @@ namespace Tests
             var scheduled_extra_pomodoro = session.get_next_time_block (extra_pomodoro);
             assert_true (scheduled_extra_pomodoro.state == Pomodoro.State.POMODORO);
             assert_true (scheduled_extra_pomodoro.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
-            assert_true (scheduled_extra_pomodoro.get_is_extra ());
 
             assert_cmpstrv (signals, {
                 "leave-time-block",
@@ -3135,7 +3132,6 @@ namespace Tests
             var extra_pomodoro = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
             extra_pomodoro.set_time_range (session.end_time,
                                            session.end_time + 25 * Pomodoro.Interval.MINUTE);
-            extra_pomodoro.set_is_extra (true);
             extra_pomodoro.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
             session.append (extra_pomodoro);
 
@@ -3153,7 +3149,6 @@ namespace Tests
             );
 
             var extra_cycle = session.get_cycles ().nth_data (4U);
-            assert_true (extra_cycle.is_extra ());
             assert_true (extra_cycle.is_visible ());
 
             Pomodoro.Timestamp.freeze_to (extra_pomodoro.start_time);
@@ -3188,7 +3183,6 @@ namespace Tests
             assert_nonnull (scheduled_extra_pomodoro);
             assert_true (scheduled_extra_pomodoro.state == Pomodoro.State.POMODORO);
             assert_true (scheduled_extra_pomodoro.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
-            assert_true (scheduled_extra_pomodoro.get_is_extra ());
 
             // Visible cycles should increase by one (another extra cycle added)
             assert_cmpuint (

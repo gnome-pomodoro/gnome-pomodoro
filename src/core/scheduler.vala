@@ -175,7 +175,7 @@ namespace Pomodoro
          * The context will hold info about current state of the session.
          */
         public abstract void resolve_context (Pomodoro.TimeBlock            time_block,
-                                              bool                          resume,
+                                              bool                          is_resuming,
                                               int64                         timestamp,
                                               ref Pomodoro.SchedulerContext context);
 
@@ -199,7 +199,7 @@ namespace Pomodoro
          * Build a scheduler context from completed/in-progress time-blocks.
          */
         internal void build_scheduler_context (Pomodoro.Session                          session,
-                                               bool                                      resume,
+                                               bool                                      is_resuming,
                                                int64                                     timestamp,
                                                out Pomodoro.SchedulerContext             context,
                                                out unowned GLib.List<Pomodoro.TimeBlock> first_scheduled_link)
@@ -228,7 +228,11 @@ namespace Pomodoro
                             time_block_status == Pomodoro.TimeBlockStatus.IN_PROGRESS
                             ? timestamp
                             : time_block.end_time;
-                    this.resolve_context (time_block, resume, time_block_timestamp, ref context);
+                    this.resolve_context (
+                            time_block,
+                            is_resuming,
+                            time_block_timestamp,
+                            ref context);
                 }
 
                 link = link.next;
@@ -271,7 +275,7 @@ namespace Pomodoro
 
         public bool reschedule_session (Pomodoro.Session    session,
                                         Pomodoro.TimeBlock? next_time_block,
-                                        bool                resume,
+                                        bool                is_resuming,
                                         int64               timestamp)
         {
             Pomodoro.ensure_timestamp (ref timestamp);
@@ -283,7 +287,7 @@ namespace Pomodoro
             session.freeze_changed ();
 
             this.ensure_session_meta (session);
-            this.build_scheduler_context (session, resume, timestamp, out context, out link);
+            this.build_scheduler_context (session, is_resuming, timestamp, out context, out link);
 
             // Prepare next time-block
             if (next_time_block != null)
@@ -480,7 +484,7 @@ namespace Pomodoro
         }
 
         public override void resolve_context (Pomodoro.TimeBlock            time_block,
-                                              bool                          resume,
+                                              bool                          is_resuming,
                                               int64                         timestamp,
                                               ref Pomodoro.SchedulerContext context)
         {
@@ -555,7 +559,6 @@ namespace Pomodoro
 
             var state = this.resolve_state (context);
             var time_block = new Pomodoro.TimeBlock (state);
-            time_block.set_is_extra (state != Pomodoro.State.LONG_BREAK && context.needs_long_break);
 
             this.reschedule_time_block (time_block, context.timestamp);
 

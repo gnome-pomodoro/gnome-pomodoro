@@ -76,7 +76,6 @@ namespace Pomodoro
         public int64                    intended_duration;
         public double                   weight;
         public int64                    completion_time;
-        public bool                     is_extra;
     }
 
 
@@ -219,8 +218,7 @@ namespace Pomodoro
                 status = Pomodoro.TimeBlockStatus.SCHEDULED,
                 intended_duration = 0,
                 weight = double.NAN,
-                completion_time = Pomodoro.Timestamp.UNDEFINED,
-                is_extra = false,
+                completion_time = Pomodoro.Timestamp.UNDEFINED
             };
         }
 
@@ -721,19 +719,6 @@ namespace Pomodoro
             if (this.meta.completion_time != completion_time) {
                 this.meta.completion_time = completion_time;
                 this.emit_changed ();
-            }
-        }
-
-        public bool get_is_extra ()
-        {
-            return this.meta.is_extra;
-        }
-
-        public void set_is_extra (bool is_extra)
-        {
-            if (this.meta.is_extra != is_extra) {
-                this.meta.is_extra = is_extra;
-                // this.emit_changed ();  // TODO
             }
         }
 

@@ -20,12 +20,9 @@ namespace Tests
             this.add_test ("is_visible__empty", this.test_is_visible__empty);
             this.add_test ("is_visible__only_uncompleted", this.test_is_visible__only_uncompleted);
             this.add_test ("is_visible__only_zero_weight", this.test_is_visible__only_zero_weight);
-            this.add_test ("is_visible__scheduled_non_extra", this.test_is_visible__scheduled_non_extra);
-            this.add_test ("is_visible__in_progress_non_extra", this.test_is_visible__in_progress_non_extra);
-            this.add_test ("is_visible__completed_non_extra", this.test_is_visible__completed_non_extra);
-            this.add_test ("is_visible__scheduled_extra", this.test_is_visible__scheduled_extra);
-            this.add_test ("is_visible__in_progress_extra", this.test_is_visible__in_progress_extra);
-            this.add_test ("is_visible__completed_extra", this.test_is_visible__completed_extra);
+            this.add_test ("is_visible__scheduled", this.test_is_visible__scheduled);
+            this.add_test ("is_visible__in_progress", this.test_is_visible__in_progress);
+            this.add_test ("is_visible__completed", this.test_is_visible__completed);
             this.add_test ("is_visible__mixed_uncompleted_then_scheduled", this.test_is_visible__mixed_uncompleted_then_scheduled);
             this.add_test ("is_visible__mixed_zero_weight_then_weighted", this.test_is_visible__mixed_zero_weight_then_weighted);
         }
@@ -468,14 +465,13 @@ namespace Tests
             assert_false (cycle.is_visible ());
         }
 
-        public void test_is_visible__scheduled_non_extra ()
+        public void test_is_visible__scheduled ()
         {
             var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
             time_block.set_meta (
                 Pomodoro.TimeBlockMeta () {
                     status = Pomodoro.TimeBlockStatus.SCHEDULED,
-                    weight = 1.0,
-                    is_extra = false,
+                    weight = 1.0
                 }
             );
 
@@ -485,14 +481,13 @@ namespace Tests
             assert_true (cycle.is_visible ());
         }
 
-        public void test_is_visible__in_progress_non_extra ()
+        public void test_is_visible__in_progress ()
         {
             var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
             time_block.set_meta (
                 Pomodoro.TimeBlockMeta () {
                     status = Pomodoro.TimeBlockStatus.IN_PROGRESS,
-                    weight = 1.0,
-                    is_extra = false,
+                    weight = 1.0
                 }
             );
 
@@ -502,65 +497,13 @@ namespace Tests
             assert_true (cycle.is_visible ());
         }
 
-        public void test_is_visible__completed_non_extra ()
+        public void test_is_visible__completed ()
         {
             var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
             time_block.set_meta (
                 Pomodoro.TimeBlockMeta () {
                     status = Pomodoro.TimeBlockStatus.COMPLETED,
-                    weight = 1.0,
-                    is_extra = false,
-                }
-            );
-
-            var cycle = new Pomodoro.Cycle ();
-            cycle.append (time_block);
-
-            assert_true (cycle.is_visible ());
-        }
-
-        public void test_is_visible__scheduled_extra ()
-        {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
-                    weight = 1.0,
-                    is_extra = true,
-                }
-            );
-
-            var cycle = new Pomodoro.Cycle ();
-            cycle.append (time_block);
-
-            assert_true (cycle.is_visible ());
-        }
-
-        public void test_is_visible__in_progress_extra ()
-        {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.IN_PROGRESS,
-                    weight = 1.0,
-                    is_extra = true,
-                }
-            );
-
-            var cycle = new Pomodoro.Cycle ();
-            cycle.append (time_block);
-
-            assert_true (cycle.is_visible ());
-        }
-
-        public void test_is_visible__completed_extra ()
-        {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.COMPLETED,
-                    weight = 1.0,
-                    is_extra = true,
+                    weight = 1.0
                 }
             );
 
@@ -584,8 +527,7 @@ namespace Tests
             time_block_2.set_meta (
                 Pomodoro.TimeBlockMeta () {
                     status = Pomodoro.TimeBlockStatus.SCHEDULED,
-                    weight = 1.0,
-                    is_extra = false,
+                    weight = 1.0
                 }
             );
 
@@ -611,8 +553,7 @@ namespace Tests
             time_block_2.set_meta (
                 Pomodoro.TimeBlockMeta () {
                     status = Pomodoro.TimeBlockStatus.SCHEDULED,
-                    weight = 1.0,
-                    is_extra = false,
+                    weight = 1.0
                 }
             );
 
