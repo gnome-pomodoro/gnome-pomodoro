@@ -198,6 +198,11 @@ namespace Pomodoro
                 return;
             }
 
+            if (!this.has_css_class ("devel")) {
+                // TODO: Display the toast once the extension is ready.
+                return;
+            }
+
             if (this.extension.available && !this.extension.is_installed ()) {
                 this.show_install_extension_toast ();
             }
