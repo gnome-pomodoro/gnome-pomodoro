@@ -122,7 +122,6 @@ namespace Pomodoro
         private GLib.Queue<unowned Pomodoro.EventSpec>     queue = null;
         private uint                                       idle_id = 0;
         private int64                                      event_source_timestamp = Pomodoro.Timestamp.UNDEFINED;
-        private int64                                      last_session_rescheduled_time = Pomodoro.Timestamp.UNDEFINED;
         private bool                                       destroying = false;
 
         private Pomodoro.Trigger[]                         timer_state_change_triggers;
@@ -369,14 +368,6 @@ namespace Pomodoro
         private void on_session_manager_session_rescheduled (Pomodoro.Session session,
                                                              int64            timestamp)
         {
-            // Workaround to filter-out redundant signals.
-            // Because we queue the event, there's little harm.
-            if (this.last_session_rescheduled_time == timestamp) {
-                return;
-            }
-
-            this.last_session_rescheduled_time = timestamp;
-
             foreach (var trigger in this.session_manager_session_rescheduled_triggers)
             {
                 var trigger_func = (Pomodoro.SessionManagerSessionRescheduledTriggerFunc) trigger.func;
