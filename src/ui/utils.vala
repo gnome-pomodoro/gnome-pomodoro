@@ -179,6 +179,14 @@ namespace Pomodoro
     }
 
 
+    internal inline Gtk.Orientation get_opposite_orientation (Gtk.Orientation orientation)
+    {
+        return orientation == Gtk.Orientation.HORIZONTAL
+                ? Gtk.Orientation.VERTICAL
+                : Gtk.Orientation.HORIZONTAL;
+    }
+
+
     internal void normalize_rectangle (ref Gdk.Rectangle rect)
     {
         if (rect.width < 0) {

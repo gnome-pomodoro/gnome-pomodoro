@@ -8,19 +8,15 @@
 
 namespace Pomodoro
 {
-    private inline Gtk.Orientation get_opposite_orientation (Gtk.Orientation orientation)
-    {
-        return orientation == Gtk.Orientation.HORIZONTAL
-            ? Gtk.Orientation.VERTICAL
-            : Gtk.Orientation.HORIZONTAL;
-    }
-
-
     public class SizeStackPage : GLib.Object
     {
         public Gtk.Widget child { get; construct; }
         public string     name { get; set; }
         public bool       resizable { get; set; default = true; }
+
+        internal unowned Gtk.Widget? last_focus = null;
+        internal int                 last_width = -1;
+        internal int                 last_height = -1;
 
         public SizeStackPage (Gtk.Widget child)
         {
@@ -28,133 +24,164 @@ namespace Pomodoro
                 child: child
             );
         }
+
+        public override void dispose ()
+        {
+            this.last_focus = null;
+
+            base.dispose ();
+        }
     }
 
 
     /**
      * Container for transitioning between widgets of varying sizes.
      *
-     * The purpose is to swap widgets of varying complexity or just different variants. It's tailored for interpolating
-     * window size - origin of the transition is at top left corner.
+     * The purpose is to swap widgets of varying complexity or just different variants.
+     * It's tailored for interpolating window size - origin of the transition is at top left corner.
      */
     public class SizeStack : Gtk.Widget, Gtk.Buildable
     {
-        private class ChildInfo
-        {
-            public Pomodoro.SizeStackPage page;
-            public weak Gtk.Widget?       last_focus = null;
-            public int                    last_width = -1;
-            public int                    last_height = -1;
-            public ulong                  notify_visible_id = 0;
-            public ulong                  unmap_id = 0;
-
-            public ChildInfo (Pomodoro.SizeStackPage page)
-            {
-                this.page = page;
-            }
-        }
-
-
         public unowned Gtk.Widget? visible_child {
             get {
-                return this._visible_child != null
-                    ? this._visible_child.page.child
-                    : null;
+                return this.current_page?.child;
             }
             set {
-                var child_info = this.find_child_info_for_widget (value);
+                unowned var page = this.find_page_by_child (value);
 
-                if (child_info == null) {
-                    GLib.warning ("Given child of type '%s' not found in PomodoroSizeStack", value.get_type ().name ());
+                if (page == null) {
+                    GLib.warning ("Given child of type '%s' not found in PomodoroSizeStack",
+                                  value.get_type ().name ());
                     return;
                 }
 
-                if (child_info.page.child.visible) {
-                    this.set_visible_child_internal (child_info, this.transition_duration);
-                }
+                this.select_page (page, true);
             }
         }
 
         public string visible_child_name {
             get {
-                return this._visible_child != null
-                    ? this._visible_child.page.name
-                    : null;
+                return this.current_page != null
+                        ? this.current_page.name
+                        : "";
             }
             set {
-                var child_info = this.find_child_info_for_name (value);
+                unowned var page = this.find_page_by_name (value);
 
-                if (child_info == null) {
-                    GLib.warning ("Child with name '%s' not found in PomodoroSizeStack", value);
+                if (page == null) {
+                    GLib.warning ("Page with name '%s' not found in PomodoroSizeStack", value);
                     return;
                 }
 
-                if (child_info.page.child.visible) {
-                    this.set_visible_child_internal (child_info, this.transition_duration);
-                }
+                this.select_page (page, true);
             }
         }
-
-        // In GTK4 window is unwilling to shrink its size, needs extra nudge.
-        public bool interpolate_window_size { get; set; default = false; }
 
         // The animation duration, in milliseconds.
         public uint transition_duration { get; set; default = 500; }
 
-        private GLib.List<ChildInfo> children;
-        private Adw.Animation?       transition_animation;
-        private unowned ChildInfo?   _visible_child;
-        private unowned ChildInfo?   last_visible_child;
+        private GLib.List<Pomodoro.SizeStackPage> pages = null;
+        private Adw.TimedAnimation?               transition_animation = null;
+        private unowned Pomodoro.SizeStackPage?   current_page = null;
+        private unowned Pomodoro.SizeStackPage?   previous_page = null;
+        private bool                              size_request_set = false;
 
-
-        private unowned ChildInfo? find_child_info_for_widget (Gtk.Widget child)
+        private unowned Pomodoro.SizeStackPage? find_page_by_child (Gtk.Widget child)
         {
-            unowned GLib.List<ChildInfo> link;
-            unowned ChildInfo            child_info;
+            unowned var link = this.pages.first ();
 
-            for (link = this.children; link != null; link = link.next)
+            while (link != null)
             {
-                child_info = link.data;
-
-                if (child_info.page.child == child) {
-                    return child_info;
+                if (link.data.child == child) {
+                    return link.data;
                 }
+
+                link = link.next;
             }
 
             return null;
         }
 
-        private unowned ChildInfo? find_child_info_for_name (string name)
+        private unowned Pomodoro.SizeStackPage? find_page_by_name (string name)
         {
-            unowned GLib.List<ChildInfo> link;
-            unowned ChildInfo            child_info;
+            unowned var link = this.pages.first ();
 
-            for (link = this.children; link != null; link = link.next)
+            while (link != null)
             {
-                child_info = link.data;
-
-                if (child_info.page.name == name) {
-                    return child_info;
+                if (link.data.name == name) {
+                    return link.data;
                 }
+
+                link = link.next;
             }
 
             return null;
         }
 
-        private double get_transition_progress ()
+        private float get_transition_progress ()
         {
-            if (this.transition_animation != null) {
-                return this.transition_animation.value;
-            }
-
-            if (this._visible_child != null && this.last_visible_child == null) {
-                return 1.0;
-            }
-
-            return 0.0;
+            return this.transition_animation != null
+                    ? (float) this.transition_animation.value
+                    : 1.0f;
         }
 
-        private void update_window_resizable ()
+        private void stop_resizing_window ()
+        {
+            var window = this.get_root () as Gtk.Window;
+            var resizable = this.current_page != null
+                    ? this.current_page.resizable
+                    : true;
+
+            if (window == null) {
+                return;
+            }
+
+            window.halign = Gtk.Align.FILL;
+            window.valign = Gtk.Align.FILL;
+
+            if (window.resizable != resizable)
+            {
+                window.resizable = resizable;
+
+                /*
+                // HACK: Workaround for not being able to resize window after the transition.
+                // When changing `resizable`, GTK calls gdk_toplevel_present() which can cause
+                // the compositor to restore a previously remembered window size.
+                // Keep size request set for a short time to prevent GTK from changing size
+                var width = window.get_width ();
+                var height = window.get_height ();
+                window.set_size_request (width, height);
+
+                window.resizable = resizable;
+
+                var timeout_id = GLib.Timeout.add (100, () => {
+                    window.set_size_request (-1, -1);
+
+                    return GLib.Source.REMOVE;
+                });
+                GLib.Source.set_name_by_id (timeout_id,
+                                            "Pomodoro.SizeStack.on_transition_animation_done");
+                */
+            }
+            else {
+                // HACK: There's a glitch with recent GTK+ / Mutter on Wayland, that window size
+                // shrinks to minimum size when initiating a resize. The workaround enforces a
+                // minimum size which we lift once user starts resizing the window. It's not great,
+                // because the user can't shrink window down at first.
+                var width = window.get_width ();
+                var height = window.get_height ();
+                window.set_size_request (width, height);
+
+                this.add_tick_callback (
+                    () => {
+                        this.size_request_set = true;
+
+                        return GLib.Source.REMOVE;
+                    });
+            }
+        }
+
+        private void start_resizing_window ()
         {
             var window = this.get_root () as Gtk.Window;
 
@@ -162,278 +189,180 @@ namespace Pomodoro
                 return;
             }
 
-            if (this.interpolate_window_size &&
-                this.transition_animation == null &&
-                this._visible_child != null)
-            {
-                window.resizable = this._visible_child.page.resizable;
-            }
+            window.halign = Gtk.Align.START;
+            window.valign = Gtk.Align.START;
+            window.set_size_request (-1, -1);
+            window.resizable = true;
         }
 
         /**
          * In GTK4, Window insists on preserving its remembered size. We need to invalidate it.
          * See `gtk_window_compute_default_size`.
          */
-        private void update_window_default_size ()
-                                                 requires (this.interpolate_window_size)
+        private inline void invalidate_window_default_size ()
         {
             var window = this.get_root () as Gtk.Window;
 
-            if (window != null) {
-                window.set_default_size (-1, -1);
-            }
-        }
-
-        private void on_transition_animation_done ()
-        {
-            var window = this.get_root () as Gtk.Window;
-
-            if (this.last_visible_child != null) {
-                this.last_visible_child.page.child.set_child_visible (false);
-                this.last_visible_child = null;
-            }
-
-            if (this.interpolate_window_size && window != null)
-            {
-                window.halign = Gtk.Align.FILL;
-                window.valign = Gtk.Align.FILL;
-
-                // HACK: Workaround not being able to resize window after the transition.
-                this.add_tick_callback (() => {
-                    window.resizable = !this._visible_child.page.resizable;
-                    window.resizable = this._visible_child.page.resizable;
-
-                    return GLib.Source.REMOVE;
-                });
-            }
+            window?.set_default_size (-1, -1);
         }
 
         /**
          * Call it after setting `visible_child` and `last_visible_child`.
          */
         private void start_transition (uint transition_duration)
+                                       requires (this.current_page != null && this.previous_page != null)
         {
-            var window = this.get_root () as Gtk.Window;
-
             if (this.transition_animation != null) {
                 this.transition_animation.pause ();
                 this.transition_animation = null;
             }
 
-            if (this.interpolate_window_size && window != null) {
-                window.halign = Gtk.Align.START;
-                window.valign = Gtk.Align.START;
-                window.set_size_request (-1, -1);
-            }
+            this.start_resizing_window ();
 
-            if (this._visible_child == null || this.last_visible_child == null || transition_duration == 0) {
-                this.on_transition_animation_done ();
-                return;
-            }
+            var animation_target = new Adw.CallbackAnimationTarget (
+                (value) => {
+                    this.queue_resize ();
 
-            if (this._visible_child.page.resizable) {
-                window.resizable = true;
-            }
+                    this.invalidate_window_default_size ();
+                });
 
-            var animation_target = new Adw.CallbackAnimationTarget ((value) => {
-                if (this.interpolate_window_size) {
-                    this.update_window_default_size ();
-                }
-
-                this.queue_resize ();
-            });
-
-            var animation = new Adw.TimedAnimation (this, 0.0, 1.0, transition_duration, animation_target);
+            var animation = new Adw.TimedAnimation (this,
+                                                    0.0,
+                                                    1.0,
+                                                    transition_duration,
+                                                    animation_target);
             animation.easing = Adw.Easing.EASE_IN_OUT_CUBIC;
-            animation.done.connect (() => {
-                if (this.transition_animation == animation)
-                {
-                    this.transition_animation.pause ();
+            animation.done.connect (
+                () => {
                     this.transition_animation = null;
 
-                    this.on_transition_animation_done ();
-                }
-            });
-            animation.play ();
+                    if (this.previous_page != null) {
+                        this.previous_page.child.set_child_visible (false);
+                        this.previous_page = null;
+                    }
+
+                    this.stop_resizing_window ();
+
+                    this.queue_resize ();
+                });
 
             this.transition_animation = animation;
+            this.transition_animation.play ();
         }
 
-        private void set_visible_child_internal (ChildInfo? child_info,
-                                                 uint       transition_duration)
+        private void select_page (Pomodoro.SizeStackPage page,
+                                  bool                   transition = true)
         {
-            unowned GLib.List<ChildInfo> link;
+            if (page == this.current_page || this.in_destruction ()) {
+                return;
+            }
+
+            // Store last focus/size for the current_page
             var contains_focus = false;
+            var current_child = this.current_page?.child;
 
-            // If we are being destroyed, do not bother with transitions
-            // and notifications.
-            if (this.in_destruction ()) {
-                return;
-            }
-
-            if (child_info == null)
+            if (current_child != null && this.transition_animation == null)
             {
-                for (link = this.children; link != null; link = link.next)
-                {
-                    if (link.data.page.child.visible) {
-                        child_info = link.data;
-                    }
-                }
-            }
-
-            if (child_info == this._visible_child) {
-                return;
-            }
-
-            // Store focus for the current child.
-            if (this.root != null &&
-                this._visible_child != null &&
-                this._visible_child.page.child != null)
-            {
-                var focus = this.root.get_focus ();
-
-                if (focus != null && focus.is_ancestor (this._visible_child.page.child))
-                {
-                    contains_focus = true;
-
-                    this._visible_child.last_focus = focus;
-                }
-                else {
-                    this._visible_child.last_focus = null;
-                }
-            }
-
-            if (this.last_visible_child != null) {
-                this.last_visible_child.page.child.set_child_visible (false);
-                this.last_visible_child = null;
-            }
-
-            if (this._visible_child != null) {
-                this._visible_child.last_width = this._visible_child.page.child.get_width ();
-                this._visible_child.last_height = this._visible_child.page.child.get_height ();
-                this.last_visible_child = this._visible_child;
-            }
-
-            if (child_info.last_width <= 0 || child_info.last_height <= 0 || !child_info.page.resizable)
-            {
+                var focus = this.root?.get_focus ();
                 var minimum_size = Gtk.Requisition ();
                 var natural_size = Gtk.Requisition ();
+                var last_width = -1;
+                var last_height = -1;
+                unowned Gtk.Widget? last_focus = null;
 
-                // TODO: try retrieving from settings
-                child_info.page.child.get_preferred_size (out minimum_size, out natural_size);
+                if (focus != null && focus.is_ancestor (current_child)) {
+                    contains_focus = true;
+                    last_focus = focus;
+                }
+                else {
+                    last_focus = null;
+                }
 
-                child_info.last_width = natural_size.width;
-                child_info.last_height = natural_size.height;
+                last_width  = current_child.get_width ();
+                last_height = current_child.get_height ();
+
+                if (last_width <= 0 ||
+                    last_height <= 0)
+                {
+                    current_child.get_preferred_size (out minimum_size, out natural_size);
+
+                    last_width  = natural_size.width;
+                    last_height = natural_size.height;
+                }
+
+                this.current_page.last_focus  = last_focus;
+                this.current_page.last_width  = last_width;
+                this.current_page.last_height = last_height;
             }
 
-            this._visible_child = child_info;
+            // Select page
+            if (this.previous_page != null && this.previous_page != page) {
+                this.previous_page.child.set_child_visible (false);
+                this.previous_page = null;
+            }
 
-            if (child_info != null &&
-                child_info.page.child != null)
+            this.previous_page = this.current_page;
+            this.current_page = page;
+
+            page.child.set_child_visible (true);
+
+            if (contains_focus)
             {
-                child_info.page.child.set_child_visible (true);
-
-                if (contains_focus)
-                {
-                    if (child_info.last_focus != null) {
-                        // FIXME? Restoring focus to Gtk.ModelButton doesnt seem to work
-                        // child_info.last_focus.grab_focus ();
-                        child_info.page.child.child_focus (Gtk.DirectionType.TAB_FORWARD);
-                    }
-                    else {
-                        child_info.page.child.child_focus (Gtk.DirectionType.TAB_FORWARD);
-                    }
+                if (page.last_focus != null) {
+                    page.last_focus.grab_focus ();
+                }
+                else {
+                    page.child.child_focus (Gtk.DirectionType.TAB_FORWARD);
                 }
             }
 
-            this.start_transition (transition_duration);
-
-            if (this.interpolate_window_size) {
-                this.update_window_resizable ();
-                this.update_window_default_size ();
+            if (this.current_page != null &&
+                this.previous_page != null)
+            {
+                this.start_transition (transition ? this.transition_duration : 0);
             }
-
-            this.queue_resize ();
+            else {
+                this.queue_resize ();
+            }
 
             this.notify_property ("visible-child");
             this.notify_property ("visible-child-name");
         }
 
-        private void on_child_notify_visible (GLib.Object    object,
-                                              GLib.ParamSpec pspec)
+        private void remove_page (Pomodoro.SizeStackPage page)
         {
-            var child_info = this.find_child_info_for_widget ((Gtk.Widget) object);
-            var visible    = child_info.page.child.visible;
-
-            if (this._visible_child == null && visible) {
-                this.set_visible_child_internal (child_info, this.transition_duration);
-            }
-            else if (this._visible_child == child_info && !visible) {
-                this.set_visible_child_internal (null, this.transition_duration);
+            if (this.pages.index (page) < 0) {
+                return;
             }
 
-            if (this.last_visible_child == child_info)
-            {
-                this.last_visible_child.page.child.set_child_visible (false);
-                this.last_visible_child = null;
+            page.child.unparent ();
+
+            if (this.current_page == page) {
+                this.current_page = null;
             }
 
-            this.start_transition (0);
-        }
-
-        private void on_child_unmap (Gtk.Widget widget)
-        {
-            if (this.transition_animation != null) {
-                this.transition_animation.skip ();
-                this.transition_animation = null;
-            }
-        }
-
-        private void add_child_internal (ChildInfo child_info)
-        {
-            var child = child_info.page.child;
-
-            this.children.append (child_info);
-
-            child.set_child_visible (false);
-            child.set_parent (this);
-
-            child_info.notify_visible_id = child.notify["visible"].connect (this.on_child_notify_visible);
-            child_info.unmap_id = child.unmap.connect (this.on_child_unmap);
-
-            if (this._visible_child == null && child.visible) {
-                this.set_visible_child_internal (child_info, this.transition_duration);
+            if (this.previous_page == page) {
+                this.previous_page = null;
             }
 
-            if (this._visible_child == child_info) {
-                this.queue_resize ();
-            }
-        }
-
-        private void remove_child_internal (ChildInfo child_info)
-        {
-            var child = child_info.page.child;
-
-            child.disconnect (child_info.notify_visible_id);
-            child.disconnect (child_info.unmap_id);
-            child.unparent ();
-
-            if (this._visible_child == child_info) {
-                this._visible_child = null;
-            }
-
-            if (this.last_visible_child == child_info) {
-                this.last_visible_child = null;
-            }
-
-            this.children.remove (child_info);
+            this.pages.remove (page);
         }
 
         private void add_page (Pomodoro.SizeStackPage page)
         {
-            var child_info = new ChildInfo (page);
+            if (this.pages.index (page) >= 0) {
+                return;
+            }
 
-            this.add_child_internal (child_info);
+            var child = page.child;
+            child.set_child_visible (false);
+            child.set_parent (this);
+
+            this.pages.append (page);
+
+            if (this.current_page == null) {
+                this.select_page (page, false);
+            }
         }
 
         public new void add_child (Gtk.Builder builder,
@@ -455,32 +384,24 @@ namespace Pomodoro
         {
             base.realize ();
 
-            this.update_window_resizable ();
+            this.invalidate_window_default_size ();
         }
 
         public override void compute_expand_internal (out bool hexpand,
                                                       out bool vexpand)
         {
-            unowned GLib.List<ChildInfo> link;
+            unowned var child = this.get_first_child ();
 
             hexpand = false;
             vexpand = false;
 
-            for (link = this.children; link != null; link = link.next)
+            while (child != null)
             {
-                if (link.data.page != null)
-                {
-                    hexpand |= link.data.page.child.hexpand_set && link.data.page.child.hexpand;
-                    vexpand |= link.data.page.child.vexpand_set && link.data.page.child.vexpand;
-                }
+                hexpand |= child.hexpand_set && child.hexpand;
+                vexpand |= child.vexpand_set && child.vexpand;
+
+                child = child.get_next_sibling ();
             }
-        }
-
-        public override void css_changed (Gtk.CssStyleChange change)
-        {
-            // TODO: invalidate last size
-
-            base.css_changed (change);
         }
 
         public override Gtk.SizeRequestMode get_request_mode ()
@@ -495,61 +416,49 @@ namespace Pomodoro
                                       out int         minimum_baseline,
                                       out int         natural_baseline)
         {
-            var visible_child        = this._visible_child;
-            var visible_child_widget = visible_child != null ? visible_child.page.child : null;
-            var last_visible_child   = this.last_visible_child;
-            var transition_progress  = this.get_transition_progress ();
-
-            var window = this.get_root () as Gtk.Window;
-            var interpolating_window_size = this.interpolate_window_size &&
-                                            window != null &&
-                                            window.default_width < 0 &&
-                                            window.default_height < 0;
-
             minimum = 0;
             natural = 0;
             minimum_baseline = -1;
             natural_baseline = -1;
 
-            if (visible_child != null)
-            {
-                var size = orientation == Gtk.Orientation.HORIZONTAL
-                    ? visible_child.last_width
-                    : visible_child.last_height;
-                var minimum_for_size = 0;
-
-                if (size >= 0 && (this.transition_animation != null || interpolating_window_size))
-                {
-                    minimum = size;
-                    natural = size;
-                }
-                else {
-                    visible_child_widget.measure (get_opposite_orientation (orientation),
-                                                  -1,
-                                                  out minimum_for_size,
-                                                  null,
-                                                  null,
-                                                  null);
-                    visible_child_widget.measure (orientation,
-                                                  int.max (minimum_for_size, for_size),
-                                                  out minimum,
-                                                  out natural,
-                                                  null,
-                                                  null);
-                }
+            if (this.current_page == null) {
+                return;
             }
 
-            if (last_visible_child != null)
+            var last_size = orientation == Gtk.Orientation.HORIZONTAL
+                    ? this.current_page.last_width
+                    : this.current_page.last_height;
+            var minimum_for_size = 0;
+
+            if (last_size <= 0 || this.transition_animation == null)
             {
-                var last_size = orientation == Gtk.Orientation.HORIZONTAL
-                    ? last_visible_child.last_width
-                    : last_visible_child.last_height;
+                current_page.child.measure (get_opposite_orientation (orientation),
+                                            -1,
+                                            out minimum_for_size,
+                                            null,
+                                            null,
+                                            null);
+                current_page.child.measure (orientation,
+                                            minimum_for_size,
+                                            out minimum,
+                                            out natural,
+                                            null,
+                                            null);
+            }
+            else {
+                minimum = 0;
+                natural = last_size;
+            }
 
-                minimum = (int) GLib.Math.round (
-                    Adw.lerp ((double) last_size, (double) minimum, transition_progress));
+            if (this.previous_page != null)
+            {
+                var previous_size = orientation == Gtk.Orientation.HORIZONTAL
+                        ? this.previous_page.last_width
+                        : this.previous_page.last_height;
+                var t = this.get_transition_progress ();
 
-                natural = (int) GLib.Math.round (
-                    Adw.lerp ((double) last_size, (double) natural, transition_progress));
+                natural = (int) GLib.Math.roundf (
+                        Pomodoro.lerpf ((float) previous_size, (float) natural, t));
             }
 
             if (natural < minimum) {
@@ -561,121 +470,99 @@ namespace Pomodoro
                                             int height,
                                             int baseline)
         {
-            var visible_child             = this._visible_child;
-            var visible_child_widget      = visible_child != null ? visible_child.page.child : null;
-            var last_visible_child        = this.last_visible_child;
-            var last_visible_child_widget = last_visible_child != null ? last_visible_child.page.child : null;
+            unowned var current_child  = this.current_page?.child;
+            unowned var previous_child = this.previous_page?.child;
 
-            if (last_visible_child != null &&
-                last_visible_child_widget != null &&
-                last_visible_child_widget.visible)
+            if (this.size_request_set)
             {
-                var last_visible_child_allocation = Gtk.Allocation () {
-                    x = 0,
-                    y = 0,
-                    width = int.max (last_visible_child.last_width, width),
-                    height = int.max (last_visible_child.last_height, height)
-                };
-                last_visible_child_widget.allocate_size (last_visible_child_allocation, baseline);
+                this.size_request_set = false;
+
+                // Lift minimum window size constraint at first opportunity.
+                var window = this.get_root () as Gtk.Window;
+                window?.set_size_request (-1, -1);
             }
 
-            if (visible_child != null &&
-                visible_child_widget != null &&
-                visible_child_widget.visible)
+            if (previous_child != null)
             {
-                var visible_child_allocation = Gtk.Allocation () {
-                    x = 0,
-                    y = 0,
-                    width = width,
+                var previous_child_allocation = Gtk.Allocation () {
+                    x      = 0,
+                    y      = 0,
+                    width  = int.max (this.previous_page.last_width, width),
+                    height = int.max (this.previous_page.last_height, height)
+                };
+
+                // Do not transition width if there's a big discrepancy
+                if (this.current_page.last_width > 2 * this.previous_page.last_width) {
+                    previous_child_allocation.width = this.previous_page.last_width;
+                }
+
+                previous_child.allocate_size (previous_child_allocation, baseline);
+            }
+
+            if (current_child != null)
+            {
+                var current_child_allocation = Gtk.Allocation () {
+                    x      = 0,
+                    y      = 0,
+                    width  = width,
                     height = height
                 };
 
                 if (this.transition_animation != null) {
-                    visible_child_allocation.width = int.max (visible_child.last_width, width);
-                    visible_child_allocation.height = int.max (visible_child.last_height, height);
+                    current_child_allocation.width = int.max (this.current_page.last_width, width);
+                    current_child_allocation.height = int.max (this.current_page.last_height, height);
+                }
+                else {
+                    this.current_page.last_width = width;
+                    this.current_page.last_height = height;
                 }
 
-                visible_child_widget.allocate_size (visible_child_allocation, baseline);
+                current_child.allocate_size (current_child_allocation, baseline);
             }
-        }
-
-        private void snapshot_crossfade (Gtk.Snapshot snapshot)
-        {
-            var visible_child             = this._visible_child;
-            var visible_child_widget      = visible_child != null ? visible_child.page.child : null;
-            var last_visible_child        = this.last_visible_child;
-            var last_visible_child_widget = last_visible_child != null ? last_visible_child.page.child : null;
-            var transition_progress       = this.get_transition_progress ();
-            var opacity                   = Math.pow (transition_progress, 1.5);
-
-            snapshot.save ();
-
-            if (last_visible_child != null &&
-                last_visible_child_widget != null &&
-                last_visible_child_widget.visible)
-            {
-                snapshot.push_opacity (1.0 - opacity);
-                this.snapshot_child (last_visible_child_widget, snapshot);
-                snapshot.pop ();
-            }
-
-            if (visible_child != null &&
-                visible_child_widget != null &&
-                visible_child_widget.visible)
-            {
-                snapshot.push_opacity (opacity);
-                this.snapshot_child (visible_child_widget, snapshot);
-                snapshot.pop ();
-            }
-
-            snapshot.restore ();
         }
 
         public override void snapshot (Gtk.Snapshot snapshot)
         {
-            var visible_child             = this._visible_child;
-            var visible_child_widget      = visible_child != null ? visible_child.page.child : null;
-            var last_visible_child        = this.last_visible_child;
-            var last_visible_child_widget = last_visible_child != null ? last_visible_child.page.child : null;
-            var bounds                    = Graphene.Rect ();
+            unowned var current_child = this.current_page?.child;
+            unowned var previous_child = this.previous_page?.child;
 
-            bounds.init (0, 0, this.get_width (), this.get_height ());
-
-            if (last_visible_child_widget != null &&
-                last_visible_child_widget.visible)
-            {
-                snapshot.push_clip (bounds);
-                this.snapshot_crossfade (snapshot);
-                snapshot.pop ();
+            if (current_child == null || !current_child.visible) {
                 return;
             }
 
-            if (visible_child_widget != null &&
-                visible_child_widget.visible)
+            if (this.transition_animation != null &&
+                previous_child != null &&
+                previous_child.visible)
             {
-                snapshot.push_clip (bounds);
-                this.snapshot_child (visible_child_widget, snapshot);
+                var progress = (double) Math.powf ((float) this.get_transition_progress (), 1.5f);
+
+                snapshot.push_cross_fade (progress);
+                this.snapshot_child (previous_child, snapshot);
                 snapshot.pop ();
+
+                this.snapshot_child (current_child, snapshot);
+                snapshot.pop ();
+            }
+            else {
+                this.snapshot_child (current_child, snapshot);
             }
         }
 
         public override void dispose ()
         {
-            unowned Gtk.Widget? child;
+            unowned var link = this.pages.first ();
 
-            while ((child = this.get_first_child ()) != null)
+            while (link != null)
             {
-                var child_info = this.find_child_info_for_widget (child);
+                this.remove_page (link.data);
 
-                if (child_info != null) {
-                    this.remove_child_internal (child_info);
-                }
+                link = this.pages.first ();
             }
 
-            this.children = null;
+            this.pages = null;
             this.transition_animation = null;
-            this._visible_child = null;
-            this.last_visible_child = null;
+            this.current_page = null;
+            this.previous_page = null;
 
             base.dispose ();
         }
