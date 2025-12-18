@@ -167,7 +167,7 @@ namespace Pomodoro
     }
 
 
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/automation/log-window.ui")]
+    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/log/log-window.ui")]
     public class LogWindow : Adw.ApplicationWindow
     {
         [GtkChild]

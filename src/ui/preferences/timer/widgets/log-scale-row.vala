@@ -9,7 +9,7 @@
 namespace Pomodoro
 {
     // TODO: rename to DurationRow
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/widgets/log-scale-row.ui")]
+    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/timer/widgets/log-scale-row.ui")]
     public class LogScaleRow : Adw.ActionRow
     {
         public Gtk.Adjustment adjustment {

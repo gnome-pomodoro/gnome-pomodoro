@@ -7,6 +7,7 @@
     <file compressed="true">migrations/version-3.sql</file>
 
     <!-- UI -->
+    <file compressed="true" preprocess="xml-stripblanks">ui/log/log-window.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/main/dialogs/install-extension-dialog.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/charts/bubble-chart.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/charts/chart.ui</file>
@@ -19,11 +20,11 @@
     <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/widgets/stats-card.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/widgets/stats-date-popover.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/main/stats/widgets/week-chooser.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/widgets/timer-control-buttons.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/widgets/timer-label.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/compact-timer-view.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/menus.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/timer-view.ui</file>
-    <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/widgets/timer-control-buttons.ui</file>
-    <file compressed="true" preprocess="xml-stripblanks">ui/main/timer/widgets/timer-label.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/main/window.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/overlays/lightbox.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/overlays/screen-overlay.ui</file>
@@ -34,7 +35,6 @@
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/action/condition-group-widget.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/action/condition-widget.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/action/variable-popover.ui</file>
-    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/log-window.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences/automation/preferences-panel-automation.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences/keyboard-shortcuts/accelerator-row.ui</file>
@@ -44,8 +44,8 @@
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences/sounds/preferences-panel-sounds.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences/sounds/sound-chooser-window.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences/sounds/volume-slider.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">ui/preferences/timer/widgets/log-scale-row.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/preferences/timer/preferences-panel-timer.ui</file>
-    <file compressed="true" preprocess="xml-stripblanks">ui/widgets/log-scale-row.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">ui/widgets/sidebar-row.ui</file>
 
     <!-- Images -->
