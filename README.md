@@ -9,12 +9,12 @@ using [GNOME](https://gnome.org/) technologies. It integrates best with the GNOM
 
 ## Screenshots
 
-![Timer](/data/screenshots/timer.png)
-![Compact timer](/data/screenshots/compact-timer.png)
-![Daily stats](/data/screenshots/stats-daily.png)
-![Monthly stats](/data/screenshots/stats-monthly.png)
-![Preferences](/data/screenshots/preferences.png)
-![Screen overlay](/data/screenshots/screen-overlay-1000x700.png)
+![Timer](https://gnomepomodoro.org/release/1.0/timer.png)
+![Compact timer](https://gnomepomodoro.org/release/1.0/compact-timer.png)
+![Daily stats](https://gnomepomodoro.org/release/1.0/stats-daily.png)
+![Monthly stats](https://gnomepomodoro.org/release/1.0/stats-monthly.png)
+![Preferences](https://gnomepomodoro.org/release/1.0/preferences.png)
+![Screen overlay](https://gnomepomodoro.org/release/1.0/screen-overlay.png)
 
 ## Installation
 

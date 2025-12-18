@@ -1,5 +1,5 @@
+# D-Bus
 dbus_conf = configuration_data()
-
 dbus_conf.set(
   'bindir',
   get_option('prefix') / get_option('bindir'),
@@ -19,6 +19,7 @@ install_data(
   install_dir: get_option('datadir') / 'dbus-1' / 'interfaces',
 )
 
+# Desktop file
 desktop_file = i18n.merge_file(
   input: 'org.gnomepomodoro.Pomodoro.desktop.in',
   output: '@BASENAME@',
@@ -37,26 +38,27 @@ if desktop_file_validate.found()
   )
 endif
 
+# Appdata
 appdata = i18n.merge_file(
-  input: 'org.gnomepomodoro.Pomodoro.appdata.xml.in',
+  input: 'org.gnomepomodoro.Pomodoro.metainfo.xml.in',
   output: '@BASENAME@',
   install: true,
   install_dir: get_option('datadir') / 'metainfo',
   po_dir: '..' / 'po',
 )
 
-appstream_util = find_program('appstream-util', required: false)
-
-if appstream_util.found()
+appstreamcli = find_program('appstreamcli', required: false)
+if appstreamcli.found()
   test(
-    'Validate .appdata.xml',
-    appstream_util,
+    'Validate .metainfo.xml',
+    appstreamcli,
     args: [
-      'validate-relax', '--nonet', appdata.full_path()
+      'validate', '--no-net', '--explain', appdata.full_path()
     ]
   )
 endif
 
+# GSchema
 install_data(
   'org.gnomepomodoro.Pomodoro.gschema.xml',
   install_dir: gschema_dir,
@@ -73,5 +75,13 @@ compiled_schemas = gnome.compile_schemas(
   depend_files: 'org.gnomepomodoro.Pomodoro.gschema.xml'
 )
 
+# Run required post-install steps
+gnome.post_install(
+  glib_compile_schemas: true,
+  gtk_update_icon_cache: true,
+  update_desktop_database: true,
+)
+
+# Assets
 subdir('icons')
 subdir('sounds')
