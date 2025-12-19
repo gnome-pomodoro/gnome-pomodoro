@@ -32,8 +32,7 @@ namespace Pomodoro
             about_dialog.translator_credits = translator_credits;
         }
 
-        // XXX: `add_link` doesn't work
-        // about_dialog.add_link (_("Donate"), Config.PACKAGE_URL);
+        about_dialog.add_link (_("Donate"), Config.PACKAGE_DONATE_URL);
 
         return about_dialog;
     }

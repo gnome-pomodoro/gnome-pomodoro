@@ -101,6 +101,7 @@ package_version = meson.project_version()
 package_website = 'https://gnomepomodoro.org'
 package_issue_url = 'https://github.com/gnome-pomodoro/gnome-pomodoro/issues'
 package_support_url = 'https://github.com/gnome-pomodoro/gnome-pomodoro/discussions'
+package_donate_url = 'https://liberapay.com/kamilprusko'
 package_datadir = get_option('prefix') / get_option('datadir') / meson.project_name()
 package_localedir = get_option('prefix') / get_option('datadir') / 'locale'
 gschema_dir = get_option('prefix') / get_option('datadir') / 'glib-2.0' / 'schemas'
@@ -145,6 +146,10 @@ conf.set_quoted(
 conf.set_quoted(
   'PACKAGE_SUPPORT_URL',
   package_support_url,
+)
+conf.set_quoted(
+  'PACKAGE_DONATE_URL',
+  package_donate_url,
 )
 conf.set_quoted(
   'GETTEXT_PACKAGE',
