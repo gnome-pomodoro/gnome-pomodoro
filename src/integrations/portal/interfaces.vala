@@ -25,9 +25,9 @@ namespace Portal
 
 
     [DBus (name = "org.freedesktop.portal.Background")]
-    interface Background : GLib.Object
+    public interface Background : GLib.Object
     {
-        public abstract uint32 version { owned get; }
+        public abstract uint32 version { get; }
 
         public abstract async GLib.ObjectPath request_background (string                               parent_window,
                                                                   GLib.HashTable<string, GLib.Variant> options) throws GLib.DBusError, GLib.IOError;
@@ -37,7 +37,7 @@ namespace Portal
     [DBus (name = "org.freedesktop.portal.GlobalShortcuts")]
     public interface GlobalShortcuts : GLib.Object
     {
-        public abstract uint32 version { owned get; }
+        public abstract uint32 version { get; }
 
         public abstract async GLib.ObjectPath create_session (GLib.HashTable<string, GLib.Variant> options) throws GLib.DBusError, GLib.IOError;
 

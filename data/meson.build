@@ -1,32 +1,39 @@
 # D-Bus
 dbus_conf = configuration_data()
-dbus_conf.set(
-  'bindir',
-  get_option('prefix') / get_option('bindir'),
-)
+dbus_conf.set('BINDIR', get_option('prefix') / get_option('bindir'))
+dbus_conf.set('APPLICATION_ID', application_id)
 
 configure_file(
   input: 'org.gnomepomodoro.Pomodoro.service.in',
-  output: '@BASENAME@',
+  output: '@0@.service'.format(application_id),
   configuration: dbus_conf,
-  install_dir: get_option('datadir') / 'dbus-1' / 'services',
+  install: true,
+  install_dir: get_option('datadir') / 'dbus-1/services',
 )
 
 install_data(
   'org.gnomepomodoro.Pomodoro.xml',
   'org.gnomepomodoro.Pomodoro.Session.xml',
   'org.gnomepomodoro.Pomodoro.Timer.xml',
-  install_dir: get_option('datadir') / 'dbus-1' / 'interfaces',
+  install_dir: get_option('datadir') / 'dbus-1/interfaces',
 )
 
 # Desktop file
+desktop_conf = configuration_data()
+desktop_conf.set('APPLICATION_ID', application_id)
+desktop_conf.set('APPLICATION_NAME', application_name)
+
 desktop_file = i18n.merge_file(
-  input: 'org.gnomepomodoro.Pomodoro.desktop.in',
-  output: '@BASENAME@',
-  install: true,
-  install_dir:  get_option('datadir') / 'applications',
-  po_dir: '..' / 'po',
+  input: configure_file(
+    input: 'org.gnomepomodoro.Pomodoro.desktop.in.in',
+    output: '@0@.desktop.in'.format(application_id),
+    configuration: desktop_conf
+  ),
+  output: '@0@.desktop'.format(application_id),
   type: 'desktop',
+  po_dir: '../po',
+  install: true,
+  install_dir: get_option('datadir') / 'applications'
 )
 
 desktop_file_validate = find_program('desktop-file-validate', required:false)
@@ -44,7 +51,7 @@ appdata = i18n.merge_file(
   output: '@BASENAME@',
   install: true,
   install_dir: get_option('datadir') / 'metainfo',
-  po_dir: '..' / 'po',
+  po_dir: '../po',
 )
 
 appstreamcli = find_program('appstreamcli', required: false)

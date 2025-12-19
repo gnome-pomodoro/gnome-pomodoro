@@ -10,7 +10,6 @@ namespace Config
     public const string PACKAGE_ISSUE_URL;
     public const string PACKAGE_SUPPORT_URL;
     public const string PACKAGE_DATA_DIR;
-    public const string PACKAGE_LIB_DIR;
     public const string PACKAGE_LOCALE_DIR;
 
     public const string GETTEXT_PACKAGE;

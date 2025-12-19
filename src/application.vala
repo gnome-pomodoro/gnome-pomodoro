@@ -65,9 +65,6 @@ namespace Pomodoro
                 { "reset", 0, 0, GLib.OptionArg.NONE,
                   ref reset, N_("Reset current session"), null },
 
-                { "no-default-window", 0, 0, GLib.OptionArg.NONE,
-                  ref no_default_window, N_("Run as background service"), null },
-
                 { "preferences", 0, 0, GLib.OptionArg.NONE,
                   ref preferences, N_("Show preferences"), null },
 
