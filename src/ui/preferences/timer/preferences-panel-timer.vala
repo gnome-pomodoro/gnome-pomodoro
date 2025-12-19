@@ -83,6 +83,7 @@ namespace Pomodoro
             var total_duration = Pomodoro.Timestamp.to_seconds_uint (session_template.calculate_total_duration ());
             var break_percentage = (uint) Math.round (session_template.calculate_break_percentage ());
 
+            // translators: time formatted as text: "5 minutes 30 seconds"
             this.session_stats_label.label = _("A single session will take <b>%s</b>.").printf (Pomodoro.format_time (total_duration));
             this.breaks_stats_label.label = _("<b>%u%%</b> of the time will be allocated for breaks.").printf (break_percentage);
         }

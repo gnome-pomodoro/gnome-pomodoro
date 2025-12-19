@@ -153,17 +153,19 @@ namespace Pomodoro
                                            get_duration));
             Pomodoro.install_variable (
                 new Pomodoro.VariableSpec ("offset",
-                                           // _("Time lost that would otherwise be included in elapsed time."),
+                                           // translators: Time difference between displayed value on the timer and real time. Think of it as a lost time.
                                            _("Discrepancy between elapsed time and the time passed."),
                                            typeof (Pomodoro.IntervalValue),
                                            get_offset));
             Pomodoro.install_variable (
                 new Pomodoro.VariableSpec ("elapsed",
+                                           // translators: Time since the start of countdown
                                            _("The amount of time spent on the countdown."),
                                            typeof (Pomodoro.IntervalValue),
                                            get_elapsed));
             Pomodoro.install_variable (
                 new Pomodoro.VariableSpec ("remaining",
+                                           // translators: Displayed timer value.
                                            _("The amount of time left before the countdown ends."),
                                            typeof (Pomodoro.IntervalValue),
                                            get_remaining));

@@ -363,7 +363,7 @@ namespace Pomodoro
         producer.install_event (event_spec);
 
         event_spec = new Pomodoro.EventSpec ("reschedule",
-                                             _("Rescheduled"),
+                                             _("Rescheduled"),  // translators: Change of plan
                                              _("Triggered when scheduled time-blocks have changed."),
                                              Pomodoro.EventCategory.SESSION);
         event_spec.add_trigger (Pomodoro.TriggerHook.SESSION_MANAGER_SESSION_RESCHEDULED,
