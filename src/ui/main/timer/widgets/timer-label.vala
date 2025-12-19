@@ -405,6 +405,29 @@ namespace Pomodoro
             this.blink_animation.play ();
         }
 
+        /**
+         * Sync all of things with the timer state
+         */
+        private void update (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        {
+            if (this._timer.user_data != null) {
+                this.update_remaining_time (timestamp);
+                this.fade_in ();
+            }
+            else {
+                this.fade_out ();
+            }
+
+            if (this.should_blink ()) {
+                this.start_blinking_animation ();
+            }
+            else {
+                this.stop_blinking_animation ();
+            }
+
+            this.queue_resize ();
+        }
+
         private void connect_signals ()
         {
             if (this.timer_tick_id == 0) {
@@ -437,29 +460,8 @@ namespace Pomodoro
         private void on_timer_state_changed (Pomodoro.TimerState current_state,
                                              Pomodoro.TimerState previous_state)
         {
-            var timestamp = this._timer.get_last_state_changed_time ();
-
-            if (current_state.user_data != null)
-            {
-                // Prevent from displaying 00:00 while stopping the timer.
-                this.update_remaining_time (timestamp);
-
-                this.fade_in ();
-            }
-            else {
-                this.fade_out ();
-            }
-
-            if (this.get_mapped ())
-            {
-                if (this.should_blink ()) {
-                    this.start_blinking_animation ();
-                }
-                else {
-                    this.stop_blinking_animation ();
-                }
-
-                this.queue_resize ();
+            if (this.get_mapped ()) {
+                this.update (this._timer.get_last_state_changed_time ());
             }
         }
 
@@ -662,7 +664,7 @@ namespace Pomodoro
 
         public override void map ()
         {
-            this.on_timer_state_changed (this._timer.state, this._timer.state);
+            this.update (this._timer.get_last_tick_time ());
             this.connect_signals ();
 
             base.map ();
