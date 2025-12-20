@@ -120,9 +120,29 @@ namespace Pomodoro.Locale
 
     public string get_month_name (uint month_number)
     {
-        return month_number >= 1 && month_number <= 12
-                ? MONTHS[month_number - 1].to_string ()
-                : "";
+        if (month_number < 1 || month_number > 12) {
+            return "";
+        }
+
+        var month_name = MONTHS[month_number - 1].to_string ();
+
+        // Convert to UTF-8 if needed
+        if (!month_name.validate ())
+        {
+            try {
+                string charset;
+                GLib.get_charset (out charset);
+
+                var bytes = month_name.data;
+                month_name = GLib.convert ((string) bytes, -1, "UTF-8",
+                                           charset, null, null);
+            }
+            catch (GLib.ConvertError error) {
+                GLib.warning ("Failed to convert month name to UTF-8: %s", error.message);
+            }
+        }
+
+        return month_name;
     }
 
 

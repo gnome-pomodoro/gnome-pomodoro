@@ -22,10 +22,15 @@ namespace Pomodoro.DateUtils
     public string format_date (GLib.Date date,
                                string    format)
     {
-        var buffer = new char[256];
-        var length = date.strftime (buffer, format);
+        // Avoid using `GLib.Date.strftime`, as it doesn't handle encodings
+        // properly.
+        var datetime = new GLib.DateTime.local (
+                date.get_year (),
+                date.get_month (),
+                date.get_day (),
+                0, 0, 0.0);
 
-        return (string) buffer[0 : length];
+        return datetime.format (format);
     }
 
 

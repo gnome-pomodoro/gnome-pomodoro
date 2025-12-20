@@ -127,6 +127,7 @@ namespace Pomodoro
         return string_builder.str;
     }
 
+
     /**
      * Function to get xdg-desktop-portal compatible window ID
      *
