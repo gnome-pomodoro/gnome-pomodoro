@@ -74,7 +74,7 @@ namespace Pomodoro
             chooser.transient_for = (Gtk.Window) this.get_root ();
 
             for (var index = 0; index < presets.length; index++) {
-                chooser.add_preset (presets[index].uri, presets[index].label);
+                chooser.add_preset (presets[index].uri, gettext (presets[index].label));
             }
 
             return chooser;
@@ -89,14 +89,14 @@ namespace Pomodoro
             foreach (var preset in ALERT_PRESETS)
             {
                 if (preset.uri == uri) {
-                    return preset.label;
+                    return gettext (preset.label);
                 }
             }
 
             foreach (var preset in BACKGROUND_PRESETS)
             {
                 if (preset.uri == uri) {
-                    return preset.label;
+                    return gettext (preset.label);
                 }
             }
 
