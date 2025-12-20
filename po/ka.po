@@ -28,12 +28,12 @@ msgstr ""
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "დროის მართვის მარტივი პროგრამა GNOME-სთვის"
+msgstr "დროის მართვის პროგრამა"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
 msgid "timer;"
-msgstr "ტაიმერი;"
+msgstr "ტაიმერი;წამმზომი;"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
 #: src/core/notification-manager.vala:335 src/core/state.vala:78
@@ -78,7 +78,7 @@ msgstr "სამუშაო სესიის და შესვენებ
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "სხვა გაფრთხილებების დამალვა"
+msgstr "ვიზუალური და ხმოვანი შეტყობინებები"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 #, fuzzy
@@ -98,7 +98,7 @@ msgstr "ეკრანის გადაფარვა შესვენე�
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "მიმდინარე პომოდოროს ან შესვენების გაფართოება"
+msgstr "საკუთარი ბრძანებების გაშვება პომოდოროს ან შესვენების შემდეგ"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -113,7 +113,7 @@ msgstr "წამმზომი"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
-msgstr "ტაიმერის გაჩერება"
+msgstr "კომპაქტური ტაიმერი"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
 #, fuzzy
@@ -173,7 +173,7 @@ msgstr "ცვლილებების მიმოხილვა gnome-pomo
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "მაჩვენებელი GNOME-ის გარსისთვის"
+msgstr "GNOME Shell 48-ის მხარდაჭერა"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 #, fuzzy
@@ -193,7 +193,7 @@ msgstr "ცვლილებების მიმოხილვა gnome-pomo
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "მაჩვენებელი GNOME-ის გარსისთვის"
+msgstr "GNOME Shell 47-ის მხარდაჭერა"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
@@ -228,12 +228,12 @@ msgstr "ცვლილებების მიმოხილვა gnome-pomo
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "მაჩვენებელი GNOME-ის გარსისთვის"
+msgstr "შესწორებები GNOME Shell 46-სთვის"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "მაჩვენებელი GNOME-ის გარსისთვის"
+msgstr "GNOME Shell 45-ის მხარდაჭერის შეწყვეტა"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 #, fuzzy
@@ -243,7 +243,7 @@ msgstr "ცვლილებების მიმოხილვა gnome-pomo
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "მაჩვენებელი GNOME-ის გარსისთვის"
+msgstr "GNOME Shell 46-ის მხარდაჭერა"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 #, fuzzy
@@ -284,7 +284,7 @@ msgstr "გაგრძელება"
 
 #: src/application.vala:60
 msgid "Skip to a pomodoro or to a break"
-msgstr "გადასვლა პომოდოროზე ან დასვენებაზე"
+msgstr "გადასვლა პომოდოროზე ან შესვენებაზე"
 
 #: src/application.vala:63
 msgid "Extend current pomodoro or break"
@@ -310,13 +310,13 @@ msgstr "ვერსიის ჩვენება და გასვლა"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "გაშვება/დასრულება"
+msgstr "გაშვება ან გაჩერება"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
-msgstr "პაუზა/გაგრძელება"
+msgstr "გაშვება, პაუზა ან გაგრძელება"
 
 #: src/application.vala:490 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
@@ -337,7 +337,7 @@ msgstr "ფოკუსში მოყვანა"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "მორგებული ქმედებები…"
+msgstr "საკუთარი ქმედება \"%s\" ჩაიშალა"
 
 #: src/core/command.vala:379
 #, fuzzy
@@ -352,7 +352,7 @@ msgstr "ბრძანების შესრულება ჩაიშა�
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
 msgid "Command is empty"
-msgstr "ბრძანება"
+msgstr "ბრძანება ცარიელია"
 
 #: src/core/command.vala:510
 #, fuzzy
@@ -403,7 +403,7 @@ msgstr "სხვა"
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "წამმზომის გაშვება"
+msgstr "ტაიმერი ჩაირთო."
 
 #: src/core/event.vala:277
 #, fuzzy
@@ -524,21 +524,21 @@ msgstr "ირთვება, როცა სესია უნდა ჩა�
 #: src/core/notification-manager.vala:130
 #, fuzzy, c-format
 msgid "%s remaining"
-msgstr "დარჩენილია %d წამი"
+msgstr "დარჩენილია %s"
 
 #: src/core/notification-manager.vala:339
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Take a break"
-msgstr "დასვენების აღება"
+msgstr "შესვენება"
 
 #: src/core/notification-manager.vala:343
 msgid "Take a short break"
-msgstr "მოკლე შესვენები აღება"
+msgstr "მოკლე შესვენება"
 
 #: src/core/notification-manager.vala:347
 msgid "Take a long break"
-msgstr "გრძელი დასვენების აღება"
+msgstr "გრძელი შესვენება"
 
 #: src/core/notification-manager.vala:394
 msgid "Pomodoro is about to end"
@@ -550,7 +550,7 @@ msgstr "პომოდორო მალე დასრულდება"
 #: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
 #, fuzzy
 msgid "Take a Break"
-msgstr "დასვენების აღება"
+msgstr "შეისვენეთ"
 
 #: src/core/notification-manager.vala:401
 msgid "Break is about to end"
@@ -577,13 +577,13 @@ msgstr "მოემზადეთ…"
 #: src/core/notification-manager.vala:473
 #, fuzzy
 msgid "Pomodoro is over!"
-msgstr "პომოდოროს ტაიმერი"
+msgstr "პომოდორო დასრულდა!"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "დასვენება დასრულდა"
+msgstr "შესვენება დასრულდა!"
 
 #: src/core/notification-manager.vala:489
 #, fuzzy
@@ -629,12 +629,12 @@ msgstr "ფაილის ტიპი მხარდაჭერილი ა
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "გაჩერება"
+msgstr "გაჩერებულია"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
 msgid "Break"
-msgstr "გაწყვეტა"
+msgstr "შესვენება"
 
 #: src/core/state.vala:84
 msgid "Short Break"
@@ -890,7 +890,7 @@ msgstr "_კიდევ სცადეთ"
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
 #, fuzzy
 msgid "_Abort"
-msgstr "შესახებ"
+msgstr "_შეწყვეტა"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
 #, fuzzy
@@ -915,7 +915,7 @@ msgstr "გაფართოების ჩამოტვირთვა ჩ�
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
-msgstr "გაწყვეტა"
+msgstr "შესვენებები"
 
 #: src/ui/main/stats/stats-day-page.ui:111
 #: src/ui/main/stats/stats-month-page.ui:48
@@ -931,7 +931,7 @@ msgstr "შეწყვეტები"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "შესვენების ხანგრძლივობა"
+msgstr "შესვენების თანაფარდობა"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -951,7 +951,7 @@ msgstr "თვე"
 #: src/ui/main/stats/stats-view.ui:39
 #, fuzzy
 msgid "Nothing to see here yet"
-msgstr "ჯერ სანახავი არაფერია"
+msgstr "ჯერჯერობით აქ არაფერია"
 
 #: src/ui/main/stats/stats-view.ui:40
 #, fuzzy
@@ -986,7 +986,7 @@ msgstr "გუშინ"
 
 #: src/ui/main/stats/stats-view.vala:1028
 msgid "This week"
-msgstr "ეს კვირა"
+msgstr "ამ კვირაში"
 
 #: src/ui/main/stats/stats-view.vala:1048
 #, fuzzy, c-format
@@ -1020,7 +1020,7 @@ msgstr "დასრულდა!"
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "გაწყვეტა"
+msgstr "_შესვენება"
 
 #: src/ui/main/timer/timer-view.ui:23
 #, fuzzy
@@ -1035,7 +1035,7 @@ msgstr "სესიის ვადა ამოიწურა"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "გრძელი შესვენების ხანგრძლივობა"
+msgstr "დიდი შესვენება დაიწყება <b>%s</b>-ში"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
@@ -1099,7 +1099,7 @@ msgstr "გასვლა"
 #: src/ui/main/window.vala:332
 #, fuzzy
 msgid "Run in background"
-msgstr "გაშვება ფონური სერვისის სახით"
+msgstr "ფონურ რეჟიმში გაშვება"
 
 #: src/ui/overlays/screen-overlay.ui:65
 msgid "It's time to take a break"
@@ -1109,7 +1109,7 @@ msgstr "დროა, შეისვენოთ"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "ტაიმერის ფანჯარა"
+msgstr "მთავარი ფანჯარა"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 #, fuzzy
@@ -1125,18 +1125,18 @@ msgstr "კომპაქტური ხედის გამოყენე�
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "გაშვება"
+msgstr "დაწყებული"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
 #, fuzzy
 msgid "Paused"
-msgstr "პაუზა"
+msgstr "შეჩერებული"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "მორგებული ქმედებები…"
+msgstr "საკუთარი ქმედების რედაქტირება"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
@@ -1155,7 +1155,7 @@ msgstr "სახელი"
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
 #, fuzzy
 msgid "Trigger"
-msgstr "ტრიგერები"
+msgstr "ტრიგერი"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
 #, fuzzy
@@ -1203,12 +1203,12 @@ msgstr "ფილტრი"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "ბრძანება"
+msgstr "Shell ბრძანება"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
 msgid "Commands"
-msgstr "ბრძანება"
+msgstr "ბრძანებები"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
 #, fuzzy
@@ -1258,7 +1258,7 @@ msgstr "სხვა ბრძანებების დაბლოკვა 
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "ქმედება"
+msgstr "ქმედების _წაშლა"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 #, fuzzy
@@ -1268,7 +1268,7 @@ msgstr "მოვლენები ჯერ არ არის მითი�
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "მორგებული ქმედებები…"
+msgstr "საკუთარი ქმედების დამატება"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 #, fuzzy
@@ -1288,7 +1288,7 @@ msgstr "_აირჩიეთ"
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "მდგომარეობის ხანგრძლივობა"
+msgstr "უსახელო ქმედება"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
@@ -1376,7 +1376,7 @@ msgstr "მუშაობს"
 #: src/ui/preferences/automation/action/condition-widget.vala:121
 #, fuzzy
 msgid "Duration"
-msgstr "მდგომარეობის ხანგრძლივობა"
+msgstr "ხანგრძლივობა"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
@@ -1411,7 +1411,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "კლავიატურის მალსახმობი"
+msgstr "მალსახმობის დაყენება"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 #, fuzzy
@@ -1422,7 +1422,7 @@ msgstr "_დაყენება"
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
 #, fuzzy
 msgid "Disabled"
-msgstr "გამორთვა"
+msgstr "გამორთულია"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
 #, fuzzy
@@ -1514,7 +1514,7 @@ msgstr "დრო იწურება"
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
 #, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
-msgstr "პომოდორო მალე დასრულდება"
+msgstr "შეტყობინება, როცა პომოდორო ან შესვენება სრულდება."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
@@ -1606,12 +1606,12 @@ msgstr "გარეგნობა"
 #: src/ui/preferences/preferences-window.vala:58
 #, fuzzy
 msgid "Keyboard Shortcuts"
-msgstr "კლავიატურის მალსახმობი"
+msgstr "კლავიატურის მალსახმობები"
 
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "მორგებული ქმედებები…"
+msgstr "ავტომატიზაცია"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 #, fuzzy
@@ -1626,18 +1626,18 @@ msgstr "განგაშის ხმები"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "პომოდორო მალე დასრულდება"
+msgstr "პომოდოროს დასრულების ხმა"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "შესვენება მალე დასრულდება"
+msgstr "შესვენების დასრულების ხმა"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
 #, fuzzy
 msgid "Background Sound"
-msgstr "წიკწიკის ხმა"
+msgstr "ფონური ხმა"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
 msgid "Bell"
@@ -1668,7 +1668,7 @@ msgstr "არცერთი"
 
 #: src/ui/preferences/sounds/sound-chooser-window.ui:63
 msgid "Volume:"
-msgstr "ტომი:"
+msgstr "ხმა:"
 
 #: src/ui/preferences/sounds/sound-chooser-window.vala:249
 msgid "Select Custom Sound"
@@ -1682,7 +1682,7 @@ msgstr "პომოდოროს ხანგრძლივობა"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:31
 #, fuzzy
 msgid "Short Break Duration"
-msgstr "შესვენების ხანგრძლივობა"
+msgstr "მოკლე შესვენების ხანგრძლივობა"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:42
 #, fuzzy
@@ -1712,7 +1712,7 @@ msgstr "შესვენების დაწყების დადას�
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
 #, fuzzy
 msgid "Confirm Starting a Pomodoro"
-msgstr "პომოდოროს გაშვება"
+msgstr "პომოდოროს დაწყების დადასტურება"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87

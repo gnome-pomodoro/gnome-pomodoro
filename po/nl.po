@@ -28,12 +28,12 @@ msgstr "@APPLICATION_NAME@"
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "Een eenvoudige tijdindelingstoepassing"
+msgstr "Hulpmiddel voor tijdsbeheer"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
 msgid "timer;"
-msgstr "timer;tijdklok;tijdindeling;"
+msgstr "timer;tijdklok;tijdindeling;pomodoro;pauze;"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
 #: src/core/notification-manager.vala:335 src/core/state.vala:78
@@ -75,7 +75,7 @@ msgstr "Aanpasbare duur van werksessies en pauzes"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "Andere meldingen verbergen"
+msgstr "Visuele en geluidsmeldingen"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 msgid "Time tracking and statistics"
@@ -92,7 +92,7 @@ msgstr "Schermoverlay tijdens pauzes"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "Verleng huidige pomodoro of pauze"
+msgstr "Voer aangepaste opdrachten uit na een pomodoro of pauze"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -102,12 +102,12 @@ msgstr "Kamil Prusko"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:37
 #: src/ui/preferences/preferences-window.vala:30
 msgid "Timer"
-msgstr "Tijdklok"
+msgstr "Timer"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
-msgstr "Tijdklok stoppen"
+msgstr "Compacte timer"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
 msgid "Daily stats"
@@ -129,42 +129,42 @@ msgstr "Schermoverlay"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:95
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.1"
-msgstr "Wijzigingslog van gnome-pomodoro 0.15.1"
+msgstr "Overzicht van wijzigingen in gnome-pomodoro 0.28.1"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:97
 #, fuzzy
 msgid "Added Tamil translation (thanks @omeritzics)"
-msgstr "Noorse vertaling (met dank aan @arnotixe)"
+msgstr "Tamil-vertaling toegevoegd (met dank aan @omeritzics)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:98
 #, fuzzy
 msgid "Added Hebrew translation (thanks @Killersparrow1)"
-msgstr "Noorse vertaling (met dank aan @arnotixe)"
+msgstr "Hebreeuwse vertaling toegevoegd (met dank aan @Killersparrow1)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:104
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.0"
-msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
+msgstr "Overzicht van wijzigingen in gnome-pomodoro 0.28.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
 #, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
-msgstr "Ondersteuning voor GNOME Shell 3.38 (met dank aan @ignapk en @szpak)"
+msgstr "Ondersteuning voor GNOME Shell 49 (met dank aan @aleasto)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
 #, fuzzy
 msgid "Updated German translation (thanks @daPhipz)"
-msgstr "Duitse vertaling bijgewerkt (met dank aan @tsabsch)"
+msgstr "Duitse vertaling bijgewerkt (met dank aan @daPhipz)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:113
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.27.0"
-msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
+msgstr "Overzicht van wijzigingen in gnome-pomodoro 0.27.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "Ondersteuning voor GNOME Shell 3.36"
+msgstr "Ondersteuning voor GNOME Shell 48"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 msgid "Split time spent across midnight"
@@ -173,17 +173,17 @@ msgstr "Splits gespendeerde tijd rond middernacht"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:117
 #, fuzzy
 msgid "Added Telugu translation (thanks @SpaciousCoder78)"
-msgstr "Noorse vertaling (met dank aan @arnotixe)"
+msgstr "Telugu-vertaling toegevoegd (met dank aan @SpaciousCoder78)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:123
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.26.0"
-msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
+msgstr "Overzicht van wijzigingen in gnome-pomodoro 0.26.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "Ondersteuning voor GNOME Shell 3.36"
+msgstr "Ondersteuning voor GNOME Shell 47"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 msgid "Allow to dismiss screen overlay by gesture when a video is playing"
@@ -193,7 +193,7 @@ msgstr ""
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:127
 #, fuzzy
 msgid "Added Georgian translation (thanks @NorwayFun)"
-msgstr "Noorse vertaling (met dank aan @arnotixe)"
+msgstr "Georgische vertaling toegevoegd (met dank aan @NorwayFun)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:128
 msgid "Adjusted translations in appdata (thanks @yakushabb)"
@@ -202,7 +202,7 @@ msgstr "Vertalingen in appdata aangepast (met dank aan @yakushabb)"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:134
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.2"
-msgstr "Wijzigingslog van gnome-pomodoro 0.15.1"
+msgstr "Overzicht van wijzigingen in gnome-pomodoro 0.25.2"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:136
 msgid "Fix keeping notification after extending Pomodoro"
@@ -211,27 +211,27 @@ msgstr "Probleem opgelost waarbij melding bleef staan na verlengen Pomodoro"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:142
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.1"
-msgstr "Wijzigingslog van gnome-pomodoro 0.15.1"
+msgstr "Overzicht van wijzigingen in gnome-pomodoro 0.25.1"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "Ondersteuning voor GNOME Shell 3.36"
+msgstr "Oplossingen voor GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "Ondersteuning voor GNOME Shell 3.36"
+msgstr "Ondersteuning voor GNOME Shell 45 beëindigd"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.0"
-msgstr "Wijzigingslog van gnome-pomodoro 0.18.0"
+msgstr "Overzicht van wijzigingen in gnome-pomodoro 0.25.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "Ondersteuning voor GNOME Shell 3.36"
+msgstr "Ondersteuning voor GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 msgid "Adjust build script to meson 0.59.0 (thanks @mattst88)"
@@ -271,15 +271,15 @@ msgstr "Hervatten"
 
 #: src/application.vala:60
 msgid "Skip to a pomodoro or to a break"
-msgstr "Spring naar een pomodoro of naar een pauze"
+msgstr "Doorgaan naar een pomodoro of pauze"
 
 #: src/application.vala:63
 msgid "Extend current pomodoro or break"
-msgstr "Verleng huidige pomodoro of pauze"
+msgstr "Huidige pomodoro of pauze verlengen"
 
 #: src/application.vala:66
 msgid "Reset current session"
-msgstr "Reset huidige sessie"
+msgstr "Huidige sessie resetten"
 
 #: src/application.vala:69
 msgid "Show preferences"
@@ -297,13 +297,13 @@ msgstr "Versie-informatie tonen en afsluiten"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "Starten/Stoppen"
+msgstr "Starten of stoppen"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
-msgstr "Onderbreken/Hervatten"
+msgstr "Starten, onderbreken of hervatten"
 
 #: src/application.vala:490 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
@@ -322,7 +322,7 @@ msgstr "Op de voorgrond plaatsen"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "Aangepaste acties…"
+msgstr "Aangepaste actie \"%s\" is mislukt"
 
 #: src/core/command.vala:379
 msgid "Reached timeout"
@@ -331,12 +331,12 @@ msgstr "Time-out bereikt"
 #: src/core/command.vala:408
 #, fuzzy
 msgid "Failed to execute command"
-msgstr "De uitbreiding kan niet worden ingeschakeld"
+msgstr "Opdracht uitvoeren mislukt"
 
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
 msgid "Command is empty"
-msgstr "Opdracht"
+msgstr "Opdracht is leeg"
 
 #: src/core/command.vala:510
 msgid "Unclosed quotation mark"
@@ -382,7 +382,7 @@ msgstr "Overig"
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "Tijdklok starten"
+msgstr "Timer gestart."
 
 #: src/core/event.vala:277
 msgid "Stopped the timer manually."
@@ -493,7 +493,7 @@ msgstr "nog %s"
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Take a break"
-msgstr "Neem een pauze"
+msgstr "Neem pauze"
 
 #: src/core/notification-manager.vala:343
 msgid "Take a short break"
@@ -505,7 +505,7 @@ msgstr "Neem een lange pauze"
 
 #: src/core/notification-manager.vala:394
 msgid "Pomodoro is about to end"
-msgstr "De Pomodoro verstrijkt bijna"
+msgstr "De Pomodoro loopt bijna af"
 
 #: src/core/notification-manager.vala:395
 #: src/core/notification-manager.vala:495
@@ -517,7 +517,7 @@ msgstr "Neem een pauze"
 
 #: src/core/notification-manager.vala:401
 msgid "Break is about to end"
-msgstr "De pauze is bijna voorbij"
+msgstr "De pauze loopt bijna af"
 
 #: src/core/notification-manager.vala:402
 #: src/core/notification-manager.vala:490
@@ -534,19 +534,19 @@ msgstr "+1 minuut"
 
 #: src/core/notification-manager.vala:432
 msgid "Get ready…"
-msgstr "Maak je klaar…"
+msgstr "Maak je gereed…"
 
 #: src/core/notification-manager.vala:437
 #: src/core/notification-manager.vala:473
 #, fuzzy
 msgid "Pomodoro is over!"
-msgstr "Pomodoro-tijdklok"
+msgstr "De Pomodoro is voorbij!"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "Pauze is afgelopen"
+msgstr "De pauze is voorbij!"
 
 #: src/core/notification-manager.vala:489
 msgid "Confirm the start of a Pomodoro…"
@@ -585,7 +585,7 @@ msgstr "Bestandstype niet ondersteund"
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "Stoppen"
+msgstr "Gestopt"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
@@ -695,7 +695,7 @@ msgstr "Tijdstip waarop het aftellen is gestart."
 #: src/integrations/portal/global-shortcuts-provider.vala:298
 #, fuzzy
 msgid "Unused"
-msgstr "Onderbroken"
+msgstr "Niet gebruikt"
 
 #: src/ui/log/log-window.ui:6
 msgid "Log"
@@ -817,7 +817,7 @@ msgstr "Opnieuw _proberen"
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
 #, fuzzy
 msgid "_Abort"
-msgstr "_Over"
+msgstr "_Afbreken"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
 msgid "Time-out reached"
@@ -830,7 +830,7 @@ msgstr "Installeren van uitbreidingen is niet toegestaan"
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
 #, fuzzy
 msgid "Failed to download the extension"
-msgstr "De uitbreiding kan niet worden ingeschakeld"
+msgstr "Downloaden van uitbreiding mislukt"
 
 #: src/ui/main/stats/stats-day-page.ui:104
 #: src/ui/main/stats/stats-day-page.vala:92
@@ -855,7 +855,7 @@ msgstr "Onderbrekingen"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "Pauzeduur"
+msgstr "Pauzeratio"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -875,7 +875,7 @@ msgstr "Maand"
 #: src/ui/main/stats/stats-view.ui:39
 #, fuzzy
 msgid "Nothing to see here yet"
-msgstr "Er valt hier nog niks te zien"
+msgstr "Nog niets te zien hier"
 
 #: src/ui/main/stats/stats-view.ui:40
 msgid "Finish a few Pomodoros to fill this up!"
@@ -945,7 +945,7 @@ msgstr "Klaar!"
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "Pauze"
+msgstr "_Pauze"
 
 #: src/ui/main/timer/timer-view.ui:23
 msgid "Open screen overlay"
@@ -958,7 +958,7 @@ msgstr "Sessie is verlopen"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "Duur van lange pauze"
+msgstr "Lange pauze over <b>%s</b>"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
@@ -1016,17 +1016,17 @@ msgstr "Afsluiten"
 #: src/ui/main/window.vala:332
 #, fuzzy
 msgid "Run in background"
-msgstr "Uitvoeren als achtergronddienst"
+msgstr "In de achtergrond uitvoeren"
 
 #: src/ui/overlays/screen-overlay.ui:65
 msgid "It's time to take a break"
-msgstr "Het is tijd voor een pauze"
+msgstr "Het is tijd voor pauze"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:17
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "Tijdklokvenster"
+msgstr "Hoofdvenster"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 msgid "Prefer Dark Theme"
@@ -1040,7 +1040,7 @@ msgstr "Voorkeur voor compacte weergave"
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "Starten"
+msgstr "Gestart"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
@@ -1050,7 +1050,7 @@ msgstr "Onderbroken"
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "Aangepaste acties…"
+msgstr "Aangepaste actie bewerken"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
@@ -1068,7 +1068,7 @@ msgstr "Naam"
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
 #, fuzzy
 msgid "Trigger"
-msgstr "Roept aan:"
+msgstr "Trigger"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
 msgid "Event"
@@ -1110,12 +1110,12 @@ msgstr "Filter"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "Opdracht"
+msgstr "Shell-opdracht"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
 msgid "Commands"
-msgstr "Opdracht"
+msgstr "Opdrachten"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
 msgid "Condition Met Command"
@@ -1156,7 +1156,7 @@ msgstr "Andere opdrachten blokkeren totdat de opdracht is voltooid."
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "Actie"
+msgstr "Actie _verwijderen"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 msgid "No events specified yet."
@@ -1165,7 +1165,7 @@ msgstr "Nog geen gebeurtenissen gespecificeerd."
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "Aangepaste acties…"
+msgstr "Aangepaste actie toevoegen"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 msgid "_Add"
@@ -1178,22 +1178,22 @@ msgstr "Werkmap selecteren"
 #: src/ui/preferences/automation/action/action-edit-window.vala:440
 #: src/ui/preferences/sounds/sound-chooser-window.vala:251
 msgid "_Select"
-msgstr "_Kiezen"
+msgstr "_Selecteren"
 
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "Statusduur"
+msgstr "Naamloze actie"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
 msgid "Add Condition"
-msgstr "Geluid toevoegen"
+msgstr "Voorwaarde toevoegen"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:45
 #, fuzzy
 msgid "Add Group"
-msgstr "Geluid toevoegen"
+msgstr "Groep toevoegen"
 
 #: src/ui/preferences/automation/action/condition-group-widget.vala:344
 msgid "AND"
@@ -1260,7 +1260,7 @@ msgstr "Lopend"
 #: src/ui/preferences/automation/action/condition-widget.vala:121
 #, fuzzy
 msgid "Duration"
-msgstr "Statusduur"
+msgstr "Duur"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
@@ -1290,7 +1290,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "Sneltoets"
+msgstr "Sneltoets instellen"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 msgid "_Set"
@@ -1300,7 +1300,7 @@ msgstr "_Instellen"
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
 #, fuzzy
 msgid "Disabled"
-msgstr "Uitschakelen"
+msgstr "Uitgeschakeld"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
 msgid ""
@@ -1378,7 +1378,7 @@ msgstr "Tijd loopt af"
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
 #, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
-msgstr "De Pomodoro verstrijkt bijna"
+msgstr "Melden wanneer Pomodoro of pauze bijna voorbij is."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
@@ -1451,7 +1451,7 @@ msgstr "Meldingen"
 #: src/ui/preferences/preferences-window.vala:44
 #, fuzzy
 msgid "Sounds"
-msgstr "Geluid toevoegen"
+msgstr "Geluiden"
 
 #: src/ui/preferences/preferences-window.vala:51
 msgid "Appearance"
@@ -1460,12 +1460,12 @@ msgstr "Uiterlijk"
 #: src/ui/preferences/preferences-window.vala:58
 #, fuzzy
 msgid "Keyboard Shortcuts"
-msgstr "Sneltoets"
+msgstr "Sneltoetsen"
 
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "Aangepaste acties…"
+msgstr "Automatisering"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 msgid "Sounds Are Disabled"
@@ -1474,23 +1474,23 @@ msgstr "Geluiden zijn uitgeschakeld"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:36
 #, fuzzy
 msgid "Alert Sounds"
-msgstr "Geluid toevoegen"
+msgstr "Waarschuwingsgeluiden"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "De Pomodoro verstrijkt bijna"
+msgstr "Geluid bij voltooide Pomodoro"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "De pauze is bijna voorbij"
+msgstr "Geluid bij voltooide pauze"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
 #, fuzzy
 msgid "Background Sound"
-msgstr "Getik"
+msgstr "Achtergrondgeluid"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
 msgid "Bell"
@@ -1498,7 +1498,7 @@ msgstr "Bel"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:21
 msgid "Loud Bell"
-msgstr "Luide bel"
+msgstr "Harde bel"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:24
 msgid "Clock Ticking"
@@ -1506,7 +1506,7 @@ msgstr "Tikkende klok"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:25
 msgid "Timer Ticking"
-msgstr "Tikkende tijdklok"
+msgstr "Tikkende timer"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:26
 msgid "Birds"
@@ -1519,21 +1519,21 @@ msgstr "Geen"
 
 #: src/ui/preferences/sounds/sound-chooser-window.ui:63
 msgid "Volume:"
-msgstr "Volumeniveau:"
+msgstr "Volume:"
 
 #: src/ui/preferences/sounds/sound-chooser-window.vala:249
 msgid "Select Custom Sound"
-msgstr "Kies een eigen geluid"
+msgstr "Aangepast geluid selecteren"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:20
 #, fuzzy
 msgid "Pomodoro Duration"
-msgstr "Pomodoro-duur"
+msgstr "Duur van Pomodoro"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:31
 #, fuzzy
 msgid "Short Break Duration"
-msgstr "Pauzeduur"
+msgstr "Duur van korte pauze"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:42
 #, fuzzy
@@ -1559,7 +1559,7 @@ msgstr "Starten van pauze bevestigen"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
 #, fuzzy
 msgid "Confirm Starting a Pomodoro"
-msgstr "Pomodoro starten"
+msgstr "Starten van Pomodoro bevestigen"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87

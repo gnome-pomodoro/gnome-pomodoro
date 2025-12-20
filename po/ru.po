@@ -32,12 +32,12 @@ msgstr "@APPLICATION_NAME@"
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "Простой инструмент для тайм-менеджмента"
+msgstr "Утилита для управления временем"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
 msgid "timer;"
-msgstr "таймер;"
+msgstr "таймер;timer;помодоро;pomodoro;"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
 #: src/core/notification-manager.vala:335 src/core/state.vala:78
@@ -83,7 +83,7 @@ msgstr "Настраиваемая длительность рабочих се�
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "Скрыть другие уведомления"
+msgstr "Визуальные и звуковые уведомления"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 #, fuzzy
@@ -98,12 +98,12 @@ msgstr "Интеграция с рабочим столом GNOME"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:24
 #, fuzzy
 msgid "Screen overlay during breaks"
-msgstr "Статус во время перерыва"
+msgstr "Экранная заставка во время перерывов"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "Продлите текущий помидор или прервите его"
+msgstr "Запуск команд после завершения помодоро или перерыва"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -118,7 +118,7 @@ msgstr "Таймер"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
-msgstr "Остановить таймер"
+msgstr "Компактный таймер"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
 #, fuzzy
@@ -143,42 +143,42 @@ msgstr "Покрытие экрана"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:95
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.1"
-msgstr "Изменения в gnome-pomodoro 0.15.1"
+msgstr "Обзор изменений в gnome-pomodoro 0.28.1"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:97
 #, fuzzy
 msgid "Added Tamil translation (thanks @omeritzics)"
-msgstr "Добавлен перевод на эсперанто (@SeZuo)"
+msgstr "Добавлен перевод на тамильский (спасибо @omeritzics)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:98
 #, fuzzy
 msgid "Added Hebrew translation (thanks @Killersparrow1)"
-msgstr "Добавлен перевод на эсперанто (@SeZuo)"
+msgstr "Добавлен перевод на иврит (спасибо @Killersparrow1)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:104
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.0"
-msgstr "Изменения в gnome-pomodoro 0.17.0"
+msgstr "Обзор изменений в gnome-pomodoro 0.28.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
 #, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
-msgstr "Поддержка GNOME Shell 3.32 (@demokritos)"
+msgstr "Поддержка GNOME Shell 49 (спасибо @aleasto)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
 #, fuzzy
 msgid "Updated German translation (thanks @daPhipz)"
-msgstr "Обновлен перевод на немецкий (@tsabsch)"
+msgstr "Обновлен немецкий перевод (спасибо @daPhipz)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:113
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.27.0"
-msgstr "Изменения в gnome-pomodoro 0.17.0"
+msgstr "Обзор изменений в gnome-pomodoro 0.27.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "Поддержка GNOME Shell 3.36"
+msgstr "Поддержка GNOME Shell 48"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 #, fuzzy
@@ -188,17 +188,17 @@ msgstr "Разделение времени, затраченного в пол�
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:117
 #, fuzzy
 msgid "Added Telugu translation (thanks @SpaciousCoder78)"
-msgstr "Добавлен перевод на эсперанто (@SeZuo)"
+msgstr "Добавлен перевод на телугу (спасибо @SpaciousCoder78)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:123
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.26.0"
-msgstr "Изменения в gnome-pomodoro 0.17.0"
+msgstr "Обзор изменений в gnome-pomodoro 0.26.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "Поддержка GNOME Shell 3.36"
+msgstr "Поддержка GNOME Shell 47"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
@@ -208,7 +208,7 @@ msgstr "Возможность закрыть оверлей жестом при
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:127
 #, fuzzy
 msgid "Added Georgian translation (thanks @NorwayFun)"
-msgstr "Добавлен перевод на эсперанто (@SeZuo)"
+msgstr "Добавлен перевод на грузинский (спасибо @NorwayFun)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:128
 #, fuzzy
@@ -218,7 +218,7 @@ msgstr "Скорректированы переводы в appdata (спасиб
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:134
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.2"
-msgstr "Изменения в gnome-pomodoro 0.15.1"
+msgstr "Обзор изменений в gnome-pomodoro 0.25.2"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:136
 #, fuzzy
@@ -228,27 +228,27 @@ msgstr "Исправлено сохранение уведомления пос�
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:142
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.1"
-msgstr "Изменения в gnome-pomodoro 0.15.1"
+msgstr "Обзор изменений в gnome-pomodoro 0.25.1"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "Поддержка GNOME Shell 3.36"
+msgstr "Исправления для GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "Поддержка GNOME Shell 3.36"
+msgstr "Прекращение поддержки GNOME Shell 45"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.0"
-msgstr "Изменения в gnome-pomodoro 0.17.0"
+msgstr "Обзор изменений в gnome-pomodoro 0.25.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "Поддержка GNOME Shell 3.36"
+msgstr "Поддержка GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 #, fuzzy
@@ -257,7 +257,7 @@ msgstr "Скрипт сборки адаптирован для meson 0.59.0 (с
 
 #: src/application.vala:42
 msgid "Start/Stop"
-msgstr "Старт/стоп"
+msgstr "Старт/Стоп"
 
 #. Actions
 #: src/application.vala:45 src/application.vala:482 src/core/event.vala:268
@@ -273,7 +273,7 @@ msgstr "Стоп"
 
 #: src/application.vala:51
 msgid "Pause/Resume"
-msgstr "Пауза/возобновить"
+msgstr "Пауза/Возобновить"
 
 #: src/application.vala:54 src/application.vala:486 src/core/event.vala:284
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:83
@@ -289,15 +289,15 @@ msgstr "Возобновить"
 
 #: src/application.vala:60
 msgid "Skip to a pomodoro or to a break"
-msgstr "Перейти к помидору или к перерыву"
+msgstr "Пропустить до помодоро или до перерыва"
 
 #: src/application.vala:63
 msgid "Extend current pomodoro or break"
-msgstr "Продлите текущий помидор или прервите его"
+msgstr "Продлить текущий помодоро или перерыв"
 
 #: src/application.vala:66
 msgid "Reset current session"
-msgstr "Сбросить текущий сеанс"
+msgstr "Сбросить текущую сессию"
 
 #: src/application.vala:69
 msgid "Show preferences"
@@ -315,13 +315,13 @@ msgstr "Вывести информацию о версии и выйти"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "Старт/стоп"
+msgstr "Старт или Стоп"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
-msgstr "Пауза/возобновить"
+msgstr "Старт, Пауза или Возобновить"
 
 #: src/application.vala:490 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
@@ -342,7 +342,7 @@ msgstr "Переместить в фокус"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "Пользовательские действия…"
+msgstr "Пользовательское действие «%s» не выполнено"
 
 #: src/core/command.vala:379
 #, fuzzy
@@ -352,12 +352,12 @@ msgstr "Время ожидания истекло"
 #: src/core/command.vala:408
 #, fuzzy
 msgid "Failed to execute command"
-msgstr "Ошибка при включении расширения"
+msgstr "Не удалось выполнить команду"
 
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
 msgid "Command is empty"
-msgstr "Команда"
+msgstr "Команда не указана"
 
 #: src/core/command.vala:510
 #, fuzzy
@@ -403,12 +403,12 @@ msgstr "Сессия"
 #: src/core/event.vala:189
 #, fuzzy
 msgid "Other"
-msgstr "Другая…"
+msgstr "Другое"
 
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "Запустить таймер"
+msgstr "Таймер запущен."
 
 #: src/core/event.vala:277
 #, fuzzy
@@ -456,7 +456,7 @@ msgstr "Сессия очищена вручную."
 #: src/ui/preferences/automation/action/condition-widget.vala:120
 #, fuzzy
 msgid "Finished"
-msgstr "Помодоро Завершен!"
+msgstr "Завершено"
 
 #: src/core/event.vala:326
 #, fuzzy
@@ -533,25 +533,25 @@ msgstr "Срабатывает, когда сессия должна быть с
 #: src/core/notification-manager.vala:130
 #, fuzzy, c-format
 msgid "%s remaining"
-msgstr "Осталась %d секунда"
+msgstr "Осталось %s"
 
 #: src/core/notification-manager.vala:339
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Take a break"
-msgstr "Перерыв"
+msgstr "Сделать перерыв"
 
 #: src/core/notification-manager.vala:343
 msgid "Take a short break"
-msgstr "Сделайте небольшой перерыв"
+msgstr "Сделать короткий перерыв"
 
 #: src/core/notification-manager.vala:347
 msgid "Take a long break"
-msgstr "Сделайте длительный перерыв"
+msgstr "Сделать длинный перерыв"
 
 #: src/core/notification-manager.vala:394
 msgid "Pomodoro is about to end"
-msgstr "Помодоро завершается"
+msgstr "Помоodoro скоро завершится"
 
 #: src/core/notification-manager.vala:395
 #: src/core/notification-manager.vala:495
@@ -559,11 +559,11 @@ msgstr "Помодоро завершается"
 #: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
 #, fuzzy
 msgid "Take a Break"
-msgstr "Перерыв"
+msgstr "Сделать перерыв"
 
 #: src/core/notification-manager.vala:401
 msgid "Break is about to end"
-msgstr "Перерыв заканчивается"
+msgstr "Перерыв скоро закончится"
 
 #: src/core/notification-manager.vala:402
 #: src/core/notification-manager.vala:490
@@ -580,19 +580,19 @@ msgstr "+1 минута"
 
 #: src/core/notification-manager.vala:432
 msgid "Get ready…"
-msgstr "Приготовься…"
+msgstr "Приготовьтесь…"
 
 #: src/core/notification-manager.vala:437
 #: src/core/notification-manager.vala:473
 #, fuzzy
 msgid "Pomodoro is over!"
-msgstr "Таймер Помодоро"
+msgstr "Помодоро завершен!"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "Перерыв окончен"
+msgstr "Перерыв окончен!"
 
 #: src/core/notification-manager.vala:489
 #, fuzzy
@@ -602,7 +602,7 @@ msgstr "Подтвердите запуск помодоро…"
 #: src/core/notification-manager.vala:494
 #, fuzzy
 msgid "Confirm the start of a break…"
-msgstr "Выберите звук для начала перерыва"
+msgstr "Подтвердите начало перерыва…"
 
 #: src/core/notification-manager.vala:499
 #, fuzzy
@@ -638,12 +638,12 @@ msgstr "Тип файла не поддерживается"
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "Стоп"
+msgstr "Остановлено"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
 msgid "Break"
-msgstr "Перерывы"
+msgstr "Перерыв"
 
 #: src/core/state.vala:84
 msgid "Short Break"
@@ -766,7 +766,7 @@ msgstr "Время начала обратного отсчета."
 #: src/integrations/portal/global-shortcuts-provider.vala:298
 #, fuzzy
 msgid "Unused"
-msgstr "На паузе"
+msgstr "Не используется"
 
 #: src/ui/log/log-window.ui:6
 #, fuzzy
@@ -899,7 +899,7 @@ msgstr "_Не сейчас"
 #: src/ui/main/dialogs/install-extension-dialog.ui:317
 #, fuzzy
 msgid "Something went wrong"
-msgstr "Что-то пошло не так..."
+msgstr "Что-то пошло не так"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:364
 #, fuzzy
@@ -916,7 +916,7 @@ msgstr "_Попробовать снова"
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
 #, fuzzy
 msgid "_Abort"
-msgstr "_О Помодоро"
+msgstr "_Прервать"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
 #, fuzzy
@@ -931,7 +931,7 @@ msgstr "Установка расширений запрещена"
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
 #, fuzzy
 msgid "Failed to download the extension"
-msgstr "Ошибка при включении расширения"
+msgstr "Не удалось загрузить расширение"
 
 #: src/ui/main/stats/stats-day-page.ui:104
 #: src/ui/main/stats/stats-day-page.vala:92
@@ -957,7 +957,7 @@ msgstr "Прерывания"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "Продолжительность короткого перерыва"
+msgstr "Соотношение перерывов"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -1033,26 +1033,26 @@ msgstr "Неделя %u из %u"
 #: src/ui/main/timer/compact-timer-view.ui:8 src/ui/main/timer/menus.ui:6
 #: src/ui/main/timer/menus.ui:22
 msgid "_Pomodoro"
-msgstr "Помодоро"
+msgstr "_Помодоро"
 
 #: src/ui/main/timer/compact-timer-view.ui:13 src/ui/main/timer/menus.ui:10
 msgid "_Short Break"
-msgstr "Короткий перерыв"
+msgstr "_Короткий перерыв"
 
 #: src/ui/main/timer/compact-timer-view.ui:18 src/ui/main/timer/menus.ui:14
 msgid "_Long Break"
-msgstr "Длинный перерыв"
+msgstr "_Длинный перерыв"
 
 #: src/ui/main/timer/compact-timer-view.vala:74
 #: src/ui/main/timer/timer-view.vala:130
 #, fuzzy
 msgid "Finished!"
-msgstr "Помодоро Завершен!"
+msgstr "Завершено!"
 
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "Перерывы"
+msgstr "_Перерыв"
 
 #: src/ui/main/timer/timer-view.ui:23
 #, fuzzy
@@ -1067,7 +1067,7 @@ msgstr "Срок сессии истек"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "Продолжительность длинного перерыва"
+msgstr "Длинный перерыв через <b>%s</b>"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
@@ -1131,7 +1131,7 @@ msgstr "Выход"
 #: src/ui/main/window.vala:332
 #, fuzzy
 msgid "Run in background"
-msgstr "Запускать как фоновый процесс"
+msgstr "Работа в фоне"
 
 #: src/ui/overlays/screen-overlay.ui:65
 msgid "It's time to take a break"
@@ -1141,7 +1141,7 @@ msgstr "Пора сделать перерыв"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "Окно таймера"
+msgstr "Главное окно"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 #, fuzzy
@@ -1157,7 +1157,7 @@ msgstr "Предпочитать компактный вид"
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "Старт"
+msgstr "Запущено"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
@@ -1167,12 +1167,12 @@ msgstr "На паузе"
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "Пользовательские действия…"
+msgstr "Редактировать действие"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
 msgid "_Cancel"
-msgstr "_Отменить"
+msgstr "_Отмена"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:46
 #, fuzzy
@@ -1234,12 +1234,12 @@ msgstr "Фильтр"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "Команда"
+msgstr "Команда оболочки"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
 msgid "Commands"
-msgstr "Команда"
+msgstr "Команды"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
 #, fuzzy
@@ -1289,7 +1289,7 @@ msgstr "Блокировать выполнение других команд д
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "Действие"
+msgstr "_Удалить действие"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 #, fuzzy
@@ -1299,7 +1299,7 @@ msgstr "События еще не указаны."
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "Пользовательские действия…"
+msgstr "Добавить действие"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 #, fuzzy
@@ -1319,7 +1319,7 @@ msgstr "_Выбрать"
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "Продолжительность"
+msgstr "Действие без названия"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
@@ -1372,7 +1372,7 @@ msgstr "Да"
 #: src/ui/preferences/automation/action/condition-widget.ui:68
 #, fuzzy
 msgid "No"
-msgstr "нет"
+msgstr "Нет"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:95
 #, fuzzy
@@ -1428,7 +1428,7 @@ msgstr "_Журнал"
 #: src/ui/preferences/automation/preferences-panel-automation.ui:15
 #, fuzzy
 msgid "Show execution log"
-msgstr "Показать сообщение"
+msgstr "Показать журнал выполнения"
 
 #: src/ui/preferences/automation/preferences-panel-automation.ui:24
 #, fuzzy
@@ -1442,7 +1442,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "Комбинация клавиш"
+msgstr "Установить комбинацию клавиш"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 #, fuzzy
@@ -1453,7 +1453,7 @@ msgstr "_Установить"
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
 #, fuzzy
 msgid "Disabled"
-msgstr "Отключить"
+msgstr "Отключено"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
 #, fuzzy
@@ -1496,22 +1496,22 @@ msgstr "Введите комбинацию для действий старт/�
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:58
 #, fuzzy
 msgid "Enter new shortcut for starting the timer"
-msgstr "Комбинации клавиш для переключения таймера"
+msgstr "Введите комбинацию для запуска таймера"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:65
 #, fuzzy
 msgid "Enter new shortcut for stopping the timer"
-msgstr "Комбинации клавиш для переключения таймера"
+msgstr "Введите комбинацию для остановки таймера"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:72
 #, fuzzy
 msgid "Enter new shortcut for pausing the timer"
-msgstr "Комбинации клавиш для переключения таймера"
+msgstr "Введите комбинацию для паузы таймера"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:79
 #, fuzzy
 msgid "Enter new shortcut for resuming the timer"
-msgstr "Комбинации клавиш для переключения таймера"
+msgstr "Введите комбинацию для возобновления таймера"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:86
 #, fuzzy
@@ -1546,7 +1546,7 @@ msgstr "Время заканчивается"
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
 #, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
-msgstr "Помодоро завершается"
+msgstr "Уведомлять, когда помодоро или перерыв подходят к концу."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
@@ -1637,12 +1637,12 @@ msgstr "Внешний вид"
 #: src/ui/preferences/preferences-window.vala:58
 #, fuzzy
 msgid "Keyboard Shortcuts"
-msgstr "Комбинация клавиш"
+msgstr "Горячие клавиши"
 
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "Пользовательские действия…"
+msgstr "Автоматизация"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 #, fuzzy
@@ -1657,18 +1657,18 @@ msgstr "Звуки оповещений"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "Помодоро Завершен!"
+msgstr "Звук завершения помодоро"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "Перерыв заканчивается"
+msgstr "Звук завершения перерыва"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
 #, fuzzy
 msgid "Background Sound"
-msgstr "Звук тиканья"
+msgstr "Фоновый звук"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
 msgid "Bell"
@@ -1694,7 +1694,7 @@ msgstr "Птицы"
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:86
 #: src/ui/preferences/sounds/sound-chooser-window.ui:25
 msgid "None"
-msgstr "нет"
+msgstr "Нет"
 
 #: src/ui/preferences/sounds/sound-chooser-window.ui:63
 msgid "Volume:"
@@ -1707,22 +1707,22 @@ msgstr "Выберите звуковой файл"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:20
 #, fuzzy
 msgid "Pomodoro Duration"
-msgstr "Продолжительность помодоро"
+msgstr "Длительность помодоро"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:31
 #, fuzzy
 msgid "Short Break Duration"
-msgstr "Продолжительность короткого перерыва"
+msgstr "Длительность короткого перерыва"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:42
 #, fuzzy
 msgid "Long Break Duration"
-msgstr "Продолжительность длинного перерыва"
+msgstr "Длительность длинного перерыва"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:53
 #, fuzzy
 msgid "Number of Cycles"
-msgstr "Количество завершенных сессий"
+msgstr "Количество циклов"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:93
 #, fuzzy
@@ -1742,7 +1742,7 @@ msgstr "Подтверждать начало перерыва"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
 #, fuzzy
 msgid "Confirm Starting a Pomodoro"
-msgstr "Запустить Помодоро"
+msgstr "Подтверждать начало помодоро"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87

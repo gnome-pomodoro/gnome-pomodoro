@@ -29,12 +29,12 @@ msgstr "@APPLICATION_NAME@"
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "Jednoduchý nástroj pro time management"
+msgstr "Nástroj pro správu času"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
 msgid "timer;"
-msgstr "Časovač;"
+msgstr "časovač;timer;pomodoro;"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
 #: src/core/notification-manager.vala:335 src/core/state.vala:78
@@ -80,7 +80,7 @@ msgstr "Nastavitelná délka práce a přestávek"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "Skrýt ostatní notifikace"
+msgstr "Vizuální a zvuková upozornění"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 #, fuzzy
@@ -95,12 +95,12 @@ msgstr "Integrace s desktopem GNOME"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:24
 #, fuzzy
 msgid "Screen overlay during breaks"
-msgstr "Stav během přestávky"
+msgstr "Překrytí obrazovky během přestávek"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "Prodlužte aktuální pomodoro nebo přerušte"
+msgstr "Spouštění vlastních příkazů po skončení práce nebo přestávky"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -115,7 +115,7 @@ msgstr "Časovač"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
-msgstr "Časovač"
+msgstr "Kompaktní časovač"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
 #, fuzzy
@@ -175,7 +175,7 @@ msgstr "Přehled změn v gnome-pomodoro 0.27.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "Indikátor pro GNOME Shell"
+msgstr "Podpora pro GNOME Shell 48"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 #, fuzzy
@@ -195,7 +195,7 @@ msgstr "Přehled změn v gnome-pomodoro 0.26.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "Indikátor pro GNOME Shell"
+msgstr "Podpora pro GNOME Shell 47"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
@@ -230,12 +230,12 @@ msgstr "Přehled změn v gnome-pomodoro 0.25.1"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "Indikátor pro GNOME Shell"
+msgstr "Opravy pro GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "Indikátor pro GNOME Shell"
+msgstr "Ukončena podpora pro GNOME Shell 45"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 #, fuzzy
@@ -245,7 +245,7 @@ msgstr "Přehled změn v gnome-pomodoro 0.25.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "Indikátor pro GNOME Shell"
+msgstr "Podpora pro GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 #, fuzzy
@@ -286,11 +286,11 @@ msgstr "Pokračovat"
 
 #: src/application.vala:60
 msgid "Skip to a pomodoro or to a break"
-msgstr "Přeskočte na pomodoro nebo na přestávku"
+msgstr "Přeskočit na pomodoro nebo na přestávku"
 
 #: src/application.vala:63
 msgid "Extend current pomodoro or break"
-msgstr "Prodlužte aktuální pomodoro nebo přerušte"
+msgstr "Prodloužit aktuální pomodoro nebo přestávku"
 
 #: src/application.vala:66
 msgid "Reset current session"
@@ -298,27 +298,27 @@ msgstr "Resetovat aktuální relaci"
 
 #: src/application.vala:69
 msgid "Show preferences"
-msgstr "Předvolby"
+msgstr "Zobrazit předvolby"
 
 #: src/application.vala:72
 msgid "Quit application"
-msgstr "Ukončit program"
+msgstr "Ukončit aplikaci"
 
 #: src/application.vala:75
 msgid "Print version information and exit"
-msgstr "Zobrazí informaci o verzi a ukončí se"
+msgstr "Zobrazit informace o verzi a ukončit"
 
 #: src/application.vala:477
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "Start/Stop"
+msgstr "Spustit nebo zastavit"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
-msgstr "Pozastavit/Pokračovat"
+msgstr "Spustit, pozastavit nebo pokračovat"
 
 #: src/application.vala:490 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
@@ -339,7 +339,7 @@ msgstr "Přenést do popředí"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "Vlastní akce…"
+msgstr "Vlastní akce \"%s\" selhala"
 
 #: src/core/command.vala:379
 #, fuzzy
@@ -349,12 +349,12 @@ msgstr "Časový limit vypršel"
 #: src/core/command.vala:408
 #, fuzzy
 msgid "Failed to execute command"
-msgstr "Nepodařilo se zapnout rozšíření"
+msgstr "Nepodařilo se spustit příkaz"
 
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
 msgid "Command is empty"
-msgstr "Příkaz"
+msgstr "Příkaz je prázdný"
 
 #: src/core/command.vala:510
 #, fuzzy
@@ -400,12 +400,12 @@ msgstr "Relace"
 #: src/core/event.vala:189
 #, fuzzy
 msgid "Other"
-msgstr "Další..."
+msgstr "Ostatní"
 
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "Začni pomodoro"
+msgstr "Časovač spuštěn."
 
 #: src/core/event.vala:277
 #, fuzzy
@@ -453,7 +453,7 @@ msgstr "Relace byla ručně vymazána."
 #: src/ui/preferences/automation/action/condition-widget.vala:120
 #, fuzzy
 msgid "Finished"
-msgstr "Konec pomodora"
+msgstr "Dokončeno"
 
 #: src/core/event.vala:326
 #, fuzzy
@@ -530,13 +530,13 @@ msgstr "Spuštěno, když má být relace resetována kvůli nečinnosti."
 #: src/core/notification-manager.vala:130
 #, fuzzy, c-format
 msgid "%s remaining"
-msgstr "Zbývá %d sekunda"
+msgstr "Zbývá %s"
 
 #: src/core/notification-manager.vala:339
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Take a break"
-msgstr "Dej si pauzu!"
+msgstr "Dejte si pauzu"
 
 #: src/core/notification-manager.vala:343
 msgid "Take a short break"
@@ -556,7 +556,7 @@ msgstr "Pomodoro brzy skončí"
 #: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
 #, fuzzy
 msgid "Take a Break"
-msgstr "Dej si pauzu!"
+msgstr "Dejte si pauzu"
 
 #: src/core/notification-manager.vala:401
 msgid "Break is about to end"
@@ -568,7 +568,7 @@ msgstr "Přestávka se blíží ke konci"
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Start Pomodoro"
-msgstr "Začni pomodoro"
+msgstr "Začít pomodoro"
 
 #: src/core/notification-manager.vala:411
 #, fuzzy
@@ -583,13 +583,13 @@ msgstr "Připravit se…"
 #: src/core/notification-manager.vala:473
 #, fuzzy
 msgid "Pomodoro is over!"
-msgstr "Časovač Pomodoro"
+msgstr "Pomodoro skončilo!"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "Přestávka skončila"
+msgstr "Přestávka skončila!"
 
 #: src/core/notification-manager.vala:489
 #, fuzzy
@@ -599,7 +599,7 @@ msgstr "Potvrdit začátek pomodora…"
 #: src/core/notification-manager.vala:494
 #, fuzzy
 msgid "Confirm the start of a break…"
-msgstr "Vyberte zvukový soubor, který se přehraje na začátku přestávky"
+msgstr "Potvrdit začátek přestávky…"
 
 #: src/core/notification-manager.vala:499
 #, fuzzy
@@ -635,7 +635,7 @@ msgstr "Typ souboru není podporován"
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "Stop"
+msgstr "Zastaveno"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
@@ -886,7 +886,7 @@ msgstr "_Nyní ne"
 #: src/ui/main/dialogs/install-extension-dialog.ui:317
 #, fuzzy
 msgid "Something went wrong"
-msgstr "Stalo se něco moc špatného..."
+msgstr "Něco se pokazilo"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:364
 #, fuzzy
@@ -903,7 +903,7 @@ msgstr "_Zkusit znovu"
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
 #, fuzzy
 msgid "_Abort"
-msgstr "_O  aplikaci"
+msgstr "_Zrušit"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
 #, fuzzy
@@ -918,7 +918,7 @@ msgstr "Instalace rozšíření není povolena"
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
 #, fuzzy
 msgid "Failed to download the extension"
-msgstr "Nepodařilo se zapnout rozšíření"
+msgstr "Nepodařilo se stáhnout rozšíření"
 
 #: src/ui/main/stats/stats-day-page.ui:104
 #: src/ui/main/stats/stats-day-page.vala:92
@@ -928,7 +928,7 @@ msgstr "Nepodařilo se zapnout rozšíření"
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
-msgstr "Přestávka"
+msgstr "Přestávky"
 
 #: src/ui/main/stats/stats-day-page.ui:111
 #: src/ui/main/stats/stats-month-page.ui:48
@@ -944,7 +944,7 @@ msgstr "Přerušení"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "Délka přestávky"
+msgstr "Poměr přestávek"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -964,7 +964,7 @@ msgstr "Měsíc"
 #: src/ui/main/stats/stats-view.ui:39
 #, fuzzy
 msgid "Nothing to see here yet"
-msgstr "Zatím není nic vidět"
+msgstr "Zatím zde není nic k vidění"
 
 #: src/ui/main/stats/stats-view.ui:40
 #, fuzzy
@@ -1010,7 +1010,7 @@ msgstr "Tento týden"
 #: src/ui/main/stats/stats-view.vala:1048
 #, fuzzy, c-format
 msgid "Week %u"
-msgstr "Týden"
+msgstr "Týden %u"
 
 #: src/ui/main/stats/stats-view.vala:1049
 #, fuzzy, c-format
@@ -1034,12 +1034,12 @@ msgstr "_Dlouhá přestávka"
 #: src/ui/main/timer/timer-view.vala:130
 #, fuzzy
 msgid "Finished!"
-msgstr "Konec pomodora"
+msgstr "Hotovo!"
 
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "Přestávka"
+msgstr "_Přestávka"
 
 #: src/ui/main/timer/timer-view.ui:23
 #, fuzzy
@@ -1054,12 +1054,12 @@ msgstr "Relace vypršela"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "Délka dlouhé přestávky"
+msgstr "Dlouhá přestávka za <b>%s</b>"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
 msgid "Rewind one minute"
-msgstr "%d minuta"
+msgstr "Přetočit o jednu minutu"
 
 #: src/ui/main/window.ui:8
 #, fuzzy
@@ -1068,15 +1068,15 @@ msgstr "_Kompaktní zobrazení"
 
 #: src/ui/main/window.ui:15
 msgid "_Preferences"
-msgstr "Předvolby"
+msgstr "_Předvolby"
 
 #: src/ui/main/window.ui:19
 msgid "_About"
-msgstr "_O  aplikaci"
+msgstr "_O aplikaci"
 
 #: src/ui/main/window.ui:25
 msgid "_Quit"
-msgstr "_Konec"
+msgstr "_Ukončit"
 
 #: src/ui/main/window.ui:62
 #, fuzzy
@@ -1113,7 +1113,7 @@ msgstr ""
 
 #: src/ui/main/window.vala:329
 msgid "Quit"
-msgstr "Konec"
+msgstr "Ukončit"
 
 #: src/ui/main/window.vala:332
 #, fuzzy
@@ -1122,13 +1122,13 @@ msgstr "Spustit na pozadí"
 
 #: src/ui/overlays/screen-overlay.ui:65
 msgid "It's time to take a break"
-msgstr "Je čas udělat si přestávku"
+msgstr "Je čas na přestávku"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:17
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "Okno časovače"
+msgstr "Hlavní okno"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 msgid "Prefer Dark Theme"
@@ -1143,18 +1143,18 @@ msgstr "Preferovat kompaktní zobrazení"
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "Start"
+msgstr "Spuštěno"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
 #, fuzzy
 msgid "Paused"
-msgstr "Pozastavit"
+msgstr "Pozastaveno"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "Vlastní akce…"
+msgstr "Upravit vlastní akci"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
@@ -1173,7 +1173,7 @@ msgstr "Název"
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
 #, fuzzy
 msgid "Trigger"
-msgstr "Spouštěče"
+msgstr "Spouštěč"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
 #, fuzzy
@@ -1222,12 +1222,12 @@ msgstr "Filtr"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "Příkaz"
+msgstr "Příkaz shellu"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
 msgid "Commands"
-msgstr "Příkaz"
+msgstr "Příkazy"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
 #, fuzzy
@@ -1275,7 +1275,7 @@ msgstr "Blokovat spouštění ostatních příkazů, dokud tento příkaz neskon
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "Akce"
+msgstr "_Smazat akci"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 #, fuzzy
@@ -1285,7 +1285,7 @@ msgstr "Zatím nejsou určeny žádné události."
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "Vlastní akce…"
+msgstr "Přidat vlastní akci"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 #, fuzzy
@@ -1300,22 +1300,22 @@ msgstr "Vyberte pracovní adresář"
 #: src/ui/preferences/automation/action/action-edit-window.vala:440
 #: src/ui/preferences/sounds/sound-chooser-window.vala:251
 msgid "_Select"
-msgstr "Zvolte soubor"
+msgstr "_Vybrat"
 
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "Trvání stavu"
+msgstr "Nepojmenovaná akce"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
 msgid "Add Condition"
-msgstr "Přidat zvuk"
+msgstr "Přidat podmínku"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:45
 #, fuzzy
 msgid "Add Group"
-msgstr "Přidat zvuk"
+msgstr "Přidat skupinu"
 
 #: src/ui/preferences/automation/action/condition-group-widget.vala:344
 #, fuzzy
@@ -1360,12 +1360,12 @@ msgstr "Ano"
 #: src/ui/preferences/automation/action/condition-widget.ui:68
 #, fuzzy
 msgid "No"
-msgstr "Žádný"
+msgstr "Ne"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:95
 #, fuzzy
 msgid "Minutes"
-msgstr "+1 minuta"
+msgstr "Minuty"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:96
 #, fuzzy
@@ -1385,7 +1385,7 @@ msgstr "Vyberte pole…"
 
 #: src/ui/preferences/automation/action/condition-widget.vala:116
 msgid "State"
-msgstr "Stát"
+msgstr "Stav"
 
 #: src/ui/preferences/automation/action/condition-widget.vala:119
 #, fuzzy
@@ -1395,7 +1395,7 @@ msgstr "Běží"
 #: src/ui/preferences/automation/action/condition-widget.vala:121
 #, fuzzy
 msgid "Duration"
-msgstr "Trvání stavu"
+msgstr "Trvání"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
@@ -1416,7 +1416,7 @@ msgstr "_Záznam"
 #: src/ui/preferences/automation/preferences-panel-automation.ui:15
 #, fuzzy
 msgid "Show execution log"
-msgstr "Ukaž dialog"
+msgstr "Zobrazit záznam provádění"
 
 #: src/ui/preferences/automation/preferences-panel-automation.ui:24
 #, fuzzy
@@ -1430,7 +1430,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "Klávesové zkratky"
+msgstr "Nastavit zkratku"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 #, fuzzy
@@ -1484,22 +1484,22 @@ msgstr "Zadejte novou zkratku pro spuštění/pozastavení/pokračování časov
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:58
 #, fuzzy
 msgid "Enter new shortcut for starting the timer"
-msgstr "Klávesová zkratka k přepnutí časovače"
+msgstr "Zadejte novou zkratku pro spuštění časovače"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:65
 #, fuzzy
 msgid "Enter new shortcut for stopping the timer"
-msgstr "Klávesová zkratka k přepnutí časovače"
+msgstr "Zadejte novou zkratku pro zastavení časovače"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:72
 #, fuzzy
 msgid "Enter new shortcut for pausing the timer"
-msgstr "Klávesová zkratka k přepnutí časovače"
+msgstr "Zadejte novou zkratku pro pozastavení časovače"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:79
 #, fuzzy
 msgid "Enter new shortcut for resuming the timer"
-msgstr "Klávesová zkratka k přepnutí časovače"
+msgstr "Zadejte novou zkratku pro pokračování v časovači"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:86
 #, fuzzy
@@ -1534,7 +1534,7 @@ msgstr "Čas vypršel"
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
 #, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
-msgstr "Pomodoro brzy skončí"
+msgstr "Upozornit, když Pomodoro nebo přestávka brzy skončí."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
@@ -1608,12 +1608,12 @@ msgstr "Doba nečinnosti před znovuotevřením překrytí po jeho zavření."
 
 #: src/ui/preferences/preferences-window.vala:37
 msgid "Notifications"
-msgstr "Notifikace"
+msgstr "Upozornění"
 
 #: src/ui/preferences/preferences-window.vala:44
 #, fuzzy
 msgid "Sounds"
-msgstr "Přidat zvuk"
+msgstr "Zvuky"
 
 #: src/ui/preferences/preferences-window.vala:51
 #, fuzzy
@@ -1628,7 +1628,7 @@ msgstr "Klávesové zkratky"
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "Vlastní akce…"
+msgstr "Automatizace"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 #, fuzzy
@@ -1638,23 +1638,23 @@ msgstr "Zvuky jsou vypnuty"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:36
 #, fuzzy
 msgid "Alert Sounds"
-msgstr "Přidat zvuk"
+msgstr "Zvuky upozornění"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "Konec pomodora"
+msgstr "Zvuk konce pomodora"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "Přestávka se blíží ke konci"
+msgstr "Zvuk konce přestávky"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
 #, fuzzy
 msgid "Background Sound"
-msgstr "Tikání"
+msgstr "Zvuk na pozadí"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
 msgid "Bell"
@@ -1666,7 +1666,7 @@ msgstr "Hlasitý zvonek"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:24
 msgid "Clock Ticking"
-msgstr "Tikání"
+msgstr "Tikání hodin"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:25
 msgid "Timer Ticking"
@@ -1708,7 +1708,7 @@ msgstr "Délka dlouhé přestávky"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:53
 #, fuzzy
 msgid "Number of Cycles"
-msgstr "Počet kompletních cyklů"
+msgstr "Počet cyklů"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:93
 #, fuzzy
@@ -1728,7 +1728,7 @@ msgstr "Potvrdit spuštění přestávky"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
 #, fuzzy
 msgid "Confirm Starting a Pomodoro"
-msgstr "Začni pomodoro"
+msgstr "Potvrdit spuštění pomodora"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87

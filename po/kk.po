@@ -28,12 +28,12 @@ msgstr "@APPLICATION_NAME@"
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "Уақытты басқарудың қарапайым утилитасы"
+msgstr "Уақытты басқару утилитасы"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
 msgid "timer;"
-msgstr "timer;таймер;"
+msgstr "timer;таймер;уақыт;"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
 #: src/core/notification-manager.vala:335 src/core/state.vala:78
@@ -46,7 +46,7 @@ msgstr "timer;таймер;"
 #: src/ui/main/stats/stats-week-page.vala:41 src/ui/main/window.vala:183
 #: src/ui/preferences/automation/action/condition-widget.ui:53
 msgid "Pomodoro"
-msgstr "Pomodoro"
+msgstr "Помодоро"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:10
 #, fuzzy
@@ -79,7 +79,7 @@ msgstr "Жұмыс және үзіліс ұзақтығын теңшеу"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "Басқа хабарламаларды жасыру"
+msgstr "Визуалды және дыбыстық хабарламалар"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 #, fuzzy
@@ -99,7 +99,7 @@ msgstr "Үзіліс кезіндегі экран қабаты"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "Ағымдағы помодоро кеңейтіңіз немесе үзіңіз"
+msgstr "Помодоро немесе үзілістен кейін командаларды орындау"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -114,7 +114,7 @@ msgstr "Таймер"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
-msgstr "Таймерді тоқтату"
+msgstr "Шағын таймер"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
 #, fuzzy
@@ -159,7 +159,7 @@ msgstr "gnome-pomodoro 0.28.0 нұсқасындағы өзгерістер"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
 #, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
-msgstr "GNOME Shell үшін индикатор"
+msgstr "GNOME Shell 49 қолдауы (@aleasto-ға рахмет)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
 #, fuzzy
@@ -174,7 +174,7 @@ msgstr "gnome-pomodoro 0.27.0 нұсқасындағы өзгерістер"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "GNOME Shell үшін индикатор"
+msgstr "GNOME Shell 48 қолдауы"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 #, fuzzy
@@ -194,7 +194,7 @@ msgstr "gnome-pomodoro 0.26.0 нұсқасындағы өзгерістер"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "GNOME Shell үшін индикатор"
+msgstr "GNOME Shell 47 қолдауы"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
@@ -229,12 +229,12 @@ msgstr "gnome-pomodoro 0.25.1 нұсқасындағы өзгерістер"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "GNOME Shell үшін индикатор"
+msgstr "GNOME Shell 46 үшін түзетулер"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "GNOME Shell үшін индикатор"
+msgstr "GNOME Shell 45 қолдауын тоқтату"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 #, fuzzy
@@ -244,7 +244,7 @@ msgstr "gnome-pomodoro 0.25.0 нұсқасындағы өзгерістер"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "GNOME Shell үшін индикатор"
+msgstr "GNOME Shell 46 қолдауы"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 #, fuzzy
@@ -254,7 +254,7 @@ msgstr ""
 
 #: src/application.vala:42
 msgid "Start/Stop"
-msgstr "Бастау/тоқтату"
+msgstr "Бастау/Тоқтату"
 
 #. Actions
 #: src/application.vala:45 src/application.vala:482 src/core/event.vala:268
@@ -270,7 +270,7 @@ msgstr "Тоқтату"
 
 #: src/application.vala:51
 msgid "Pause/Resume"
-msgstr "Аялдату/жалғастыру"
+msgstr "Кідірту/Жалғастыру"
 
 #: src/application.vala:54 src/application.vala:486 src/core/event.vala:284
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:83
@@ -290,11 +290,11 @@ msgstr "Помодороға немесе үзіліске өтіңіз"
 
 #: src/application.vala:63
 msgid "Extend current pomodoro or break"
-msgstr "Ағымдағы помодоро кеңейтіңіз немесе үзіңіз"
+msgstr "Ағымдағы помодороны немесе үзілісті ұзарту"
 
 #: src/application.vala:66
 msgid "Reset current session"
-msgstr "Ағымдағы сеансты қалпына келтіріңіз"
+msgstr "Ағымдағы сеансты тастау"
 
 #: src/application.vala:69
 msgid "Show preferences"
@@ -302,7 +302,7 @@ msgstr "Баптауларды көрсету"
 
 #: src/application.vala:72
 msgid "Quit application"
-msgstr "Қолданба жұмысын аяқтау"
+msgstr "Қолданбадан шығу"
 
 #: src/application.vala:75
 msgid "Print version information and exit"
@@ -312,13 +312,13 @@ msgstr "Нұсқа ақпаратын шығару және шығу"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "Бастау/тоқтату"
+msgstr "Бастау немесе Тоқтату"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
-msgstr "Аялдату/жалғастыру"
+msgstr "Бастау, Кідірту немесе Жалғастыру"
 
 #: src/application.vala:490 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
@@ -339,7 +339,7 @@ msgstr "Назарға алу"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "Таңдауыңызша әрекеттер…"
+msgstr "\"%s\" таңдамалы әрекеті сәтсіз аяқталды"
 
 #: src/core/command.vala:379
 #, fuzzy
@@ -349,12 +349,12 @@ msgstr "Күту уақыты аяқталды"
 #: src/core/command.vala:408
 #, fuzzy
 msgid "Failed to execute command"
-msgstr "Кеңейтуді іске қосу сәтсіз аяқталды"
+msgstr "Команданы орындау сәтсіз аяқталды"
 
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
 msgid "Command is empty"
-msgstr "Команда"
+msgstr "Команда бос"
 
 #: src/core/command.vala:510
 #, fuzzy
@@ -405,7 +405,7 @@ msgstr "Басқа"
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "Таймерді бастау"
+msgstr "Таймер іске қосылды."
 
 #: src/core/event.vala:277
 #, fuzzy
@@ -536,7 +536,7 @@ msgstr "%s қалды"
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Take a break"
-msgstr "Үзілісті алыңыз"
+msgstr "Үзіліс жасаңыз"
 
 #: src/core/notification-manager.vala:343
 msgid "Take a short break"
@@ -556,7 +556,7 @@ msgstr "Помодоро аяқталуға жақын"
 #: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
 #, fuzzy
 msgid "Take a Break"
-msgstr "Үзілісті алыңыз"
+msgstr "Үзіліс жасаңыз"
 
 #: src/core/notification-manager.vala:401
 msgid "Break is about to end"
@@ -568,7 +568,7 @@ msgstr "Үзіліс аяқталуға жақын"
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Start Pomodoro"
-msgstr "Pomodoro іске қосу"
+msgstr "Помодороны бастау"
 
 #: src/core/notification-manager.vala:411
 #, fuzzy
@@ -577,19 +577,19 @@ msgstr "+1 минут"
 
 #: src/core/notification-manager.vala:432
 msgid "Get ready…"
-msgstr "Дайын бол…"
+msgstr "Дайын болыңыз…"
 
 #: src/core/notification-manager.vala:437
 #: src/core/notification-manager.vala:473
 #, fuzzy
 msgid "Pomodoro is over!"
-msgstr "Pomodoro таймері"
+msgstr "Помодоро аяқталды!"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "Үзіліс аяқталды"
+msgstr "Үзіліс аяқталды!"
 
 #: src/core/notification-manager.vala:489
 #, fuzzy
@@ -613,7 +613,7 @@ msgstr "Ұзақ үзілістің басталуын растаңыз…"
 
 #: src/core/notification-manager.vala:516
 msgid "Skip Break"
-msgstr "Үзілісті өткізіп жіберу"
+msgstr "Үзілісті аттап кету"
 
 #: src/core/sound.vala:405 src/core/sound.vala:605 src/core/sound.vala:662
 #, fuzzy
@@ -635,7 +635,7 @@ msgstr "Файл түріне қолдау көрсетілмейді"
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "Тоқтату"
+msgstr "Тоқтатылды"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
@@ -900,7 +900,7 @@ msgstr "_Қайтадан байқап көру"
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
 #, fuzzy
 msgid "_Abort"
-msgstr "Осы тур_алы"
+msgstr "_Тоқтату"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
 #, fuzzy
@@ -915,7 +915,7 @@ msgstr "Кеңейтімдерді орнатуға рұқсат етілмей�
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
 #, fuzzy
 msgid "Failed to download the extension"
-msgstr "Кеңейтуді іске қосу сәтсіз аяқталды"
+msgstr "Кеңейтімді жүктеп алу сәтсіз аяқталды"
 
 #: src/ui/main/stats/stats-day-page.ui:104
 #: src/ui/main/stats/stats-day-page.vala:92
@@ -925,7 +925,7 @@ msgstr "Кеңейтуді іске қосу сәтсіз аяқталды"
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
-msgstr "Үзіліс"
+msgstr "Үзілістер"
 
 #: src/ui/main/stats/stats-day-page.ui:111
 #: src/ui/main/stats/stats-month-page.ui:48
@@ -941,7 +941,7 @@ msgstr "Үзілістер (кедергілер)"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "Үзіліс ұзақтығы"
+msgstr "Үзіліс коэффициенті"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -961,7 +961,7 @@ msgstr "Ай"
 #: src/ui/main/stats/stats-view.ui:39
 #, fuzzy
 msgid "Nothing to see here yet"
-msgstr "Әлі көретін ештеңе жоқ"
+msgstr "Әзірге көретін ештеңе жоқ"
 
 #: src/ui/main/stats/stats-view.ui:40
 #, fuzzy
@@ -996,7 +996,7 @@ msgstr "Кеше"
 
 #: src/ui/main/stats/stats-view.vala:1028
 msgid "This week"
-msgstr "Осы апта"
+msgstr "Осы аптада"
 
 #: src/ui/main/stats/stats-view.vala:1048
 #, fuzzy, c-format
@@ -1011,7 +1011,7 @@ msgstr "%u-дан %u-апта"
 #: src/ui/main/timer/compact-timer-view.ui:8 src/ui/main/timer/menus.ui:6
 #: src/ui/main/timer/menus.ui:22
 msgid "_Pomodoro"
-msgstr "_Pomodoro"
+msgstr "_Помодоро"
 
 #: src/ui/main/timer/compact-timer-view.ui:13 src/ui/main/timer/menus.ui:10
 msgid "_Short Break"
@@ -1030,7 +1030,7 @@ msgstr "Аяқталды!"
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "Үзіліс"
+msgstr "_Үзіліс"
 
 #: src/ui/main/timer/timer-view.ui:23
 #, fuzzy
@@ -1045,7 +1045,7 @@ msgstr "Сеанс мерзімі аяқталды"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "Ұзақ үзіліс ұзақтығы"
+msgstr "Ұзақ үзіліске дейін <b>%s</b> қалды"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
@@ -1109,17 +1109,17 @@ msgstr "Шығу"
 #: src/ui/main/window.vala:332
 #, fuzzy
 msgid "Run in background"
-msgstr "Фон қызметі ретінде орындау"
+msgstr "Фонда орындау"
 
 #: src/ui/overlays/screen-overlay.ui:65
 msgid "It's time to take a break"
-msgstr "Үзіліс алатын уақыт келді"
+msgstr "Үзіліс жасайтын уақыт келді"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:17
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "Таймер терезесі"
+msgstr "Негізгі терезе"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 #, fuzzy
@@ -1135,18 +1135,18 @@ msgstr "Шағын көріністі таңдау"
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "Бастау"
+msgstr "Басталды"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
 #, fuzzy
 msgid "Paused"
-msgstr "Кідірту"
+msgstr "Кідіртілді"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "Таңдауыңызша әрекеттер…"
+msgstr "Таңдамалы әрекетті өңдеу"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
@@ -1165,7 +1165,7 @@ msgstr "Аты"
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
 #, fuzzy
 msgid "Trigger"
-msgstr "Триггерлер"
+msgstr "Триггер"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
 #, fuzzy
@@ -1214,12 +1214,12 @@ msgstr "Сүзгі"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "Команда"
+msgstr "Shell командасы"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
 msgid "Commands"
-msgstr "Команда"
+msgstr "Командалар"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
 #, fuzzy
@@ -1269,7 +1269,7 @@ msgstr "Команда аяқталғанша басқа командалард�
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "Әрекет"
+msgstr "Әрекетті _өшіру"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 #, fuzzy
@@ -1279,7 +1279,7 @@ msgstr "Әзірге оқиғалар көрсетілмеген."
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "Таңдауыңызша әрекеттер…"
+msgstr "Таңдамалы әрекет қосу"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 #, fuzzy
@@ -1299,17 +1299,17 @@ msgstr "_Таңдау"
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "Қалып-күйдің ұзақтығы"
+msgstr "Атаусыз әрекет"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
 msgid "Add Condition"
-msgstr "Дыбысты қосу"
+msgstr "Шарт қосу"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:45
 #, fuzzy
 msgid "Add Group"
-msgstr "Дыбысты қосу"
+msgstr "Топ қосу"
 
 #: src/ui/preferences/automation/action/condition-group-widget.vala:344
 #, fuzzy
@@ -1389,7 +1389,7 @@ msgstr "Орындалуда"
 #: src/ui/preferences/automation/action/condition-widget.vala:121
 #, fuzzy
 msgid "Duration"
-msgstr "Қалып-күйдің ұзақтығы"
+msgstr "Ұзақтығы"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
@@ -1424,7 +1424,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "Пернетақта жарлығы"
+msgstr "Жарлықты орнату"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 #, fuzzy
@@ -1435,7 +1435,7 @@ msgstr "_Орнату"
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
 #, fuzzy
 msgid "Disabled"
-msgstr "Сөндіру"
+msgstr "Сөндірулі"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
 #, fuzzy
@@ -1609,7 +1609,7 @@ msgstr "Хабарламалар"
 #: src/ui/preferences/preferences-window.vala:44
 #, fuzzy
 msgid "Sounds"
-msgstr "Дыбысты қосу"
+msgstr "Дыбыстар"
 
 #: src/ui/preferences/preferences-window.vala:51
 #, fuzzy
@@ -1619,12 +1619,12 @@ msgstr "Сыртқы түрі"
 #: src/ui/preferences/preferences-window.vala:58
 #, fuzzy
 msgid "Keyboard Shortcuts"
-msgstr "Пернетақта жарлығы"
+msgstr "Пернетақта жарлықтары"
 
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "Таңдауыңызша әрекеттер…"
+msgstr "Автоматизация"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 #, fuzzy
@@ -1634,23 +1634,23 @@ msgstr "Дыбыстар сөндірілген"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:36
 #, fuzzy
 msgid "Alert Sounds"
-msgstr "Дыбысты қосу"
+msgstr "Ескерту дыбыстары"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "Помодоро аяқталуға жақын"
+msgstr "Помодоро аяқталғандағы дыбыс"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "Үзіліс аяқталуға жақын"
+msgstr "Үзіліс аяқталғандағы дыбыс"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
 #, fuzzy
 msgid "Background Sound"
-msgstr "Тықылдайтын дыбыс"
+msgstr "Фондық дыбыс"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
 msgid "Bell"
@@ -1662,11 +1662,11 @@ msgstr "Қатты қоңырау"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:24
 msgid "Clock Ticking"
-msgstr "Сағат дыбысы"
+msgstr "Сағат тықылы"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:25
 msgid "Timer Ticking"
-msgstr "Таймер дыбысы"
+msgstr "Таймер тықылы"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:26
 #, fuzzy
@@ -1681,21 +1681,21 @@ msgstr "Жоқ"
 
 #: src/ui/preferences/sounds/sound-chooser-window.ui:63
 msgid "Volume:"
-msgstr "Дыбыс:"
+msgstr "Дыбыс деңгейі:"
 
 #: src/ui/preferences/sounds/sound-chooser-window.vala:249
 msgid "Select Custom Sound"
-msgstr "Таңдауыңызша дыбысты таңдаңыз"
+msgstr "Таңдаулы дыбысты таңдау"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:20
 #, fuzzy
 msgid "Pomodoro Duration"
-msgstr "Pomodoro ұзақтығы"
+msgstr "Помодоро ұзақтығы"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:31
 #, fuzzy
 msgid "Short Break Duration"
-msgstr "Үзіліс ұзақтығы"
+msgstr "Қысқа үзіліс ұзақтығы"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:42
 #, fuzzy
@@ -1725,7 +1725,7 @@ msgstr "Үзілістің басталуын растау"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
 #, fuzzy
 msgid "Confirm Starting a Pomodoro"
-msgstr "Pomodoro іске қосу"
+msgstr "Помодороның басталуын растау"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87

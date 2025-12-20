@@ -28,12 +28,12 @@ msgstr "@APPLICATION_NAME@"
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "Ett enkelt tidshanteringsverktyg"
+msgstr "Tidshanteringsverktyg"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
 msgid "timer;"
-msgstr "tidtagare;timer;"
+msgstr "tidtagare;timer;pomodoro;"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
 #: src/core/notification-manager.vala:335 src/core/state.vala:78
@@ -79,7 +79,7 @@ msgstr "Anpassningsbara längder för arbetspass och raster"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "Dölj andra aviseringar"
+msgstr "Visuella aviseringar och ljudaviseringar"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 #, fuzzy
@@ -99,7 +99,7 @@ msgstr "Skärmöverlägg under raster"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "Förläng nuvarande pomodoro eller bryt"
+msgstr "Kör anpassade kommandon efter Pomodoro eller rast"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -114,7 +114,7 @@ msgstr "Tidtagare"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
-msgstr "Stoppa tidtagare"
+msgstr "Kompakt tidtagare"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
 #, fuzzy
@@ -159,7 +159,7 @@ msgstr "Översikt över ändringar i gnome-pomodoro 0.28.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
 #, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
-msgstr "Indikator för Gnome Shell"
+msgstr "Stöd för GNOME Shell 49 (tack @aleasto)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
 #, fuzzy
@@ -174,7 +174,7 @@ msgstr "Översikt över ändringar i gnome-pomodoro 0.27.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "Indikator för Gnome Shell"
+msgstr "Stöd för GNOME Shell 48"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 #, fuzzy
@@ -194,7 +194,7 @@ msgstr "Översikt över ändringar i gnome-pomodoro 0.26.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "Indikator för Gnome Shell"
+msgstr "Stöd för GNOME Shell 47"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
@@ -229,12 +229,12 @@ msgstr "Översikt över ändringar i gnome-pomodoro 0.25.1"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "Indikator för Gnome Shell"
+msgstr "Rättningar för GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "Indikator för Gnome Shell"
+msgstr "Slopat stöd för GNOME Shell 45"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 #, fuzzy
@@ -244,7 +244,7 @@ msgstr "Översikt över ändringar i gnome-pomodoro 0.25.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "Indikator för Gnome Shell"
+msgstr "Stöd för GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 #, fuzzy
@@ -285,11 +285,11 @@ msgstr "Återuppta"
 
 #: src/application.vala:60
 msgid "Skip to a pomodoro or to a break"
-msgstr "Hoppa till en pomodoro eller till en paus"
+msgstr "Hoppa till en pomodoro eller till en rast"
 
 #: src/application.vala:63
 msgid "Extend current pomodoro or break"
-msgstr "Förläng nuvarande pomodoro eller bryt"
+msgstr "Förläng nuvarande pomodoro eller rast"
 
 #: src/application.vala:66
 msgid "Reset current session"
@@ -311,13 +311,13 @@ msgstr "Skriv ut versionsinformation och avsluta"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "Starta/Stoppa"
+msgstr "Starta eller Stoppa"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
-msgstr "Pausa/Återuppta"
+msgstr "Starta, Pausa eller Återuppta"
 
 #: src/application.vala:490 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
@@ -338,7 +338,7 @@ msgstr "Flytta till fokus"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "Anpassade åtgärder…"
+msgstr "Anpassad åtgärd \"%s\" misslyckades"
 
 #: src/core/command.vala:379
 #, fuzzy
@@ -348,7 +348,7 @@ msgstr "Tidsgräns nådd"
 #: src/core/command.vala:408
 #, fuzzy
 msgid "Failed to execute command"
-msgstr "Misslyckades med att aktivera tillägg"
+msgstr "Misslyckades med att köra kommando"
 
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
@@ -404,7 +404,7 @@ msgstr "Annat"
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "Starta tidtagare"
+msgstr "Startade tidtagaren."
 
 #: src/core/event.vala:277
 #, fuzzy
@@ -540,11 +540,11 @@ msgstr "Ta en rast"
 
 #: src/core/notification-manager.vala:343
 msgid "Take a short break"
-msgstr "Ta en kort paus"
+msgstr "Ta en kort rast"
 
 #: src/core/notification-manager.vala:347
 msgid "Take a long break"
-msgstr "Ta en lång paus"
+msgstr "Ta en lång rast"
 
 #: src/core/notification-manager.vala:394
 msgid "Pomodoro is about to end"
@@ -560,7 +560,7 @@ msgstr "Ta en rast"
 
 #: src/core/notification-manager.vala:401
 msgid "Break is about to end"
-msgstr "Rast håller på att ta slut"
+msgstr "Rasten håller på att ta slut"
 
 #: src/core/notification-manager.vala:402
 #: src/core/notification-manager.vala:490
@@ -583,13 +583,13 @@ msgstr "Gör dig redo…"
 #: src/core/notification-manager.vala:473
 #, fuzzy
 msgid "Pomodoro is over!"
-msgstr "Pomodorotidtagare"
+msgstr "Pomodoron är slut!"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "Pausen är över"
+msgstr "Rasten är slut!"
 
 #: src/core/notification-manager.vala:489
 #, fuzzy
@@ -635,7 +635,7 @@ msgstr "Filtypen stöds inte"
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "Stoppa"
+msgstr "Stoppad"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
@@ -757,7 +757,7 @@ msgstr "Tidpunkt då nedräkningen startade."
 #: src/integrations/portal/global-shortcuts-provider.vala:298
 #, fuzzy
 msgid "Unused"
-msgstr "Pausad"
+msgstr "Oanvänd"
 
 #: src/ui/log/log-window.ui:6
 #, fuzzy
@@ -902,7 +902,7 @@ msgstr "_Försök igen"
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
 #, fuzzy
 msgid "_Abort"
-msgstr "_Om"
+msgstr "_Avbryt"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
 #, fuzzy
@@ -917,7 +917,7 @@ msgstr "Installation av tillägg är inte tillåten"
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
 #, fuzzy
 msgid "Failed to download the extension"
-msgstr "Misslyckades med att aktivera tillägg"
+msgstr "Misslyckades med att ladda ner tillägget"
 
 #: src/ui/main/stats/stats-day-page.ui:104
 #: src/ui/main/stats/stats-day-page.vala:92
@@ -927,7 +927,7 @@ msgstr "Misslyckades med att aktivera tillägg"
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
-msgstr "Rast"
+msgstr "Raster"
 
 #: src/ui/main/stats/stats-day-page.ui:111
 #: src/ui/main/stats/stats-month-page.ui:48
@@ -943,7 +943,7 @@ msgstr "Avbrott"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "Längd på rast"
+msgstr "Rastförhållande"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -963,7 +963,7 @@ msgstr "Månad"
 #: src/ui/main/stats/stats-view.ui:39
 #, fuzzy
 msgid "Nothing to see here yet"
-msgstr "Inget att se ännu"
+msgstr "Inget att se här ännu"
 
 #: src/ui/main/stats/stats-view.ui:40
 #, fuzzy
@@ -1030,12 +1030,12 @@ msgstr "_Lång rast"
 #: src/ui/main/timer/timer-view.vala:130
 #, fuzzy
 msgid "Finished!"
-msgstr ""
+msgstr "Klar!"
 
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "Rast"
+msgstr "_Rast"
 
 #: src/ui/main/timer/timer-view.ui:23
 #, fuzzy
@@ -1050,7 +1050,7 @@ msgstr "Sessionen har löpt ut"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "Längd på lång rast"
+msgstr "Lång rast om <b>%s</b>"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
@@ -1114,7 +1114,7 @@ msgstr "Avsluta"
 #: src/ui/main/window.vala:332
 #, fuzzy
 msgid "Run in background"
-msgstr "Kör som bakgrundstjänst"
+msgstr "Kör i bakgrunden"
 
 #: src/ui/overlays/screen-overlay.ui:65
 msgid "It's time to take a break"
@@ -1124,7 +1124,7 @@ msgstr "Det är dags för en rast"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "Tidtagarfönster"
+msgstr "Huvudfönster"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 #, fuzzy
@@ -1140,7 +1140,7 @@ msgstr "Föredra kompakt vy"
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "Starta"
+msgstr "Startad"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
@@ -1150,7 +1150,7 @@ msgstr "Pausad"
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "Anpassade åtgärder…"
+msgstr "Redigera anpassad åtgärd"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
@@ -1218,12 +1218,12 @@ msgstr "Filter"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "Kommando"
+msgstr "Skalkommando"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
 msgid "Commands"
-msgstr "Kommando"
+msgstr "Kommandon"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
 #, fuzzy
@@ -1273,7 +1273,7 @@ msgstr "Blockera körning av andra kommandon tills kommandot är klart."
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "Åtgärd"
+msgstr "_Ta bort åtgärd"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 #, fuzzy
@@ -1283,7 +1283,7 @@ msgstr "Inga händelser angivna ännu."
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "Anpassade åtgärder…"
+msgstr "Lägg till anpassad åtgärd"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 #, fuzzy
@@ -1303,17 +1303,17 @@ msgstr "_Välj"
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "Varaktighet för tillstånd"
+msgstr "Namnlös åtgärd"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
 msgid "Add Condition"
-msgstr "Lägg till ljud"
+msgstr "Lägg till villkor"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:45
 #, fuzzy
 msgid "Add Group"
-msgstr "Lägg till ljud"
+msgstr "Lägg till grupp"
 
 #: src/ui/preferences/automation/action/condition-group-widget.vala:344
 #, fuzzy
@@ -1393,7 +1393,7 @@ msgstr "Körs"
 #: src/ui/preferences/automation/action/condition-widget.vala:121
 #, fuzzy
 msgid "Duration"
-msgstr "Varaktighet för tillstånd"
+msgstr "Längd"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
@@ -1428,7 +1428,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "Tangentbordsgenväg"
+msgstr "Ställ in genväg"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 #, fuzzy
@@ -1439,7 +1439,7 @@ msgstr "_Välj"
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
 #, fuzzy
 msgid "Disabled"
-msgstr "Inaktivera"
+msgstr "Inaktiverad"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
 #, fuzzy
@@ -1532,7 +1532,7 @@ msgstr "Tiden håller på att ta slut"
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
 #, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
-msgstr "Pomodoro håller på att ta slut"
+msgstr "Avisera när Pomodoro eller rast håller på att ta slut."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
@@ -1615,7 +1615,7 @@ msgstr "Aviseringar"
 #: src/ui/preferences/preferences-window.vala:44
 #, fuzzy
 msgid "Sounds"
-msgstr "Lägg till ljud"
+msgstr "Ljud"
 
 #: src/ui/preferences/preferences-window.vala:51
 #, fuzzy
@@ -1625,12 +1625,12 @@ msgstr "Utseende"
 #: src/ui/preferences/preferences-window.vala:58
 #, fuzzy
 msgid "Keyboard Shortcuts"
-msgstr "Tangentbordsgenväg"
+msgstr "Tangentbordsgenvägar"
 
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "Anpassade åtgärder…"
+msgstr "Automatisering"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 #, fuzzy
@@ -1640,23 +1640,23 @@ msgstr "Ljud är inaktiverade"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:36
 #, fuzzy
 msgid "Alert Sounds"
-msgstr "Lägg till ljud"
+msgstr "Aviseringsljud"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "Pomodoro håller på att ta slut"
+msgstr "Ljud vid slutförd Pomodoro"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "Rast håller på att ta slut"
+msgstr "Ljud vid slutförd rast"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
 #, fuzzy
 msgid "Background Sound"
-msgstr "Tickande ljud"
+msgstr "Bakgrundsljud"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
 msgid "Bell"
@@ -1701,7 +1701,7 @@ msgstr "Pomodorolängd"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:31
 #, fuzzy
 msgid "Short Break Duration"
-msgstr "Längd på rast"
+msgstr "Längd på kort rast"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:42
 #, fuzzy
@@ -1731,7 +1731,7 @@ msgstr "Bekräfta start av en rast"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
 #, fuzzy
 msgid "Confirm Starting a Pomodoro"
-msgstr "Starta Pomodoro"
+msgstr "Bekräfta start av en Pomodoro"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87

@@ -28,12 +28,12 @@ msgstr "@APPLICATION_NAME@"
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "Yksinkertainen ajanhallintatyökalu"
+msgstr "Ajanhallintatyökalu"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
 msgid "timer;"
-msgstr "timer;"
+msgstr "ajastin;timer;pomodoro;"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
 #: src/core/notification-manager.vala:335 src/core/state.vala:78
@@ -79,7 +79,7 @@ msgstr "Muokattavat työjaksojen ja taukojen pituudet"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "Piilota muut ilmoitukset"
+msgstr "Visuaaliset ja äänimerkit"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 #, fuzzy
@@ -99,7 +99,7 @@ msgstr "Koko näytön peitto taukojen aikana"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "Pidennä nykyistä pomodoroa tai taukoa"
+msgstr "Suorita omia komentoja pomodoron tai tauon jälkeen"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -114,7 +114,7 @@ msgstr "Ajastin"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
-msgstr "Lopeta ajastin"
+msgstr "Pienikokoinen ajastin"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
 #, fuzzy
@@ -129,7 +129,7 @@ msgstr "Kuukausitilastot"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:83
 #: src/ui/preferences/preferences-window.ui:6
 msgid "Preferences"
-msgstr "Ominaisuudet"
+msgstr "Asetukset"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:87
 #, fuzzy
@@ -159,7 +159,7 @@ msgstr "Yhteenveto muutoksista gnome-pomodoro 0.28.0 -versiossa"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
 #, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
-msgstr "GNOME Shellin indikaattori"
+msgstr "Tuki GNOME Shell 49 -versiolle (kiitos @aleasto)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
 #, fuzzy
@@ -174,7 +174,7 @@ msgstr "Yhteenveto muutoksista gnome-pomodoro 0.27.0 -versiossa"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "GNOME Shellin indikaattori"
+msgstr "Tuki GNOME Shell 48 -versiolle"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 #, fuzzy
@@ -194,7 +194,7 @@ msgstr "Yhteenveto muutoksista gnome-pomodoro 0.26.0 -versiossa"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "GNOME Shellin indikaattori"
+msgstr "Tuki GNOME Shell 47 -versiolle"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
@@ -229,12 +229,12 @@ msgstr "Yhteenveto muutoksista gnome-pomodoro 0.25.1 -versiossa"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "GNOME Shellin indikaattori"
+msgstr "Korjauksia GNOME Shell 46 -versiolle"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "GNOME Shellin indikaattori"
+msgstr "Poistettu tuki GNOME Shell 45 -versiolle"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 #, fuzzy
@@ -244,7 +244,7 @@ msgstr "Yhteenveto muutoksista gnome-pomodoro 0.25.0 -versiossa"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "GNOME Shellin indikaattori"
+msgstr "Tuki GNOME Shell 46 -versiolle"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 #, fuzzy
@@ -285,7 +285,7 @@ msgstr "Jatka"
 
 #: src/application.vala:60
 msgid "Skip to a pomodoro or to a break"
-msgstr "Hyppää pomodorolle tai tauolle"
+msgstr "Hyppää pomodoroon tai taukoon"
 
 #: src/application.vala:63
 msgid "Extend current pomodoro or break"
@@ -297,7 +297,7 @@ msgstr "Nollaa nykyinen istunto"
 
 #: src/application.vala:69
 msgid "Show preferences"
-msgstr "Näytä ominaisuudet"
+msgstr "Näytä asetukset"
 
 #: src/application.vala:72
 msgid "Quit application"
@@ -305,19 +305,19 @@ msgstr "Lopeta sovellus"
 
 #: src/application.vala:75
 msgid "Print version information and exit"
-msgstr "Näytä versiotiedot ja lopeta"
+msgstr "Näytä versiotiedot ja poistu"
 
 #: src/application.vala:477
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "Käynnistä/Pysäytä"
+msgstr "Käynnistä tai pysäytä"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
-msgstr "Keskeytä/Jatka"
+msgstr "Käynnistä, keskeytä tai jatka"
 
 #: src/application.vala:490 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
@@ -338,7 +338,7 @@ msgstr "Tuo etualalle"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "Muokatut toiminnot…"
+msgstr "Oma toiminto \"%s\" epäonnistui"
 
 #: src/core/command.vala:379
 #, fuzzy
@@ -348,12 +348,12 @@ msgstr "Aikakatkaisu saavutettu"
 #: src/core/command.vala:408
 #, fuzzy
 msgid "Failed to execute command"
-msgstr "Liitännäistä ei voitu ottaa käyttöön"
+msgstr "Komennon suorittaminen epäonnistui"
 
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
 msgid "Command is empty"
-msgstr "Komento"
+msgstr "Komento on tyhjä"
 
 #: src/core/command.vala:510
 #, fuzzy
@@ -404,7 +404,7 @@ msgstr "Muu"
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "Käynnistä ajastin"
+msgstr "Ajastin käynnistetty."
 
 #: src/core/event.vala:277
 #, fuzzy
@@ -582,13 +582,13 @@ msgstr "Valmistaudu…"
 #: src/core/notification-manager.vala:473
 #, fuzzy
 msgid "Pomodoro is over!"
-msgstr "Pomodoro-ajastin"
+msgstr "Pomodoro on ohi!"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "Tauko on ohi"
+msgstr "Tauko on ohi!"
 
 #: src/core/notification-manager.vala:489
 #, fuzzy
@@ -634,7 +634,7 @@ msgstr "Tiedostotyyppi ei ole tuettu"
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "Pysäytä"
+msgstr "Pysäytetty"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
@@ -756,7 +756,7 @@ msgstr "Aika, jolloin laskenta alkoi."
 #: src/integrations/portal/global-shortcuts-provider.vala:298
 #, fuzzy
 msgid "Unused"
-msgstr "Keskeytetty"
+msgstr "Käyttämätön"
 
 #: src/ui/log/log-window.ui:6
 #, fuzzy
@@ -903,7 +903,7 @@ msgstr "_Yritä uudelleen"
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
 #, fuzzy
 msgid "_Abort"
-msgstr "T_ietoa"
+msgstr "_Keskeytä"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
 #, fuzzy
@@ -918,7 +918,7 @@ msgstr "Laajennusten asennus ei ole sallittua"
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
 #, fuzzy
 msgid "Failed to download the extension"
-msgstr "Liitännäistä ei voitu ottaa käyttöön"
+msgstr "Laajennuksen lataaminen epäonnistui"
 
 #: src/ui/main/stats/stats-day-page.ui:104
 #: src/ui/main/stats/stats-day-page.vala:92
@@ -928,7 +928,7 @@ msgstr "Liitännäistä ei voitu ottaa käyttöön"
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
-msgstr "Tauko"
+msgstr "Tauot"
 
 #: src/ui/main/stats/stats-day-page.ui:111
 #: src/ui/main/stats/stats-month-page.ui:48
@@ -944,7 +944,7 @@ msgstr "Keskeytykset"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "Tauon kesto"
+msgstr "Taukojen suhde"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -964,7 +964,7 @@ msgstr "Kuukausi"
 #: src/ui/main/stats/stats-view.ui:39
 #, fuzzy
 msgid "Nothing to see here yet"
-msgstr "Ei vielä nähtävää"
+msgstr "Täällä ei ole vielä mitään"
 
 #: src/ui/main/stats/stats-view.ui:40
 #, fuzzy
@@ -1036,7 +1036,7 @@ msgstr "Valmis!"
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "Tauko"
+msgstr "_Tauko"
 
 #: src/ui/main/timer/timer-view.ui:23
 #, fuzzy
@@ -1051,7 +1051,7 @@ msgstr "Istunto on vanhentunut"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "Pitkän tauon kesto"
+msgstr "Pitkä tauko alkaa <b>%s</b> kuluttua"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
@@ -1065,7 +1065,7 @@ msgstr "_Pieni näkymä"
 
 #: src/ui/main/window.ui:15
 msgid "_Preferences"
-msgstr "_Ominaisuudet"
+msgstr "_Asetukset"
 
 #: src/ui/main/window.ui:19
 msgid "_About"
@@ -1115,7 +1115,7 @@ msgstr "Lopeta"
 #: src/ui/main/window.vala:332
 #, fuzzy
 msgid "Run in background"
-msgstr "Suorita taustapalveluna"
+msgstr "Suorita taustalla"
 
 #: src/ui/overlays/screen-overlay.ui:65
 msgid "It's time to take a break"
@@ -1125,7 +1125,7 @@ msgstr "On aika pitää taukoa"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "Ajastimen ikkuna"
+msgstr "Pääikkuna"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 #, fuzzy
@@ -1141,7 +1141,7 @@ msgstr "Suosi pientä näkymää"
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "Käynnistä"
+msgstr "Käynnistetty"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
@@ -1151,7 +1151,7 @@ msgstr "Keskeytetty"
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "Muokatut toiminnot…"
+msgstr "Muokkaa omaa toimintoa"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
@@ -1170,7 +1170,7 @@ msgstr "Nimi"
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
 #, fuzzy
 msgid "Trigger"
-msgstr "Liipaisimet"
+msgstr "Laukaisin"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
 #, fuzzy
@@ -1218,12 +1218,12 @@ msgstr "Suodatin"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "Komento"
+msgstr "Shell-komento"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
 msgid "Commands"
-msgstr "Komento"
+msgstr "Komennot"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
 #, fuzzy
@@ -1273,7 +1273,7 @@ msgstr "Estä muiden komentojen suoritus, kunnes komento on valmis."
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "Toiminto"
+msgstr "_Poista toiminto"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 #, fuzzy
@@ -1283,7 +1283,7 @@ msgstr "Tapahtumia ei ole vielä määritetty."
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "Muokatut toiminnot…"
+msgstr "Lisää oma toiminto"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 #, fuzzy
@@ -1303,7 +1303,7 @@ msgstr "_Valitse"
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "Tilan kesto"
+msgstr "Nimetön toiminto"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
@@ -1391,7 +1391,7 @@ msgstr "Käynnissä"
 #: src/ui/preferences/automation/action/condition-widget.vala:121
 #, fuzzy
 msgid "Duration"
-msgstr "Tilan kesto"
+msgstr "Kesto"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
@@ -1426,7 +1426,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "Pikanäppäin"
+msgstr "Aseta pikanäppäin"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 #, fuzzy
@@ -1532,7 +1532,7 @@ msgstr "Aika loppumassa"
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
 #, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
-msgstr "Pomodoro on päättymässä"
+msgstr "Ilmoita, kun pomodoro tai tauko on päättymässä."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
@@ -1627,12 +1627,12 @@ msgstr "Ulkoasu"
 #: src/ui/preferences/preferences-window.vala:58
 #, fuzzy
 msgid "Keyboard Shortcuts"
-msgstr "Pikanäppäin"
+msgstr "Pikanäppäimet"
 
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "Muokatut toiminnot…"
+msgstr "Automaatio"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 #, fuzzy
@@ -1647,18 +1647,18 @@ msgstr "Hälytysäänet"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "Pomodoro on päättymässä"
+msgstr "Pomodoron päättymisääni"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "Tauko on päättymässä"
+msgstr "Tauon päättymisääni"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
 #, fuzzy
 msgid "Background Sound"
-msgstr "Tikitysääni"
+msgstr "Taustaääni"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
 msgid "Bell"
@@ -1703,7 +1703,7 @@ msgstr "Pomodoron kesto"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:31
 #, fuzzy
 msgid "Short Break Duration"
-msgstr "Tauon kesto"
+msgstr "Lyhyen tauon kesto"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:42
 #, fuzzy
@@ -1733,7 +1733,7 @@ msgstr "Vahvista tauon aloitus"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
 #, fuzzy
 msgid "Confirm Starting a Pomodoro"
-msgstr "Käynnistä Pomodoro"
+msgstr "Vahvista pomodoron aloitus"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87

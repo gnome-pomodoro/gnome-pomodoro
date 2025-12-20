@@ -28,7 +28,7 @@ msgstr "@APPLICATION_NAME@"
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "ஒரு எளிய நேர நிர்வாக பயன்பாடு"
+msgstr "நேர மேலாண்மை பயன்பாடு"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
@@ -78,7 +78,7 @@ msgstr "வேலை நேரம் மற்றும் இடைவெளி
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "பிற அறிவிப்புகளை மறை"
+msgstr "காட்சி மற்றும் ஒலி அறிவிப்புகள்"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 #, fuzzy
@@ -113,7 +113,7 @@ msgstr "நேரங்காட்டி"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
-msgstr "நேரங்காட்டியை நிறுத்து"
+msgstr "சிறிய நேரங்காட்டி"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
 #, fuzzy
@@ -171,7 +171,7 @@ msgstr "gnome-pomodoro 0.27.0 மாற்றங்களின் கண்ண�
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "GNOME ஷெல்லுக்கான காட்டொளி"
+msgstr "GNOME Shell 48-க்கான ஆதரவு"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 #, fuzzy
@@ -190,7 +190,7 @@ msgstr "gnome-pomodoro 0.26.0 மாற்றங்களின் கண்ண�
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "GNOME ஷெல்லுக்கான காட்டொளி"
+msgstr "GNOME Shell 47-க்கான ஆதரவு"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
@@ -223,12 +223,12 @@ msgstr "gnome-pomodoro 0.25.1 மாற்றங்களின் கண்ண�
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "GNOME ஷெல்லுக்கான காட்டொளி"
+msgstr "GNOME Shell 46-க்கான திருத்தங்கள்"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "GNOME ஷெல்லுக்கான காட்டொளி"
+msgstr "GNOME Shell 45-க்கான ஆதரவு நீக்கப்பட்டது"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 msgid "Overview of changes in gnome-pomodoro 0.25.0"
@@ -237,7 +237,7 @@ msgstr "gnome-pomodoro 0.25.0 மாற்றங்களின் கண்ண�
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "GNOME ஷெல்லுக்கான காட்டொளி"
+msgstr "GNOME Shell 46-க்கான ஆதரவு"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 #, fuzzy
@@ -247,7 +247,7 @@ msgstr "பில்ட் ஸ்கிரிப்ட் meson 0.59.0-க்க
 #: src/application.vala:42
 #, fuzzy
 msgid "Start/Stop"
-msgstr "தொடங்கு"
+msgstr "தொடங்கு/நிறுத்து"
 
 #. Actions
 #: src/application.vala:45 src/application.vala:482 src/core/event.vala:268
@@ -264,7 +264,7 @@ msgstr "நிறுத்து"
 #: src/application.vala:51
 #, fuzzy
 msgid "Pause/Resume"
-msgstr "மீண்டும் தொடங்கு"
+msgstr "இடைநிறுத்து/தொடர்"
 
 #: src/application.vala:54 src/application.vala:486 src/core/event.vala:284
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:83
@@ -296,7 +296,7 @@ msgstr "தற்போதைய அமர்வை மீட்டமை"
 #: src/application.vala:69
 #, fuzzy
 msgid "Show preferences"
-msgstr "விருப்பத்தேர்வுகள்"
+msgstr "விருப்பத்தேர்வுகளைக் காட்டு"
 
 #: src/application.vala:72
 #, fuzzy
@@ -312,7 +312,7 @@ msgstr "பதிப்புத் தகவலை அச்சிட்டு 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "இடைவெளி தொடங்கும் ஒலி"
+msgstr "தொடங்கு அல்லது நிறுத்து"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
@@ -339,7 +339,7 @@ msgstr "முன்னிலைக்குக் கொண்டுவா"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "தனிப்பயன் செயல்கள்..."
+msgstr "தனிப்பயன் செயல் \"%s\" தோல்வியுற்றது"
 
 #: src/core/command.vala:379
 #, fuzzy
@@ -354,7 +354,7 @@ msgstr "கட்டளையை இயக்க முடியவில்ல�
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
 msgid "Command is empty"
-msgstr "கட்டளை"
+msgstr "கட்டளை காலியாக உள்ளது"
 
 #: src/core/command.vala:510
 #, fuzzy
@@ -405,7 +405,7 @@ msgstr "மற்றவை"
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "நேரங்காட்டியைத் தொடங்கு"
+msgstr "நேரங்காட்டி தொடங்கப்பட்டது."
 
 #: src/core/event.vala:277
 #, fuzzy
@@ -529,7 +529,7 @@ msgstr "செயல்பாடின்மை காரணமாக அமர�
 #: src/core/notification-manager.vala:130
 #, fuzzy, c-format
 msgid "%s remaining"
-msgstr "இன்னும் %d வினாடி உள்ளது"
+msgstr "இன்னும் %s உள்ளது"
 
 #: src/core/notification-manager.vala:339
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
@@ -582,13 +582,13 @@ msgstr "தயாராகுங்கள்..."
 #: src/core/notification-manager.vala:473
 #, fuzzy
 msgid "Pomodoro is over!"
-msgstr "பொமோடோரோ நேரங்காட்டி"
+msgstr "பொமோடோரோ முடிந்தது!"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "இடைவெளி முடிந்தது"
+msgstr "இடைவெளி முடிந்தது!"
 
 #: src/core/notification-manager.vala:489
 #, fuzzy
@@ -634,13 +634,13 @@ msgstr "கோப்பு வகை ஆதரிக்கப்படவில�
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "நிறுத்து"
+msgstr "நிறுத்தப்பட்டது"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
 #, fuzzy
 msgid "Break"
-msgstr "நீண்ட இடைவெளி"
+msgstr "இடைவெளி"
 
 #: src/core/state.vala:84
 msgid "Short Break"
@@ -895,7 +895,7 @@ msgstr "மீண்டும் முயற்சி செய் (_T)"
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
 #, fuzzy
 msgid "_Abort"
-msgstr "_பற்றி"
+msgstr "கைவிடு (_A)"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
 #, fuzzy
@@ -920,7 +920,7 @@ msgstr "நீட்டிப்பைத் தரவிறக்க முட�
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
-msgstr "இடைவெளி முடிந்தது"
+msgstr "இடைவெளிகள்"
 
 #: src/ui/main/stats/stats-day-page.ui:111
 #: src/ui/main/stats/stats-month-page.ui:48
@@ -936,7 +936,7 @@ msgstr "குறுக்கீடுகள்"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "சிறு இடைவெளி நேரம்"
+msgstr "இடைவெளி விகிதம்"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -956,7 +956,7 @@ msgstr "மாதம்"
 #: src/ui/main/stats/stats-view.ui:39
 #, fuzzy
 msgid "Nothing to see here yet"
-msgstr "பார்க்க எதுவும் இல்லை"
+msgstr "இங்கே பார்ப்பதற்கு இன்னும் எதுவும் இல்லை"
 
 #: src/ui/main/stats/stats-view.ui:40
 #, fuzzy
@@ -1030,7 +1030,7 @@ msgstr "முடிந்தது!"
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "_நீண்ட இடைவெளி"
+msgstr "இடைவெளி (_B)"
 
 #: src/ui/main/timer/timer-view.ui:23
 #, fuzzy
@@ -1045,7 +1045,7 @@ msgstr "அமர்வு காலாவதியானது"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "நீண்ட இடைவெளி நேரம்"
+msgstr "இன்னும் <b>%s</b>-ல் நீண்ட இடைவெளி வரும்"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
@@ -1119,7 +1119,7 @@ msgstr "இடைவெளி எடுக்க வேண்டிய நேர
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "நேரங்காட்டி சாளரம்"
+msgstr "முதன்மைச் சாளரம்"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 #, fuzzy
@@ -1135,18 +1135,18 @@ msgstr "சிறிய காட்சியினைப் பயன்பட�
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "தொடங்கு"
+msgstr "தொடங்கியது"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
 #, fuzzy
 msgid "Paused"
-msgstr "இடைநிறுத்து"
+msgstr "இடைநிறுத்தப்பட்டது"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "தனிப்பயன் செயல்கள்..."
+msgstr "தனிப்பயன் செயலைத் திருத்து"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
@@ -1165,7 +1165,7 @@ msgstr "பெயர்"
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
 #, fuzzy
 msgid "Trigger"
-msgstr "தூண்டுகள்"
+msgstr "தூண்டுதல்"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
 #, fuzzy
@@ -1213,12 +1213,12 @@ msgstr "வடிகட்டி"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "கட்டளை"
+msgstr "ஷெல் கட்டளை"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
 msgid "Commands"
-msgstr "கட்டளை"
+msgstr "கட்டளைகள்"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
 #, fuzzy
@@ -1268,7 +1268,7 @@ msgstr "இந்தக் கட்டளை முடியும் வரை
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "செயல்"
+msgstr "செயலை நீக்கு (_D)"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 #, fuzzy
@@ -1278,7 +1278,7 @@ msgstr "இன்னும் நிகழ்வுகள் எதுவும�
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "தனிப்பயன் செயல்கள்..."
+msgstr "தனிப்பயன் செயலைச் சேர்"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 #, fuzzy
@@ -1298,7 +1298,7 @@ msgstr "_தேர்ந்தெடு"
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "நிலை நேரம்"
+msgstr "தலைப்பில்லாத செயல்"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
@@ -1379,7 +1379,7 @@ msgstr "ஓடிக்கொண்டிருக்கிறது"
 #: src/ui/preferences/automation/action/condition-widget.vala:121
 #, fuzzy
 msgid "Duration"
-msgstr "நிலை நேரம்"
+msgstr "கால அளவு"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
@@ -1414,7 +1414,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "விசைப்பலகை குறுக்குவழி"
+msgstr "குறுக்குவழியை அமை"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 #, fuzzy
@@ -1425,7 +1425,7 @@ msgstr "அமை (_S)"
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
 #, fuzzy
 msgid "Disabled"
-msgstr "முடக்கு"
+msgstr "முடக்கப்பட்டது"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
 #, fuzzy
@@ -1516,7 +1516,7 @@ msgstr "நேரம் முடிந்து கொண்டிருக்�
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
 #, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
-msgstr "பொமோடோரோ விரைவில் முடிவடைகிறது"
+msgstr "பொமோடோரோ அல்லது இடைவெளி முடியும்போது அறிவிக்கவும்."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
@@ -1613,7 +1613,7 @@ msgstr "விசைப்பலகை குறுக்குவழி"
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "தனிப்பயன் செயல்கள்..."
+msgstr "தானியக்கம்"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 #, fuzzy
@@ -1628,12 +1628,12 @@ msgstr "எச்சரிக்கை ஒலிகள்"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "பொமோடோரோ விரைவில் முடிவடைகிறது"
+msgstr "பொமோடோரோ முடிந்ததற்கான ஒலி"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "இடைவெளி விரைவில் முடிவடைகிறது"
+msgstr "இடைவெளி முடிந்ததற்கான ஒலி"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94

@@ -30,12 +30,12 @@ msgstr "@APPLICATION_NAME@"
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "Jednostavan uslužni program za upravljanja vremenom"
+msgstr "Uslužni program za upravljanje vremenom"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
 msgid "timer;"
-msgstr "mjerač vremena;vremenski brojač;"
+msgstr "timer;mjerač vremena;vremenski brojač;"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
 #: src/core/notification-manager.vala:335 src/core/state.vala:78
@@ -81,7 +81,7 @@ msgstr "Prilagodljivo trajanje sesija rada i pauza"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "Sakrij druge obavijesti"
+msgstr "Vizualne i zvučne obavijesti"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 #, fuzzy
@@ -101,7 +101,7 @@ msgstr "Prekrivanje zaslona tijekom pauza"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "Produžite trenutni pomodoro ili prekid"
+msgstr "Pokrenite prilagođene naredbe nakon Pomodora ili pauze"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -116,7 +116,7 @@ msgstr "Timer"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
-msgstr "Prekini timer"
+msgstr "Kompaktni timer"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
 #, fuzzy
@@ -141,42 +141,42 @@ msgstr "Prekrivanje zaslona"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:95
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.1"
-msgstr "Pregled promjena za gnome-pomodoro 0.15.1"
+msgstr "Pregled promjena u gnome-pomodoro 0.28.1"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:97
 #, fuzzy
 msgid "Added Tamil translation (thanks @omeritzics)"
-msgstr "Dodan prijevod za norveški (@arnotixe)"
+msgstr "Dodan tamilski prijevod (zahvaljujući @omeritzics)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:98
 #, fuzzy
 msgid "Added Hebrew translation (thanks @Killersparrow1)"
-msgstr "Dodan prijevod za norveški (@arnotixe)"
+msgstr "Dodan hebrejski prijevod (zahvaljujući @Killersparrow1)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:104
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.0"
-msgstr "Pregled promjena za gnome-pomodoro 0.18.0"
+msgstr "Pregled promjena u gnome-pomodoro 0.28.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
 #, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
-msgstr "Podrška za GNOME ljusku 3.38 (@ignapk i @szpak)"
+msgstr "Podrška za GNOME Shell 49 (zahvaljujući @aleasto)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
 #, fuzzy
 msgid "Updated German translation (thanks @daPhipz)"
-msgstr "Aktualiziran prijevod za njemački (@tsabsch)"
+msgstr "Ažuriran njemački prijevod (zahvaljujući @daPhipz)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:113
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.27.0"
-msgstr "Pregled promjena za gnome-pomodoro 0.18.0"
+msgstr "Pregled promjena u gnome-pomodoro 0.27.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "Podrška za GNOME ljusku 3.36"
+msgstr "Podrška za GNOME Shell 48"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 #, fuzzy
@@ -186,17 +186,17 @@ msgstr "Razdvoji vrijeme provedeno preko ponoći"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:117
 #, fuzzy
 msgid "Added Telugu translation (thanks @SpaciousCoder78)"
-msgstr "Dodan prijevod za norveški (@arnotixe)"
+msgstr "Dodan telugu prijevod (zahvaljujući @SpaciousCoder78)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:123
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.26.0"
-msgstr "Pregled promjena za gnome-pomodoro 0.18.0"
+msgstr "Pregled promjena u gnome-pomodoro 0.26.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "Podrška za GNOME ljusku 3.36"
+msgstr "Podrška za GNOME Shell 47"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
@@ -207,7 +207,7 @@ msgstr ""
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:127
 #, fuzzy
 msgid "Added Georgian translation (thanks @NorwayFun)"
-msgstr "Dodan prijevod za norveški (@arnotixe)"
+msgstr "Dodan gruzijski prijevod (zahvaljujući @NorwayFun)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:128
 #, fuzzy
@@ -218,7 +218,7 @@ msgstr ""
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:134
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.2"
-msgstr "Pregled promjena za gnome-pomodoro 0.15.1"
+msgstr "Pregled promjena u gnome-pomodoro 0.25.2"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:136
 #, fuzzy
@@ -228,27 +228,27 @@ msgstr "Popravljeno zadržavanje obavijesti nakon produženja Pomodora"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:142
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.1"
-msgstr "Pregled promjena za gnome-pomodoro 0.15.1"
+msgstr "Pregled promjena u gnome-pomodoro 0.25.1"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "Podrška za GNOME ljusku 3.36"
+msgstr "Ispravci za GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "Podrška za GNOME ljusku 3.36"
+msgstr "Prestanak podrške za GNOME Shell 45"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.0"
-msgstr "Pregled promjena za gnome-pomodoro 0.18.0"
+msgstr "Pregled promjena u gnome-pomodoro 0.25.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "Podrška za GNOME ljusku 3.36"
+msgstr "Podrška za GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 #, fuzzy
@@ -293,11 +293,11 @@ msgstr "Preskočite na pomodoro ili na pauzu"
 
 #: src/application.vala:63
 msgid "Extend current pomodoro or break"
-msgstr "Produžite trenutni pomodoro ili prekid"
+msgstr "Produžite trenutni pomodoro ili pauzu"
 
 #: src/application.vala:66
 msgid "Reset current session"
-msgstr "Ponovno postavite trenutnu sesiju"
+msgstr "Ponovno postavi trenutnu sesiju"
 
 #: src/application.vala:69
 msgid "Show preferences"
@@ -315,13 +315,13 @@ msgstr "Ispiši informacije o verziji i izađi"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "Pokreni/Prekini"
+msgstr "Pokreni ili prekini"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
-msgstr "Zaustavi/Nastavi"
+msgstr "Pokreni, zaustavi ili nastavi"
 
 #: src/application.vala:490 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
@@ -342,7 +342,7 @@ msgstr "Stavi u fokus"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "Prilagođene radnje …"
+msgstr "Prilagođena radnja \"%s\" nije uspjela"
 
 #: src/core/command.vala:379
 #, fuzzy
@@ -352,12 +352,12 @@ msgstr "Vrijeme je isteklo"
 #: src/core/command.vala:408
 #, fuzzy
 msgid "Failed to execute command"
-msgstr "Neuspjelo aktiviranje proširenja"
+msgstr "Neuspjelo izvršavanje naredbe"
 
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
 msgid "Command is empty"
-msgstr "Naredba"
+msgstr "Naredba je prazna"
 
 #: src/core/command.vala:510
 #, fuzzy
@@ -408,7 +408,7 @@ msgstr "Ostalo"
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "Pokreni timer"
+msgstr "Timer je pokrenut."
 
 #: src/core/event.vala:277
 #, fuzzy
@@ -539,11 +539,11 @@ msgstr "preostalo %s"
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Take a break"
-msgstr "Odmori se"
+msgstr "Uzmite pauzu"
 
 #: src/core/notification-manager.vala:343
 msgid "Take a short break"
-msgstr "Napravite kratku stanku"
+msgstr "Napravite kratku pauzu"
 
 #: src/core/notification-manager.vala:347
 msgid "Take a long break"
@@ -559,7 +559,7 @@ msgstr "Pomodoro će uskoro završiti"
 #: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
 #, fuzzy
 msgid "Take a Break"
-msgstr "Odmori se"
+msgstr "Uzmite pauzu"
 
 #: src/core/notification-manager.vala:401
 msgid "Break is about to end"
@@ -586,13 +586,13 @@ msgstr "Pripremi se…"
 #: src/core/notification-manager.vala:473
 #, fuzzy
 msgid "Pomodoro is over!"
-msgstr "Pomodoro timer"
+msgstr "Pomodoro je gotov!"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "Pauza je završila"
+msgstr "Pauza je gotova!"
 
 #: src/core/notification-manager.vala:489
 #, fuzzy
@@ -638,7 +638,7 @@ msgstr "Vrsta datoteke nije podržana"
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "Prekini"
+msgstr "Zaustavljeno"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
@@ -763,7 +763,7 @@ msgstr "Vrijeme kada je odbrojavanje započelo."
 #: src/integrations/portal/global-shortcuts-provider.vala:298
 #, fuzzy
 msgid "Unused"
-msgstr "Zaustavljeno"
+msgstr "Neiskorišteno"
 
 #: src/ui/log/log-window.ui:6
 #, fuzzy
@@ -909,7 +909,7 @@ msgstr "_Pokušaj ponovno"
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
 #, fuzzy
 msgid "_Abort"
-msgstr "_Informacije"
+msgstr "_Prekini"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
 #, fuzzy
@@ -924,7 +924,7 @@ msgstr "Instaliranje proširenja nije dopušteno"
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
 #, fuzzy
 msgid "Failed to download the extension"
-msgstr "Neuspjelo aktiviranje proširenja"
+msgstr "Preuzimanje proširenja nije uspjelo"
 
 #: src/ui/main/stats/stats-day-page.ui:104
 #: src/ui/main/stats/stats-day-page.vala:92
@@ -934,7 +934,7 @@ msgstr "Neuspjelo aktiviranje proširenja"
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
-msgstr "Pauza"
+msgstr "Pauze"
 
 #: src/ui/main/stats/stats-day-page.ui:111
 #: src/ui/main/stats/stats-month-page.ui:48
@@ -950,7 +950,7 @@ msgstr "Prekidi"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "Trajanje pauze"
+msgstr "Omjer pauza"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -970,7 +970,7 @@ msgstr "Mjesec"
 #: src/ui/main/stats/stats-view.ui:39
 #, fuzzy
 msgid "Nothing to see here yet"
-msgstr "Još se nema što vidjeti"
+msgstr "Ovdje još nema ničega"
 
 #: src/ui/main/stats/stats-view.ui:40
 #, fuzzy
@@ -1016,7 +1016,7 @@ msgstr "Ovaj tjedan"
 #: src/ui/main/stats/stats-view.vala:1048
 #, fuzzy, c-format
 msgid "Week %u"
-msgstr "Tjedan"
+msgstr "Tjedan %u"
 
 #: src/ui/main/stats/stats-view.vala:1049
 #, fuzzy, c-format
@@ -1045,7 +1045,7 @@ msgstr "Završeno!"
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "Pauza"
+msgstr "_Pauza"
 
 #: src/ui/main/timer/timer-view.ui:23
 #, fuzzy
@@ -1060,12 +1060,12 @@ msgstr "Sesija je istekla"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "Trajanje duge pauze"
+msgstr "Duga pauza slijedi za <b>%s</b>"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
 msgid "Rewind one minute"
-msgstr "%d minuta"
+msgstr "Vrati jednu minutu unatrag"
 
 #: src/ui/main/window.ui:8
 #, fuzzy
@@ -1078,11 +1078,11 @@ msgstr "_Postavke"
 
 #: src/ui/main/window.ui:19
 msgid "_About"
-msgstr "_Informacije"
+msgstr "_O programu"
 
 #: src/ui/main/window.ui:25
 msgid "_Quit"
-msgstr "_Zatvori program"
+msgstr "_Zatvori"
 
 #: src/ui/main/window.ui:62
 #, fuzzy
@@ -1124,7 +1124,7 @@ msgstr "Zatvori program"
 #: src/ui/main/window.vala:332
 #, fuzzy
 msgid "Run in background"
-msgstr "Pokreni kao uslugu u pozadini"
+msgstr "Pokreni u pozadini"
 
 #: src/ui/overlays/screen-overlay.ui:65
 msgid "It's time to take a break"
@@ -1134,7 +1134,7 @@ msgstr "Vrijeme je za pauzu"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "Prozor timera"
+msgstr "Glavni prozor"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 #, fuzzy
@@ -1150,7 +1150,7 @@ msgstr "Preferiraj kompaktni prikaz"
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "Pokreni"
+msgstr "Pokrenuto"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
@@ -1160,7 +1160,7 @@ msgstr "Zaustavljeno"
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "Prilagođene radnje …"
+msgstr "Uredi prilagođenu radnju"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
@@ -1179,7 +1179,7 @@ msgstr "Ime"
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
 #, fuzzy
 msgid "Trigger"
-msgstr "Okidači"
+msgstr "Okidač"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
 #, fuzzy
@@ -1227,12 +1227,12 @@ msgstr "Filter"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "Naredba"
+msgstr "Naredba ljuske"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
 msgid "Commands"
-msgstr "Naredba"
+msgstr "Naredbe"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
 #, fuzzy
@@ -1282,7 +1282,7 @@ msgstr "Blokiraj izvršavanje drugih naredbi dok se naredba ne dovrši."
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "Radnja"
+msgstr "_Obriši radnju"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 #, fuzzy
@@ -1292,7 +1292,7 @@ msgstr "Nijedan događaj još nije naveden."
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "Prilagođene radnje …"
+msgstr "Dodaj prilagođenu radnju"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 #, fuzzy
@@ -1312,7 +1312,7 @@ msgstr "Oda_beri"
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "Trajanje stanja"
+msgstr "Radnja bez naslova"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
@@ -1372,7 +1372,7 @@ msgstr "Ne"
 #: src/ui/preferences/automation/action/condition-widget.ui:95
 #, fuzzy
 msgid "Minutes"
-msgstr "+1 minuta"
+msgstr "Minute"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:96
 #, fuzzy
@@ -1402,7 +1402,7 @@ msgstr "Radi"
 #: src/ui/preferences/automation/action/condition-widget.vala:121
 #, fuzzy
 msgid "Duration"
-msgstr "Trajanje stanja"
+msgstr "Trajanje"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
@@ -1437,7 +1437,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "Tipkovni prečaci"
+msgstr "Postavi prečac"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 #, fuzzy
@@ -1448,7 +1448,7 @@ msgstr "_Postavi"
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
 #, fuzzy
 msgid "Disabled"
-msgstr "Deaktiviraj"
+msgstr "Onemogućeno"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
 #, fuzzy
@@ -1541,7 +1541,7 @@ msgstr "Vrijeme istječe"
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
 #, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
-msgstr "Pomodoro će uskoro završiti"
+msgstr "Obavijesti kada Pomodoro ili pauza budu blizu kraja."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
@@ -1640,7 +1640,7 @@ msgstr "Tipkovni prečaci"
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "Prilagođene radnje …"
+msgstr "Automatizacija"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 #, fuzzy
@@ -1655,18 +1655,18 @@ msgstr "Zvukovi upozorenja"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "Pomodoro će uskoro završiti"
+msgstr "Zvuk završetka Pomodora"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "Pauza će uskoro završiti"
+msgstr "Zvuk završetka pauze"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
 #, fuzzy
 msgid "Background Sound"
-msgstr "Zvuk otkucavanja"
+msgstr "Pozadinski zvuk"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
 msgid "Bell"
@@ -1711,7 +1711,7 @@ msgstr "Trajanje Pomodora"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:31
 #, fuzzy
 msgid "Short Break Duration"
-msgstr "Trajanje pauze"
+msgstr "Trajanje kratke pauze"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:42
 #, fuzzy
@@ -1741,7 +1741,7 @@ msgstr "Potvrdi početak pauze"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
 #, fuzzy
 msgid "Confirm Starting a Pomodoro"
-msgstr "Pokreni Pomodoro"
+msgstr "Potvrdi početak Pomodora"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87

@@ -28,7 +28,7 @@ msgstr "@APPLICATION_NAME@"
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "一个简易的时间管理工具"
+msgstr "时间管理工具"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
@@ -77,7 +77,7 @@ msgstr "可自定义工作会话和休息时长"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "隐藏其他通知"
+msgstr "视觉与音频通知"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 #, fuzzy
@@ -97,7 +97,7 @@ msgstr "休息时的全屏覆盖层"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "延长当前番茄钟或休息"
+msgstr "在番茄钟或休息结束后运行自定义命令"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -157,7 +157,7 @@ msgstr "gnome-pomodoro 0.28.0 更新概览"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
 #, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
-msgstr "GNOME Shell下的程序指示器"
+msgstr "支持 GNOME Shell 49（感谢 @aleasto）"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
 #, fuzzy
@@ -172,7 +172,7 @@ msgstr "gnome-pomodoro 0.27.0 更新概览"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "GNOME Shell下的程序指示器"
+msgstr "支持 GNOME Shell 48"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 #, fuzzy
@@ -192,7 +192,7 @@ msgstr "gnome-pomodoro 0.26.0 更新概览"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "GNOME Shell下的程序指示器"
+msgstr "支持 GNOME Shell 47"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
@@ -227,12 +227,12 @@ msgstr "gnome-pomodoro 0.25.1 更新概览"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "GNOME Shell下的程序指示器"
+msgstr "修复了 GNOME Shell 46 的问题"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "GNOME Shell下的程序指示器"
+msgstr "停止支持 GNOME Shell 45"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 #, fuzzy
@@ -242,7 +242,7 @@ msgstr "gnome-pomodoro 0.25.0 更新概览"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "GNOME Shell下的程序指示器"
+msgstr "支持 GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 #, fuzzy
@@ -309,13 +309,13 @@ msgstr "打印版本信息并退出"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "开始/停止"
+msgstr "开始或停止"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
-msgstr "暂停/继续"
+msgstr "开始、暂停或继续"
 
 #: src/application.vala:490 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
@@ -336,7 +336,7 @@ msgstr "聚焦窗口"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "自定义动作……"
+msgstr "自定义动作“%s”失败"
 
 #: src/core/command.vala:379
 #, fuzzy
@@ -346,7 +346,7 @@ msgstr "已超时"
 #: src/core/command.vala:408
 #, fuzzy
 msgid "Failed to execute command"
-msgstr "未能开启扩展"
+msgstr "无法执行命令"
 
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
@@ -402,7 +402,7 @@ msgstr "其他"
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "开始计时"
+msgstr "已启动计时器。"
 
 #: src/core/event.vala:277
 #, fuzzy
@@ -523,7 +523,7 @@ msgstr "在会话因不活动即将被重置时触发。"
 #: src/core/notification-manager.vala:130
 #, fuzzy, c-format
 msgid "%s remaining"
-msgstr "剩余 %d 秒"
+msgstr "剩余 %s"
 
 #: src/core/notification-manager.vala:339
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
@@ -549,7 +549,7 @@ msgstr "番茄钟即将结束"
 #: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
 #, fuzzy
 msgid "Take a Break"
-msgstr "休息一下吧"
+msgstr "休息一下"
 
 #: src/core/notification-manager.vala:401
 msgid "Break is about to end"
@@ -576,13 +576,13 @@ msgstr "做好准备…"
 #: src/core/notification-manager.vala:473
 #, fuzzy
 msgid "Pomodoro is over!"
-msgstr "番茄计时器"
+msgstr "番茄钟结束了！"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "休息结束"
+msgstr "休息结束了！"
 
 #: src/core/notification-manager.vala:489
 #, fuzzy
@@ -628,7 +628,7 @@ msgstr "文件类型不支持"
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "停止"
+msgstr "已停止"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
@@ -748,7 +748,7 @@ msgstr "倒计时开始的时间。"
 #: src/integrations/portal/global-shortcuts-provider.vala:298
 #, fuzzy
 msgid "Unused"
-msgstr "已暂停"
+msgstr "未使用"
 
 #: src/ui/log/log-window.ui:6
 #, fuzzy
@@ -908,7 +908,7 @@ msgstr "不允许安装扩展"
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
 #, fuzzy
 msgid "Failed to download the extension"
-msgstr "未能开启扩展"
+msgstr "无法下载扩展"
 
 #: src/ui/main/stats/stats-day-page.ui:104
 #: src/ui/main/stats/stats-day-page.vala:92
@@ -918,7 +918,7 @@ msgstr "未能开启扩展"
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
-msgstr "休息"
+msgstr "休息次数"
 
 #: src/ui/main/stats/stats-day-page.ui:111
 #: src/ui/main/stats/stats-month-page.ui:48
@@ -934,7 +934,7 @@ msgstr "干扰"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "短休息时长"
+msgstr "休息比例"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -954,7 +954,7 @@ msgstr "月"
 #: src/ui/main/stats/stats-view.ui:39
 #, fuzzy
 msgid "Nothing to see here yet"
-msgstr "还没有统计信息"
+msgstr "暂无统计信息"
 
 #: src/ui/main/stats/stats-view.ui:40
 #, fuzzy
@@ -989,7 +989,7 @@ msgstr "昨天"
 
 #: src/ui/main/stats/stats-view.vala:1028
 msgid "This week"
-msgstr "今周"
+msgstr "本周"
 
 #: src/ui/main/stats/stats-view.vala:1048
 #, fuzzy, c-format
@@ -1004,26 +1004,26 @@ msgstr "%2$u 年第 %1$u 周"
 #: src/ui/main/timer/compact-timer-view.ui:8 src/ui/main/timer/menus.ui:6
 #: src/ui/main/timer/menus.ui:22
 msgid "_Pomodoro"
-msgstr "番茄计时器"
+msgstr "番茄计时器(_P)"
 
 #: src/ui/main/timer/compact-timer-view.ui:13 src/ui/main/timer/menus.ui:10
 msgid "_Short Break"
-msgstr "短休息"
+msgstr "短休息(_S)"
 
 #: src/ui/main/timer/compact-timer-view.ui:18 src/ui/main/timer/menus.ui:14
 msgid "_Long Break"
-msgstr "长休息"
+msgstr "长休息(_L)"
 
 #: src/ui/main/timer/compact-timer-view.vala:74
 #: src/ui/main/timer/timer-view.vala:130
 #, fuzzy
 msgid "Finished!"
-msgstr ""
+msgstr "已完成！"
 
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "休息"
+msgstr "休息(_B)"
 
 #: src/ui/main/timer/timer-view.ui:23
 #, fuzzy
@@ -1038,12 +1038,12 @@ msgstr "会话已过期"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "长休息时长"
+msgstr "将在 <b>%s</b> 后进行长休息"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
 msgid "Rewind one minute"
-msgstr "%d 分钟"
+msgstr "快退一分钟"
 
 #: src/ui/main/window.ui:8
 #, fuzzy
@@ -1100,7 +1100,7 @@ msgstr "退出"
 #: src/ui/main/window.vala:332
 #, fuzzy
 msgid "Run in background"
-msgstr "作为后台服务运行"
+msgstr "在后台运行"
 
 #: src/ui/overlays/screen-overlay.ui:65
 msgid "It's time to take a break"
@@ -1110,7 +1110,7 @@ msgstr "是时候休息一下了"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "计时器窗口"
+msgstr "主窗口"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 #, fuzzy
@@ -1126,7 +1126,7 @@ msgstr "偏好紧凑视图"
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "开始"
+msgstr "已启动"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
@@ -1136,7 +1136,7 @@ msgstr "已暂停"
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "自定义动作……"
+msgstr "编辑自定义动作"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
@@ -1155,7 +1155,7 @@ msgstr "名称"
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
 #, fuzzy
 msgid "Trigger"
-msgstr "触发"
+msgstr "触发器"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
 #, fuzzy
@@ -1203,7 +1203,7 @@ msgstr "过滤器"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "命令"
+msgstr "Shell 命令"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
@@ -1258,7 +1258,7 @@ msgstr "阻塞其他命令的执行，直到此命令完成。"
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "动作"
+msgstr "删除动作(_D)"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 #, fuzzy
@@ -1268,7 +1268,7 @@ msgstr "尚未指定事件。"
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "自定义动作……"
+msgstr "添加自定义动作"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 #, fuzzy
@@ -1288,7 +1288,7 @@ msgstr "选择(_S)"
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "状态时长"
+msgstr "未命名动作"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
@@ -1376,7 +1376,7 @@ msgstr "运行中"
 #: src/ui/preferences/automation/action/condition-widget.vala:121
 #, fuzzy
 msgid "Duration"
-msgstr "状态时长"
+msgstr "时长"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
@@ -1410,7 +1410,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "键盘快捷键"
+msgstr "设置快捷键"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 #, fuzzy
@@ -1421,7 +1421,7 @@ msgstr "设置(_S)"
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
 #, fuzzy
 msgid "Disabled"
-msgstr "禁用"
+msgstr "已禁用"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
 #, fuzzy
@@ -1512,7 +1512,7 @@ msgstr "时间即将耗尽"
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
 #, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
-msgstr "番茄钟即将结束"
+msgstr "番茄钟或休息即将结束时发出通知。"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
@@ -1609,7 +1609,7 @@ msgstr "键盘快捷键"
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "自定义动作……"
+msgstr "自动化"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 #, fuzzy
@@ -1624,18 +1624,18 @@ msgstr "警报声音"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "番茄钟即将结束"
+msgstr "番茄钟完成后的声音"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "休息即将结束"
+msgstr "休息结束后的声音"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
 #, fuzzy
 msgid "Background Sound"
-msgstr "滴答声"
+msgstr "背景声音"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
 msgid "Bell"
@@ -1710,7 +1710,7 @@ msgstr "开始休息前需确认"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
 #, fuzzy
 msgid "Confirm Starting a Pomodoro"
-msgstr "启动番茄计时器"
+msgstr "开始番茄钟前需确认"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87

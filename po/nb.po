@@ -28,12 +28,12 @@ msgstr "@APPLICATION_NAME@"
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
 #, fuzzy
 msgid "Time management utility"
-msgstr "Et enkelt pauseverktøy"
+msgstr "Verktøy for tidsstyring"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
 msgid "timer;"
-msgstr "timer;"
+msgstr "timer;tidtaker;nedtelling;"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
 #: src/core/notification-manager.vala:335 src/core/state.vala:78
@@ -79,7 +79,7 @@ msgstr "Tilpassbare lengder for arbeidsøkter og pauser"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
-msgstr "Skjul andre varsler"
+msgstr "Visuelle varsler og lydvarsler"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
 #, fuzzy
@@ -99,7 +99,7 @@ msgstr "Skjermoverlegg under pauser"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "Forleng gjeldende pomodoro eller pause"
+msgstr "Kjør egendefinerte kommandoer etter Pomodoro eller pause"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -109,12 +109,12 @@ msgstr "Kamil Prusko"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:37
 #: src/ui/preferences/preferences-window.vala:30
 msgid "Timer"
-msgstr "Timer"
+msgstr "Tidtaker"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
-msgstr "Stopp timer"
+msgstr "Kompakt tidtaker"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
 #, fuzzy
@@ -159,7 +159,7 @@ msgstr "Oversikt over endringer i gnome-pomodoro 0.28.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
 #, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
-msgstr "Indikator for GNOME-skallet"
+msgstr "Støtte for GNOME Shell 49 (takk til @aleasto)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
 #, fuzzy
@@ -174,7 +174,7 @@ msgstr "Oversikt over endringer i gnome-pomodoro 0.27.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
-msgstr "Indikator for GNOME-skallet"
+msgstr "Støtte for GNOME Shell 48"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
 #, fuzzy
@@ -194,7 +194,7 @@ msgstr "Oversikt over endringer i gnome-pomodoro 0.26.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
-msgstr "Indikator for GNOME-skallet"
+msgstr "Støtte for GNOME Shell 47"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
@@ -229,12 +229,12 @@ msgstr "Oversikt over endringer i gnome-pomodoro 0.25.1"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
-msgstr "Indikator for GNOME-skallet"
+msgstr "Rettelser for GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
-msgstr "Indikator for GNOME-skallet"
+msgstr "Fjernet støtte for GNOME Shell 45"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
 #, fuzzy
@@ -244,7 +244,7 @@ msgstr "Oversikt over endringer i gnome-pomodoro 0.25.0"
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
-msgstr "Indikator for GNOME-skallet"
+msgstr "Støtte for GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
 #, fuzzy
@@ -269,13 +269,13 @@ msgstr "Stopp"
 
 #: src/application.vala:51
 msgid "Pause/Resume"
-msgstr "Avbryt/Fortsett"
+msgstr "Pause/Fortsett"
 
 #: src/application.vala:54 src/application.vala:486 src/core/event.vala:284
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:83
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:71
 msgid "Pause"
-msgstr "Avbryt"
+msgstr "Pause"
 
 #: src/application.vala:57 src/application.vala:488 src/core/event.vala:292
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:97
@@ -311,13 +311,13 @@ msgstr "Vis versjonsinformasjon og avslutt"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
-msgstr "Start/Stopp"
+msgstr "Start eller Stopp"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
-msgstr "Avbryt/Fortsett"
+msgstr "Start, Pause eller Fortsett"
 
 #: src/application.vala:490 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
@@ -338,7 +338,7 @@ msgstr "Hent til forgrunnen"
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "Egendefinerte handlinger…"
+msgstr "Egendefinert handling \"%s\" feilet"
 
 #: src/core/command.vala:379
 #, fuzzy
@@ -348,7 +348,7 @@ msgstr "Tidsavbrudd nådd"
 #: src/core/command.vala:408
 #, fuzzy
 msgid "Failed to execute command"
-msgstr "Kunne ikke slå på utvidelsen"
+msgstr "Kunne ikke utføre kommando"
 
 #: src/core/command.vala:491 src/core/command.vala:506
 #, fuzzy
@@ -404,7 +404,7 @@ msgstr "Annet"
 #: src/core/event.vala:269
 #, fuzzy
 msgid "Started the timer."
-msgstr "Start timer"
+msgstr "Startet tidtakeren."
 
 #: src/core/event.vala:277
 #, fuzzy
@@ -589,7 +589,7 @@ msgstr "Pomodoro er ferdig!"
 #: src/core/notification-manager.vala:479
 #, fuzzy
 msgid "Break is over!"
-msgstr "Pausen er over"
+msgstr "Pausen er over!"
 
 #: src/core/notification-manager.vala:489
 #, fuzzy
@@ -635,7 +635,7 @@ msgstr "Filtypen støttes ikke"
 #: src/ui/preferences/automation/action/condition-widget.ui:55
 #, fuzzy
 msgid "Stopped"
-msgstr "Stopp"
+msgstr "Stoppet"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
@@ -757,7 +757,7 @@ msgstr "Tidspunktet når nedtellingen startet."
 #: src/integrations/portal/global-shortcuts-provider.vala:298
 #, fuzzy
 msgid "Unused"
-msgstr "Satt på pause"
+msgstr "Ubrukt"
 
 #: src/ui/log/log-window.ui:6
 #, fuzzy
@@ -899,7 +899,7 @@ msgstr "_Prøv igjen"
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
 #, fuzzy
 msgid "_Abort"
-msgstr "_Om"
+msgstr "_Avbryt"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
 #, fuzzy
@@ -914,7 +914,7 @@ msgstr "Installasjon av utvidelser er ikke tillatt"
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
 #, fuzzy
 msgid "Failed to download the extension"
-msgstr "Kunne ikke slå på utvidelsen"
+msgstr "Kunne ikke laste ned utvidelsen"
 
 #: src/ui/main/stats/stats-day-page.ui:104
 #: src/ui/main/stats/stats-day-page.vala:92
@@ -924,7 +924,7 @@ msgstr "Kunne ikke slå på utvidelsen"
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
-msgstr "Pause"
+msgstr "Pauser"
 
 #: src/ui/main/stats/stats-day-page.ui:111
 #: src/ui/main/stats/stats-month-page.ui:48
@@ -940,7 +940,7 @@ msgstr "Avbrytelser"
 #: src/ui/main/stats/stats-week-page.ui:59
 #, fuzzy
 msgid "Break Ratio"
-msgstr "Lengde, kort pause"
+msgstr "Pauseandel"
 
 #: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
 #: src/ui/main/stats/widgets/stats-date-popover.ui:22
@@ -960,7 +960,7 @@ msgstr "Måned"
 #: src/ui/main/stats/stats-view.ui:39
 #, fuzzy
 msgid "Nothing to see here yet"
-msgstr "Ingenting her ennå"
+msgstr "Ingenting å se her ennå"
 
 #: src/ui/main/stats/stats-view.ui:40
 #, fuzzy
@@ -1032,7 +1032,7 @@ msgstr "Ferdig!"
 #: src/ui/main/timer/menus.ui:26
 #, fuzzy
 msgid "_Break"
-msgstr "Pause"
+msgstr "_Pause"
 
 #: src/ui/main/timer/timer-view.ui:23
 #, fuzzy
@@ -1047,7 +1047,7 @@ msgstr "Økten har utløpt"
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "Lengde, lang pause"
+msgstr "Lang pause om <b>%s</b>"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
 #, fuzzy
@@ -1111,7 +1111,7 @@ msgstr "Avslutt"
 #: src/ui/main/window.vala:332
 #, fuzzy
 msgid "Run in background"
-msgstr "Kjør som bakgrunnstjeneste"
+msgstr "Kjør i bakgrunnen"
 
 #: src/ui/overlays/screen-overlay.ui:65
 msgid "It's time to take a break"
@@ -1121,7 +1121,7 @@ msgstr "På tide med en pause"
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
 #, fuzzy
 msgid "Main Window"
-msgstr "Tidtakervindu"
+msgstr "Hovedvindu"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
 #, fuzzy
@@ -1137,7 +1137,7 @@ msgstr "Foretrekk kompakt visning"
 #: src/ui/preferences/automation/action/condition-widget.vala:117
 #, fuzzy
 msgid "Started"
-msgstr "Start"
+msgstr "Startet"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
@@ -1147,7 +1147,7 @@ msgstr "Satt på pause"
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
 #, fuzzy
 msgid "Edit Custom Action"
-msgstr "Egendefinerte handlinger…"
+msgstr "Rediger egendefinert handling"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:39
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
@@ -1166,7 +1166,7 @@ msgstr "Navn"
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
 #, fuzzy
 msgid "Trigger"
-msgstr "Triggere"
+msgstr "Utløser"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
 #, fuzzy
@@ -1215,12 +1215,12 @@ msgstr "Filter"
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
 #, fuzzy
 msgid "Shell Command"
-msgstr "Kommando"
+msgstr "Shell-kommando"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
 #, fuzzy
 msgid "Commands"
-msgstr "Kommando"
+msgstr "Kommandoer"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
 #, fuzzy
@@ -1270,7 +1270,7 @@ msgstr "Blokker kjøring av andre kommandoer til kommandoen er ferdig."
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
 #, fuzzy
 msgid "_Delete Action"
-msgstr "Handling"
+msgstr "_Slett handling"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
 #, fuzzy
@@ -1280,7 +1280,7 @@ msgstr "Ingen hendelser er spesifisert ennå."
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
 #, fuzzy
 msgid "Add Custom Action"
-msgstr "Egendefinerte handlinger…"
+msgstr "Legg til egendefinert handling"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
 #, fuzzy
@@ -1300,7 +1300,7 @@ msgstr "_Velg"
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
 #, fuzzy
 msgid "Untitled action"
-msgstr "Tilstandens varighet"
+msgstr "Navnløs handling"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
 #, fuzzy
@@ -1388,7 +1388,7 @@ msgstr "Kjører"
 #: src/ui/preferences/automation/action/condition-widget.vala:121
 #, fuzzy
 msgid "Duration"
-msgstr "Tilstandens varighet"
+msgstr "Varighet"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
@@ -1423,7 +1423,7 @@ msgstr ""
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
 #, fuzzy
 msgid "Set Shortcut"
-msgstr "Hurtigtast"
+msgstr "Angi hurtigtast"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
 #, fuzzy
@@ -1434,7 +1434,7 @@ msgstr "_Angi"
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
 #, fuzzy
 msgid "Disabled"
-msgstr "Slå av"
+msgstr "Deaktivert"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
 #, fuzzy
@@ -1527,7 +1527,7 @@ msgstr "Tiden er i ferd med å gå ut"
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
 #, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
-msgstr "Pomodoro snart slutt"
+msgstr "Varsle når Pomodoro eller pause er i ferd med å slutte."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
@@ -1624,7 +1624,7 @@ msgstr "Hurtigtaster"
 #: src/ui/preferences/preferences-window.vala:71
 #, fuzzy
 msgid "Automation"
-msgstr "Egendefinerte handlinger…"
+msgstr "Automasjon"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
 #, fuzzy
@@ -1639,18 +1639,18 @@ msgstr "Varsellyder"
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
 #, fuzzy
 msgid "Pomodoro Finished Sound"
-msgstr "Pomodoro snart slutt"
+msgstr "Lyd ved ferdig Pomodoro"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
 #, fuzzy
 msgid "Break Finished Sound"
-msgstr "Pausen er snart slutt"
+msgstr "Lyd ved ferdig pause"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
 #, fuzzy
 msgid "Background Sound"
-msgstr "Klikkelyd"
+msgstr "Bakgrunnslyd"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
 msgid "Bell"
@@ -1666,7 +1666,7 @@ msgstr "Tikking av klokke"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:25
 msgid "Timer Ticking"
-msgstr "Klikking av timer"
+msgstr "Klikking av tidtaker"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:26
 #, fuzzy
@@ -1690,17 +1690,17 @@ msgstr "Velg egendefinert lyd"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:20
 #, fuzzy
 msgid "Pomodoro Duration"
-msgstr "Lengde, Pomodoro"
+msgstr "Varighet for Pomodoro"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:31
 #, fuzzy
 msgid "Short Break Duration"
-msgstr "Lengde, kort pause"
+msgstr "Varighet for kort pause"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:42
 #, fuzzy
 msgid "Long Break Duration"
-msgstr "Lengde, lang pause"
+msgstr "Varighet for lang pause"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:53
 #, fuzzy
@@ -1725,7 +1725,7 @@ msgstr "Bekreft start av en pause"
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
 #, fuzzy
 msgid "Confirm Starting a Pomodoro"
-msgstr "Start Pomodoro"
+msgstr "Bekreft start av en Pomodoro"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87
@@ -1762,26 +1762,26 @@ msgstr "Sidestolpe"
 #~ msgstr "Kjør som bakgrunnstjeneste"
 
 #~ msgid "About Pomodoro"
-#~ msgstr "Om Pomodorosta"
+#~ msgstr "Om Pomodoro"
 
 #~ msgid "A simple time management utility"
 #~ msgstr "Et enkelt pauseverktøy"
 
 #, fuzzy
 #~ msgid "_Stopped"
-#~ msgstr "Stopp"
+#~ msgstr "_Stoppet"
 
 #, fuzzy
 #~ msgid "Extension for GNOME Shell is available"
-#~ msgstr "Indikator for GNOME-skallet"
+#~ msgstr "Utvidelse for GNOME Shell er tilgjengelig"
 
 #, fuzzy
 #~ msgid "Failed to install extension"
-#~ msgstr "Kunne ikke slå på utvidelsen"
+#~ msgstr "Kunne ikke installere utvidelse"
 
 #, fuzzy, c-format
 #~ msgid "Long break due in %s"
-#~ msgstr "Lengde, lang pause"
+#~ msgstr "Lang pause om %s"
 
 #~ msgid "A time management utility for GNOME"
 #~ msgstr "Et pauseverktøy for GNOME"
@@ -1803,46 +1803,47 @@ msgstr "Sidestolpe"
 
 #, fuzzy
 #~ msgid "Support for GNOME Shell 42 (@milotype and @kappa)"
-#~ msgstr "Indikator for GNOME-skallet"
+#~ msgstr "Støtte for GNOME Shell 42 (@milotype og @kappa)"
 
 #, fuzzy
 #~ msgid "Support for GNOME Shell 41 (@mbooth101)"
-#~ msgstr "Indikator for GNOME-skallet"
+#~ msgstr "Støtte for GNOME Shell 41 (@mbooth101)"
 
 #, fuzzy
 #~ msgid "Support GNOME Shell 40.0, not 4.0"
-#~ msgstr "Indikator for GNOME-skallet"
+#~ msgstr "Støtte GNOME Shell 40.0, ikke 4.0"
 
 #, fuzzy
 #~ msgid "Support for GNOME Shell 4.0"
-#~ msgstr "Indikator for GNOME-skallet"
+#~ msgstr "Støtte for GNOME Shell 4.0"
 
 #, fuzzy
 #~ msgid "Support for GNOME Shell 3.38 (@ignapk and @szpak)"
-#~ msgstr "Indikator for GNOME-skallet"
+#~ msgstr "Støtte for GNOME Shell 3.38 (@ignapk og @szpak)"
 
 #, fuzzy
 #~ msgid "Support for GNOME Shell 3.36"
-#~ msgstr "Indikator for GNOME-skallet"
+#~ msgstr "Støtte for GNOME Shell 3.36"
 
 #, fuzzy
 #~ msgid "Support for GNOME Shell 3.34 only"
-#~ msgstr "Indikator for GNOME-skallet"
+#~ msgstr "Støtte bare for GNOME Shell 3.34"
 
 #, fuzzy
 #~ msgid "Support for GNOME Shell 3.32 (@demokritos)"
-#~ msgstr "Indikator for GNOME-skallet"
+#~ msgstr "Støtte for GNOME Shell 3.32 (@demokritos)"
 
 #, fuzzy
 #~ msgid "Support for GNOME Shell 3.28 and 3.30 (@aerostitch)"
-#~ msgstr "Indikator for GNOME-skallet"
+#~ msgstr "Støtte for GNOME Shell 3.28 og 3.30 (@aerostitch)"
 
 #~ msgid "_Timer"
 #~ msgstr "_Tidtaker"
 
 #~ msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
 #~ msgstr ""
-#~ "Hurtigtast for å starte/stoppe timeren. Trykk ny hurtigtast for å endre."
+#~ "Hurtigtast for å starte/stoppe tidtakeren. Trykk ny hurtigtast for å "
+#~ "endre."
 
 #~ msgid "Pomodoros before a long break"
 #~ msgstr "Antall Pomodoro før lang pause"
@@ -1893,13 +1894,13 @@ msgstr "Sidestolpe"
 #~ msgstr "Forløpt tid"
 
 #~ msgid "Pause Timer"
-#~ msgstr "Interrupt"
+#~ msgstr "Pause tidtaker"
 
 #~ msgid "Pause break"
-#~ msgstr "Avbryt"
+#~ msgstr "Pause"
 
 #~ msgid "Pause Pomodoro"
-#~ msgstr "Avbryt"
+#~ msgstr "Pause"
 
 #~ msgid "Resume break"
 #~ msgstr "Fortsett"
@@ -1957,7 +1958,7 @@ msgstr "Sidestolpe"
 #~ msgstr[1] "Du har %d sekunder"
 
 #~ msgid "Take a longer break"
-#~ msgstr "Ta en legre pause"
+#~ msgstr "Ta en lengre pause"
 
 #~ msgid "Lengthen it"
 #~ msgstr "Forleng den"
