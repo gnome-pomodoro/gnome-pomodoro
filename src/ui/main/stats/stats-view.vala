@@ -1001,20 +1001,20 @@ namespace Pomodoro
                     if (date.compare (today) == 0) {
                         title = _("Today");
                         subtitle += capitalize_words (
-                                Pomodoro.DateUtils.format_date (date, ", %e %B").chug ());
+                                Pomodoro.DateUtils.format_date (date, ", %e %B").replace (" ", ""));
                     }
                     else if (date.days_between (today) == 1) {
                         title = _("Yesterday");
                         subtitle += capitalize_words (
-                                Pomodoro.DateUtils.format_date (date, ", %e %B").chug ());
+                                Pomodoro.DateUtils.format_date (date, ", %e %B").replace (" ", ""));
                     }
                     else if (date.get_year () == today.get_year ()) {
                         title = capitalize_words (
-                                Pomodoro.DateUtils.format_date (date, "%e %B").chug ());
+                                Pomodoro.DateUtils.format_date (date, "%e %B").replace (" ", ""));
                     }
                     else {
                         title = capitalize_words (
-                                Pomodoro.DateUtils.format_date (date, "%e %B %Y").chug ());
+                                Pomodoro.DateUtils.format_date (date, "%e %B %Y").replace (" ", ""));
                     }
 
                     break;
@@ -1061,8 +1061,8 @@ namespace Pomodoro
                     }
 
                     subtitle = capitalize_words ("%s – %s".printf (
-                        Pomodoro.DateUtils.format_date (week_start_date, week_start_format).chug (),
-                        Pomodoro.DateUtils.format_date (week_end_date, week_end_format).chug ()));
+                        Pomodoro.DateUtils.format_date (week_start_date, week_start_format).replace (" ", ""),
+                        Pomodoro.DateUtils.format_date (week_end_date, week_end_format).replace (" ", "")));
                     break;
 
                 case Pomodoro.Timeframe.MONTH:
