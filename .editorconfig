@@ -1,0 +1,42 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+trim_trailing_whitespace = true
+
+[*.vala]
+indent_size = 4
+tab_size = 4
+indent_style = space
+max_line_length = 100
+
+[*.css]
+indent_size = 4
+tab_size = 4
+indent_style = space
+
+[*.json]
+indent_size = 2
+tab_size = 2
+indent_style = space
+
+[*.ui]
+indent_size = 2
+tab_size = 2
+indent_style = space
+
+[*.{xml.in,xml}]
+indent_size = 2
+tab_size = 2
+indent_style = space
+
+[meson.build]
+indent_size = 2
+indent_style = space
+
+[NEWS]
+indent_size = 2
+tab_size = 2
+indent_style = space
+max_line_length = 72

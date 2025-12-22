@@ -1,0 +1,134 @@
+/*
+ * Copyright (c) 2016-2025 gnome-pomodoro contributors
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
+using GLib;
+
+
+namespace Pomodoro
+{
+    public class TimerActionGroup : GLib.SimpleActionGroup
+    {
+        public Pomodoro.Timer timer { get; construct; }
+
+        public TimerActionGroup ()
+        {
+            GLib.Object (
+                timer: Pomodoro.Timer.get_default ()
+            );
+        }
+
+        public TimerActionGroup.with_timer (Pomodoro.Timer timer)
+        {
+            GLib.Object (
+                timer: timer
+            );
+        }
+
+        construct
+        {
+            var start_action = new GLib.SimpleAction ("start", null);
+            start_action.activate.connect (this.activate_start);
+            this.add_action (start_action);
+
+            var reset_action = new GLib.SimpleAction ("reset", null);
+            reset_action.activate.connect (this.activate_reset);
+            this.add_action (reset_action);
+
+            var pause_action = new GLib.SimpleAction ("pause", null);
+            pause_action.activate.connect (this.activate_pause);
+            this.add_action (pause_action);
+
+            var resume_action = new GLib.SimpleAction ("resume", null);
+            resume_action.activate.connect (this.activate_resume);
+            this.add_action (resume_action);
+
+            var rewind_action = new GLib.SimpleAction ("rewind", null);
+            rewind_action.activate.connect (this.activate_rewind);
+            this.add_action (rewind_action);
+
+            var toggle_action = new GLib.SimpleAction ("toggle", null);  // alias for start-stop
+            toggle_action.activate.connect (this.activate_start_stop);
+            this.add_action (toggle_action);
+
+            var start_stop_action = new GLib.SimpleAction ("start-stop", null);
+            start_stop_action.activate.connect (this.activate_start_stop);
+            this.add_action (start_stop_action);
+
+            var start_pause_resume_action = new GLib.SimpleAction ("start-pause-resume", null);
+            start_pause_resume_action.activate.connect (this.activate_start_pause_resume);
+            this.add_action (start_pause_resume_action);
+        }
+
+        private void activate_start (GLib.SimpleAction action,
+                                     GLib.Variant?     parameter)
+        {
+            Pomodoro.Context.set_event_source ("timer.start");
+            this.timer.start ();
+        }
+
+        private void activate_reset (GLib.SimpleAction action,
+                                     GLib.Variant?     parameter)
+        {
+            Pomodoro.Context.set_event_source ("timer.reset");
+            this.timer.reset ();
+        }
+
+        private void activate_pause (GLib.SimpleAction action,
+                                     GLib.Variant?     parameter)
+        {
+            Pomodoro.Context.set_event_source ("timer.pause");
+            this.timer.pause ();
+        }
+
+        private void activate_resume (GLib.SimpleAction action,
+                                      GLib.Variant?     parameter)
+        {
+            Pomodoro.Context.set_event_source ("timer.resume");
+            this.timer.resume ();
+        }
+
+        private void activate_rewind (GLib.SimpleAction action,
+                                      GLib.Variant?     parameter)
+        {
+            // TODO: take microseconds from param
+
+            Pomodoro.Context.set_event_source ("timer.rewind");
+            this.timer.rewind (Pomodoro.Interval.MINUTE);
+        }
+
+        private void activate_start_stop (GLib.SimpleAction action,
+                                          GLib.Variant?     parameter)
+        {
+            if (!this.timer.is_started ()) {
+                Pomodoro.Context.set_event_source ("timer.start");
+                this.timer.start ();
+            }
+            else {
+                Pomodoro.Context.set_event_source ("timer.reset");
+                this.timer.reset ();
+            }
+        }
+
+        private void activate_start_pause_resume (GLib.SimpleAction action,
+                                                  GLib.Variant?     parameter)
+        {
+            if (!this.timer.is_started ()) {
+                Pomodoro.Context.set_event_source ("timer.start");
+                this.timer.start ();
+            }
+            else if (this.timer.is_paused ()) {
+                Pomodoro.Context.set_event_source ("timer.resume");
+                this.timer.resume ();
+            }
+            else {
+                Pomodoro.Context.set_event_source ("timer.pause");
+                this.timer.pause ();
+            }
+        }
+    }
+}

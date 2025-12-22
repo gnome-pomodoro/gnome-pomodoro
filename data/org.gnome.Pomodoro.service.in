@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=org.gnome.Pomodoro
-Exec=@bindir@/gnome-pomodoro --no-default-window

@@ -1,16 +1,18 @@
 # French translation for gnome-pomodoro
 # Copyright (c) 2012 gnome-pomodoro contributors
 # This file is distributed under the same license as the gnome-pomodoro package.
+#
+# Authors:
 # Benjamin Danon <benjamin@sphax3d.org>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-pomodoro\n"
+"Project-Id-Version: gnome-pomodoro 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-24 15:30+0100\n"
+"POT-Creation-Date: 2025-12-20 11:56+0100\n"
 "PO-Revision-Date: 2023-03-25 11:39+0100\n"
 "Last-Translator: Bastien Traverse <bt@esrevart.net>\n"
-"Language-Team: \n"
+"Language-Team: French\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,599 +20,1978 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n>1;\n"
 "X-Generator: Poedit 3.1.1\n"
 
-#: data/org.gnome.Pomodoro.appdata.xml:8 data/org.gnome.Pomodoro.desktop.in:3
-#: data/resources/menus.ui:28 data/resources/window.ui:382
-#: plugins/actions/enums.vala:92 plugins/gnome/extension/indicator.js:77
-#: plugins/gnome/extension/indicator.js:729
-#: plugins/gnome/extension/notifications.js:281
-#: plugins/gnome/extension/timer.js:41 src/about-dialog.vala:31
-#: src/main.vala:50 src/notifications-capability.vala:129
-#: src/stats-page.vala:527 src/window.vala:44
+#. Translators: Do NOT translate or transliterate this text
+#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:3
+msgid "@APPLICATION_NAME@"
+msgstr ""
+
+#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
+#, fuzzy
+msgid "Time management utility"
+msgstr "Utilitaire de gestion du temps"
+
+#. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
+msgid "timer;"
+msgstr "minuteur;pomodoro;"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
+#: src/core/notification-manager.vala:335 src/core/state.vala:78
+#: src/main.vala:34 src/ui/main/dialogs/about-dialog.vala:16
+#: src/ui/main/stats/stats-day-page.ui:97
+#: src/ui/main/stats/stats-day-page.vala:87
+#: src/ui/main/stats/stats-month-page.ui:34
+#: src/ui/main/stats/stats-month-page.vala:43
+#: src/ui/main/stats/stats-week-page.ui:38
+#: src/ui/main/stats/stats-week-page.vala:41 src/ui/main/window.vala:183
+#: src/ui/preferences/automation/action/condition-widget.ui:53
 msgid "Pomodoro"
 msgstr "Pomodoro"
 
-#: data/org.gnome.Pomodoro.appdata.xml:9
-msgid "A time management utility for GNOME"
-msgstr "Un utilitaire de gestion du temps pour GNOME"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:10
+#, fuzzy
+msgid "Maintain focus by taking frequent breaks"
+msgstr "Restez concentré en prenant des pauses fréquentes"
 
-#: data/org.gnome.Pomodoro.appdata.xml:11
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:12
+#, fuzzy
 msgid ""
-"A GNOME utility that helps managing time according to Pomodoro Technique. It "
-"intends to improve productivity and focus by taking short breaks after every "
-"25 minutes of work."
+"A productivity timer that helps you work more effectively by breaking your "
+"time into focused work sessions followed by short breaks. Work for 25 "
+"minutes, then take a 5-minute break to maintain concentration and prevent "
+"burnout."
 msgstr ""
-"Un utilitaire GNOME qui aide à la gestion du temps selon la technique "
-"Pomodoro. Il vise à améliorer la productivité et la concentration en "
-"aménageant de courtes pauses toutes les 25 minutes de travail."
+"Un minuteur de productivité qui vous aide à travailler plus efficacement en "
+"divisant votre temps en sessions de travail concentré suivies de courtes "
+"pauses. Travaillez pendant 25 minutes, puis prenez une pause de 5 minutes "
+"pour maintenir votre concentration et éviter l'épuisement."
 
-#: data/org.gnome.Pomodoro.appdata.xml:23
-msgid "Timer window"
-msgstr "Fenêtre de la minuterie"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:16
+#, fuzzy
+msgid "Key features:"
+msgstr "Caractéristiques principales :"
 
-#: data/org.gnome.Pomodoro.appdata.xml:27
-#: plugins/gnome/extension/indicator.js:83 src/preferences-dialog.vala:800
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:20
+#, fuzzy
+msgid "Customizable work session and break lengths"
+msgstr "Durées des sessions de travail et des pauses personnalisables"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
+#, fuzzy
+msgid "Visual and audio notifications"
+msgstr "Notifications visuelles et sonores"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
+#, fuzzy
+msgid "Time tracking and statistics"
+msgstr "Suivi du temps et statistiques"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:23
+#, fuzzy
+msgid "GNOME desktop integration"
+msgstr "Intégration au bureau GNOME"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:24
+#, fuzzy
+msgid "Screen overlay during breaks"
+msgstr "Superposition d'écran pendant les pauses"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
+#, fuzzy
+msgid "Run custom commands after Pomodoro or break"
+msgstr "Exécuter des commandes personnalisées après un Pomodoro ou une pause"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
+msgid "Kamil Prusko"
+msgstr ""
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:67 src/ui/main/window.ui:76
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:37
+#: src/ui/preferences/preferences-window.vala:30
+msgid "Timer"
+msgstr "Minuteur"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
+#, fuzzy
+msgid "Compact timer"
+msgstr "Minuteur compact"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
+#, fuzzy
+msgid "Daily stats"
+msgstr "Statistiques quotidiennes"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:79
+#, fuzzy
+msgid "Monthly stats"
+msgstr "Statistiques mensuelles"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:83
+#: src/ui/preferences/preferences-window.ui:6
 msgid "Preferences"
 msgstr "Préférences"
 
-#: data/org.gnome.Pomodoro.appdata.xml:31
-msgid "Indicator for GNOME Shell"
-msgstr "Indicateur pour GNOME Shell"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:87
+#, fuzzy
+msgid "Screen overlay"
+msgstr "Superposition d'écran"
 
-#: data/org.gnome.Pomodoro.desktop.in:4 src/about-dialog.vala:32
-msgid "A simple time management utility"
-msgstr "Un outil simple de gestion du temps"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:95
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.28.1"
+msgstr "Aperçu des changements dans gnome-pomodoro 0.28.1"
 
-#: data/org.gnome.Pomodoro.desktop.in:5
-msgid "timer;"
-msgstr "minuterie;"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:97
+#, fuzzy
+msgid "Added Tamil translation (thanks @omeritzics)"
+msgstr "Ajout de la traduction tamoule (merci @omeritzics)"
 
-#: data/resources/menus.ui:6 plugins/actions/enums.vala:188
-#: plugins/actions/resources/action-page.ui:155 src/application.vala:90
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:98
+#, fuzzy
+msgid "Added Hebrew translation (thanks @Killersparrow1)"
+msgstr "Ajout de la traduction hébraïque (merci @Killersparrow1)"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:104
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.28.0"
+msgstr "Aperçu des changements dans gnome-pomodoro 0.28.0"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
+#, fuzzy
+msgid "Support for GNOME Shell 49 (thanks @aleasto)"
+msgstr "Support de GNOME Shell 49 (merci @aleasto)"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
+#, fuzzy
+msgid "Updated German translation (thanks @daPhipz)"
+msgstr "Mise à jour de la traduction allemande (merci @daPhipz)"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:113
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.27.0"
+msgstr "Aperçu des changements dans gnome-pomodoro 0.27.0"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
+#, fuzzy
+msgid "Support for GNOME Shell 48"
+msgstr "Support de GNOME Shell 48"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
+#, fuzzy
+msgid "Split time spent across midnight"
+msgstr "Répartir le temps passé après minuit"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:117
+#, fuzzy
+msgid "Added Telugu translation (thanks @SpaciousCoder78)"
+msgstr "Ajout de la traduction télougou (merci @SpaciousCoder78)"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:123
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.26.0"
+msgstr "Aperçu des changements dans gnome-pomodoro 0.26.0"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
+#, fuzzy
+msgid "Support for GNOME Shell 47"
+msgstr "Support de GNOME Shell 47"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
+#, fuzzy
+msgid "Allow to dismiss screen overlay by gesture when a video is playing"
+msgstr "Permettre d'ignorer la superposition par geste pendant une vidéo"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:127
+#, fuzzy
+msgid "Added Georgian translation (thanks @NorwayFun)"
+msgstr "Ajout de la traduction géorgienne (merci @NorwayFun)"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:128
+#, fuzzy
+msgid "Adjusted translations in appdata (thanks @yakushabb)"
+msgstr "Ajustement des traductions dans appdata (merci @yakushabb)"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:134
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.25.2"
+msgstr "Aperçu des changements dans gnome-pomodoro 0.25.2"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:136
+#, fuzzy
+msgid "Fix keeping notification after extending Pomodoro"
+msgstr "Correction du maintien de la notification après extension du Pomodoro"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:142
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.25.1"
+msgstr "Aperçu des changements dans gnome-pomodoro 0.25.1"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
+#, fuzzy
+msgid "Fixes for GNOME Shell 46"
+msgstr "Corrections pour GNOME Shell 46"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
+#, fuzzy
+msgid "Drop support for GNOME Shell 45"
+msgstr "Fin du support pour GNOME Shell 45"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.25.0"
+msgstr "Aperçu des changements dans gnome-pomodoro 0.25.0"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
+#, fuzzy
+msgid "Support for GNOME Shell 46"
+msgstr "Support de GNOME Shell 46"
+
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
+#, fuzzy
+msgid "Adjust build script to meson 0.59.0 (thanks @mattst88)"
+msgstr ""
+"Ajustement du script de construction pour meson 0.59.0 (merci @mattst88)"
+
+#: src/application.vala:42
+#, fuzzy
+msgid "Start/Stop"
+msgstr "Commencer/Arrêter"
+
+#. Actions
+#: src/application.vala:45 src/application.vala:482 src/core/event.vala:268
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:57
 msgid "Start"
 msgstr "Commencer"
 
-#: data/resources/menus.ui:11 data/resources/window.ui:180
-#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:200
-#: src/application.vala:99
-msgid "Pause"
-msgstr "Interrompre"
-
-#: data/resources/menus.ui:16 plugins/actions/enums.vala:200
-#: plugins/actions/resources/action-page.ui:215 src/application.vala:102
-msgid "Resume"
-msgstr "Continuer"
-
-#: data/resources/menus.ui:21 data/resources/window.ui:207
-#: plugins/gnome/extension/indicator.js:221 src/application.vala:93
-#: src/window.vala:163 src/window.vala:176
+#: src/application.vala:48 src/application.vala:484 src/core/event.vala:276
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:139
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:64
 msgid "Stop"
 msgstr "Arrêter"
 
-#: data/resources/menus.ui:33 data/resources/window.ui:398
-#: plugins/actions/enums.vala:95 plugins/gnome/extension/indicator.js:78
-#: plugins/gnome/extension/timer.js:44 src/window.vala:45
-msgid "Short Break"
-msgstr "Courte pause"
-
-#: data/resources/menus.ui:38 data/resources/window.ui:414
-#: plugins/actions/enums.vala:98 plugins/gnome/extension/indicator.js:79
-#: plugins/gnome/extension/timer.js:47 src/window.vala:46
-msgid "Long Break"
-msgstr "Longue pause"
-
-#: data/resources/menus.ui:45
-msgid "_Timer"
-msgstr "_Minuteur"
-
-#: data/resources/menus.ui:49 data/resources/window.ui:309
-msgid "_Preferences"
-msgstr "_Préférences"
-
-#: data/resources/menus.ui:53 data/resources/window.ui:348
-msgid "_Quit"
-msgstr "_Quitter"
-
-#: data/resources/preferences-keyboard-shortcut-page.ui:29
-msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
-msgstr ""
-"Raccourci clavier pour basculer la minuterie. Entrez le nouveau raccourci à "
-"modifier."
-
-#: data/resources/preferences-keyboard-shortcut-page.ui:83
-#: plugins/actions/enums.vala:206 plugins/actions/resources/action-page.ui:245
-msgid "Disable"
-msgstr "Désactiver"
-
-#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:247
-msgid "Timer"
-msgstr "Minuterie"
-
-#: data/resources/preferences-main-page.ui:108
-msgid "Pomodoro duration"
-msgstr "Durée d'un pomodoro"
-
-#: data/resources/preferences-main-page.ui:160
-msgid "Break duration"
-msgstr "Durée de la pause"
-
-#: data/resources/preferences-main-page.ui:213
-msgid "Long break duration"
-msgstr "Durée d'une pause longue"
-
-#: data/resources/preferences-main-page.ui:245
-msgid "Pomodoros before a long break"
-msgstr "Pomodoros avant une longue pause"
-
-#: data/resources/preferences-main-page.ui:294
-msgid "Keyboard shortcut"
-msgstr "Raccourci clavier"
-
-#: data/resources/preferences-main-page.ui:357
-msgid "Notifications"
-msgstr "Notifications"
-
-#: data/resources/preferences-main-page.ui:400
-msgid "Screen notifications"
-msgstr "Notification à l'écran"
-
-#: data/resources/preferences-main-page.ui:460
-msgid "Desktop"
-msgstr "Bureau"
-
-#: data/resources/preferences-main-page.ui:509
-msgid "Wait for activity after a break"
-msgstr "Attendre qu'il y ait de l'activité après une pause"
-
-#: data/resources/preferences-main-page.ui:573
-msgid "Plugins…"
-msgstr "Greffons…"
-
-#: data/resources/preferences.ui:8 src/preferences-dialog.vala:804
-msgid "Plugins"
-msgstr "Greffons"
-
-#: data/resources/preferences.ui:47
-msgid "Back"
-msgstr "Retour"
-
-#: data/resources/screen-notification.ui:89
-#: plugins/gnome/extension/dialogs.js:1002
-msgid "It's time to take a break"
-msgstr "Il est temps de faire une pause"
-
-#: data/resources/stats-view.ui:28
-msgid "Nothing to see yet"
-msgstr "Rien à voir encore"
-
-#: data/resources/stats-view.ui:45
-msgid "Complete a few sessions"
-msgstr "Effectuez quelques séances"
-
-#: data/resources/stats-view.ui:86 data/resources/stats-view.ui:343
-msgid "Day"
-msgstr "Jour"
-
-#: data/resources/stats-view.ui:109 data/resources/stats-view.ui:356
-msgid "Week"
-msgstr "Semaine"
-
-#: data/resources/stats-view.ui:133 data/resources/stats-view.ui:369
-msgid "Month"
-msgstr "Mois"
-
-#: data/resources/stats-view.ui:161
-msgid "Previous (Alt+Left)"
-msgstr "Précédent (Alt+Gauche)"
-
-#: data/resources/stats-view.ui:188
-msgid "Next (Alt+Right)"
-msgstr "Suivant (Alt+Droite)"
-
-#: data/resources/stats-view.ui:216 data/resources/stats-view.ui:319
-#: src/stats-day-page.vala:62
-msgid "Today"
-msgstr "Aujourd'hui"
-
-#: data/resources/window.ui:36 plugins/gnome/extension/indicator.js:214
-#: src/window.vala:180
-msgid "Start Pomodoro"
-msgstr "Démarrer Pomodoro"
-
-#: data/resources/window.ui:323
-msgid "_About"
-msgstr "À propos"
-
-#: plugins/actions/actions.vala:423
-msgid "Actions"
-msgstr "Actions"
-
-#: plugins/actions/actions.vala:427
-msgid "Action"
-msgstr "Action"
-
-#: plugins/actions/actions.vala:452
-msgid "Custom actions…"
-msgstr "Actions personnalisées…"
-
-#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:170
-msgid "Complete"
-msgstr "Terminé"
-
-#: plugins/actions/enums.vala:194 plugins/actions/resources/action-page.ui:185
-msgid "Skip"
-msgstr "Sauter"
-
-#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:230
-msgid "Enable"
-msgstr "Activer"
-
-#: plugins/actions/resources/action-page.ui:28
-msgid "Command"
-msgstr "Commande"
-
-#: plugins/actions/resources/action-page.ui:41
-#: plugins/actions/resources/menus.ui:29
-msgid "Triggers"
-msgstr "Événements"
-
-#: plugins/actions/resources/action-page.ui:54
-msgid "Name"
-msgstr "Nom"
-
-#: plugins/actions/resources/action-page.ui:88
-msgid "_Pomodoro"
-msgstr "_Pomodoro"
-
-#: plugins/actions/resources/action-page.ui:102
-msgid "_Short Break"
-msgstr "_Courte pause"
-
-#: plugins/actions/resources/action-page.ui:116
-msgid "_Long Break"
-msgstr "_Longue pause"
-
-#: plugins/actions/resources/action-page.ui:299
-msgid "Add"
-msgstr "Ajouter"
-
-#: plugins/actions/resources/menus.ui:6
-msgid "Remove"
-msgstr "Supprimer"
-
-#: plugins/actions/resources/menus.ui:14
-msgid "State"
-msgstr "État"
-
-#: plugins/actions/resources/menus.ui:19
-msgid "State Duration"
-msgstr "Durée de l'état"
-
-#: plugins/actions/resources/menus.ui:24
-msgid "Elapsed Time"
-msgstr "Temps écoulé"
-
-#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
-#: plugins/gnome/extension/indicator.js:84 src/window.vala:101
-msgid "Stats"
-msgstr "Statistiques"
-
-#: plugins/gnome/extension/indicator.js:85
-msgid "Quit"
-msgstr "Quitter"
-
-#: plugins/gnome/extension/indicator.js:123
-#: plugins/gnome/extension/notifications.js:128
-#: plugins/gnome/extension/notifications.js:549
-msgid "Pomodoro Timer"
-msgstr "Minuteur Pomodoro"
-
-#: plugins/gnome/extension/indicator.js:129
-msgid "Start Timer"
-msgstr "Démarrer la minuterie"
-
-#: plugins/gnome/extension/indicator.js:162
-msgid "Pause Timer"
-msgstr "Interrompre"
-
-#: plugins/gnome/extension/indicator.js:174
-msgid "Stop Timer"
-msgstr "Arrêter la minuterie"
-
-#: plugins/gnome/extension/indicator.js:211 src/window.vala:179
-msgid "Pause break"
-msgstr "Interrompre pause"
-
-#: plugins/gnome/extension/indicator.js:211 src/window.vala:166
-msgid "Pause Pomodoro"
-msgstr "Interrompre pomodoro"
-
-#: plugins/gnome/extension/indicator.js:214
-#: src/notifications-capability.vala:141 src/notifications-capability.vala:162
-#: src/window.vala:167
-msgid "Take a break"
-msgstr "Faites une pause"
-
-#: plugins/gnome/extension/indicator.js:218 src/window.vala:175
-msgid "Resume break"
-msgstr "Continuer la pause"
-
-#: plugins/gnome/extension/indicator.js:218 src/window.vala:162
-msgid "Resume Pomodoro"
-msgstr "Continuer pomodoro"
-
-#: plugins/gnome/extension/notifications.js:89
-#, javascript-format
-msgid "%d minute remaining"
-msgid_plural "%d minutes remaining"
-msgstr[0] "%d minute restante"
-msgstr[1] "%d minutes restantes"
-
-#: plugins/gnome/extension/notifications.js:97
-#, javascript-format
-msgid "%d second remaining"
-msgid_plural "%d seconds remaining"
-msgstr[0] "%d seconde restante"
-msgstr[1] "%d secondes restantes"
-
-#: plugins/gnome/extension/notifications.js:289
-msgid "Pomodoro is about to end"
-msgstr "Pomodoro est sur le point de se terminer"
-
-#: plugins/gnome/extension/notifications.js:295
-msgid "Take a long break"
-msgstr "Faire une longue pause"
-
-#: plugins/gnome/extension/notifications.js:296
-msgid "Take a short break"
-msgstr "Faites une courte pause"
-
-#: plugins/gnome/extension/notifications.js:304
-msgid "Break is about to end"
-msgstr "La pause est sur le point de se terminer"
-
-#: plugins/gnome/extension/notifications.js:308
-msgid "Break is over"
-msgstr "La pause est terminée"
-
-#. body = _("Get ready for Pomodoro");
-#: plugins/gnome/extension/notifications.js:336
-msgid "Get ready…"
-msgstr "Sois prêt…"
-
-#: plugins/gnome/extension/notifications.js:362
-msgid "Skip Break"
-msgstr "Sauter la pause"
-
-#: plugins/gnome/extension/notifications.js:365
-msgid "+1 Minute"
-msgstr "+1 minute"
-
-#: plugins/gnome/extension/notifications.js:557
-msgid "Report issue"
-msgstr "Signaler un problème"
-
-#: plugins/gnome/extension/timer.js:248
-#, javascript-format
-msgid "Failed to run <i>%s</i> service"
-msgstr "Impossible d'exécuter le service <i>%s</i>"
-
-#: plugins/gnome/gnome-plugin.vala:290
-msgid "Hide other notifications"
-msgstr "Masquer les autres notifications"
-
-#: plugins/sounds/resources/preferences-sound-page.ui:33
-msgid "Volume:"
-msgstr "Volume:"
-
-#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:410
-msgid "Clock Ticking"
-msgstr "Horloge"
-
-#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:411
-msgid "Timer Ticking"
-msgstr "Minuteur"
-
-#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:412
-msgid "Woodland Birds"
-msgstr "Oiseaux forestiers"
-
-#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:472
-#: plugins/sounds/sounds-plugin.vala:511
-msgid "Bell"
-msgstr "Cloche"
-
-#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:473
-#: plugins/sounds/sounds-plugin.vala:512
-msgid "Loud Bell"
-msgstr "Cloche forte"
-
-#: plugins/sounds/sounds-plugin.vala:334
-msgid "Select Custom Sound"
-msgstr "Sélectionnez Son personnalisé"
-
-#: plugins/sounds/sounds-plugin.vala:337
-msgid "_Cancel"
-msgstr "_Annuler"
-
-#: plugins/sounds/sounds-plugin.vala:339
-msgid "_Select"
-msgstr "_Choisir"
-
-#: plugins/sounds/sounds-plugin.vala:568
-msgid "Ticking Sound"
-msgstr "Tic-tac sonore"
-
-#: plugins/sounds/sounds-plugin.vala:572
-msgid "End of Break Sound"
-msgstr "Son de fin de pause"
-
-#: plugins/sounds/sounds-plugin.vala:576
-msgid "Start of Break Sound"
-msgstr "Son de début de pause"
-
-#: plugins/sounds/sounds-plugin.vala:604 src/preferences-dialog.vala:590
-msgid "Off"
-msgstr "Arrêt"
-
-#: plugins/sounds/sounds-plugin.vala:744
-msgid "Ticking sound"
-msgstr "Tic-tac"
-
-#: plugins/sounds/sounds-plugin.vala:749
-msgid "Start of break sound"
-msgstr "Son de début de pause"
-
-#: plugins/sounds/sounds-plugin.vala:754
-msgid "End of break sound"
-msgstr "Son de fin de pause"
-
-#: src/about-dialog.vala:30
-msgid "About Pomodoro"
-msgstr "À propos de Pomodoro"
-
-#: src/about-dialog.vala:41
-msgid "translator-credits"
-msgstr "Bastien Traverse <bt@esrevart.net>"
-
-#: src/application.vala:87
-msgid "Start/Stop"
-msgstr "Commencer arrêter"
-
-#: src/application.vala:96
+#: src/application.vala:51
+#, fuzzy
 msgid "Pause/Resume"
 msgstr "Interrompre/Continuer"
 
-#: src/application.vala:105
+#: src/application.vala:54 src/application.vala:486 src/core/event.vala:284
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:83
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:71
+msgid "Pause"
+msgstr "Interrompre"
+
+#: src/application.vala:57 src/application.vala:488 src/core/event.vala:292
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:97
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:78
+msgid "Resume"
+msgstr "Continuer"
+
+#: src/application.vala:60
+#, fuzzy
 msgid "Skip to a pomodoro or to a break"
-msgstr "Passer à un pomodoro ou à une pause"
+msgstr "Passer au prochain pomodoro ou à la pause"
 
-#: src/application.vala:108
+#: src/application.vala:63
+#, fuzzy
 msgid "Extend current pomodoro or break"
-msgstr "Prolonger le pomodoro actuel ou casser"
+msgstr "Prolonger le pomodoro ou la pause actuelle"
 
-#: src/application.vala:111
+#: src/application.vala:66
 msgid "Reset current session"
 msgstr "Réinitialiser la session en cours"
 
-#: src/application.vala:114
-msgid "Run as background service"
-msgstr "Exécuter en tant que service d'arrière-plan"
-
-#: src/application.vala:117
+#: src/application.vala:69
 msgid "Show preferences"
 msgstr "Afficher les préférences"
 
-#: src/application.vala:120
+#: src/application.vala:72
 msgid "Quit application"
 msgstr "Quitter l'application"
 
-#: src/application.vala:123
+#: src/application.vala:75
 msgid "Print version information and exit"
 msgstr "Imprimer les informations de version et quitter"
 
-#: src/notifications-capability.vala:130
-msgid "Focus on your task."
-msgstr "Concentrez-vous sur votre tâche."
+#: src/application.vala:477
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
+#, fuzzy
+msgid "Start or Stop"
+msgstr "Commencer ou Arrêter"
 
-#: src/notifications-capability.vala:156
-#, c-format
-msgid "You have %d minute"
-msgid_plural "You have %d minutes"
-msgstr[0] "Vous avez %d minutes"
-msgstr[1] "%d minutes"
+#: src/application.vala:480
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
+#, fuzzy
+msgid "Start, Pause or Resume"
+msgstr "Commencer, Interrompre ou Continuer"
 
-#: src/notifications-capability.vala:158
-#, c-format
-msgid "You have %d second"
-msgid_plural "You have %d seconds"
-msgstr[0] "Vous avez %d seconde avant le prochain pomodoro"
-msgstr[1] "Vous avez %d secondes avant le prochain pomodoro"
+#: src/application.vala:490 src/core/event.vala:300
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
+msgid "Skip"
+msgstr "Sauter"
 
-#: src/notifications-capability.vala:163
-msgid "Take a longer break"
-msgstr "Faites une pause plus longue"
+#: src/application.vala:492 src/core/event.vala:308
+#, fuzzy
+msgid "Rewind"
+msgstr "Rembobiner"
 
-#: src/notifications-capability.vala:179
-msgid "Lengthen it"
-msgstr "Prolonger la pause"
+#: src/application.vala:494
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
+#, fuzzy
+msgid "Bring to Focus"
+msgstr "Mettre au premier plan"
 
-#: src/notifications-capability.vala:184
-msgid "Shorten it"
-msgstr "Raccourcir la pause"
+#: src/core/action-manager.vala:111
+#, fuzzy, c-format
+msgid "Custom action \"%s\" has failed"
+msgstr "L'action personnalisée \"%s\" a échoué"
 
-#: src/notifications-capability.vala:189
-msgid "Start pomodoro"
-msgstr "Démarrer un pomodoro"
+#: src/core/command.vala:379
+#, fuzzy
+msgid "Reached timeout"
+msgstr "Délai d'attente atteint"
 
-#: src/preferences-dialog.vala:158
-#, c-format
+#: src/core/command.vala:408
+#, fuzzy
+msgid "Failed to execute command"
+msgstr "Échec de l'exécution de la commande"
+
+#: src/core/command.vala:491 src/core/command.vala:506
+#, fuzzy
+msgid "Command is empty"
+msgstr "La commande est vide"
+
+#: src/core/command.vala:510
+#, fuzzy
+msgid "Unclosed quotation mark"
+msgstr "Guillemet non fermé"
+
+#: src/core/command.vala:515
+#, fuzzy
+msgid "Invalid command"
+msgstr "Commande invalide"
+
+#: src/core/command.vala:540 src/core/expression.vala:859
+#, fuzzy, c-format
+msgid "Unknown variable \"%s\""
+msgstr "Variable inconnue \"%s\""
+
+#: src/core/command.vala:546 src/core/expression.vala:236
+#, fuzzy, c-format
+msgid "Unknown format \"%s\""
+msgstr "Format inconnu \"%s\""
+
+#: src/core/command.vala:619
+#, fuzzy, c-format
+msgid "Program \"%s\" not found"
+msgstr "Programme \"%s\" non trouvé"
+
+#: src/core/event.vala:180
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:54
+msgid "Actions"
+msgstr "Actions"
+
+#: src/core/event.vala:183
+#, fuzzy
+msgid "Countdown"
+msgstr "Compte à rebours"
+
+#: src/core/event.vala:186
+#: src/ui/preferences/timer/preferences-panel-timer.ui:17
+#, fuzzy
+msgid "Session"
+msgstr "Session"
+
+#: src/core/event.vala:189
+#, fuzzy
+msgid "Other"
+msgstr "Autre"
+
+#: src/core/event.vala:269
+#, fuzzy
+msgid "Started the timer."
+msgstr "Le minuteur a démarré."
+
+#: src/core/event.vala:277
+#, fuzzy
+msgid "Stopped the timer manually."
+msgstr "Le minuteur a été arrêté manuellement."
+
+#: src/core/event.vala:285
+#, fuzzy
 msgid ""
-"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
-"such as Control, Alt or Shift."
+"The countdown has been manually paused. Not triggered when locking the "
+"screen or when suspending the system."
 msgstr ""
-"L'utilisation de \"%s\" comme raccourci interférera avec la saisie. Essayez "
-"d'ajouter une autre touche, telle que Contrôle, Alt ou Maj."
+"Le compte à rebours a été mis en pause manuellement. Ne se déclenche pas "
+"lors du verrouillage de l'écran ou de la mise en veille du système."
 
-#: src/preferences-dialog.vala:808
-msgid "Keyboard Shortcut"
-msgstr "Raccourci clavier"
+#: src/core/event.vala:293
+#, fuzzy
+msgid "The countdown has been manually resumed."
+msgstr "Le compte à rebours a été repris manuellement."
 
-#: src/presence.vala:80
-msgid "Available"
-msgstr "Disponible"
+#: src/core/event.vala:301
+#, fuzzy
+msgid "Jumped to a next time-block before the countdown has finished."
+msgstr "Passage au bloc suivant avant la fin du compte à rebours."
 
-#: src/presence.vala:83
-msgid "Busy"
-msgstr "Occupé"
+#: src/core/event.vala:309
+#, fuzzy
+msgid "Rewind action has been used. It adds a pause in the past."
+msgstr ""
+"L'action rembobiner a été utilisée. Elle ajoute une pause dans le passé."
 
-#: src/presence.vala:86
-msgid "Idle"
-msgstr "Au repos"
+#: src/core/event.vala:316
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:39
+#, fuzzy
+msgid "Reset"
+msgstr "Réinitialiser"
 
-#: src/presence.vala:89
-msgid "Invisible"
-msgstr "Invisible"
+#: src/core/event.vala:317
+#, fuzzy
+msgid "Manually cleared the session."
+msgstr "La session a été effacée manuellement."
 
-#: src/stats-day-page.vala:66
-msgid "Yesterday"
-msgstr "Hier"
+#. Countdown
+#: src/core/event.vala:325
+#: src/ui/preferences/automation/action/action-edit-window.ui:20
+#: src/ui/preferences/automation/action/condition-widget.vala:120
+#, fuzzy
+msgid "Finished"
+msgstr "Terminé"
 
-#: src/stats-page.vala:87
-#, c-format
-msgid "%d m"
-msgstr "%d m"
+#: src/core/event.vala:326
+#, fuzzy
+msgid ""
+"The countdown has finished. If waiting for confirmation, the duration of the "
+"time-block still may be altered."
+msgstr ""
+"Le compte à rebours est terminé. En attente de confirmation, la durée du "
+"bloc peut encore être modifiée."
 
-#: src/stats-page.vala:93
-#, c-format
-msgid "%.0f h"
-msgstr "%.0f h"
+#: src/core/event.vala:333
+#, fuzzy
+msgid "Changed"
+msgstr "Modifié"
 
-#: src/stats-page.vala:96
-#, c-format
-msgid "%.1f h"
-msgstr "%.1f h"
+#: src/core/event.vala:334
+#, fuzzy
+msgid "Triggered on any change related to the countdown."
+msgstr "Déclenché lors de tout changement lié au compte à rebours."
 
-#: src/stats-page.vala:573
+#. Session
+#: src/core/event.vala:342
+#, fuzzy
+msgid "Confirm Advancement"
+msgstr "Confirmer l'avancement"
+
+#: src/core/event.vala:343
+#, fuzzy
+msgid "A manual confirmation is required to start next time-block."
+msgstr "Une confirmation manuelle est requise pour démarrer le bloc suivant."
+
+#: src/core/event.vala:350
+#, fuzzy
+msgid "Advanced"
+msgstr "Avancé"
+
+#: src/core/event.vala:351
+#, fuzzy
+msgid "Transitioned or skipped to a next time-block."
+msgstr "Passage ou saut vers le bloc suivant."
+
+#: src/core/event.vala:358
+#, fuzzy
+msgid "State Changed"
+msgstr "État modifié"
+
+#: src/core/event.vala:359
+#, fuzzy
+msgid "Transitioned to a next time-block or when a break gets relabelled."
+msgstr "Passage au bloc suivant ou renommage d'une pause."
+
+#: src/core/event.vala:366
+#, fuzzy
+msgid "Rescheduled"
+msgstr "Reprogrammé"
+
+#. translators: Change of plan
+#: src/core/event.vala:367
+#, fuzzy
+msgid "Triggered when scheduled time-blocks have changed."
+msgstr "Déclenché lorsque les blocs de temps prévus ont changé."
+
+#: src/core/event.vala:374
+#, fuzzy
+msgid "Expired"
+msgstr "Expiré"
+
+#: src/core/event.vala:375
+#, fuzzy
+msgid "Triggered when session is about to be reset due to inactivity."
+msgstr ""
+"Déclenché quand la session va être réinitialisée pour cause d'inactivité."
+
+#. translators: time remaining eg. "3 minutes 50 seconds remaining"
+#: src/core/notification-manager.vala:130
+#, fuzzy, c-format
+msgid "%s remaining"
+msgstr "%s restant"
+
+#: src/core/notification-manager.vala:339
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:314
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:330
+msgid "Take a break"
+msgstr "Faites une pause"
+
+#: src/core/notification-manager.vala:343
+msgid "Take a short break"
+msgstr "Faites une courte pause"
+
+#: src/core/notification-manager.vala:347
+msgid "Take a long break"
+msgstr "Faire une longue pause"
+
+#: src/core/notification-manager.vala:394
+msgid "Pomodoro is about to end"
+msgstr "Pomodoro est sur le point de se terminer"
+
+#: src/core/notification-manager.vala:395
+#: src/core/notification-manager.vala:495
+#: src/core/notification-manager.vala:500
+#: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
+#, fuzzy
+msgid "Take a Break"
+msgstr "Faites une pause"
+
+#: src/core/notification-manager.vala:401
+msgid "Break is about to end"
+msgstr "La pause est sur le point de se terminer"
+
+#: src/core/notification-manager.vala:402
+#: src/core/notification-manager.vala:490
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:69
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:314
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:330
+msgid "Start Pomodoro"
+msgstr "Démarrer Pomodoro"
+
+#: src/core/notification-manager.vala:411
+#, fuzzy
+msgid "+1 minute"
+msgstr "+1 minute"
+
+#: src/core/notification-manager.vala:432
+msgid "Get ready…"
+msgstr "Sois prêt…"
+
+#: src/core/notification-manager.vala:437
+#: src/core/notification-manager.vala:473
+#, fuzzy
+msgid "Pomodoro is over!"
+msgstr "Le Pomodoro est terminé !"
+
+#: src/core/notification-manager.vala:443
+#: src/core/notification-manager.vala:479
+#, fuzzy
+msgid "Break is over!"
+msgstr "La pause est terminée"
+
+#: src/core/notification-manager.vala:489
+#, fuzzy
+msgid "Confirm the start of a Pomodoro…"
+msgstr "Confirmez le début d'un Pomodoro…"
+
+#: src/core/notification-manager.vala:494
+#, fuzzy
+msgid "Confirm the start of a break…"
+msgstr "Confirmez le début d'une pause…"
+
+#: src/core/notification-manager.vala:499
+#, fuzzy
+msgid "Confirm the start of a short break…"
+msgstr "Confirmez le début d'une courte pause…"
+
+#: src/core/notification-manager.vala:504
+#, fuzzy
+msgid "Confirm the start of a long break…"
+msgstr "Confirmez le début d'une longue pause…"
+
+#: src/core/notification-manager.vala:516
+msgid "Skip Break"
+msgstr "Sauter la pause"
+
+#: src/core/sound.vala:405 src/core/sound.vala:605 src/core/sound.vala:662
+#, fuzzy
+msgid "Failed to initialize playback"
+msgstr "Échec de l'initialisation de la lecture"
+
+#. Validate file.
+#: src/core/sound.vala:757
+#, fuzzy
+msgid "File not found"
+msgstr "Fichier non trouvé"
+
+#: src/core/sound.vala:775
+#, fuzzy
+msgid "File type not supported"
+msgstr "Type de fichier non supporté"
+
+#: src/core/state.vala:75
+#: src/ui/preferences/automation/action/condition-widget.ui:55
+#, fuzzy
+msgid "Stopped"
+msgstr "Arrêté"
+
+#: src/core/state.vala:81
+#: src/ui/preferences/automation/action/condition-widget.ui:54
 msgid "Break"
 msgstr "Pause"
 
-#: src/stats-week-page.vala:58
+#: src/core/state.vala:84
+msgid "Short Break"
+msgstr "Courte pause"
+
+#: src/core/state.vala:87
+msgid "Long Break"
+msgstr "Longue pause"
+
+#. translators: Short form for number of hours
+#: src/core/timestamp.vala:117
+#, fuzzy, c-format
+msgid "%uh"
+msgstr "%uh"
+
+#. translators: Short form for number of minutes
+#: src/core/timestamp.vala:126
+#, fuzzy, c-format
+msgid "%um"
+msgstr "%um"
+
+#: src/core/utils.vala:72
+#, fuzzy, c-format
+msgid "%u hour"
+msgid_plural "%u hours"
+msgstr[0] "%u heure"
+msgstr[1] "%u heures"
+
+#: src/core/utils.vala:81
+#, fuzzy, c-format
+msgid "%u minute"
+msgid_plural "%u minutes"
+msgstr[0] "%u minute"
+msgstr[1] "%u minutes"
+
+#: src/core/utils.vala:90
+#, fuzzy, c-format
+msgid "%u second"
+msgid_plural "%u seconds"
+msgstr[0] "%u seconde"
+msgstr[1] "%u secondes"
+
+#: src/core/variables.vala:116
+#, fuzzy
+msgid "The exact time of the current event."
+msgstr "L'heure exacte de l'événement actuel."
+
+#: src/core/variables.vala:121
+#, fuzzy
+msgid ""
+"The current phase of the Pomodoro cycle. Possible values: <tt>stopped</tt>, "
+"<tt>pomodoro</tt>, <tt>break</tt>, <tt>short-break</tt>, <tt>long-break</tt>."
+msgstr ""
+"La phase actuelle du cycle Pomodoro. Valeurs possibles : <tt>stopped</tt>, "
+"<tt>pomodoro</tt>, <tt>break</tt>, <tt>short-break</tt>, <tt>long-break</tt>."
+
+#: src/core/variables.vala:126
+#, fuzzy
+msgid ""
+"Status of the current time-block. Possible values: <tt>scheduled</tt>, "
+"<tt>in-progress</tt>, <tt>completed</tt>, <tt>uncompleted</tt>."
+msgstr ""
+"Statut du bloc de temps actuel. Valeurs possibles : <tt>scheduled</tt>, "
+"<tt>in-progress</tt>, <tt>completed</tt>, <tt>uncompleted</tt>."
+
+#: src/core/variables.vala:131
+#, fuzzy
+msgid "A flag indicating whether countdown has begun."
+msgstr "Un indicateur signalant si le compte à rebours a commencé."
+
+#: src/core/variables.vala:136
+#, fuzzy
+msgid "A flag indicating whether countdown is paused."
+msgstr "Un indicateur signalant si le compte à rebours est en pause."
+
+#: src/core/variables.vala:141
+#, fuzzy
+msgid "A flag indicating whether countdown has finished."
+msgstr "Un indicateur signalant si le compte à rebours est terminé."
+
+#: src/core/variables.vala:146
+#, fuzzy
+msgid "A flag indicating whether the timer is actively counting down."
+msgstr "Un indicateur signalant si le minuteur décompte activement."
+
+#: src/core/variables.vala:151
+#, fuzzy
+msgid "Duration of the current countdown."
+msgstr "Durée du compte à rebours actuel."
+
+#. translators: Time difference between displayed value on the timer and real time. Think of it as a lost time.
+#: src/core/variables.vala:157
+#, fuzzy
+msgid "Discrepancy between elapsed time and the time passed."
+msgstr "Différence entre le temps écoulé et le temps passé."
+
+#. translators: Time since the start of countdown
+#: src/core/variables.vala:163
+#, fuzzy
+msgid "The amount of time spent on the countdown."
+msgstr "La quantité de temps passé sur le compte à rebours."
+
+#. translators: Displayed timer value.
+#: src/core/variables.vala:169
+#, fuzzy
+msgid "The amount of time left before the countdown ends."
+msgstr "La quantité de temps restant avant la fin du compte à rebours."
+
+#: src/core/variables.vala:174
+#, fuzzy
+msgid "Time when the countdown has started."
+msgstr "L'heure à laquelle le compte à rebours a commencé."
+
+#: src/integrations/portal/global-shortcuts-provider.vala:298
+#, fuzzy
+msgid "Unused"
+msgstr "Inutilisé"
+
+#: src/ui/log/log-window.ui:6
+#, fuzzy
+msgid "Log"
+msgstr "Journal"
+
+#: src/ui/log/log-window.ui:38
+#, fuzzy
+msgid "Empty Log"
+msgstr "Journal vide"
+
+#: src/ui/log/log-window.ui:39
+#, fuzzy
+msgid "Entries will show up here once you start the timer."
+msgstr ""
+"Les entrées apparaîtront ici une fois que vous aurez démarré le minuteur."
+
+#: src/ui/log/log-window.ui:165
+#, fuzzy
+msgid "Context"
+msgstr "Contexte"
+
+#: src/ui/log/log-window.ui:190
+#: src/ui/preferences/automation/action/action-edit-window.ui:186
+msgid "Command"
+msgstr "Commande"
+
+#: src/ui/log/log-window.ui:214
+#, fuzzy
+msgid "Output"
+msgstr "Sortie"
+
+#: src/ui/log/log-window.ui:238
+#, fuzzy
+msgid "Error"
+msgstr "Erreur"
+
+#: src/ui/log/log-window.ui:267
+#, fuzzy
+msgid "Exit Code:"
+msgstr "Code de sortie :"
+
+#: src/ui/log/log-window.ui:278
+#, fuzzy
+msgid "Execution Time:"
+msgstr "Temps d'exécution :"
+
+#: src/ui/main/dialogs/about-dialog.vala:29
+msgid "translator-credits"
+msgstr "Bastien Traverse <bt@esrevart.net>"
+
+#: src/ui/main/dialogs/about-dialog.vala:35
+#, fuzzy
+msgid "Donate"
+msgstr "Faire un don"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:6
+#, fuzzy
+msgid "GNOME Shell Extension"
+msgstr "Extension GNOME Shell"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:57
+#, fuzzy
+msgid "Get the best experience!"
+msgstr "Profitez de la meilleure expérience !"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:68
+#, fuzzy
+msgid "Enable <b>GNOME Shell extension</b> for seamless desktop integration"
+msgstr ""
+"Activez l'<b>extension GNOME Shell</b> pour une intégration parfaite au "
+"bureau"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:95
+#, fuzzy
+msgid "Always within reach"
+msgstr "Toujours à portée de main"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:106
+#, fuzzy
+msgid "Control timer directly from the top bar without opening the app"
+msgstr ""
+"Contrôlez le minuteur directement depuis la barre supérieure sans ouvrir "
+"l'application"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:132
+#, fuzzy
+msgid "Less distractions"
+msgstr "Moins de distractions"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:143
+#, fuzzy
+msgid ""
+"Let <b>Pomodoro</b> manage system notifications while the timer is running"
+msgstr ""
+"Laissez <b>Pomodoro</b> gérer les notifications système pendant que le "
+"minuteur tourne"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:170
+#, fuzzy
+msgid "Refined break reminders"
+msgstr "Rappels de pause raffinés"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:181
+#, fuzzy
+msgid ""
+"Elegant full-screen overlay that make taking breaks a more pleasant "
+"experience"
+msgstr "Une élégante superposition plein écran qui rend la pause plus agréable"
+
+#. translators: "It" refers to installing GNOME Shell extension
+#: src/ui/main/dialogs/install-extension-dialog.ui:195
+#, fuzzy
+msgid "Ready to try it?"
+msgstr "Prêt à essayer ?"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:219
+#: src/ui/main/dialogs/install-extension-dialog.ui:252
+#, fuzzy
+msgid "_Install Extension"
+msgstr "_Installer l'extension"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:229
+#: src/ui/main/dialogs/install-extension-dialog.ui:245
+#, fuzzy
+msgid "_Not Now"
+msgstr "_Pas maintenant"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:317
+#, fuzzy
+msgid "Something went wrong"
+msgstr "Une erreur s'est produite"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:364
+#, fuzzy
+msgid "Copy to clipboard"
+msgstr "Copier dans le presse-papiers"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:383
+#: src/ui/main/dialogs/install-extension-dialog.ui:416
+#, fuzzy
+msgid "_Try Again"
+msgstr "_Réessayer"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:393
+#: src/ui/main/dialogs/install-extension-dialog.ui:409
+#, fuzzy
+msgid "_Abort"
+msgstr "À propos"
+
+#: src/ui/main/dialogs/install-extension-dialog.vala:86
+#, fuzzy
+msgid "Time-out reached"
+msgstr "Délai expiré"
+
+#: src/ui/main/dialogs/install-extension-dialog.vala:91
+#, fuzzy
+msgid "Installing extensions is not allowed"
+msgstr "L'installation d'extensions n'est pas autorisée"
+
+#: src/ui/main/dialogs/install-extension-dialog.vala:96
+#, fuzzy
+msgid "Failed to download the extension"
+msgstr "Échec du téléchargement de l'extension"
+
+#: src/ui/main/stats/stats-day-page.ui:104
+#: src/ui/main/stats/stats-day-page.vala:92
+#: src/ui/main/stats/stats-month-page.ui:41
+#: src/ui/main/stats/stats-month-page.vala:48
+#: src/ui/main/stats/stats-week-page.ui:45
+#: src/ui/main/stats/stats-week-page.vala:46
+#, fuzzy
+msgid "Breaks"
+msgstr "Pauses"
+
+#: src/ui/main/stats/stats-day-page.ui:111
+#: src/ui/main/stats/stats-month-page.ui:48
+#: src/ui/main/stats/stats-month-page.vala:53
+#: src/ui/main/stats/stats-week-page.ui:52
+#: src/ui/main/stats/stats-week-page.vala:51
+#, fuzzy
+msgid "Interruptions"
+msgstr "Interruptions"
+
+#: src/ui/main/stats/stats-day-page.ui:118
+#: src/ui/main/stats/stats-month-page.ui:55
+#: src/ui/main/stats/stats-week-page.ui:59
+#, fuzzy
+msgid "Break Ratio"
+msgstr "Ratio de pause"
+
+#: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
+#: src/ui/main/stats/widgets/stats-date-popover.ui:22
+msgid "Day"
+msgstr "Jour"
+
+#: src/ui/main/stats/stats-view.ui:13 src/ui/main/stats/stats-view.vala:62
+#: src/ui/main/stats/widgets/stats-date-popover.ui:28
+msgid "Week"
+msgstr "Semaine"
+
+#: src/ui/main/stats/stats-view.ui:18 src/ui/main/stats/stats-view.vala:65
+#: src/ui/main/stats/widgets/stats-date-popover.ui:34
+msgid "Month"
+msgstr "Mois"
+
+#: src/ui/main/stats/stats-view.ui:39
+#, fuzzy
+msgid "Nothing to see here yet"
+msgstr "Rien à voir encore"
+
+#: src/ui/main/stats/stats-view.ui:40
+#, fuzzy
+msgid "Finish a few Pomodoros to fill this up!"
+msgstr "Terminez quelques Pomodoros pour remplir ceci !"
+
+#: src/ui/main/stats/stats-view.vala:792
+#, fuzzy, c-format
+msgid "Skipped %u day"
+msgid_plural "Skipped %u days"
+msgstr[0] "%u jour sauté"
+msgstr[1] "%u jours sautés"
+
+#: src/ui/main/stats/stats-view.vala:798
+#, fuzzy, c-format
+msgid "Skipped %u week"
+msgid_plural "Skipped %u weeks"
+msgstr[0] "%u semaine sautée"
+msgstr[1] "%u semaines sautées"
+
+#: src/ui/main/stats/stats-view.vala:804
+#, fuzzy, c-format
+msgid "Skipped %u month"
+msgid_plural "Skipped %u months"
+msgstr[0] "%u mois sauté"
+msgstr[1] "%u mois sautés"
+
+#: src/ui/main/stats/stats-view.vala:1002
+msgid "Today"
+msgstr "Aujourd'hui"
+
+#: src/ui/main/stats/stats-view.vala:1007
+msgid "Yesterday"
+msgstr "Hier"
+
+#: src/ui/main/stats/stats-view.vala:1028
 msgid "This week"
 msgstr "Cette semaine"
 
-#: src/utils.vala:32
+#: src/ui/main/stats/stats-view.vala:1048
 #, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d heure"
-msgstr[1] "%d heures"
+msgid "Week %u"
+msgstr "Semaine %u"
 
-#: src/utils.vala:41
+#: src/ui/main/stats/stats-view.vala:1049
+#, fuzzy, c-format
+msgid "Week %u of %u"
+msgstr "Semaine %u sur %u"
+
+#: src/ui/main/timer/compact-timer-view.ui:8 src/ui/main/timer/menus.ui:6
+#: src/ui/main/timer/menus.ui:22
+msgid "_Pomodoro"
+msgstr "_Pomodoro"
+
+#: src/ui/main/timer/compact-timer-view.ui:13 src/ui/main/timer/menus.ui:10
+msgid "_Short Break"
+msgstr "_Courte pause"
+
+#: src/ui/main/timer/compact-timer-view.ui:18 src/ui/main/timer/menus.ui:14
+msgid "_Long Break"
+msgstr "_Longue pause"
+
+#: src/ui/main/timer/compact-timer-view.vala:74
+#: src/ui/main/timer/timer-view.vala:130
+#, fuzzy
+msgid "Finished!"
+msgstr "Terminé !"
+
+#: src/ui/main/timer/menus.ui:26
+#, fuzzy
+msgid "_Break"
+msgstr "_Pause"
+
+#: src/ui/main/timer/timer-view.ui:23
+#, fuzzy
+msgid "Open screen overlay"
+msgstr "Ouvrir la superposition d'écran"
+
+#: src/ui/main/timer/timer-view.vala:244
+#, fuzzy
+msgid "Session has expired"
+msgstr "La session a expiré"
+
+#: src/ui/main/timer/widgets/session-progress-bar.vala:1398
+#, fuzzy, c-format
+msgid "Long break due in <b>%s</b>"
+msgstr "Longue pause prévue dans <b>%s</b>"
+
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:25
+#, fuzzy
+msgid "Rewind one minute"
+msgstr "Rembobiner d'une minute"
+
+#: src/ui/main/window.ui:8
+#, fuzzy
+msgid "_Compact View"
+msgstr "Vue _compacte"
+
+#: src/ui/main/window.ui:15
+msgid "_Preferences"
+msgstr "_Préférences"
+
+#: src/ui/main/window.ui:19
+msgid "_About"
+msgstr "À propos"
+
+#: src/ui/main/window.ui:25
+msgid "_Quit"
+msgstr "_Quitter"
+
+#: src/ui/main/window.ui:62
+#, fuzzy
+msgid "Primary Menu"
+msgstr "Menu principal"
+
+#: src/ui/main/window.ui:92
+msgid "Stats"
+msgstr "Statistiques"
+
+#: src/ui/main/window.vala:301
+#, fuzzy
+msgid "GNOME Shell extension available"
+msgstr "Extension GNOME Shell disponible"
+
+#: src/ui/main/window.vala:302
+#, fuzzy
+msgid "Learn More"
+msgstr "En savoir plus"
+
+#: src/ui/main/window.vala:324
+#, fuzzy
+msgid "Keep timer running?"
+msgstr "Laisser le minuteur tourner ?"
+
+#: src/ui/main/window.vala:325
+#, fuzzy
+msgid ""
+"You can keep it running in the background — notifications and keyboard "
+"shortcuts will still work."
+msgstr ""
+"Vous pouvez le laisser tourner en arrière-plan — les notifications et "
+"raccourcis clavier fonctionneront toujours."
+
+#: src/ui/main/window.vala:329
+msgid "Quit"
+msgstr "Quitter"
+
+#: src/ui/main/window.vala:332
+#, fuzzy
+msgid "Run in background"
+msgstr "Exécuter en arrière-plan"
+
+#: src/ui/overlays/screen-overlay.ui:65
+msgid "It's time to take a break"
+msgstr "Il est temps de faire une pause"
+
+#: src/ui/preferences/appearance/preferences-panel-appearance.ui:17
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
+#, fuzzy
+msgid "Main Window"
+msgstr "Fenêtre principale"
+
+#: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
+#, fuzzy
+msgid "Prefer Dark Theme"
+msgstr "Préférer le thème sombre"
+
+#: src/ui/preferences/appearance/preferences-panel-appearance.ui:25
+#, fuzzy
+msgid "Prefer Compact View"
+msgstr "Préférer la vue compacte"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:12
+#: src/ui/preferences/automation/action/condition-widget.vala:117
+#, fuzzy
+msgid "Started"
+msgstr "Commencer"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:16
+#: src/ui/preferences/automation/action/condition-widget.vala:118
+#, fuzzy
+msgid "Paused"
+msgstr "Interrompre"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:26
+#, fuzzy
+msgid "Edit Custom Action"
+msgstr "Modifier l'action personnalisée"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:39
+#: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
+msgid "_Cancel"
+msgstr "_Annuler"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:46
+#, fuzzy
+msgid "_Save"
+msgstr "_Enregistrer"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:62
+msgid "Name"
+msgstr "Nom"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:76
+#, fuzzy
+msgid "Trigger"
+msgstr "Déclencheur"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:80
+#, fuzzy
+msgid "Event"
+msgstr "Événement"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:81
+#, fuzzy
+msgid "Execute command after an event."
+msgstr "Exécuter une commande après un événement."
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:96
+#: src/ui/preferences/automation/action/action-edit-window.ui:174
+#, fuzzy
+msgid "Condition"
+msgstr "Condition"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:97
+#, fuzzy
+msgid "Ensure execution of a second command once condition is no longer met."
+msgstr ""
+"Assurer l'exécution d'une seconde commande une fois que la condition n'est "
+"plus remplie."
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:114
+#, fuzzy
+msgid "Events"
+msgstr "Événements"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:125
+#, fuzzy
+msgid "Add _Event"
+msgstr "Ajouter un _événement"
+
+#. translators: Filter (verb)
+#: src/ui/preferences/automation/action/action-edit-window.ui:140
+#, fuzzy
+msgid "_Filter"
+msgstr "_Filtrer"
+
+#. translators: Filter (noun)
+#: src/ui/preferences/automation/action/action-edit-window.ui:160
+#, fuzzy
+msgid "Filter"
+msgstr "Filtre"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:191
+#, fuzzy
+msgid "Shell Command"
+msgstr "Commande"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:199
+#, fuzzy
+msgid "Commands"
+msgstr "Commandes"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:204
+#, fuzzy
+msgid "Condition Met Command"
+msgstr "Commande si condition remplie"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:210
+#, fuzzy
+msgid "Condition Not Met Command"
+msgstr "Commande si condition non remplie"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:221
+#, fuzzy
+msgid "Working Directory"
+msgstr "Répertoire de travail"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:236
+#, fuzzy
+msgid "Use Subshell"
+msgstr "Utiliser un sous-shell"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:237
+#, fuzzy
+msgid "Run the program from a subshell such as sh -c ''"
+msgstr "Lancer le programme depuis un sous-shell tel que sh -c ''"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:242
+#, fuzzy
+msgid "Pass Input Data"
+msgstr "Passer les données d'entrée"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:243
+#, fuzzy
+msgid "Instead of passing variables you can process a JSON object."
+msgstr "Au lieu de passer des variables, vous pouvez traiter un objet JSON."
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:248
+#, fuzzy
+msgid "Wait For Completion"
+msgstr "Attendre la fin de l'exécution"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:249
+#, fuzzy
+msgid "Block execution of other commands until the command completes."
+msgstr "Bloquer l'exécution d'autres commandes jusqu'à la fin de la commande."
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:259
+#, fuzzy
+msgid "_Delete Action"
+msgstr "_Supprimer l'action"
+
+#: src/ui/preferences/automation/action/action-edit-window.vala:230
+#, fuzzy
+msgid "No events specified yet."
+msgstr "Aucun événement spécifié."
+
+#: src/ui/preferences/automation/action/action-edit-window.vala:248
+#, fuzzy
+msgid "Add Custom Action"
+msgstr "Actions personnalisées…"
+
+#: src/ui/preferences/automation/action/action-edit-window.vala:249
+#, fuzzy
+msgid "_Add"
+msgstr "_Ajouter"
+
+#: src/ui/preferences/automation/action/action-edit-window.vala:438
+#, fuzzy
+msgid "Select Working Directory"
+msgstr "Sélectionner le répertoire de travail"
+
+#: src/ui/preferences/automation/action/action-edit-window.vala:440
+#: src/ui/preferences/sounds/sound-chooser-window.vala:251
+msgid "_Select"
+msgstr "_Choisir"
+
+#: src/ui/preferences/automation/action/action-listboxrow.vala:67
+#, fuzzy
+msgid "Untitled action"
+msgstr "Action sans titre"
+
+#: src/ui/preferences/automation/action/condition-group-widget.ui:28
+#, fuzzy
+msgid "Add Condition"
+msgstr "Ajouter une condition"
+
+#: src/ui/preferences/automation/action/condition-group-widget.ui:45
+#, fuzzy
+msgid "Add Group"
+msgstr "Ajouter un groupe"
+
+#: src/ui/preferences/automation/action/condition-group-widget.vala:344
+#, fuzzy
+msgid "AND"
+msgstr "ET"
+
+#: src/ui/preferences/automation/action/condition-group-widget.vala:345
+#, fuzzy
+msgid "OR"
+msgstr "OU"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:26
+#, fuzzy
+msgid "Is"
+msgstr "Est"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:27
+#, fuzzy
+msgid "Is Not"
+msgstr "N'est pas"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:39
+#, fuzzy
+msgid "Equals"
+msgstr "Égale"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:40
+#, fuzzy
+msgid "Greater Than"
+msgstr "Plus grand que"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:41
+#, fuzzy
+msgid "Less Than"
+msgstr "Moins que"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:67
+#, fuzzy
+msgid "Yes"
+msgstr "Oui"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:68
+#, fuzzy
+msgid "No"
+msgstr "Non"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:95
+#, fuzzy
+msgid "Minutes"
+msgstr "Minutes"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:96
+#, fuzzy
+msgid "Seconds"
+msgstr "Secondes"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:97
+#, fuzzy
+msgid "Hours"
+msgstr "Heures"
+
+#. translators: No field selected when defining a condition.
+#: src/ui/preferences/automation/action/condition-widget.vala:115
+#, fuzzy
+msgid "Select Field…"
+msgstr "Choisir un champ…"
+
+#: src/ui/preferences/automation/action/condition-widget.vala:116
+msgid "State"
+msgstr "État"
+
+#: src/ui/preferences/automation/action/condition-widget.vala:119
+#, fuzzy
+msgid "Running"
+msgstr "En cours"
+
+#: src/ui/preferences/automation/action/condition-widget.vala:121
+#, fuzzy
+msgid "Duration"
+msgstr "Durée"
+
+#: src/ui/preferences/automation/action/variable-popover.ui:19
+#: src/ui/preferences/automation/action/variable-popover.ui:161
+#, fuzzy
+msgid "Insert Variable"
+msgstr "Insérer une variable"
+
+#: src/ui/preferences/automation/action/variable-popover.ui:132
+#, fuzzy
+msgid "Format"
+msgstr "Format"
+
+#: src/ui/preferences/automation/preferences-panel-automation.ui:13
+#, fuzzy
+msgid "_Log"
+msgstr "_Journal"
+
+#: src/ui/preferences/automation/preferences-panel-automation.ui:15
+#, fuzzy
+msgid "Show execution log"
+msgstr "Afficher le journal d'exécution"
+
+#: src/ui/preferences/automation/preferences-panel-automation.ui:24
+#, fuzzy
+msgid ""
+"Run shell commands automatically on timer events or conditions. <a "
+"href=\"\">Learn more.</a>"
+msgstr ""
+"Lancer des commandes automatiquement sur des événements ou conditions du "
+"minuteur. <a href=\"\">En savoir plus.</a>"
+
+#: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
+#, fuzzy
+msgid "Set Shortcut"
+msgstr "Raccourci clavier"
+
+#: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
+#, fuzzy
+msgid "_Set"
+msgstr "_Définir"
+
+#: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:63
+#: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
+#, fuzzy
+msgid "Disabled"
+msgstr "Désactiver"
+
+#: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
+#, fuzzy
+msgid ""
+"Press <b>Esc</b> to cancel or <b>Backspace</b> to disable the keyboard "
+"shortcut"
+msgstr ""
+"Appuyez sur <b>Échap</b> pour annuler ou <b>Retour arrière</b> pour "
+"désactiver le raccourci clavier"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:17
+#, fuzzy
+msgid ""
+"Global shortcuts let you control the app even when it’s not on screen. They "
+"work as long as the app is running in the background."
+msgstr ""
+"Les raccourcis globaux permettent de contrôler l'application même hors "
+"écran. Ils fonctionnent tant que l'application tourne en arrière-plan."
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:20
+#, fuzzy
+msgid "Open app settings for editing global shortcuts"
+msgstr "Ouvrir les paramètres pour modifier les raccourcis globaux"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:25
+#, fuzzy
+msgid "_Edit"
+msgstr "_Modifier"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:41
+#, fuzzy
+msgid "Enter new shortcut for starting or stopping the timer"
+msgstr "Saisissez un raccourci pour commencer ou arrêter le minuteur"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:48
+#, fuzzy
+msgid "Enter new shortcut to start/pause/resume the timer"
+msgstr ""
+"Saisissez un raccourci pour commencer/interrompre/continuer le minuteur"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:58
+#, fuzzy
+msgid "Enter new shortcut for starting the timer"
+msgstr "Saisissez un nouveau raccourci pour démarrer le minuteur"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:65
+#, fuzzy
+msgid "Enter new shortcut for stopping the timer"
+msgstr "Saisissez un nouveau raccourci pour arrêter le minuteur"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:72
+#, fuzzy
+msgid "Enter new shortcut for pausing the timer"
+msgstr "Saisissez un nouveau raccourci pour interrompre le minuteur"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:79
+#, fuzzy
+msgid "Enter new shortcut for resuming the timer"
+msgstr "Saisissez un nouveau raccourci pour continuer le minuteur"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:86
+#, fuzzy
+msgid "Enter new shortcut for skipping"
+msgstr "Saisissez un nouveau raccourci pour sauter"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:92
+#, fuzzy
+msgid "Rewind One Minute"
+msgstr "Rembobiner d'une minute"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:93
+#, fuzzy
+msgid "Enter new shortcut for rewinding"
+msgstr "Saisissez un nouveau raccourci pour rembobiner"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:107
+#, fuzzy
+msgid "Enter new shortcut for bringing window to focus"
+msgstr "Saisissez un nouveau raccourci pour mettre la fenêtre au premier plan"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:17
+#, fuzzy
+msgid "Announcements"
+msgstr "Annonces"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:20
+#, fuzzy
+msgid "Time Running Out"
+msgstr "Temps presque écoulé"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
+#, fuzzy
+msgid "Notify when Pomodoro or break is about to end."
+msgstr ""
+"Prévenir quand le Pomodoro ou la pause est sur le point de se terminer."
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
+msgid "Screen Overlay"
+msgstr "Superposition d'écran"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:29
+#, fuzzy
+msgid "A full-screen notification intended to enforce taking a break."
+msgstr "Une notification plein écran destinée à forcer la prise d'une pause."
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:37
+#, fuzzy
+msgid "Lock Delay"
+msgstr "Délai de verrouillage"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:38
+#, fuzzy
+msgid "Period of inactivity to lock the screen."
+msgstr "Période d'inactivité avant de verrouiller l'écran."
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:42
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:61
+#, fuzzy
+msgid "15 seconds"
+msgstr "15 secondes"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:43
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:62
+#, fuzzy
+msgid "30 seconds"
+msgstr "30 secondes"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:44
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:63
+#, fuzzy
+msgid "1 minute"
+msgstr "1 minute"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:45
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:64
+#, fuzzy
+msgid "2 minutes"
+msgstr "2 minutes"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:46
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:65
+#, fuzzy
+msgid "3 minutes"
+msgstr "3 minutes"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:47
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:66
+#, fuzzy
+msgid "5 minutes"
+msgstr "5 minutes"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:48
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:67
+#, fuzzy
+msgid "Never"
+msgstr "Jamais"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:56
+#, fuzzy
+msgid "Reopen Delay"
+msgstr "Délai de réouverture"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:57
+#, fuzzy
+msgid "Period of inactivity to reopen the overlay after it gets dismissed."
+msgstr ""
+"Période d'inactivité avant de rouvrir la superposition après fermeture."
+
+#: src/ui/preferences/preferences-window.vala:37
+msgid "Notifications"
+msgstr "Notifications"
+
+#: src/ui/preferences/preferences-window.vala:44
+msgid "Sounds"
+msgstr "Sons"
+
+#: src/ui/preferences/preferences-window.vala:51
+#, fuzzy
+msgid "Appearance"
+msgstr "Apparence"
+
+#: src/ui/preferences/preferences-window.vala:58
+#, fuzzy
+msgid "Keyboard Shortcuts"
+msgstr "Raccourcis clavier"
+
+#: src/ui/preferences/preferences-window.vala:71
+#, fuzzy
+msgid "Automation"
+msgstr "Automatisation"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
+#, fuzzy
+msgid "Sounds Are Disabled"
+msgstr "Les sons sont désactivés"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:36
+#, fuzzy
+msgid "Alert Sounds"
+msgstr "Sons d'alerte"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
+#, fuzzy
+msgid "Pomodoro Finished Sound"
+msgstr "Son de fin de Pomodoro"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
+#, fuzzy
+msgid "Break Finished Sound"
+msgstr "Son de fin de pause"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
+#, fuzzy
+msgid "Background Sound"
+msgstr "Son d'ambiance"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
+msgid "Bell"
+msgstr "Cloche"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:21
+msgid "Loud Bell"
+msgstr "Cloche forte"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:24
+msgid "Clock Ticking"
+msgstr "Horloge"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:25
+msgid "Timer Ticking"
+msgstr "Minuteur"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:26
+#, fuzzy
+msgid "Birds"
+msgstr "Oiseaux"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:86
+#: src/ui/preferences/sounds/sound-chooser-window.ui:25
+msgid "None"
+msgstr "Aucun"
+
+#: src/ui/preferences/sounds/sound-chooser-window.ui:63
+msgid "Volume:"
+msgstr "Volume :"
+
+#: src/ui/preferences/sounds/sound-chooser-window.vala:249
+msgid "Select Custom Sound"
+msgstr "Sélectionnez un son personnalisé"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:20
+#, fuzzy
+msgid "Pomodoro Duration"
+msgstr "Durée d'un Pomodoro"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:31
+#, fuzzy
+msgid "Short Break Duration"
+msgstr "Durée d'une courte pause"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:42
+#, fuzzy
+msgid "Long Break Duration"
+msgstr "Durée d'une longue pause"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:53
+#, fuzzy
+msgid "Number of Cycles"
+msgstr "Nombre de cycles"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:93
+msgid "Behavior"
+msgstr "Comportement"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:96
+msgid "Pause By Locking The Screen"
+msgstr "Interrompre en verrouillant l'écran"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:101
+#, fuzzy
+msgid "Confirm Starting a Break"
+msgstr "Confirmer le début d'une pause"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:106
+#, fuzzy
+msgid "Confirm Starting a Pomodoro"
+msgstr "Confirmer le début d'un Pomodoro"
+
+#. translators: time formatted as text: "5 minutes 30 seconds"
+#: src/ui/preferences/timer/preferences-panel-timer.vala:87
+#, fuzzy, c-format
+msgid "A single session will take <b>%s</b>."
+msgstr "Une session unique prendra <b>%s</b>."
+
+#: src/ui/preferences/timer/preferences-panel-timer.vala:88
+#, fuzzy, c-format
+msgid "<b>%u%%</b> of the time will be allocated for breaks."
+msgstr "<b>%u%%</b> du temps sera alloué aux pauses."
+
+#: src/ui/preferences/timer/preferences-panel-timer.vala:136
+#, fuzzy
+msgid "Apply changes to ongoing Pomodoro?"
+msgstr "Appliquer les changements au Pomodoro en cours ?"
+
+#: src/ui/preferences/timer/preferences-panel-timer.vala:137
+#, fuzzy
+msgid "Apply changes to ongoing break?"
+msgstr "Appliquer les changements à la pause en cours ?"
+
+#: src/ui/preferences/timer/preferences-panel-timer.vala:139
+#, fuzzy
+msgid "Apply"
+msgstr "Appliquer"
+
+#: src/ui/preferences/widgets/preferences-sidebar.vala:73
+#, fuzzy
+msgctxt "accessibility"
+msgid "Sidebar"
+msgstr "Barre latérale"
+
+#~ msgid "Run as background service"
+#~ msgstr "Exécuter en tant que service d'arrière-plan"
+
+#~ msgid "About Pomodoro"
+#~ msgstr "À propos de Pomodoro"
+
+#~ msgid "A simple time management utility"
+#~ msgstr "Un outil simple de gestion du temps"
+
+#, fuzzy
+#~ msgid "_Stopped"
+#~ msgstr "Arrêter"
+
+#, fuzzy
+#~ msgid "Extension for GNOME Shell is available"
+#~ msgstr "Indicateur pour GNOME Shell"
+
+#, fuzzy
+#~ msgid "_Install"
+#~ msgstr "Installer"
+
+#, fuzzy, c-format
+#~ msgid "Long break due in %s"
+#~ msgstr "Durée d'une pause longue"
+
+#~ msgid "A time management utility for GNOME"
+#~ msgstr "Un utilitaire de gestion du temps pour GNOME"
+
+#~ msgid ""
+#~ "A GNOME utility that helps managing time according to Pomodoro Technique. "
+#~ "It intends to improve productivity and focus by taking short breaks after "
+#~ "every 25 minutes of work."
+#~ msgstr ""
+#~ "Un utilitaire GNOME qui aide à la gestion du temps selon la technique "
+#~ "Pomodoro. Il vise à améliorer la productivité et la concentration en "
+#~ "aménageant de courtes pauses toutes les 25 minutes de travail."
+
+#~ msgid "Timer window"
+#~ msgstr "Fenêtre de la minuterie"
+
+#~ msgid "Indicator for GNOME Shell"
+#~ msgstr "Indicateur pour GNOME Shell"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 4.0"
+#~ msgstr "Indicateur pour GNOME Shell"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 3.36"
+#~ msgstr "Indicateur pour GNOME Shell"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 3.34 only"
+#~ msgstr "Indicateur pour GNOME Shell"
+
+#~ msgid "_Timer"
+#~ msgstr "_Minuteur"
+
+#~ msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
+#~ msgstr ""
+#~ "Raccourci clavier pour basculer la minuterie. Entrez le nouveau raccourci "
+#~ "à modifier."
+
+#~ msgid "Pomodoros before a long break"
+#~ msgstr "Pomodoros avant une longue pause"
+
+#~ msgid "Keyboard shortcut"
+#~ msgstr "Raccourci clavier"
+
+#~ msgid "Screen notifications"
+#~ msgstr "Notification à l'écran"
+
+#~ msgid "Desktop"
+#~ msgstr "Bureau"
+
+#~ msgid "Wait for activity after a break"
+#~ msgstr "Attendre qu'il y ait de l'activité après une pause"
+
+#~ msgid "Plugins…"
+#~ msgstr "Greffons…"
+
+#~ msgid "Plugins"
+#~ msgstr "Greffons"
+
+#~ msgid "Back"
+#~ msgstr "Retour"
+
+#~ msgid "Complete a few sessions"
+#~ msgstr "Effectuez quelques séances"
+
+#~ msgid "Previous (Alt+Left)"
+#~ msgstr "Précédent (Alt+Gauche)"
+
+#~ msgid "Next (Alt+Right)"
+#~ msgstr "Suivant (Alt+Droite)"
+
+#~ msgid "Complete"
+#~ msgstr "Terminé"
+
+#~ msgid "Enable"
+#~ msgstr "Activer"
+
+#~ msgid "Add"
+#~ msgstr "Ajouter"
+
+#~ msgid "Remove"
+#~ msgstr "Supprimer"
+
+#~ msgid "Elapsed Time"
+#~ msgstr "Temps écoulé"
+
+#~ msgid "Pause Timer"
+#~ msgstr "Interrompre"
+
+#~ msgid "Pause break"
+#~ msgstr "Interrompre pause"
+
+#~ msgid "Pause Pomodoro"
+#~ msgstr "Interrompre pomodoro"
+
+#~ msgid "Resume break"
+#~ msgstr "Continuer la pause"
+
+#~ msgid "Resume Pomodoro"
+#~ msgstr "Continuer pomodoro"
+
+#, javascript-format
+#~ msgid "%d minute remaining"
+#~ msgid_plural "%d minutes remaining"
+#~ msgstr[0] "%d minute restante"
+#~ msgstr[1] "%d minutes restantes"
+
+#~ msgid "Report issue"
+#~ msgstr "Signaler un problème"
+
+#, javascript-format
+#~ msgid "Failed to run <i>%s</i> service"
+#~ msgstr "Impossible d'exécuter le service <i>%s</i>"
+
+#~ msgid "Woodland Birds"
+#~ msgstr "Oiseaux forestiers"
+
+#~ msgid "End of Break Sound"
+#~ msgstr "Son de fin de pause"
+
+#~ msgid "Start of Break Sound"
+#~ msgstr "Son de début de pause"
+
+#~ msgid "Off"
+#~ msgstr "Arrêt"
+
+#~ msgid "Ticking sound"
+#~ msgstr "Tic-tac"
+
+#~ msgid "Start of break sound"
+#~ msgstr "Son de début de pause"
+
+#~ msgid "End of break sound"
+#~ msgstr "Son de fin de pause"
+
+#~ msgid "Focus on your task."
+#~ msgstr "Concentrez-vous sur votre tâche."
+
 #, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minute"
-msgstr[1] "%d minutes"
+#~ msgid "You have %d minute"
+#~ msgid_plural "You have %d minutes"
+#~ msgstr[0] "Vous avez %d minutes"
+#~ msgstr[1] "%d minutes"
+
+#, c-format
+#~ msgid "You have %d second"
+#~ msgid_plural "You have %d seconds"
+#~ msgstr[0] "Vous avez %d seconde avant le prochain pomodoro"
+#~ msgstr[1] "Vous avez %d secondes avant le prochain pomodoro"
+
+#~ msgid "Take a longer break"
+#~ msgstr "Faites une pause plus longue"
+
+#~ msgid "Lengthen it"
+#~ msgstr "Prolonger la pause"
+
+#~ msgid "Shorten it"
+#~ msgstr "Raccourcir la pause"
+
+#~ msgid "Start pomodoro"
+#~ msgstr "Démarrer un pomodoro"
+
+#, c-format
+#~ msgid ""
+#~ "Using \"%s\" as shortcut will interfere with typing. Try adding another "
+#~ "key, such as Control, Alt or Shift."
+#~ msgstr ""
+#~ "L'utilisation de \"%s\" comme raccourci interférera avec la saisie. "
+#~ "Essayez d'ajouter une autre touche, telle que Contrôle, Alt ou Maj."
+
+#~ msgid "Available"
+#~ msgstr "Disponible"
+
+#~ msgid "Busy"
+#~ msgstr "Occupé"
+
+#~ msgid "Idle"
+#~ msgstr "Au repos"
+
+#~ msgid "Invisible"
+#~ msgstr "Invisible"
+
+#, c-format
+#~ msgid "%d m"
+#~ msgstr "%d m"
+
+#, c-format
+#~ msgid "%.0f h"
+#~ msgstr "%.0f h"
+
+#, c-format
+#~ msgid "%.1f h"
+#~ msgstr "%.1f h"
 
 #~ msgid "time;timer;tasks;manage;organize;"
 #~ msgstr "temps;minuteur;tâches;gérer;organiser;"
@@ -624,10 +2005,6 @@ msgstr[1] "%d minutes"
 #, javascript-format
 #~ msgid "%ds"
 #~ msgstr "%ds"
-
-#, javascript-format
-#~ msgid "%dm"
-#~ msgstr "%dm"
 
 #~ msgid "Take a break!"
 #~ msgstr "Faites une pause !"
@@ -696,32 +2073,17 @@ msgstr[1] "%d minutes"
 #~ msgid "Status during pomodoro"
 #~ msgstr "Statut pendant un pomodoro"
 
-#~ msgid "Status during break"
-#~ msgstr "Statut pendant une pause"
-
 #~ msgid "Empathy"
 #~ msgstr "Empathy"
 
 #~ msgid "Set custom status"
 #~ msgstr "Définir un statut personnalisé"
 
-#~ msgid "Short break duration"
-#~ msgstr "Durée d'une pause courte"
-
-#~ msgid "Shortcut to toggle the timer"
-#~ msgstr "Raccourci pour activer ou désactiver le minuteur"
-
-#~ msgid "Indicator appearance"
-#~ msgstr "Apparence de l'indicateur"
-
 #~ msgid "Remind to take a break"
 #~ msgstr "Rappeler de faire une pause"
 
 #~ msgid "Wake up screen"
 #~ msgstr "Écran de réveil"
-
-#~ msgid "Select sound for start of break"
-#~ msgstr "Choisir un son de début de pause"
 
 #~ msgid "Select sound for end of break"
 #~ msgstr "Choisir un son de fin de pause"
@@ -738,9 +2100,6 @@ msgstr[1] "%d minutes"
 #~ msgid "Presence"
 #~ msgstr "Présence"
 
-#~ msgid "Hide notifications during pomodoro"
-#~ msgstr "Cacher les notifications pendant un pomodoro"
-
 #~ msgid "Change presence status"
 #~ msgstr "Changer le statut de présence"
 
@@ -752,12 +2111,6 @@ msgstr[1] "%d minutes"
 
 #~ msgid "All files"
 #~ msgstr "Tous les fichiers"
-
-#~ msgid "Other…"
-#~ msgstr "Autre…"
-
-#~ msgid "None"
-#~ msgstr "Aucun"
 
 #~ msgid "Supported audio files"
 #~ msgstr "Fichiers audio pris en charge"
@@ -781,9 +2134,6 @@ msgstr[1] "%d minutes"
 #~ "modifier suivant les termes de la GNU General Public License telle que "
 #~ "publiée par la Free Software Foundation ; soit la version 3 de la "
 #~ "licence, soit (à votre gré) toute version ultérieure."
-
-#~ msgid "Sounds"
-#~ msgstr "Sons"
 
 #~ msgid "Select sound for pomodoro start"
 #~ msgstr "Choisir le son pour le démarrage d’un pomodoro"
@@ -818,12 +2168,6 @@ msgstr[1] "%d minutes"
 #~ msgid "Could not run pomodoro"
 #~ msgstr "Impossible de lancer le pomodoro"
 
-#~ msgid "Something went badly wrong..."
-#~ msgstr "Quelque chose s'est très mal passé..."
-
-#~ msgid "Install"
-#~ msgstr "Installer"
-
 #, fuzzy
 #~ msgid "Reset Counts and Timer"
 #~ msgstr "Réinitialiser le compteur et le minuteur"
@@ -837,10 +2181,6 @@ msgstr[1] "%d minutes"
 #~ msgid_plural "%d Completed Sessions"
 #~ msgstr[0] "%d pomodoro terminé"
 #~ msgstr[1] "%d pomodoros terminés"
-
-#, fuzzy
-#~ msgid "Pause finished."
-#~ msgstr "Pause terminée."
 
 #, fuzzy
 #~ msgid "Time in seconds you are supposed to be working."
@@ -887,9 +2227,6 @@ msgstr[1] "%d minutes"
 #~ msgid "Whether to restore state on startup."
 #~ msgstr "S'il faut restaurer l’état du minuteur au démarrage."
 
-#~ msgid "Number of completed sessions"
-#~ msgstr "Nombre de pomodoro terminés"
-
 #~ msgid "Number of completed sessions since long break"
 #~ msgstr "Nombre de pomodoro terminés depuis la longue pause"
 
@@ -922,10 +2259,6 @@ msgstr[1] "%d minutes"
 
 #~ msgid "Hide"
 #~ msgstr "Masquer"
-
-#, fuzzy
-#~ msgid "Show dialog"
-#~ msgstr "Afficher la boîte de dialogue"
 
 #~ msgid "Timer toggle key"
 #~ msgstr "Raccourci d’activation du minuteur"

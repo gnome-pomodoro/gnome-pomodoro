@@ -1,5 +1,0 @@
-extends:
- - ./lint/eslintrc-gjs.yml
- - ./lint/eslintrc-shell.yml
-parserOptions:
-    sourceType: module

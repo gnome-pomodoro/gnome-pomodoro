@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="gnome-pomodoro">
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <template class="PomodoroStatsCard" parent="AdwBin">
+    <property name="focusable">false</property>
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+        <property name="halign">center</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="label" bind-source="PomodoroStatsCard" bind-property="label" bind-flags="sync-create"/>
+            <style>
+              <class name="heading"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel" id="value_label">
+            <style>
+              <class name="value"/>
+            </style>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>

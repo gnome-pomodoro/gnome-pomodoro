@@ -1,0 +1,687 @@
+/*
+ * Colors
+ *
+ * Most of custom widgets require that colors are opaque, so we can't rely on
+ * theme variables unfortunately.
+ */
+@define-color pomodoro_primary_color color-mix(in srgb, @window_fg_color 97.5%, @window_bg_color);
+@define-color pomodoro_unfocused_primary_color color-mix(in srgb, @window_fg_color 49.5%, @window_bg_color);
+@define-color pomodoro_insensitive_primary_color color-mix(in srgb, @window_fg_color 30%, @window_bg_color);
+
+@define-color pomodoro_secondary_color color-mix(in srgb, @pomodoro_primary_color 50%, @window_bg_color);
+@define-color pomodoro_unfocused_secondary_color color-mix(in srgb, @pomodoro_unfocused_primary_color 50%, @window_bg_color);
+@define-color pomodoro_insensitive_secondary_color color-mix(in srgb, @pomodoro_insensitive_primary_color 50%, @window_bg_color);
+
+@define-color pomodoro_support_color color-mix(in srgb, @pomodoro_primary_color 13.5%, @window_bg_color);
+@define-color pomodoro_unfocused_support_color color-mix(in srgb, @pomodoro_support_color 50%, @window_bg_color);
+@define-color pomodoro_insensitive_support_color color-mix(in srgb, @pomodoro_support_color 50%, @window_bg_color);
+
+
+/*
+ * Misc
+ */
+.pomodoro-header-bar viewswitcher.wide image {
+    opacity: 0.001;  /* setting opacity to 0 causes errors */
+    margin-right: -16px;
+}
+
+.pomodoro-header-bar viewswitcher.wide label {
+    margin-right: 2px;
+}
+
+.keybinding {
+    font-size: 16pt;
+}
+
+.keybinding .key {
+    font-weight: bold;
+    background-color: @theme_base_color;
+    padding: 8px 16px;
+    border: 1px solid alpha(@borders, 0.4);
+    border-radius: 5px;
+}
+
+
+row.pomodoro-log-scale {
+    padding: 14px 14px 7px 14px;
+}
+
+.pomodoro-list > row.pomodoro-slim-row {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.pomodoro-plugin-name {
+    font-weight: bold;
+}
+
+.pomodoro-plugin-description {
+    font-size: small;
+}
+
+.pomodoro-state-button {
+    padding-top: 5px;
+    padding-bottom: 6px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+
+/**
+ * PomodoroTimerControlButtons widget
+ */
+timercontrolbuttons.circular button {
+    border-radius: 50%;
+}
+
+
+/**
+ * PomodoroSessionProgressBar widget
+ */
+sessionprogressbar .through {
+    color: @pomodoro_support_color;
+}
+
+sessionprogressbar:backdrop .through {
+    color: @pomodoro_unfocused_support_color;
+}
+
+sessionprogressbar:disabled .through {
+    color: @pomodoro_insensitive_support_color;
+}
+
+sessionprogressbar .highlight {
+    color: @pomodoro_primary_color;
+}
+
+sessionprogressbar:backdrop .highlight {
+    color: @pomodoro_unfocused_primary_color;
+}
+
+
+/**
+ * PomodoroTimerProgressBar widget
+ */
+timerprogressbar .through {
+    color: @pomodoro_support_color;
+}
+
+timerprogressbar:backdrop .through {
+    color: @pomodoro_unfocused_support_color;
+}
+
+timerprogressbar:disabled .through {
+    color: @pomodoro_insensitive_support_color;
+}
+
+timerprogressbar .highlight {
+    color: @pomodoro_primary_color;
+}
+
+timerprogressbar:backdrop .highlight {
+    color: @pomodoro_unfocused_primary_color;
+}
+
+
+/**
+ * PomodoroTimerLabel widget
+ */
+timerlabel .placeholder {
+    color: @unfocused_borders;
+}
+
+
+/**
+ * PomodoroTimerView widget
+ */
+timerview button:backdrop,
+timerview button:disabled {
+    color: @insensitive_fg_color;
+}
+
+timerview timerlabel {
+    font-size: 55pt;  /* reference size */
+    font-weight: 400;
+}
+
+timerview sessionprogressbar {
+    padding: 12px 0;
+    margin: 0 3px;
+}
+
+timerview timercontrolbuttons button {
+    padding: 16px;
+    -gtk-icon-size: 24px;
+}
+
+timerview timercontrolbuttons button.suggested-action {
+    padding: 20px;
+}
+
+timerview timercontrolbuttons .suggested-action,
+timerview timercontrolbuttons .suggested-action:focus,
+timerview timercontrolbuttons .suggested-action:hover,
+timerview timercontrolbuttons .suggested-action:active {
+    border: 0;
+    color: @theme_bg_color;
+    background-color: @theme_fg_color;
+    background-image: none;
+}
+
+timerview .suggested-action:focus {
+    outline-width: 3px;
+    outline-offset: 0px;
+}
+
+timerview .suggested-action:backdrop,
+timerview .suggested-action:backdrop:hover,
+timerview .suggested-action:disabled {
+    color: @theme_bg_color;
+    background-color: @insensitive_fg_color;
+}
+
+timerview .pomodoro-state-menu > button {
+    padding: 8px 12px 8px 16px;
+}
+
+timerview .pomodoro-state-menu arrow {
+    opacity: 0;
+    margin: 0;
+    margin-left: -16px;
+}
+
+timerview timerlabel:backdrop,
+timerview timerstatemenu label:backdrop {
+    color: @pomodoro_unfocused_primary_color;
+}
+
+timerview:dir(rtl) .pomodoro-state-menu > button {
+    padding: 8px 16px 8px 12px;
+}
+
+timerview:dir(rtl) .pomodoro-state-menu arrow {
+    margin: 0;
+    margin-right: -16px;
+}
+
+
+/**
+ * PomodoroCompactTimerView widget
+ */
+compacttimerview {
+    min-width: 300px;
+    padding: 5px;
+}
+
+compacttimerview > grid > separator {
+    margin-left: 7px;
+}
+
+compacttimerview .pomodoro-state-menu > button {
+    padding: 3px 5px 3px 9px;
+}
+
+compacttimerview .pomodoro-state-menu arrow {
+    opacity: 0;
+    margin: 0;
+    margin-left: -16px;
+}
+
+compacttimerview timerlabel {
+    font-size: 16pt;
+    font-weight: 600;
+}
+
+compacttimerview timerprogressbar {
+    padding: 0 0 0 9px;
+}
+
+compacttimerview timercontrolbuttons button {
+    padding: 3px;
+}
+
+compacttimerview:dir(rtl) > grid > separator {
+    margin: 0;
+    margin-right: 7px;
+}
+
+compacttimerview:dir(rtl) .pomodoro-state-menu > button {
+    padding: 3px 9px 3px 5px;
+}
+
+compacttimerview:dir(rtl) .pomodoro-state-menu arrow {
+    margin: 0;
+    margin-right: -16px;
+}
+
+compacttimerview:dir(rtl) timerprogressbar {
+    padding: 0 9px 0 0;
+}
+
+compacttimerview:backdrop timerprogressbar .highlight {
+    color: @pomodoro_primary_color;
+}
+
+
+/**
+ * PomodoroStatsView
+ */
+
+statsview #title > button {
+    padding: 4px 12px 4px 12px;
+}
+
+statsview .title-1 {
+    font-size: 1.6em;
+    font-weight: bold;
+}
+
+statsview .title-2 {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+statsview .osd.toolbar {
+    padding: 2px;
+    border-radius: 14px;
+}
+
+statsview .osd.toolbar > button {
+    border: none;
+    padding: 2px;
+    border-radius: 12px;
+    min-height: 20px;
+    min-width: 20px;
+}
+
+statsview chart label,
+statsview chart chartaxis,
+statsview statscard label.heading {
+   color: alpha(@theme_fg_color, 0.7);
+}
+
+statsview:backdrop #navigation image,
+statsview:backdrop label.heading,
+statsview:backdrop chart label,
+statsview:backdrop chart chartaxis {
+   color: @insensitive_fg_color;
+}
+
+statsview:backdrop canvas {
+   opacity: 0.95;
+}
+
+
+/**
+ * ChartGrid widget
+ */
+chartgrid {
+    color: @unfocused_borders;
+}
+
+
+/**
+ * PomodoroStatsCard
+ */
+statscard {
+    padding: 12px;
+}
+
+statscard label.heading {
+    font-size: 1em;
+    font-weight: 800;
+}
+
+statscard label.value {
+    font-size: 1.6em;
+    font-weight: 400;
+}
+
+statscard .pill {
+    padding: 1pt 6pt 2pt 6pt;
+    font-size: 10pt;
+    border: none;
+    border-radius: 10pt;
+    background-clip: padding-box;
+    color: #666;
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+statscard .pill.positive {
+    color: #449e70;
+    background-color: rgba(78, 160, 114, 0.15);
+}
+
+statscard .pill.negative {
+    color: #d24444;
+    background-color: rgba(184, 52, 52, 0.15);
+}
+
+
+/**
+ * PomodoroBarChart, PomodoroBubbleChart widgets
+ */
+chart scrolledwindow undershoot.left {
+    background: linear-gradient(to right, @theme_bg_color, transparent 100%);
+}
+
+chart scrolledwindow undershoot.right {
+    background: linear-gradient(to left, @theme_bg_color, transparent 100%);
+}
+
+chart .bar:not(:disabled):hover,
+chart .bubble:not(:disabled):hover {
+    filter: contrast(0.75) brightness(1.15);
+}
+
+
+/**
+ * PomodoroDayChooser widgets
+ */
+calendar {
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-size: inherit;
+}
+
+calendar header {
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-size: inherit;
+    font-weight: 600;
+}
+
+calendar grid,
+calendar box.weekday {
+    font-size: 90%;
+}
+
+calendar box.weekday {
+    margin: 8px 12px 3px 12px;
+}
+
+calendar box.weekday.dim-label {
+    color: alpha(@theme_fg_color, 0.5);
+    opacity: 1;
+    filter: none;
+}
+
+calendar grid button {
+    font-weight: 400;
+}
+
+calendar grid button:selected {
+   color: @accent_fg_color;
+   background-color: @accent_bg_color;
+   font-weight: 600;
+}
+
+calendar grid button:disabled,
+calendar grid button.dim-label {
+    color: alpha(@theme_fg_color, 0.5);
+    opacity: 1;
+    filter: none;
+}
+
+calendar grid button.dim-label:selected {
+    color: @accent_fg_color;
+    background-color: alpha(@accent_bg_color, 0.5);
+    opacity: 1;
+    filter: none;
+}
+
+calendar grid .week-number {
+    font-weight: 600;
+}
+
+calendar grid .week:selected .day-number {
+    color: alpha(@accent_fg_color, 0.8);
+}
+
+calendar grid .week:selected .day-number.dim-label {
+    color: alpha(@accent_fg_color, 0.6);
+}
+
+calendar grid .circular {
+    padding: 0px;
+    min-height: 32px;
+}
+
+calendar grid .pill {
+    padding: 6px;
+}
+
+calendar grid .pill.week {
+    padding: 0px 12px;
+    font-weight: 400;
+}
+
+
+/**
+ * PomodoroCondition widget
+ */
+condition.card {
+    padding: 6px;
+}
+
+
+/**
+ * PomodoroConditionGroup widget
+ */
+button.small.pill {
+    font-size: 90%;
+    padding: 6px 12px;
+}
+
+menubutton.small.pill {
+    padding: 0;
+}
+
+menubutton.small.pill button {
+    font-size: 90%;
+    padding: 6px 12px;
+}
+
+
+/*
+ * Screen Overlay
+ */
+lightbox {
+    background-color: rgba(0, 0, 0, 1.0);
+    color: white;
+    padding: 0;
+}
+
+lightbox .contents {
+    padding: 20px;
+}
+
+lightbox timerlabel {
+    font-size: 65pt;
+    font-weight: 400;
+}
+
+lightbox .message {
+    font-size: 15pt;
+}
+
+lightbox button {
+    padding: 10px;
+}
+
+lightbox button:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+lightbox button:active {
+    background-color: rgba(255, 255, 255, 0.30);
+}
+
+
+/*
+ * Preferences window
+ */
+
+.preferences .sidebar {
+    border: none;
+}
+
+popover.menu .title.no-padding {
+    padding-left: 10px;
+}
+
+
+/*
+ * Action edit window
+ */
+
+.events-list list.boxed-list > row:nth-last-child(2) {
+    border-bottom: none;  /* hide separator between last row and hidden placeholder */
+}
+
+
+/*
+ * Log window
+ */
+
+.navigation-sidebar header {
+    padding-left: 10px;
+}
+
+
+/*
+ * Shortcut edit window
+ */
+shortcut {
+    font-size: 150%;
+}
+
+shortcut label.keycap {
+     padding: 0.4em 0.7em;
+     margin: 0.3em;
+}
+
+
+/*
+ * PomodoroExtensionDialog widget
+ */
+
+.extension-dialog carouselindicatordots {
+    margin: 0px;
+}
+
+.extension-dialog carousel > box {
+    padding: 18px 24px 24px 24px;
+}
+
+.extension-dialog .icon {
+    color: alpha(currentColor, 0.9);
+    margin-bottom: 24px;
+}
+
+.extension-dialog .title-1 {
+    font-size: 160%;
+    margin-bottom: 20px;
+}
+
+.extension-dialog .title-2 {
+    font-size: 130%;
+    margin-top: 6px;
+    margin-bottom: 16px;
+}
+
+.extension-dialog .description {
+    margin-bottom: 20px;
+}
+
+.extension-dialog .response-area {
+    margin: 0 24px 24px 24px;
+}
+
+.extension-dialog .response-area button {
+    padding: 10px 20px;
+    border-radius: 12px;
+}
+
+.extension-dialog .linked *:first-child {
+   border-radius: 9px 0 0 9px;
+}
+
+.extension-dialog .linked *:last-child {
+   border-radius: 0 9px 9px 0;
+}
+
+.extension-dialog .body {
+   padding: 24px;
+}
+
+.extension-dialog .body .title {
+   padding: 0;
+   margin-bottom: 12px;
+}
+
+.extension-dialog .body .error-message {
+   margin-bottom: 12px;
+}
+
+.extension-dialog textview.monospace {
+    padding: 12px;
+    font-size: inherit;
+}
+
+
+/*
+ * PomodoroCheckmark widget
+ */
+
+checkmark {
+    background: @pomodoro_primary_color;
+    color: @window_bg_color;
+    border-radius: 50%;
+    padding: 16px;
+    outline: none;
+}
+
+checkmark:backdrop {
+    background: @pomodoro_unfocused_primary_color;
+}
+
+
+/*
+ * About dialog
+ */
+
+dialog.about .icon-dropshadow {
+   -gtk-icon-shadow: 0px 1px rgba(0, 0, 0, 0.02),
+                     0px -1px rgba(0, 0, 0, 0.02),
+                     1px 0px rgba(0, 0, 0, 0.02),
+                     -1px 0px rgba(0, 0, 0, 0.02);
+}
+
+
+/*
+ * Common
+ */
+
+.no-padding {
+    padding: 0;
+}
+
+.numeric {
+    font-feature-settings: "tnum";
+}
+
+.small-text {
+    font-size: 80%;
+    font-weight: 400;
+}
+
+.tooltip-contents {
+    font-size: 90%;
+}
+
+.tooltip-header {
+    font-weight: bold;
+}

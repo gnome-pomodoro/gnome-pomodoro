@@ -1,13 +1,15 @@
-# Telugu Translation for GNOME Pomodoro.
-# Copyright (C) 2024
+# Telugu translation for gnome-pomodoro
+# Copyright (c) 2024 gnome-pomodoro contributors
 # This file is distributed under the same license as the gnome-pomodoro package.
+#
+# Authors:
 # Aryan Karamtoth <aryankmmiv@outlook.com>, 2024.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-pomodoro\n"
+"Project-Id-Version: gnome-pomodoro 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-31 13:18+0200\n"
+"POT-Creation-Date: 2025-12-20 11:56+0100\n"
 "PO-Revision-Date: 2024-10-08 09:33+0530\n"
 "Last-Translator: Aryan Karamtoth <aryankmmiv@outlook.com>\n"
 "Language-Team: Telugu\n"
@@ -18,594 +20,1939 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 47.0\n"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:8
-#: data/org.gnome.Pomodoro.desktop.in:3 data/resources/menus.ui:28
-#: data/resources/window.ui:382 plugins/actions/enums.vala:92
-#: plugins/gnome/extension/indicator.js:77
-#: plugins/gnome/extension/indicator.js:729
-#: plugins/gnome/extension/notifications.js:281
-#: plugins/gnome/extension/timer.js:41 src/about-dialog.vala:31
-#: src/main.vala:50 src/notifications-capability.vala:129
-#: src/stats-page.vala:527 src/window.vala:44
-msgid "Pomodoro"
-msgstr "పోమోడోరో"
+#. Translators: Do NOT translate or transliterate this text
+#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:3
+msgid "@APPLICATION_NAME@"
+msgstr "@APPLICATION_NAME@"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:9
-msgid "A time management utility for GNOME"
-msgstr "గ్నోమ్ కోసం సమయ నిర్వహణ యుటిలిటీ"
+#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
+#, fuzzy
+msgid "Time management utility"
+msgstr "సమయ నిర్వహణ సాధనం"
 
-#: data/org.gnome.Pomodoro.appdata.xml.in:11
-msgid ""
-"A GNOME utility that helps managing time according to Pomodoro Technique. It "
-"intends to improve productivity and focus by taking short breaks after every "
-"25 minutes of work."
-msgstr ""
-"పోమోడోరో టెక్నిక్ ప్రకారం సమయాన్ని నిర్వహించడంలో సహాయపడే గ్నోమ్ యుటిలిటీ. ప్రతి 25 నిమిషాల పని తర్వాత చిన్న "
-"విరామాలు తీసుకోవడం ద్వారా ఉత్పాదకతను మెరుగుపరచడం మరియు దృష్టి కేంద్రీకరించడం దీని ఉద్దేశ్యం."
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:23
-msgid "Timer window"
-msgstr "టైమర్ విండో"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:27
-#: plugins/gnome/extension/indicator.js:83 src/preferences-dialog.vala:800
-msgid "Preferences"
-msgstr "ప్రాధాన్యతలు"
-
-#: data/org.gnome.Pomodoro.appdata.xml.in:31
-msgid "Indicator for GNOME Shell"
-msgstr "గ్నోమ్ షెల్ కోసం సూచిక"
-
-#: data/org.gnome.Pomodoro.desktop.in:4 src/about-dialog.vala:32
-msgid "A simple time management utility"
-msgstr "ఒక సాధారణ సమయ నిర్వహణ యుటిలిటీ"
-
-#: data/org.gnome.Pomodoro.desktop.in:5
+#. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
 msgid "timer;"
 msgstr "టైమర్;"
 
-#: data/resources/menus.ui:6 plugins/actions/enums.vala:188
-#: plugins/actions/resources/action-page.ui:155 src/application.vala:90
-msgid "Start"
-msgstr "ప్రారంభించండి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
+#: src/core/notification-manager.vala:335 src/core/state.vala:78
+#: src/main.vala:34 src/ui/main/dialogs/about-dialog.vala:16
+#: src/ui/main/stats/stats-day-page.ui:97
+#: src/ui/main/stats/stats-day-page.vala:87
+#: src/ui/main/stats/stats-month-page.ui:34
+#: src/ui/main/stats/stats-month-page.vala:43
+#: src/ui/main/stats/stats-week-page.ui:38
+#: src/ui/main/stats/stats-week-page.vala:41 src/ui/main/window.vala:183
+#: src/ui/preferences/automation/action/condition-widget.ui:53
+msgid "Pomodoro"
+msgstr "పోమోడోరో"
 
-#: data/resources/menus.ui:11 data/resources/window.ui:180
-#: plugins/actions/enums.vala:197 plugins/actions/resources/action-page.ui:200
-#: src/application.vala:99
-msgid "Pause"
-msgstr "పాజ్ చేయండి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:10
+#, fuzzy
+msgid "Maintain focus by taking frequent breaks"
+msgstr "తరచుగా విరామాలు తీసుకోవడం ద్వారా ఏకాగ్రతను కాపాడుకోండి"
 
-#: data/resources/menus.ui:16 plugins/actions/enums.vala:200
-#: plugins/actions/resources/action-page.ui:215 src/application.vala:102
-msgid "Resume"
-msgstr "పునఃప్రారంభించండి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:12
+#, fuzzy
+msgid ""
+"A productivity timer that helps you work more effectively by breaking your "
+"time into focused work sessions followed by short breaks. Work for 25 "
+"minutes, then take a 5-minute break to maintain concentration and prevent "
+"burnout."
+msgstr ""
+"మీ సమయాన్ని ఏకాగ్రతతో కూడిన పని సెషన్‌లుగా మరియు చిన్న విరామాలుగా విభజించడం ద్వారా మీరు మరింత ప్రభావవంతంగా "
+"పనిచేయడానికి సహాయపడే ఉత్పాదకత టైమర్. ఏకాగ్రతను కాపాడుకోవడానికి మరియు అలసటను నివారించడానికి 25 నిమిషాలు పని "
+"చేయండి, ఆపై 5 నిమిషాల విరామం తీసుకోండి."
 
-#: data/resources/menus.ui:21 data/resources/window.ui:207
-#: plugins/gnome/extension/indicator.js:221 src/application.vala:93
-#: src/window.vala:163 src/window.vala:176
-msgid "Stop"
-msgstr "ఆపు"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:16
+#, fuzzy
+msgid "Key features:"
+msgstr "ముఖ్య లక్షణాలు:"
 
-#: data/resources/menus.ui:33 data/resources/window.ui:398
-#: plugins/actions/enums.vala:95 plugins/gnome/extension/indicator.js:78
-#: plugins/gnome/extension/timer.js:44 src/window.vala:45
-msgid "Short Break"
-msgstr "చిన్న విరామం"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:20
+#, fuzzy
+msgid "Customizable work session and break lengths"
+msgstr "అనుకూలీకరించదగిన పని సెషన్ మరియు విరామ సమయాలు"
 
-#: data/resources/menus.ui:38 data/resources/window.ui:414
-#: plugins/actions/enums.vala:98 plugins/gnome/extension/indicator.js:79
-#: plugins/gnome/extension/timer.js:47 src/window.vala:46
-msgid "Long Break"
-msgstr "లాంగ్ బ్రేక్"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
+#, fuzzy
+msgid "Visual and audio notifications"
+msgstr "దృశ్య మరియు శ్రవణ నోటిఫికేషన్‌లు"
 
-#: data/resources/menus.ui:45
-msgid "_Timer"
-msgstr "టైమర్(_T)"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
+#, fuzzy
+msgid "Time tracking and statistics"
+msgstr "సమయ ట్రాకింగ్ మరియు గణాంకాలు"
 
-#: data/resources/menus.ui:49 data/resources/window.ui:309
-msgid "_Preferences"
-msgstr "ప్రాధాన్యతలు(_P)"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:23
+#, fuzzy
+msgid "GNOME desktop integration"
+msgstr "గ్నోమ్ డెస్క్‌టాప్ అనుసంధానం"
 
-#: data/resources/menus.ui:53 data/resources/window.ui:348
-msgid "_Quit"
-msgstr "విరమించండి(_Q)"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:24
+#, fuzzy
+msgid "Screen overlay during breaks"
+msgstr "విరామ సమయంలో స్క్రీన్ ఓవర్లే"
 
-#: data/resources/preferences-keyboard-shortcut-page.ui:29
-msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
-msgstr "టైమర్‌ను టోగుల్ చేయడానికి కీబోర్డ్ సత్వరమార్గం. మార్చడానికి కొత్త సత్వరమార్గాన్ని నమోదు చేయండి."
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
+#, fuzzy
+msgid "Run custom commands after Pomodoro or break"
+msgstr "పోమోడోరో లేదా విరామం తర్వాత అనుకూల ఆదేశాలను అమలు చేయండి"
 
-#: data/resources/preferences-keyboard-shortcut-page.ui:83
-#: plugins/actions/enums.vala:206 plugins/actions/resources/action-page.ui:245
-msgid "Disable"
-msgstr "ఆపివేయి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
+msgid "Kamil Prusko"
+msgstr "కామిల్ ప్రుస్కో"
 
-#: data/resources/preferences-main-page.ui:45 data/resources/window.ui:247
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:67 src/ui/main/window.ui:76
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:37
+#: src/ui/preferences/preferences-window.vala:30
 msgid "Timer"
 msgstr "టైమర్"
 
-#: data/resources/preferences-main-page.ui:108
-msgid "Pomodoro duration"
-msgstr "పోమోడోరో వ్యవధి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
+#, fuzzy
+msgid "Compact timer"
+msgstr "చిన్న టైమర్"
 
-#: data/resources/preferences-main-page.ui:160
-msgid "Break duration"
-msgstr "విరామ వ్యవధి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
+#, fuzzy
+msgid "Daily stats"
+msgstr "రోజువారీ గణాంకాలు"
 
-#: data/resources/preferences-main-page.ui:213
-msgid "Long break duration"
-msgstr "సుదీర్ఘ విరామం వ్యవధి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:79
+#, fuzzy
+msgid "Monthly stats"
+msgstr "నెలవారీ గణాంకాలు"
 
-#: data/resources/preferences-main-page.ui:245
-msgid "Pomodoros before a long break"
-msgstr "సుదీర్ఘ విరామం ముందు Pomodoros"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:83
+#: src/ui/preferences/preferences-window.ui:6
+msgid "Preferences"
+msgstr "ప్రాధాన్యతలు"
 
-#: data/resources/preferences-main-page.ui:294
-msgid "Keyboard shortcut"
-msgstr "కీబోర్డ్ సత్వరమార్గం"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:87
+#, fuzzy
+msgid "Screen overlay"
+msgstr "స్క్రీన్ ఓవర్లే"
 
-#: data/resources/preferences-main-page.ui:357
-msgid "Notifications"
-msgstr "నోటిఫికేషన్‌లు"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:95
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.28.1"
+msgstr "gnome-pomodoro 0.28.1 లో మార్పుల అవలోకనం"
 
-#: data/resources/preferences-main-page.ui:400
-msgid "Screen notifications"
-msgstr "స్క్రీన్ నోటిఫికేషన్‌లు"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:97
+#, fuzzy
+msgid "Added Tamil translation (thanks @omeritzics)"
+msgstr "తమిళ అనువాదం జోడించబడింది (ధన్యవాదాలు @omeritzics)"
 
-#: data/resources/preferences-main-page.ui:460
-msgid "Desktop"
-msgstr "డెస్క్‌టాప్"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:98
+#, fuzzy
+msgid "Added Hebrew translation (thanks @Killersparrow1)"
+msgstr "హీబ్రూ అనువాదం జోడించబడింది (ధన్యవాదాలు @Killersparrow1)"
 
-#: data/resources/preferences-main-page.ui:509
-msgid "Wait for activity after a break"
-msgstr "విరామం తర్వాత కార్యాచరణ కోసం వేచి ఉండండి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:104
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.28.0"
+msgstr "gnome-pomodoro 0.28.0 లో మార్పుల అవలోకనం"
 
-#: data/resources/preferences-main-page.ui:573
-msgid "Plugins…"
-msgstr "ప్లగిన్‌లు..."
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
+#, fuzzy
+msgid "Support for GNOME Shell 49 (thanks @aleasto)"
+msgstr "గ్నోమ్ షెల్ 49 కోసం మద్దతు (ధన్యవాదాలు @aleasto)"
 
-#: data/resources/preferences.ui:8 src/preferences-dialog.vala:804
-msgid "Plugins"
-msgstr "ప్లగిన్లు"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
+#, fuzzy
+msgid "Updated German translation (thanks @daPhipz)"
+msgstr "జర్మన్ అనువాదం నవీకరించబడింది (ధన్యవాదాలు @daPhipz)"
 
-#: data/resources/preferences.ui:47
-msgid "Back"
-msgstr "వెనుకకు"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:113
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.27.0"
+msgstr "gnome-pomodoro 0.27.0 లో మార్పుల అవలోకనం"
 
-#: data/resources/screen-notification.ui:89
-#: plugins/gnome/extension/dialogs.js:1002
-msgid "It's time to take a break"
-msgstr "ఇది విరామం తీసుకోవలసిన సమయం"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
+#, fuzzy
+msgid "Support for GNOME Shell 48"
+msgstr "గ్నోమ్ షెల్ 48 కోసం మద్దతు"
 
-#: data/resources/stats-view.ui:28
-msgid "Nothing to see yet"
-msgstr "ఇంకా ఏమీ చూడలేదు"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
+#, fuzzy
+msgid "Split time spent across midnight"
+msgstr "అర్ధరాత్రి దాటిన సమయాన్ని విభజించండి"
 
-#: data/resources/stats-view.ui:45
-msgid "Complete a few sessions"
-msgstr "కొన్ని సెషన్లను పూర్తి చేయండి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:117
+#, fuzzy
+msgid "Added Telugu translation (thanks @SpaciousCoder78)"
+msgstr "తెలుగు అనువాదం జోడించబడింది (ధన్యవాదాలు @SpaciousCoder78)"
 
-#: data/resources/stats-view.ui:86 data/resources/stats-view.ui:343
-msgid "Day"
-msgstr "రోజు"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:123
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.26.0"
+msgstr "gnome-pomodoro 0.26.0 లో మార్పుల అవలోకనం"
 
-#: data/resources/stats-view.ui:109 data/resources/stats-view.ui:356
-msgid "Week"
-msgstr "వారం"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
+#, fuzzy
+msgid "Support for GNOME Shell 47"
+msgstr "గ్నోమ్ షెల్ 47 కోసం మద్దతు"
 
-#: data/resources/stats-view.ui:133 data/resources/stats-view.ui:369
-msgid "Month"
-msgstr "నెల"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
+#, fuzzy
+msgid "Allow to dismiss screen overlay by gesture when a video is playing"
+msgstr "వీడియో ప్లే అవుతున్నప్పుడు సంజ్ఞ ద్వారా స్క్రీన్ ఓవర్లేను తీసివేయడానికి అనుమతించు"
 
-#: data/resources/stats-view.ui:161
-msgid "Previous (Alt+Left)"
-msgstr "మునుపటి (Alt+ఎడమ)"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:127
+#, fuzzy
+msgid "Added Georgian translation (thanks @NorwayFun)"
+msgstr "జార్జియన్ అనువాదం జోడించబడింది (ధన్యవాదాలు @NorwayFun)"
 
-#: data/resources/stats-view.ui:188
-msgid "Next (Alt+Right)"
-msgstr "తదుపరి (Alt+కుడి)"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:128
+#, fuzzy
+msgid "Adjusted translations in appdata (thanks @yakushabb)"
+msgstr "యాప్ డేటాలో అనువాదాలు సర్దుబాటు చేయబడ్డాయి (ధన్యవాదాలు @yakushabb)"
 
-#: data/resources/stats-view.ui:216 data/resources/stats-view.ui:319
-#: src/stats-day-page.vala:62
-msgid "Today"
-msgstr "ఈరోజు"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:134
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.25.2"
+msgstr "gnome-pomodoro 0.25.2 లో మార్పుల అవలోకనం"
 
-#: data/resources/window.ui:36 plugins/gnome/extension/indicator.js:214
-#: src/window.vala:180
-msgid "Start Pomodoro"
-msgstr "Pomodoro ప్రారంభించండి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:136
+#, fuzzy
+msgid "Fix keeping notification after extending Pomodoro"
+msgstr "పోమోడోరోను పొడిగించిన తర్వాత నోటిఫికేషన్‌ను అలాగే ఉంచేలా పరిష్కరించబడింది"
 
-#: data/resources/window.ui:323
-msgid "_About"
-msgstr "గురించి(_A)"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:142
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.25.1"
+msgstr "gnome-pomodoro 0.25.1 లో మార్పుల అవలోకనం"
 
-#: plugins/actions/actions.vala:423
-msgid "Actions"
-msgstr "చర్యలు"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
+#, fuzzy
+msgid "Fixes for GNOME Shell 46"
+msgstr "గ్నోమ్ షెల్ 46 కోసం పరిష్కారాలు"
 
-#: plugins/actions/actions.vala:427
-msgid "Action"
-msgstr "చర్య"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
+#, fuzzy
+msgid "Drop support for GNOME Shell 45"
+msgstr "గ్నోమ్ షెల్ 45 మద్దతు నిలిపివేత"
 
-#: plugins/actions/actions.vala:452
-msgid "Custom actions…"
-msgstr "అనుకూల చర్యలు..."
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
+#, fuzzy
+msgid "Overview of changes in gnome-pomodoro 0.25.0"
+msgstr "gnome-pomodoro 0.25.0 లో మార్పుల అవలోకనం"
 
-#: plugins/actions/enums.vala:191 plugins/actions/resources/action-page.ui:170
-msgid "Complete"
-msgstr "పూర్తి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
+#, fuzzy
+msgid "Support for GNOME Shell 46"
+msgstr "గ్నోమ్ షెల్ 46 కోసం మద్దతు"
 
-#: plugins/actions/enums.vala:194 plugins/actions/resources/action-page.ui:185
-msgid "Skip"
-msgstr "దాటవేయి"
+#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
+#, fuzzy
+msgid "Adjust build script to meson 0.59.0 (thanks @mattst88)"
+msgstr "బిల్డ్ స్క్రిప్ట్‌ను meson 0.59.0 కి సర్దుబాటు చేయండి (ధన్యవాదాలు @mattst88)"
 
-#: plugins/actions/enums.vala:203 plugins/actions/resources/action-page.ui:230
-msgid "Enable"
+#: src/application.vala:42
+msgid "Start/Stop"
+msgstr "ప్రారంభించు/ఆపు"
+
+#. Actions
+#: src/application.vala:45 src/application.vala:482 src/core/event.vala:268
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:57
+msgid "Start"
 msgstr "ప్రారంభించు"
 
-#: plugins/actions/resources/action-page.ui:28
-msgid "Command"
-msgstr "ఆదేశం"
+#: src/application.vala:48 src/application.vala:484 src/core/event.vala:276
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:139
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:64
+msgid "Stop"
+msgstr "ఆపు"
 
-#: plugins/actions/resources/action-page.ui:41
-#: plugins/actions/resources/menus.ui:29
-msgid "Triggers"
-msgstr "ట్రిగ్గర్స్"
-
-#: plugins/actions/resources/action-page.ui:54
-msgid "Name"
-msgstr "పేరు"
-
-#: plugins/actions/resources/action-page.ui:88
-msgid "_Pomodoro"
-msgstr "పోమోడోరో(_P)"
-
-#: plugins/actions/resources/action-page.ui:102
-msgid "_Short Break"
-msgstr "చిన్న విరామం(_S)"
-
-#: plugins/actions/resources/action-page.ui:116
-msgid "_Long Break"
-msgstr "లాంగ్ బ్రేక్(_L)"
-
-#: plugins/actions/resources/action-page.ui:299
-msgid "Add"
-msgstr "జోడించు"
-
-#: plugins/actions/resources/menus.ui:6
-msgid "Remove"
-msgstr "తొలగించు"
-
-#: plugins/actions/resources/menus.ui:14
-msgid "State"
-msgstr "రాష్ట్రం"
-
-#: plugins/actions/resources/menus.ui:19
-msgid "State Duration"
-msgstr "రాష్ట్ర వ్యవధి"
-
-#: plugins/actions/resources/menus.ui:24
-msgid "Elapsed Time"
-msgstr "గడిచిన సమయం"
-
-#. this.stack.add_titled (this.timer_stack, "timer", _("Timer"));
-#: plugins/gnome/extension/indicator.js:84 src/window.vala:101
-msgid "Stats"
-msgstr "గణాంకాలు"
-
-#: plugins/gnome/extension/indicator.js:85
-msgid "Quit"
-msgstr "నిష్క్రమించు"
-
-#: plugins/gnome/extension/indicator.js:123
-#: plugins/gnome/extension/notifications.js:128
-#: plugins/gnome/extension/notifications.js:549
-msgid "Pomodoro Timer"
-msgstr "పోమోడోరో టైమర్"
-
-#: plugins/gnome/extension/indicator.js:129
-msgid "Start Timer"
-msgstr "టైమర్‌ని ప్రారంభించండి"
-
-#: plugins/gnome/extension/indicator.js:162
-msgid "Pause Timer"
-msgstr "టైమర్‌ను పాజ్ చేయండి"
-
-#: plugins/gnome/extension/indicator.js:174
-msgid "Stop Timer"
-msgstr "టైమర్‌ని ఆపు"
-
-#: plugins/gnome/extension/indicator.js:211 src/window.vala:179
-msgid "Pause break"
-msgstr "విరామం విరామం"
-
-#: plugins/gnome/extension/indicator.js:211 src/window.vala:166
-msgid "Pause Pomodoro"
-msgstr "పోమోడోరోను పాజ్ చేయండి"
-
-#: plugins/gnome/extension/indicator.js:214
-#: src/notifications-capability.vala:141 src/notifications-capability.vala:162
-#: src/window.vala:167
-msgid "Take a break"
-msgstr "విరామం తీసుకోండి"
-
-#: plugins/gnome/extension/indicator.js:218 src/window.vala:175
-msgid "Resume break"
-msgstr "పునఃప్రారంభం విరామం"
-
-#: plugins/gnome/extension/indicator.js:218 src/window.vala:162
-msgid "Resume Pomodoro"
-msgstr "పోమోడోరోను పునఃప్రారంభించండి"
-
-#: plugins/gnome/extension/notifications.js:89
-#, javascript-format
-msgid "%d minute remaining"
-msgid_plural "%d minutes remaining"
-msgstr[0] "%d నిమిషం మిగిలి ఉంది"
-msgstr[1] "%d నిమిషాలు మిగిలి ఉన్నాయి"
-
-#: plugins/gnome/extension/notifications.js:97
-#, javascript-format
-msgid "%d second remaining"
-msgid_plural "%d seconds remaining"
-msgstr[0] "%d సెకను మిగిలి ఉంది"
-msgstr[1] "%d సెకన్లు మిగిలి ఉన్నాయి"
-
-#: plugins/gnome/extension/notifications.js:289
-msgid "Pomodoro is about to end"
-msgstr "పోమోడోరో ముగియబోతోంది"
-
-#: plugins/gnome/extension/notifications.js:295
-msgid "Take a long break"
-msgstr "సుదీర్ఘ విరామం తీసుకోండి"
-
-#: plugins/gnome/extension/notifications.js:296
-msgid "Take a short break"
-msgstr "చిన్న విరామం తీసుకోండి"
-
-#: plugins/gnome/extension/notifications.js:304
-msgid "Break is about to end"
-msgstr "విరామం ముగియబోతోంది"
-
-#: plugins/gnome/extension/notifications.js:308
-msgid "Break is over"
-msgstr "విరామం ముగిసింది"
-
-#. body = _("Get ready for Pomodoro");
-#: plugins/gnome/extension/notifications.js:336
-msgid "Get ready…"
-msgstr "సిద్ధంగా ఉండు..."
-
-#: plugins/gnome/extension/notifications.js:362
-msgid "Skip Break"
-msgstr "విరామాన్ని దాటవేయి"
-
-#: plugins/gnome/extension/notifications.js:365
-msgid "+1 Minute"
-msgstr "+1 నిమిషం"
-
-#: plugins/gnome/extension/notifications.js:557
-msgid "Report issue"
-msgstr "సమస్యను నివేదించండి"
-
-#: plugins/gnome/extension/timer.js:248
-#, javascript-format
-msgid "Failed to run <i>%s</i> service"
-msgstr "<i>%s</i> సేవను అమలు చేయడంలో విఫలమైంది"
-
-#: plugins/gnome/gnome-plugin.vala:290
-msgid "Hide other notifications"
-msgstr "ఇతర నోటిఫికేషన్‌లను దాచండి"
-
-#: plugins/sounds/resources/preferences-sound-page.ui:33
-msgid "Volume:"
-msgstr "వాల్యూమ్:"
-
-#: plugins/sounds/sounds-plugin.vala:35 plugins/sounds/sounds-plugin.vala:410
-msgid "Clock Ticking"
-msgstr "గడియారం టిక్కింగ్"
-
-#: plugins/sounds/sounds-plugin.vala:36 plugins/sounds/sounds-plugin.vala:411
-msgid "Timer Ticking"
-msgstr "టైమర్ టిక్కింగ్"
-
-#: plugins/sounds/sounds-plugin.vala:37 plugins/sounds/sounds-plugin.vala:412
-msgid "Woodland Birds"
-msgstr "వుడ్‌ల్యాండ్ పక్షులు"
-
-#: plugins/sounds/sounds-plugin.vala:38 plugins/sounds/sounds-plugin.vala:472
-#: plugins/sounds/sounds-plugin.vala:511
-msgid "Bell"
-msgstr "బెల్"
-
-#: plugins/sounds/sounds-plugin.vala:39 plugins/sounds/sounds-plugin.vala:473
-#: plugins/sounds/sounds-plugin.vala:512
-msgid "Loud Bell"
-msgstr "బిగ్గరగా బెల్"
-
-#: plugins/sounds/sounds-plugin.vala:334
-msgid "Select Custom Sound"
-msgstr "అనుకూల ధ్వనిని ఎంచుకోండి"
-
-#: plugins/sounds/sounds-plugin.vala:337
-msgid "_Cancel"
-msgstr "రద్దు(_C)"
-
-#: plugins/sounds/sounds-plugin.vala:339
-msgid "_Select"
-msgstr "ఎంచుకోండి(_S)"
-
-#: plugins/sounds/sounds-plugin.vala:568
-msgid "Ticking Sound"
-msgstr "టిక్కింగ్ సౌండ్"
-
-#: plugins/sounds/sounds-plugin.vala:572
-msgid "End of Break Sound"
-msgstr "బ్రేక్ సౌండ్ ముగింపు"
-
-#: plugins/sounds/sounds-plugin.vala:576
-msgid "Start of Break Sound"
-msgstr "బ్రేక్ సౌండ్ ప్రారంభం"
-
-#: plugins/sounds/sounds-plugin.vala:604 src/preferences-dialog.vala:590
-msgid "Off"
-msgstr "ఆఫ్"
-
-#: plugins/sounds/sounds-plugin.vala:744
-msgid "Ticking sound"
-msgstr "టిక్కింగ్ ధ్వని"
-
-#: plugins/sounds/sounds-plugin.vala:749
-msgid "Start of break sound"
-msgstr "బ్రేక్ సౌండ్ ప్రారంభం"
-
-#: plugins/sounds/sounds-plugin.vala:754
-msgid "End of break sound"
-msgstr "విరామం ధ్వని ముగింపు"
-
-#: src/about-dialog.vala:30
-msgid "About Pomodoro"
-msgstr "పోమోడోరో గురించి"
-
-#: src/about-dialog.vala:41
-msgid "translator-credits"
-msgstr "Aryan Karamtoth <aryankmmiv@outlook.com>"
-
-#: src/application.vala:87
-msgid "Start/Stop"
-msgstr "ప్రారంభం/ఆపు"
-
-#: src/application.vala:96
+#: src/application.vala:51
 msgid "Pause/Resume"
-msgstr "పాజ్/రెస్యూమ్"
+msgstr "పాజ్/కొనసాగించు"
 
-#: src/application.vala:105
+#: src/application.vala:54 src/application.vala:486 src/core/event.vala:284
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:83
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:71
+msgid "Pause"
+msgstr "పాజ్"
+
+#: src/application.vala:57 src/application.vala:488 src/core/event.vala:292
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:97
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:78
+msgid "Resume"
+msgstr "కొనసాగించు"
+
+#: src/application.vala:60
 msgid "Skip to a pomodoro or to a break"
 msgstr "పోమోడోరోకు లేదా విరామానికి వెళ్లండి"
 
-#: src/application.vala:108
+#: src/application.vala:63
 msgid "Extend current pomodoro or break"
-msgstr "ప్రస్తుత పోమోడోరోను పొడిగించండి లేదా విచ్ఛిన్నం చేయండి"
+msgstr "ప్రస్తుత పోమోడోరోను లేదా విరామాన్ని పొడిగించండి"
 
-#: src/application.vala:111
+#: src/application.vala:66
 msgid "Reset current session"
 msgstr "ప్రస్తుత సెషన్‌ని రీసెట్ చేయండి"
 
-#: src/application.vala:114
-msgid "Run as background service"
-msgstr "నేపథ్య సేవగా అమలు చేయండి"
-
-#: src/application.vala:117
+#: src/application.vala:69
 msgid "Show preferences"
 msgstr "ప్రాధాన్యతలను చూపించు"
 
-#: src/application.vala:120
+#: src/application.vala:72
 msgid "Quit application"
 msgstr "అప్లికేషన్ నుండి నిష్క్రమించండి"
 
-#: src/application.vala:123
+#: src/application.vala:75
 msgid "Print version information and exit"
-msgstr "సంస్కరణ సమాచారాన్ని ముద్రించండి మరియు నిష్క్రమించండి"
+msgstr "సంస్కరణ సమాచారాన్ని ముద్రించి నిష్క్రమించండి"
 
-#: src/notifications-capability.vala:130
-msgid "Focus on your task."
-msgstr "మీ పనిపై దృష్టి పెట్టండి."
+#: src/application.vala:477
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
+#, fuzzy
+msgid "Start or Stop"
+msgstr "ప్రారంభించు లేదా ఆపు"
 
-#: src/notifications-capability.vala:156
-#, c-format
-msgid "You have %d minute"
-msgid_plural "You have %d minutes"
-msgstr[0] "మీకు %d నిమిషం ఉంది"
-msgstr[1] "మీకు %d నిమిషాలు ఉన్నాయి"
+#: src/application.vala:480
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
+#, fuzzy
+msgid "Start, Pause or Resume"
+msgstr "ప్రారంభించు, పాజ్ లేదా కొనసాగించు"
 
-#: src/notifications-capability.vala:158
-#, c-format
-msgid "You have %d second"
-msgid_plural "You have %d seconds"
-msgstr[0] "మీకు %d సెకను ఉంది"
-msgstr[1] "మీకు %d సెకన్లు ఉన్నాయి"
+#: src/application.vala:490 src/core/event.vala:300
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
+msgid "Skip"
+msgstr "దాటవేయి"
 
-#: src/notifications-capability.vala:163
-msgid "Take a longer break"
-msgstr "ఎక్కువసేపు విరామం తీసుకోండి"
+#: src/application.vala:492 src/core/event.vala:308
+#, fuzzy
+msgid "Rewind"
+msgstr "వెనక్కి తిప్పు"
 
-#: src/notifications-capability.vala:179
-msgid "Lengthen it"
-msgstr "దానిని పొడిగించండి"
+#: src/application.vala:494
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
+#, fuzzy
+msgid "Bring to Focus"
+msgstr "ముందుకి తీసుకురా"
 
-#: src/notifications-capability.vala:184
-msgid "Shorten it"
-msgstr "దానిని కుదించండి"
+#: src/core/action-manager.vala:111
+#, fuzzy, c-format
+msgid "Custom action \"%s\" has failed"
+msgstr "అనుకూల చర్య \"%s\" విఫలమైంది"
 
-#: src/notifications-capability.vala:189
-msgid "Start pomodoro"
-msgstr "పోమోడోరోను ప్రారంభించండి"
+#: src/core/command.vala:379
+#, fuzzy
+msgid "Reached timeout"
+msgstr "సమయం ముగిసింది"
 
-#: src/preferences-dialog.vala:158
-#, c-format
+#: src/core/command.vala:408
+#, fuzzy
+msgid "Failed to execute command"
+msgstr "ఆదేశాన్ని అమలు చేయడంలో విఫలమైంది"
+
+#: src/core/command.vala:491 src/core/command.vala:506
+#, fuzzy
+msgid "Command is empty"
+msgstr "ఆదేశం ఖాళీగా ఉంది"
+
+#: src/core/command.vala:510
+#, fuzzy
+msgid "Unclosed quotation mark"
+msgstr "ముగించని కొటేషన్ మార్క్"
+
+#: src/core/command.vala:515
+#, fuzzy
+msgid "Invalid command"
+msgstr "చెల్లని ఆదేశం"
+
+#: src/core/command.vala:540 src/core/expression.vala:859
+#, fuzzy, c-format
+msgid "Unknown variable \"%s\""
+msgstr "తెలియని వేరియబుల్ \"%s\""
+
+#: src/core/command.vala:546 src/core/expression.vala:236
+#, fuzzy, c-format
+msgid "Unknown format \"%s\""
+msgstr "తెలియని ఫార్మాట్ \"%s\""
+
+#: src/core/command.vala:619
+#, fuzzy, c-format
+msgid "Program \"%s\" not found"
+msgstr "ప్రోగ్రామ్ \"%s\" కనుగొనబడలేదు"
+
+#: src/core/event.vala:180
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:54
+msgid "Actions"
+msgstr "చర్యలు"
+
+#: src/core/event.vala:183
+#, fuzzy
+msgid "Countdown"
+msgstr "కౌంట్‌డౌన్"
+
+#: src/core/event.vala:186
+#: src/ui/preferences/timer/preferences-panel-timer.ui:17
+msgid "Session"
+msgstr "సెషన్"
+
+#: src/core/event.vala:189
+#, fuzzy
+msgid "Other"
+msgstr "ఇతర"
+
+#: src/core/event.vala:269
+#, fuzzy
+msgid "Started the timer."
+msgstr "టైమర్ ప్రారంభించబడింది."
+
+#: src/core/event.vala:277
+#, fuzzy
+msgid "Stopped the timer manually."
+msgstr "టైమర్ మాన్యువల్‌గా ఆపబడింది."
+
+#: src/core/event.vala:285
+#, fuzzy
 msgid ""
-"Using \"%s\" as shortcut will interfere with typing. Try adding another key, "
-"such as Control, Alt or Shift."
+"The countdown has been manually paused. Not triggered when locking the "
+"screen or when suspending the system."
 msgstr ""
-"\"%s\"ని సత్వరమార్గంగా ఉపయోగించడం టైపింగ్‌కు ఆటంకం కలిగిస్తుంది. Control, Alt లేదా Shift వంటి "
-"మరొక కీని జోడించడానికి ప్రయత్నించండి."
+"కౌంట్‌డౌన్ మాన్యువల్‌గా పాజ్ చేయబడింది. స్క్రీన్ లాక్ చేసినప్పుడు లేదా సిస్టమ్ సస్పెండ్ చేసినప్పుడు ఇది ట్రిగ్గర్ "
+"అవ్వదు."
 
-#: src/preferences-dialog.vala:808
-msgid "Keyboard Shortcut"
-msgstr "కీబోర్డ్ సత్వరమార్గం"
+#: src/core/event.vala:293
+#, fuzzy
+msgid "The countdown has been manually resumed."
+msgstr "కౌంట్‌డౌన్ మాన్యువల్‌గా కొనసాగించబడింది."
 
-#: src/presence.vala:80
-msgid "Available"
-msgstr "అందుబాటులో ఉంది"
+#: src/core/event.vala:301
+#, fuzzy
+msgid "Jumped to a next time-block before the countdown has finished."
+msgstr "కౌంట్‌డౌన్ ముగియకముందే తదుపరి సమయ విభాగానికి వెళ్లారు."
 
-#: src/presence.vala:83
-msgid "Busy"
-msgstr "బిజీ"
+#: src/core/event.vala:309
+#, fuzzy
+msgid "Rewind action has been used. It adds a pause in the past."
+msgstr "వెనక్కి తిప్పే చర్య ఉపయోగించబడింది. ఇది గతంలో ఒక పాజ్‌ని జోడిస్తుంది."
 
-#: src/presence.vala:86
-msgid "Idle"
-msgstr "పనిలేకుండా"
+#: src/core/event.vala:316
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:39
+msgid "Reset"
+msgstr "రీసెట్"
 
-#: src/presence.vala:89
-msgid "Invisible"
-msgstr "అదృశ్య"
+#: src/core/event.vala:317
+#, fuzzy
+msgid "Manually cleared the session."
+msgstr "సెషన్ మాన్యువల్‌గా తొలగించబడింది."
 
-#: src/stats-day-page.vala:66
+#. Countdown
+#: src/core/event.vala:325
+#: src/ui/preferences/automation/action/action-edit-window.ui:20
+#: src/ui/preferences/automation/action/condition-widget.vala:120
+msgid "Finished"
+msgstr "పూర్తయింది"
+
+#: src/core/event.vala:326
+#, fuzzy
+msgid ""
+"The countdown has finished. If waiting for confirmation, the duration of the "
+"time-block still may be altered."
+msgstr "కౌంట్‌డౌన్ ముగిసింది. నిర్ధారణ కోసం వేచి ఉంటే, సమయ విభాగం యొక్క వ్యవధిని ఇంకా మార్చవచ్చు."
+
+#: src/core/event.vala:333
+#, fuzzy
+msgid "Changed"
+msgstr "మారింది"
+
+#: src/core/event.vala:334
+#, fuzzy
+msgid "Triggered on any change related to the countdown."
+msgstr "కౌంట్‌డౌన్‌కు సంబంధించిన ఏవైనా మార్పులపైన ట్రిగ్గర్ చేయబడుతుంది."
+
+#. Session
+#: src/core/event.vala:342
+#, fuzzy
+msgid "Confirm Advancement"
+msgstr "పురోగతిని నిర్ధారించండి"
+
+#: src/core/event.vala:343
+#, fuzzy
+msgid "A manual confirmation is required to start next time-block."
+msgstr "తదుపరి సమయ విభాగాన్ని ప్రారంభించడానికి మాన్యువల్ నిర్ధారణ అవసరం."
+
+#: src/core/event.vala:350
+#, fuzzy
+msgid "Advanced"
+msgstr "ముందుకు వెళ్ళారు"
+
+#: src/core/event.vala:351
+#, fuzzy
+msgid "Transitioned or skipped to a next time-block."
+msgstr "తదుపరి సమయ విభాగానికి మారారు లేదా దాటవేశారు."
+
+#: src/core/event.vala:358
+#, fuzzy
+msgid "State Changed"
+msgstr "స్థితి మారింది"
+
+#: src/core/event.vala:359
+#, fuzzy
+msgid "Transitioned to a next time-block or when a break gets relabelled."
+msgstr "తదుపరి సమయ విభాగానికి మారినప్పుడు లేదా విరామం మళ్ళీ లేబుల్ చేయబడినప్పుడు."
+
+#: src/core/event.vala:366
+#, fuzzy
+msgid "Rescheduled"
+msgstr "మళ్ళీ షెడ్యూల్ చేయబడింది"
+
+#. translators: Change of plan
+#: src/core/event.vala:367
+#, fuzzy
+msgid "Triggered when scheduled time-blocks have changed."
+msgstr "షెడ్యూల్ చేయబడిన సమయ విభాగాలు మారినప్పుడు ట్రిగ్గర్ చేయబడుతుంది."
+
+#: src/core/event.vala:374
+#, fuzzy
+msgid "Expired"
+msgstr "గడువు ముగిసింది"
+
+#: src/core/event.vala:375
+#, fuzzy
+msgid "Triggered when session is about to be reset due to inactivity."
+msgstr "కార్యాచరణ లేకపోవడం వల్ల సెషన్ రీసెట్ కాబోతున్నప్పుడు ట్రిగ్గర్ చేయబడుతుంది."
+
+#. translators: time remaining eg. "3 minutes 50 seconds remaining"
+#: src/core/notification-manager.vala:130
+#, fuzzy, c-format
+msgid "%s remaining"
+msgstr "%s మిగిలి ఉంది"
+
+#: src/core/notification-manager.vala:339
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:314
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:330
+msgid "Take a break"
+msgstr "విరామం తీసుకోండి"
+
+#: src/core/notification-manager.vala:343
+msgid "Take a short break"
+msgstr "చిన్న విరామం తీసుకోండి"
+
+#: src/core/notification-manager.vala:347
+msgid "Take a long break"
+msgstr "పెద్ద విరామం తీసుకోండి"
+
+#: src/core/notification-manager.vala:394
+msgid "Pomodoro is about to end"
+msgstr "పోమోడోరో ముగియబోతోంది"
+
+#: src/core/notification-manager.vala:395
+#: src/core/notification-manager.vala:495
+#: src/core/notification-manager.vala:500
+#: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
+#, fuzzy
+msgid "Take a Break"
+msgstr "విరామం తీసుకోండి"
+
+#: src/core/notification-manager.vala:401
+msgid "Break is about to end"
+msgstr "విరామం ముగియబోతోంది"
+
+#: src/core/notification-manager.vala:402
+#: src/core/notification-manager.vala:490
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:69
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:314
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:330
+msgid "Start Pomodoro"
+msgstr "పోమోడోరో ప్రారంభించండి"
+
+#: src/core/notification-manager.vala:411
+#, fuzzy
+msgid "+1 minute"
+msgstr "+1 నిమిషం"
+
+#: src/core/notification-manager.vala:432
+msgid "Get ready…"
+msgstr "సిద్ధంగా ఉండండి..."
+
+#: src/core/notification-manager.vala:437
+#: src/core/notification-manager.vala:473
+#, fuzzy
+msgid "Pomodoro is over!"
+msgstr "పోమోడోరో ముగిసింది!"
+
+#: src/core/notification-manager.vala:443
+#: src/core/notification-manager.vala:479
+#, fuzzy
+msgid "Break is over!"
+msgstr "విరామం ముగిసింది!"
+
+#: src/core/notification-manager.vala:489
+#, fuzzy
+msgid "Confirm the start of a Pomodoro…"
+msgstr "పోమోడోరో ప్రారంభాన్ని ధృవీకరించండి..."
+
+#: src/core/notification-manager.vala:494
+#, fuzzy
+msgid "Confirm the start of a break…"
+msgstr "విరామం ప్రారంభాన్ని ధృవీకరించండి..."
+
+#: src/core/notification-manager.vala:499
+#, fuzzy
+msgid "Confirm the start of a short break…"
+msgstr "చిన్న విరామం ప్రారంభాన్ని ధృవీకరించండి..."
+
+#: src/core/notification-manager.vala:504
+#, fuzzy
+msgid "Confirm the start of a long break…"
+msgstr "పెద్ద విరామం ప్రారంభాన్ని ధృవీకరించండి..."
+
+#: src/core/notification-manager.vala:516
+msgid "Skip Break"
+msgstr "విరామాన్ని దాటవేయి"
+
+#: src/core/sound.vala:405 src/core/sound.vala:605 src/core/sound.vala:662
+#, fuzzy
+msgid "Failed to initialize playback"
+msgstr "ప్లేబ్యాక్ ప్రారంభించడంలో విఫలమైంది"
+
+#. Validate file.
+#: src/core/sound.vala:757
+#, fuzzy
+msgid "File not found"
+msgstr "ఫైల్ కనుగొనబడలేదు"
+
+#: src/core/sound.vala:775
+#, fuzzy
+msgid "File type not supported"
+msgstr "ఫైల్ రకానికి మద్దతు లేదు"
+
+#: src/core/state.vala:75
+#: src/ui/preferences/automation/action/condition-widget.ui:55
+#, fuzzy
+msgid "Stopped"
+msgstr "ఆపబడింది"
+
+#: src/core/state.vala:81
+#: src/ui/preferences/automation/action/condition-widget.ui:54
+msgid "Break"
+msgstr "విరామం"
+
+#: src/core/state.vala:84
+msgid "Short Break"
+msgstr "చిన్న విరామం"
+
+#: src/core/state.vala:87
+msgid "Long Break"
+msgstr "పెద్ద విరామం"
+
+#. translators: Short form for number of hours
+#: src/core/timestamp.vala:117
+#, fuzzy, c-format
+msgid "%uh"
+msgstr "%u గం"
+
+#. translators: Short form for number of minutes
+#: src/core/timestamp.vala:126
+#, fuzzy, c-format
+msgid "%um"
+msgstr "%u ని"
+
+#: src/core/utils.vala:72
+#, fuzzy, c-format
+msgid "%u hour"
+msgid_plural "%u hours"
+msgstr[0] "%u గంట"
+msgstr[1] "%u గంటలు"
+
+#: src/core/utils.vala:81
+#, fuzzy, c-format
+msgid "%u minute"
+msgid_plural "%u minutes"
+msgstr[0] "%u నిమిషం"
+msgstr[1] "%u నిమిషాలు"
+
+#: src/core/utils.vala:90
+#, fuzzy, c-format
+msgid "%u second"
+msgid_plural "%u seconds"
+msgstr[0] "%u సెకను"
+msgstr[1] "%u సెకన్లు"
+
+#: src/core/variables.vala:116
+#, fuzzy
+msgid "The exact time of the current event."
+msgstr "ప్రస్తుత ఈవెంట్ యొక్క ఖచ్చితమైన సమయం."
+
+#: src/core/variables.vala:121
+#, fuzzy
+msgid ""
+"The current phase of the Pomodoro cycle. Possible values: <tt>stopped</tt>, "
+"<tt>pomodoro</tt>, <tt>break</tt>, <tt>short-break</tt>, <tt>long-break</tt>."
+msgstr ""
+"పోమోడోరో చక్రం యొక్క ప్రస్తుత దశ. సాధ్యమయ్యే విలువలు: <tt>stopped</tt>, <tt>pomodoro</tt>, "
+"<tt>break</tt>, <tt>short-break</tt>, <tt>long-break</tt>."
+
+#: src/core/variables.vala:126
+#, fuzzy
+msgid ""
+"Status of the current time-block. Possible values: <tt>scheduled</tt>, "
+"<tt>in-progress</tt>, <tt>completed</tt>, <tt>uncompleted</tt>."
+msgstr ""
+"ప్రస్తుత సమయ విభాగం స్థితి. సాధ్యమయ్యే విలువలు: <tt>scheduled</tt>, <tt>in-progress</"
+"tt>, <tt>completed</tt>, <tt>uncompleted</tt>."
+
+#: src/core/variables.vala:131
+#, fuzzy
+msgid "A flag indicating whether countdown has begun."
+msgstr "కౌంట్‌డౌన్ ప్రారంభమైందో లేదో తెలిపే ఫ్లాగ్."
+
+#: src/core/variables.vala:136
+#, fuzzy
+msgid "A flag indicating whether countdown is paused."
+msgstr "కౌంట్‌డౌన్ పాజ్ చేయబడిందో లేదో తెలిపే ఫ్లాగ్."
+
+#: src/core/variables.vala:141
+#, fuzzy
+msgid "A flag indicating whether countdown has finished."
+msgstr "కౌంట్‌డౌన్ ముగిసిందో లేదో తెలిపే ఫ్లాగ్."
+
+#: src/core/variables.vala:146
+#, fuzzy
+msgid "A flag indicating whether the timer is actively counting down."
+msgstr "టైమర్ చురుకుగా కౌంట్‌డౌన్ చేస్తుందో లేదో తెలిపే ఫ్లాగ్."
+
+#: src/core/variables.vala:151
+#, fuzzy
+msgid "Duration of the current countdown."
+msgstr "ప్రస్తుత కౌంట్‌డౌన్ వ్యవధి."
+
+#. translators: Time difference between displayed value on the timer and real time. Think of it as a lost time.
+#: src/core/variables.vala:157
+#, fuzzy
+msgid "Discrepancy between elapsed time and the time passed."
+msgstr "గడిచిన సమయానికి మరియు గడిచిన అసలు సమయానికి మధ్య వ్యత్యాసం."
+
+#. translators: Time since the start of countdown
+#: src/core/variables.vala:163
+#, fuzzy
+msgid "The amount of time spent on the countdown."
+msgstr "కౌంట్‌డౌన్‌లో గడిపిన సమయం."
+
+#. translators: Displayed timer value.
+#: src/core/variables.vala:169
+#, fuzzy
+msgid "The amount of time left before the countdown ends."
+msgstr "కౌంట్‌డౌన్ ముగిసేలోపు మిగిలి ఉన్న సమయం."
+
+#: src/core/variables.vala:174
+#, fuzzy
+msgid "Time when the countdown has started."
+msgstr "కౌంట్‌డౌన్ ప్రారంభమైన సమయం."
+
+#: src/integrations/portal/global-shortcuts-provider.vala:298
+#, fuzzy
+msgid "Unused"
+msgstr "ఉపయోగించనిది"
+
+#: src/ui/log/log-window.ui:6
+#, fuzzy
+msgid "Log"
+msgstr "లాగ్"
+
+#: src/ui/log/log-window.ui:38
+#, fuzzy
+msgid "Empty Log"
+msgstr "ఖాళీ లాగ్"
+
+#: src/ui/log/log-window.ui:39
+#, fuzzy
+msgid "Entries will show up here once you start the timer."
+msgstr "మీరు టైమర్‌ను ప్రారంభించిన తర్వాత ఎంట్రీలు ఇక్కడ కనిపిస్తాయి."
+
+#: src/ui/log/log-window.ui:165
+#, fuzzy
+msgid "Context"
+msgstr "సందర్భం"
+
+#: src/ui/log/log-window.ui:190
+#: src/ui/preferences/automation/action/action-edit-window.ui:186
+msgid "Command"
+msgstr "ఆదేశం"
+
+#: src/ui/log/log-window.ui:214
+#, fuzzy
+msgid "Output"
+msgstr "అవుట్‌పుట్"
+
+#: src/ui/log/log-window.ui:238
+#, fuzzy
+msgid "Error"
+msgstr "లోపం"
+
+#: src/ui/log/log-window.ui:267
+#, fuzzy
+msgid "Exit Code:"
+msgstr "ఎగ్జిట్ కోడ్:"
+
+#: src/ui/log/log-window.ui:278
+#, fuzzy
+msgid "Execution Time:"
+msgstr "అమలు సమయం:"
+
+#: src/ui/main/dialogs/about-dialog.vala:29
+msgid "translator-credits"
+msgstr "Aryan Karamtoth <aryankmmiv@outlook.com>"
+
+#: src/ui/main/dialogs/about-dialog.vala:35
+#, fuzzy
+msgid "Donate"
+msgstr "విరాళం ఇవ్వండి"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:6
+#, fuzzy
+msgid "GNOME Shell Extension"
+msgstr "గ్నోమ్ షెల్ ఎక్స్‌టెన్షన్"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:57
+#, fuzzy
+msgid "Get the best experience!"
+msgstr "ఉత్తమ అనుభవాన్ని పొందండి!"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:68
+#, fuzzy
+msgid "Enable <b>GNOME Shell extension</b> for seamless desktop integration"
+msgstr "అతుకులు లేని డెస్క్‌టాప్ అనుసంధానం కోసం <b>గ్నోమ్ షెల్ ఎక్స్‌టెన్షన్</b> ని ప్రారంభించండి"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:95
+#, fuzzy
+msgid "Always within reach"
+msgstr "ఎల్లప్పుడూ అందుబాటులో"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:106
+#, fuzzy
+msgid "Control timer directly from the top bar without opening the app"
+msgstr "యాప్ తెరవకుండానే నేరుగా టాప్ బార్ నుండి టైమర్‌ను నియంత్రించండి"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:132
+#, fuzzy
+msgid "Less distractions"
+msgstr "తక్కువ పరధ్యానం"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:143
+#, fuzzy
+msgid ""
+"Let <b>Pomodoro</b> manage system notifications while the timer is running"
+msgstr "టైమర్ నడుస్తున్నప్పుడు సిస్టమ్ నోటిఫికేషన్‌లను <b>పోమోడోరో</b> నిర్వహించనివ్వండి"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:170
+#, fuzzy
+msgid "Refined break reminders"
+msgstr "మెరుగైన విరామ రిమైండర్‌లు"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:181
+#, fuzzy
+msgid ""
+"Elegant full-screen overlay that make taking breaks a more pleasant "
+"experience"
+msgstr "విరామం తీసుకోవడాన్ని ఆహ్లాదకరంగా మార్చే సొగసైన ఫుల్-స్క్రీన్ ఓవర్లే"
+
+#. translators: "It" refers to installing GNOME Shell extension
+#: src/ui/main/dialogs/install-extension-dialog.ui:195
+#, fuzzy
+msgid "Ready to try it?"
+msgstr "దీన్ని ప్రయత్నించడానికి సిద్ధంగా ఉన్నారా?"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:219
+#: src/ui/main/dialogs/install-extension-dialog.ui:252
+#, fuzzy
+msgid "_Install Extension"
+msgstr "ఎక్స్‌టెన్షన్‌ను ఇన్‌స్టాల్ చేయండి (_I)"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:229
+#: src/ui/main/dialogs/install-extension-dialog.ui:245
+#, fuzzy
+msgid "_Not Now"
+msgstr "ఇప్పుడు వద్దు (_N)"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:317
+#, fuzzy
+msgid "Something went wrong"
+msgstr "ఏదో తప్పు జరిగింది"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:364
+#, fuzzy
+msgid "Copy to clipboard"
+msgstr "క్లిప్‌బోర్డ్‌కు కాపీ చేయండి"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:383
+#: src/ui/main/dialogs/install-extension-dialog.ui:416
+#, fuzzy
+msgid "_Try Again"
+msgstr "మళ్ళీ ప్రయత్నించండి (_T)"
+
+#: src/ui/main/dialogs/install-extension-dialog.ui:393
+#: src/ui/main/dialogs/install-extension-dialog.ui:409
+#, fuzzy
+msgid "_Abort"
+msgstr "విరమించు (_A)"
+
+#: src/ui/main/dialogs/install-extension-dialog.vala:86
+#, fuzzy
+msgid "Time-out reached"
+msgstr "సమయం ముగిసింది"
+
+#: src/ui/main/dialogs/install-extension-dialog.vala:91
+#, fuzzy
+msgid "Installing extensions is not allowed"
+msgstr "ఎక్స్‌టెన్షన్‌లను ఇన్‌స్టాల్ చేయడం అనుమతించబడదు"
+
+#: src/ui/main/dialogs/install-extension-dialog.vala:96
+#, fuzzy
+msgid "Failed to download the extension"
+msgstr "ఎక్స్‌టెన్షన్‌ను డౌన్‌లోడ్ చేయడంలో విఫలమైంది"
+
+#: src/ui/main/stats/stats-day-page.ui:104
+#: src/ui/main/stats/stats-day-page.vala:92
+#: src/ui/main/stats/stats-month-page.ui:41
+#: src/ui/main/stats/stats-month-page.vala:48
+#: src/ui/main/stats/stats-week-page.ui:45
+#: src/ui/main/stats/stats-week-page.vala:46
+#, fuzzy
+msgid "Breaks"
+msgstr "విరామాలు"
+
+#: src/ui/main/stats/stats-day-page.ui:111
+#: src/ui/main/stats/stats-month-page.ui:48
+#: src/ui/main/stats/stats-month-page.vala:53
+#: src/ui/main/stats/stats-week-page.ui:52
+#: src/ui/main/stats/stats-week-page.vala:51
+#, fuzzy
+msgid "Interruptions"
+msgstr "అంతరాయాలు"
+
+#: src/ui/main/stats/stats-day-page.ui:118
+#: src/ui/main/stats/stats-month-page.ui:55
+#: src/ui/main/stats/stats-week-page.ui:59
+#, fuzzy
+msgid "Break Ratio"
+msgstr "విరామ నిష్పత్తి"
+
+#: src/ui/main/stats/stats-view.ui:8 src/ui/main/stats/stats-view.vala:59
+#: src/ui/main/stats/widgets/stats-date-popover.ui:22
+msgid "Day"
+msgstr "రోజు"
+
+#: src/ui/main/stats/stats-view.ui:13 src/ui/main/stats/stats-view.vala:62
+#: src/ui/main/stats/widgets/stats-date-popover.ui:28
+msgid "Week"
+msgstr "వారం"
+
+#: src/ui/main/stats/stats-view.ui:18 src/ui/main/stats/stats-view.vala:65
+#: src/ui/main/stats/widgets/stats-date-popover.ui:34
+msgid "Month"
+msgstr "నెల"
+
+#: src/ui/main/stats/stats-view.ui:39
+#, fuzzy
+msgid "Nothing to see here yet"
+msgstr "ఇక్కడ ఇంకా ఏమీ లేదు"
+
+#: src/ui/main/stats/stats-view.ui:40
+#, fuzzy
+msgid "Finish a few Pomodoros to fill this up!"
+msgstr "దీన్ని నింపడానికి కొన్ని పోమోడోరోలను పూర్తి చేయండి!"
+
+#: src/ui/main/stats/stats-view.vala:792
+#, fuzzy, c-format
+msgid "Skipped %u day"
+msgid_plural "Skipped %u days"
+msgstr[0] "%u రోజు దాటవేయబడింది"
+msgstr[1] "%u రోజులు దాటవేయబడ్డాయి"
+
+#: src/ui/main/stats/stats-view.vala:798
+#, fuzzy, c-format
+msgid "Skipped %u week"
+msgid_plural "Skipped %u weeks"
+msgstr[0] "%u వారం దాటవేయబడింది"
+msgstr[1] "%u వారాలు దాటవేయబడ్డాయి"
+
+#: src/ui/main/stats/stats-view.vala:804
+#, fuzzy, c-format
+msgid "Skipped %u month"
+msgid_plural "Skipped %u months"
+msgstr[0] "%u నెల దాటవేయబడింది"
+msgstr[1] "%u నెలలు దాటవేయబడ్డాయి"
+
+#: src/ui/main/stats/stats-view.vala:1002
+msgid "Today"
+msgstr "ఈరోజు"
+
+#: src/ui/main/stats/stats-view.vala:1007
 msgid "Yesterday"
 msgstr "నిన్న"
 
-#: src/stats-page.vala:87
-#, c-format
-msgid "%d m"
-msgstr "%d m"
-
-#: src/stats-page.vala:93
-#, c-format
-msgid "%.0f h"
-msgstr "%.0f h"
-
-#: src/stats-page.vala:96
-#, c-format
-msgid "%.1f h"
-msgstr "%.1f h"
-
-#: src/stats-page.vala:573
-msgid "Break"
-msgstr "బ్రేక్"
-
-#: src/stats-week-page.vala:58
+#: src/ui/main/stats/stats-view.vala:1028
 msgid "This week"
 msgstr "ఈ వారం"
 
-#: src/utils.vala:32
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d గంట"
-msgstr[1] "%d గంటలు"
+#: src/ui/main/stats/stats-view.vala:1048
+#, fuzzy, c-format
+msgid "Week %u"
+msgstr "వారం %u"
 
-#: src/utils.vala:41
+#: src/ui/main/stats/stats-view.vala:1049
+#, fuzzy, c-format
+msgid "Week %u of %u"
+msgstr "%u లో వారం %u"
+
+#: src/ui/main/timer/compact-timer-view.ui:8 src/ui/main/timer/menus.ui:6
+#: src/ui/main/timer/menus.ui:22
+msgid "_Pomodoro"
+msgstr "పోమోడోరో (_P)"
+
+#: src/ui/main/timer/compact-timer-view.ui:13 src/ui/main/timer/menus.ui:10
+msgid "_Short Break"
+msgstr "చిన్న విరామం (_S)"
+
+#: src/ui/main/timer/compact-timer-view.ui:18 src/ui/main/timer/menus.ui:14
+msgid "_Long Break"
+msgstr "పెద్ద విరామం (_L)"
+
+#: src/ui/main/timer/compact-timer-view.vala:74
+#: src/ui/main/timer/timer-view.vala:130
+#, fuzzy
+msgid "Finished!"
+msgstr "పూర్తయింది!"
+
+#: src/ui/main/timer/menus.ui:26
+#, fuzzy
+msgid "_Break"
+msgstr "విరామం (_B)"
+
+#: src/ui/main/timer/timer-view.ui:23
+#, fuzzy
+msgid "Open screen overlay"
+msgstr "స్క్రీన్ ఓవర్లేను తెరువు"
+
+#: src/ui/main/timer/timer-view.vala:244
+#, fuzzy
+msgid "Session has expired"
+msgstr "సెషన్ ముగిసింది"
+
+#: src/ui/main/timer/widgets/session-progress-bar.vala:1398
+#, fuzzy, c-format
+msgid "Long break due in <b>%s</b>"
+msgstr "పెద్ద విరామం ఇంకో <b>%s</b> లో"
+
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:25
+#, fuzzy
+msgid "Rewind one minute"
+msgstr "ఒక నిమిషం వెనక్కి తిప్పు"
+
+#: src/ui/main/window.ui:8
+#, fuzzy
+msgid "_Compact View"
+msgstr "చిన్న రూపు (_C)"
+
+#: src/ui/main/window.ui:15
+msgid "_Preferences"
+msgstr "ప్రాధాన్యతలు (_P)"
+
+#: src/ui/main/window.ui:19
+msgid "_About"
+msgstr "గురించి (_A)"
+
+#: src/ui/main/window.ui:25
+msgid "_Quit"
+msgstr "నిష్క్రమించు (_Q)"
+
+#: src/ui/main/window.ui:62
+#, fuzzy
+msgid "Primary Menu"
+msgstr "ప్రధాన మెనూ"
+
+#: src/ui/main/window.ui:92
+msgid "Stats"
+msgstr "గణాంకాలు"
+
+#: src/ui/main/window.vala:301
+#, fuzzy
+msgid "GNOME Shell extension available"
+msgstr "గ్నోమ్ షెల్ ఎక్స్‌టెన్షన్ అందుబాటులో ఉంది"
+
+#: src/ui/main/window.vala:302
+#, fuzzy
+msgid "Learn More"
+msgstr "మరింత తెలుసుకోండి"
+
+#: src/ui/main/window.vala:324
+#, fuzzy
+msgid "Keep timer running?"
+msgstr "టైమర్‌ను నడవనివ్వాలా?"
+
+#: src/ui/main/window.vala:325
+#, fuzzy
+msgid ""
+"You can keep it running in the background — notifications and keyboard "
+"shortcuts will still work."
+msgstr "మీరు దీన్ని బ్యాక్‌గ్రౌండ్‌లో నడవనివ్వవచ్చు — నోటిఫికేషన్‌లు మరియు షార్ట్‌కట్‌లు ఇప్పటికీ పనిచేస్తాయి."
+
+#: src/ui/main/window.vala:329
+msgid "Quit"
+msgstr "నిష్క్రమించు"
+
+#: src/ui/main/window.vala:332
+#, fuzzy
+msgid "Run in background"
+msgstr "బ్యాక్‌గ్రౌండ్‌లో నడపండి"
+
+#: src/ui/overlays/screen-overlay.ui:65
+msgid "It's time to take a break"
+msgstr "ఇది విరామం తీసుకోవలసిన సమయం"
+
+#: src/ui/preferences/appearance/preferences-panel-appearance.ui:17
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
+#, fuzzy
+msgid "Main Window"
+msgstr "ప్రధాన విండో"
+
+#: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
+#, fuzzy
+msgid "Prefer Dark Theme"
+msgstr "డార్క్ థీమ్"
+
+#: src/ui/preferences/appearance/preferences-panel-appearance.ui:25
+#, fuzzy
+msgid "Prefer Compact View"
+msgstr "చిన్న రూపు కావాలి"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:12
+#: src/ui/preferences/automation/action/condition-widget.vala:117
+#, fuzzy
+msgid "Started"
+msgstr "ప్రారంభించబడింది"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:16
+#: src/ui/preferences/automation/action/condition-widget.vala:118
+#, fuzzy
+msgid "Paused"
+msgstr "నిలిపివేయబడింది"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:26
+#, fuzzy
+msgid "Edit Custom Action"
+msgstr "అనుకూల చర్యను సవరించండి"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:39
+#: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:21
+msgid "_Cancel"
+msgstr "రద్దు (_C)"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:46
+#, fuzzy
+msgid "_Save"
+msgstr "సేవ్ చేయి (_S)"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:62
+msgid "Name"
+msgstr "పేరు"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:76
+#, fuzzy
+msgid "Trigger"
+msgstr "ట్రిగ్గర్"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:80
+#, fuzzy
+msgid "Event"
+msgstr "ఈవెంట్"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:81
+#, fuzzy
+msgid "Execute command after an event."
+msgstr "ఈవెంట్ తర్వాత ఆదేశాన్ని అమలు చేయండి."
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:96
+#: src/ui/preferences/automation/action/action-edit-window.ui:174
+#, fuzzy
+msgid "Condition"
+msgstr "షరతు"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:97
+#, fuzzy
+msgid "Ensure execution of a second command once condition is no longer met."
+msgstr "షరతు నెరవేరకపోతే రెండో ఆదేశాన్ని అమలు చేసేలా చూడు."
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:114
+#, fuzzy
+msgid "Events"
+msgstr "ఈవెంట్‌లు"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:125
+#, fuzzy
+msgid "Add _Event"
+msgstr "ఈవెంట్ జోడించు (_E)"
+
+#. translators: Filter (verb)
+#: src/ui/preferences/automation/action/action-edit-window.ui:140
+#, fuzzy
+msgid "_Filter"
+msgstr "ఫిల్టర్ (_F)"
+
+#. translators: Filter (noun)
+#: src/ui/preferences/automation/action/action-edit-window.ui:160
+#, fuzzy
+msgid "Filter"
+msgstr "ఫిల్టర్"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:191
+#, fuzzy
+msgid "Shell Command"
+msgstr "షెల్ ఆదేశం"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:199
+#, fuzzy
+msgid "Commands"
+msgstr "ఆదేశాలు"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:204
+#, fuzzy
+msgid "Condition Met Command"
+msgstr "షరతు నెరవేరినప్పటి ఆదేశం"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:210
+#, fuzzy
+msgid "Condition Not Met Command"
+msgstr "షరతు నెరవేరనప్పటి ఆదేశం"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:221
+#, fuzzy
+msgid "Working Directory"
+msgstr "వర్కింగ్ డైరెక్టరీ"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:236
+#, fuzzy
+msgid "Use Subshell"
+msgstr "సబ్-షెల్ ఉపయోగించండి"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:237
+#, fuzzy
+msgid "Run the program from a subshell such as sh -c ''"
+msgstr "ప్రోగ్రామ్‌ను sh -c '' వంటి సబ్-షెల్ నుండి నడపండి"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:242
+#, fuzzy
+msgid "Pass Input Data"
+msgstr "ఇన్‌పుట్ డేటాను పంపండి"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:243
+#, fuzzy
+msgid "Instead of passing variables you can process a JSON object."
+msgstr "వేరియబుల్స్ పంపే బదులు మీరు JSON ఆబ్జెక్ట్‌ను ప్రాసెస్ చేయవచ్చు."
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:248
+#, fuzzy
+msgid "Wait For Completion"
+msgstr "పూర్తయ్యే వరకు వేచి ఉండు"
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:249
+#, fuzzy
+msgid "Block execution of other commands until the command completes."
+msgstr "ఆదేశం పూర్తయ్యే వరకు ఇతర ఆదేశాలను అమలు చేయకుండా ఆపు."
+
+#: src/ui/preferences/automation/action/action-edit-window.ui:259
+#, fuzzy
+msgid "_Delete Action"
+msgstr "చర్యను తొలగించు (_D)"
+
+#: src/ui/preferences/automation/action/action-edit-window.vala:230
+#, fuzzy
+msgid "No events specified yet."
+msgstr "ఇంకా ఏ ఈవెంట్‌లు పేర్కొనబడలేదు."
+
+#: src/ui/preferences/automation/action/action-edit-window.vala:248
+#, fuzzy
+msgid "Add Custom Action"
+msgstr "అనుకూల చర్యను జోడించండి"
+
+#: src/ui/preferences/automation/action/action-edit-window.vala:249
+#, fuzzy
+msgid "_Add"
+msgstr "జోడించు (_A)"
+
+#: src/ui/preferences/automation/action/action-edit-window.vala:438
+#, fuzzy
+msgid "Select Working Directory"
+msgstr "వర్కింగ్ డైరెక్టరీని ఎంచుకోండి"
+
+#: src/ui/preferences/automation/action/action-edit-window.vala:440
+#: src/ui/preferences/sounds/sound-chooser-window.vala:251
+msgid "_Select"
+msgstr "ఎంచుకోండి (_S)"
+
+#: src/ui/preferences/automation/action/action-listboxrow.vala:67
+#, fuzzy
+msgid "Untitled action"
+msgstr "పేరులేని చర్య"
+
+#: src/ui/preferences/automation/action/condition-group-widget.ui:28
+#, fuzzy
+msgid "Add Condition"
+msgstr "షరతు జోడించు"
+
+#: src/ui/preferences/automation/action/condition-group-widget.ui:45
+#, fuzzy
+msgid "Add Group"
+msgstr "సమూహాన్ని జోడించు"
+
+#: src/ui/preferences/automation/action/condition-group-widget.vala:344
+msgid "AND"
+msgstr "మరియు (AND)"
+
+#: src/ui/preferences/automation/action/condition-group-widget.vala:345
+msgid "OR"
+msgstr "లేదా (OR)"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:26
+#, fuzzy
+msgid "Is"
+msgstr "అవును"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:27
+#, fuzzy
+msgid "Is Not"
+msgstr "కాదు"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:39
+#, fuzzy
+msgid "Equals"
+msgstr "సమానం"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:40
+#, fuzzy
+msgid "Greater Than"
+msgstr "కంటే ఎక్కువ"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:41
+#, fuzzy
+msgid "Less Than"
+msgstr "కంటే తక్కువ"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:67
+msgid "Yes"
+msgstr "అవును"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:68
+msgid "No"
+msgstr "కాదు"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:95
+#, fuzzy
+msgid "Minutes"
+msgstr "నిమిషాలు"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:96
+#, fuzzy
+msgid "Seconds"
+msgstr "సెకన్లు"
+
+#: src/ui/preferences/automation/action/condition-widget.ui:97
+#, fuzzy
+msgid "Hours"
+msgstr "గంటలు"
+
+#. translators: No field selected when defining a condition.
+#: src/ui/preferences/automation/action/condition-widget.vala:115
+#, fuzzy
+msgid "Select Field…"
+msgstr "ఫీల్డ్‌ని ఎంచుకోండి..."
+
+#: src/ui/preferences/automation/action/condition-widget.vala:116
+msgid "State"
+msgstr "స్థితి"
+
+#: src/ui/preferences/automation/action/condition-widget.vala:119
+#, fuzzy
+msgid "Running"
+msgstr "నడుస్తోంది"
+
+#: src/ui/preferences/automation/action/condition-widget.vala:121
+#, fuzzy
+msgid "Duration"
+msgstr "వ్యవధి"
+
+#: src/ui/preferences/automation/action/variable-popover.ui:19
+#: src/ui/preferences/automation/action/variable-popover.ui:161
+#, fuzzy
+msgid "Insert Variable"
+msgstr "వేరియబుల్‌ను చొప్పించండి"
+
+#: src/ui/preferences/automation/action/variable-popover.ui:132
+#, fuzzy
+msgid "Format"
+msgstr "ఫార్మాట్"
+
+#: src/ui/preferences/automation/preferences-panel-automation.ui:13
+#, fuzzy
+msgid "_Log"
+msgstr "లాగ్ (_L)"
+
+#: src/ui/preferences/automation/preferences-panel-automation.ui:15
+#, fuzzy
+msgid "Show execution log"
+msgstr "ఎగ్జిక్యూషన్ లాగ్‌ను చూపించు"
+
+#: src/ui/preferences/automation/preferences-panel-automation.ui:24
+#, fuzzy
+msgid ""
+"Run shell commands automatically on timer events or conditions. <a "
+"href=\"\">Learn more.</a>"
+msgstr ""
+"టైమర్ ఈవెంట్‌లు లేదా షరతులపై షెల్ ఆదేశాలను స్వయంచాలకంగా నడపండి. <a href=\"\">మరింత తెలుసుకోండి.</"
+"a>"
+
+#: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
+#, fuzzy
+msgid "Set Shortcut"
+msgstr "షార్ట్‌కట్ సెట్ చేయండి"
+
+#: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
+#, fuzzy
+msgid "_Set"
+msgstr "సెట్ చేయి (_S)"
+
+#: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:63
+#: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
+#, fuzzy
+msgid "Disabled"
+msgstr "నిలిపివేయబడింది"
+
+#: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
+#, fuzzy
+msgid ""
+"Press <b>Esc</b> to cancel or <b>Backspace</b> to disable the keyboard "
+"shortcut"
+msgstr "రద్దు చేయడానికి <b>Esc</b> నొక్కండి లేదా షార్ట్‌కట్‌ను నిలిపివేయడానికి <b>Backspace</b> నొక్కండి"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:17
+#, fuzzy
+msgid ""
+"Global shortcuts let you control the app even when it’s not on screen. They "
+"work as long as the app is running in the background."
+msgstr ""
+"గ్లోబల్ షార్ట్‌కట్‌లు యాప్ స్క్రీన్‌పై లేనప్పుడు కూడా దాన్ని నియంత్రించడానికి అనుమతిస్తాయి. యాప్ బ్యాక్‌గ్రౌండ్‌లో "
+"నడుస్తున్నంత వరకు ఇవి పనిచేస్తాయి."
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:20
+#, fuzzy
+msgid "Open app settings for editing global shortcuts"
+msgstr "గ్లోబల్ షార్ట్‌కట్‌లను సవరించడానికి యాప్ సెట్టింగ్‌లను తెరవండి"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:25
+#, fuzzy
+msgid "_Edit"
+msgstr "సవరించు (_E)"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:41
+#, fuzzy
+msgid "Enter new shortcut for starting or stopping the timer"
+msgstr "టైమర్‌ను ప్రారంభించడానికి లేదా ఆపడానికి కొత్త షార్ట్‌కట్‌ను నమోదు చేయండి"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:48
+#, fuzzy
+msgid "Enter new shortcut to start/pause/resume the timer"
+msgstr "టైమర్‌ను ప్రారంభించడానికి/పాజ్ చేయడానికి/కొనసాగించడానికి కొత్త షార్ట్‌కట్‌ను నమోదు చేయండి"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:58
+#, fuzzy
+msgid "Enter new shortcut for starting the timer"
+msgstr "టైమర్‌ను ప్రారంభించడానికి కొత్త షార్ట్‌కట్‌ను నమోదు చేయండి"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:65
+#, fuzzy
+msgid "Enter new shortcut for stopping the timer"
+msgstr "టైమర్‌ను ఆపడానికి కొత్త షార్ట్‌కట్‌ను నమోదు చేయండి"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:72
+#, fuzzy
+msgid "Enter new shortcut for pausing the timer"
+msgstr "టైమర్‌ను పాజ్ చేయడానికి కొత్త షార్ట్‌కట్‌ను నమోదు చేయండి"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:79
+#, fuzzy
+msgid "Enter new shortcut for resuming the timer"
+msgstr "టైమర్‌ను కొనసాగించడానికి కొత్త షార్ట్‌కట్‌ను నమోదు చేయండి"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:86
+#, fuzzy
+msgid "Enter new shortcut for skipping"
+msgstr "దాటవేయడానికి కొత్త షార్ట్‌కట్‌ను నమోదు చేయండి"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:92
+#, fuzzy
+msgid "Rewind One Minute"
+msgstr "ఒక నిమిషం వెనక్కి తిప్పు"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:93
+#, fuzzy
+msgid "Enter new shortcut for rewinding"
+msgstr "వెనక్కి తిప్పడానికి కొత్త షార్ట్‌కట్‌ను నమోదు చేయండి"
+
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:107
+#, fuzzy
+msgid "Enter new shortcut for bringing window to focus"
+msgstr "విండోను ముందుకు తీసుకురావడానికి కొత్త షార్ట్‌కట్‌ను నమోదు చేయండి"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:17
+#, fuzzy
+msgid "Announcements"
+msgstr "ప్రకటనలు"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:20
+#, fuzzy
+msgid "Time Running Out"
+msgstr "సమయం అయిపోతోంది"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
+#, fuzzy
+msgid "Notify when Pomodoro or break is about to end."
+msgstr "పోమోడోరో లేదా విరామం ముగియబోతున్నప్పుడు తెలియజేయండి."
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
+#, fuzzy
+msgid "Screen Overlay"
+msgstr "స్క్రీన్ ఓవర్లే"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:29
+#, fuzzy
+msgid "A full-screen notification intended to enforce taking a break."
+msgstr "ఖచ్చితంగా విరామం తీసుకోవాలని సూచించే ఫుల్-స్క్రీన్ నోటిఫికేషన్."
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:37
+#, fuzzy
+msgid "Lock Delay"
+msgstr "లాక్ ఆలస్యం"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:38
+#, fuzzy
+msgid "Period of inactivity to lock the screen."
+msgstr "స్క్రీన్ లాక్ చేయడానికి కావాల్సిన నిశ్చల సమయం."
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:42
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:61
+#, fuzzy
+msgid "15 seconds"
+msgstr "15 సెకన్లు"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:43
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:62
+#, fuzzy
+msgid "30 seconds"
+msgstr "30 సెకన్లు"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:44
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:63
+#, fuzzy
+msgid "1 minute"
+msgstr "1 నిమిషం"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:45
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:64
+#, fuzzy
+msgid "2 minutes"
+msgstr "2 నిమిషాలు"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:46
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:65
+#, fuzzy
+msgid "3 minutes"
+msgstr "3 నిమిషాలు"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:47
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:66
+#, fuzzy
+msgid "5 minutes"
+msgstr "5 నిమిషాలు"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:48
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:67
+#, fuzzy
+msgid "Never"
+msgstr "ఎప్పుడూ వద్దు"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:56
+#, fuzzy
+msgid "Reopen Delay"
+msgstr "తిరిగి తెరిచే ఆలస్యం"
+
+#: src/ui/preferences/notifications/preferences-panel-notifications.ui:57
+#, fuzzy
+msgid "Period of inactivity to reopen the overlay after it gets dismissed."
+msgstr "ఓవర్లే తీసివేసిన తర్వాత తిరిగి తెరవడానికి కావాల్సిన నిశ్చల సమయం."
+
+#: src/ui/preferences/preferences-window.vala:37
+msgid "Notifications"
+msgstr "నోటిఫికేషన్‌లు"
+
+#: src/ui/preferences/preferences-window.vala:44
+#, fuzzy
+msgid "Sounds"
+msgstr "శబ్దాలు"
+
+#: src/ui/preferences/preferences-window.vala:51
+#, fuzzy
+msgid "Appearance"
+msgstr "కనిపించే తీరు"
+
+#: src/ui/preferences/preferences-window.vala:58
+#, fuzzy
+msgid "Keyboard Shortcuts"
+msgstr "కీబోర్డ్ షార్ట్‌కట్‌లు"
+
+#: src/ui/preferences/preferences-window.vala:71
+#, fuzzy
+msgid "Automation"
+msgstr "ఆటోమేషన్"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
+#, fuzzy
+msgid "Sounds Are Disabled"
+msgstr "శబ్దాలు నిలిపివేయబడ్డాయి"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:36
+#, fuzzy
+msgid "Alert Sounds"
+msgstr "అలర్ట్ శబ్దాలు"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
+#, fuzzy
+msgid "Pomodoro Finished Sound"
+msgstr "పోమోడోరో పూర్తయిన శబ్దం"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
+#, fuzzy
+msgid "Break Finished Sound"
+msgstr "విరామం పూర్తయిన శబ్దం"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
+#: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
+#, fuzzy
+msgid "Background Sound"
+msgstr "నేపథ్య శబ్దం"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:20
+msgid "Bell"
+msgstr "గంట (Bell)"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:21
+msgid "Loud Bell"
+msgstr "పెద్ద గంట"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:24
+msgid "Clock Ticking"
+msgstr "గడియారం టిక్-టిక్"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:25
+msgid "Timer Ticking"
+msgstr "టైమర్ టిక్-టిక్"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:26
+#, fuzzy
+msgid "Birds"
+msgstr "పక్షులు"
+
+#: src/ui/preferences/sounds/preferences-panel-sounds.vala:86
+#: src/ui/preferences/sounds/sound-chooser-window.ui:25
+#, fuzzy
+msgid "None"
+msgstr "ఏదీ లేదు"
+
+#: src/ui/preferences/sounds/sound-chooser-window.ui:63
+msgid "Volume:"
+msgstr "వాల్యూమ్:"
+
+#: src/ui/preferences/sounds/sound-chooser-window.vala:249
+msgid "Select Custom Sound"
+msgstr "అనుకూల ధ్వనిని ఎంచుకోండి"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:20
+#, fuzzy
+msgid "Pomodoro Duration"
+msgstr "పోమోడోరో వ్యవధి"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:31
+#, fuzzy
+msgid "Short Break Duration"
+msgstr "చిన్న విరామ వ్యవధి"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:42
+#, fuzzy
+msgid "Long Break Duration"
+msgstr "పెద్ద విరామ వ్యవధి"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:53
+#, fuzzy
+msgid "Number of Cycles"
+msgstr "చక్రాల సంఖ్య"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:93
+#, fuzzy
+msgid "Behavior"
+msgstr "ప్రవర్తన"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:96
+#, fuzzy
+msgid "Pause By Locking The Screen"
+msgstr "స్క్రీన్ లాక్ చేయడం ద్వారా పాజ్ చేయండి"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:101
+#, fuzzy
+msgid "Confirm Starting a Break"
+msgstr "విరామం ప్రారంభించే ముందు నిర్ధారించండి"
+
+#: src/ui/preferences/timer/preferences-panel-timer.ui:106
+#, fuzzy
+msgid "Confirm Starting a Pomodoro"
+msgstr "పోమోడోరో ప్రారంభించే ముందు నిర్ధారించండి"
+
+#. translators: time formatted as text: "5 minutes 30 seconds"
+#: src/ui/preferences/timer/preferences-panel-timer.vala:87
+#, fuzzy, c-format
+msgid "A single session will take <b>%s</b>."
+msgstr "ఒక సెషన్ <b>%s</b> సమయం తీసుకుంటుంది."
+
+#: src/ui/preferences/timer/preferences-panel-timer.vala:88
+#, fuzzy, c-format
+msgid "<b>%u%%</b> of the time will be allocated for breaks."
+msgstr "సమయంలో <b>%u%%</b> విరామాల కోసం కేటాయించబడుతుంది."
+
+#: src/ui/preferences/timer/preferences-panel-timer.vala:136
+#, fuzzy
+msgid "Apply changes to ongoing Pomodoro?"
+msgstr "ప్రస్తుతం నడుస్తున్న పోమోడోరోకు మార్పులను వర్తింపజేయాలా?"
+
+#: src/ui/preferences/timer/preferences-panel-timer.vala:137
+#, fuzzy
+msgid "Apply changes to ongoing break?"
+msgstr "ప్రస్తుతం నడుస్తున్న విరామానికి మార్పులను వర్తింపజేయాలా?"
+
+#: src/ui/preferences/timer/preferences-panel-timer.vala:139
+#, fuzzy
+msgid "Apply"
+msgstr "వర్తింపజేయి"
+
+#: src/ui/preferences/widgets/preferences-sidebar.vala:73
+msgctxt "accessibility"
+msgid "Sidebar"
+msgstr "సైడ్ బార్"
+
+#~ msgid "Run as background service"
+#~ msgstr "నేపథ్య సేవగా అమలు చేయండి"
+
+#~ msgid "About Pomodoro"
+#~ msgstr "పోమోడోరో గురించి"
+
+#~ msgid "A simple time management utility"
+#~ msgstr "ఒక సాధారణ సమయ నిర్వహణ సాధనం"
+
+#, fuzzy
+#~ msgid "_Stopped"
+#~ msgstr "ఆపబడింది (_S)"
+
+#, fuzzy
+#~ msgid "Extension for GNOME Shell is available"
+#~ msgstr "గ్నోమ్ షెల్ ఎక్స్‌టెన్షన్ అందుబాటులో ఉంది"
+
+#, fuzzy, c-format
+#~ msgid "Long break due in %s"
+#~ msgstr "పెద్ద విరామం ఇంకో %s లో"
+
+#~ msgid "A time management utility for GNOME"
+#~ msgstr "గ్నోమ్ కోసం సమయ నిర్వహణ సాధనం"
+
+#~ msgid ""
+#~ "A GNOME utility that helps managing time according to Pomodoro Technique. "
+#~ "It intends to improve productivity and focus by taking short breaks after "
+#~ "every 25 minutes of work."
+#~ msgstr ""
+#~ "పోమోడోరో పద్ధతి ప్రకారం సమయాన్ని నిర్వహించడంలో సహాయపడే గ్నోమ్ సాధనం. ప్రతి 25 నిమిషాల పని తర్వాత చిన్న "
+#~ "విరామాలు తీసుకోవడం ద్వారా ఉత్పాదకతను మరియు ఏకాగ్రతను మెరుగుపరచడం దీని ఉద్దేశ్యం."
+
+#~ msgid "Timer window"
+#~ msgstr "టైమర్ విండో"
+
+#~ msgid "Indicator for GNOME Shell"
+#~ msgstr "గ్నోమ్ షెల్ కోసం సూచిక"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 4.0"
+#~ msgstr "గ్నోమ్ షెల్ 4.0 కోసం మద్దతు"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 3.36"
+#~ msgstr "గ్నోమ్ షెల్ 3.36 కోసం మద్దతు"
+
+#, fuzzy
+#~ msgid "Support for GNOME Shell 3.34 only"
+#~ msgstr "గ్నోమ్ షెల్ 3.34 కి మాత్రమే మద్దతు"
+
+#~ msgid "_Timer"
+#~ msgstr "టైమర్ (_T)"
+
+#~ msgid "Keyboard shortcut to toggle the timer. Enter new shortcut to change."
+#~ msgstr "టైమర్‌ను మార్చడానికి కీబోర్డ్ షార్ట్‌కట్. మార్చడానికి కొత్త షార్ట్‌కట్‌ను నమోదు చేయండి."
+
+#~ msgid "Pomodoros before a long break"
+#~ msgstr "పెద్ద విరామం ముందు పోమోడోరోలు"
+
+#~ msgid "Keyboard shortcut"
+#~ msgstr "కీబోర్డ్ షార్ట్‌కట్"
+
+#~ msgid "Screen notifications"
+#~ msgstr "స్క్రీన్ నోటిఫికేషన్‌లు"
+
+#~ msgid "Desktop"
+#~ msgstr "డెస్క్‌టాప్"
+
+#~ msgid "Wait for activity after a break"
+#~ msgstr "విరామం తర్వాత కార్యాచరణ కోసం వేచి ఉండండి"
+
+#~ msgid "Plugins…"
+#~ msgstr "ప్లగిన్‌లు..."
+
+#~ msgid "Plugins"
+#~ msgstr "ప్లగిన్‌లు"
+
+#~ msgid "Back"
+#~ msgstr "వెనుకకు"
+
+#~ msgid "Complete a few sessions"
+#~ msgstr "కొన్ని సెషన్లను పూర్తి చేయండి"
+
+#~ msgid "Previous (Alt+Left)"
+#~ msgstr "మునుపటి (Alt+Left)"
+
+#~ msgid "Next (Alt+Right)"
+#~ msgstr "తదుపరి (Alt+Right)"
+
+#~ msgid "Complete"
+#~ msgstr "పూర్తి"
+
+#~ msgid "Enable"
+#~ msgstr "ప్రారంభించు"
+
+#~ msgid "Add"
+#~ msgstr "జోడించు"
+
+#~ msgid "Remove"
+#~ msgstr "తొలగించు"
+
+#~ msgid "Elapsed Time"
+#~ msgstr "గడిచిన సమయం"
+
+#~ msgid "Pause Timer"
+#~ msgstr "టైమర్‌ను పాజ్ చేయండి"
+
+#~ msgid "Pause break"
+#~ msgstr "విరామాన్ని పాజ్ చేయండి"
+
+#~ msgid "Pause Pomodoro"
+#~ msgstr "పోమోడోరోను పాజ్ చేయండి"
+
+#~ msgid "Resume break"
+#~ msgstr "విరామాన్ని కొనసాగించు"
+
+#~ msgid "Resume Pomodoro"
+#~ msgstr "పోమోడోరోను కొనసాగించు"
+
+#, javascript-format
+#~ msgid "%d minute remaining"
+#~ msgid_plural "%d minutes remaining"
+#~ msgstr[0] "%d నిమిషం మిగిలి ఉంది"
+#~ msgstr[1] "%d నిమిషాలు మిగిలి ఉన్నాయి"
+
+#~ msgid "Report issue"
+#~ msgstr "సమస్యను నివేదించండి"
+
+#, javascript-format
+#~ msgid "Failed to run <i>%s</i> service"
+#~ msgstr "<i>%s</i> సేవను నడపడంలో విఫలమైంది"
+
+#~ msgid "Woodland Birds"
+#~ msgstr "అడవి పక్షులు"
+
+#~ msgid "End of Break Sound"
+#~ msgstr "విరామం ముగింపు శబ్దం"
+
+#~ msgid "Start of Break Sound"
+#~ msgstr "విరామం ప్రారంభ శబ్దం"
+
+#~ msgid "Off"
+#~ msgstr "ఆఫ్"
+
+#~ msgid "Ticking sound"
+#~ msgstr "టిక్-టిక్ శబ్దం"
+
+#~ msgid "Start of break sound"
+#~ msgstr "విరామం ప్రారంభ శబ్దం"
+
+#~ msgid "End of break sound"
+#~ msgstr "విరామం ముగింపు శబ్దం"
+
+#~ msgid "Focus on your task."
+#~ msgstr "మీ పనిపై దృష్టి పెట్టండి."
+
 #, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d నిమిషం"
-msgstr[1] "%d నిమిషాలు"
+#~ msgid "You have %d minute"
+#~ msgid_plural "You have %d minutes"
+#~ msgstr[0] "మీకు %d నిమిషం ఉంది"
+#~ msgstr[1] "మీకు %d నిమిషాలు ఉన్నాయి"
+
+#, c-format
+#~ msgid "You have %d second"
+#~ msgid_plural "You have %d seconds"
+#~ msgstr[0] "మీకు %d సెకను ఉంది"
+#~ msgstr[1] "మీకు %d సెకన్లు ఉన్నాయి"
+
+#~ msgid "Take a longer break"
+#~ msgstr "కాస్త పెద్ద విరామం తీసుకోండి"
+
+#~ msgid "Lengthen it"
+#~ msgstr "దీనిని పొడిగించండి"
+
+#~ msgid "Shorten it"
+#~ msgstr "దీనిని కుదించండి"
+
+#~ msgid "Start pomodoro"
+#~ msgstr "పోమోడోరో ప్రారంభించండి"
+
+#, c-format
+#~ msgid ""
+#~ "Using \"%s\" as shortcut will interfere with typing. Try adding another "
+#~ "key, such as Control, Alt or Shift."
+#~ msgstr ""
+#~ "\"%s\"ని షార్ట్‌కట్‌గా ఉపయోగించడం టైపింగ్‌కు ఆటంకం కలిగిస్తుంది. Control, Alt లేదా Shift వంటి "
+#~ "మరో కీని జోడించి ప్రయత్నించండి."
+
+#~ msgid "Available"
+#~ msgstr "అందుబాటులో ఉంది"
+
+#~ msgid "Busy"
+#~ msgstr "బిజీ"
+
+#~ msgid "Idle"
+#~ msgstr "ఖాళీగా ఉంది"
+
+#~ msgid "Invisible"
+#~ msgstr "కనిపించదు"
+
+#, c-format
+#~ msgid "%d m"
+#~ msgstr "%d ని"
+
+#, c-format
+#~ msgid "%.0f h"
+#~ msgstr "%.0f గం"
+
+#, c-format
+#~ msgid "%.1f h"
+#~ msgstr "%.1f గం"

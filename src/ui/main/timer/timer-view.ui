@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <template class="PomodoroTimerView" parent="GtkWidget">
+    <child>
+      <object class="GtkBox" id="header_box">
+        <property name="spacing">10</property>
+        <child>
+          <object class="GtkMenuButton" id="state_menubutton">
+            <property name="halign">start</property>
+            <property name="hexpand">true</property>
+            <property name="has-frame">false</property>
+            <style>
+              <class name="title-1"/>
+              <class name="pomodoro-state-menu"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="open_screen_overlay_button">
+            <property name="action-name">app.screen-overlay</property>
+            <property name="tooltip-text" translatable="yes">Open screen overlay</property>
+            <style>
+              <class name="flat"/>
+            </style>
+            <child>
+              <object class="GtkImage">
+                <property name="icon-name">screen-overlay-open-symbolic</property>
+                <style>
+                  <class name="symbolic"/>
+                </style>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="PomodoroTimerProgressBar" id="timer_progressbar">
+        <property name="shape">ring</property>
+        <property name="valign">center</property>
+        <property name="can_focus">false</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkBox" id="inner_box">
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="PomodoroTimerLabel" id="timer_label"/>
+        </child>
+        <child>
+          <object class="GtkRevealer" id="session_progressbar_revealer">
+            <property name="reveal-child">true</property>
+            <property name="transition-type">slide-up</property>
+            <property name="transition-duration">500</property>
+            <property name="reveal-child" bind-source="session_progressbar" bind-property="reveal" bind-flags="sync-create"/>
+            <property name="overflow">visible</property>
+            <child>
+              <object class="PomodoroSessionProgressBar" id="session_progressbar">
+                <property name="line-width" bind-source="timer_progressbar" bind-property="line-width" bind-flags="sync-create"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="PomodoroTimerControlButtons" id="timer_control_buttons">
+        <property name="has-suggested-action">true</property>
+        <property name="circular">true</property>
+        <property name="spacing">30</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkGestureClick" id="click_gesture">
+        <signal name="pressed" handler="on_pressed"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkGestureDrag" id="drag_gesture">
+        <signal name="drag-update" handler="on_drag_update"/>
+      </object>
+    </child>
+  </template>
+</interface>

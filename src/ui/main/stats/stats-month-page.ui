@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="gnome-pomodoro">
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <template class="PomodoroStatsMonthPage" parent="AdwBin">
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+        <child>
+          <object class="PomodoroBubbleChart" id="bubble_chart">
+            <property name="activate-on-click">true</property>
+            <property name="reference-value">3600</property><!-- 1 hour -->
+            <style>
+              <class name="small-text"/>
+              <class name="numeric"/>
+            </style>
+            <signal name="bubble-activated" handler="on_bubble_activated"/>
+          </object>
+        </child>
+        <child>
+          <object class="GtkFlowBox">
+            <property name="selection-mode">none</property>
+            <property name="column-spacing">6</property>
+            <property name="row-spacing">6</property>
+            <property name="homogeneous">true</property>
+            <property name="max-children-per-line">3</property>
+            <property name="min-children-per-line">2</property>
+            <property name="margin-top">6</property>
+            <property name="margin-bottom">12</property>
+            <property name="can-focus">false</property>
+            <child>
+              <object class="PomodoroStatsCard" id="pomodoro_card">
+                <property name="label" translatable="yes">Pomodoro</property>
+                <property name="value">0</property>
+                <property name="unit">interval</property>
+              </object>
+            </child>
+            <child>
+              <object class="PomodoroStatsCard" id="breaks_card">
+                <property name="label" translatable="yes">Breaks</property>
+                <property name="value">0</property>
+                <property name="unit">interval</property>
+              </object>
+            </child>
+            <child>
+              <object class="PomodoroStatsCard" id="interruptions_card">
+                <property name="label" translatable="yes">Interruptions</property>
+                <property name="value">0</property>
+                <property name="unit">amount</property>
+              </object>
+            </child>
+            <child>
+              <object class="PomodoroStatsCard" id="break_ratio_card">
+                <property name="label" translatable="yes">Break Ratio</property>
+                <property name="unit">percent</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>

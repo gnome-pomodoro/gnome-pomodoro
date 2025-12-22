@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="PomodoroChart" parent="GtkWidget">
+    <property name="accessible-role">img</property>
+    <child>
+      <object class="GtkScrolledWindow" id="scrolled_window">
+        <property name="window-placement">bottom-left</property>
+        <property name="hscrollbar-policy">external</property>
+        <property name="vscrollbar-policy">never</property>
+        <property name="propagate-natural-height">true</property>
+        <property name="kinetic-scrolling">false</property>
+        <property name="overlay-scrolling">false</property>
+        <property name="hexpand">true</property>
+        <property name="child">
+          <object class="PomodoroChartContents" id="contents"/>
+        </property>
+        <child>
+          <object class="GtkGesturePan">
+            <property name="orientation">horizontal</property>
+            <signal name="drag-begin" handler="on_drag_begin"/>
+            <signal name="pan" handler="on_pan"/>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkEventControllerScroll">
+        <property name="flags">vertical|discrete</property>
+        <property name="propagation-phase">capture</property>
+        <signal name="scroll" handler="on_scroll"/>
+      </object>
+    </child>
+  </template>
+</interface>

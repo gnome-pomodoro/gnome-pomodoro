@@ -1,0 +1,72 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+                      "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+
+  <!--
+      org.gnomepomodoro.Pomodoro:
+      @short_description: Main application interface
+
+      The main interface for controlling the Pomodoro application.
+  -->
+  <interface name="org.gnomepomodoro.Pomodoro">
+
+    <!--
+        Version:
+        The application version
+
+        This property contains the version string of the running
+        Pomodoro application.
+    -->
+    <property type="s" name="Version" access="read"/>
+
+    <!--
+        ShowWindow:
+        @view: The view to display in the window
+
+        Show the main application window and switch to the specified view.
+
+        The @view parameter specifies which view to display. Possible values:
+
+        <simplelist>
+          <member>"timer" - the main timer view</member>
+          <member>"stats" - the statistics view</member>
+          <member>"default" - let the app decide which view to display</member>
+        </simplelist>
+    -->
+    <method name="ShowWindow">
+      <arg type="s" name="view" direction="in"/>
+    </method>
+
+    <!--
+        ShowPreferences:
+        @view: The preferences view to display
+
+        Open the preferences window and switch to the specified view.
+
+        The @view parameter specifies which preferences section to display.
+        Possible values:
+
+        <simplelist>
+          <member>"timer" - the timer section</member>
+          <member>"appearance" - the appearance section</member>
+          <member>"notifications" - the notifications section</member>
+          <member>"keyboard-shortcuts" - the keyboard shortcuts section</member>
+          <member>"sounds" - the sounds section</member>
+          <member>"automation" - the automation section</member>
+        </simplelist>
+    -->
+    <method name="ShowPreferences">
+      <arg type="s" name="view" direction="in"/>
+    </method>
+
+    <!--
+        Quit:
+
+        Quit the application.
+
+        This method terminates the Pomodoro application.
+    -->
+    <method name="Quit"/>
+
+  </interface>
+</node>

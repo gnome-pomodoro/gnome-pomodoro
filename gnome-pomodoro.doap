@@ -6,13 +6,11 @@
          xmlns="http://usefulinc.com/ns/doap#">
 
   <name xml:lang="en">Pomodoro</name>
-  <shortdesc xml:lang="en">Time management utility for GNOME</shortdesc>
-  <homepage rdf:resource="https://github.com/gnome-pomodoro/gnome-pomodoro" />
+  <shortdesc xml:lang="en">Maintain focus by taking frequent breaks</shortdesc>
+  <homepage rdf:resource="https://gnomepomodoro.org" />
   <license rdf:resource="https://www.gnu.org/licenses/gpl-3.0.html" />
-  <category rdf:resource="https://api.gnome.org/doap-extensions#desktop" />
-
+  <category rdf:resource="http://api.gnome.org/doap-extensions#apps"/>
   <programming-language>Vala</programming-language>
-  <programming-language>JavaScript</programming-language>
 
   <repository>
     <GitRepository>
@@ -27,5 +25,4 @@
       <foaf:mbox rdf:resource="mailto:kamilprusko@gmail.com" />
     </foaf:Person>
   </maintainer>
-
 </Project>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-pomodoro">
+  <enum id="org.gnomepomodoro.Pomodoro.ActionTrigger">
+    <value nick="event" value="0"/>
+    <value nick="condition" value="1"/>
+  </enum>
+
+  <schema id="org.gnomepomodoro.Pomodoro" path="/org/gnomepomodoro/Pomodoro/">
+    <!-- Timer -->
+    <key name="pomodoro-duration" type="u">
+      <default>1500</default>
+      <range min="1" max="14400"/>
+      <summary>Pomodoro duration</summary>
+      <description>Time in seconds destined for an focused work.</description>
+    </key>
+    <key name="short-break-duration" type="u">
+      <default>300</default>
+      <range min="1" max="14400"/>
+      <summary>Short break duration</summary>
+      <description>Time in seconds destined for a short rest.</description>
+    </key>
+    <key name="long-break-duration" type="u">
+      <default>900</default>
+      <range min="1" max="14400"/>
+      <summary>Long break duration</summary>
+      <description>Time in seconds destined for a longer rest.</description>
+    </key>
+    <key name="cycles" type="u">
+      <default>4</default>
+      <range min="1" max="6"/>
+      <summary>Number of pomodoros before a long break</summary>
+      <description>Number of pomodoros before a long break.</description>
+    </key>
+    <key name="confirm-starting-break" type="b">
+      <default>false</default>
+      <description>Don't start break unless manually confirmed</description>
+    </key>
+    <key name="confirm-starting-pomodoro" type="b">
+      <default>false</default>
+      <summary>Confirm starting a Pomodoro</summary>
+      <description>Don't start pomodoro unless manually confirmed</description>
+    </key>
+    <key name="pause-on-lockscreen" type="b">
+      <default>true</default>
+      <summary>Pause Pomodoro when screen is locked</summary>
+    </key>
+
+    <!-- Notifications -->
+    <key name="announce-about-to-end" type="b">
+      <default>true</default>
+      <summary>Announce Time Running Out</summary>
+      <description>Notify when Pomodoro or break is about to end.</description>
+    </key>
+    <key name="screen-overlay" type="b">
+      <default>true</default>
+      <summary>Show screen overlay</summary>
+      <description>Whether to open screen overlay during break.</description>
+    </key>
+    <key name="screen-overlay-lock-delay" type="u">
+      <default>0</default>
+      <summary>Time to lock the screen after opening screen overlay</summary>
+      <description></description>
+    </key>
+    <key name="screen-overlay-reopen-delay" type="u">
+      <default>30</default>
+      <summary>Time to reopen screen overlay</summary>
+      <description></description>
+    </key>
+
+    <!-- Appearance -->
+    <key name="dark-theme" type="b">
+      <default>false</default>
+      <summary>Use dark theme variant</summary>
+      <description></description>
+    </key>
+    <key name="prefer-compact-size" type="b">
+      <default>false</default>
+      <summary>Open app in compact view</summary>
+      <description></description>
+    </key>
+
+    <!-- Sounds -->
+    <key name="sounds" type="b">
+      <default>true</default>
+      <summary>Toggle all sounds</summary>
+    </key>
+    <key name="pomodoro-finished-sound" type="s">
+      <default>"bell.ogg"</default>
+      <summary>Pomodoro finished sound</summary>
+    </key>
+    <key name="pomodoro-finished-sound-volume" type="d">
+      <default>1.0</default>
+      <summary>Volume of Pomodoro finished sound</summary>
+    </key>
+    <key name="break-finished-sound" type="s">
+      <default>"loud-bell.ogg"</default>
+      <summary>Break finished sound</summary>
+    </key>
+    <key name="break-finished-sound-volume" type="d">
+      <default>1.0</default>
+      <summary>Volume of break finished sound</summary>
+    </key>
+    <key name="background-sound" type="s">
+      <default>""</default>
+      <summary>Background sound</summary>
+    </key>
+    <key name="background-sound-volume" type="d">
+      <default>0.5</default>
+      <summary>Volume of background sound</summary>
+    </key>
+
+    <!-- Other -->
+    <key name="preferences-window-state" type="(iib)">
+      <default>(-1, -1, false)</default>
+      <summary>State of preferences window</summary>
+    </key>
+    <key name="global-shortcuts-configured" type="b">
+      <default>false</default>
+      <summary>State of global shortcuts</summary>
+    </key>
+  </schema>
+
+  <!-- Actions -->
+  <schema id="org.gnomepomodoro.Pomodoro.actions.action">
+    <key name="trigger" enum="org.gnomepomodoro.Pomodoro.ActionTrigger">
+      <default>"event"</default>
+      <summary>Trigger</summary>
+    </key>
+    <key name="enabled" type="b">
+      <default>true</default>
+      <summary>Enabled</summary>
+    </key>
+    <key name="display-name" type="s">
+      <default>""</default>
+      <summary>Name</summary>
+    </key>
+    <key name="events" type="as">
+      <default>[]</default>
+      <summary>List of events</summary>
+    </key>
+    <key name="condition" type="s">
+      <default>""</default>
+      <summary>Condition</summary>
+    </key>
+    <key name="command" type="s">
+      <default>""</default>
+      <summary>Shell command</summary>
+    </key>
+    <key name="exit-command" type="s">
+      <default>""</default>
+      <summary>Shell command</summary>
+    </key>
+    <key name="working-directory" type="s">
+      <default>""</default>
+      <summary>Working directory</summary>
+    </key>
+    <key name="use-subshell" type="b">
+      <default>false</default>
+      <summary>Use Sub-shell</summary>
+    </key>
+    <key name="pass-input" type="b">
+      <default>false</default>
+      <summary>Pass JSON input to the command</summary>
+    </key>
+    <key name="wait-for-completion" type="b">
+      <default>true</default>
+      <summary>Wait for completion</summary>
+    </key>
+  </schema>
+  <schema id="org.gnomepomodoro.Pomodoro.actions" path="/org/gnomepomodoro/Pomodoro/actions/">
+    <key name="actions" type="as">
+      <default>[]</default>
+      <summary>Actions</summary>
+      <description>A list of action uuids to load.</description>
+    </key>
+  </schema>
+</schemalist>

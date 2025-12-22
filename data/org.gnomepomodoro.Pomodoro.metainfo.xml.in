@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2025 Kamil Prusko <kamilprusko@gmail.com> -->
+<component type="desktop-application">
+
+  <!-- General -->
+  <id>org.gnomepomodoro.Pomodoro</id>
+  <translation type="gettext">gnome-pomodoro</translation>
+  ​<launchable type="desktop-id">org.gnomepomodoro.Pomodoro.desktop</launchable>
+  <name>Pomodoro</name>
+  <summary>Maintain focus by taking frequent breaks</summary>
+  <description>
+    <p>
+      A productivity timer that helps you work more effectively by breaking your time into focused work sessions followed by short breaks.
+      Work for 25 minutes, then take a 5-minute break to maintain concentration and prevent burnout.
+    </p>
+    <p>
+      Key features:
+    </p>
+    <ul>
+      <li>Customizable work session and break lengths</li>
+      <li>Visual and audio notifications</li>
+      <li>Time tracking and statistics</li>
+      <li>GNOME desktop integration</li>
+      <li>Screen overlay during breaks</li>
+      <li>Run custom commands after Pomodoro or break</li>
+    </ul>
+  </description>
+  <keywords>
+    <keyword>pomodoro</keyword>
+    <keyword>timer</keyword>
+    <keyword>productivity</keyword>
+    <keyword>focus</keyword>
+    <keyword>time management</keyword>
+  </keywords>
+  <categories>
+    <category>Utility</category>
+    <category>Clock</category>
+    <category>GNOME</category>
+  </categories>
+  <provides>
+    <binary>gnome-pomodoro</binary>
+    <dbus type="user">org.gnomepomodoro.Pomodoro</dbus>
+  </provides>
+  <content_rating type="oars-1.1" />
+  <update_contact>kamilprusko@gmail.com</update_contact>
+
+  <!-- Branding -->
+  <developer_name translate="no">Kamil Prusko</developer_name>
+  <developer id="org.gnomepomodoro">
+    <name translate="no">Kamil Prusko</name>
+  </developer>
+
+  <!-- License -->
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <!-- URLs -->
+  <url type="homepage">https://gnomepomodoro.org</url>
+  <url type="bugtracker">https://github.com/gnome-pomodoro/gnome-pomodoro/issues</url>
+  <url type="vcs-browser">https://github.com/gnome-pomodoro/gnome-pomodoro/</url>
+  <url type="donation">https://liberapay.com/kamilprusko</url>
+
+  <!-- Screenshots -->
+  <screenshots>
+    <screenshot type="default">
+      <image>https://gnomepomodoro.org/release/1.0/timer.png</image>
+      <caption>Timer</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gnomepomodoro.org/release/1.0/compact-timer.png</image>
+      <caption>Compact timer</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gnomepomodoro.org/release/1.0/stats-daily.png</image>
+      <caption>Daily stats</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gnomepomodoro.org/release/1.0/stats-monthly.png</image>
+      <caption>Monthly stats</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gnomepomodoro.org/release/1.0/preferences.png</image>
+      <caption>Preferences</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gnomepomodoro.org/release/1.0/screen-overlay.png</image>
+      <caption>Screen overlay</caption>
+    </screenshot>
+  </screenshots>
+
+  <!-- Releases -->
+  <releases>
+    <release version="0.28.1" date="2025-12-18">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.28.1</p>
+        <ul>
+          <li>Added Tamil translation (thanks @omeritzics)</li>
+          <li>Added Hebrew translation (thanks @Killersparrow1)</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.28.0" date="2025-09-18">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.28.0</p>
+        <ul>
+          <li>Support for GNOME Shell 49 (thanks @aleasto)</li>
+          <li>Updated German translation (thanks @daPhipz)</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.27.0" date="2025-02-22">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.27.0</p>
+        <ul>
+          <li>Support for GNOME Shell 48</li>
+          <li>Split time spent across midnight</li>
+          <li>Added Telugu translation (thanks @SpaciousCoder78)</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.26.0" date="2024-09-10">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.26.0</p>
+        <ul>
+          <li>Support for GNOME Shell 47</li>
+          <li>Allow to dismiss screen overlay by gesture when a video is playing</li>
+          <li>Added Georgian translation (thanks @NorwayFun)</li>
+          <li>Adjusted translations in appdata (thanks @yakushabb)</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.25.2" date="2024-05-31">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.25.2</p>
+        <ul>
+          <li>Fix keeping notification after extending Pomodoro</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.25.1" date="2024-03-28">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.25.1</p>
+        <ul>
+          <li>Fixes for GNOME Shell 46</li>
+          <li>Drop support for GNOME Shell 45</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.25.0" date="2024-03-05">
+      <description translate="no">
+        <p>Overview of changes in gnome-pomodoro 0.25.0</p>
+        <ul>
+          <li>Support for GNOME Shell 46</li>
+          <li>Adjust build script to meson 0.59.0 (thanks @mattst88)</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>

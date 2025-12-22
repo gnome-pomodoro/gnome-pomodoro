@@ -1,5 +1,2 @@
-gettext_targets = i18n.gettext(
-  gettext_package,
-  install: true,
-  preset: 'glib',
-)
+i18n = import('i18n')
+i18n.gettext('gnome-pomodoro', preset : 'glib')

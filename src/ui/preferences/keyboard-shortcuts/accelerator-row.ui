@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.0"/>
+  <template class="PomodoroAcceleratorRow" parent="AdwActionRow">
+    <property name="use-markup">false</property>
+    <property name="selectable">false</property>
+    <property name="activatable">true</property>
+    <child>
+      <object class="GtkLabel" id="accelerator_label">
+        <property name="xalign">1.0</property>
+      </object>
+    </child>
+    <child type="suffix">
+      <object class="GtkImage">
+        <property name="icon-name">go-next-symbolic</property>
+        <property name="visible" bind-source="PomodoroAcceleratorRow" bind-property="activatable" bind-flags="sync-create"/>
+      </object>
+    </child>
+    <signal name="activated" handler="on_activated"/>
+  </template>
+</interface>

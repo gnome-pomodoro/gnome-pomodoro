@@ -1504,4 +1504,3 @@ msgstr "გადატარება"
 msgctxt "accessibility"
 msgid "Sidebar"
 msgstr "გვერდითი პანელი"
-

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.4"/>
+  <menu id="primary_menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Compact View</attribute>
+        <attribute name="verb-icon">window-compact-size-symbolic</attribute>
+        <attribute name="action">win.toggle-compact-size</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Preferences</attribute>
+        <attribute name="action">app.preferences</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_About</attribute>
+        <attribute name="action">app.about</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Quit</attribute>
+        <attribute name="action">app.quit</attribute>
+      </item>
+    </section>
+  </menu>
+  <template class="PomodoroWindow" parent="AdwApplicationWindow">
+    <property name="default-width">400</property>
+    <property name="default-height">600</property>
+    <property name="content">
+      <object class="PomodoroSizeStack" id="size_stack">
+        <property name="transition-duration">500</property>
+        <child>
+          <object class="PomodoroSizeStackPage">
+            <property name="name">normal</property>
+            <property name="resizable">true</property>
+            <property name="child">
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="AdwHeaderBar" id="header_bar">
+                    <property name="centering-policy">loose</property>
+                    <property name="decoration-layout">menu:close</property>
+                    <property name="title-widget">
+                      <object class="AdwViewSwitcher">
+                        <property name="stack">view_stack</property>
+                        <property name="policy">wide</property>
+                      </object>
+                    </property>
+                    <style>
+                      <class name="pomodoro-header-bar"/>
+                    </style>
+                    <child type="end">
+                      <object class="GtkMenuButton">
+                        <property name="icon-name">open-menu-symbolic</property>
+                        <property name="menu-model">primary_menu</property>
+                        <property name="primary">true</property>
+                        <accessibility>
+                          <property name="label" translatable="yes">Primary Menu</property>
+                        </accessibility>
+                      </object>
+                    </child>
+                  </object><!-- header_bar -->
+                </child>
+                <child>
+                  <object class="AdwToastOverlay" id="toast_overlay">
+                    <property name="vexpand">true</property>
+                    <property name="child">
+                      <object class="AdwViewStack" id="view_stack">
+                        <child>
+                          <object class="AdwViewStackPage">
+                            <property name="name">timer</property>
+                            <property name="title" translatable="yes">Timer</property>
+                            <property name="icon-name">timer-symbolic</property>
+                            <property name="child">
+                              <object class="PomodoroTimerView" id="timer_view">
+                                <child>
+                                  <object class="GtkGestureClick">
+                                    <signal name="pressed" handler="on_gesture_click_pressed"/>
+                                  </object>
+                                </child>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwViewStackPage">
+                            <property name="name">stats</property>
+                            <property name="title" translatable="yes">Stats</property>
+                            <property name="icon-name">stats-symbolic</property>
+                            <property name="child">
+                              <object class="PomodoroStatsView"/>
+                            </property>
+                          </object>
+                        </child>
+                        <signal name="notify::visible-child" handler="on_view_stack_visible_child_notify"/>
+                      </object><!-- view_stack -->
+                    </property>
+                  </object><!-- toast_overlay -->
+                </child>
+              </object><!-- box -->
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="PomodoroSizeStackPage">
+            <property name="name">compact</property>
+            <property name="resizable">false</property>
+            <property name="child">
+              <object class="GtkWindowHandle">
+                <property name="valign">start</property>
+                <property name="child">
+                  <object class="PomodoroCompactTimerView">
+                    <child>
+                      <object class="GtkGestureClick">
+                        <property name="propagation-phase">capture</property>
+                        <signal name="pressed" handler="on_gesture_click_pressed"/>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </property>
+          </object>
+        </child>
+        <signal name="notify::visible-child" handler="on_size_stack_visible_child_notify"/>
+      </object><!-- size_stack -->
+    </property>
+    <signal name="close_request" handler="on_close_request"/>
+  </template>
+</interface>
