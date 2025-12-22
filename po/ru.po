@@ -30,7 +30,6 @@ msgid "@APPLICATION_NAME@"
 msgstr "@APPLICATION_NAME@"
 
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
-#, fuzzy
 msgid "Time management utility"
 msgstr "Утилита для управления временем"
 
@@ -53,7 +52,6 @@ msgid "Pomodoro"
 msgstr "Помодоро"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:10
-#, fuzzy
 msgid "Maintain focus by taking frequent breaks"
 msgstr "Сохраняйте концентрацию, делая регулярные перерывы"
 
@@ -66,44 +64,37 @@ msgid ""
 "burnout."
 msgstr ""
 "Таймер продуктивности, который помогает работать эффективнее, разделяя время "
-"на периоды сосредоточенной работы и короткие перерывы. Работайте 25 минут, "
+"на периоды, сосредоточенные на работе, и короткие перерывы. Работайте 25 минут, "
 "затем сделайте 5-минутный перерыв, чтобы сохранить концентрацию и избежать "
 "выгорания."
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:16
-#, fuzzy
 msgid "Key features:"
 msgstr "Основные возможности:"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:20
-#, fuzzy
 msgid "Customizable work session and break lengths"
 msgstr "Настраиваемая длительность рабочих сессий и перерывов"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
-#, fuzzy
 msgid "Visual and audio notifications"
 msgstr "Визуальные и звуковые уведомления"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
-#, fuzzy
 msgid "Time tracking and statistics"
 msgstr "Учет времени и статистика"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:23
-#, fuzzy
 msgid "GNOME desktop integration"
 msgstr "Интеграция с рабочим столом GNOME"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:24
-#, fuzzy
 msgid "Screen overlay during breaks"
 msgstr "Экранная заставка во время перерывов"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
-#, fuzzy
 msgid "Run custom commands after Pomodoro or break"
-msgstr "Запуск команд после завершения помодоро или перерыва"
+msgstr "Запуск команд после завершения Помодоро или перерыва"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
 msgid "Kamil Prusko"
@@ -116,17 +107,14 @@ msgid "Timer"
 msgstr "Таймер"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
-#, fuzzy
 msgid "Compact timer"
 msgstr "Компактный таймер"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
-#, fuzzy
 msgid "Daily stats"
 msgstr "Статистика за день"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:79
-#, fuzzy
 msgid "Monthly stats"
 msgstr "Статистика за месяц"
 
@@ -136,122 +124,99 @@ msgid "Preferences"
 msgstr "Настройки"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:87
-#, fuzzy
 msgid "Screen overlay"
 msgstr "Покрытие экрана"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:95
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.1"
 msgstr "Обзор изменений в gnome-pomodoro 0.28.1"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:97
-#, fuzzy
 msgid "Added Tamil translation (thanks @omeritzics)"
 msgstr "Добавлен перевод на тамильский (спасибо @omeritzics)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:98
-#, fuzzy
 msgid "Added Hebrew translation (thanks @Killersparrow1)"
 msgstr "Добавлен перевод на иврит (спасибо @Killersparrow1)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:104
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.0"
 msgstr "Обзор изменений в gnome-pomodoro 0.28.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
-#, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
 msgstr "Поддержка GNOME Shell 49 (спасибо @aleasto)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
-#, fuzzy
 msgid "Updated German translation (thanks @daPhipz)"
 msgstr "Обновлен немецкий перевод (спасибо @daPhipz)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:113
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.27.0"
 msgstr "Обзор изменений в gnome-pomodoro 0.27.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
-#, fuzzy
 msgid "Support for GNOME Shell 48"
 msgstr "Поддержка GNOME Shell 48"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
-#, fuzzy
 msgid "Split time spent across midnight"
-msgstr "Разделение времени, затраченного в полночь"
+msgstr "Разделение времени, проведенного в полночь"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:117
-#, fuzzy
 msgid "Added Telugu translation (thanks @SpaciousCoder78)"
 msgstr "Добавлен перевод на телугу (спасибо @SpaciousCoder78)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:123
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.26.0"
 msgstr "Обзор изменений в gnome-pomodoro 0.26.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
-#, fuzzy
 msgid "Support for GNOME Shell 47"
 msgstr "Поддержка GNOME Shell 47"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
 #, fuzzy
 msgid "Allow to dismiss screen overlay by gesture when a video is playing"
-msgstr "Возможность закрыть оверлей жестом при воспроизведении видео"
+msgstr "Разрешить скрывать экранное наложение жестом во время воспроизведения видео"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:127
-#, fuzzy
 msgid "Added Georgian translation (thanks @NorwayFun)"
 msgstr "Добавлен перевод на грузинский (спасибо @NorwayFun)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:128
-#, fuzzy
 msgid "Adjusted translations in appdata (thanks @yakushabb)"
 msgstr "Скорректированы переводы в appdata (спасибо @yakushabb)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:134
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.2"
 msgstr "Обзор изменений в gnome-pomodoro 0.25.2"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:136
-#, fuzzy
 msgid "Fix keeping notification after extending Pomodoro"
-msgstr "Исправлено сохранение уведомления после продления помодоро"
+msgstr "Исправлено отображение уведомления после продления Помодоро"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:142
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.1"
 msgstr "Обзор изменений в gnome-pomodoro 0.25.1"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
-#, fuzzy
 msgid "Fixes for GNOME Shell 46"
 msgstr "Исправления для GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
-#, fuzzy
 msgid "Drop support for GNOME Shell 45"
 msgstr "Прекращение поддержки GNOME Shell 45"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.0"
 msgstr "Обзор изменений в gnome-pomodoro 0.25.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
-#, fuzzy
 msgid "Support for GNOME Shell 46"
 msgstr "Поддержка GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
-#, fuzzy
 msgid "Adjust build script to meson 0.59.0 (thanks @mattst88)"
 msgstr "Скрипт сборки адаптирован для meson 0.59.0 (спасибо @mattst88)"
 
@@ -313,13 +278,11 @@ msgstr "Вывести информацию о версии и выйти"
 
 #: src/application.vala:477
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
-#, fuzzy
 msgid "Start or Stop"
 msgstr "Старт или Стоп"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
-#, fuzzy
 msgid "Start, Pause or Resume"
 msgstr "Старт, Пауза или Возобновить"
 
@@ -329,60 +292,53 @@ msgid "Skip"
 msgstr "Пропустить"
 
 #: src/application.vala:492 src/core/event.vala:308
-#, fuzzy
 msgid "Rewind"
 msgstr "Перемотать назад"
 
 #: src/application.vala:494
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
-#, fuzzy
 msgid "Bring to Focus"
 msgstr "Переместить в фокус"
 
 #: src/core/action-manager.vala:111
-#, fuzzy, c-format
+#, c-format
 msgid "Custom action \"%s\" has failed"
-msgstr "Пользовательское действие «%s» не выполнено"
+msgstr "Пользовательское действие \"%s\" не выполнено"
 
 #: src/core/command.vala:379
-#, fuzzy
 msgid "Reached timeout"
 msgstr "Время ожидания истекло"
 
 #: src/core/command.vala:408
-#, fuzzy
 msgid "Failed to execute command"
 msgstr "Не удалось выполнить команду"
 
 #: src/core/command.vala:491 src/core/command.vala:506
-#, fuzzy
 msgid "Command is empty"
 msgstr "Команда не указана"
 
 #: src/core/command.vala:510
-#, fuzzy
 msgid "Unclosed quotation mark"
 msgstr "Незакрытая кавычка"
 
 #: src/core/command.vala:515
-#, fuzzy
 msgid "Invalid command"
 msgstr "Недопустимая команда"
 
 #: src/core/command.vala:540 src/core/expression.vala:859
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown variable \"%s\""
-msgstr "Неизвестная переменная «%s»"
+msgstr "Неизвестная переменная \"%s\""
 
 #: src/core/command.vala:546 src/core/expression.vala:236
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown format \"%s\""
-msgstr "Неизвестный формат «%s»"
+msgstr "Неизвестный формат \"%s\""
 
 #: src/core/command.vala:619
-#, fuzzy, c-format
+#, c-format
 msgid "Program \"%s\" not found"
-msgstr "Программа «%s» не найдена"
+msgstr "Программа \"%s\" не найдена"
 
 #: src/core/event.vala:180
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:54
@@ -390,33 +346,27 @@ msgid "Actions"
 msgstr "Действия"
 
 #: src/core/event.vala:183
-#, fuzzy
 msgid "Countdown"
 msgstr "Обратный отсчет"
 
 #: src/core/event.vala:186
 #: src/ui/preferences/timer/preferences-panel-timer.ui:17
-#, fuzzy
 msgid "Session"
 msgstr "Сессия"
 
 #: src/core/event.vala:189
-#, fuzzy
 msgid "Other"
 msgstr "Другое"
 
 #: src/core/event.vala:269
-#, fuzzy
 msgid "Started the timer."
 msgstr "Таймер запущен."
 
 #: src/core/event.vala:277
-#, fuzzy
 msgid "Stopped the timer manually."
 msgstr "Таймер остановлен вручную."
 
 #: src/core/event.vala:285
-#, fuzzy
 msgid ""
 "The countdown has been manually paused. Not triggered when locking the "
 "screen or when suspending the system."
@@ -425,28 +375,23 @@ msgstr ""
 "экрана или при переходе в спящий режим."
 
 #: src/core/event.vala:293
-#, fuzzy
 msgid "The countdown has been manually resumed."
 msgstr "Обратный отсчет был возобновлен вручную."
 
 #: src/core/event.vala:301
-#, fuzzy
 msgid "Jumped to a next time-block before the countdown has finished."
 msgstr "Переход к следующему блоку времени до завершения отсчета."
 
 #: src/core/event.vala:309
-#, fuzzy
 msgid "Rewind action has been used. It adds a pause in the past."
-msgstr "Было использовано действие перемотки. Оно добавляет паузу в прошлом."
+msgstr "Использовано действие перемотки. Оно добавляет паузу в прошлом."
 
 #: src/core/event.vala:316
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:39
-#, fuzzy
 msgid "Reset"
 msgstr "Сбросить"
 
 #: src/core/event.vala:317
-#, fuzzy
 msgid "Manually cleared the session."
 msgstr "Сессия очищена вручную."
 
@@ -454,7 +399,6 @@ msgstr "Сессия очищена вручную."
 #: src/core/event.vala:325
 #: src/ui/preferences/automation/action/action-edit-window.ui:20
 #: src/ui/preferences/automation/action/condition-widget.vala:120
-#, fuzzy
 msgid "Finished"
 msgstr "Завершено"
 
@@ -464,16 +408,14 @@ msgid ""
 "The countdown has finished. If waiting for confirmation, the duration of the "
 "time-block still may be altered."
 msgstr ""
-"Обратный отсчет завершен. При ожидании подтверждения длительность блока "
-"времени еще может быть изменена."
+"Обратный отсчет завершен. При ожидании подтверждения длительность временного "
+"блока еще может быть изменена."
 
 #: src/core/event.vala:333
-#, fuzzy
 msgid "Changed"
 msgstr "Изменено"
 
 #: src/core/event.vala:334
-#, fuzzy
 msgid "Triggered on any change related to the countdown."
 msgstr "Срабатывает при любом изменении обратного отсчета."
 
@@ -484,9 +426,8 @@ msgid "Confirm Advancement"
 msgstr "Подтверждение перехода"
 
 #: src/core/event.vala:343
-#, fuzzy
 msgid "A manual confirmation is required to start next time-block."
-msgstr "Требуется ручное подтверждение для запуска следующего блока времени."
+msgstr "Требуется ручное подтверждение для запуска следующего временного блока."
 
 #: src/core/event.vala:350
 #, fuzzy
@@ -494,44 +435,37 @@ msgid "Advanced"
 msgstr "Переход"
 
 #: src/core/event.vala:351
-#, fuzzy
 msgid "Transitioned or skipped to a next time-block."
-msgstr "Совершен переход или пропуск к следующему блоку времени."
+msgstr "Совершен переход или пропуск к следующему временном блоку."
 
 #: src/core/event.vala:358
-#, fuzzy
 msgid "State Changed"
 msgstr "Состояние изменено"
 
 #: src/core/event.vala:359
-#, fuzzy
 msgid "Transitioned to a next time-block or when a break gets relabelled."
 msgstr "Переход к следующему блоку или изменение типа перерыва."
 
 #: src/core/event.vala:366
-#, fuzzy
 msgid "Rescheduled"
-msgstr "Перепланировано"
+msgstr "Перенесено"
 
 #. translators: Change of plan
 #: src/core/event.vala:367
-#, fuzzy
 msgid "Triggered when scheduled time-blocks have changed."
-msgstr "Срабатывает при изменении запланированных блоков времени."
+msgstr "Срабатывает при изменении запланированных временных блоков."
 
 #: src/core/event.vala:374
-#, fuzzy
 msgid "Expired"
 msgstr "Истекло"
 
 #: src/core/event.vala:375
-#, fuzzy
 msgid "Triggered when session is about to be reset due to inactivity."
-msgstr "Срабатывает, когда сессия должна быть сброшена из-за бездействия."
+msgstr "Срабатывает, когда сессия настроена на сброс из-за бездействия."
 
 #. translators: time remaining eg. "3 minutes 50 seconds remaining"
 #: src/core/notification-manager.vala:130
-#, fuzzy, c-format
+#, c-format
 msgid "%s remaining"
 msgstr "Осталось %s"
 
