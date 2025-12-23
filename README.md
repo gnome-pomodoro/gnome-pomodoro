@@ -1,3 +1,6 @@
+> [!IMPORTANT]  
+> [master](https://github.com/gnome-pomodoro/gnome-pomodoro/tree/master) branch holds latest stable version of the app. Development has moved to [main](https://github.com/gnome-pomodoro/gnome-pomodoro/tree/main) branch.
+
 # A time management utility for GNOME
 
 GNOME Pomodoro is a small application that helps managing time according to [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique). It intends to improve productivity and focus by taking short breaks. It
