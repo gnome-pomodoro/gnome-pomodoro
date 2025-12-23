@@ -130,9 +130,12 @@ namespace Pomodoro
             return _("%s remaining").printf (Pomodoro.format_time (seconds_uint));
         }
 
+        /**
+         * Check basic conditions if the screen overlay is possible for the current timer state.
+         */
         private bool can_open_screen_overlay_later ()
         {
-            if (!this.timer.is_running ()) {
+            if (!this._timer.is_running ()) {
                 return false;
             }
 
@@ -161,7 +164,7 @@ namespace Pomodoro
                 return false;
             }
 
-            // Don't interrupt the current notification.
+            // Don't interrupt the current announcement.
             if (this.notification_type == Pomodoro.NotificationType.TIME_BLOCK_ABOUT_TO_END &&
                 this.notification_time_block != null &&
                 this.notification_time_block.state.is_break ())
@@ -186,22 +189,24 @@ namespace Pomodoro
         private void on_reopen_screen_overlay_idle ()
         {
             if (this.screen_overlay_active) {
-                GLib.warning ("Screen overlay is already opened.");
+                GLib.debug ("Screen overlay is already opened.");
                 return;
             }
 
             if (!this.can_open_screen_overlay ()) {
+                GLib.debug ("Screen overlay not allowed.");
                 return;
             }
 
             // Don't reopen if close to announcement notification.
-            var timestamp = this.timer.get_current_time ();
+            var timestamp = this._timer.get_current_time ();
             var about_to_end_threshold = this.get_about_to_end_duration () + TIME_BLOCK_ABOUT_TO_END_TOLERANCE;
 
-            if (this.timer.calculate_remaining (timestamp) <= about_to_end_threshold) {
+            if (this._timer.calculate_remaining (timestamp) <= about_to_end_threshold) {
                 return;
             }
 
+            // Request the overlay
             this.request_screen_overlay_open ();
         }
 
@@ -233,32 +238,43 @@ namespace Pomodoro
 
         private bool add_reopen_screen_overlay_idle_watch ()
         {
+            if (this.reopen_screen_overlay_idle_id != 0) {
+                return false;  // already added
+            }
+
+            if (!this.idle_monitor.enabled ||
+                !this.can_open_screen_overlay_later ())
+            {
+                return false;
+            }
+
             var reopen_delay = Pomodoro.Timestamp.from_milliseconds_uint (
                     this.settings.get_uint ("screen-overlay-reopen-delay") * 1000);
 
-            if (this.reopen_screen_overlay_idle_id == 0 &&
-                this.idle_monitor.enabled &&
-                this.can_open_screen_overlay_later ())
-            {
-                this.reopen_screen_overlay_idle_id = this.idle_monitor.add_idle_watch (
-                                        reopen_delay,
-                                        this.on_reopen_screen_overlay_idle,
-                                        GLib.get_monotonic_time ());
-                return true;
-            }
+            this.reopen_screen_overlay_idle_id = this.idle_monitor.add_idle_watch (
+                    reopen_delay,
+                    this.on_reopen_screen_overlay_idle,
+                    GLib.get_monotonic_time ());
 
-            return false;
+            return true;
         }
 
         private bool remove_reopen_screen_overlay_idle_watch ()
         {
-            if (this.reopen_screen_overlay_idle_id != 0) {
-                this.idle_monitor.remove_watch (this.reopen_screen_overlay_idle_id);
-                this.reopen_screen_overlay_idle_id = 0;
-                return true;
+            if (this.reopen_screen_overlay_idle_id == 0) {
+                return false;  // already removed
             }
 
-            return false;
+            this.idle_monitor.remove_watch (this.reopen_screen_overlay_idle_id);
+            this.reopen_screen_overlay_idle_id = 0;
+
+            return true;
+        }
+
+        private void reset_reopen_screen_overlay_idle_watch ()
+        {
+            this.remove_reopen_screen_overlay_idle_watch ();
+            this.add_reopen_screen_overlay_idle_watch ();
         }
 
         private void remove_withdraw_timeout ()
@@ -605,6 +621,9 @@ namespace Pomodoro
                     if (!this.screen_overlay_active) {
                         this.request_screen_overlay_open ();
                     }
+                    else {
+                        this.reset_reopen_screen_overlay_idle_watch ();
+                    }
 
                     return;
                 }
@@ -676,9 +695,9 @@ namespace Pomodoro
 
                 case "screen-overlay-reopen-delay":
                     if (this.reopen_screen_overlay_idle_id != 0) {
-                        this.remove_reopen_screen_overlay_idle_watch ();
-                        this.add_reopen_screen_overlay_idle_watch ();
+                        this.reset_reopen_screen_overlay_idle_watch ();
                     }
+
                     break;
             }
         }

@@ -130,7 +130,9 @@ namespace Pomodoro
                     : _("Finished!");
 
             this.open_screen_overlay_button.visible =
-                    this.settings.get_boolean ("screen-overlay") && current_state.is_break ();
+                    this.settings.get_boolean ("screen-overlay") &&
+                    current_state.is_break () &&
+                    !this.timer.is_finished ();
         }
 
         private void update_timer_label_placeholder ()

@@ -303,10 +303,6 @@ namespace Pomodoro
                                               GLib.Variant?     parameter)
         {
             this.capability_manager.activate ("notifications");
-
-            if (this.timer.is_paused ()) {
-                this.timer.resume ();
-            }
         }
 
         private void activate_visit_website (GLib.SimpleAction action,

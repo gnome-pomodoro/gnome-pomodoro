@@ -126,6 +126,27 @@ namespace Pomodoro
 
         public override void activate ()
         {
+            assert (this.notification_manager != null);
+
+            var current_state = this.notification_manager.session_manager.current_state;
+            if (!current_state.is_break ()) {
+                GLib.info ("Ignoring NotificationsCapability.activate. Not on a break");
+                return;
+            }
+
+            var timer = this.notification_manager.timer;
+            if (timer.is_finished ()) {
+                GLib.info ("Ignoring NotificationsCapability.activate. Break has finished");
+                return;
+            }
+
+            if (timer.is_paused ()) {
+                timer.resume ();
+            }
+            else if (!timer.is_started ()) {
+                timer.start ();
+            }
+
             this.show_screen_overlay (false);
         }
     }
