@@ -4,22 +4,22 @@
 #
 # Authors:
 # Ali <admin@situsali.com>, 2017.
-# Andika Triwidada <andika@gmail.com>, 2020.
+# Andika Triwidada <andika@gmail.com>, 2020, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-pomodoro 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-20 11:56+0100\n"
-"PO-Revision-Date: 2023-03-25 12:01+0100\n"
+"PO-Revision-Date: 2025-12-23 20:58+0700\n"
 "Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.8\n"
 
 #. Translators: Do NOT translate or transliterate this text
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:3
@@ -27,7 +27,6 @@ msgid "@APPLICATION_NAME@"
 msgstr "@APPLICATION_NAME@"
 
 #: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
-#, fuzzy
 msgid "Time management utility"
 msgstr "Utilitas manajemen waktu"
 
@@ -50,12 +49,10 @@ msgid "Pomodoro"
 msgstr "Pomodoro"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:10
-#, fuzzy
 msgid "Maintain focus by taking frequent breaks"
 msgstr "Menjaga fokus dengan mengambil rehat secara berkala"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:12
-#, fuzzy
 msgid ""
 "A productivity timer that helps you work more effectively by breaking your "
 "time into focused work sessions followed by short breaks. Work for 25 "
@@ -68,37 +65,30 @@ msgstr ""
 "dan mencegah kelelahan kerja (burnout)."
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:16
-#, fuzzy
 msgid "Key features:"
 msgstr "Fitur utama:"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:20
-#, fuzzy
 msgid "Customizable work session and break lengths"
 msgstr "Durasi sesi kerja dan rehat yang dapat disesuaikan"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
-#, fuzzy
 msgid "Visual and audio notifications"
 msgstr "Notifikasi visual dan audio"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
-#, fuzzy
 msgid "Time tracking and statistics"
 msgstr "Pelacakan waktu dan statistik"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:23
-#, fuzzy
 msgid "GNOME desktop integration"
 msgstr "Integrasi desktop GNOME"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:24
-#, fuzzy
 msgid "Screen overlay during breaks"
 msgstr "Hamparan layar selama rehat"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
-#, fuzzy
 msgid "Run custom commands after Pomodoro or break"
 msgstr "Jalankan perintah ubahan setelah Pomodoro atau rehat"
 
@@ -113,17 +103,14 @@ msgid "Timer"
 msgstr "Timer"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
-#, fuzzy
 msgid "Compact timer"
 msgstr "Timer ringkas"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
-#, fuzzy
 msgid "Daily stats"
 msgstr "Statistik harian"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:79
-#, fuzzy
 msgid "Monthly stats"
 msgstr "Statistik bulanan"
 
@@ -133,122 +120,98 @@ msgid "Preferences"
 msgstr "Preferensi"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:87
-#, fuzzy
 msgid "Screen overlay"
 msgstr "Hamparan layar"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:95
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.1"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.28.1"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:97
-#, fuzzy
 msgid "Added Tamil translation (thanks @omeritzics)"
 msgstr "Menambahkan terjemahan Tamil (terima kasih @omeritzics)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:98
-#, fuzzy
 msgid "Added Hebrew translation (thanks @Killersparrow1)"
 msgstr "Menambahkan terjemahan Ibrani (terima kasih @Killersparrow1)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:104
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.0"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.28.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
-#, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
 msgstr "Dukungan untuk GNOME Shell 49 (terima kasih @aleasto)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
-#, fuzzy
 msgid "Updated German translation (thanks @daPhipz)"
 msgstr "Pembaruan terjemahan Jerman (terima kasih @daPhipz)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:113
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.27.0"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.27.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
-#, fuzzy
 msgid "Support for GNOME Shell 48"
 msgstr "Dukungan untuk GNOME Shell 48"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
-#, fuzzy
 msgid "Split time spent across midnight"
 msgstr "Pisahkan waktu yang dihabiskan melewati tengah malam"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:117
-#, fuzzy
 msgid "Added Telugu translation (thanks @SpaciousCoder78)"
 msgstr "Menambahkan terjemahan Telugu (terima kasih @SpaciousCoder78)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:123
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.26.0"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.26.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
-#, fuzzy
 msgid "Support for GNOME Shell 47"
 msgstr "Dukungan untuk GNOME Shell 47"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
-#, fuzzy
 msgid "Allow to dismiss screen overlay by gesture when a video is playing"
 msgstr "Izinkan untuk menutup hamparan layar dengan gestur saat video diputar"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:127
-#, fuzzy
 msgid "Added Georgian translation (thanks @NorwayFun)"
 msgstr "Menambahkan terjemahan Georgia (terima kasih @NorwayFun)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:128
-#, fuzzy
 msgid "Adjusted translations in appdata (thanks @yakushabb)"
 msgstr "Penyesuaian terjemahan dalam appdata (terima kasih @yakushabb)"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:134
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.2"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.25.2"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:136
-#, fuzzy
 msgid "Fix keeping notification after extending Pomodoro"
 msgstr "Perbaikan notifikasi yang menetap setelah memperpanjang Pomodoro"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:142
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.1"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.25.1"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
-#, fuzzy
 msgid "Fixes for GNOME Shell 46"
 msgstr "Perbaikan untuk GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
-#, fuzzy
 msgid "Drop support for GNOME Shell 45"
 msgstr "Hentikan dukungan untuk GNOME Shell 45"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.0"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.25.0"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
-#, fuzzy
 msgid "Support for GNOME Shell 46"
 msgstr "Dukungan untuk GNOME Shell 46"
 
 #: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
-#, fuzzy
 msgid "Adjust build script to meson 0.59.0 (thanks @mattst88)"
 msgstr "Sesuaikan skrip build ke meson 0.59.0 (terima kasih @mattst88)"
 
@@ -310,13 +273,11 @@ msgstr "Cetak informasi versi dan keluar"
 
 #: src/application.vala:477
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
-#, fuzzy
 msgid "Start or Stop"
 msgstr "Mulai atau Berhenti"
 
 #: src/application.vala:480
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
-#, fuzzy
 msgid "Start, Pause or Resume"
 msgstr "Mulai, Jeda, atau Lanjut"
 
@@ -326,58 +287,51 @@ msgid "Skip"
 msgstr "Lewati"
 
 #: src/application.vala:492 src/core/event.vala:308
-#, fuzzy
 msgid "Rewind"
 msgstr "Putar balik"
 
 #: src/application.vala:494
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
-#, fuzzy
 msgid "Bring to Focus"
 msgstr "Bawa ke Fokus"
 
 #: src/core/action-manager.vala:111
-#, fuzzy, c-format
+#, c-format
 msgid "Custom action \"%s\" has failed"
 msgstr "Aksi ubahan \"%s\" gagal"
 
 #: src/core/command.vala:379
-#, fuzzy
 msgid "Reached timeout"
 msgstr "Batas waktu tercapai"
 
 #: src/core/command.vala:408
-#, fuzzy
 msgid "Failed to execute command"
 msgstr "Gagal menjalankan perintah"
 
 #: src/core/command.vala:491 src/core/command.vala:506
-#, fuzzy
 msgid "Command is empty"
 msgstr "Perintah kosong"
 
 #: src/core/command.vala:510
-#, fuzzy
 msgid "Unclosed quotation mark"
 msgstr "Tanda kutip belum ditutup"
 
 #: src/core/command.vala:515
-#, fuzzy
 msgid "Invalid command"
 msgstr "Perintah tidak valid"
 
 #: src/core/command.vala:540 src/core/expression.vala:859
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown variable \"%s\""
 msgstr "Variabel \"%s\" tidak dikenal"
 
 #: src/core/command.vala:546 src/core/expression.vala:236
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown format \"%s\""
 msgstr "Format \"%s\" tidak dikenal"
 
 #: src/core/command.vala:619
-#, fuzzy, c-format
+#, c-format
 msgid "Program \"%s\" not found"
 msgstr "Program \"%s\" tidak ditemukan"
 
@@ -387,64 +341,53 @@ msgid "Actions"
 msgstr "Aksi"
 
 #: src/core/event.vala:183
-#, fuzzy
 msgid "Countdown"
 msgstr "Hitung mundur"
 
 #: src/core/event.vala:186
 #: src/ui/preferences/timer/preferences-panel-timer.ui:17
-#, fuzzy
 msgid "Session"
 msgstr "Sesi"
 
 #: src/core/event.vala:189
-#, fuzzy
 msgid "Other"
 msgstr "Lainnya"
 
 #: src/core/event.vala:269
-#, fuzzy
 msgid "Started the timer."
 msgstr "Memulai timer."
 
 #: src/core/event.vala:277
-#, fuzzy
 msgid "Stopped the timer manually."
 msgstr "Menghentikan timer secara manual."
 
 #: src/core/event.vala:285
-#, fuzzy
 msgid ""
 "The countdown has been manually paused. Not triggered when locking the "
 "screen or when suspending the system."
 msgstr ""
 "Hitung mundur telah dijeda secara manual. Tidak dipicu saat mengunci layar "
-"atau saat sistem ditunda (suspend)."
+"atau saat sistem disuspensi."
 
 #: src/core/event.vala:293
-#, fuzzy
 msgid "The countdown has been manually resumed."
 msgstr "Hitung mundur telah dilanjutkan secara manual."
 
 #: src/core/event.vala:301
-#, fuzzy
 msgid "Jumped to a next time-block before the countdown has finished."
-msgstr "Lompat ke blok waktu berikutnya sebelum hitung mundur selesai."
+msgstr "Melompat ke blok waktu berikutnya sebelum hitung mundur selesai."
 
 #: src/core/event.vala:309
-#, fuzzy
 msgid "Rewind action has been used. It adds a pause in the past."
 msgstr ""
 "Aksi putar balik telah digunakan. Ini menambahkan jeda pada waktu lampau."
 
 #: src/core/event.vala:316
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:39
-#, fuzzy
 msgid "Reset"
 msgstr "Setel ulang"
 
 #: src/core/event.vala:317
-#, fuzzy
 msgid "Manually cleared the session."
 msgstr "Membersihkan sesi secara manual."
 
@@ -452,12 +395,10 @@ msgstr "Membersihkan sesi secara manual."
 #: src/core/event.vala:325
 #: src/ui/preferences/automation/action/action-edit-window.ui:20
 #: src/ui/preferences/automation/action/condition-widget.vala:120
-#, fuzzy
 msgid "Finished"
 msgstr "Selesai"
 
 #: src/core/event.vala:326
-#, fuzzy
 msgid ""
 "The countdown has finished. If waiting for confirmation, the duration of the "
 "time-block still may be altered."
@@ -466,70 +407,58 @@ msgstr ""
 "masih dapat diubah."
 
 #: src/core/event.vala:333
-#, fuzzy
 msgid "Changed"
 msgstr "Berubah"
 
 #: src/core/event.vala:334
-#, fuzzy
 msgid "Triggered on any change related to the countdown."
 msgstr "Dipicu pada setiap perubahan yang terkait dengan hitung mundur."
 
 #. Session
 #: src/core/event.vala:342
-#, fuzzy
 msgid "Confirm Advancement"
 msgstr "Konfirmasi Kemajuan"
 
 #: src/core/event.vala:343
-#, fuzzy
 msgid "A manual confirmation is required to start next time-block."
 msgstr "Konfirmasi manual diperlukan untuk memulai blok waktu berikutnya."
 
 #: src/core/event.vala:350
-#, fuzzy
 msgid "Advanced"
-msgstr "Lanjut"
+msgstr "Tingkat Lanjut"
 
 #: src/core/event.vala:351
-#, fuzzy
 msgid "Transitioned or skipped to a next time-block."
-msgstr "Beralih atau melompat ke blok waktu berikutnya."
+msgstr "Beralih atau dilewati ke blok waktu berikutnya."
 
 #: src/core/event.vala:358
-#, fuzzy
 msgid "State Changed"
 msgstr "Keadaan Berubah"
 
 #: src/core/event.vala:359
-#, fuzzy
 msgid "Transitioned to a next time-block or when a break gets relabelled."
 msgstr "Beralih ke blok waktu berikutnya atau ketika rehat diberi label ulang."
 
 #: src/core/event.vala:366
-#, fuzzy
 msgid "Rescheduled"
 msgstr "Dijadwalkan ulang"
 
 #. translators: Change of plan
 #: src/core/event.vala:367
-#, fuzzy
 msgid "Triggered when scheduled time-blocks have changed."
 msgstr "Dipicu ketika blok waktu yang dijadwalkan telah berubah."
 
 #: src/core/event.vala:374
-#, fuzzy
 msgid "Expired"
 msgstr "Kedaluwarsa"
 
 #: src/core/event.vala:375
-#, fuzzy
 msgid "Triggered when session is about to be reset due to inactivity."
 msgstr "Dipicu ketika sesi akan disetel ulang karena tidak ada aktivitas."
 
 #. translators: time remaining eg. "3 minutes 50 seconds remaining"
 #: src/core/notification-manager.vala:130
-#, fuzzy, c-format
+#, c-format
 msgid "%s remaining"
 msgstr "tersisa %s"
 
@@ -555,7 +484,6 @@ msgstr "Pomodoro akan berakhir"
 #: src/core/notification-manager.vala:495
 #: src/core/notification-manager.vala:500
 #: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
-#, fuzzy
 msgid "Take a Break"
 msgstr "Waktunya Rehat"
 
@@ -572,7 +500,6 @@ msgid "Start Pomodoro"
 msgstr "Mulai Pomodoro"
 
 #: src/core/notification-manager.vala:411
-#, fuzzy
 msgid "+1 minute"
 msgstr "+1 menit"
 
@@ -582,33 +509,27 @@ msgstr "Siap-siap…"
 
 #: src/core/notification-manager.vala:437
 #: src/core/notification-manager.vala:473
-#, fuzzy
 msgid "Pomodoro is over!"
 msgstr "Pomodoro telah usai!"
 
 #: src/core/notification-manager.vala:443
 #: src/core/notification-manager.vala:479
-#, fuzzy
 msgid "Break is over!"
 msgstr "Rehat telah usai!"
 
 #: src/core/notification-manager.vala:489
-#, fuzzy
 msgid "Confirm the start of a Pomodoro…"
 msgstr "Konfirmasi awal Pomodoro…"
 
 #: src/core/notification-manager.vala:494
-#, fuzzy
 msgid "Confirm the start of a break…"
 msgstr "Konfirmasi awal rehat…"
 
 #: src/core/notification-manager.vala:499
-#, fuzzy
 msgid "Confirm the start of a short break…"
 msgstr "Konfirmasi awal rehat pendek…"
 
 #: src/core/notification-manager.vala:504
-#, fuzzy
 msgid "Confirm the start of a long break…"
 msgstr "Konfirmasi awal rehat panjang…"
 
@@ -617,26 +538,22 @@ msgid "Skip Break"
 msgstr "Lewati Rehat"
 
 #: src/core/sound.vala:405 src/core/sound.vala:605 src/core/sound.vala:662
-#, fuzzy
 msgid "Failed to initialize playback"
 msgstr "Gagal menginisialisasi pemutaran"
 
 #. Validate file.
 #: src/core/sound.vala:757
-#, fuzzy
 msgid "File not found"
 msgstr "Berkas tidak ditemukan"
 
 #: src/core/sound.vala:775
-#, fuzzy
 msgid "File type not supported"
 msgstr "Tipe berkas tidak didukung"
 
 #: src/core/state.vala:75
 #: src/ui/preferences/automation/action/condition-widget.ui:55
-#, fuzzy
 msgid "Stopped"
-msgstr "Berhenti"
+msgstr "Dihentikan"
 
 #: src/core/state.vala:81
 #: src/ui/preferences/automation/action/condition-widget.ui:54
@@ -653,44 +570,39 @@ msgstr "Rehat Panjang"
 
 #. translators: Short form for number of hours
 #: src/core/timestamp.vala:117
-#, fuzzy, c-format
+#, c-format
 msgid "%uh"
-msgstr "%u j"
+msgstr "%uj"
 
 #. translators: Short form for number of minutes
 #: src/core/timestamp.vala:126
-#, fuzzy, c-format
+#, c-format
 msgid "%um"
-msgstr "%u m"
+msgstr "%um"
 
 #: src/core/utils.vala:72
-#, fuzzy, c-format
+#, c-format
 msgid "%u hour"
 msgid_plural "%u hours"
 msgstr[0] "%u jam"
-msgstr[1] "%u jam"
 
 #: src/core/utils.vala:81
-#, fuzzy, c-format
+#, c-format
 msgid "%u minute"
 msgid_plural "%u minutes"
 msgstr[0] "%u menit"
-msgstr[1] "%u menit"
 
 #: src/core/utils.vala:90
-#, fuzzy, c-format
+#, c-format
 msgid "%u second"
 msgid_plural "%u seconds"
 msgstr[0] "%u detik"
-msgstr[1] "%u detik"
 
 #: src/core/variables.vala:116
-#, fuzzy
 msgid "The exact time of the current event."
 msgstr "Waktu tepat dari acara saat ini."
 
 #: src/core/variables.vala:121
-#, fuzzy
 msgid ""
 "The current phase of the Pomodoro cycle. Possible values: <tt>stopped</tt>, "
 "<tt>pomodoro</tt>, <tt>break</tt>, <tt>short-break</tt>, <tt>long-break</tt>."
@@ -699,7 +611,6 @@ msgstr ""
 "<tt>pomodoro</tt>, <tt>break</tt>, <tt>short-break</tt>, <tt>long-break</tt>."
 
 #: src/core/variables.vala:126
-#, fuzzy
 msgid ""
 "Status of the current time-block. Possible values: <tt>scheduled</tt>, "
 "<tt>in-progress</tt>, <tt>completed</tt>, <tt>uncompleted</tt>."
@@ -708,75 +619,61 @@ msgstr ""
 "progress</tt>, <tt>completed</tt>, <tt>uncompleted</tt>."
 
 #: src/core/variables.vala:131
-#, fuzzy
 msgid "A flag indicating whether countdown has begun."
 msgstr "Tanda yang menunjukkan apakah hitung mundur telah dimulai."
 
 #: src/core/variables.vala:136
-#, fuzzy
 msgid "A flag indicating whether countdown is paused."
 msgstr "Tanda yang menunjukkan apakah hitung mundur dijeda."
 
 #: src/core/variables.vala:141
-#, fuzzy
 msgid "A flag indicating whether countdown has finished."
 msgstr "Tanda yang menunjukkan apakah hitung mundur telah selesai."
 
 #: src/core/variables.vala:146
-#, fuzzy
 msgid "A flag indicating whether the timer is actively counting down."
 msgstr "Tanda yang menunjukkan apakah timer sedang aktif menghitung mundur."
 
 #: src/core/variables.vala:151
-#, fuzzy
 msgid "Duration of the current countdown."
 msgstr "Durasi hitung mundur saat ini."
 
 #. translators: Time difference between displayed value on the timer and real time. Think of it as a lost time.
 #: src/core/variables.vala:157
-#, fuzzy
 msgid "Discrepancy between elapsed time and the time passed."
-msgstr "Diskrepansi antara waktu yang telah berlalu dan waktu sebenarnya."
+msgstr "Perbedaan antara waktu yang telah berlalu dan waktu sebenarnya."
 
 #. translators: Time since the start of countdown
 #: src/core/variables.vala:163
-#, fuzzy
 msgid "The amount of time spent on the countdown."
-msgstr "Jumlah waktu yang dihabiskan pada hitung mundur."
+msgstr "Banyaknya waktu yang dihabiskan pada hitung mundur."
 
 #. translators: Displayed timer value.
 #: src/core/variables.vala:169
-#, fuzzy
 msgid "The amount of time left before the countdown ends."
-msgstr "Jumlah waktu yang tersisa sebelum hitung mundur berakhir."
+msgstr "Banyaknya waktu yang tersisa sebelum hitung mundur berakhir."
 
 #: src/core/variables.vala:174
-#, fuzzy
 msgid "Time when the countdown has started."
 msgstr "Waktu saat hitung mundur dimulai."
 
 #: src/integrations/portal/global-shortcuts-provider.vala:298
-#, fuzzy
 msgid "Unused"
 msgstr "Tidak digunakan"
 
 #: src/ui/log/log-window.ui:6
-#, fuzzy
 msgid "Log"
 msgstr "Log"
 
 #: src/ui/log/log-window.ui:38
-#, fuzzy
 msgid "Empty Log"
 msgstr "Log Kosong"
 
 #: src/ui/log/log-window.ui:39
-#, fuzzy
 msgid "Entries will show up here once you start the timer."
 msgstr "Entri akan muncul di sini setelah Anda memulai timer."
 
 #: src/ui/log/log-window.ui:165
-#, fuzzy
 msgid "Context"
 msgstr "Konteks"
 
@@ -786,22 +683,18 @@ msgid "Command"
 msgstr "Perintah"
 
 #: src/ui/log/log-window.ui:214
-#, fuzzy
 msgid "Output"
 msgstr "Keluaran"
 
 #: src/ui/log/log-window.ui:238
-#, fuzzy
 msgid "Error"
 msgstr "Galat"
 
 #: src/ui/log/log-window.ui:267
-#, fuzzy
 msgid "Exit Code:"
 msgstr "Kode Keluar:"
 
 #: src/ui/log/log-window.ui:278
-#, fuzzy
 msgid "Execution Time:"
 msgstr "Waktu Eksekusi:"
 
@@ -809,117 +702,97 @@ msgstr "Waktu Eksekusi:"
 msgid "translator-credits"
 msgstr ""
 "Ali <admin@situsali.com>, 2017\n"
-"Andika Triwidada <andika@gmail.com>, 2020"
+"Andika Triwidada <andika@gmail.com>, 2020, 2025"
 
 #: src/ui/main/dialogs/about-dialog.vala:35
-#, fuzzy
 msgid "Donate"
 msgstr "Donasi"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:6
-#, fuzzy
 msgid "GNOME Shell Extension"
 msgstr "Ekstensi GNOME Shell"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:57
-#, fuzzy
 msgid "Get the best experience!"
 msgstr "Dapatkan pengalaman terbaik!"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:68
-#, fuzzy
 msgid "Enable <b>GNOME Shell extension</b> for seamless desktop integration"
 msgstr ""
 "Aktifkan <b>ekstensi GNOME Shell</b> untuk integrasi desktop yang mulus"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:95
-#, fuzzy
 msgid "Always within reach"
 msgstr "Selalu dalam jangkauan"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:106
-#, fuzzy
 msgid "Control timer directly from the top bar without opening the app"
-msgstr "Kontrol timer langsung dari bar atas tanpa membuka aplikasi"
+msgstr "Kontrol timer langsung dari bilah atas tanpa membuka aplikasi"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:132
-#, fuzzy
 msgid "Less distractions"
 msgstr "Kurangi gangguan"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:143
-#, fuzzy
 msgid ""
 "Let <b>Pomodoro</b> manage system notifications while the timer is running"
 msgstr ""
 "Biarkan <b>Pomodoro</b> mengelola notifikasi sistem saat timer berjalan"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:170
-#, fuzzy
 msgid "Refined break reminders"
 msgstr "Pengingat rehat yang lebih baik"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:181
-#, fuzzy
 msgid ""
 "Elegant full-screen overlay that make taking breaks a more pleasant "
 "experience"
 msgstr ""
-"Hamparan layar penuh elegan yang membuat istirahat menjadi pengalaman yang "
-"lebih menyenangkan"
+"Hamparan layar penuh yang elegan, yang membuat istirahat menjadi pengalaman "
+"yang lebih menyenangkan"
 
 #. translators: "It" refers to installing GNOME Shell extension
 #: src/ui/main/dialogs/install-extension-dialog.ui:195
-#, fuzzy
 msgid "Ready to try it?"
 msgstr "Siap mencobanya?"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:219
 #: src/ui/main/dialogs/install-extension-dialog.ui:252
-#, fuzzy
 msgid "_Install Extension"
-msgstr "_Pasang Ekstensi"
+msgstr "Pasang Ekstens_i"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:229
 #: src/ui/main/dialogs/install-extension-dialog.ui:245
-#, fuzzy
 msgid "_Not Now"
 msgstr "_Nanti Saja"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:317
-#, fuzzy
 msgid "Something went wrong"
 msgstr "Terjadi kesalahan"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:364
-#, fuzzy
 msgid "Copy to clipboard"
 msgstr "Salin ke papan klip"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:383
 #: src/ui/main/dialogs/install-extension-dialog.ui:416
-#, fuzzy
 msgid "_Try Again"
 msgstr "_Coba Lagi"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:393
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
-#, fuzzy
 msgid "_Abort"
-msgstr "_Gugurkan"
+msgstr "Gugurk_an"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
-#, fuzzy
 msgid "Time-out reached"
 msgstr "Batas waktu tercapai"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:91
-#, fuzzy
 msgid "Installing extensions is not allowed"
 msgstr "Pemasangan ekstensi tidak diizinkan"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
-#, fuzzy
 msgid "Failed to download the extension"
 msgstr "Gagal mengunduh ekstensi"
 
@@ -929,7 +802,6 @@ msgstr "Gagal mengunduh ekstensi"
 #: src/ui/main/stats/stats-month-page.vala:48
 #: src/ui/main/stats/stats-week-page.ui:45
 #: src/ui/main/stats/stats-week-page.vala:46
-#, fuzzy
 msgid "Breaks"
 msgstr "Rehat"
 
@@ -938,14 +810,12 @@ msgstr "Rehat"
 #: src/ui/main/stats/stats-month-page.vala:53
 #: src/ui/main/stats/stats-week-page.ui:52
 #: src/ui/main/stats/stats-week-page.vala:51
-#, fuzzy
 msgid "Interruptions"
 msgstr "Gangguan"
 
 #: src/ui/main/stats/stats-day-page.ui:118
 #: src/ui/main/stats/stats-month-page.ui:55
 #: src/ui/main/stats/stats-week-page.ui:59
-#, fuzzy
 msgid "Break Ratio"
 msgstr "Rasio Rehat"
 
@@ -965,35 +835,30 @@ msgid "Month"
 msgstr "Bulan"
 
 #: src/ui/main/stats/stats-view.ui:39
-#, fuzzy
 msgid "Nothing to see here yet"
 msgstr "Belum ada yang dapat dilihat di sini"
 
 #: src/ui/main/stats/stats-view.ui:40
-#, fuzzy
 msgid "Finish a few Pomodoros to fill this up!"
 msgstr "Selesaikan beberapa Pomodoro untuk mengisi bagian ini!"
 
 #: src/ui/main/stats/stats-view.vala:792
-#, fuzzy, c-format
+#, c-format
 msgid "Skipped %u day"
 msgid_plural "Skipped %u days"
 msgstr[0] "Melewati %u hari"
-msgstr[1] "Melewati %u hari"
 
 #: src/ui/main/stats/stats-view.vala:798
-#, fuzzy, c-format
+#, c-format
 msgid "Skipped %u week"
 msgid_plural "Skipped %u weeks"
 msgstr[0] "Melewati %u minggu"
-msgstr[1] "Melewati %u minggu"
 
 #: src/ui/main/stats/stats-view.vala:804
-#, fuzzy, c-format
+#, c-format
 msgid "Skipped %u month"
 msgid_plural "Skipped %u months"
 msgstr[0] "Melewati %u bulan"
-msgstr[1] "Melewati %u bulan"
 
 #: src/ui/main/stats/stats-view.vala:1002
 msgid "Today"
@@ -1008,12 +873,12 @@ msgid "This week"
 msgstr "Minggu Ini"
 
 #: src/ui/main/stats/stats-view.vala:1048
-#, fuzzy, c-format
+#, c-format
 msgid "Week %u"
 msgstr "Minggu %u"
 
 #: src/ui/main/stats/stats-view.vala:1049
-#, fuzzy, c-format
+#, c-format
 msgid "Week %u of %u"
 msgstr "Minggu %u dari %u"
 
@@ -1032,37 +897,31 @@ msgstr "Rehat Panjan_g"
 
 #: src/ui/main/timer/compact-timer-view.vala:74
 #: src/ui/main/timer/timer-view.vala:130
-#, fuzzy
 msgid "Finished!"
 msgstr "Selesai!"
 
 #: src/ui/main/timer/menus.ui:26
-#, fuzzy
 msgid "_Break"
 msgstr "_Rehat"
 
 #: src/ui/main/timer/timer-view.ui:23
-#, fuzzy
 msgid "Open screen overlay"
 msgstr "Buka hamparan layar"
 
 #: src/ui/main/timer/timer-view.vala:244
-#, fuzzy
 msgid "Session has expired"
 msgstr "Sesi telah kedaluwarsa"
 
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1398
-#, fuzzy, c-format
+#, c-format
 msgid "Long break due in <b>%s</b>"
 msgstr "Rehat panjang dalam <b>%s</b>"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
-#, fuzzy
 msgid "Rewind one minute"
 msgstr "Putar balik satu menit"
 
 #: src/ui/main/window.ui:8
-#, fuzzy
 msgid "_Compact View"
 msgstr "Tampilan _Ringkas"
 
@@ -1079,7 +938,6 @@ msgid "_Quit"
 msgstr "_Keluar"
 
 #: src/ui/main/window.ui:62
-#, fuzzy
 msgid "Primary Menu"
 msgstr "Menu Utama"
 
@@ -1088,22 +946,18 @@ msgid "Stats"
 msgstr "Statistik"
 
 #: src/ui/main/window.vala:301
-#, fuzzy
 msgid "GNOME Shell extension available"
 msgstr "Ekstensi GNOME Shell tersedia"
 
 #: src/ui/main/window.vala:302
-#, fuzzy
 msgid "Learn More"
 msgstr "Pelajari Selengkapnya"
 
 #: src/ui/main/window.vala:324
-#, fuzzy
 msgid "Keep timer running?"
 msgstr "Biarkan timer berjalan?"
 
 #: src/ui/main/window.vala:325
-#, fuzzy
 msgid ""
 "You can keep it running in the background — notifications and keyboard "
 "shortcuts will still work."
@@ -1116,7 +970,6 @@ msgid "Quit"
 msgstr "Keluar"
 
 #: src/ui/main/window.vala:332
-#, fuzzy
 msgid "Run in background"
 msgstr "Jalankan di latar belakang"
 
@@ -1126,23 +979,19 @@ msgstr "Waktunya rehat"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:17
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
-#, fuzzy
 msgid "Main Window"
 msgstr "Jendela Utama"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
-#, fuzzy
 msgid "Prefer Dark Theme"
-msgstr "Utamakan Tema Gelap"
+msgstr "Lebih Suka Tema Gelap"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:25
-#, fuzzy
 msgid "Prefer Compact View"
-msgstr "Utamakan Tampilan Ringkas"
+msgstr "Lebih Suka Tampilan Ringkas"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:12
 #: src/ui/preferences/automation/action/condition-widget.vala:117
-#, fuzzy
 msgid "Started"
 msgstr "Dimulai"
 
@@ -1152,7 +1001,6 @@ msgid "Paused"
 msgstr "Dijeda"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
-#, fuzzy
 msgid "Edit Custom Action"
 msgstr "Sunting Aksi Ubahan"
 
@@ -1162,7 +1010,6 @@ msgid "_Cancel"
 msgstr "_Batal"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:46
-#, fuzzy
 msgid "_Save"
 msgstr "_Simpan"
 
@@ -1171,44 +1018,36 @@ msgid "Name"
 msgstr "Nama"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
-#, fuzzy
 msgid "Trigger"
 msgstr "Pemicu"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
-#, fuzzy
 msgid "Event"
 msgstr "Acara"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:81
-#, fuzzy
 msgid "Execute command after an event."
 msgstr "Jalankan perintah setelah suatu acara."
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:96
 #: src/ui/preferences/automation/action/action-edit-window.ui:174
-#, fuzzy
 msgid "Condition"
 msgstr "Kondisi"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:97
-#, fuzzy
 msgid "Ensure execution of a second command once condition is no longer met."
 msgstr "Pastikan eksekusi perintah kedua setelah kondisi tidak lagi terpenuhi."
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:114
-#, fuzzy
 msgid "Events"
-msgstr "Acara-acara"
+msgstr "Acara"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:125
-#, fuzzy
 msgid "Add _Event"
 msgstr "Tambah _Acara"
 
 #. translators: Filter (verb)
 #: src/ui/preferences/automation/action/action-edit-window.ui:140
-#, fuzzy
 msgid "_Filter"
 msgstr "_Filter"
 
@@ -1218,82 +1057,66 @@ msgid "Filter"
 msgstr "Filter"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
-#, fuzzy
 msgid "Shell Command"
 msgstr "Perintah Shell"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
-#, fuzzy
 msgid "Commands"
-msgstr "Perintah-perintah"
+msgstr "Perintah"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
-#, fuzzy
 msgid "Condition Met Command"
-msgstr "Perintah Kondisi Terpenuhi"
+msgstr "Perintah Saat Kondisi Terpenuhi"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:210
-#, fuzzy
 msgid "Condition Not Met Command"
-msgstr "Perintah Kondisi Tidak Terpenuhi"
+msgstr "Perintah Saat Kondisi Tidak Terpenuhi"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:221
-#, fuzzy
 msgid "Working Directory"
 msgstr "Direktori Kerja"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:236
-#, fuzzy
 msgid "Use Subshell"
 msgstr "Gunakan Subshell"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:237
-#, fuzzy
 msgid "Run the program from a subshell such as sh -c ''"
 msgstr "Jalankan program dari subshell seperti sh -c ''"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:242
-#, fuzzy
 msgid "Pass Input Data"
 msgstr "Kirim Data Masukan"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:243
-#, fuzzy
 msgid "Instead of passing variables you can process a JSON object."
-msgstr "Sebagai ganti mengirim variabel, Anda dapat memproses objek JSON."
+msgstr "Sebagai ganti mengirim variabel, Anda dapat memroses objek JSON."
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:248
-#, fuzzy
 msgid "Wait For Completion"
 msgstr "Tunggu Selesai"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:249
-#, fuzzy
 msgid "Block execution of other commands until the command completes."
 msgstr "Blokir eksekusi perintah lain sampai perintah ini selesai."
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
-#, fuzzy
 msgid "_Delete Action"
 msgstr "_Hapus Aksi"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
-#, fuzzy
 msgid "No events specified yet."
 msgstr "Belum ada acara yang ditentukan."
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
-#, fuzzy
 msgid "Add Custom Action"
 msgstr "Tambah Aksi Ubahan"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
-#, fuzzy
 msgid "_Add"
 msgstr "T_ambah"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:438
-#, fuzzy
 msgid "Select Working Directory"
 msgstr "Pilih Direktori Kerja"
 
@@ -1303,17 +1126,14 @@ msgid "_Select"
 msgstr "_Pilih"
 
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
-#, fuzzy
 msgid "Untitled action"
 msgstr "Aksi tanpa judul"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
-#, fuzzy
 msgid "Add Condition"
 msgstr "Tambah Kondisi"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:45
-#, fuzzy
 msgid "Add Group"
 msgstr "Tambah Grup"
 
@@ -1326,29 +1146,24 @@ msgid "OR"
 msgstr "ATAU"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:26
-#, fuzzy
 msgid "Is"
 msgstr "Adalah"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:27
-#, fuzzy
 msgid "Is Not"
 msgstr "Bukan"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:39
-#, fuzzy
 msgid "Equals"
-msgstr "Sama dengan"
+msgstr "Sama Dengan"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:40
-#, fuzzy
 msgid "Greater Than"
-msgstr "Lebih besar dari"
+msgstr "Lebih Dari"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:41
-#, fuzzy
 msgid "Less Than"
-msgstr "Lebih kecil dari"
+msgstr "Kurang Dari"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:67
 msgid "Yes"
@@ -1359,23 +1174,19 @@ msgid "No"
 msgstr "Tidak"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:95
-#, fuzzy
 msgid "Minutes"
 msgstr "Menit"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:96
-#, fuzzy
 msgid "Seconds"
 msgstr "Detik"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:97
-#, fuzzy
 msgid "Hours"
 msgstr "Jam"
 
 #. translators: No field selected when defining a condition.
 #: src/ui/preferences/automation/action/condition-widget.vala:115
-#, fuzzy
 msgid "Select Field…"
 msgstr "Pilih Bidang…"
 
@@ -1384,38 +1195,31 @@ msgid "State"
 msgstr "Keadaan"
 
 #: src/ui/preferences/automation/action/condition-widget.vala:119
-#, fuzzy
 msgid "Running"
 msgstr "Berjalan"
 
 #: src/ui/preferences/automation/action/condition-widget.vala:121
-#, fuzzy
 msgid "Duration"
 msgstr "Durasi"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
-#, fuzzy
 msgid "Insert Variable"
 msgstr "Sisipkan Variabel"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:132
-#, fuzzy
 msgid "Format"
 msgstr "Format"
 
 #: src/ui/preferences/automation/preferences-panel-automation.ui:13
-#, fuzzy
 msgid "_Log"
 msgstr "_Log"
 
 #: src/ui/preferences/automation/preferences-panel-automation.ui:15
-#, fuzzy
 msgid "Show execution log"
 msgstr "Tampilkan log eksekusi"
 
 #: src/ui/preferences/automation/preferences-panel-automation.ui:24
-#, fuzzy
 msgid ""
 "Run shell commands automatically on timer events or conditions. <a "
 "href=\"\">Learn more.</a>"
@@ -1424,23 +1228,19 @@ msgstr ""
 "tertentu. <a href=\"\">Pelajari selengkapnya.</a>"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
-#, fuzzy
 msgid "Set Shortcut"
 msgstr "Atur Pintasan"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
-#, fuzzy
 msgid "_Set"
 msgstr "_Atur"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:63
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
-#, fuzzy
 msgid "Disabled"
 msgstr "Dinonaktifkan"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
-#, fuzzy
 msgid ""
 "Press <b>Esc</b> to cancel or <b>Backspace</b> to disable the keyboard "
 "shortcut"
@@ -1449,7 +1249,6 @@ msgstr ""
 "pintasan papan ketik"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:17
-#, fuzzy
 msgid ""
 "Global shortcuts let you control the app even when it’s not on screen. They "
 "work as long as the app is running in the background."
@@ -1458,150 +1257,122 @@ msgstr ""
 "di layar. Pintasan ini berfungsi selama aplikasi berjalan di latar belakang."
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:20
-#, fuzzy
 msgid "Open app settings for editing global shortcuts"
 msgstr "Buka pengaturan aplikasi untuk menyunting pintasan global"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:25
-#, fuzzy
 msgid "_Edit"
 msgstr "_Sunting"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:41
-#, fuzzy
 msgid "Enter new shortcut for starting or stopping the timer"
 msgstr "Masukkan pintasan baru untuk memulai atau menghentikan timer"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:48
-#, fuzzy
 msgid "Enter new shortcut to start/pause/resume the timer"
 msgstr "Masukkan pintasan baru untuk memulai/menjeda/melanjutkan timer"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:58
-#, fuzzy
 msgid "Enter new shortcut for starting the timer"
 msgstr "Masukkan pintasan baru untuk memulai timer"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:65
-#, fuzzy
 msgid "Enter new shortcut for stopping the timer"
 msgstr "Masukkan pintasan baru untuk menghentikan timer"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:72
-#, fuzzy
 msgid "Enter new shortcut for pausing the timer"
 msgstr "Masukkan pintasan baru untuk menjeda timer"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:79
-#, fuzzy
 msgid "Enter new shortcut for resuming the timer"
 msgstr "Masukkan pintasan baru untuk melanjutkan timer"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:86
-#, fuzzy
 msgid "Enter new shortcut for skipping"
 msgstr "Masukkan pintasan baru untuk melewati"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:92
-#, fuzzy
 msgid "Rewind One Minute"
 msgstr "Putar Balik Satu Menit"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:93
-#, fuzzy
 msgid "Enter new shortcut for rewinding"
 msgstr "Masukkan pintasan baru untuk memutar balik"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:107
-#, fuzzy
 msgid "Enter new shortcut for bringing window to focus"
 msgstr "Masukkan pintasan baru untuk membawa jendela ke fokus"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:17
-#, fuzzy
 msgid "Announcements"
 msgstr "Pengumuman"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:20
-#, fuzzy
 msgid "Time Running Out"
 msgstr "Waktu Hampir Habis"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
-#, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
 msgstr "Beri tahu saat Pomodoro atau rehat akan berakhir."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
-#, fuzzy
 msgid "Screen Overlay"
 msgstr "Hamparan Layar"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:29
-#, fuzzy
 msgid "A full-screen notification intended to enforce taking a break."
 msgstr "Notifikasi layar penuh yang ditujukan untuk memaksa pengambilan rehat."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:37
-#, fuzzy
 msgid "Lock Delay"
 msgstr "Tunda Kunci"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:38
-#, fuzzy
 msgid "Period of inactivity to lock the screen."
 msgstr "Periode tanpa aktivitas sebelum mengunci layar."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:42
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:61
-#, fuzzy
 msgid "15 seconds"
 msgstr "15 detik"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:43
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:62
-#, fuzzy
 msgid "30 seconds"
 msgstr "30 detik"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:44
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:63
-#, fuzzy
 msgid "1 minute"
 msgstr "1 menit"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:45
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:64
-#, fuzzy
 msgid "2 minutes"
 msgstr "2 menit"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:46
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:65
-#, fuzzy
 msgid "3 minutes"
 msgstr "3 menit"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:47
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:66
-#, fuzzy
 msgid "5 minutes"
 msgstr "5 menit"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:48
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:67
-#, fuzzy
 msgid "Never"
-msgstr "Jangan Pernah"
+msgstr "Tidak Pernah"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:56
-#, fuzzy
 msgid "Reopen Delay"
 msgstr "Tunda Buka Kembali"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:57
-#, fuzzy
 msgid "Period of inactivity to reopen the overlay after it gets dismissed."
 msgstr ""
 "Periode tanpa aktivitas untuk membuka kembali hamparan setelah ditutup."
@@ -1611,48 +1382,39 @@ msgid "Notifications"
 msgstr "Notifikasi"
 
 #: src/ui/preferences/preferences-window.vala:44
-#, fuzzy
 msgid "Sounds"
 msgstr "Suara"
 
 #: src/ui/preferences/preferences-window.vala:51
-#, fuzzy
 msgid "Appearance"
-msgstr "Tampilan"
+msgstr "Penampilan"
 
 #: src/ui/preferences/preferences-window.vala:58
-#, fuzzy
 msgid "Keyboard Shortcuts"
 msgstr "Pintasan Papan Ketik"
 
 #: src/ui/preferences/preferences-window.vala:71
-#, fuzzy
 msgid "Automation"
 msgstr "Otomatisasi"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
-#, fuzzy
 msgid "Sounds Are Disabled"
 msgstr "Suara Dinonaktifkan"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:36
-#, fuzzy
 msgid "Alert Sounds"
 msgstr "Suara Peringatan"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
-#, fuzzy
 msgid "Pomodoro Finished Sound"
 msgstr "Suara Pomodoro Selesai"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
-#, fuzzy
 msgid "Break Finished Sound"
 msgstr "Suara Rehat Selesai"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
-#, fuzzy
 msgid "Background Sound"
 msgstr "Suara Latar Belakang"
 
@@ -1673,15 +1435,13 @@ msgid "Timer Ticking"
 msgstr "Detak Timer"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:26
-#, fuzzy
 msgid "Birds"
 msgstr "Burung"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:86
 #: src/ui/preferences/sounds/sound-chooser-window.ui:25
-#, fuzzy
 msgid "None"
-msgstr "Tidak ada"
+msgstr "Nihil"
 
 #: src/ui/preferences/sounds/sound-chooser-window.ui:63
 msgid "Volume:"
@@ -1692,68 +1452,57 @@ msgid "Select Custom Sound"
 msgstr "Pilih Suara Ubahan"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:20
-#, fuzzy
 msgid "Pomodoro Duration"
 msgstr "Durasi Pomodoro"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:31
-#, fuzzy
 msgid "Short Break Duration"
 msgstr "Durasi Rehat Pendek"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:42
-#, fuzzy
 msgid "Long Break Duration"
 msgstr "Durasi Rehat Panjang"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:53
-#, fuzzy
 msgid "Number of Cycles"
 msgstr "Jumlah Siklus"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:93
-#, fuzzy
 msgid "Behavior"
 msgstr "Perilaku"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:96
-#, fuzzy
 msgid "Pause By Locking The Screen"
 msgstr "Jeda Dengan Mengunci Layar"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:101
-#, fuzzy
 msgid "Confirm Starting a Break"
 msgstr "Konfirmasi Memulai Rehat"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
-#, fuzzy
 msgid "Confirm Starting a Pomodoro"
 msgstr "Konfirmasi Memulai Pomodoro"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:87
-#, fuzzy, c-format
+#, c-format
 msgid "A single session will take <b>%s</b>."
 msgstr "Satu sesi tunggal akan memakan waktu <b>%s</b>."
 
 #: src/ui/preferences/timer/preferences-panel-timer.vala:88
-#, fuzzy, c-format
+#, c-format
 msgid "<b>%u%%</b> of the time will be allocated for breaks."
 msgstr "<b>%u%%</b> waktu akan dialokasikan untuk rehat."
 
 #: src/ui/preferences/timer/preferences-panel-timer.vala:136
-#, fuzzy
 msgid "Apply changes to ongoing Pomodoro?"
 msgstr "Terapkan perubahan pada Pomodoro yang sedang berjalan?"
 
 #: src/ui/preferences/timer/preferences-panel-timer.vala:137
-#, fuzzy
 msgid "Apply changes to ongoing break?"
 msgstr "Terapkan perubahan pada rehat yang sedang berjalan?"
 
 #: src/ui/preferences/timer/preferences-panel-timer.vala:139
-#, fuzzy
 msgid "Apply"
 msgstr "Terapkan"
 
