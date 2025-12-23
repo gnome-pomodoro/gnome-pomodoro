@@ -20,13 +20,15 @@ namespace Pomodoro
         [GtkChild]
         private unowned Adw.ComboRow screen_overlay_reopen_delay_comborow;
 
-        private GLib.Settings?  settings;
-        private ulong           settings_changed_id = 0;
+        private GLib.Settings?        settings;
+        private Pomodoro.IdleMonitor? idle_monitor = null;
 
         construct
         {
             this.settings = Pomodoro.get_settings ();
-            this.settings_changed_id = settings.changed.connect (this.on_settings_changed);
+            this.settings.changed.connect (this.on_settings_changed);
+
+            this.idle_monitor = new Pomodoro.IdleMonitor ();
 
             // Announcements
             this.settings.bind ("announce-about-to-end",
@@ -57,6 +59,16 @@ namespace Pomodoro
                                 idle_delay_set_mapping,
                                 null,
                                 null);
+            this.idle_monitor.bind_property (
+                                "enabled",
+                                this.screen_overlay_lock_delay_comborow,
+                                "visible",
+                                GLib.BindingFlags.SYNC_CREATE);
+            this.idle_monitor.bind_property (
+                                "enabled",
+                                this.screen_overlay_reopen_delay_comborow,
+                                "visible",
+                                GLib.BindingFlags.SYNC_CREATE);
             this.screen_overlay_switchrow.bind_property (
                                 "active",
                                 this.screen_overlay_lock_delay_comborow,
@@ -112,12 +124,12 @@ namespace Pomodoro
 
         public override void dispose ()
         {
-            if (this.settings_changed_id != 0) {
-                this.settings.disconnect (this.settings_changed_id);
-                this.settings_changed_id = 0;
+            if (this.settings != null) {
+                this.settings.changed.disconnect (this.on_settings_changed);
+                this.settings = null;
             }
 
-            this.settings = null;
+            this.idle_monitor = null;
 
             base.dispose ();
         }
