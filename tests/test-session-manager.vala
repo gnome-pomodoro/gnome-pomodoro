@@ -67,6 +67,8 @@ namespace Tests
             this.add_test ("advance_to_state__extend_short_break", this.test_advance_to_state__extend_short_break);
             this.add_test ("advance_to_state__extend_long_break", this.test_advance_to_state__extend_long_break);
             this.add_test ("advance_to_state__switch_breaks", this.test_advance_to_state__switch_breaks);
+            this.add_test ("advance_to_state__confirm_advancement", this.test_advance_to_state__confirm_advancement);
+            this.add_test ("advance_to_state__skip_advancement", this.test_advance_to_state__skip_advancement);
             this.add_test ("advance_to_state__completed_session", this.test_advance_to_state__completed_session);
 
             this.add_test ("confirm_starting_break", this.test_confirm_starting_break);
@@ -1691,6 +1693,97 @@ namespace Tests
                 "state-changed",
                 "session-rescheduled"
             });
+        }
+
+        /**
+         * Manually advance to the same state as the upcoming time-block
+         */
+        public void test_advance_to_state__confirm_advancement ()
+        {
+            var settings = Pomodoro.get_settings ();
+            settings.set_boolean ("confirm-starting-break", true);
+            settings.set_boolean ("confirm-starting-pomodoro", true);
+
+            var timer           = new Pomodoro.Timer ();
+            var session_manager = new Pomodoro.SessionManager.with_timer (timer);
+
+            session_manager.advance_to_state (Pomodoro.State.POMODORO);
+
+            var session = session_manager.current_session;
+            var pomodoro = session_manager.current_time_block;
+            var short_break = session.get_next_time_block (pomodoro);
+
+            Pomodoro.Timestamp.freeze_to (pomodoro.end_time);
+            timer.finish (pomodoro.end_time);
+
+            // Confirm after 1 minute.
+            var now = pomodoro.end_time + Pomodoro.Interval.MINUTE;
+            Pomodoro.Timestamp.freeze_to (now);
+            session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK, now);
+
+            assert_cmpvariant (
+                new GLib.Variant.int64 (pomodoro.duration),
+                new GLib.Variant.int64 (26 * Pomodoro.Interval.MINUTE)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (pomodoro.end_time),
+                new GLib.Variant.int64 (now)
+            );
+
+            assert_true (session_manager.current_time_block == short_break);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (short_break.start_time),
+                new GLib.Variant.int64 (now)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (timer.calculate_remaining (now)),
+                new GLib.Variant.int64 (5 * Pomodoro.Interval.MINUTE)
+            );
+            assert_cmpfloat (
+                timer.calculate_progress (now),
+                GLib.CompareOperator.EQ,
+                0.0
+            );
+        }
+
+        /**
+         * Manually extend current state instead of confirming advancement
+         */
+        public void test_advance_to_state__skip_advancement ()
+        {
+            var settings = Pomodoro.get_settings ();
+            settings.set_boolean ("confirm-starting-break", true);
+            settings.set_boolean ("confirm-starting-pomodoro", true);
+
+            var timer           = new Pomodoro.Timer ();
+            var session_manager = new Pomodoro.SessionManager.with_timer (timer);
+            session_manager.advance_to_state (Pomodoro.State.POMODORO);
+
+            var pomodoro = session_manager.current_time_block;
+            var expected_start_time = pomodoro.start_time;
+
+            Pomodoro.Timestamp.freeze_to (pomodoro.end_time);
+            timer.finish (pomodoro.end_time);
+
+            // Advance to a POMODORO after 1 minute.
+            var now = pomodoro.end_time + Pomodoro.Interval.MINUTE;
+            Pomodoro.Timestamp.freeze_to (now);
+            session_manager.advance_to_state (Pomodoro.State.POMODORO, now);
+
+            assert_true (session_manager.current_time_block == pomodoro);
+            assert_cmpvariant (
+                new GLib.Variant.int64 (pomodoro.start_time),
+                new GLib.Variant.int64 (expected_start_time)
+            );
+            assert_cmpvariant (
+                new GLib.Variant.int64 (timer.calculate_remaining (now)),
+                new GLib.Variant.int64 (25 * Pomodoro.Interval.MINUTE)
+            );
+            assert_cmpfloat_with_epsilon (
+                timer.calculate_progress (now),
+                (25.0 + 1.0) / (25.0 + 1.0 + 25.0),
+                0.001
+            );
         }
 
         /**

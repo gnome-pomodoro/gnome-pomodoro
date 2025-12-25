@@ -684,7 +684,11 @@ namespace Pomodoro
             // Reschedule.
             if (session != null)
             {
-                if (session == this.next_session && time_block == this.next_time_block) {
+                if (session == this.next_session &&
+                    time_block == this.next_time_block &&
+                    time_block != null &&
+                    time_block.start_time == timestamp)
+                {
                     // Already scheduled using `initialize_next_time_block`
                 }
                 else {
@@ -1461,6 +1465,10 @@ namespace Pomodoro
             var duration = this._timer.calculate_elapsed (timestamp) +
                            this._current_time_block.get_intended_duration ();
             // TODO: use scheduler to determine `duration`
+
+            if (this._timer.is_finished ()) {
+                duration += timestamp - this._timer.state.finished_time;
+            }
 
             if (resume && this._timer.is_paused ())
             {
