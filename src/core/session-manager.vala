@@ -1711,10 +1711,19 @@ namespace Pomodoro
 
             this.freeze_current_session_changed ();
 
-            // Check whether session has expired and select upcoming time-block.
+            // Preserve current session if it hasn't been completed.
             var next_time_block = this.get_next_time_block ();
             var next_session = next_time_block != null ? next_time_block.session : null;
 
+            if (next_session == null &&
+                this._current_session != null &&
+                !this._current_session.is_completed ())
+            {
+                next_session = this._current_session;
+                next_time_block = null;
+            }
+
+            // Check whether session has expired and select upcoming time-block.
             if (next_session == null || next_session.is_expired (timestamp)) {
                 next_session = this.initialize_next_session (timestamp);
                 next_time_block = next_session.get_first_time_block ();
