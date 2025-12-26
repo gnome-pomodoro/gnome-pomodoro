@@ -144,6 +144,7 @@ namespace Pomodoro
         private double                      _display_value = 0.0;
         private double                      display_value_from = 0.0;
         private double                      display_value_to = 0.0;
+        private int64                       last_display_time = Pomodoro.Timestamp.UNDEFINED;
         private Adw.TimedAnimation?         value_animation = null;
         private Adw.TimedAnimation?         opacity_animation = null;
         private unowned Pomodoro.Gizmo      through = null;
@@ -169,6 +170,10 @@ namespace Pomodoro
                     : this._timer.get_last_state_changed_time ();
         }
 
+        /**
+         * Stop the timeout callbacks. Prioritise animations over the timeout. It's redundant to
+         * run both.
+         */
         private void inhibit_timeout ()
         {
             this.timeout_inhibit_count++;
@@ -258,7 +263,7 @@ namespace Pomodoro
             var timestamp = this._timer.get_last_state_changed_time ();
             var is_ring = this._shape == Pomodoro.TimerProgressShape.RING;
 
-            if (!current_state.is_started () && previous_state.is_finished () && is_ring) {
+            if (!current_state.is_finished () && previous_state.is_finished () && is_ring) {
                 this.fade_in ();
             }
             else if (current_state.user_data != null && previous_state.user_data == null) {
@@ -268,7 +273,8 @@ namespace Pomodoro
                 this.fade_out ();
             }
 
-            if (this.opacity_animation == null)
+            if (this.opacity_animation == null &&
+                (timestamp - this.last_display_time) < 5 * Pomodoro.Interval.SECOND)
             {
                 var value_from = this._display_value;
                 var value_to = this._timer.calculate_progress (timestamp);
@@ -555,6 +561,7 @@ namespace Pomodoro
             var opacity = this.opacity_animation != null
                     ? this.opacity_animation.value
                     : 1.0;
+            var timestamp = this.get_current_time ();
 
             if (this.opacity_animation == null ||
                 this.opacity_animation.value_to > 0.0)
@@ -576,6 +583,7 @@ namespace Pomodoro
             if (display_value <= 0.0 || opacity == 0.0)
             {
                 this._display_value = 0.0;
+                this.last_display_time = timestamp;
 
                 return;  // Nothing to draw
             }
@@ -637,6 +645,7 @@ namespace Pomodoro
             }
 
             this._display_value = display_value;
+            this.last_display_time = timestamp;
         }
 
 
@@ -729,12 +738,13 @@ namespace Pomodoro
             var opacity = this.opacity_animation != null
                     ? this.opacity_animation.value
                     : 1.0;
+            var timestamp = this.get_current_time ();
 
             if (this.opacity_animation == null ||
                 this.opacity_animation.value_to > 0.0)
             {
                 display_value = this._timer.user_data != null && !this._timer.is_finished ()
-                        ? this._timer.calculate_progress (this.get_current_time ())
+                        ? this._timer.calculate_progress (timestamp)
                         : 1.0;
             }
             else {
@@ -750,6 +760,7 @@ namespace Pomodoro
             if (display_value >= 1.0 || opacity == 0.0)
             {
                 this._display_value = 1.0;
+                this.last_display_time = timestamp;
 
                 return;  // Nothing to draw
             }
@@ -831,6 +842,7 @@ namespace Pomodoro
             }
 
             this._display_value = display_value;
+            this.last_display_time = timestamp;
         }
 
 
