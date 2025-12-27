@@ -145,7 +145,9 @@ namespace Pomodoro
         private void on_timer_state_changed (Pomodoro.TimerState current_state,
                                              Pomodoro.TimerState previous_state)
         {
-            if (current_state.is_finished () && !previous_state.is_finished ())
+            if (current_state.is_finished () &&
+                !previous_state.is_finished () &&
+                previous_state.user_data != null)
             {
                 var current_time_block = current_state.user_data as Pomodoro.TimeBlock;
 
