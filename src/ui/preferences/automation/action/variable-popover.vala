@@ -203,7 +203,11 @@ namespace Pomodoro
                 });
             var notify_selected_id = list_item.notify["selected"].connect (
                 (obj, pspec) => {
-                    check_button.active = list_item.selected;
+                    if (check_button.active != list_item.selected) {
+                        GLib.SignalHandler.block (check_button, toggled_id);
+                        check_button.active = list_item.selected;
+                        GLib.SignalHandler.unblock (check_button, toggled_id);
+                    }
                 });
 
             list_item.set_data<ulong> ("toggled-id", toggled_id);
