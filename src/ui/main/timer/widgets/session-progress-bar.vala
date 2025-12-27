@@ -112,9 +112,10 @@ namespace Pomodoro
             private unowned Pomodoro.Gizmo highlight = null;
             private Graphene.Rect          bounds;
             private Gsk.RoundedRect        outline;
+            private float                  value_animation_progress = 1.0f;
+
             internal float                 display_value_from = 0.0f;
             internal float                 display_value_to = 0.0f;
-            private float                  value_animation_progress = 1.0f;
 
             construct
             {
@@ -150,14 +151,21 @@ namespace Pomodoro
                 );
             }
 
+            private inline int64 get_current_time ()
+            {
+                return this._timer.is_running ()
+                        ? this._timer.get_current_time (this.get_frame_clock ().get_frame_time ())
+                        : this._timer.get_last_state_changed_time ();
+            }
+
             internal void prepare_value_animation (float display_value_from,
                                                    float display_value_to)
             {
                 this.display_value_from = display_value_from;
                 this.display_value_to = display_value_to;
-                this.value_animation_progress = display_value_to != this._display_value
-                        ? 0.0f
-                        : 1.0f;
+                this.value_animation_progress = this._display_value == display_value_to
+                        ? 1.0f
+                        : 0.0f;
             }
 
             internal void finish_value_animation ()
@@ -289,13 +297,6 @@ namespace Pomodoro
                 }
 
                 this._display_value = display_value;
-            }
-
-            private inline int64 get_current_time ()
-            {
-                return this._timer.is_running ()
-                        ? this._timer.get_current_time (this.get_frame_clock ().get_frame_time ())
-                        : this._timer.get_last_state_changed_time ();
             }
 
             public void set_span_range (float span_start,
@@ -993,14 +994,19 @@ namespace Pomodoro
 
             while (segment != null)
             {
-                var display_value_from = (
-                        (position_from - segment.span_start) /
-                        (segment.span_end - segment.span_start)).clamp (0.0f, 1.0f);
-                var display_value_to = (
-                        (position_to - segment.span_start) /
-                        (segment.span_end - segment.span_start)).clamp (0.0f, 1.0f);
+                if (segment.span_start < segment.span_end)
+                {
+                    var display_value_from = (
+                            (position_from - segment.span_start) /
+                            (segment.span_end - segment.span_start)).clamp (0.0f, 1.0f);
+                    var display_value_to = (
+                            (position_to - segment.span_start) /
+                            (segment.span_end - segment.span_start)).clamp (0.0f, 1.0f);
 
-                segment.prepare_value_animation (display_value_from, display_value_to);
+                    segment.prepare_value_animation (
+                            float.max (display_value_from, segment.display_value),
+                            display_value_to);
+                }
 
                 segment = (Segment?) segment.get_next_sibling ();
             }
