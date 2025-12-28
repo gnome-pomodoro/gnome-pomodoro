@@ -73,6 +73,9 @@ namespace Pomodoro
                 get {
                     return this._weight;
                 }
+                set {
+                    this._weight = value;
+                }
             }
 
             [CCode (notify = false)]
@@ -113,6 +116,7 @@ namespace Pomodoro
             private Graphene.Rect          bounds;
             private Gsk.RoundedRect        outline;
             private float                  value_animation_progress = 1.0f;
+            private Adw.TimedAnimation?    weight_animation = null;
 
             internal float                 display_value_from = 0.0f;
             internal float                 display_value_to = 0.0f;
@@ -182,6 +186,32 @@ namespace Pomodoro
                     this.value_animation_progress = progress;
                     this.highlight.queue_draw ();
                 }
+            }
+
+            internal void animate_weight (float weight_from,
+                                          float weight_to,
+                                          owned Adw.CallbackAnimationTarget target)
+            {
+                if (weight_to == weight_from) {
+                    return;
+                }
+
+                if (this.weight_animation != null) {
+                    this.weight_animation.pause ();
+                    this.weight_animation = null;
+                }
+
+                this.weight_animation = new Adw.TimedAnimation (this,
+                                                                (double) weight_from,
+                                                                (double) weight_to,
+                                                                SCALE_ANIMATION_DURATION,
+                                                                target);
+                this.weight_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
+                this.weight_animation.done.connect (
+                    () => {
+                        this.weight_animation = null;
+                    });
+                this.weight_animation.play ();
             }
 
             private inline void queue_draw_all ()
@@ -441,8 +471,8 @@ namespace Pomodoro
                     return;  // retain last weight
                 }
 
-                if (this._weight != weight) {
-                    // TODO: animate weight
+                // Set the initial weight. Let patent animate weights.
+                if (this._weight != weight && this._weight == 0.0f) {
                     this._weight = weight;
                 }
 
@@ -521,6 +551,11 @@ namespace Pomodoro
             public override void dispose ()
             {
                 this.stop_timeout ();
+
+                if (this.weight_animation != null) {
+                    this.weight_animation.pause ();
+                    this.weight_animation = null;
+                }
 
                 this.through.unparent ();
                 this.highlight.unparent ();
@@ -876,7 +911,7 @@ namespace Pomodoro
             }
 
             if (this._reveal) {
-                // this.animate_weights ();  TODO
+                this.animate_weights ();
                 this.animate_scale (scale_from, scale_to);
                 this.animate_value (position_from, position_to);
             }
@@ -1108,6 +1143,39 @@ namespace Pomodoro
             this.value_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
             this.value_animation.done.connect (this.on_value_animation_done);
             this.value_animation.play ();
+        }
+
+
+        /*
+         * Weights animation
+         */
+        private void animate_weights ()
+        {
+            var segment = (Segment?) this.get_first_child ();
+
+            // Find the first segment whose weight differs from its current span.
+            // Assume that only one segment may be animated at a time.
+            while (segment != null)
+            {
+                var weight = segment.cycle != null
+                        ? (float) segment.cycle.get_weight ()
+                        : segment.weight;
+
+                if (weight != segment.weight)
+                {
+                    var animation_target = new Adw.CallbackAnimationTarget (
+                        (value) => {
+                            segment.weight = (float) value;
+
+                            this.update_segments_span ();
+                        });
+
+                    segment.animate_weight (segment.weight, weight, animation_target);
+                    break;
+                }
+
+                segment = (Segment?) segment.get_next_sibling ();
+            }
         }
 
 
