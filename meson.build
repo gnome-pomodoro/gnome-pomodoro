@@ -172,7 +172,6 @@ configure_file(
 # Include the config.h we just generated
 config_h_dir = include_directories('.')
 
-
 subdir('po')
 subdir('data')
 subdir('src')

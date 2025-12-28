@@ -23,11 +23,8 @@
     "--talk-name=org.gnome.Mutter.IdleMonitor",
     "--talk-name=org.gnome.ScreenSaver",
     "--talk-name=org.gnome.Shell",
-    "--talk-name=org.gtk.vfs",
     "--talk-name=org.gtk.vfs.*",
-    "--filesystem=xdg-run/gvfs",
     "--filesystem=xdg-run/gvfsd",
-    "--filesystem=home:ro",
     "--env=G_MESSAGES_DEBUG=gnome-pomodoro",
     "--env=G_ENABLE_DIAGNOSTIC=1"
   ],
