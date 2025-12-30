@@ -44,6 +44,7 @@ namespace GnomePlugin
         private double                          last_activity_time = 0.0;
         private Gnome.Shell?                    shell_proxy = null;
         private Gnome.ShellExtensions?          shell_extensions_proxy = null;
+        private Gnome.ScreenSaver?              screensaver_proxy = null;
 
         /**
          * Method for enabling extension after install
@@ -207,6 +208,21 @@ namespace GnomePlugin
                 throw error;
             }
 
+            /* GNOME ScreenSaver */
+            try {
+                this.screensaver_proxy = yield GLib.Bus.get_proxy<Gnome.ScreenSaver> (
+                        GLib.BusType.SESSION,
+                        "org.gnome.ScreenSaver",
+                        "/org/gnome/ScreenSaver",
+                        GLib.DBusProxyFlags.DO_NOT_AUTO_START,
+                        cancellable);
+
+                this.screensaver_proxy.active_changed.connect (this.on_screensaver_active_changed);
+            }
+            catch (GLib.Error error) {
+                GLib.debug ("ScreenSaver is not available");
+            }
+
             /* GNOME Shell extension */
             yield this.init_shell_extension (cancellable);
 
@@ -262,6 +278,20 @@ namespace GnomePlugin
             }
 
             this.last_activity_time = timestamp;
+        }
+
+        /**
+         * on_screensaver_active_changed callback
+         *
+         * Pause timer when screen is locked
+         */
+        private void on_screensaver_active_changed (bool active)
+        {
+            if (active && this.timer != null && !this.timer.is_paused)
+            {
+                GLib.info ("Screen locked, pausing timer");
+                this.timer.pause ();
+            }
         }
     }
 

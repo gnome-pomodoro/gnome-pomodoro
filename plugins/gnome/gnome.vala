@@ -143,6 +143,15 @@ namespace Gnome
                                        (string uuid,
                                         HashTable<string,Variant> state);
     }
+
+    [DBus (name = "org.gnome.ScreenSaver")]
+    public interface ScreenSaver : GLib.Object
+    {
+        public abstract bool get_active ()
+                                       throws GLib.DBusError, GLib.IOError;
+
+        public signal void active_changed (bool active);
+    }
 }
 
 
