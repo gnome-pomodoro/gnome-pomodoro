@@ -182,40 +182,38 @@ namespace Pomodoro.Database
 
         if (!Pomodoro.is_test ())
         {
+            var directory_path = GLib.Path.build_filename (GLib.Environment.get_user_data_dir (),
+                                                          Config.PACKAGE_NAME);
+            var directory_file = GLib.File.new_for_path (directory_path);
+
+            if (!directory_file.query_exists ()) {
+                make_directory_with_parents (directory_file);
+            }
+
+            var file_path = GLib.Path.build_filename (directory_path, "database.sqlite");
+            file = GLib.File.new_for_path (file_path);
+
             if (Pomodoro.is_flatpak ())
             {
-                var host_db_path = GLib.Path.build_filename (GLib.Environment.get_home_dir (),
-                                                             ".local",
-                                                             "share",
-                                                             Config.PACKAGE_NAME,
-                                                             "database.sqlite");
-                var sandbox_data_dir = GLib.Path.build_filename (GLib.Environment.get_user_data_dir (),
-                                                                 Config.PACKAGE_NAME);
-                var sandbox_db_path = GLib.Path.build_filename (sandbox_data_dir, "database.sqlite");
+                var host_file_path = GLib.Path.build_filename (GLib.Environment.get_home_dir (),
+                                                               ".local",
+                                                               "share",
+                                                               Config.PACKAGE_NAME,
+                                                               "database.sqlite");
+                var host_file = GLib.File.new_for_path (host_file_path);
 
-                var host_file = GLib.File.new_for_path (host_db_path);
-                var sandbox_dir_file = GLib.File.new_for_path (sandbox_data_dir);
-                var sandbox_file = GLib.File.new_for_path (sandbox_db_path);
-
-                if (host_file.query_exists () && !sandbox_file.query_exists ())
+                if (host_file.query_exists () && !file.query_exists ())
                 {
-                    make_directory_with_parents (sandbox_dir_file);
-
                     try {
-                        host_file.copy (sandbox_file, GLib.FileCopyFlags.NONE, null, null);
-                        GLib.info ("Imported database from host to sandbox: %s -> %s",
-                                   host_db_path, sandbox_db_path);
+                        host_file.copy (file, GLib.FileCopyFlags.NONE, null, null);
+                        GLib.info ("Imported database from host to sandbox: %s --> %s",
+                                   host_file_path, file_path);
                     }
                     catch (GLib.Error error) {
                         GLib.warning ("Failed to import host database: %s", error.message);
                     }
                 }
             }
-
-            var file_path = GLib.Path.build_filename (GLib.Environment.get_user_data_dir (),
-                                                      Config.PACKAGE_NAME,
-                                                      "database.sqlite");
-            file = GLib.File.new_for_path (file_path);
         }
 
         Pomodoro.Database.adapter = new Gom.Adapter ();
