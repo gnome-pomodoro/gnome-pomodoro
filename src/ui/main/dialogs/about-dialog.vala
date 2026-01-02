@@ -23,7 +23,7 @@ namespace Pomodoro
             "Kamil Prusko <kamilprusko@gmail.com>",
             "Arun Mahapatra <pratikarun@gmail.com>"
         };
-        about_dialog.copyright = "\xc2\xa9 2011-2025 Arun Mahapatra, Kamil Prusko";
+        about_dialog.copyright = "\xc2\xa9 2011-2026 Arun Mahapatra, Kamil Prusko";
         about_dialog.license_type = Gtk.License.GPL_3_0;
 
         var translator_credits = _("translator-credits");
