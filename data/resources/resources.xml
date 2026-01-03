@@ -9,6 +9,8 @@
     <file compressed="true" preprocess="xml-stripblanks">preferences-plugins-page.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">screen-notification.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">stats-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">stats-today-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">stats-lifetime-page.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">stats-view.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">window.ui</file>
     <file>style.css</file>

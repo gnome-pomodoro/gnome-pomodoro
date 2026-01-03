@@ -109,16 +109,28 @@ namespace Pomodoro
         {
             switch (source_value.get_string ())
             {
-                case "day":
+                case "today":
                     target_value.set_int (0);
                     break;
 
-                case "week":
+                case "day":
                     target_value.set_int (1);
                     break;
 
-                case "month":
+                case "week":
                     target_value.set_int (2);
+                    break;
+
+                case "month":
+                    target_value.set_int (3);
+                    break;
+
+                case "year":
+                    target_value.set_int (4);
+                    break;
+
+                case "lifetime":
+                    target_value.set_int (5);
                     break;
 
                 case "none":
@@ -138,15 +150,27 @@ namespace Pomodoro
             switch (source_value.get_int ())
             {
                 case 0:
-                    target_value.set_string ("day");
+                    target_value.set_string ("today");
                     break;
 
                 case 1:
-                    target_value.set_string ("week");
+                    target_value.set_string ("day");
                     break;
 
                 case 2:
+                    target_value.set_string ("week");
+                    break;
+
+                case 3:
                     target_value.set_string ("month");
+                    break;
+
+                case 4:
+                    target_value.set_string ("year");
+                    break;
+
+                case 5:
+                    target_value.set_string ("lifetime");
                     break;
 
                 default:
@@ -253,6 +277,9 @@ namespace Pomodoro
                 case "none":
                     break;
 
+                case "today":
+                    return new GLib.DateTime.now_local ();
+
                 case "day":
                     return new GLib.DateTime.local (datetime.get_year (),
                                                     datetime.get_month (),
@@ -277,6 +304,16 @@ namespace Pomodoro
                                                     0,
                                                     0,
                                                     0.0);
+                case "year":
+                    return new GLib.DateTime.local (datetime.get_year (),
+                                                    1,
+                                                    1,
+                                                    0,
+                                                    0,
+                                                    0.0);
+                case "lifetime":
+                    return new GLib.DateTime.now_local ();
+
                 default:
                     assert_not_reached ();
             }
@@ -290,10 +327,13 @@ namespace Pomodoro
             return "%s:%s".printf (mode, datetime.format ("%s"));
         }
 
-        private Pomodoro.StatsPage? create_page (GLib.DateTime datetime,
-                                                 string        mode)
+        private Gtk.Widget? create_page (GLib.DateTime datetime,
+                                         string        mode)
         {
             switch (mode) {
+                case "today":
+                    return new Pomodoro.StatsTodayPage (this.repository);
+
                 case "day":
                     return new Pomodoro.StatsDayPage (this.repository, datetime);
 
@@ -303,18 +343,24 @@ namespace Pomodoro
                 case "month":
                     return new Pomodoro.StatsMonthPage (this.repository, datetime);
 
+                case "year":
+                    return new Pomodoro.StatsYearPage (this.repository, datetime);
+
+                case "lifetime":
+                    return new Pomodoro.StatsLifetimePage (this.repository);
+
                 default:
                     assert_not_reached ();
             }
         }
 
-        private Pomodoro.StatsPage? get_page (string name)
+        private Gtk.Widget? get_page (string name)
         {
-            return this.pages.get_child_by_name (name) as Pomodoro.StatsPage;
+            return this.pages.get_child_by_name (name);
         }
 
-        private Pomodoro.StatsPage get_or_create_page (GLib.DateTime datetime,
-                                                       string        mode)
+        private Gtk.Widget get_or_create_page (GLib.DateTime datetime,
+                                               string        mode)
         {
             var page_name = this.build_page_name (datetime, mode);
             var page = this.get_page (page_name);
@@ -322,7 +368,7 @@ namespace Pomodoro
             if (page == null) {
                 page = this.create_page (datetime, mode);
 
-                this.pages.add_named (page as Gtk.Widget, page_name);
+                this.pages.add_named (page, page_name);
             }
             
             return page;
@@ -343,24 +389,28 @@ namespace Pomodoro
                 var page = this.get_or_create_page (datetime, mode);
                 var page_transition = Gtk.StackTransitionType.NONE;
 
-                var current_page = this.pages.visible_child as Pomodoro.StatsPage;
-                if (current_page != null) {
-                    if (page.get_type () != current_page.get_type ()) {
+                var current_page_widget = this.pages.visible_child;
+                var current_page = current_page_widget as Pomodoro.StatsPage;
+                if (current_page_widget != null) {
+                    if (page.get_type () != current_page_widget.get_type ()) {
                         page_transition = Gtk.StackTransitionType.CROSSFADE;
                     }
-                    else {
-                        page_transition = current_page.date.compare (page.date) < 0
-                            ? Gtk.StackTransitionType.SLIDE_LEFT
-                            : Gtk.StackTransitionType.SLIDE_RIGHT;
+                    else if (current_page != null) {
+                        var new_page = page as Pomodoro.StatsPage;
+                        if (new_page != null) {
+                            page_transition = current_page.date.compare (new_page.date) < 0
+                                ? Gtk.StackTransitionType.SLIDE_LEFT
+                                : Gtk.StackTransitionType.SLIDE_RIGHT;
+                        }
                     }
                 }
 
                 this.pages.set_transition_type (page_transition);
-                this.pages.set_visible_child (page as Gtk.Widget);
+                this.pages.set_visible_child (page);
 
                 /* cleanup previous pages */
-                this.history.remove (page as Gtk.Widget);
-                this.history.push_tail (page as Gtk.Widget);
+                this.history.remove (page);
+                this.history.push_tail (page);
 
                 while (this.history.length > 3) {
                     this.history.pop_head ().destroy ();
@@ -369,21 +419,39 @@ namespace Pomodoro
                 /* update navigation */
                 if (this.title_binding != null) {
                     this.title_binding.unbind ();
+                    this.title_binding = null;
                 }
 
-                this.title_binding = page.bind_property
-                        ("title",
-                         this.title,
-                         "label",
-                         GLib.BindingFlags.SYNC_CREATE);
+                // Only bind title for StatsPage instances
+                var stats_page = page as Pomodoro.StatsPage;
+                if (stats_page != null) {
+                    this.title_binding = stats_page.bind_property
+                            ("title",
+                             this.title,
+                             "label",
+                             GLib.BindingFlags.SYNC_CREATE);
 
-                this.previous_action.set_enabled
-                        (min_datetime != null &&
-                         min_datetime.compare (page.get_previous_date ()) <= 0);
+                    this.previous_action.set_enabled
+                            (min_datetime != null &&
+                             min_datetime.compare (stats_page.get_previous_date ()) <= 0);
 
-                this.next_action.set_enabled
-                        (max_datetime != null &&
-                         max_datetime.compare (page.get_next_date ()) >= 0);
+                    this.next_action.set_enabled
+                            (max_datetime != null &&
+                             max_datetime.compare (stats_page.get_next_date ()) >= 0);
+                }
+                else {
+                    // For non-StatsPage (today/lifetime), set title directly
+                    if (mode == "today") {
+                        this.title.label = _("Today");
+                    }
+                    else if (mode == "lifetime") {
+                        this.title.label = _("Lifetime Statistics");
+                    }
+
+                    // Disable navigation buttons for today/lifetime
+                    this.previous_action.set_enabled (false);
+                    this.next_action.set_enabled (false);
+                }
             }
             else {
                 this.previous_action.set_enabled (false);
