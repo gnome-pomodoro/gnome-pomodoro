@@ -51,6 +51,10 @@ namespace Pomodoro
             rewind_action.activate.connect (this.activate_rewind);
             this.add_action (rewind_action);
 
+            var rewind_by_action = new GLib.SimpleAction ("rewind-by", GLib.VariantType.INT32);
+            rewind_by_action.activate.connect (this.activate_rewind);
+            this.add_action (rewind_by_action);
+
             var toggle_action = new GLib.SimpleAction ("toggle", null);  // alias for start-stop
             toggle_action.activate.connect (this.activate_start_stop);
             this.add_action (toggle_action);
@@ -62,6 +66,14 @@ namespace Pomodoro
             var start_pause_resume_action = new GLib.SimpleAction ("start-pause-resume", null);
             start_pause_resume_action.activate.connect (this.activate_start_pause_resume);
             this.add_action (start_pause_resume_action);
+
+            var extend_action = new GLib.SimpleAction ("extend", null);
+            extend_action.activate.connect (this.activate_extend);
+            this.add_action (extend_action);
+
+            var extend_by_action = new GLib.SimpleAction ("extend-by", GLib.VariantType.INT32);
+            extend_by_action.activate.connect (this.activate_extend);
+            this.add_action (extend_by_action);
         }
 
         private void activate_start (GLib.SimpleAction action,
@@ -95,10 +107,12 @@ namespace Pomodoro
         private void activate_rewind (GLib.SimpleAction action,
                                       GLib.Variant?     parameter)
         {
-            // TODO: take microseconds from param
+            var interval = parameter != null
+                    ? parameter.get_int32 () * Pomodoro.Interval.SECOND
+                    : Pomodoro.Interval.MINUTE;
 
             Pomodoro.Context.set_event_source ("timer.rewind");
-            this.timer.rewind (Pomodoro.Interval.MINUTE);
+            this.timer.rewind (interval);
         }
 
         private void activate_start_stop (GLib.SimpleAction action,
@@ -129,6 +143,16 @@ namespace Pomodoro
                 Pomodoro.Context.set_event_source ("timer.pause");
                 this.timer.pause ();
             }
+        }
+
+        private void activate_extend (GLib.SimpleAction action,
+                                      GLib.Variant?     parameter)
+        {
+            var interval = parameter != null
+                    ? parameter.get_int32 () * Pomodoro.Interval.SECOND
+                    : Pomodoro.Interval.MINUTE;
+
+            this.timer.duration += interval;
         }
     }
 }

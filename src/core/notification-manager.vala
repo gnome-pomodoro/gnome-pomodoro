@@ -424,7 +424,7 @@ namespace Pomodoro
 
             var notification = this.create_notification (title, body);
             notification.set_priority (GLib.NotificationPriority.URGENT);
-            notification.add_button_with_target_value (_("+1 minute"), "app.extend", 60U);
+            notification.add_button_with_target_value (_("+1 minute"), "app.extend", 60);
             notification.add_button (action_label, "app.advance");
 
             this.notification = notification;

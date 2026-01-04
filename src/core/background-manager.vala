@@ -30,6 +30,7 @@ namespace Pomodoro
         private static uint                      next_hold_id = 1U;
 
         private async void request_background (string parent_window = "")
+                                               requires (this.provider.enabled)
         {
             // Ask for request each time when trying to acquire `application_hold`.
             // It's doesn't seem to be required, but just in case.
@@ -61,7 +62,9 @@ namespace Pomodoro
 
         private void update_application_hold ()
         {
-            if (this.holds.length > 0U && this.request_granted) {
+            var is_provider_enabled = this.provider != null && this.provider.enabled;
+
+            if (this.holds.length > 0U && (this.request_granted || !is_provider_enabled)) {
                 this.hold_application ();
             }
             else {
@@ -75,7 +78,12 @@ namespace Pomodoro
             BackgroundManager.next_hold_id++;
 
             this.holds.add (hold_id);
-            yield this.request_background (parent_window);
+            this.hold_application ();
+
+            // XXX: Not sure if we need to request for permission every time
+            if (this.provider != null && this.provider.enabled) {
+                yield this.request_background (parent_window);
+            }
 
             return hold_id;
         }
@@ -99,6 +107,8 @@ namespace Pomodoro
         {
             // TODO: Providers should register themselves in a static constructors, but can't make it work...
             this.providers.add (new Portal.BackgroundProvider ());
+
+            // TODO: add a permissive provider if the Background portal is not available
         }
 
         protected override void provider_enabled (Pomodoro.BackgroundProvider provider)
