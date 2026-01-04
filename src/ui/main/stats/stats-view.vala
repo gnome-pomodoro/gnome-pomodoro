@@ -302,6 +302,21 @@ namespace Pomodoro
         public void update_date_range ()
         {
             this.max_date = this.stats_manager.get_today ();
+
+            if (!this.min_date.valid ())
+            {
+                var main_context = GLib.MainContext.@default ();
+                var fetched = false;
+
+                this.fetch_min_date.begin (
+                    (obj, res) => {
+                        this.min_date = this.fetch_min_date.end (res);
+
+                        fetched = true;
+                    });
+
+                while (!fetched && main_context.iteration (true));
+            }
         }
 
         private async GLib.Date fetch_min_date ()
