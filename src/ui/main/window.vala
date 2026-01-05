@@ -169,6 +169,7 @@ namespace Pomodoro
             this.extension.notify["available"].connect (this.on_extension_notify_available);
 
             this.notify["is-active"].connect (this.on_notify_is_active);
+            this.notify["maximized"].connect (this.on_notify_maximized);
 
             this.update_title ();
             this.update_timer_indicator ();
@@ -385,13 +386,13 @@ namespace Pomodoro
                                                double           x,
                                                double           y)
         {
-            if (gesture.get_current_button () == Gdk.BUTTON_PRIMARY &&
+            var toggle_compact_size_action = this.lookup_action ("toggle-compact-size");
+
+            if (toggle_compact_size_action.enabled &&
+                gesture.get_current_button () == Gdk.BUTTON_PRIMARY &&
                 n_press == 2)
             {
-                this.size = this.size != Pomodoro.WindowSize.COMPACT
-                    ? Pomodoro.WindowSize.COMPACT
-                    : Pomodoro.WindowSize.NORMAL;
-
+                toggle_compact_size_action.activate (null);
                 gesture.set_state (Gtk.EventSequenceState.CLAIMED);
             }
         }
@@ -423,6 +424,19 @@ namespace Pomodoro
                 this.background_manager.release (Pomodoro.Window.background_hold_id);
                 Pomodoro.Window.background_hold_id = 0U;
             }
+        }
+
+        private void on_notify_maximized (GLib.Object    object,
+                                          GLib.ParamSpec pspec)
+        {
+            var can_change_size = !this.maximized;
+
+            var compact_size_action = (GLib.SimpleAction) this.lookup_action ("compact-size");
+            compact_size_action.set_enabled (can_change_size);
+
+            var toggle_compact_size_action =
+                    (GLib.SimpleAction) this.lookup_action ("toggle-compact-size");
+            toggle_compact_size_action.set_enabled (can_change_size);
         }
 
         private void on_extension_notify_available (GLib.Object    object,
@@ -466,19 +480,17 @@ namespace Pomodoro
         {
             var action_map = (GLib.ActionMap) this;
 
-            GLib.SimpleAction action;
+            var compact_size_action = new GLib.SimpleAction ("compact-size", null);
+            compact_size_action.activate.connect (this.on_compact_size_activate);
+            action_map.add_action (compact_size_action);
 
-            action = new GLib.SimpleAction ("compact-size", null);
-            action.activate.connect (this.on_compact_size_activate);
-            action_map.add_action (action);
+            var normal_size_action = new GLib.SimpleAction ("normal-size", null);
+            normal_size_action.activate.connect (this.on_normal_size_activate);
+            action_map.add_action (normal_size_action);
 
-            action = new GLib.SimpleAction ("normal-size", null);
-            action.activate.connect (this.on_normal_size_activate);
-            action_map.add_action (action);
-
-            action = new GLib.SimpleAction ("toggle-compact-size", null);
-            action.activate.connect (this.on_toggle_compact_size_activate);
-            action_map.add_action (action);
+            var toggle_compact_size_action = new GLib.SimpleAction ("toggle-compact-size", null);
+            toggle_compact_size_action.activate.connect (this.on_toggle_compact_size_activate);
+            action_map.add_action (toggle_compact_size_action);
         }
 
         public void parser_finished (Gtk.Builder builder)
