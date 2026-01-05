@@ -303,19 +303,8 @@ namespace Pomodoro
         {
             this.max_date = this.stats_manager.get_today ();
 
-            if (!this.min_date.valid ())
-            {
-                var main_context = GLib.MainContext.@default ();
-                var fetched = false;
-
-                this.fetch_min_date.begin (
-                    (obj, res) => {
-                        this.min_date = this.fetch_min_date.end (res);
-
-                        fetched = true;
-                    });
-
-                while (!fetched && main_context.iteration (true));
+            if (!this.min_date.valid ()) {
+                this.min_date = this.fetch_min_date_sync ();
             }
         }
 
@@ -339,6 +328,41 @@ namespace Pomodoro
                 if (results.count > 0)
                 {
                     yield results.fetch_async (0U, 1U);
+
+                    var entry = (Pomodoro.AggregatedStatsEntry?) results.get_index (0);
+
+                    if (entry != null && entry.date != null) {
+                        return Pomodoro.Database.parse_date (entry.date);
+                    }
+                }
+            }
+            catch (GLib.Error error) {
+                GLib.critical ("Error while fetching minimal stats date: %s", error.message);
+            }
+
+            return min_date;
+        }
+
+        private GLib.Date fetch_min_date_sync ()
+        {
+            var min_date = GLib.Date ();
+
+            if (this.repository == null) {
+                return min_date;
+            }
+
+            var sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
+            sorting.add (typeof (Pomodoro.AggregatedStatsEntry), "date", Gom.SortingMode.ASCENDING);
+
+            try {
+                var results = this.repository.find_sorted_sync (
+                        typeof (Pomodoro.AggregatedStatsEntry),
+                        null,
+                        sorting);
+
+                if (results.count > 0)
+                {
+                    results.fetch_sync (0U, 1U);
 
                     var entry = (Pomodoro.AggregatedStatsEntry?) results.get_index (0);
 
