@@ -116,7 +116,6 @@
                   <object class="PomodoroCompactTimerView">
                     <child>
                       <object class="GtkGestureClick">
-                        <property name="propagation-phase">capture</property>
                         <signal name="pressed" handler="on_gesture_click_pressed"/>
                       </object>
                     </child>
