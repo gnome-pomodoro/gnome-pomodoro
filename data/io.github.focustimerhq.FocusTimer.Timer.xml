@@ -3,13 +3,13 @@
 <node>
 
   <!--
-      org.gnomepomodoro.Pomodoro.Timer:
+      io.github.focustimerhq.FocusTimer.Timer:
       @short_description: Timer control interface
 
       The timer interface provides functionality for controlling the pomodoro timer.
       It has most of the information needed to display the current state of the timer.
   -->
-  <interface name="org.gnomepomodoro.Pomodoro.Timer">
+  <interface name="io.github.focustimerhq.FocusTimer.Timer">
 
     <!--
         State:

@@ -1,13 +1,13 @@
-# Georgian translation for gnome-pomodoro
-# Copyright (c) 2024 gnome-pomodoro contributors
-# This file is distributed under the same license as the gnome-pomodoro package.
+# Georgian translation for focus-timer
+# Copyright (c) 2024 focus-timer contributors
+# This file is distributed under the same license as the focus-timer package.
 #
 # Authors:
 # Temuri Doghonadze <temuri.doghonadze@gmail.com>, 2024-2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-pomodoro 1.0-alpha\n"
+"Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-20 11:56+0100\n"
 "PO-Revision-Date: 2025-12-22 11:37+0100\n"

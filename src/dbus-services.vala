@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2025 gnome-pomodoro contributors
+ * Copyright (c) 2012-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -9,7 +9,7 @@ using GLib;
 
 namespace Pomodoro
 {
-    [DBus (name = "org.gnomepomodoro.Pomodoro")]
+    [DBus (name = "io.github.focustimerhq.FocusTimer")]
     public class ApplicationDBusService : GLib.Object
     {
         public string version {
@@ -50,10 +50,10 @@ namespace Pomodoro
     /**
      * Timer service provides equivalent functionality of the timer view in the app.
      */
-    [DBus (name = "org.gnomepomodoro.Pomodoro.Timer")]
+    [DBus (name = "io.github.focustimerhq.FocusTimer.Timer")]
     public class TimerDBusService : GLib.Object
     {
-        private const string DBUS_INTERFACE_NAME = "org.gnomepomodoro.Pomodoro.Timer";
+        private const string DBUS_INTERFACE_NAME = "io.github.focustimerhq.FocusTimer.Timer";
 
         public string state
         {
@@ -313,10 +313,10 @@ namespace Pomodoro
      * Session service represents mostly `SessionManager.current_session`, but
      * also includes relevant methods/properties from `SessionManager` and scheduler.
      */
-    [DBus (name = "org.gnomepomodoro.Pomodoro.Session")]
+    [DBus (name = "io.github.focustimerhq.FocusTimer.Session")]
     public class SessionDBusService : GLib.Object
     {
-        private const string DBUS_INTERFACE_NAME = "org.gnomepomodoro.Pomodoro.Session";
+        private const string DBUS_INTERFACE_NAME = "io.github.focustimerhq.FocusTimer.Session";
 
         public int64 start_time
         {

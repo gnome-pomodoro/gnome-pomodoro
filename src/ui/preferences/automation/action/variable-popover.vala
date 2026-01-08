@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -68,7 +68,7 @@ namespace Pomodoro
     }
 
 
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/automation/action/variable-popover.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/automation/action/variable-popover.ui")]
     public class VariablePopover : Gtk.Popover
     {
         [GtkChild]

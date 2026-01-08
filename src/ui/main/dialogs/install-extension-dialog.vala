@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -9,7 +9,7 @@ using GLib;
 
 namespace Pomodoro
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/dialogs/install-extension-dialog.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/dialogs/install-extension-dialog.ui")]
     public class InstallExtensionDialog : Adw.Dialog
     {
         private uint CLOSE_TIMEOUT_SECONDS = 3;

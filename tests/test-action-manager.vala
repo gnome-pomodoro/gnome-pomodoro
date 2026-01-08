@@ -1,3 +1,11 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     public class EventActionTest : Tests.TestSuite
@@ -18,8 +26,8 @@ namespace Tests
         public void test_load ()
         {
             var settings = new GLib.Settings.with_path (
-                    "org.gnomepomodoro.Pomodoro.actions.action",
-                    @"/org/gnomepomodoro/Pomodoro/actions/$(this.uuid)/");
+                    "io.github.focustimerhq.FocusTimer.actions.action",
+                    @"/io/github/focustimerhq/FocusTimer/actions/$(this.uuid)/");
             settings.set_enum ("trigger", Pomodoro.ActionTrigger.EVENT);
             settings.set_boolean ("enabled", true);
             settings.set_string ("display-name", "Event Action");
@@ -49,8 +57,8 @@ namespace Tests
         public void test_save ()
         {
             var settings = new GLib.Settings.with_path (
-                    "org.gnomepomodoro.Pomodoro.actions.action",
-                    @"/org/gnomepomodoro/Pomodoro/actions/$(uuid)/");
+                    "io.github.focustimerhq.FocusTimer.actions.action",
+                    @"/io/github/focustimerhq/FocusTimer/actions/$(uuid)/");
 
             var action = new Pomodoro.EventAction (this.uuid);
             action.display_name = "Event Action";
@@ -94,8 +102,8 @@ namespace Tests
         public void test_load ()
         {
             var settings = new GLib.Settings.with_path (
-                    "org.gnomepomodoro.Pomodoro.actions.action",
-                    @"/org/gnomepomodoro/Pomodoro/actions/$(this.uuid)/");
+                    "io.github.focustimerhq.FocusTimer.actions.action",
+                    @"/io/github/focustimerhq/FocusTimer/actions/$(this.uuid)/");
             settings.set_enum ("trigger", Pomodoro.ActionTrigger.CONDITION);
             settings.set_boolean ("enabled", true);
             settings.set_string ("display-name", "Condition Action");
@@ -126,8 +134,8 @@ namespace Tests
         public void test_save ()
         {
             var settings = new GLib.Settings.with_path (
-                    "org.gnomepomodoro.Pomodoro.actions.action",
-                    @"/org/gnomepomodoro/Pomodoro/actions/$(this.uuid)/");
+                    "io.github.focustimerhq.FocusTimer.actions.action",
+                    @"/io/github/focustimerhq/FocusTimer/actions/$(this.uuid)/");
 
             var action = new Pomodoro.ConditionAction (this.uuid);
             action.display_name = "Condition Action";
@@ -168,7 +176,7 @@ namespace Tests
 
         public override void setup ()
         {
-            this.settings = new GLib.Settings ("org.gnomepomodoro.Pomodoro.actions");
+            this.settings = new GLib.Settings ("io.github.focustimerhq.FocusTimer.actions");
             this.settings.set_strv ("actions", {});
         }
 
@@ -417,7 +425,7 @@ namespace Tests
 
         public override void setup ()
         {
-            this.settings = new GLib.Settings ("org.gnomepomodoro.Pomodoro.actions");
+            this.settings = new GLib.Settings ("io.github.focustimerhq.FocusTimer.actions");
             this.settings.set_strv ("actions", {});
         }
 

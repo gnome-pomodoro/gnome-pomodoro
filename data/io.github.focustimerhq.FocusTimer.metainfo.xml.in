@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2025 Kamil Prusko <kamilprusko@gmail.com> -->
+<!-- Copyright 2025-2026 Kamil Prusko <kamilprusko@gmail.com> -->
 <component type="desktop-application">
 
   <!-- General -->
-  <id>org.gnomepomodoro.Pomodoro</id>
-  <translation type="gettext">gnome-pomodoro</translation>
-  ​<launchable type="desktop-id">org.gnomepomodoro.Pomodoro.desktop</launchable>
-  <name>Pomodoro</name>
+  <id>io.github.focustimerhq.FocusTimer</id>
+  <translation type="gettext">focus-timer</translation>
+  ​<launchable type="desktop-id">io.github.focustimerhq.FocusTimer.desktop</launchable>
+  <name>Focus Timer</name>
   <summary>Maintain focus by taking frequent breaks</summary>
   <description>
     <p>
@@ -38,15 +38,15 @@
     <category>GNOME</category>
   </categories>
   <provides>
-    <binary>gnome-pomodoro</binary>
-    <dbus type="user">org.gnomepomodoro.Pomodoro</dbus>
+    <binary>focus-timer</binary>
+    <dbus type="user">io.github.focustimerhq.FocusTimer</dbus>
   </provides>
   <content_rating type="oars-1.1" />
   <update_contact>kamilprusko@gmail.com</update_contact>
 
   <!-- Branding -->
   <developer_name translate="no">Kamil Prusko</developer_name>
-  <developer id="org.gnomepomodoro">
+  <developer id="io.github.focustimerhq">
     <name translate="no">Kamil Prusko</name>
   </developer>
 
@@ -55,9 +55,9 @@
   <project_license>GPL-3.0-or-later</project_license>
 
   <!-- URLs -->
-  <url type="homepage">https://gnomepomodoro.org</url>
-  <url type="bugtracker">https://github.com/gnome-pomodoro/gnome-pomodoro/issues</url>
-  <url type="vcs-browser">https://github.com/gnome-pomodoro/gnome-pomodoro/</url>
+  <url type="homepage">https://github.com/focustimerhq/focus-timer</url>
+  <url type="bugtracker">https://github.com/focustimerhq/focus-timer/issues</url>
+  <url type="vcs-browser">https://github.com/focustimerhq/focus-timer</url>
   <url type="donation">https://liberapay.com/kamilprusko</url>
 
   <!-- Screenshots -->

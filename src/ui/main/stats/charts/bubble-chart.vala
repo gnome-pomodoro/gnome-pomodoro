@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -11,7 +11,7 @@ using GLib;
 
 namespace Pomodoro
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/stats/charts/bubble-chart.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/charts/bubble-chart.ui")]
     public class BubbleChart : Gtk.Widget
     {
         private const int    MIN_BUBBLE_SIZE = 16;

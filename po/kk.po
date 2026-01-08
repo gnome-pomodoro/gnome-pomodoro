@@ -1,13 +1,13 @@
-# Kazakh translation for gnome-pomodoro
-# Copyright (c) 2017 gnome-pomodoro contributors
-# This file is distributed under the same license as the gnome-pomodoro package.
+# Kazakh translation for focus-timer
+# Copyright (c) 2017 focus-timer contributors
+# This file is distributed under the same license as the focus-timer package.
 #
 # Authors:
 # Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2017.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-pomodoro 1.0-alpha\n"
+"Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-20 11:56+0100\n"
 "PO-Revision-Date: 2023-03-25 14:18+0100\n"

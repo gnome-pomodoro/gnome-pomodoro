@@ -5,7 +5,7 @@
          xmlns:gnome="https://api.gnome.org/doap-extensions#"
          xmlns="http://usefulinc.com/ns/doap#">
 
-  <name xml:lang="en">Pomodoro</name>
+  <name xml:lang="en">Focus Timer</name>
   <shortdesc xml:lang="en">Maintain focus by taking frequent breaks</shortdesc>
   <homepage rdf:resource="https://gnomepomodoro.org" />
   <license rdf:resource="https://www.gnu.org/licenses/gpl-3.0.html" />
@@ -14,8 +14,8 @@
 
   <repository>
     <GitRepository>
-      <browse rdf:resource="https://github.com/gnome-pomodoro/gnome-pomodoro" />
-      <location rdf:resource="git@github.com:gnome-pomodoro/gnome-pomodoro.git" />
+      <browse rdf:resource="https://github.com/focustimerhq/focus-timer" />
+      <location rdf:resource="git@github.com:focustimerhq/focus-timer.git" />
     </GitRepository>
   </repository>
 

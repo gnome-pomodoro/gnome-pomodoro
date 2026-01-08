@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -11,7 +11,7 @@
 namespace Pomodoro
 {
     // TODO: make it a dialog window
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui")]
     public class AcceleratorChooserWindow : Adw.Window
     {
         private enum Mode

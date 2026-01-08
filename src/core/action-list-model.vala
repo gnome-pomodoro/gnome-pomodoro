@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -40,7 +40,7 @@ namespace Pomodoro
             this.actions = new GLib.HashTable<string, Pomodoro.Action> (GLib.str_hash,
                                                                         GLib.str_equal);
 
-            this.settings = new GLib.Settings ("org.gnomepomodoro.Pomodoro.actions");
+            this.settings = new GLib.Settings ("io.github.focustimerhq.FocusTimer.actions");
             this.settings_changed_id = this.settings.changed.connect (this.on_settings_changed);
 
             this.load ();
@@ -79,8 +79,8 @@ namespace Pomodoro
                 return existing_settings;
             }
 
-            return new GLib.Settings.with_path ("org.gnomepomodoro.Pomodoro.actions.action",
-                                                @"/org/gnomepomodoro/Pomodoro/actions/$(uuid)/");
+            return new GLib.Settings.with_path ("io.github.focustimerhq.FocusTimer.actions.action",
+                                                @"/io/github/focustimerhq/FocusTimer/actions/$(uuid)/");
         }
 
         private void inhibit_settings_changed ()

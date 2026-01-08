@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2022-2025 gnome-pomodoro contributors
+ * Copyright (c) 2022-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 namespace Pomodoro
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/timer/compact-timer-view.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/timer/compact-timer-view.ui")]
     public class CompactTimerView : Adw.Bin, Gtk.Buildable
     {
         [GtkChild]
@@ -35,7 +35,7 @@ namespace Pomodoro
             this.session_manager = Pomodoro.SessionManager.get_default ();
             this.timer           = session_manager.timer;
 
-            var builder = new Gtk.Builder.from_resource ("/org/gnomepomodoro/Pomodoro/ui/main/timer/menus.ui");
+            var builder = new Gtk.Builder.from_resource ("/io/github/focustimerhq/FocusTimer/ui/main/timer/menus.ui");
             this.state_menu = (GLib.MenuModel) builder.get_object ("state_menu");
             this.uniform_state_menu = (GLib.MenuModel) builder.get_object ("uniform_state_menu");
 

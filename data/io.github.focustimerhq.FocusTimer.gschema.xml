@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schemalist gettext-domain="gnome-pomodoro">
-  <enum id="org.gnomepomodoro.Pomodoro.ActionTrigger">
+<schemalist gettext-domain="focus-timer">
+  <enum id="io.github.focustimerhq.FocusTimer.ActionTrigger">
     <value nick="event" value="0"/>
     <value nick="condition" value="1"/>
   </enum>
 
-  <schema id="org.gnomepomodoro.Pomodoro" path="/org/gnomepomodoro/Pomodoro/">
+  <schema id="io.github.focustimerhq.FocusTimer" path="/io/github/focustimerhq/FocusTimer/">
     <!-- Timer -->
     <key name="pomodoro-duration" type="u">
       <default>1500</default>
@@ -121,8 +121,8 @@
   </schema>
 
   <!-- Actions -->
-  <schema id="org.gnomepomodoro.Pomodoro.actions.action">
-    <key name="trigger" enum="org.gnomepomodoro.Pomodoro.ActionTrigger">
+  <schema id="io.github.focustimerhq.FocusTimer.actions.action">
+    <key name="trigger" enum="io.github.focustimerhq.FocusTimer.ActionTrigger">
       <default>"event"</default>
       <summary>Trigger</summary>
     </key>
@@ -167,7 +167,7 @@
       <summary>Wait for completion</summary>
     </key>
   </schema>
-  <schema id="org.gnomepomodoro.Pomodoro.actions" path="/org/gnomepomodoro/Pomodoro/actions/">
+  <schema id="io.github.focustimerhq.FocusTimer.actions" path="/io/github/focustimerhq/FocusTimer/actions/">
     <key name="actions" type="as">
       <default>[]</default>
       <summary>Actions</summary>

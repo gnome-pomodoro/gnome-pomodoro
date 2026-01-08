@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 gnome-pomodoro contributors
+ * Copyright (c) 2014 focus-timer contributors
  *
  * This code is partly borrowed from libgee's test suite,
  * at https://git.gnome.org/browse/libgee and from gnome-break-timer

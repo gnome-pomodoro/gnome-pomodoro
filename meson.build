@@ -1,5 +1,5 @@
 project(
-  'gnome-pomodoro',
+  'focus-timer',
   ['vala', 'c'],
   version: '1.0-alpha',
   meson_version: '>=0.59.0',
@@ -94,13 +94,13 @@ if gtk_wayland_dep.found()
   add_project_arguments(['-D', 'HAVE_GDK_WAYLAND'], language: 'vala')
 endif
 
-application_id = 'org.gnomepomodoro.Pomodoro'
-application_name = 'Pomodoro'
+application_id = 'io.github.focustimerhq.FocusTimer'
+application_name = 'Focus Timer'
 package_name = meson.project_name()
 package_version = meson.project_version()
-package_website = 'https://gnomepomodoro.org'
-package_issue_url = 'https://github.com/gnome-pomodoro/gnome-pomodoro/issues'
-package_support_url = 'https://github.com/gnome-pomodoro/gnome-pomodoro/discussions'
+package_website = 'https://github.com/focustimerhq/focus-timer'
+package_issue_url = 'https://github.com/focustimerhq/focus-timer/issues'
+package_support_url = 'https://github.com/focustimerhq/focus-timer/discussions'
 package_donate_url = 'https://liberapay.com/kamilprusko'
 package_datadir = get_option('prefix') / get_option('datadir') / meson.project_name()
 package_localedir = get_option('prefix') / get_option('datadir') / 'locale'
@@ -110,7 +110,7 @@ gettext_package = package_name
 # Change app id for development builds
 if get_option('profile') == 'development'
   application_id = '@0@.Devel'.format(application_id)
-  application_name = 'Pomodoro (Development)'
+  application_name = '@0@ (Development)'.format(application_name)
 endif
 
 conf = configuration_data()

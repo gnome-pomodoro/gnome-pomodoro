@@ -1,13 +1,13 @@
-# Hebrew translation for gnome-pomodoro
-# Copyright (c) 2025 gnome-pomodoro contributors
-# This file is distributed under the same license as the gnome-pomodoro package.
+# Hebrew translation for focus-timer
+# Copyright (c) 2025 focus-timer contributors
+# This file is distributed under the same license as the focus-timer package.
 #
 # Authors:
 # Omer I.S. <omeritzicschwartz@gmail.com>, 2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-pomodoro 1.0-alpha\n"
+"Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-20 11:56+0100\n"
 "PO-Revision-Date: 2025-12-11 22:52+0200\n"

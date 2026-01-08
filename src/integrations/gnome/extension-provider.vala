@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -8,7 +8,7 @@ namespace Gnome
 {
     public class ExtensionProvider : Pomodoro.Provider, Pomodoro.ExtensionProvider
     {
-        private const string EXTENSION_UUID = "pomodoro@gnomepomodoro.org";
+        private const string EXTENSION_UUID = "focustimer@focustimerhq.github.io";
 
         public bool extension_enabled {
             get {

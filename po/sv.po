@@ -1,11 +1,11 @@
-# Swedish translation for gnome-pomodoro.
+# Swedish translation for focus-timer
 # Copyright © 2017, 2025 Free Software Foundation, Inc.
-# This file is distributed under the same license as the gnome-pomodoro package.
+# This file is distributed under the same license as the focus-timer package.
 # Anders Jonsson <anders.jonsson@norsjovallen.se>, 2017, 2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-pomodoro 1.0-alpha\n"
+"Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-20 11:56+0100\n"
 "PO-Revision-Date: 2025-12-22 16:18+0100\n"

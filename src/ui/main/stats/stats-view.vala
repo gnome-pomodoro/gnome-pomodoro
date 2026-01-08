@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2025 gnome-pomodoro contributors
+ * Copyright (c) 2017, 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -545,7 +545,7 @@ namespace Pomodoro
                                       uint                         skipped);
     }
 
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/stats/stats-view.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/stats-view.ui")]
     public class StatsView : Adw.BreakpointBin
     {
         private const uint PAGES_HISTORY_LIMIT = 2;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 gnome-pomodoro contributors
+ * Copyright (c) 2021-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -8,7 +8,7 @@
 
 namespace Pomodoro
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/timer/widgets/timer-label.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/timer/widgets/timer-label.ui")]
     public class TimerLabel : Gtk.Widget, Gtk.Buildable
     {
         private const uint   BLINK_DURATION = 1000;

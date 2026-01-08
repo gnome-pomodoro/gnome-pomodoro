@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 namespace Pomodoro
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui")]
     public class PreferencesPanelKeyboardShortcuts : Pomodoro.PreferencesPanel
     {
         [GtkChild]

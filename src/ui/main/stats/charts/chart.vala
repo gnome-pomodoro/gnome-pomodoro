@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -72,7 +72,7 @@ namespace Pomodoro
      *
      * The content is scrollable horizontally.
      */
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/stats/charts/chart.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/charts/chart.ui")]
     public abstract class Chart : Gtk.Widget, Gtk.Buildable
     {
         private const int MIN_WIDTH = 300;

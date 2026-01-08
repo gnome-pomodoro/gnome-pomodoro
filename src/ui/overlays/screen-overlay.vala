@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ * Copyright (c) 2023-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 namespace Pomodoro
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/overlays/screen-overlay.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/overlays/screen-overlay.ui")]
     public class ScreenOverlay : Pomodoro.Lightbox
     {
         [GtkChild]

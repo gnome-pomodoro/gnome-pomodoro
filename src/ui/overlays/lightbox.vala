@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ * Copyright (c) 2023-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -473,7 +473,7 @@ namespace Pomodoro
     }
 
 
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/overlays/lightbox.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/overlays/lightbox.ui")]
     public class Lightbox : Gtk.Window, Gtk.Buildable
     {
         public Gdk.Monitor? monitor_request

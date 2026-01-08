@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ * Copyright (c) 2023-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,7 +9,7 @@
 namespace Pomodoro
 {
     // TODO: rename to DurationRow
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/timer/widgets/log-scale-row.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/timer/widgets/log-scale-row.ui")]
     public class LogScaleRow : Adw.ActionRow
     {
         public Gtk.Adjustment adjustment {

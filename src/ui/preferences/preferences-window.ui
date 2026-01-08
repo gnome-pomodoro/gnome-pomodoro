@@ -4,12 +4,11 @@
   <requires lib="libadwaita" version="1.0"/>
   <template class="PomodoroPreferencesWindow" parent="AdwApplicationWindow">
     <property name="title" translatable="yes">Preferences</property>
-    <property name="default_width">900</property>
-    <property name="default_height">720</property>
+    <property name="default-width">900</property>
+    <property name="default-height">720</property>
     <property name="width-request">360</property>
     <property name="height-request">200</property>
-    <property name="icon_name">gnome-pomodoro</property>
-    <property name="startup_id">gnome-pomodoro-preferences</property>
+    <property name="startup-id">focus-timer-preferences</property>
     <child>
       <object class="AdwBreakpoint">
         <condition>max-width: 660sp</condition>

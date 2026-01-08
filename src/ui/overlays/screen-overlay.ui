@@ -3,8 +3,7 @@
   <requires lib="gtk" version="4.0"/>
   <template class="PomodoroScreenOverlay" parent="PomodoroLightbox">
     <property name="title" translatable="yes">Take a Break</property>
-    <property name="icon-name">gnome-pomodoro</property>
-    <property name="startup-id">gnome-pomodoro-screen-overlay</property>
+    <property name="startup-id">focus-timer-screen-overlay</property>
     <property name="can-focus">true</property>
     <property name="contents">
       <object class="GtkBox">

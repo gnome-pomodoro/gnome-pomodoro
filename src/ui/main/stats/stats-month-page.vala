@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2025 gnome-pomodoro contributors
+ * Copyright (c) 2013-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -9,7 +9,7 @@ using GLib;
 
 namespace Pomodoro
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/stats/stats-month-page.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/stats-month-page.ui")]
     public class StatsMonthPage : Adw.Bin, Pomodoro.StatsPage
     {
         private const int DAYS_PER_WEEK = 7;

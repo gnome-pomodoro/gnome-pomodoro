@@ -68,7 +68,7 @@
                 <property name="halign">center</property>
                 <property name="valign">center</property>
                 <property name="can-shrink">false</property>
-                <property name="file">resource:///org/gnomepomodoro/Pomodoro/ui/preferences/keyboard-shortcuts/enter-keyboard-shortcut.svg</property>
+                <property name="file">resource:///io/github/focustimerhq/FocusTimer/ui/preferences/keyboard-shortcuts/enter-keyboard-shortcut.svg</property>
               </object>
             </child>
             <child>

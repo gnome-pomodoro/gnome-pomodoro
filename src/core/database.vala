@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 gnome-pomodoro contributors
+ * Copyright (c) 2022-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -10,7 +10,7 @@ using GLib;
 namespace Pomodoro.Database
 {
     private const uint VERSION = 3;
-    private const string MIGRATIONS_URI = "resource:///org/gnomepomodoro/Pomodoro/migrations";
+    private const string MIGRATIONS_URI = "resource:///io/github/focustimerhq/FocusTimer/migrations";
     private const string DATE_FORMAT = "%Y-%m-%d";  // TODO: make functions to convert date
 
     private Gom.Adapter? adapter = null;
@@ -183,7 +183,7 @@ namespace Pomodoro.Database
         if (!Pomodoro.is_test ())
         {
             var directory_path = GLib.Path.build_filename (GLib.Environment.get_user_data_dir (),
-                                                          Config.PACKAGE_NAME);
+                                                           Config.PACKAGE_NAME);
             var directory_file = GLib.File.new_for_path (directory_path);
 
             if (!directory_file.query_exists ()) {
@@ -193,25 +193,21 @@ namespace Pomodoro.Database
             var file_path = GLib.Path.build_filename (directory_path, "database.sqlite");
             file = GLib.File.new_for_path (file_path);
 
-            if (Pomodoro.is_flatpak ())
-            {
-                var host_file_path = GLib.Path.build_filename (GLib.Environment.get_home_dir (),
-                                                               ".local",
-                                                               "share",
-                                                               Config.PACKAGE_NAME,
-                                                               "database.sqlite");
-                var host_file = GLib.File.new_for_path (host_file_path);
+            var old_file_path = GLib.Path.build_filename (GLib.Environment.get_home_dir (),
+                                                          ".local",
+                                                          "share",
+                                                          "gnome-pomodoro",
+                                                          "database.sqlite");
+            var old_file = GLib.File.new_for_path (old_file_path);
 
-                if (host_file.query_exists () && !file.query_exists ())
-                {
-                    try {
-                        host_file.copy (file, GLib.FileCopyFlags.NONE, null, null);
-                        GLib.info ("Imported database from host to sandbox: %s --> %s",
-                                   host_file_path, file_path);
-                    }
-                    catch (GLib.Error error) {
-                        GLib.warning ("Failed to import host database: %s", error.message);
-                    }
+            if (old_file.query_exists () && !file.query_exists ())
+            {
+                try {
+                    old_file.copy (file, GLib.FileCopyFlags.NONE, null, null);
+                    GLib.info ("Imported database from %s to %s", old_file_path, file_path);
+                }
+                catch (GLib.Error error) {
+                    GLib.warning ("Failed to import database: %s", error.message);
                 }
             }
         }

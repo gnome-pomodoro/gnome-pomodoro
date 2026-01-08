@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=@APPLICATION_ID@
-Exec=@BINDIR@/gnome-pomodoro --gapplication-service

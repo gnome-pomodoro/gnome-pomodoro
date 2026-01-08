@@ -3,12 +3,12 @@
 <node>
 
   <!--
-      org.gnomepomodoro.Pomodoro:
+      io.github.focustimerhq.FocusTimer:
       @short_description: Main application interface
 
       The main interface for controlling the Pomodoro application.
   -->
-  <interface name="org.gnomepomodoro.Pomodoro">
+  <interface name="io.github.focustimerhq.FocusTimer">
 
     <!--
         Version:

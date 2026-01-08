@@ -2,7 +2,7 @@
 libtests_common = static_library(
   'tests',
   'common.vala',
-  dependencies: libgnome_pomodoro_dep,
+  dependencies: libfocus_timer_dep,
   # c_args: [
   #   '-DG_LOG_DOMAIN="Pomodoro"',
   #   '-UG_DISABLE_ASSERT',
@@ -74,7 +74,7 @@ foreach test_name : test_names
     executable(
       f'test-@test_name@',
       test_sources,
-      dependencies: libgnome_pomodoro_dep,
+      dependencies: libfocus_timer_dep,
       link_with: libtests_common,
       c_args: [
         # '-DG_LOG_DOMAIN="Pomodoro"',

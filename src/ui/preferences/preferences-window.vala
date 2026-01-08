@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013,2014,2016,2024 gnome-pomodoro contributors
+ * Copyright (c) 2013,2014,2016,2024 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -82,7 +82,7 @@ namespace Pomodoro
     }
 
 
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/preferences-window.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/preferences-window.ui")]
     public class PreferencesWindow : Adw.ApplicationWindow, Gtk.Buildable
     {
         public Gtk.SingleSelection? model

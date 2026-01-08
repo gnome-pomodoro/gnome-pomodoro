@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2025 gnome-pomodoro contributors
+ * Copyright (c) 2013-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -249,7 +249,7 @@ namespace Pomodoro
             GLib.Object (
                 application_id: Config.APPLICATION_ID,
                 flags: GLib.ApplicationFlags.HANDLES_COMMAND_LINE,
-                resource_base_path: "/org/gnomepomodoro/Pomodoro/"
+                resource_base_path: "/io/github/focustimerhq/FocusTimer/"
             );
         }
 
@@ -509,7 +509,7 @@ namespace Pomodoro
             var display = Gdk.Display.get_default ();
 
             var icon_theme = Gtk.IconTheme.get_for_display (display);
-            icon_theme.add_resource_path ("/org/gnomepomodoro/Pomodoro/icons");
+            icon_theme.add_resource_path ("/io/github/focustimerhq/FocusTimer/icons");
         }
 
         private void setup_capabilities ()

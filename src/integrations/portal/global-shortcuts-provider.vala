@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -73,7 +73,7 @@ namespace Portal
                 options.insert ("handle_token",
                                 new GLib.Variant.string (handle_token));
                 options.insert ("session_handle_token",
-                                new GLib.Variant.string (@"gnomepomodoro_$(timestamp)"));
+                                new GLib.Variant.string (@"focustimer_$(timestamp)"));
 
                 yield this.proxy.create_session (options);
 

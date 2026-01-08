@@ -3,14 +3,14 @@
 <node>
 
   <!--
-      org.gnomepomodoro.Pomodoro.Session:
+      io.github.focustimerhq.FocusTimer.Session:
       @short_description: Session management interface
 
       The session interface provides access to the current pomodoro session,
       including time blocks, cycles, and session state. A session represents
       a continuous period of pomodoro work and breaks until a long break.
   -->
-  <interface name="org.gnomepomodoro.Pomodoro.Session">
+  <interface name="io.github.focustimerhq.FocusTimer.Session">
 
     <!--
         Advance:

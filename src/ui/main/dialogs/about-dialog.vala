@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2025 gnome-pomodoro contributors
+ * Copyright (c) 2013-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -13,7 +13,8 @@ namespace Pomodoro
     {
         var about_dialog = new Adw.AboutDialog ();
         about_dialog.application_icon = Config.APPLICATION_ID;
-        about_dialog.application_name = _("Pomodoro");
+        // translators: consider 'Concentration Timer' as an alternative, whichever sounds more natural
+        about_dialog.application_name = _("Focus Timer");
         about_dialog.version = Config.PACKAGE_VERSION;
         about_dialog.website = Config.PACKAGE_WEBSITE;
         about_dialog.issue_url = Config.PACKAGE_ISSUE_URL;

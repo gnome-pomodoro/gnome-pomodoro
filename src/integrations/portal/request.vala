@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -21,7 +21,7 @@ namespace Portal
                                         Portal.RequestCallback callback) throws GLib.Error
     {
         var request_id     = next_request_id;
-        var handle_token   = "gnomepomodoro_" + request_id.to_string ();
+        var handle_token   = "focustimer_" + request_id.to_string ();
         var sender         = connection.get_unique_name ();
         var sender_escaped = sender.replace (":", "").replace (".", "_");
 

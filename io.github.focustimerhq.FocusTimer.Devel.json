@@ -1,9 +1,9 @@
 {
-  "app-id": "org.gnomepomodoro.Pomodoro.Devel",
+  "app-id": "io.github.focustimerhq.FocusTimer.Devel",
   "runtime": "org.gnome.Platform",
   "runtime-version": "49",
   "sdk": "org.gnome.Sdk",
-  "command": "gnome-pomodoro",
+  "command": "focus-timer",
   "tags": [
     "devel"
   ],
@@ -26,7 +26,7 @@
     "--talk-name=org.gtk.vfs.*",
     "--filesystem=~/.local/share/gnome-pomodoro/:ro",
     "--filesystem=xdg-run/gvfsd",
-    "--env=G_MESSAGES_DEBUG=gnome-pomodoro",
+    "--env=G_MESSAGES_DEBUG=focus-timer",
     "--env=G_ENABLE_DIAGNOSTIC=1"
   ],
   "cleanup": [
@@ -161,7 +161,7 @@
       ]
     },
     {
-      "name": "gnome-pomodoro",
+      "name": "focus-timer",
       "buildsystem": "meson",
       "config-opts": [
         "-Dprofile=development"
