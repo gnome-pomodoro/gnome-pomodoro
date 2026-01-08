@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2025 focus-timer contributors
+ * Copyright (c) 2016-2026 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -35,15 +35,17 @@ namespace Pomodoro
                 (obj, res) => {
                     try {
                         screen_overlay_group.open.end (res);
-
-                        this.cancellable = null;
-                        this.notification_manager.screen_overlay_closed ();
                     }
                     catch (GLib.Error error) {
                         if (!cancellable.is_cancelled ()) {
                             GLib.warning ("Failed to open overlay: %s", error.message);
                             cancellable.cancel ();
                         }
+                    }
+
+                    if (this.cancellable == cancellable) {
+                        this.cancellable = null;
+                        this.notification_manager.screen_overlay_closed ();
                     }
                 });
 

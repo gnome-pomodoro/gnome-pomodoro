@@ -37,6 +37,7 @@ test_names = [
   'session-manager',
   'stats-manager',
   'database',
+  'notification-manager',
   'command',
   'action-manager',
   'matrix',

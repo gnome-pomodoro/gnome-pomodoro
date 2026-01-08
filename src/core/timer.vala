@@ -1027,7 +1027,6 @@ namespace Pomodoro
             var remaining         = this.calculate_remaining (timestamp);
 
             if (remaining > 0 && this.last_tick_time != timestamp_rounded) {
-                this.last_tick_time = timestamp_rounded;
                 this.tick (timestamp_rounded);
             }
 
@@ -1085,7 +1084,11 @@ namespace Pomodoro
          *
          * Ticks are aligned to full seconds of elapsed time.
          */
-        public signal void tick (int64 timestamp);
+        [Signal (run = "first")]
+        public signal void tick (int64 timestamp)
+        {
+            this.last_tick_time = timestamp;
+        }
 
         /**
          * Emitted when countdown is close to zero or passed it.

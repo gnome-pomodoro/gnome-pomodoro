@@ -33,11 +33,12 @@ namespace Pomodoro
         [GtkChild]
         private unowned Pomodoro.LogScaleRow long_break_row;
 
-        private GLib.Settings?  settings;
-        private ulong           settings_changed_id = 0;
-        private Pomodoro.Timer? timer;
-        private ulong           timer_state_changed_id = 0;
-        private Adw.Toast?      apply_changes_toast;
+        private GLib.Settings?        settings;
+        private ulong                 settings_changed_id = 0;
+        private Pomodoro.Timer?       timer;
+        private ulong                 timer_state_changed_id = 0;
+        private Pomodoro.IdleMonitor? idle_monitor;
+        private Adw.Toast?            apply_changes_toast;
 
         construct
         {
@@ -59,6 +60,12 @@ namespace Pomodoro
                                  this.confirm_starting_pomodoro_switchrow,
                                  "active",
                                  GLib.SettingsBindFlags.DEFAULT);
+
+            this.idle_monitor = new Pomodoro.IdleMonitor ();
+            this.idle_monitor.bind_property ("enabled",
+                                             this.confirm_starting_pomodoro_switchrow,
+                                             "visible",
+                                             GLib.BindingFlags.SYNC_CREATE);
 
             this.settings_changed_id = settings.changed.connect (this.on_settings_changed);
 
@@ -230,6 +237,7 @@ namespace Pomodoro
 
             this.settings = null;
             this.timer = null;
+            this.idle_monitor = null;
 
             base.dispose ();
         }

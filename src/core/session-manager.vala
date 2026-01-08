@@ -14,7 +14,7 @@ namespace Pomodoro
     private enum AdvancementMode
     {
         CONTINUOUS,
-        MANUAL,
+        CONFIRM,
         WAIT_FOR_ACTIVITY
     }
 
@@ -833,33 +833,32 @@ namespace Pomodoro
 
             if (current_state == Pomodoro.State.POMODORO) {
                 advancement_mode = this.settings.get_boolean ("confirm-starting-break")
-                        ? Pomodoro.AdvancementMode.MANUAL
+                        ? Pomodoro.AdvancementMode.CONFIRM
                         : Pomodoro.AdvancementMode.CONTINUOUS;
             }
             else if (current_state.is_break ()) {
                 advancement_mode = this.settings.get_boolean ("confirm-starting-pomodoro")
-                        ? Pomodoro.AdvancementMode.MANUAL
+                        ? Pomodoro.AdvancementMode.CONFIRM
                         : Pomodoro.AdvancementMode.WAIT_FOR_ACTIVITY;
             }
 
             switch (advancement_mode)
             {
                 case Pomodoro.AdvancementMode.CONTINUOUS:
-                    // Confirm advancement if user is idle at the end of a pomodoro.
-                    // TODO: only do this if notifications have actions / have indicator
-                    // TODO: perhaps we need to add option to the notification to rewind to the last activity
+                    // Require activity before starting a break if user is idle at the end of
+                    // a pomodoro.
                     if (this._timer.is_finished () &&
                         this.idle_monitor.enabled &&
                         this.idle_monitor.is_idle (CONTINOUS_ADVANCEMENT_IDLE_TIME_LIMIT))
                     {
-                        advancement_mode = Pomodoro.AdvancementMode.MANUAL;
+                        advancement_mode = Pomodoro.AdvancementMode.WAIT_FOR_ACTIVITY;
                     }
                     break;
 
                 case Pomodoro.AdvancementMode.WAIT_FOR_ACTIVITY:
                     // If `IdleMonitor` is not available, use manual confirmation.
                     if (!this.idle_monitor.enabled) {
-                        advancement_mode = Pomodoro.AdvancementMode.MANUAL;
+                        advancement_mode = Pomodoro.AdvancementMode.CONFIRM;
                     }
                     break;
 
@@ -2205,7 +2204,7 @@ namespace Pomodoro
                     this.advance_to_time_block (next_time_block, timestamp);
                     break;
 
-                case Pomodoro.AdvancementMode.MANUAL:
+                case Pomodoro.AdvancementMode.CONFIRM:
                     // Keep the current time-block and let the timer indicate it has finished
                     // until user confirms the advancement. Use it if you're uncertain whether the current state
                     // should be extended.
