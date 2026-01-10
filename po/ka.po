@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the focus-timer package.
 #
 # Authors:
-# Temuri Doghonadze <temuri.doghonadze@gmail.com>, 2024-2025.
+# Temuri Doghonadze <temuri.doghonadze@gmail.com>, 2024-2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-10 11:02+0100\n"
-"PO-Revision-Date: 2025-12-22 11:37+0100\n"
+"POT-Creation-Date: 2026-01-10 11:31+0100\n"
+"PO-Revision-Date: 2026-01-10 15:43+0100\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian\n"
 "Language: ka\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:9 src/main.vala:34
 #: src/ui/main/dialogs/about-dialog.vala:17
 msgid "Focus Timer"
-msgstr ""
+msgstr "Focus Timer"
 
 #: data/io.github.focustimerhq.FocusTimer.desktop.in.in:3
 msgid "Time management utility"
@@ -34,7 +34,7 @@ msgstr "დროის მართვის პროგრამა"
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/io.github.focustimerhq.FocusTimer.desktop.in.in:5
 msgid "pomodoro;timer;"
-msgstr ""
+msgstr "pomodoro;timer;ტაიმერი;"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:10
 msgid "Maintain focus by taking frequent breaks"
@@ -223,15 +223,15 @@ msgstr "Pomodoro-ის გაშვება"
 
 #: src/application.vala:160
 msgid "Start break"
-msgstr ""
+msgstr "შესვენების დაწყება"
 
 #: src/application.vala:163
 msgid "Start short break"
-msgstr ""
+msgstr "მოკლე დასვენების დასაწყისი"
 
 #: src/application.vala:166
 msgid "Start long break"
-msgstr ""
+msgstr "გრძელი დასვენების დასაწყისი"
 
 #. Actions
 #: src/application.vala:169 src/application.vala:611 src/core/event.vala:268
@@ -268,7 +268,7 @@ msgstr "გადახვევა"
 
 #: src/application.vala:185 src/application.vala:188
 msgid "SECONDS"
-msgstr ""
+msgstr "წამი"
 
 #: src/application.vala:187
 msgid "Extend current pomodoro or break"
@@ -281,7 +281,7 @@ msgstr "ჩამოყრა"
 
 #: src/application.vala:193
 msgid "Print timer status"
-msgstr ""
+msgstr "ტაიმერის სტატუსის გამოტანა"
 
 #: src/application.vala:196
 msgid "Show preferences"
@@ -297,16 +297,16 @@ msgstr "ვერსიის ჩვენება და გასვლა"
 
 #: src/application.vala:236
 msgid "Timer Options:"
-msgstr ""
+msgstr "ტაიმერის მორგება:"
 
 #: src/application.vala:237
 msgid "Show options for controlling the timer"
-msgstr ""
+msgstr "ტაიმერის მართვის პარამეტრების ჩვენება"
 
 #: src/application.vala:244
 #, c-format
 msgid "Bugs may be reported at: %s"
-msgstr ""
+msgstr "შეცდომების შესახებ მოგვწერეთ მისამართზე: %s"
 
 #: src/application.vala:623
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
@@ -322,6 +322,8 @@ msgstr "დარჩენილია %s"
 #: src/application.vala:829
 msgid "Invalid use. Pass one flag for controlling the timer at a time."
 msgstr ""
+"არასწორი გამოყენება. ერთდროულად შესაძლებელია ტაიმერის მართვის, მხოლოდ, ერთი "
+"ალმის გადაცემა."
 
 #: src/core/action-manager.vala:111
 #, c-format
@@ -1526,21 +1528,3 @@ msgstr "გადატარება"
 msgctxt "accessibility"
 msgid "Sidebar"
 msgstr "გვერდითი პანელი"
-
-#~ msgid "@APPLICATION_NAME@"
-#~ msgstr "@APPLICATION_NAME@"
-
-#~ msgid "timer;"
-#~ msgstr "ტაიმერი;წამმზომი;"
-
-#~ msgid "Start/Stop"
-#~ msgstr "გაშვება/გაჩერება"
-
-#~ msgid "Pause/Resume"
-#~ msgstr "პაუზა/გაგრძელება"
-
-#~ msgid "Skip to a pomodoro or to a break"
-#~ msgstr "გადასვლა პომოდოროზე ან შესვენებაზე"
-
-#~ msgid "Reset current session"
-#~ msgstr "მიმდინარე სესიის ჩამოყრა"
