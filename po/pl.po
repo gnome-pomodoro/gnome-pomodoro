@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the focus-timer package.
 #
 # Authors:
-# Kamil Prusko <kamilprusko@gmail.com>, 2012 -2025.
+# Kamil Prusko <kamilprusko@gmail.com>, 2012 -2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-10 11:02+0100\n"
-"PO-Revision-Date: 2025-12-20 17:12+0100\n"
+"PO-Revision-Date: 2026-01-10 12:04+0100\n"
 "Last-Translator: Kamil Prusko <kamilprusko@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
@@ -26,7 +26,7 @@ msgstr ""
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:9 src/main.vala:34
 #: src/ui/main/dialogs/about-dialog.vala:17
 msgid "Focus Timer"
-msgstr ""
+msgstr "Minutnik Koncentracji"
 
 #: data/io.github.focustimerhq.FocusTimer.desktop.in.in:3
 msgid "Time management utility"
@@ -35,7 +35,7 @@ msgstr "Narzędzie do zarządzania czasem"
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/io.github.focustimerhq.FocusTimer.desktop.in.in:5
 msgid "pomodoro;timer;"
-msgstr ""
+msgstr "pomodoro;minutnik;timer;"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:10
 msgid "Maintain focus by taking frequent breaks"
@@ -222,19 +222,19 @@ msgstr "Rozpocznij, wstrzymaj lub wznów"
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Start Pomodoro"
-msgstr "Zacznij pomodoro"
+msgstr "Rozpocznij pomodoro"
 
 #: src/application.vala:160
 msgid "Start break"
-msgstr ""
+msgstr "Rozpocznij przerwę"
 
 #: src/application.vala:163
 msgid "Start short break"
-msgstr ""
+msgstr "Rozpocznij krótką przerwę"
 
 #: src/application.vala:166
 msgid "Start long break"
-msgstr ""
+msgstr "Rozpocznij długą przerwę"
 
 #. Actions
 #: src/application.vala:169 src/application.vala:611 src/core/event.vala:268
@@ -271,7 +271,7 @@ msgstr "Przewiń"
 
 #: src/application.vala:185 src/application.vala:188
 msgid "SECONDS"
-msgstr ""
+msgstr "SEKUNDY"
 
 #: src/application.vala:187
 msgid "Extend current pomodoro or break"
@@ -284,7 +284,7 @@ msgstr "Resetuj"
 
 #: src/application.vala:193
 msgid "Print timer status"
-msgstr ""
+msgstr "Wyświetl stan minutnika"
 
 #: src/application.vala:196
 msgid "Show preferences"
@@ -300,16 +300,16 @@ msgstr "Wyświetl wersję aplikacji"
 
 #: src/application.vala:236
 msgid "Timer Options:"
-msgstr ""
+msgstr "Opcje Minutnika:"
 
 #: src/application.vala:237
 msgid "Show options for controlling the timer"
-msgstr ""
+msgstr "Wyświetla opcje sterowania minutnikiem"
 
 #: src/application.vala:244
 #, c-format
 msgid "Bugs may be reported at: %s"
-msgstr ""
+msgstr "Błędy można zgłaszać pod adresem: %s"
 
 #: src/application.vala:623
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
@@ -325,6 +325,7 @@ msgstr "Pozostało %s"
 #: src/application.vala:829
 msgid "Invalid use. Pass one flag for controlling the timer at a time."
 msgstr ""
+"Nieprawidłowe użycie. Przekaż jedną flagę do sterowania minutnikiem na raz."
 
 #: src/core/action-manager.vala:111
 #, c-format
