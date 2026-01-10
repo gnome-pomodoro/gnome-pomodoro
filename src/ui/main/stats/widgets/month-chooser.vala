@@ -101,7 +101,7 @@ namespace Pomodoro
         private Gtk.Button create_month_button (GLib.Date date)
         {
             var button = new Gtk.Button ();
-            button.label = Pomodoro.DateUtils.format_date (date, "%b");
+            button.label = capitalize_words (Pomodoro.DateUtils.format_date (date, "%b"));
             button.add_css_class ("pill");
             button.add_css_class ("flat");
             button.add_css_class ("month");

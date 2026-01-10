@@ -185,7 +185,7 @@ namespace Pomodoro
         }
 
         /**
-         * We place weekday labels as first row of the grid.
+         * Place weekday labels as first row of the grid.
          */
         private void update_weekday_labels ()
         {
@@ -196,7 +196,7 @@ namespace Pomodoro
             for (var column = 0; column < DAYS_PER_WEEK; column++)
             {
                 var day_name = Pomodoro.DateUtils.format_date (date, "%a");
-                var day_letter = day_name.get_char (0).to_string ();
+                var day_letter = day_name.get_char (0).toupper ().to_string ();
 
                 var label = new Gtk.Label (day_letter);
                 label.add_css_class ("dim-label");
@@ -226,7 +226,8 @@ namespace Pomodoro
 
         private void update_header ()
         {
-            var month_name = Pomodoro.DateUtils.get_month_name (this._display_month);
+            var month_name = capitalize_words (
+                    Pomodoro.DateUtils.get_month_name (this._display_month));
             var year = (int) this._display_year;
 
             this.header_label.label = @"$(month_name) $(year)";
