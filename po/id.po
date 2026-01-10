@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-20 11:56+0100\n"
+"POT-Creation-Date: 2026-01-10 11:02+0100\n"
 "PO-Revision-Date: 2025-12-23 20:58+0700\n"
 "Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian\n"
@@ -21,38 +21,27 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.8\n"
 
-#. Translators: Do NOT translate or transliterate this text
-#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:3
-msgid "@APPLICATION_NAME@"
-msgstr "@APPLICATION_NAME@"
+#. translators: consider 'Concentration Timer' as an alternative, whichever sounds more natural
+#: data/io.github.focustimerhq.FocusTimer.desktop.in.in:2
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:9 src/main.vala:34
+#: src/ui/main/dialogs/about-dialog.vala:17
+msgid "Focus Timer"
+msgstr ""
 
-#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
+#: data/io.github.focustimerhq.FocusTimer.desktop.in.in:3
 msgid "Time management utility"
 msgstr "Utilitas manajemen waktu"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
-msgid "timer;"
-msgstr "timer;pewaktu;pengatur waktu;"
+#: data/io.github.focustimerhq.FocusTimer.desktop.in.in:5
+msgid "pomodoro;timer;"
+msgstr ""
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
-#: src/core/notification-manager.vala:335 src/core/state.vala:78
-#: src/main.vala:34 src/ui/main/dialogs/about-dialog.vala:16
-#: src/ui/main/stats/stats-day-page.ui:97
-#: src/ui/main/stats/stats-day-page.vala:87
-#: src/ui/main/stats/stats-month-page.ui:34
-#: src/ui/main/stats/stats-month-page.vala:43
-#: src/ui/main/stats/stats-week-page.ui:38
-#: src/ui/main/stats/stats-week-page.vala:41 src/ui/main/window.vala:183
-#: src/ui/preferences/automation/action/condition-widget.ui:53
-msgid "Pomodoro"
-msgstr "Pomodoro"
-
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:10
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:10
 msgid "Maintain focus by taking frequent breaks"
 msgstr "Menjaga fokus dengan mengambil rehat secara berkala"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:12
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:12
 msgid ""
 "A productivity timer that helps you work more effectively by breaking your "
 "time into focused work sessions followed by short breaks. Work for 25 "
@@ -64,236 +53,277 @@ msgstr ""
 "Bekerja selama 25 menit, lalu ambil rehat 5 menit untuk menjaga konsentrasi "
 "dan mencegah kelelahan kerja (burnout)."
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:16
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:16
 msgid "Key features:"
 msgstr "Fitur utama:"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:20
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:20
 msgid "Customizable work session and break lengths"
 msgstr "Durasi sesi kerja dan rehat yang dapat disesuaikan"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:21
 msgid "Visual and audio notifications"
 msgstr "Notifikasi visual dan audio"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:22
 msgid "Time tracking and statistics"
 msgstr "Pelacakan waktu dan statistik"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:23
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:23
 msgid "GNOME desktop integration"
 msgstr "Integrasi desktop GNOME"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:24
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:24
 msgid "Screen overlay during breaks"
 msgstr "Hamparan layar selama rehat"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:25
 msgid "Run custom commands after Pomodoro or break"
 msgstr "Jalankan perintah ubahan setelah Pomodoro atau rehat"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:48
 msgid "Kamil Prusko"
 msgstr "Kamil Prusko"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:67 src/ui/main/window.ui:76
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:67
+#: src/ui/main/window.ui:76
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:37
 #: src/ui/preferences/preferences-window.vala:30
 msgid "Timer"
 msgstr "Timer"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:71
 msgid "Compact timer"
 msgstr "Timer ringkas"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:75
 msgid "Daily stats"
 msgstr "Statistik harian"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:79
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:79
 msgid "Monthly stats"
 msgstr "Statistik bulanan"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:83
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:83
 #: src/ui/preferences/preferences-window.ui:6
 msgid "Preferences"
 msgstr "Preferensi"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:87
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:87
 msgid "Screen overlay"
 msgstr "Hamparan layar"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:95
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:95
 msgid "Overview of changes in gnome-pomodoro 0.28.1"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.28.1"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:97
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:97
 msgid "Added Tamil translation (thanks @omeritzics)"
 msgstr "Menambahkan terjemahan Tamil (terima kasih @omeritzics)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:98
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:98
 msgid "Added Hebrew translation (thanks @Killersparrow1)"
 msgstr "Menambahkan terjemahan Ibrani (terima kasih @Killersparrow1)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:104
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:104
 msgid "Overview of changes in gnome-pomodoro 0.28.0"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.28.0"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:106
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
 msgstr "Dukungan untuk GNOME Shell 49 (terima kasih @aleasto)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:107
 msgid "Updated German translation (thanks @daPhipz)"
 msgstr "Pembaruan terjemahan Jerman (terima kasih @daPhipz)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:113
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:113
 msgid "Overview of changes in gnome-pomodoro 0.27.0"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.27.0"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:115
 msgid "Support for GNOME Shell 48"
 msgstr "Dukungan untuk GNOME Shell 48"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:116
 msgid "Split time spent across midnight"
 msgstr "Pisahkan waktu yang dihabiskan melewati tengah malam"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:117
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:117
 msgid "Added Telugu translation (thanks @SpaciousCoder78)"
 msgstr "Menambahkan terjemahan Telugu (terima kasih @SpaciousCoder78)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:123
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:123
 msgid "Overview of changes in gnome-pomodoro 0.26.0"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.26.0"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:125
 msgid "Support for GNOME Shell 47"
 msgstr "Dukungan untuk GNOME Shell 47"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:126
 msgid "Allow to dismiss screen overlay by gesture when a video is playing"
 msgstr "Izinkan untuk menutup hamparan layar dengan gestur saat video diputar"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:127
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:127
 msgid "Added Georgian translation (thanks @NorwayFun)"
 msgstr "Menambahkan terjemahan Georgia (terima kasih @NorwayFun)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:128
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:128
 msgid "Adjusted translations in appdata (thanks @yakushabb)"
 msgstr "Penyesuaian terjemahan dalam appdata (terima kasih @yakushabb)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:134
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:134
 msgid "Overview of changes in gnome-pomodoro 0.25.2"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.25.2"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:136
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:136
 msgid "Fix keeping notification after extending Pomodoro"
 msgstr "Perbaikan notifikasi yang menetap setelah memperpanjang Pomodoro"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:142
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:142
 msgid "Overview of changes in gnome-pomodoro 0.25.1"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.25.1"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:144
 msgid "Fixes for GNOME Shell 46"
 msgstr "Perbaikan untuk GNOME Shell 46"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:145
 msgid "Drop support for GNOME Shell 45"
 msgstr "Hentikan dukungan untuk GNOME Shell 45"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:151
 msgid "Overview of changes in gnome-pomodoro 0.25.0"
 msgstr "Ringkasan perubahan di gnome-pomodoro 0.25.0"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:153
 msgid "Support for GNOME Shell 46"
 msgstr "Dukungan untuk GNOME Shell 46"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:154
 msgid "Adjust build script to meson 0.59.0 (thanks @mattst88)"
 msgstr "Sesuaikan skrip build ke meson 0.59.0 (terima kasih @mattst88)"
 
-#: src/application.vala:42
-msgid "Start/Stop"
-msgstr "Mulai/Berhenti"
+#: src/application.vala:151 src/application.vala:606
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
+msgid "Start or Stop"
+msgstr "Mulai atau Berhenti"
+
+#: src/application.vala:154 src/application.vala:609
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
+msgid "Start, Pause or Resume"
+msgstr "Mulai, Jeda, atau Lanjut"
+
+#: src/application.vala:157 src/core/notification-manager.vala:502
+#: src/core/notification-manager.vala:598
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:69
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:314
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:330
+msgid "Start Pomodoro"
+msgstr "Mulai Pomodoro"
+
+#: src/application.vala:160
+msgid "Start break"
+msgstr ""
+
+#: src/application.vala:163
+msgid "Start short break"
+msgstr ""
+
+#: src/application.vala:166
+msgid "Start long break"
+msgstr ""
 
 #. Actions
-#: src/application.vala:45 src/application.vala:482 src/core/event.vala:268
+#: src/application.vala:169 src/application.vala:611 src/core/event.vala:268
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:57
 msgid "Start"
 msgstr "Mulai"
 
-#: src/application.vala:48 src/application.vala:484 src/core/event.vala:276
+#: src/application.vala:172 src/application.vala:613 src/core/event.vala:276
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:139
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:64
 msgid "Stop"
 msgstr "Berhenti"
 
-#: src/application.vala:51
-msgid "Pause/Resume"
-msgstr "Jeda/Lanjut"
-
-#: src/application.vala:54 src/application.vala:486 src/core/event.vala:284
+#: src/application.vala:175 src/application.vala:615 src/core/event.vala:284
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:83
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:71
 msgid "Pause"
 msgstr "Jeda"
 
-#: src/application.vala:57 src/application.vala:488 src/core/event.vala:292
+#: src/application.vala:178 src/application.vala:617 src/core/event.vala:292
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:97
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:78
 msgid "Resume"
 msgstr "Lanjut"
 
-#: src/application.vala:60
-msgid "Skip to a pomodoro or to a break"
-msgstr "Lewati ke pomodoro atau rehat"
-
-#: src/application.vala:63
-msgid "Extend current pomodoro or break"
-msgstr "Perpanjang pomodoro saat ini atau rehat"
-
-#: src/application.vala:66
-msgid "Reset current session"
-msgstr "Setel ulang sesi saat ini"
-
-#: src/application.vala:69
-msgid "Show preferences"
-msgstr "Tampilkan preferensi"
-
-#: src/application.vala:72
-msgid "Quit application"
-msgstr "Keluar aplikasi"
-
-#: src/application.vala:75
-msgid "Print version information and exit"
-msgstr "Cetak informasi versi dan keluar"
-
-#: src/application.vala:477
-#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
-msgid "Start or Stop"
-msgstr "Mulai atau Berhenti"
-
-#: src/application.vala:480
-#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
-msgid "Start, Pause or Resume"
-msgstr "Mulai, Jeda, atau Lanjut"
-
-#: src/application.vala:490 src/core/event.vala:300
+#: src/application.vala:181 src/application.vala:619 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
 msgid "Skip"
 msgstr "Lewati"
 
-#: src/application.vala:492 src/core/event.vala:308
+#: src/application.vala:184 src/application.vala:621 src/core/event.vala:308
 msgid "Rewind"
 msgstr "Putar balik"
 
-#: src/application.vala:494
+#: src/application.vala:185 src/application.vala:188
+msgid "SECONDS"
+msgstr ""
+
+#: src/application.vala:187
+msgid "Extend current pomodoro or break"
+msgstr "Perpanjang pomodoro saat ini atau rehat"
+
+#: src/application.vala:190 src/core/event.vala:316
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:39
+msgid "Reset"
+msgstr "Setel ulang"
+
+#: src/application.vala:193
+msgid "Print timer status"
+msgstr ""
+
+#: src/application.vala:196
+msgid "Show preferences"
+msgstr "Tampilkan preferensi"
+
+#: src/application.vala:199
+msgid "Quit application"
+msgstr "Keluar aplikasi"
+
+#: src/application.vala:202
+msgid "Print version information and exit"
+msgstr "Cetak informasi versi dan keluar"
+
+#: src/application.vala:236
+msgid "Timer Options:"
+msgstr ""
+
+#: src/application.vala:237
+msgid "Show options for controlling the timer"
+msgstr ""
+
+#: src/application.vala:244
+#, c-format
+msgid "Bugs may be reported at: %s"
+msgstr ""
+
+#: src/application.vala:623
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
 msgid "Bring to Focus"
 msgstr "Bawa ke Fokus"
+
+#. translators: time remaining eg. "3 minutes 50 seconds remaining"
+#: src/application.vala:786 src/core/notification-manager.vala:188
+#, c-format
+msgid "%s remaining"
+msgstr "tersisa %s"
+
+#: src/application.vala:829
+msgid "Invalid use. Pass one flag for controlling the timer at a time."
+msgstr ""
 
 #: src/core/action-manager.vala:111
 #, c-format
@@ -382,11 +412,6 @@ msgid "Rewind action has been used. It adds a pause in the past."
 msgstr ""
 "Aksi putar balik telah digunakan. Ini menambahkan jeda pada waktu lampau."
 
-#: src/core/event.vala:316
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:39
-msgid "Reset"
-msgstr "Setel ulang"
-
 #: src/core/event.vala:317
 msgid "Manually cleared the session."
 msgstr "Membersihkan sesi secara manual."
@@ -456,84 +481,81 @@ msgstr "Kedaluwarsa"
 msgid "Triggered when session is about to be reset due to inactivity."
 msgstr "Dipicu ketika sesi akan disetel ulang karena tidak ada aktivitas."
 
-#. translators: time remaining eg. "3 minutes 50 seconds remaining"
-#: src/core/notification-manager.vala:130
-#, c-format
-msgid "%s remaining"
-msgstr "tersisa %s"
+#: src/core/notification-manager.vala:420 src/core/state.vala:78
+#: src/ui/main/stats/stats-day-page.ui:98
+#: src/ui/main/stats/stats-day-page.vala:87
+#: src/ui/main/stats/stats-month-page.ui:35
+#: src/ui/main/stats/stats-month-page.vala:43
+#: src/ui/main/stats/stats-week-page.ui:39
+#: src/ui/main/stats/stats-week-page.vala:41 src/ui/main/window.vala:184
+#: src/ui/preferences/automation/action/condition-widget.ui:53
+msgid "Pomodoro"
+msgstr "Pomodoro"
 
-#: src/core/notification-manager.vala:339
+#: src/core/notification-manager.vala:424
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Take a break"
 msgstr "Waktunya rehat"
 
-#: src/core/notification-manager.vala:343
+#: src/core/notification-manager.vala:428
 msgid "Take a short break"
 msgstr "Rehat sejenak"
 
-#: src/core/notification-manager.vala:347
+#: src/core/notification-manager.vala:432
 msgid "Take a long break"
 msgstr "Rehat panjang"
 
-#: src/core/notification-manager.vala:394
+#: src/core/notification-manager.vala:494
 msgid "Pomodoro is about to end"
 msgstr "Pomodoro akan berakhir"
 
-#: src/core/notification-manager.vala:395
 #: src/core/notification-manager.vala:495
-#: src/core/notification-manager.vala:500
-#: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
+#: src/core/notification-manager.vala:603
+#: src/core/notification-manager.vala:608
+#: src/core/notification-manager.vala:613 src/ui/overlays/screen-overlay.ui:5
 msgid "Take a Break"
 msgstr "Waktunya Rehat"
 
-#: src/core/notification-manager.vala:401
+#: src/core/notification-manager.vala:501
 msgid "Break is about to end"
 msgstr "Rehat akan berakhir"
 
-#: src/core/notification-manager.vala:402
-#: src/core/notification-manager.vala:490
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:69
-#: src/ui/main/timer/widgets/timer-control-buttons.vala:314
-#: src/ui/main/timer/widgets/timer-control-buttons.vala:330
-msgid "Start Pomodoro"
-msgstr "Mulai Pomodoro"
-
-#: src/core/notification-manager.vala:411
+#: src/core/notification-manager.vala:511
 msgid "+1 minute"
 msgstr "+1 menit"
 
-#: src/core/notification-manager.vala:432
+#: src/core/notification-manager.vala:536
 msgid "Get ready…"
 msgstr "Siap-siap…"
 
-#: src/core/notification-manager.vala:437
-#: src/core/notification-manager.vala:473
+#: src/core/notification-manager.vala:541
+#: src/core/notification-manager.vala:581
 msgid "Pomodoro is over!"
 msgstr "Pomodoro telah usai!"
 
-#: src/core/notification-manager.vala:443
-#: src/core/notification-manager.vala:479
+#: src/core/notification-manager.vala:547
+#: src/core/notification-manager.vala:587
 msgid "Break is over!"
 msgstr "Rehat telah usai!"
 
-#: src/core/notification-manager.vala:489
+#: src/core/notification-manager.vala:597
 msgid "Confirm the start of a Pomodoro…"
 msgstr "Konfirmasi awal Pomodoro…"
 
-#: src/core/notification-manager.vala:494
+#: src/core/notification-manager.vala:602
 msgid "Confirm the start of a break…"
 msgstr "Konfirmasi awal rehat…"
 
-#: src/core/notification-manager.vala:499
+#: src/core/notification-manager.vala:607
 msgid "Confirm the start of a short break…"
 msgstr "Konfirmasi awal rehat pendek…"
 
-#: src/core/notification-manager.vala:504
+#: src/core/notification-manager.vala:612
 msgid "Confirm the start of a long break…"
 msgstr "Konfirmasi awal rehat panjang…"
 
-#: src/core/notification-manager.vala:516
+#: src/core/notification-manager.vala:624
 msgid "Skip Break"
 msgstr "Lewati Rehat"
 
@@ -665,46 +687,46 @@ msgstr "Tidak digunakan"
 msgid "Log"
 msgstr "Log"
 
-#: src/ui/log/log-window.ui:38
+#: src/ui/log/log-window.ui:37
 msgid "Empty Log"
 msgstr "Log Kosong"
 
-#: src/ui/log/log-window.ui:39
+#: src/ui/log/log-window.ui:38
 msgid "Entries will show up here once you start the timer."
 msgstr "Entri akan muncul di sini setelah Anda memulai timer."
 
-#: src/ui/log/log-window.ui:165
+#: src/ui/log/log-window.ui:164
 msgid "Context"
 msgstr "Konteks"
 
-#: src/ui/log/log-window.ui:190
+#: src/ui/log/log-window.ui:189
 #: src/ui/preferences/automation/action/action-edit-window.ui:186
 msgid "Command"
 msgstr "Perintah"
 
-#: src/ui/log/log-window.ui:214
+#: src/ui/log/log-window.ui:213
 msgid "Output"
 msgstr "Keluaran"
 
-#: src/ui/log/log-window.ui:238
+#: src/ui/log/log-window.ui:237
 msgid "Error"
 msgstr "Galat"
 
-#: src/ui/log/log-window.ui:267
+#: src/ui/log/log-window.ui:266
 msgid "Exit Code:"
 msgstr "Kode Keluar:"
 
-#: src/ui/log/log-window.ui:278
+#: src/ui/log/log-window.ui:277
 msgid "Execution Time:"
 msgstr "Waktu Eksekusi:"
 
-#: src/ui/main/dialogs/about-dialog.vala:29
+#: src/ui/main/dialogs/about-dialog.vala:30
 msgid "translator-credits"
 msgstr ""
 "Ali <admin@situsali.com>, 2017\n"
 "Andika Triwidada <andika@gmail.com>, 2020, 2025"
 
-#: src/ui/main/dialogs/about-dialog.vala:35
+#: src/ui/main/dialogs/about-dialog.vala:36
 msgid "Donate"
 msgstr "Donasi"
 
@@ -796,26 +818,26 @@ msgstr "Pemasangan ekstensi tidak diizinkan"
 msgid "Failed to download the extension"
 msgstr "Gagal mengunduh ekstensi"
 
-#: src/ui/main/stats/stats-day-page.ui:104
+#: src/ui/main/stats/stats-day-page.ui:105
 #: src/ui/main/stats/stats-day-page.vala:92
-#: src/ui/main/stats/stats-month-page.ui:41
+#: src/ui/main/stats/stats-month-page.ui:42
 #: src/ui/main/stats/stats-month-page.vala:48
-#: src/ui/main/stats/stats-week-page.ui:45
+#: src/ui/main/stats/stats-week-page.ui:46
 #: src/ui/main/stats/stats-week-page.vala:46
 msgid "Breaks"
 msgstr "Rehat"
 
-#: src/ui/main/stats/stats-day-page.ui:111
-#: src/ui/main/stats/stats-month-page.ui:48
+#: src/ui/main/stats/stats-day-page.ui:112
+#: src/ui/main/stats/stats-month-page.ui:49
 #: src/ui/main/stats/stats-month-page.vala:53
-#: src/ui/main/stats/stats-week-page.ui:52
+#: src/ui/main/stats/stats-week-page.ui:53
 #: src/ui/main/stats/stats-week-page.vala:51
 msgid "Interruptions"
 msgstr "Gangguan"
 
-#: src/ui/main/stats/stats-day-page.ui:118
-#: src/ui/main/stats/stats-month-page.ui:55
-#: src/ui/main/stats/stats-week-page.ui:59
+#: src/ui/main/stats/stats-day-page.ui:119
+#: src/ui/main/stats/stats-month-page.ui:56
+#: src/ui/main/stats/stats-week-page.ui:60
 msgid "Break Ratio"
 msgstr "Rasio Rehat"
 
@@ -842,42 +864,42 @@ msgstr "Belum ada yang dapat dilihat di sini"
 msgid "Finish a few Pomodoros to fill this up!"
 msgstr "Selesaikan beberapa Pomodoro untuk mengisi bagian ini!"
 
-#: src/ui/main/stats/stats-view.vala:792
+#: src/ui/main/stats/stats-view.vala:831
 #, c-format
 msgid "Skipped %u day"
 msgid_plural "Skipped %u days"
 msgstr[0] "Melewati %u hari"
 
-#: src/ui/main/stats/stats-view.vala:798
+#: src/ui/main/stats/stats-view.vala:837
 #, c-format
 msgid "Skipped %u week"
 msgid_plural "Skipped %u weeks"
 msgstr[0] "Melewati %u minggu"
 
-#: src/ui/main/stats/stats-view.vala:804
+#: src/ui/main/stats/stats-view.vala:843
 #, c-format
 msgid "Skipped %u month"
 msgid_plural "Skipped %u months"
 msgstr[0] "Melewati %u bulan"
 
-#: src/ui/main/stats/stats-view.vala:1002
+#: src/ui/main/stats/stats-view.vala:1041
 msgid "Today"
 msgstr "Hari ini"
 
-#: src/ui/main/stats/stats-view.vala:1007
+#: src/ui/main/stats/stats-view.vala:1046
 msgid "Yesterday"
 msgstr "Kemarin"
 
-#: src/ui/main/stats/stats-view.vala:1028
+#: src/ui/main/stats/stats-view.vala:1067
 msgid "This week"
 msgstr "Minggu Ini"
 
-#: src/ui/main/stats/stats-view.vala:1048
+#: src/ui/main/stats/stats-view.vala:1087
 #, c-format
 msgid "Week %u"
 msgstr "Minggu %u"
 
-#: src/ui/main/stats/stats-view.vala:1049
+#: src/ui/main/stats/stats-view.vala:1088
 #, c-format
 msgid "Week %u of %u"
 msgstr "Minggu %u dari %u"
@@ -908,11 +930,11 @@ msgstr "_Rehat"
 msgid "Open screen overlay"
 msgstr "Buka hamparan layar"
 
-#: src/ui/main/timer/timer-view.vala:244
+#: src/ui/main/timer/timer-view.vala:246
 msgid "Session has expired"
 msgstr "Sesi telah kedaluwarsa"
 
-#: src/ui/main/timer/widgets/session-progress-bar.vala:1398
+#: src/ui/main/timer/widgets/session-progress-bar.vala:1472
 #, c-format
 msgid "Long break due in <b>%s</b>"
 msgstr "Rehat panjang dalam <b>%s</b>"
@@ -945,19 +967,19 @@ msgstr "Menu Utama"
 msgid "Stats"
 msgstr "Statistik"
 
-#: src/ui/main/window.vala:301
+#: src/ui/main/window.vala:302
 msgid "GNOME Shell extension available"
 msgstr "Ekstensi GNOME Shell tersedia"
 
-#: src/ui/main/window.vala:302
+#: src/ui/main/window.vala:303
 msgid "Learn More"
 msgstr "Pelajari Selengkapnya"
 
-#: src/ui/main/window.vala:324
+#: src/ui/main/window.vala:325
 msgid "Keep timer running?"
 msgstr "Biarkan timer berjalan?"
 
-#: src/ui/main/window.vala:325
+#: src/ui/main/window.vala:326
 msgid ""
 "You can keep it running in the background — notifications and keyboard "
 "shortcuts will still work."
@@ -965,15 +987,15 @@ msgstr ""
 "Anda dapat membiarkannya berjalan di latar belakang — notifikasi dan "
 "pintasan papan ketik akan tetap berfungsi."
 
-#: src/ui/main/window.vala:329
+#: src/ui/main/window.vala:330
 msgid "Quit"
 msgstr "Keluar"
 
-#: src/ui/main/window.vala:332
+#: src/ui/main/window.vala:333
 msgid "Run in background"
 msgstr "Jalankan di latar belakang"
 
-#: src/ui/overlays/screen-overlay.ui:65
+#: src/ui/overlays/screen-overlay.ui:64
 msgid "It's time to take a break"
 msgstr "Waktunya rehat"
 
@@ -1484,25 +1506,25 @@ msgid "Confirm Starting a Pomodoro"
 msgstr "Konfirmasi Memulai Pomodoro"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
-#: src/ui/preferences/timer/preferences-panel-timer.vala:87
+#: src/ui/preferences/timer/preferences-panel-timer.vala:94
 #, c-format
 msgid "A single session will take <b>%s</b>."
 msgstr "Satu sesi tunggal akan memakan waktu <b>%s</b>."
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:88
+#: src/ui/preferences/timer/preferences-panel-timer.vala:95
 #, c-format
 msgid "<b>%u%%</b> of the time will be allocated for breaks."
 msgstr "<b>%u%%</b> waktu akan dialokasikan untuk rehat."
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:136
+#: src/ui/preferences/timer/preferences-panel-timer.vala:143
 msgid "Apply changes to ongoing Pomodoro?"
 msgstr "Terapkan perubahan pada Pomodoro yang sedang berjalan?"
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:137
+#: src/ui/preferences/timer/preferences-panel-timer.vala:144
 msgid "Apply changes to ongoing break?"
 msgstr "Terapkan perubahan pada rehat yang sedang berjalan?"
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:139
+#: src/ui/preferences/timer/preferences-panel-timer.vala:146
 msgid "Apply"
 msgstr "Terapkan"
 
@@ -1510,6 +1532,24 @@ msgstr "Terapkan"
 msgctxt "accessibility"
 msgid "Sidebar"
 msgstr "Bilah Sisi"
+
+#~ msgid "@APPLICATION_NAME@"
+#~ msgstr "@APPLICATION_NAME@"
+
+#~ msgid "timer;"
+#~ msgstr "timer;pewaktu;pengatur waktu;"
+
+#~ msgid "Start/Stop"
+#~ msgstr "Mulai/Berhenti"
+
+#~ msgid "Pause/Resume"
+#~ msgstr "Jeda/Lanjut"
+
+#~ msgid "Skip to a pomodoro or to a break"
+#~ msgstr "Lewati ke pomodoro atau rehat"
+
+#~ msgid "Reset current session"
+#~ msgstr "Setel ulang sesi saat ini"
 
 #~ msgid "Run as background service"
 #~ msgstr "Jalankan sebagai layanan latar belakang"

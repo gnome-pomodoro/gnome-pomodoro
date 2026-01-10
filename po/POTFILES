@@ -1,5 +1,5 @@
-data/org.gnomepomodoro.Pomodoro.desktop.in.in
-data/org.gnomepomodoro.Pomodoro.metainfo.xml.in
+data/io.github.focustimerhq.FocusTimer.desktop.in.in
+data/io.github.focustimerhq.FocusTimer.metainfo.xml.in
 src/application.vala
 src/capabilities/global-shortcuts.vala
 src/capabilities/notifications.vala

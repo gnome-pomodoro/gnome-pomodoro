@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-20 11:56+0100\n"
+"POT-Creation-Date: 2026-01-10 11:31+0100\n"
 "PO-Revision-Date: 2023-03-24 16:00+0100\n"
 "Last-Translator: Tuomas Jaakola <tuomas.jaakola@iki.fi>\n"
 "Language-Team: Finnish\n"
@@ -20,40 +20,29 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.1.1\n"
 
-#. Translators: Do NOT translate or transliterate this text
-#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:3
-msgid "@APPLICATION_NAME@"
-msgstr "@APPLICATION_NAME@"
+#. translators: consider 'Concentration Timer' as an alternative, whichever sounds more natural
+#: data/io.github.focustimerhq.FocusTimer.desktop.in.in:2
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:9 src/main.vala:34
+#: src/ui/main/dialogs/about-dialog.vala:17
+msgid "Focus Timer"
+msgstr ""
 
-#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
+#: data/io.github.focustimerhq.FocusTimer.desktop.in.in:3
 #, fuzzy
 msgid "Time management utility"
 msgstr "Ajanhallintatyökalu"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
-msgid "timer;"
-msgstr "ajastin;timer;pomodoro;"
+#: data/io.github.focustimerhq.FocusTimer.desktop.in.in:5
+msgid "pomodoro;timer;"
+msgstr ""
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
-#: src/core/notification-manager.vala:335 src/core/state.vala:78
-#: src/main.vala:34 src/ui/main/dialogs/about-dialog.vala:16
-#: src/ui/main/stats/stats-day-page.ui:97
-#: src/ui/main/stats/stats-day-page.vala:87
-#: src/ui/main/stats/stats-month-page.ui:34
-#: src/ui/main/stats/stats-month-page.vala:43
-#: src/ui/main/stats/stats-week-page.ui:38
-#: src/ui/main/stats/stats-week-page.vala:41 src/ui/main/window.vala:183
-#: src/ui/preferences/automation/action/condition-widget.ui:53
-msgid "Pomodoro"
-msgstr "Pomodoro"
-
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:10
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:10
 #, fuzzy
 msgid "Maintain focus by taking frequent breaks"
 msgstr "Säilytä keskittymiskyky säännöllisillä tauoilla"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:12
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:12
 #, fuzzy
 msgid ""
 "A productivity timer that helps you work more effectively by breaking your "
@@ -66,274 +55,316 @@ msgstr ""
 "minuuttia ja pidä sitten 5 minuutin tauko ylläpitääksesi keskittymistä ja "
 "ehkäistäksesi uupumusta."
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:16
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:16
 #, fuzzy
 msgid "Key features:"
 msgstr "Keskeiset ominaisuudet:"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:20
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:20
 #, fuzzy
 msgid "Customizable work session and break lengths"
 msgstr "Muokattavat työjaksojen ja taukojen pituudet"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
 msgstr "Visuaaliset ja äänimerkit"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:22
 #, fuzzy
 msgid "Time tracking and statistics"
 msgstr "Ajanseuranta ja tilastot"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:23
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:23
 #, fuzzy
 msgid "GNOME desktop integration"
 msgstr "GNOME-työpöytäintegraatio"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:24
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:24
 #, fuzzy
 msgid "Screen overlay during breaks"
 msgstr "Koko näytön peitto taukojen aikana"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
 msgstr "Suorita omia komentoja pomodoron tai tauon jälkeen"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:48
 msgid "Kamil Prusko"
 msgstr "Kamil Prusko"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:67 src/ui/main/window.ui:76
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:67
+#: src/ui/main/window.ui:76
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:37
 #: src/ui/preferences/preferences-window.vala:30
 msgid "Timer"
 msgstr "Ajastin"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
 msgstr "Pienikokoinen ajastin"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:75
 #, fuzzy
 msgid "Daily stats"
 msgstr "Päivittäiset tilastot"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:79
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:79
 #, fuzzy
 msgid "Monthly stats"
 msgstr "Kuukausitilastot"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:83
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:83
 #: src/ui/preferences/preferences-window.ui:6
 msgid "Preferences"
 msgstr "Asetukset"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:87
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:87
 #, fuzzy
 msgid "Screen overlay"
 msgstr "Näytön peitto"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:95
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:95
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.1"
 msgstr "Yhteenveto muutoksista gnome-pomodoro 0.28.1 -versiossa"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:97
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:97
 #, fuzzy
 msgid "Added Tamil translation (thanks @omeritzics)"
 msgstr "Lisätty tamilinkielinen käännös (kiitos @omeritzics)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:98
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:98
 #, fuzzy
 msgid "Added Hebrew translation (thanks @Killersparrow1)"
 msgstr "Lisätty hepreankielinen käännös (kiitos @Killersparrow1)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:104
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:104
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.0"
 msgstr "Yhteenveto muutoksista gnome-pomodoro 0.28.0 -versiossa"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:106
 #, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
 msgstr "Tuki GNOME Shell 49 -versiolle (kiitos @aleasto)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:107
 #, fuzzy
 msgid "Updated German translation (thanks @daPhipz)"
 msgstr "Päivitetty saksankielinen käännös (kiitos @daPhipz)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:113
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:113
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.27.0"
 msgstr "Yhteenveto muutoksista gnome-pomodoro 0.27.0 -versiossa"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
 msgstr "Tuki GNOME Shell 48 -versiolle"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:116
 #, fuzzy
 msgid "Split time spent across midnight"
 msgstr "Keskiyön ylittävän ajan jakaminen"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:117
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:117
 #, fuzzy
 msgid "Added Telugu translation (thanks @SpaciousCoder78)"
 msgstr "Lisätty telugunkielinen käännös (kiitos @SpaciousCoder78)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:123
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:123
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.26.0"
 msgstr "Yhteenveto muutoksista gnome-pomodoro 0.26.0 -versiossa"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
 msgstr "Tuki GNOME Shell 47 -versiolle"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:126
 #, fuzzy
 msgid "Allow to dismiss screen overlay by gesture when a video is playing"
 msgstr "Salli näytön peiton ohittaminen eleellä, kun videota toistetaan"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:127
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:127
 #, fuzzy
 msgid "Added Georgian translation (thanks @NorwayFun)"
 msgstr "Lisätty georgiankielinen käännös (kiitos @NorwayFun)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:128
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:128
 #, fuzzy
 msgid "Adjusted translations in appdata (thanks @yakushabb)"
 msgstr "Muokattu appdata-käännöksiä (kiitos @yakushabb)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:134
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:134
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.2"
 msgstr "Yhteenveto muutoksista gnome-pomodoro 0.25.2 -versiossa"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:136
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:136
 #, fuzzy
 msgid "Fix keeping notification after extending Pomodoro"
 msgstr "Korjattu ilmoituksen jääminen näkyviin pomodoron jatkamisen jälkeen"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:142
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:142
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.1"
 msgstr "Yhteenveto muutoksista gnome-pomodoro 0.25.1 -versiossa"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
 msgstr "Korjauksia GNOME Shell 46 -versiolle"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
 msgstr "Poistettu tuki GNOME Shell 45 -versiolle"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:151
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.0"
 msgstr "Yhteenveto muutoksista gnome-pomodoro 0.25.0 -versiossa"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
 msgstr "Tuki GNOME Shell 46 -versiolle"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:154
 #, fuzzy
 msgid "Adjust build script to meson 0.59.0 (thanks @mattst88)"
 msgstr "Käännösskriptin päivitys meson 0.59.0 -versiolle (kiitos @mattst88)"
 
-#: src/application.vala:42
-msgid "Start/Stop"
-msgstr "Käynnistä/Pysäytä"
-
-#. Actions
-#: src/application.vala:45 src/application.vala:482 src/core/event.vala:268
-#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:57
-msgid "Start"
-msgstr "Käynnistä"
-
-#: src/application.vala:48 src/application.vala:484 src/core/event.vala:276
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:139
-#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:64
-msgid "Stop"
-msgstr "Pysäytä"
-
-#: src/application.vala:51
-msgid "Pause/Resume"
-msgstr "Keskeytä/Jatka"
-
-#: src/application.vala:54 src/application.vala:486 src/core/event.vala:284
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:83
-#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:71
-msgid "Pause"
-msgstr "Keskeytä"
-
-#: src/application.vala:57 src/application.vala:488 src/core/event.vala:292
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:97
-#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:78
-msgid "Resume"
-msgstr "Jatka"
-
-#: src/application.vala:60
-msgid "Skip to a pomodoro or to a break"
-msgstr "Hyppää pomodoroon tai taukoon"
-
-#: src/application.vala:63
-msgid "Extend current pomodoro or break"
-msgstr "Pidennä nykyistä pomodoroa tai taukoa"
-
-#: src/application.vala:66
-msgid "Reset current session"
-msgstr "Nollaa nykyinen istunto"
-
-#: src/application.vala:69
-msgid "Show preferences"
-msgstr "Näytä asetukset"
-
-#: src/application.vala:72
-msgid "Quit application"
-msgstr "Lopeta sovellus"
-
-#: src/application.vala:75
-msgid "Print version information and exit"
-msgstr "Näytä versiotiedot ja poistu"
-
-#: src/application.vala:477
+#: src/application.vala:151 src/application.vala:606
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
 msgstr "Käynnistä tai pysäytä"
 
-#: src/application.vala:480
+#: src/application.vala:154 src/application.vala:609
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
 msgstr "Käynnistä, keskeytä tai jatka"
 
-#: src/application.vala:490 src/core/event.vala:300
+#: src/application.vala:157 src/core/notification-manager.vala:502
+#: src/core/notification-manager.vala:598
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:69
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:314
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:330
+msgid "Start Pomodoro"
+msgstr "Käynnistä Pomodoro"
+
+#: src/application.vala:160
+msgid "Start break"
+msgstr ""
+
+#: src/application.vala:163
+msgid "Start short break"
+msgstr ""
+
+#: src/application.vala:166
+msgid "Start long break"
+msgstr ""
+
+#. Actions
+#: src/application.vala:169 src/application.vala:611 src/core/event.vala:268
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:57
+msgid "Start"
+msgstr "Käynnistä"
+
+#: src/application.vala:172 src/application.vala:613 src/core/event.vala:276
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:139
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:64
+msgid "Stop"
+msgstr "Pysäytä"
+
+#: src/application.vala:175 src/application.vala:615 src/core/event.vala:284
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:83
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:71
+msgid "Pause"
+msgstr "Keskeytä"
+
+#: src/application.vala:178 src/application.vala:617 src/core/event.vala:292
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:97
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:78
+msgid "Resume"
+msgstr "Jatka"
+
+#: src/application.vala:181 src/application.vala:619 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
 msgid "Skip"
 msgstr "Ohita"
 
-#: src/application.vala:492 src/core/event.vala:308
+#: src/application.vala:184 src/application.vala:621 src/core/event.vala:308
 #, fuzzy
 msgid "Rewind"
 msgstr "Kelaa taaksepäin"
 
-#: src/application.vala:494
+#: src/application.vala:185 src/application.vala:188
+msgid "SECONDS"
+msgstr ""
+
+#: src/application.vala:187
+msgid "Extend current pomodoro or break"
+msgstr "Pidennä nykyistä pomodoroa tai taukoa"
+
+#: src/application.vala:190 src/core/event.vala:316
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:39
+#, fuzzy
+msgid "Reset"
+msgstr "Nollaa"
+
+#: src/application.vala:193
+msgid "Print timer status"
+msgstr ""
+
+#: src/application.vala:196
+msgid "Show preferences"
+msgstr "Näytä asetukset"
+
+#: src/application.vala:199
+msgid "Quit application"
+msgstr "Lopeta sovellus"
+
+#: src/application.vala:202
+msgid "Print version information and exit"
+msgstr "Näytä versiotiedot ja poistu"
+
+#: src/application.vala:236
+msgid "Timer Options:"
+msgstr ""
+
+#: src/application.vala:237
+msgid "Show options for controlling the timer"
+msgstr ""
+
+#: src/application.vala:244
+#, c-format
+msgid "Bugs may be reported at: %s"
+msgstr ""
+
+#: src/application.vala:623
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
 #, fuzzy
 msgid "Bring to Focus"
 msgstr "Tuo etualalle"
+
+#. translators: time remaining eg. "3 minutes 50 seconds remaining"
+#: src/application.vala:786 src/core/notification-manager.vala:188
+#, fuzzy, c-format
+msgid "%s remaining"
+msgstr "%s jäljellä"
+
+#: src/application.vala:829
+msgid "Invalid use. Pass one flag for controlling the timer at a time."
+msgstr ""
 
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
@@ -435,12 +466,6 @@ msgstr "Hypätty seuraavaan aikajaksoon ennen laskennan päättymistä."
 msgid "Rewind action has been used. It adds a pause in the past."
 msgstr "Kelaustoimintoa on käytetty. Se lisää tauon menneisyyteen."
 
-#: src/core/event.vala:316
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:39
-#, fuzzy
-msgid "Reset"
-msgstr "Nollaa"
-
 #: src/core/event.vala:317
 #, fuzzy
 msgid "Manually cleared the session."
@@ -525,92 +550,89 @@ msgstr "Vanhentunut"
 msgid "Triggered when session is about to be reset due to inactivity."
 msgstr "Aktivoituu, kun istunto nollataan pian käyttämättömyyden vuoksi."
 
-#. translators: time remaining eg. "3 minutes 50 seconds remaining"
-#: src/core/notification-manager.vala:130
-#, fuzzy, c-format
-msgid "%s remaining"
-msgstr "%s jäljellä"
+#: src/core/notification-manager.vala:420 src/core/state.vala:78
+#: src/ui/main/stats/stats-day-page.ui:98
+#: src/ui/main/stats/stats-day-page.vala:87
+#: src/ui/main/stats/stats-month-page.ui:35
+#: src/ui/main/stats/stats-month-page.vala:43
+#: src/ui/main/stats/stats-week-page.ui:39
+#: src/ui/main/stats/stats-week-page.vala:41 src/ui/main/window.vala:184
+#: src/ui/preferences/automation/action/condition-widget.ui:53
+msgid "Pomodoro"
+msgstr "Pomodoro"
 
-#: src/core/notification-manager.vala:339
+#: src/core/notification-manager.vala:424
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Take a break"
 msgstr "Pidä tauko"
 
-#: src/core/notification-manager.vala:343
+#: src/core/notification-manager.vala:428
 msgid "Take a short break"
 msgstr "Pidä lyhyt tauko"
 
-#: src/core/notification-manager.vala:347
+#: src/core/notification-manager.vala:432
 msgid "Take a long break"
 msgstr "Pidä pitkä tauko"
 
-#: src/core/notification-manager.vala:394
+#: src/core/notification-manager.vala:494
 msgid "Pomodoro is about to end"
 msgstr "Pomodoro on päättymässä"
 
-#: src/core/notification-manager.vala:395
 #: src/core/notification-manager.vala:495
-#: src/core/notification-manager.vala:500
-#: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
+#: src/core/notification-manager.vala:603
+#: src/core/notification-manager.vala:608
+#: src/core/notification-manager.vala:613 src/ui/overlays/screen-overlay.ui:5
 #, fuzzy
 msgid "Take a Break"
 msgstr "Pidä tauko"
 
-#: src/core/notification-manager.vala:401
+#: src/core/notification-manager.vala:501
 msgid "Break is about to end"
 msgstr "Tauko on päättymässä"
 
-#: src/core/notification-manager.vala:402
-#: src/core/notification-manager.vala:490
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:69
-#: src/ui/main/timer/widgets/timer-control-buttons.vala:314
-#: src/ui/main/timer/widgets/timer-control-buttons.vala:330
-msgid "Start Pomodoro"
-msgstr "Käynnistä Pomodoro"
-
-#: src/core/notification-manager.vala:411
+#: src/core/notification-manager.vala:511
 #, fuzzy
 msgid "+1 minute"
 msgstr "+1 minuutti"
 
-#: src/core/notification-manager.vala:432
+#: src/core/notification-manager.vala:536
 msgid "Get ready…"
 msgstr "Valmistaudu…"
 
-#: src/core/notification-manager.vala:437
-#: src/core/notification-manager.vala:473
+#: src/core/notification-manager.vala:541
+#: src/core/notification-manager.vala:581
 #, fuzzy
 msgid "Pomodoro is over!"
 msgstr "Pomodoro on ohi!"
 
-#: src/core/notification-manager.vala:443
-#: src/core/notification-manager.vala:479
+#: src/core/notification-manager.vala:547
+#: src/core/notification-manager.vala:587
 #, fuzzy
 msgid "Break is over!"
 msgstr "Tauko on ohi!"
 
-#: src/core/notification-manager.vala:489
+#: src/core/notification-manager.vala:597
 #, fuzzy
 msgid "Confirm the start of a Pomodoro…"
 msgstr "Vahvista pomodoron aloitus…"
 
-#: src/core/notification-manager.vala:494
+#: src/core/notification-manager.vala:602
 #, fuzzy
 msgid "Confirm the start of a break…"
 msgstr "Vahvista tauon aloitus…"
 
-#: src/core/notification-manager.vala:499
+#: src/core/notification-manager.vala:607
 #, fuzzy
 msgid "Confirm the start of a short break…"
 msgstr "Vahvista lyhyen tauon aloitus…"
 
-#: src/core/notification-manager.vala:504
+#: src/core/notification-manager.vala:612
 #, fuzzy
 msgid "Confirm the start of a long break…"
 msgstr "Vahvista pitkän tauon aloitus…"
 
-#: src/core/notification-manager.vala:516
+#: src/core/notification-manager.vala:624
 msgid "Skip Break"
 msgstr "Ohita tauko"
 
@@ -763,51 +785,51 @@ msgstr "Käyttämätön"
 msgid "Log"
 msgstr "Loki"
 
-#: src/ui/log/log-window.ui:38
+#: src/ui/log/log-window.ui:37
 #, fuzzy
 msgid "Empty Log"
 msgstr "Tyhjä loki"
 
-#: src/ui/log/log-window.ui:39
+#: src/ui/log/log-window.ui:38
 #, fuzzy
 msgid "Entries will show up here once you start the timer."
 msgstr "Merkinnät näkyvät tässä, kun käynnistät ajastimen."
 
-#: src/ui/log/log-window.ui:165
+#: src/ui/log/log-window.ui:164
 #, fuzzy
 msgid "Context"
 msgstr "Konteksti"
 
-#: src/ui/log/log-window.ui:190
+#: src/ui/log/log-window.ui:189
 #: src/ui/preferences/automation/action/action-edit-window.ui:186
 msgid "Command"
 msgstr "Komento"
 
-#: src/ui/log/log-window.ui:214
+#: src/ui/log/log-window.ui:213
 #, fuzzy
 msgid "Output"
 msgstr "Tuloste"
 
-#: src/ui/log/log-window.ui:238
+#: src/ui/log/log-window.ui:237
 #, fuzzy
 msgid "Error"
 msgstr "Virhe"
 
-#: src/ui/log/log-window.ui:267
+#: src/ui/log/log-window.ui:266
 #, fuzzy
 msgid "Exit Code:"
 msgstr "Paluukoodi:"
 
-#: src/ui/log/log-window.ui:278
+#: src/ui/log/log-window.ui:277
 #, fuzzy
 msgid "Execution Time:"
 msgstr "Suoritusaika:"
 
-#: src/ui/main/dialogs/about-dialog.vala:29
+#: src/ui/main/dialogs/about-dialog.vala:30
 msgid "translator-credits"
 msgstr "Tuomas Jaakola <tuomas.jaakola@iki.fi>"
 
-#: src/ui/main/dialogs/about-dialog.vala:35
+#: src/ui/main/dialogs/about-dialog.vala:36
 #, fuzzy
 msgid "Donate"
 msgstr "Lahjoita"
@@ -920,28 +942,28 @@ msgstr "Laajennusten asennus ei ole sallittua"
 msgid "Failed to download the extension"
 msgstr "Laajennuksen lataaminen epäonnistui"
 
-#: src/ui/main/stats/stats-day-page.ui:104
+#: src/ui/main/stats/stats-day-page.ui:105
 #: src/ui/main/stats/stats-day-page.vala:92
-#: src/ui/main/stats/stats-month-page.ui:41
+#: src/ui/main/stats/stats-month-page.ui:42
 #: src/ui/main/stats/stats-month-page.vala:48
-#: src/ui/main/stats/stats-week-page.ui:45
+#: src/ui/main/stats/stats-week-page.ui:46
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
 msgstr "Tauot"
 
-#: src/ui/main/stats/stats-day-page.ui:111
-#: src/ui/main/stats/stats-month-page.ui:48
+#: src/ui/main/stats/stats-day-page.ui:112
+#: src/ui/main/stats/stats-month-page.ui:49
 #: src/ui/main/stats/stats-month-page.vala:53
-#: src/ui/main/stats/stats-week-page.ui:52
+#: src/ui/main/stats/stats-week-page.ui:53
 #: src/ui/main/stats/stats-week-page.vala:51
 #, fuzzy
 msgid "Interruptions"
 msgstr "Keskeytykset"
 
-#: src/ui/main/stats/stats-day-page.ui:118
-#: src/ui/main/stats/stats-month-page.ui:55
-#: src/ui/main/stats/stats-week-page.ui:59
+#: src/ui/main/stats/stats-day-page.ui:119
+#: src/ui/main/stats/stats-month-page.ui:56
+#: src/ui/main/stats/stats-week-page.ui:60
 #, fuzzy
 msgid "Break Ratio"
 msgstr "Taukojen suhde"
@@ -971,45 +993,45 @@ msgstr "Täällä ei ole vielä mitään"
 msgid "Finish a few Pomodoros to fill this up!"
 msgstr "Suorita muutama pomodoro täyttääksesi tämän!"
 
-#: src/ui/main/stats/stats-view.vala:792
+#: src/ui/main/stats/stats-view.vala:831
 #, fuzzy, c-format
 msgid "Skipped %u day"
 msgid_plural "Skipped %u days"
 msgstr[0] "Hypätty %u päivän yli"
 msgstr[1] "Hypätty %u päivän yli"
 
-#: src/ui/main/stats/stats-view.vala:798
+#: src/ui/main/stats/stats-view.vala:837
 #, fuzzy, c-format
 msgid "Skipped %u week"
 msgid_plural "Skipped %u weeks"
 msgstr[0] "Hypätty %u viikon yli"
 msgstr[1] "Hypätty %u viikon yli"
 
-#: src/ui/main/stats/stats-view.vala:804
+#: src/ui/main/stats/stats-view.vala:843
 #, fuzzy, c-format
 msgid "Skipped %u month"
 msgid_plural "Skipped %u months"
 msgstr[0] "Hypätty %u kuukauden yli"
 msgstr[1] "Hypätty %u kuukauden yli"
 
-#: src/ui/main/stats/stats-view.vala:1002
+#: src/ui/main/stats/stats-view.vala:1041
 msgid "Today"
 msgstr "Tänään"
 
-#: src/ui/main/stats/stats-view.vala:1007
+#: src/ui/main/stats/stats-view.vala:1046
 msgid "Yesterday"
 msgstr "Eilen"
 
-#: src/ui/main/stats/stats-view.vala:1028
+#: src/ui/main/stats/stats-view.vala:1067
 msgid "This week"
 msgstr "Tällä viikolla"
 
-#: src/ui/main/stats/stats-view.vala:1048
+#: src/ui/main/stats/stats-view.vala:1087
 #, fuzzy, c-format
 msgid "Week %u"
 msgstr "Viikko %u"
 
-#: src/ui/main/stats/stats-view.vala:1049
+#: src/ui/main/stats/stats-view.vala:1088
 #, fuzzy, c-format
 msgid "Week %u of %u"
 msgstr "Viikko %u / %u"
@@ -1043,12 +1065,12 @@ msgstr "_Tauko"
 msgid "Open screen overlay"
 msgstr "Avaa näytön peitto"
 
-#: src/ui/main/timer/timer-view.vala:244
+#: src/ui/main/timer/timer-view.vala:246
 #, fuzzy
 msgid "Session has expired"
 msgstr "Istunto on vanhentunut"
 
-#: src/ui/main/timer/widgets/session-progress-bar.vala:1398
+#: src/ui/main/timer/widgets/session-progress-bar.vala:1472
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
 msgstr "Pitkä tauko alkaa <b>%s</b> kuluttua"
@@ -1084,22 +1106,22 @@ msgstr "Päävalikko"
 msgid "Stats"
 msgstr "Tilastot"
 
-#: src/ui/main/window.vala:301
+#: src/ui/main/window.vala:302
 #, fuzzy
 msgid "GNOME Shell extension available"
 msgstr "GNOME Shell -laajennus saatavilla"
 
-#: src/ui/main/window.vala:302
+#: src/ui/main/window.vala:303
 #, fuzzy
 msgid "Learn More"
 msgstr "Lue lisää"
 
-#: src/ui/main/window.vala:324
+#: src/ui/main/window.vala:325
 #, fuzzy
 msgid "Keep timer running?"
 msgstr "Pidetäänkö ajastin käynnissä?"
 
-#: src/ui/main/window.vala:325
+#: src/ui/main/window.vala:326
 #, fuzzy
 msgid ""
 "You can keep it running in the background — notifications and keyboard "
@@ -1108,16 +1130,16 @@ msgstr ""
 "Voit pitää sen käynnissä taustalla — ilmoitukset ja pikanäppäimet toimivat "
 "edelleen."
 
-#: src/ui/main/window.vala:329
+#: src/ui/main/window.vala:330
 msgid "Quit"
 msgstr "Lopeta"
 
-#: src/ui/main/window.vala:332
+#: src/ui/main/window.vala:333
 #, fuzzy
 msgid "Run in background"
 msgstr "Suorita taustalla"
 
-#: src/ui/overlays/screen-overlay.ui:65
+#: src/ui/overlays/screen-overlay.ui:64
 msgid "It's time to take a break"
 msgstr "On aika pitää taukoa"
 
@@ -1736,27 +1758,27 @@ msgid "Confirm Starting a Pomodoro"
 msgstr "Vahvista pomodoron aloitus"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
-#: src/ui/preferences/timer/preferences-panel-timer.vala:87
+#: src/ui/preferences/timer/preferences-panel-timer.vala:94
 #, fuzzy, c-format
 msgid "A single session will take <b>%s</b>."
 msgstr "Yksi istunto kestää <b>%s</b>."
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:88
+#: src/ui/preferences/timer/preferences-panel-timer.vala:95
 #, fuzzy, c-format
 msgid "<b>%u%%</b> of the time will be allocated for breaks."
 msgstr "<b>%u%%</b> ajasta käytetään taukoihin."
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:136
+#: src/ui/preferences/timer/preferences-panel-timer.vala:143
 #, fuzzy
 msgid "Apply changes to ongoing Pomodoro?"
 msgstr "Otetaanko muutokset käyttöön meneillään olevaan pomodoroon?"
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:137
+#: src/ui/preferences/timer/preferences-panel-timer.vala:144
 #, fuzzy
 msgid "Apply changes to ongoing break?"
 msgstr "Otetaanko muutokset käyttöön meneillään olevaan taukoon?"
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:139
+#: src/ui/preferences/timer/preferences-panel-timer.vala:146
 #, fuzzy
 msgid "Apply"
 msgstr "Käytä"
@@ -1766,6 +1788,24 @@ msgstr "Käytä"
 msgctxt "accessibility"
 msgid "Sidebar"
 msgstr "Sivupalkki"
+
+#~ msgid "@APPLICATION_NAME@"
+#~ msgstr "@APPLICATION_NAME@"
+
+#~ msgid "timer;"
+#~ msgstr "ajastin;timer;pomodoro;"
+
+#~ msgid "Start/Stop"
+#~ msgstr "Käynnistä/Pysäytä"
+
+#~ msgid "Pause/Resume"
+#~ msgstr "Keskeytä/Jatka"
+
+#~ msgid "Skip to a pomodoro or to a break"
+#~ msgstr "Hyppää pomodoroon tai taukoon"
+
+#~ msgid "Reset current session"
+#~ msgstr "Nollaa nykyinen istunto"
 
 #~ msgid "Run as background service"
 #~ msgstr "Suorita taustapalveluna"

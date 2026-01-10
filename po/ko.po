@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-20 11:56+0100\n"
+"POT-Creation-Date: 2026-01-10 11:31+0100\n"
 "PO-Revision-Date: 2023-03-25 14:25+0100\n"
 "Last-Translator: root <dayeon.dev@gmail.com>\n"
 "Language-Team: Korean\n"
@@ -20,40 +20,29 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.1.1\n"
 
-#. Translators: Do NOT translate or transliterate this text
-#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:3
-msgid "@APPLICATION_NAME@"
-msgstr "@APPLICATION_NAME@"
+#. translators: consider 'Concentration Timer' as an alternative, whichever sounds more natural
+#: data/io.github.focustimerhq.FocusTimer.desktop.in.in:2
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:9 src/main.vala:34
+#: src/ui/main/dialogs/about-dialog.vala:17
+msgid "Focus Timer"
+msgstr ""
 
-#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:4
+#: data/io.github.focustimerhq.FocusTimer.desktop.in.in:3
 #, fuzzy
 msgid "Time management utility"
 msgstr "시간 관리 유틸리티"
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-#: data/org.gnomepomodoro.Pomodoro.desktop.in.in:6
-msgid "timer;"
-msgstr "타이머;timer;포모도로;pomodoro;"
+#: data/io.github.focustimerhq.FocusTimer.desktop.in.in:5
+msgid "pomodoro;timer;"
+msgstr ""
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:9
-#: src/core/notification-manager.vala:335 src/core/state.vala:78
-#: src/main.vala:34 src/ui/main/dialogs/about-dialog.vala:16
-#: src/ui/main/stats/stats-day-page.ui:97
-#: src/ui/main/stats/stats-day-page.vala:87
-#: src/ui/main/stats/stats-month-page.ui:34
-#: src/ui/main/stats/stats-month-page.vala:43
-#: src/ui/main/stats/stats-week-page.ui:38
-#: src/ui/main/stats/stats-week-page.vala:41 src/ui/main/window.vala:183
-#: src/ui/preferences/automation/action/condition-widget.ui:53
-msgid "Pomodoro"
-msgstr "포모도로"
-
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:10
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:10
 #, fuzzy
 msgid "Maintain focus by taking frequent breaks"
 msgstr "주기적인 휴식을 통해 집중력을 유지하세요"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:12
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:12
 #, fuzzy
 msgid ""
 "A productivity timer that helps you work more effectively by breaking your "
@@ -65,274 +54,315 @@ msgstr ""
 "는 생산성 타이머입니다. 25분간 업무를 수행한 후, 5분간 휴식을 취하여 집중력"
 "을 유지하고 번아웃을 방지하세요."
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:16
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:16
 #, fuzzy
 msgid "Key features:"
 msgstr "주요 기능:"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:20
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:20
 #, fuzzy
 msgid "Customizable work session and break lengths"
 msgstr "사용자 설정 가능한 업무 세션 및 휴식 시간"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:21
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:21
 #, fuzzy
 msgid "Visual and audio notifications"
 msgstr "시각 및 음성 알림"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:22
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:22
 #, fuzzy
 msgid "Time tracking and statistics"
 msgstr "시간 추적 및 통계"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:23
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:23
 #, fuzzy
 msgid "GNOME desktop integration"
 msgstr "그놈 데스크톱 통합"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:24
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:24
 #, fuzzy
 msgid "Screen overlay during breaks"
 msgstr "휴식 시간 중 화면 오버레이"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:25
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:25
 #, fuzzy
 msgid "Run custom commands after Pomodoro or break"
 msgstr "포모도로 또는 휴식 후 사용자 지정 명령 실행"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:48
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:48
 msgid "Kamil Prusko"
 msgstr "Kamil Prusko"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:67 src/ui/main/window.ui:76
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:67
+#: src/ui/main/window.ui:76
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:37
 #: src/ui/preferences/preferences-window.vala:30
 msgid "Timer"
 msgstr "타이머"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:71
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:71
 #, fuzzy
 msgid "Compact timer"
 msgstr "간편 타이머"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:75
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:75
 #, fuzzy
 msgid "Daily stats"
 msgstr "일일 통계"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:79
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:79
 #, fuzzy
 msgid "Monthly stats"
 msgstr "월간 통계"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:83
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:83
 #: src/ui/preferences/preferences-window.ui:6
 msgid "Preferences"
 msgstr "환경설정"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:87
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:87
 #, fuzzy
 msgid "Screen overlay"
 msgstr "화면 오버레이"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:95
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:95
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.1"
 msgstr "그놈 포모도로 0.28.1 변경 사항 개요"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:97
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:97
 #, fuzzy
 msgid "Added Tamil translation (thanks @omeritzics)"
 msgstr "타밀어 번역 추가 (도움 주신 분: @omeritzics)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:98
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:98
 #, fuzzy
 msgid "Added Hebrew translation (thanks @Killersparrow1)"
 msgstr "히브리어 번역 추가 (도움 주신 분: @Killersparrow1)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:104
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:104
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.0"
 msgstr "그놈 포모도로 0.28.0 변경 사항 개요"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:106
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:106
 #, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
 msgstr "그놈 쉘 49 지원 (도움 주신 분: @aleasto)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:107
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:107
 #, fuzzy
 msgid "Updated German translation (thanks @daPhipz)"
 msgstr "독일어 번역 업데이트 (도움 주신 분: @daPhipz)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:113
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:113
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.27.0"
 msgstr "그놈 포모도로 0.27.0 변경 사항 개요"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:115
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:115
 #, fuzzy
 msgid "Support for GNOME Shell 48"
 msgstr "그놈 쉘 48 지원"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:116
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:116
 #, fuzzy
 msgid "Split time spent across midnight"
 msgstr "자정을 걸친 시간 기록 분할"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:117
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:117
 #, fuzzy
 msgid "Added Telugu translation (thanks @SpaciousCoder78)"
 msgstr "텔루구어 번역 추가 (도움 주신 분: @SpaciousCoder78)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:123
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:123
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.26.0"
 msgstr "그놈 포모도로 0.26.0 변경 사항 개요"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:125
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:125
 #, fuzzy
 msgid "Support for GNOME Shell 47"
 msgstr "그놈 쉘 47 지원"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:126
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:126
 #, fuzzy
 msgid "Allow to dismiss screen overlay by gesture when a video is playing"
 msgstr "동영상 재생 중 제스처를 통한 화면 오버레이 닫기 허용"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:127
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:127
 #, fuzzy
 msgid "Added Georgian translation (thanks @NorwayFun)"
 msgstr "조지아어 번역 추가 (도움 주신 분: @NorwayFun)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:128
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:128
 #, fuzzy
 msgid "Adjusted translations in appdata (thanks @yakushabb)"
 msgstr "appdata 내 번역 수정 (도움 주신 분: @yakushabb)"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:134
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:134
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.2"
 msgstr "그놈 포모도로 0.25.2 변경 사항 개요"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:136
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:136
 #, fuzzy
 msgid "Fix keeping notification after extending Pomodoro"
 msgstr "포모도로 연장 후 알림이 유지되던 현상 수정"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:142
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:142
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.1"
 msgstr "그놈 포모도로 0.25.1 변경 사항 개요"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:144
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:144
 #, fuzzy
 msgid "Fixes for GNOME Shell 46"
 msgstr "그놈 쉘 46 수정 사항"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:145
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:145
 #, fuzzy
 msgid "Drop support for GNOME Shell 45"
 msgstr "그놈 쉘 45 지원 중단"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:151
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:151
 #, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.0"
 msgstr "그놈 포모도로 0.25.0 변경 사항 개요"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:153
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:153
 #, fuzzy
 msgid "Support for GNOME Shell 46"
 msgstr "그놈 쉘 46 지원"
 
-#: data/org.gnomepomodoro.Pomodoro.metainfo.xml.in:154
+#: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:154
 #, fuzzy
 msgid "Adjust build script to meson 0.59.0 (thanks @mattst88)"
 msgstr "빌드 스크립트를 meson 0.59.0에 맞게 조정 (도움 주신 분: @mattst88)"
 
-#: src/application.vala:42
-msgid "Start/Stop"
-msgstr "시작/정지"
-
-#. Actions
-#: src/application.vala:45 src/application.vala:482 src/core/event.vala:268
-#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:57
-msgid "Start"
-msgstr "시작"
-
-#: src/application.vala:48 src/application.vala:484 src/core/event.vala:276
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:139
-#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:64
-msgid "Stop"
-msgstr "정지"
-
-#: src/application.vala:51
-msgid "Pause/Resume"
-msgstr "일시 정지/재개"
-
-#: src/application.vala:54 src/application.vala:486 src/core/event.vala:284
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:83
-#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:71
-msgid "Pause"
-msgstr "일시 정지"
-
-#: src/application.vala:57 src/application.vala:488 src/core/event.vala:292
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:97
-#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:78
-msgid "Resume"
-msgstr "재개"
-
-#: src/application.vala:60
-msgid "Skip to a pomodoro or to a break"
-msgstr "포모도로 또는 휴식으로 건너뛰기"
-
-#: src/application.vala:63
-msgid "Extend current pomodoro or break"
-msgstr "현재 포모도로 또는 휴식 연장"
-
-#: src/application.vala:66
-msgid "Reset current session"
-msgstr "현재 세션 초기화"
-
-#: src/application.vala:69
-msgid "Show preferences"
-msgstr "설정 보기"
-
-#: src/application.vala:72
-msgid "Quit application"
-msgstr "애플리케이션 종료"
-
-#: src/application.vala:75
-msgid "Print version information and exit"
-msgstr "버전 정보 출력 및 종료"
-
-#: src/application.vala:477
+#: src/application.vala:151 src/application.vala:606
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
 #, fuzzy
 msgid "Start or Stop"
 msgstr "시작 또는 정지"
 
-#: src/application.vala:480
+#: src/application.vala:154 src/application.vala:609
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
 #, fuzzy
 msgid "Start, Pause or Resume"
 msgstr "시작, 일시 정지 또는 재개"
 
-#: src/application.vala:490 src/core/event.vala:300
+#: src/application.vala:157 src/core/notification-manager.vala:502
+#: src/core/notification-manager.vala:598
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:69
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:314
+#: src/ui/main/timer/widgets/timer-control-buttons.vala:330
+msgid "Start Pomodoro"
+msgstr "포모도로 시작하기"
+
+#: src/application.vala:160
+msgid "Start break"
+msgstr ""
+
+#: src/application.vala:163
+msgid "Start short break"
+msgstr ""
+
+#: src/application.vala:166
+msgid "Start long break"
+msgstr ""
+
+#. Actions
+#: src/application.vala:169 src/application.vala:611 src/core/event.vala:268
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:57
+msgid "Start"
+msgstr "시작"
+
+#: src/application.vala:172 src/application.vala:613 src/core/event.vala:276
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:139
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:64
+msgid "Stop"
+msgstr "정지"
+
+#: src/application.vala:175 src/application.vala:615 src/core/event.vala:284
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:83
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:71
+msgid "Pause"
+msgstr "일시 정지"
+
+#: src/application.vala:178 src/application.vala:617 src/core/event.vala:292
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:97
+#: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:78
+msgid "Resume"
+msgstr "재개"
+
+#: src/application.vala:181 src/application.vala:619 src/core/event.vala:300
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:85
 msgid "Skip"
 msgstr "건너뛰기"
 
-#: src/application.vala:492 src/core/event.vala:308
+#: src/application.vala:184 src/application.vala:621 src/core/event.vala:308
 #, fuzzy
 msgid "Rewind"
 msgstr "감기"
 
-#: src/application.vala:494
+#: src/application.vala:185 src/application.vala:188
+msgid "SECONDS"
+msgstr ""
+
+#: src/application.vala:187
+msgid "Extend current pomodoro or break"
+msgstr "현재 포모도로 또는 휴식 연장"
+
+#: src/application.vala:190 src/core/event.vala:316
+#: src/ui/main/timer/widgets/timer-control-buttons.ui:39
+msgid "Reset"
+msgstr "초기화"
+
+#: src/application.vala:193
+msgid "Print timer status"
+msgstr ""
+
+#: src/application.vala:196
+msgid "Show preferences"
+msgstr "설정 보기"
+
+#: src/application.vala:199
+msgid "Quit application"
+msgstr "애플리케이션 종료"
+
+#: src/application.vala:202
+msgid "Print version information and exit"
+msgstr "버전 정보 출력 및 종료"
+
+#: src/application.vala:236
+msgid "Timer Options:"
+msgstr ""
+
+#: src/application.vala:237
+msgid "Show options for controlling the timer"
+msgstr ""
+
+#: src/application.vala:244
+#, c-format
+msgid "Bugs may be reported at: %s"
+msgstr ""
+
+#: src/application.vala:623
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
 #, fuzzy
 msgid "Bring to Focus"
 msgstr "창 활성화"
+
+#. translators: time remaining eg. "3 minutes 50 seconds remaining"
+#: src/application.vala:786 src/core/notification-manager.vala:188
+#, fuzzy, c-format
+msgid "%s remaining"
+msgstr "%s 남음"
+
+#: src/application.vala:829
+msgid "Invalid use. Pass one flag for controlling the timer at a time."
+msgstr ""
 
 #: src/core/action-manager.vala:111
 #, fuzzy, c-format
@@ -433,11 +463,6 @@ msgstr "카운트다운이 끝나기 전에 다음 시간 블록으로 이동했
 msgid "Rewind action has been used. It adds a pause in the past."
 msgstr "감기 동작이 사용되었습니다. 과거 기록에 일시 정지를 추가합니다."
 
-#: src/core/event.vala:316
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:39
-msgid "Reset"
-msgstr "초기화"
-
 #: src/core/event.vala:317
 #, fuzzy
 msgid "Manually cleared the session."
@@ -521,92 +546,89 @@ msgstr "만료됨"
 msgid "Triggered when session is about to be reset due to inactivity."
 msgstr "활동이 없어 세션이 초기화되기 직전에 트리거됩니다."
 
-#. translators: time remaining eg. "3 minutes 50 seconds remaining"
-#: src/core/notification-manager.vala:130
-#, fuzzy, c-format
-msgid "%s remaining"
-msgstr "%s 남음"
+#: src/core/notification-manager.vala:420 src/core/state.vala:78
+#: src/ui/main/stats/stats-day-page.ui:98
+#: src/ui/main/stats/stats-day-page.vala:87
+#: src/ui/main/stats/stats-month-page.ui:35
+#: src/ui/main/stats/stats-month-page.vala:43
+#: src/ui/main/stats/stats-week-page.ui:39
+#: src/ui/main/stats/stats-week-page.vala:41 src/ui/main/window.vala:184
+#: src/ui/preferences/automation/action/condition-widget.ui:53
+msgid "Pomodoro"
+msgstr "포모도로"
 
-#: src/core/notification-manager.vala:339
+#: src/core/notification-manager.vala:424
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:314
 #: src/ui/main/timer/widgets/timer-control-buttons.vala:330
 msgid "Take a break"
 msgstr "휴식을 취하세요"
 
-#: src/core/notification-manager.vala:343
+#: src/core/notification-manager.vala:428
 msgid "Take a short break"
 msgstr "잠시 휴식"
 
-#: src/core/notification-manager.vala:347
+#: src/core/notification-manager.vala:432
 msgid "Take a long break"
 msgstr "긴 휴식을 취하십시오"
 
-#: src/core/notification-manager.vala:394
+#: src/core/notification-manager.vala:494
 msgid "Pomodoro is about to end"
 msgstr "포모도로가 곧 끝납니다"
 
-#: src/core/notification-manager.vala:395
 #: src/core/notification-manager.vala:495
-#: src/core/notification-manager.vala:500
-#: src/core/notification-manager.vala:505 src/ui/overlays/screen-overlay.ui:5
+#: src/core/notification-manager.vala:603
+#: src/core/notification-manager.vala:608
+#: src/core/notification-manager.vala:613 src/ui/overlays/screen-overlay.ui:5
 #, fuzzy
 msgid "Take a Break"
 msgstr "휴식을 취하세요"
 
-#: src/core/notification-manager.vala:401
+#: src/core/notification-manager.vala:501
 msgid "Break is about to end"
 msgstr "휴식이 곧 끝납니다"
 
-#: src/core/notification-manager.vala:402
-#: src/core/notification-manager.vala:490
-#: src/ui/main/timer/widgets/timer-control-buttons.ui:69
-#: src/ui/main/timer/widgets/timer-control-buttons.vala:314
-#: src/ui/main/timer/widgets/timer-control-buttons.vala:330
-msgid "Start Pomodoro"
-msgstr "포모도로 시작하기"
-
-#: src/core/notification-manager.vala:411
+#: src/core/notification-manager.vala:511
 #, fuzzy
 msgid "+1 minute"
 msgstr "+1분"
 
-#: src/core/notification-manager.vala:432
+#: src/core/notification-manager.vala:536
 msgid "Get ready…"
 msgstr "준비하세요…"
 
-#: src/core/notification-manager.vala:437
-#: src/core/notification-manager.vala:473
+#: src/core/notification-manager.vala:541
+#: src/core/notification-manager.vala:581
 #, fuzzy
 msgid "Pomodoro is over!"
 msgstr "포모도로가 끝났습니다!"
 
-#: src/core/notification-manager.vala:443
-#: src/core/notification-manager.vala:479
+#: src/core/notification-manager.vala:547
+#: src/core/notification-manager.vala:587
 #, fuzzy
 msgid "Break is over!"
 msgstr "휴식이 끝났습니다!"
 
-#: src/core/notification-manager.vala:489
+#: src/core/notification-manager.vala:597
 #, fuzzy
 msgid "Confirm the start of a Pomodoro…"
 msgstr "포모도로 시작 확인…"
 
-#: src/core/notification-manager.vala:494
+#: src/core/notification-manager.vala:602
 #, fuzzy
 msgid "Confirm the start of a break…"
 msgstr "휴식 시작 확인…"
 
-#: src/core/notification-manager.vala:499
+#: src/core/notification-manager.vala:607
 #, fuzzy
 msgid "Confirm the start of a short break…"
 msgstr "짧은 휴식 시작 확인…"
 
-#: src/core/notification-manager.vala:504
+#: src/core/notification-manager.vala:612
 #, fuzzy
 msgid "Confirm the start of a long break…"
 msgstr "긴 휴식 시작 확인…"
 
-#: src/core/notification-manager.vala:516
+#: src/core/notification-manager.vala:624
 msgid "Skip Break"
 msgstr "휴식 건너뛰기"
 
@@ -756,51 +778,51 @@ msgstr "사용되지 않음"
 msgid "Log"
 msgstr "로그"
 
-#: src/ui/log/log-window.ui:38
+#: src/ui/log/log-window.ui:37
 #, fuzzy
 msgid "Empty Log"
 msgstr "로그가 비어 있음"
 
-#: src/ui/log/log-window.ui:39
+#: src/ui/log/log-window.ui:38
 #, fuzzy
 msgid "Entries will show up here once you start the timer."
 msgstr "타이머를 시작하면 여기에 항목이 표시됩니다."
 
-#: src/ui/log/log-window.ui:165
+#: src/ui/log/log-window.ui:164
 #, fuzzy
 msgid "Context"
 msgstr "컨텍스트"
 
-#: src/ui/log/log-window.ui:190
+#: src/ui/log/log-window.ui:189
 #: src/ui/preferences/automation/action/action-edit-window.ui:186
 msgid "Command"
 msgstr "명령"
 
-#: src/ui/log/log-window.ui:214
+#: src/ui/log/log-window.ui:213
 #, fuzzy
 msgid "Output"
 msgstr "출력"
 
-#: src/ui/log/log-window.ui:238
+#: src/ui/log/log-window.ui:237
 #, fuzzy
 msgid "Error"
 msgstr "오류"
 
-#: src/ui/log/log-window.ui:267
+#: src/ui/log/log-window.ui:266
 #, fuzzy
 msgid "Exit Code:"
 msgstr "종료 코드:"
 
-#: src/ui/log/log-window.ui:278
+#: src/ui/log/log-window.ui:277
 #, fuzzy
 msgid "Execution Time:"
 msgstr "실행 시간:"
 
-#: src/ui/main/dialogs/about-dialog.vala:29
+#: src/ui/main/dialogs/about-dialog.vala:30
 msgid "translator-credits"
 msgstr "Dayeon Lee <dayeon.dev@gmail.com>"
 
-#: src/ui/main/dialogs/about-dialog.vala:35
+#: src/ui/main/dialogs/about-dialog.vala:36
 #, fuzzy
 msgid "Donate"
 msgstr "기부하기"
@@ -908,28 +930,28 @@ msgstr "확장 설치가 허용되지 않았습니다"
 msgid "Failed to download the extension"
 msgstr "확장 다운로드 실패"
 
-#: src/ui/main/stats/stats-day-page.ui:104
+#: src/ui/main/stats/stats-day-page.ui:105
 #: src/ui/main/stats/stats-day-page.vala:92
-#: src/ui/main/stats/stats-month-page.ui:41
+#: src/ui/main/stats/stats-month-page.ui:42
 #: src/ui/main/stats/stats-month-page.vala:48
-#: src/ui/main/stats/stats-week-page.ui:45
+#: src/ui/main/stats/stats-week-page.ui:46
 #: src/ui/main/stats/stats-week-page.vala:46
 #, fuzzy
 msgid "Breaks"
 msgstr "휴식 횟수"
 
-#: src/ui/main/stats/stats-day-page.ui:111
-#: src/ui/main/stats/stats-month-page.ui:48
+#: src/ui/main/stats/stats-day-page.ui:112
+#: src/ui/main/stats/stats-month-page.ui:49
 #: src/ui/main/stats/stats-month-page.vala:53
-#: src/ui/main/stats/stats-week-page.ui:52
+#: src/ui/main/stats/stats-week-page.ui:53
 #: src/ui/main/stats/stats-week-page.vala:51
 #, fuzzy
 msgid "Interruptions"
 msgstr "방해 요소"
 
-#: src/ui/main/stats/stats-day-page.ui:118
-#: src/ui/main/stats/stats-month-page.ui:55
-#: src/ui/main/stats/stats-week-page.ui:59
+#: src/ui/main/stats/stats-day-page.ui:119
+#: src/ui/main/stats/stats-month-page.ui:56
+#: src/ui/main/stats/stats-week-page.ui:60
 #, fuzzy
 msgid "Break Ratio"
 msgstr "휴식 비율"
@@ -959,42 +981,42 @@ msgstr "아직 표시할 데이터가 없습니다"
 msgid "Finish a few Pomodoros to fill this up!"
 msgstr "포모도로를 몇 번 완료하여 통계를 채워보세요!"
 
-#: src/ui/main/stats/stats-view.vala:792
+#: src/ui/main/stats/stats-view.vala:831
 #, fuzzy, c-format
 msgid "Skipped %u day"
 msgid_plural "Skipped %u days"
 msgstr[0] "%u일 건너뜀"
 
-#: src/ui/main/stats/stats-view.vala:798
+#: src/ui/main/stats/stats-view.vala:837
 #, fuzzy, c-format
 msgid "Skipped %u week"
 msgid_plural "Skipped %u weeks"
 msgstr[0] "%u주 건너뜀"
 
-#: src/ui/main/stats/stats-view.vala:804
+#: src/ui/main/stats/stats-view.vala:843
 #, fuzzy, c-format
 msgid "Skipped %u month"
 msgid_plural "Skipped %u months"
 msgstr[0] "%u개월 건너뜀"
 
-#: src/ui/main/stats/stats-view.vala:1002
+#: src/ui/main/stats/stats-view.vala:1041
 msgid "Today"
 msgstr "오늘"
 
-#: src/ui/main/stats/stats-view.vala:1007
+#: src/ui/main/stats/stats-view.vala:1046
 msgid "Yesterday"
 msgstr "어제"
 
-#: src/ui/main/stats/stats-view.vala:1028
+#: src/ui/main/stats/stats-view.vala:1067
 msgid "This week"
 msgstr "이번 주"
 
-#: src/ui/main/stats/stats-view.vala:1048
+#: src/ui/main/stats/stats-view.vala:1087
 #, fuzzy, c-format
 msgid "Week %u"
 msgstr "%u주"
 
-#: src/ui/main/stats/stats-view.vala:1049
+#: src/ui/main/stats/stats-view.vala:1088
 #, fuzzy, c-format
 msgid "Week %u of %u"
 msgstr "%u주 중 %u번째 주"
@@ -1028,12 +1050,12 @@ msgstr "휴식(_B)"
 msgid "Open screen overlay"
 msgstr "화면 오버레이 열기"
 
-#: src/ui/main/timer/timer-view.vala:244
+#: src/ui/main/timer/timer-view.vala:246
 #, fuzzy
 msgid "Session has expired"
 msgstr "세션이 만료되었습니다"
 
-#: src/ui/main/timer/widgets/session-progress-bar.vala:1398
+#: src/ui/main/timer/widgets/session-progress-bar.vala:1472
 #, fuzzy, c-format
 msgid "Long break due in <b>%s</b>"
 msgstr "긴 휴식까지 <b>%s</b> 남음"
@@ -1069,22 +1091,22 @@ msgstr "기본 메뉴"
 msgid "Stats"
 msgstr "통계"
 
-#: src/ui/main/window.vala:301
+#: src/ui/main/window.vala:302
 #, fuzzy
 msgid "GNOME Shell extension available"
 msgstr "그놈 쉘 확장을 사용할 수 있습니다"
 
-#: src/ui/main/window.vala:302
+#: src/ui/main/window.vala:303
 #, fuzzy
 msgid "Learn More"
 msgstr "더 알아보기"
 
-#: src/ui/main/window.vala:324
+#: src/ui/main/window.vala:325
 #, fuzzy
 msgid "Keep timer running?"
 msgstr "타이머를 계속 실행할까요?"
 
-#: src/ui/main/window.vala:325
+#: src/ui/main/window.vala:326
 #, fuzzy
 msgid ""
 "You can keep it running in the background — notifications and keyboard "
@@ -1092,16 +1114,16 @@ msgid ""
 msgstr ""
 "배경에서 계속 실행할 수 있습니다. 알림과 키보드 단축키는 여전히 작동합니다."
 
-#: src/ui/main/window.vala:329
+#: src/ui/main/window.vala:330
 msgid "Quit"
 msgstr "종료"
 
-#: src/ui/main/window.vala:332
+#: src/ui/main/window.vala:333
 #, fuzzy
 msgid "Run in background"
 msgstr "배경에서 실행"
 
-#: src/ui/overlays/screen-overlay.ui:65
+#: src/ui/overlays/screen-overlay.ui:64
 msgid "It's time to take a break"
 msgstr "휴식을 취할 시간입니다"
 
@@ -1713,27 +1735,27 @@ msgid "Confirm Starting a Pomodoro"
 msgstr "포모도로 시작 전 확인"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
-#: src/ui/preferences/timer/preferences-panel-timer.vala:87
+#: src/ui/preferences/timer/preferences-panel-timer.vala:94
 #, fuzzy, c-format
 msgid "A single session will take <b>%s</b>."
 msgstr "단일 세션 소요 시간: <b>%s</b>."
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:88
+#: src/ui/preferences/timer/preferences-panel-timer.vala:95
 #, fuzzy, c-format
 msgid "<b>%u%%</b> of the time will be allocated for breaks."
 msgstr "전체 시간의 <b>%u%%</b>가 휴식에 할당됩니다."
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:136
+#: src/ui/preferences/timer/preferences-panel-timer.vala:143
 #, fuzzy
 msgid "Apply changes to ongoing Pomodoro?"
 msgstr "진행 중인 포모도로에 변경 사항을 적용할까요?"
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:137
+#: src/ui/preferences/timer/preferences-panel-timer.vala:144
 #, fuzzy
 msgid "Apply changes to ongoing break?"
 msgstr "진행 중인 휴식에 변경 사항을 적용할까요?"
 
-#: src/ui/preferences/timer/preferences-panel-timer.vala:139
+#: src/ui/preferences/timer/preferences-panel-timer.vala:146
 #, fuzzy
 msgid "Apply"
 msgstr "적용"
@@ -1742,6 +1764,24 @@ msgstr "적용"
 msgctxt "accessibility"
 msgid "Sidebar"
 msgstr "사이드바"
+
+#~ msgid "@APPLICATION_NAME@"
+#~ msgstr "@APPLICATION_NAME@"
+
+#~ msgid "timer;"
+#~ msgstr "타이머;timer;포모도로;pomodoro;"
+
+#~ msgid "Start/Stop"
+#~ msgstr "시작/정지"
+
+#~ msgid "Pause/Resume"
+#~ msgstr "일시 정지/재개"
+
+#~ msgid "Skip to a pomodoro or to a break"
+#~ msgstr "포모도로 또는 휴식으로 건너뛰기"
+
+#~ msgid "Reset current session"
+#~ msgstr "현재 세션 초기화"
 
 #~ msgid "Run as background service"
 #~ msgstr "백그라운드 서비스로 실행"
