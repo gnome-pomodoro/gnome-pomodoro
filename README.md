@@ -1,10 +1,10 @@
-# Pomodoro Timer for GNOME
+# Focus Timer
 
 <p align="center">
-  <img src="/data/icons/256x256/org.gnomepomodoro.Pomodoro.png" width="256" height="256">
+  <img src="/data/icons/256x256/io.github.focustimerhq.FocusTimer.png" width="256" height="256">
 </p>
 
-[Pomodoro Timer for GNOME](https://gnomepomodoro.org) is a time-management application that helps with taking breaks according to [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique). It intends to help maintain your focus and health. It's built
+[Focus Timer](https://gnomepomodoro.org) (formerly gnome-pomodoro) is a time-management application that helps with taking breaks according to [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique). It intends to help maintain your focus and health. It's built
 using [GNOME](https://gnome.org/) technologies. It integrates best with the GNOME desktop environment, but you should be able to use it on most Linux desktops with limited features.
 
 ## Screenshots
@@ -23,8 +23,8 @@ using [GNOME](https://gnome.org/) technologies. It integrates best with the GNOM
 To get latest releases we recommend installing the app via *Flatpak*:
 
 ```bash
-flatpak install flathub org.gnomepomodoro.Pomodoro
-flatpak run org.gnomepomodoro.Pomodoro
+flatpak install flathub io.github.focustimerhq.FocusTimer
+flatpak run io.github.focustimerhq.FocusTimer
 ```
 
 ### Distributions
@@ -61,8 +61,8 @@ To build the application from source, you will need `meson`, `ninja`, and the ne
 Clone the repository:
 
 ```bash
-git clone https://github.com/gnome-pomodoro/gnome-pomodoro.git
-cd gnome-pomodoro
+git clone https://github.com/focustimerhq/focus-timer.git
+cd focus-timer
 ```
 
 Build and install:
