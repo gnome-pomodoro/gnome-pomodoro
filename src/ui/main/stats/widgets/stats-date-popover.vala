@@ -7,13 +7,13 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/widgets/stats-date-popover.ui")]
     public class StatsDatePopover : Gtk.Popover
     {
         [CCode (notify = false)]
-        public Pomodoro.Timeframe timeframe {
+        public Ft.Timeframe timeframe {
             get {
                 return this._timeframe;
             }
@@ -71,17 +71,17 @@ namespace Pomodoro
         [GtkChild]
         private unowned Adw.ToggleGroup timeframe_toggle_group;
         [GtkChild]
-        private unowned Pomodoro.DayChooser day_chooser;
+        private unowned Ft.DayChooser day_chooser;
         [GtkChild]
-        private unowned Pomodoro.WeekChooser week_chooser;
+        private unowned Ft.WeekChooser week_chooser;
         [GtkChild]
-        private unowned Pomodoro.MonthChooser month_chooser;
+        private unowned Ft.MonthChooser month_chooser;
 
-        private Pomodoro.Timeframe _timeframe = Pomodoro.Timeframe.DAY;
-        private GLib.Date          _date;
-        private GLib.Date          _min_date;
-        private GLib.Date          _max_date;
-        private GLib.Date          user_selected_date;
+        private Ft.Timeframe    _timeframe = Ft.Timeframe.DAY;
+        private GLib.Date       _date;
+        private GLib.Date       _min_date;
+        private GLib.Date       _max_date;
+        private GLib.Date       user_selected_date;
 
         construct
         {
@@ -98,7 +98,7 @@ namespace Pomodoro
                                                       GLib.Value     source_value,
                                                       ref GLib.Value target_value)
         {
-            var timeframe = (Pomodoro.Timeframe) source_value.get_enum ();
+            var timeframe = (Ft.Timeframe) source_value.get_enum ();
 
             target_value.set_string (timeframe.to_string ());
 
@@ -109,7 +109,7 @@ namespace Pomodoro
                                                     GLib.Value     source_value,
                                                     ref GLib.Value target_value)
         {
-            var timeframe = Pomodoro.Timeframe.from_string (source_value.get_string ());
+            var timeframe = Ft.Timeframe.from_string (source_value.get_string ());
 
             target_value.set_enum (timeframe);
 
@@ -121,17 +121,17 @@ namespace Pomodoro
         {
             switch (this._timeframe)
             {
-                case Pomodoro.Timeframe.DAY:
+                case Ft.Timeframe.DAY:
                     display_month = this.day_chooser.display_month;
                     display_year = this.day_chooser.display_year;
                     break;
 
-                case Pomodoro.Timeframe.WEEK:
+                case Ft.Timeframe.WEEK:
                     display_month = this.week_chooser.display_month;
                     display_year = this.week_chooser.display_year;
                     break;
 
-                case Pomodoro.Timeframe.MONTH:
+                case Ft.Timeframe.MONTH:
                     display_month = this._date.valid () ? this._date.get_month () : GLib.DateMonth.BAD_MONTH;
                     display_year = this.month_chooser.display_year;
                     break;
@@ -142,7 +142,7 @@ namespace Pomodoro
 
             if (!display_month.valid () || !display_year.valid ())
             {
-                var today = Pomodoro.DateUtils.get_today ();
+                var today = Ft.DateUtils.get_today ();
 
                 display_month = today.get_month ();
                 display_year = today.get_year ();
@@ -161,16 +161,16 @@ namespace Pomodoro
                 return;
             }
 
-            this.day_chooser.selected_date = this._timeframe == Pomodoro.Timeframe.DAY
-                    ? Pomodoro.Timeframe.DAY.normalize_date (this._date)
+            this.day_chooser.selected_date = this._timeframe == Ft.Timeframe.DAY
+                    ? Ft.Timeframe.DAY.normalize_date (this._date)
                     : GLib.Date ();
-            this.month_chooser.selected_date = this._timeframe == Pomodoro.Timeframe.MONTH
-                    ? Pomodoro.Timeframe.MONTH.normalize_date (this._date)
+            this.month_chooser.selected_date = this._timeframe == Ft.Timeframe.MONTH
+                    ? Ft.Timeframe.MONTH.normalize_date (this._date)
                     : GLib.Date ();
 
-            if (this._timeframe == Pomodoro.Timeframe.WEEK)
+            if (this._timeframe == Ft.Timeframe.WEEK)
             {
-                var week_start_date = Pomodoro.Timeframe.WEEK.normalize_date (this._date);
+                var week_start_date = Ft.Timeframe.WEEK.normalize_date (this._date);
                 var week_end_date = week_start_date.copy ();
                 week_end_date.add_days (6U);
 
@@ -179,13 +179,13 @@ namespace Pomodoro
 
                 if (week_start_date.compare (display_date) >= 0) {
                     this.week_chooser.set_selected_date_full (
-                            Pomodoro.Timeframe.WEEK.normalize_date (this._date),
+                            Ft.Timeframe.WEEK.normalize_date (this._date),
                             week_start_date.get_month (),
                             week_start_date.get_year ());
                 }
                 else {
                     this.week_chooser.set_selected_date_full (
-                            Pomodoro.Timeframe.WEEK.normalize_date (this._date),
+                            Ft.Timeframe.WEEK.normalize_date (this._date),
                             week_end_date.get_month (),
                             week_end_date.get_year ());
                 }
@@ -197,18 +197,18 @@ namespace Pomodoro
 
         private void update_date_range ()
         {
-            this.day_chooser.min_date = Pomodoro.Timeframe.DAY.normalize_date (this._min_date);
-            this.day_chooser.max_date = Pomodoro.Timeframe.DAY.normalize_date (this._max_date);
+            this.day_chooser.min_date = Ft.Timeframe.DAY.normalize_date (this._min_date);
+            this.day_chooser.max_date = Ft.Timeframe.DAY.normalize_date (this._max_date);
 
-            this.week_chooser.min_date = Pomodoro.Timeframe.WEEK.normalize_date (this._min_date);
-            this.week_chooser.max_date = Pomodoro.Timeframe.WEEK.normalize_date (this._max_date);
+            this.week_chooser.min_date = Ft.Timeframe.WEEK.normalize_date (this._min_date);
+            this.week_chooser.max_date = Ft.Timeframe.WEEK.normalize_date (this._max_date);
 
-            this.month_chooser.min_date = Pomodoro.Timeframe.MONTH.normalize_date (this._min_date);
-            this.month_chooser.max_date = Pomodoro.Timeframe.MONTH.normalize_date (this._max_date);
+            this.month_chooser.min_date = Ft.Timeframe.MONTH.normalize_date (this._min_date);
+            this.month_chooser.max_date = Ft.Timeframe.MONTH.normalize_date (this._max_date);
         }
 
         private void set_date_timeframe (GLib.Date          date,
-                                         Pomodoro.Timeframe timeframe)
+                                         Ft.Timeframe timeframe)
         {
             GLib.DateMonth display_month;
             GLib.DateYear  display_year;
@@ -244,12 +244,12 @@ namespace Pomodoro
          * When selecting a higher timeframes we may loose user intent. We want to transition
          * between "this month", "this week" and "today" while switching timeframes.
          */
-        private GLib.Date refine_date (GLib.Date          date,
-                                       Pomodoro.Timeframe date_timeframe,
-                                       GLib.DateMonth     display_month = GLib.DateMonth.BAD_MONTH,
-                                       GLib.DateYear      display_year = GLib.DateYear.BAD_YEAR)
+        private GLib.Date refine_date (GLib.Date      date,
+                                       Ft.Timeframe   date_timeframe,
+                                       GLib.DateMonth display_month = GLib.DateMonth.BAD_MONTH,
+                                       GLib.DateYear  display_year = GLib.DateYear.BAD_YEAR)
         {
-            var today = Pomodoro.DateUtils.get_today ();
+            var today = Ft.DateUtils.get_today ();
             var refined_date = date.copy ();
 
             if (!date.valid ()) {
@@ -259,10 +259,10 @@ namespace Pomodoro
 
             switch (date_timeframe)
             {
-                case Pomodoro.Timeframe.DAY:
+                case Ft.Timeframe.DAY:
                     break;
 
-                case Pomodoro.Timeframe.WEEK:
+                case Ft.Timeframe.WEEK:
                     var week_start_date = date.copy ();
                     var week_end_date = date.copy ();
                     week_end_date.add_days (6U);
@@ -314,7 +314,7 @@ namespace Pomodoro
 
                     break;
 
-                case Pomodoro.Timeframe.MONTH:
+                case Ft.Timeframe.MONTH:
                     if (this.user_selected_date.valid () &&
                         this.user_selected_date.get_month () == date.get_month () &&
                         this.user_selected_date.get_year () == date.get_year ())
@@ -349,8 +349,7 @@ namespace Pomodoro
                                             GLib.ParamSpec pspec)
         {
             // Detect user selection
-            var timeframe = Pomodoro.Timeframe.from_string (
-                    this.timeframe_toggle_group.active_name);
+            var timeframe = Ft.Timeframe.from_string (this.timeframe_toggle_group.active_name);
 
             if (timeframe != this._timeframe) {
                 this.timeframe_selected (timeframe);
@@ -368,7 +367,7 @@ namespace Pomodoro
         [GtkCallback]
         private void on_week_selected (GLib.Date date)
         {
-            this.user_selected_date = this.refine_date (date, Pomodoro.Timeframe.WEEK);
+            this.user_selected_date = this.refine_date (date, Ft.Timeframe.WEEK);
 
             this.date_selected (this.user_selected_date);
         }
@@ -376,7 +375,7 @@ namespace Pomodoro
         [GtkCallback]
         private void on_month_selected (GLib.Date date)
         {
-            this.user_selected_date = this.refine_date (date, Pomodoro.Timeframe.MONTH);
+            this.user_selected_date = this.refine_date (date, Ft.Timeframe.MONTH);
 
             this.date_selected (this.user_selected_date);
         }
@@ -386,7 +385,7 @@ namespace Pomodoro
                                               GLib.DateYear  display_year)
         {
             this.user_selected_date = this.refine_date (this._date,
-                                                        Pomodoro.Timeframe.WEEK,
+                                                        Ft.Timeframe.WEEK,
                                                         display_month,
                                                         display_year);
             this.date_selected (this.user_selected_date);
@@ -400,7 +399,7 @@ namespace Pomodoro
         }
 
         [Signal (run = "last")]
-        public signal void timeframe_selected (Pomodoro.Timeframe timeframe)
+        public signal void timeframe_selected (Ft.Timeframe timeframe)
         {
             this.timeframe = timeframe;
         }

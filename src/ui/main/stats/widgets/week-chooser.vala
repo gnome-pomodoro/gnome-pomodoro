@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/widgets/week-chooser.ui")]
     public sealed class WeekChooser : Adw.Bin
@@ -114,11 +114,11 @@ namespace Pomodoro
             var display_date = GLib.Date ();
             display_date.set_dmy (1, month, year);
 
-            this.display_start_date = Pomodoro.Timeframe.WEEK.normalize_date (display_date);
+            this.display_start_date = Ft.Timeframe.WEEK.normalize_date (display_date);
 
             this.display_end_date = display_date.copy ();
             this.display_end_date.add_months (1U);
-            this.display_end_date = Pomodoro.Timeframe.WEEK.normalize_date (this.display_end_date);
+            this.display_end_date = Ft.Timeframe.WEEK.normalize_date (this.display_end_date);
 
             if (this.display_end_date.get_month () == display_date.get_month ()) {
                 this.display_end_date.add_days (7U);
@@ -241,7 +241,7 @@ namespace Pomodoro
 
             for (var column = 0; column < DAYS_PER_WEEK; column++)
             {
-                var day_name = Pomodoro.DateUtils.format_date (date, "%a");
+                var day_name = Ft.DateUtils.format_date (date, "%a");
                 var day_letter = day_name.get_char (0).toupper ().to_string ();
 
                 var label = new Gtk.Label (day_letter);
@@ -270,7 +270,7 @@ namespace Pomodoro
         private void update_header ()
         {
             var month_name = capitalize_words (
-                    Pomodoro.DateUtils.get_month_name (this._display_month));
+                    Ft.DateUtils.get_month_name (this._display_month));
             var year = (int) this._display_year;
 
             this.header_label.label = @"$(month_name) $(year)";
@@ -290,7 +290,7 @@ namespace Pomodoro
 
             var is_min_date_valid = this._min_date.valid ();
             var is_max_date_valid = this._max_date.valid ();
-            var first_day_of_week = Pomodoro.Locale.get_first_day_of_week ();
+            var first_day_of_week = Ft.Locale.get_first_day_of_week ();
             var week_number_offset = 1U - (
                     first_day_of_week == GLib.DateWeekday.MONDAY
                         ? year_start_date.get_monday_week_of_year ()
@@ -364,7 +364,7 @@ namespace Pomodoro
                 month = GLib.DateMonth.DECEMBER;
             }
             else {
-                month = (GLib.DateMonth)(Pomodoro.DateUtils.get_month_number (month) - 1U);
+                month = (GLib.DateMonth)(Ft.DateUtils.get_month_number (month) - 1U);
             }
 
             this.set_display_month_year (month, year);
@@ -381,7 +381,7 @@ namespace Pomodoro
                 month = GLib.DateMonth.JANUARY;
             }
             else {
-                month = (GLib.DateMonth)(Pomodoro.DateUtils.get_month_number (month) + 1U);
+                month = (GLib.DateMonth)(Ft.DateUtils.get_month_number (month) + 1U);
             }
 
             this.set_display_month_year (month, year);
@@ -411,7 +411,7 @@ namespace Pomodoro
                                              this._selected_date.get_year ());
             }
             else {
-                var today = Pomodoro.DateUtils.get_today ();
+                var today = Ft.DateUtils.get_today ();
 
                 this.set_display_month_year (today.get_month (), today.get_year ());
             }

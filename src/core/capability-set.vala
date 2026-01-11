@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public class CapabilitySet : GLib.Object
     {
@@ -28,15 +28,15 @@ namespace Pomodoro
                 if (this._preferred_capability != null && this._preferred_capability.is_available ())
                 {
                     if (this._enable &&
-                        this._preferred_capability.status != Pomodoro.CapabilityStatus.ENABLING &&
-                        this._preferred_capability.status != Pomodoro.CapabilityStatus.ENABLED)
+                        this._preferred_capability.status != Ft.CapabilityStatus.ENABLING &&
+                        this._preferred_capability.status != Ft.CapabilityStatus.ENABLED)
                     {
                         this._preferred_capability.enable ();
                     }
 
                     if (!this._enable && (
-                        this._preferred_capability.status == Pomodoro.CapabilityStatus.ENABLING ||
-                        this._preferred_capability.status == Pomodoro.CapabilityStatus.ENABLED))
+                        this._preferred_capability.status == Ft.CapabilityStatus.ENABLING ||
+                        this._preferred_capability.status == Ft.CapabilityStatus.ENABLED))
                     {
                         this._preferred_capability.disable ();
                     }
@@ -47,7 +47,7 @@ namespace Pomodoro
         }
 
         [CCode (notify = false)]
-        public unowned Pomodoro.Capability? preferred_capability {
+        public unowned Ft.Capability? preferred_capability {
             get {
                 return this._preferred_capability;
             }
@@ -55,8 +55,8 @@ namespace Pomodoro
                 if (this._preferred_capability != value)
                 {
                     if (this._preferred_capability != null && (
-                        this._preferred_capability.status == Pomodoro.CapabilityStatus.ENABLING ||
-                        this._preferred_capability.status == Pomodoro.CapabilityStatus.ENABLED))
+                        this._preferred_capability.status == Ft.CapabilityStatus.ENABLING ||
+                        this._preferred_capability.status == Ft.CapabilityStatus.ENABLED))
                     {
                         this._preferred_capability.disable ();
                     }
@@ -74,8 +74,8 @@ namespace Pomodoro
 
                     if (this._enable &&
                         this._preferred_capability.is_available () &&
-                        this._preferred_capability.status != Pomodoro.CapabilityStatus.ENABLING &&
-                        this._preferred_capability.status != Pomodoro.CapabilityStatus.ENABLED)
+                        this._preferred_capability.status != Ft.CapabilityStatus.ENABLING &&
+                        this._preferred_capability.status != Ft.CapabilityStatus.ENABLED)
                     {
                         this._preferred_capability.enable ();
                     }
@@ -83,17 +83,17 @@ namespace Pomodoro
             }
         }
 
-        private bool                                 _enable = false;
-        private Pomodoro.Capability?                 _preferred_capability = null;
-        private GLib.GenericSet<Pomodoro.Capability> capabilities = null;
+        private bool                           _enable = false;
+        private Ft.Capability?                 _preferred_capability = null;
+        private GLib.GenericSet<Ft.Capability> capabilities = null;
 
         public CapabilitySet ()
         {
-            this.capabilities = new GLib.GenericSet<Pomodoro.Capability> (direct_hash, direct_equal);
+            this.capabilities = new GLib.GenericSet<Ft.Capability> (direct_hash, direct_equal);
         }
 
-        private static int compare (Pomodoro.Capability capability,
-                                    Pomodoro.Capability other)
+        private static int compare (Ft.Capability capability,
+                                    Ft.Capability other)
         {
             var priority = capability.priority;
             var other_priority = other.priority;
@@ -113,7 +113,7 @@ namespace Pomodoro
 
         private void update_preferred_capability ()
         {
-            unowned Pomodoro.Capability? preferred_capability = null;
+            unowned Ft.Capability? preferred_capability = null;
 
             this.capabilities.@foreach (
                 (capability) => {
@@ -145,7 +145,7 @@ namespace Pomodoro
             this.update_preferred_capability ();
         }
 
-        public void add (Pomodoro.Capability capability)
+        public void add (Ft.Capability capability)
         {
             this.capabilities.add (capability);
 
@@ -158,7 +158,7 @@ namespace Pomodoro
             capability.notify["status"].connect (this.on_capability_notify_status);
         }
 
-        public void remove (Pomodoro.Capability capability)
+        public void remove (Ft.Capability capability)
         {
             this.capabilities.remove (capability);
 
@@ -171,7 +171,7 @@ namespace Pomodoro
             }
         }
 
-        public bool contains (Pomodoro.Capability capability)
+        public bool contains (Ft.Capability capability)
         {
             return this.capabilities.contains (capability);
         }
@@ -179,11 +179,13 @@ namespace Pomodoro
         /**
          * `status-changed` signal only tracks a preferred capability.
          */
-        public signal void status_changed (Pomodoro.Capability capability);
+        public signal void status_changed (Ft.Capability capability);
 
         public override void dispose ()
         {
-            if (this._preferred_capability != null && this._preferred_capability.status == Pomodoro.CapabilityStatus.ENABLED) {
+            if (this._preferred_capability != null &&
+                this._preferred_capability.status == Ft.CapabilityStatus.ENABLED)
+            {
                 this._preferred_capability.disable ();
             }
 

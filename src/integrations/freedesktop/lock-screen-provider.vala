@@ -6,7 +6,7 @@
 
 namespace Freedesktop
 {
-    public class LockScreenProvider : Pomodoro.Provider, Pomodoro.LockScreenProvider
+    public class LockScreenProvider : Ft.Provider, Ft.LockScreenProvider
     {
         public bool active {
             get {

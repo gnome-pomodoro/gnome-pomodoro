@@ -6,7 +6,7 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * Provider class helps integrating with an external service. Unlike capabilities which may be enabled/disabled

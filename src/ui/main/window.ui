@@ -27,14 +27,14 @@
       </item>
     </section>
   </menu>
-  <template class="PomodoroWindow" parent="AdwApplicationWindow">
+  <template class="FtWindow" parent="AdwApplicationWindow">
     <property name="default-width">400</property>
     <property name="default-height">600</property>
     <property name="content">
-      <object class="PomodoroSizeStack" id="size_stack">
+      <object class="FtSizeStack" id="size_stack">
         <property name="transition-duration">500</property>
         <child>
-          <object class="PomodoroSizeStackPage">
+          <object class="FtSizeStackPage">
             <property name="name">normal</property>
             <property name="resizable">true</property>
             <property name="child">
@@ -51,7 +51,7 @@
                       </object>
                     </property>
                     <style>
-                      <class name="pomodoro-header-bar"/>
+                      <class name="ft-header-bar"/>
                     </style>
                     <child type="end">
                       <object class="GtkMenuButton">
@@ -76,7 +76,7 @@
                             <property name="title" translatable="yes">Timer</property>
                             <property name="icon-name">timer-symbolic</property>
                             <property name="child">
-                              <object class="PomodoroTimerView" id="timer_view">
+                              <object class="FtTimerView" id="timer_view">
                                 <child>
                                   <object class="GtkGestureClick">
                                     <signal name="pressed" handler="on_gesture_click_pressed"/>
@@ -92,7 +92,7 @@
                             <property name="title" translatable="yes">Stats</property>
                             <property name="icon-name">stats-symbolic</property>
                             <property name="child">
-                              <object class="PomodoroStatsView"/>
+                              <object class="FtStatsView"/>
                             </property>
                           </object>
                         </child>
@@ -106,14 +106,14 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroSizeStackPage">
+          <object class="FtSizeStackPage">
             <property name="name">compact</property>
             <property name="resizable">false</property>
             <property name="child">
               <object class="GtkWindowHandle">
                 <property name="valign">start</property>
                 <property name="child">
-                  <object class="PomodoroCompactTimerView">
+                  <object class="FtCompactTimerView">
                     <child>
                       <object class="GtkGestureClick">
                         <signal name="pressed" handler="on_gesture_click_pressed"/>

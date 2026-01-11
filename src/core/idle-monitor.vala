@@ -6,13 +6,13 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public delegate void UserIdleFunc ();
     public delegate void UserActiveFunc ();
 
 
-    public interface IdleMonitorProvider : Pomodoro.Provider
+    public interface IdleMonitorProvider : Ft.Provider
     {
         public abstract int64 get_idle_time () throws GLib.Error;
         public abstract uint32 add_idle_watch (int64 timeout, int64 monotonic_time) throws GLib.Error;
@@ -32,7 +32,7 @@ namespace Pomodoro
         public static int64 calculate_absolute_timeout (int64 relative_timeout,
                                                         int64 idle_time,
                                                         int64 reference_time)
-                                                        requires (Pomodoro.Timestamp.is_defined (reference_time))
+                                                        requires (Ft.Timestamp.is_defined (reference_time))
         {
             if (idle_time == 0) {
                 return relative_timeout;
@@ -49,7 +49,7 @@ namespace Pomodoro
 
 
     // TODO: should be defined in tests
-    public class DummyIdleMonitorProvider : Pomodoro.Provider, Pomodoro.IdleMonitorProvider
+    public class DummyIdleMonitorProvider : Ft.Provider, Ft.IdleMonitorProvider
     {
         public override async void initialize (GLib.Cancellable? cancellable) throws GLib.Error
         {
@@ -100,21 +100,21 @@ namespace Pomodoro
 
 
     [SingleInstance]
-    public class IdleMonitor : Pomodoro.ProvidedObject<Pomodoro.IdleMonitorProvider>
+    public class IdleMonitor : Ft.ProvidedObject<Ft.IdleMonitorProvider>
     {
         private static uint next_watch_id = 1U;
 
         [Compact]
         private class Watch
         {
-            public uint                                  id = 0U;
-            public uint32                                external_id = 0U;
-            public int64                                 timeout = 0;
-            public int64                                 reference_time = Pomodoro.Timestamp.UNDEFINED;
-            public Pomodoro.UserIdleFunc?                idle_callback = null;
-            public Pomodoro.UserActiveFunc?              active_callback = null;
-            public unowned Pomodoro.IdleMonitorProvider? provider = null;
-            public bool                                  invalid = false;
+            public uint                            id = 0U;
+            public uint32                          external_id = 0U;
+            public int64                           timeout = 0;
+            public int64                           reference_time = Ft.Timestamp.UNDEFINED;
+            public Ft.UserIdleFunc?                idle_callback = null;
+            public Ft.UserActiveFunc?              active_callback = null;
+            public unowned Ft.IdleMonitorProvider? provider = null;
+            public bool                            invalid = false;
 
             ~Watch ()
             {
@@ -125,7 +125,7 @@ namespace Pomodoro
         }
 
         private GLib.HashTable<int64?, Watch> watches = null;
-        private int64                         last_activity_time = Pomodoro.Timestamp.UNDEFINED;
+        private int64                         last_activity_time = Ft.Timestamp.UNDEFINED;
 
         private void on_became_idle (uint32 id)
         {
@@ -193,16 +193,16 @@ namespace Pomodoro
         protected override void setup_providers ()
         {
             // XXX: this should be defined in tests
-            if (Pomodoro.is_test ()) {
-                this.providers.add (new Pomodoro.DummyIdleMonitorProvider (), Pomodoro.Priority.HIGH);
+            if (Ft.is_test ()) {
+                this.providers.add (new Ft.DummyIdleMonitorProvider (), Ft.Priority.HIGH);
                 return;
             }
 
             // TODO: Providers should register themselves in a static constructors, but can't make it work...
-            this.providers.add (new Gnome.IdleMonitorProvider (), Pomodoro.Priority.HIGH);
+            this.providers.add (new Gnome.IdleMonitorProvider (), Ft.Priority.HIGH);
         }
 
-        protected override void provider_enabled (Pomodoro.IdleMonitorProvider provider)
+        protected override void provider_enabled (Ft.IdleMonitorProvider provider)
         {
             provider.became_idle.connect (this.on_became_idle);
             provider.became_active.connect (this.on_became_active);
@@ -219,7 +219,7 @@ namespace Pomodoro
                 });
         }
 
-        protected override void provider_disabled (Pomodoro.IdleMonitorProvider provider)
+        protected override void provider_disabled (Ft.IdleMonitorProvider provider)
         {
             provider.became_idle.disconnect (this.on_became_idle);
             provider.became_active.disconnect (this.on_became_active);
@@ -252,8 +252,8 @@ namespace Pomodoro
             }
         }
 
-        public bool is_idle (int64 duration = Pomodoro.Interval.SECOND,
-                             int64 monotonic_time = Pomodoro.Timestamp.UNDEFINED)
+        public bool is_idle (int64 duration = Ft.Interval.SECOND,
+                             int64 monotonic_time = Ft.Timestamp.UNDEFINED)
         {
             if (this.provider == null) {
                 return false;
@@ -263,7 +263,7 @@ namespace Pomodoro
                 return false;
             }
 
-            if (Pomodoro.Timestamp.is_undefined (monotonic_time)) {
+            if (Ft.Timestamp.is_undefined (monotonic_time)) {
                 monotonic_time = GLib.get_monotonic_time ();
             }
 
@@ -280,9 +280,9 @@ namespace Pomodoro
             }
         }
 
-        // public void mark_activity (int64 monotonic_time = Pomodoro.Timestamp.UNDEFINED)
+        // public void mark_activity (int64 monotonic_time = Ft.Timestamp.UNDEFINED)
         // {
-        //     if (Pomodoro.Timestamp.is_undefined (monotonic_time)) {
+        //     if (Ft.Timestamp.is_undefined (monotonic_time)) {
         //         monotonic_time = GLib.get_monotonic_time ();
         //     }
         //
@@ -299,16 +299,16 @@ namespace Pomodoro
          * `reference_time` specifies whether idle-time should be detected from this point of time,
          * otherwise the callback will be called counting from the time of users last activity.
          */
-        public uint add_idle_watch (int64                       timeout,
-                                    owned Pomodoro.UserIdleFunc callback,
-                                    int64                       monotonic_time = Pomodoro.Timestamp.UNDEFINED)
+        public uint add_idle_watch (int64                 timeout,
+                                    owned Ft.UserIdleFunc callback,
+                                    int64                 monotonic_time = Ft.Timestamp.UNDEFINED)
         {
             if (timeout == 0) {
                 return 0;
             }
 
-            var watch_id = Pomodoro.IdleMonitor.next_watch_id;
-            Pomodoro.IdleMonitor.next_watch_id++;
+            var watch_id = Ft.IdleMonitor.next_watch_id;
+            Ft.IdleMonitor.next_watch_id++;
 
             var watch = new Watch ();
             watch.id = watch_id;
@@ -338,11 +338,11 @@ namespace Pomodoro
         /**
          * Trigger callback on first user activity counting from now.
          */
-        public uint add_active_watch (owned Pomodoro.UserActiveFunc callback,
-                                      int64                         monotonic_time = Pomodoro.Timestamp.UNDEFINED)
+        public uint add_active_watch (owned Ft.UserActiveFunc callback,
+                                      int64                   monotonic_time = Ft.Timestamp.UNDEFINED)
         {
-            var watch_id = Pomodoro.IdleMonitor.next_watch_id;
-            Pomodoro.IdleMonitor.next_watch_id++;
+            var watch_id = Ft.IdleMonitor.next_watch_id;
+            Ft.IdleMonitor.next_watch_id++;
 
             var watch = new Watch ();
             watch.id = watch_id;

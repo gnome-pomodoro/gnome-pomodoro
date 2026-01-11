@@ -9,30 +9,30 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
-    public delegate void CapabilityStatusChangedFunc (Pomodoro.Capability capability);
+    public delegate void CapabilityStatusChangedFunc (Ft.Capability capability);
 
 
     internal struct CapabilityMeta
     {
-        public string            name;
-        public Pomodoro.Priority priority;
-        public GLib.Type         class_type;
+        public string      name;
+        public Ft.Priority priority;
+        public GLib.Type   class_type;
     }
 
 
     [SingleInstance]
     public class CapabilityManager : GLib.Object
     {
-        private GLib.HashTable<string, Pomodoro.CapabilitySet> capabilities;
-        private bool                                           destroying = false;
+        private GLib.HashTable<string, Ft.CapabilitySet> capabilities;
+        private bool                                     destroying = false;
 
-        private static Pomodoro.CapabilityMeta[] registry;
+        private static Ft.CapabilityMeta[] registry;
 
         construct
         {
-            this.capabilities = new GLib.HashTable<string, Pomodoro.CapabilitySet> (str_hash, str_equal);
+            this.capabilities = new GLib.HashTable<string, Ft.CapabilitySet> (str_hash, str_equal);
         }
 
         public void populate ()
@@ -44,19 +44,20 @@ namespace Pomodoro
                 var name_value = GLib.Value (typeof (string));
                 name_value.set_string (capability_meta.name);
 
-                var priority_value = GLib.Value (typeof (Pomodoro.Priority));
+                var priority_value = GLib.Value (typeof (Ft.Priority));
                 priority_value.set_enum (capability_meta.priority);
 
-                this.register ((Pomodoro.Capability) GLib.Object.new_with_properties (capability_meta.class_type,
-                                                                                      {"name", "priority"},
-                                                                                      {name_value, priority_value}));
+                this.register ((Ft.Capability) GLib.Object.new_with_properties (
+                        capability_meta.class_type,
+                        {"name", "priority"},
+                        {name_value, priority_value}));
             }
         }
 
         /**
          * Return a preferred capability.
          */
-        public unowned Pomodoro.Capability? lookup (string capability_name)
+        public unowned Ft.Capability? lookup (string capability_name)
         {
             var capability_set = this.capabilities.lookup (capability_name);
 
@@ -83,18 +84,18 @@ namespace Pomodoro
                 : false;
         }
 
-        public static void register_class (string            name,
-                                           Pomodoro.Priority priority,
-                                           GLib.Type         class_type)
+        public static void register_class (string      name,
+                                           Ft.Priority priority,
+                                           GLib.Type   class_type)
         {
-            registry += Pomodoro.CapabilityMeta () {
+            registry += Ft.CapabilityMeta () {
                 name = name,
                 priority = priority,
                 class_type = class_type
             };
         }
 
-        public void register (Pomodoro.Capability capability)
+        public void register (Ft.Capability capability)
                               requires (capability.name != null)
         {
             var capability_set = this.ensure_capability_set (capability.name);
@@ -104,7 +105,7 @@ namespace Pomodoro
             }
         }
 
-        public void unregister (Pomodoro.Capability capability)
+        public void unregister (Ft.Capability capability)
         {
             var capability_name = capability.name;
             var capability_set = this.capabilities.lookup (capability_name);
@@ -114,13 +115,13 @@ namespace Pomodoro
             }
         }
 
-        private unowned Pomodoro.CapabilitySet ensure_capability_set (string capability_name)
+        private unowned Ft.CapabilitySet ensure_capability_set (string capability_name)
         {
-            unowned Pomodoro.CapabilitySet existing_capability_set = this.capabilities.lookup (capability_name);
+            unowned Ft.CapabilitySet existing_capability_set = this.capabilities.lookup (capability_name);
 
             if (existing_capability_set == null)
             {
-                var capability_set = new Pomodoro.CapabilitySet ();
+                var capability_set = new Ft.CapabilitySet ();
 
                 this.capabilities.insert (capability_name, capability_set);
 
@@ -166,7 +167,7 @@ namespace Pomodoro
                 return;
             }
 
-            if (capability.status != Pomodoro.CapabilityStatus.ENABLED) {
+            if (capability.status != Ft.CapabilityStatus.ENABLED) {
                 GLib.debug ("Can't activate capability %s: its status is \"%s\"",
                             capability.get_debug_name (),
                             capability.status.to_string ());
@@ -176,8 +177,8 @@ namespace Pomodoro
             capability.activate ();
         }
 
-        public ulong add_watch (string                               capability_name,
-                                Pomodoro.CapabilityStatusChangedFunc status_changed_func)
+        public ulong add_watch (string                         capability_name,
+                                Ft.CapabilityStatusChangedFunc status_changed_func)
         {
             var capability_set = this.ensure_capability_set (capability_name);
 
@@ -203,7 +204,7 @@ namespace Pomodoro
          * `status-changed` signal only track of a preferred capabilities, so that you don't get updated about
          * capabilities that may be asynchronously disabled.
          */
-        public signal void status_changed (Pomodoro.Capability capability);
+        public signal void status_changed (Ft.Capability capability);
 
         public void destroy ()
         {

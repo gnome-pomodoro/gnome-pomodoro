@@ -5,7 +5,7 @@
  */
 
 [CCode (cprefix = "")]
-namespace Pomodoro.Locale
+namespace Ft.Locale
 {
     #if HAVE_ALTMON
     [CCode (cheader_filename = "langinfo.h", cprefix = "", has_type_id = false)]

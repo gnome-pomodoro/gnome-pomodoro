@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     [CCode (scope = "weak")]
     public delegate string FormatValueFunc (double value);
@@ -97,17 +97,17 @@ namespace Pomodoro
         internal int label_width;
         internal int label_height;
 
-        private Gtk.Orientation           _orientation = Gtk.Orientation.HORIZONTAL;
-        private float                     _value_from = 0.0f;
-        private float                     _value_to = 1.0f;
-        private float                     _value_spacing = 1.0f;
-        private float                     _scale = 1.0f;
-        private int                       _text_offset = 0;
-        private bool                      _continous = true;
-        private int                       _origin = 0;
-        private float[]                   ticks = null;
-        private Pango.Layout[]            layouts = null;
-        private Pomodoro.FormatValueFunc? format_value_func = null;
+        private Gtk.Orientation     _orientation = Gtk.Orientation.HORIZONTAL;
+        private float               _value_from = 0.0f;
+        private float               _value_to = 1.0f;
+        private float               _value_spacing = 1.0f;
+        private float               _scale = 1.0f;
+        private int                 _text_offset = 0;
+        private bool                _continous = true;
+        private int                 _origin = 0;
+        private float[]             ticks = null;
+        private Pango.Layout[]      layouts = null;
+        private Ft.FormatValueFunc? format_value_func = null;
 
         static construct
         {
@@ -119,8 +119,8 @@ namespace Pomodoro
             this.layouts = {};
         }
 
-        public ChartAxis (Gtk.Orientation                 orientation,
-                          owned Pomodoro.FormatValueFunc? format_value_func = null)
+        public ChartAxis (Gtk.Orientation           orientation,
+                          owned Ft.FormatValueFunc? format_value_func = null)
         {
             GLib.Object (
                 orientation: orientation,
@@ -365,7 +365,7 @@ namespace Pomodoro
             }
         }
 
-        public void set_format_value_func (owned Pomodoro.FormatValueFunc? func)
+        public void set_format_value_func (owned Ft.FormatValueFunc? func)
         {
             this.format_value_func = (owned) func;
 
@@ -401,14 +401,14 @@ namespace Pomodoro
             return this.ticks;
         }
 
-        public Pomodoro.ChartAxis detach ()
+        public Ft.ChartAxis detach ()
         {
-            var clone = (Pomodoro.ChartAxis) GLib.Object.@new (
-                    typeof (Pomodoro.ChartAxis),
+            var clone = (Ft.ChartAxis) GLib.Object.@new (
+                    typeof (Ft.ChartAxis),
                     orientation: this._orientation);
 
             var initial_ref_count  = this.ref_count;
-            weak Pomodoro.ChartAxis self = this;
+            weak Ft.ChartAxis self = this;
             GLib.WeakRef weak_clone = GLib.WeakRef (clone);
             ulong configured_id = 0,
                   destroy_id = 0,
@@ -435,7 +435,7 @@ namespace Pomodoro
 
             configured_id = this.configured.connect (
                 () => {
-                    var _clone = (Pomodoro.ChartAxis) weak_clone.get ();
+                    var _clone = (Ft.ChartAxis) weak_clone.get ();
 
                     if (_clone != null)
                     {
@@ -447,7 +447,7 @@ namespace Pomodoro
                 });
             destroy_id = this.destroy.connect (
                 () => {
-                    var _clone = (Pomodoro.ChartAxis) weak_clone.get ();
+                    var _clone = (Ft.ChartAxis) weak_clone.get ();
 
                     if (_clone != null) {
                         _clone.set_format_value_func (null);
@@ -470,7 +470,7 @@ namespace Pomodoro
                 });
             clone_destroy_id = clone.destroy.connect (
                 () => {
-                    var _clone = (Pomodoro.ChartAxis) weak_clone.get ();
+                    var _clone = (Ft.ChartAxis) weak_clone.get ();
 
                     if (_clone != null) {
                         _clone.set_format_value_func (null);

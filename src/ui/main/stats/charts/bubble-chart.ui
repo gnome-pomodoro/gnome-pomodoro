@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
-  <template class="PomodoroBubbleChart" parent="GtkWidget">
+  <template class="FtBubbleChart" parent="GtkWidget">
     <property name="accessible-role">img</property>
     <child>
       <object class="GtkGrid" id="layout_grid">

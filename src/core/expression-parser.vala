@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public errordomain ExpressionParserError
     {
@@ -135,14 +135,14 @@ namespace Pomodoro
     {
         private const uint BASE_OPERATOR_PRECEDENCE = 1000U;
 
-        public GLib.HashTable<string, Pomodoro.Operator> operators;
+        public GLib.HashTable<string, Ft.Operator> operators;
 
         public ExpressionParser ()
         {
-            this.operators = new GLib.HashTable<string, Pomodoro.Operator> (
+            this.operators = new GLib.HashTable<string, Ft.Operator> (
                 GLib.str_hash, GLib.str_equal);
 
-            Pomodoro.Operator.@foreach (
+            Ft.Operator.@foreach (
                 (operator) => {
                     operators.insert (operator.to_string (), operator);
                 });
@@ -174,7 +174,7 @@ namespace Pomodoro
 
         private Token tokenize_string_literal (string  text,
                                                ref int index)
-                                               throws Pomodoro.ExpressionParserError
+                                               throws Ft.ExpressionParserError
         {
             var token = new Token () {
                 type = TokenType.STRING_LITERAL,
@@ -238,7 +238,7 @@ namespace Pomodoro
                 string_builder.append_unichar (chr);
             }
 
-            throw new Pomodoro.ExpressionParserError.SYNTAX_ERROR ("Unquoted string at %d", index);
+            throw new Ft.ExpressionParserError.SYNTAX_ERROR ("Unquoted string at %d", index);
         }
 
         private Token tokenize_identifier (string  text,
@@ -276,7 +276,7 @@ namespace Pomodoro
 
         private Token tokenize_operator (string  text,
                                          ref int index)
-                                         throws Pomodoro.ExpressionParserError
+                                         throws Ft.ExpressionParserError
         {
             var token = new Token () {
                 type = TokenType.OPERATOR,
@@ -307,7 +307,7 @@ namespace Pomodoro
             token.text = text.substring (token.span_start, token.span_end - token.span_start);
 
             if (!this.operators.contains (token.text)) {
-                throw new Pomodoro.ExpressionParserError.SYNTAX_ERROR (
+                throw new Ft.ExpressionParserError.SYNTAX_ERROR (
                     "Invalid operator '%s' at position %d", token.text, index);
             }
 
@@ -346,7 +346,7 @@ namespace Pomodoro
         }
 
         private GLib.Array<Token> tokenize (string text)
-                                            throws Pomodoro.ExpressionParserError
+                                            throws Ft.ExpressionParserError
         {
             var tokens = new GLib.Array<Token>.sized (false, true, 8U);
 
@@ -409,7 +409,7 @@ namespace Pomodoro
                             break;
                         }
 
-                        throw new Pomodoro.ExpressionParserError.SYNTAX_ERROR (
+                        throw new Ft.ExpressionParserError.SYNTAX_ERROR (
                             "Unexpected expression %s",
                             format_error_context (text, chr_span_start));
                 }
@@ -426,7 +426,7 @@ namespace Pomodoro
 
             while (node != null)
             {
-                if (node.type == Pomodoro.TokenType.PARENTHESIS && node.matching_token == null) {
+                if (node.type == Ft.TokenType.PARENTHESIS && node.matching_token == null) {
                     return node;
                 }
 
@@ -497,7 +497,7 @@ namespace Pomodoro
                     // is kept as `token.matching_token` to indicate whether parenthesis is still
                     // open while building the token tree.
                     return previous_token != null &&
-                           previous_token.type == Pomodoro.TokenType.PARENTHESIS
+                           previous_token.type == Ft.TokenType.PARENTHESIS
                         ? previous_token.precedence - 1U
                         : BASE_OPERATOR_PRECEDENCE;
 
@@ -509,19 +509,19 @@ namespace Pomodoro
         private inline unowned Token? link_tokens (Token  token,
                                                    Token? previous_token)
         {
-            if (token.type == Pomodoro.TokenType.OPERATOR)
+            if (token.type == Ft.TokenType.OPERATOR)
             {
                 // If the same operator is repeated, ignore it and use the first token.
                 // Find closest operator.
                 unowned var reference_token = previous_token;
 
                 while (reference_token.parent != null &&
-                       reference_token.type != Pomodoro.TokenType.OPERATOR)
+                       reference_token.type != Ft.TokenType.OPERATOR)
                 {
                     reference_token = reference_token.parent;
                 }
 
-                if (reference_token.type == Pomodoro.TokenType.OPERATOR &&
+                if (reference_token.type == Ft.TokenType.OPERATOR &&
                     reference_token.text == token.text)
                 {
                     return reference_token;  // use first operator token for an operation
@@ -571,7 +571,7 @@ namespace Pomodoro
          *        B    C
          */
         public unowned Token? build_token_tree (GLib.Array<Token> tokens)
-                                                throws Pomodoro.ExpressionParserError
+                                                throws Ft.ExpressionParserError
         {
             unowned Token? token = null;
             unowned Token? previous_token = null;
@@ -582,7 +582,7 @@ namespace Pomodoro
 
                 // Validate token
                 if (!this.is_valid_token (token, previous_token)) {
-                    throw new Pomodoro.ExpressionParserError.SYNTAX_ERROR (
+                    throw new Ft.ExpressionParserError.SYNTAX_ERROR (
                         "Unexpected token '%s' at position %d", token.text, token.span_start);
                 }
 
@@ -591,8 +591,7 @@ namespace Pomodoro
                     unowned var reference_token = this.find_open_parenthesis (previous_token);
 
                     if (reference_token == null) {
-                        throw new Pomodoro.ExpressionParserError.SYNTAX_ERROR (
-                            "Unmatched parenthesis");
+                        throw new Ft.ExpressionParserError.SYNTAX_ERROR ("Unmatched parenthesis");
                     }
 
                     reference_token.matching_token = token;
@@ -610,7 +609,7 @@ namespace Pomodoro
             }
 
             if (!this.is_valid_expression (token)) {
-                throw new Pomodoro.ExpressionParserError.SYNTAX_ERROR (
+                throw new Ft.ExpressionParserError.SYNTAX_ERROR (
                     "Unexpected end of expression");
             }
 
@@ -622,82 +621,82 @@ namespace Pomodoro
          * look more like JSON. But this has cost - we now have to deduce original types from
          * the strings during parsing.
          */
-        private inline Pomodoro.Value cast_string_literal (string text)
+        private inline Ft.Value cast_string_literal (string text)
         {
             switch (text)
             {
                 case "stopped":
-                    return new Pomodoro.StateValue (Pomodoro.State.STOPPED);
+                    return new Ft.StateValue (Ft.State.STOPPED);
 
                 case "pomodoro":
-                    return new Pomodoro.StateValue (Pomodoro.State.POMODORO);
+                    return new Ft.StateValue (Ft.State.POMODORO);
 
                 case "break":
-                    return new Pomodoro.StateValue (Pomodoro.State.BREAK);
+                    return new Ft.StateValue (Ft.State.BREAK);
 
                 case "short-break":
-                    return new Pomodoro.StateValue (Pomodoro.State.SHORT_BREAK);
+                    return new Ft.StateValue (Ft.State.SHORT_BREAK);
 
                 case "long-break":
-                    return new Pomodoro.StateValue (Pomodoro.State.LONG_BREAK);
+                    return new Ft.StateValue (Ft.State.LONG_BREAK);
 
                 case "scheduled":
-                    return new Pomodoro.StatusValue (Pomodoro.TimeBlockStatus.SCHEDULED);
+                    return new Ft.StatusValue (Ft.TimeBlockStatus.SCHEDULED);
 
                 case "in-progress":
-                    return new Pomodoro.StatusValue (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+                    return new Ft.StatusValue (Ft.TimeBlockStatus.IN_PROGRESS);
 
                 case "completed":
-                    return new Pomodoro.StatusValue (Pomodoro.TimeBlockStatus.COMPLETED);
+                    return new Ft.StatusValue (Ft.TimeBlockStatus.COMPLETED);
 
                 case "uncompleted":
-                    return new Pomodoro.StatusValue (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+                    return new Ft.StatusValue (Ft.TimeBlockStatus.UNCOMPLETED);
 
                 default:
                     break;
             }
 
-            var timestamp = Pomodoro.Timestamp.from_iso8601 (text);
+            var timestamp = Ft.Timestamp.from_iso8601 (text);
 
-            if (timestamp != Pomodoro.Timestamp.UNDEFINED) {
-                return new Pomodoro.TimestampValue (timestamp);
+            if (timestamp != Ft.Timestamp.UNDEFINED) {
+                return new Ft.TimestampValue (timestamp);
             }
 
-            return new Pomodoro.StringValue (text);
+            return new Ft.StringValue (text);
         }
 
-        private inline Pomodoro.Value cast_numeric_literal (string text)
+        private inline Ft.Value cast_numeric_literal (string text)
         {
             // XXX: handle overflow errors when parsing int?
 
-            return new Pomodoro.IntervalValue (int64.parse (text));
+            return new Ft.IntervalValue (int64.parse (text));
         }
 
-        private inline Pomodoro.Expression? interpret_identifier (Token token)
-                                                                  throws Pomodoro.ExpressionParserError
+        private inline Ft.Expression? interpret_identifier (Token token)
+                                                            throws Ft.ExpressionParserError
         {
             assert (token.n_children () == 0);
 
             if (token.text == "true") {
-                return new Pomodoro.Constant (new Pomodoro.BooleanValue (true));
+                return new Ft.Constant (new Ft.BooleanValue (true));
             }
 
             if (token.text == "false") {
-                return new Pomodoro.Constant (new Pomodoro.BooleanValue (false));
+                return new Ft.Constant (new Ft.BooleanValue (false));
             }
 
-            var name = Pomodoro.from_camel_case (token.text);
+            var name = Ft.from_camel_case (token.text);
 
-            if (Pomodoro.find_variable (name) == null) {
-                throw new Pomodoro.ExpressionParserError.UNKNOWN_IDENTIFIER (
+            if (Ft.find_variable (name) == null) {
+                throw new Ft.ExpressionParserError.UNKNOWN_IDENTIFIER (
                     "Unknown identifier '%s' at %d", token.text, token.span_start);
             }
 
-            return new Pomodoro.Variable (name);
+            return new Ft.Variable (name);
         }
 
-        private inline Pomodoro.Expression? interpret_operator (Token token)
-                                                            throws Pomodoro.ExpressionParserError
+        private inline Ft.Expression? interpret_operator (Token token)
+                                                          throws Ft.ExpressionParserError
         {
             var operator = this.operators.lookup (token.text);
             var n_children = token.n_children ();
@@ -705,25 +704,25 @@ namespace Pomodoro
 
             switch (operator.get_category ())
             {
-                case Pomodoro.OperatorCategory.LOGICAL:
+                case Ft.OperatorCategory.LOGICAL:
                     assert (n_children >= 2);
 
-                    var arguments = new Pomodoro.Expression[n_children];
+                    var arguments = new Ft.Expression[n_children];
 
                     for (var index = 0; index < n_children; index++) {
                         arguments[index] = this.interpret (child);
                         child = child.next;
                     }
 
-                    return new Pomodoro.Operation.with_argv (operator, arguments);
+                    return new Ft.Operation.with_argv (operator, arguments);
 
-                case Pomodoro.OperatorCategory.COMPARISON:
+                case Ft.OperatorCategory.COMPARISON:
                     assert (n_children == 2);
 
                     var argument_lhs = this.interpret (child);
                     var argument_rhs = this.interpret (child.next);
 
-                    return new Pomodoro.Comparison (argument_lhs, operator, argument_rhs);
+                    return new Ft.Comparison (argument_lhs, operator, argument_rhs);
 
                 default:
                     assert_not_reached ();
@@ -733,8 +732,8 @@ namespace Pomodoro
         /**
          * Convert token tree (aka AST) into our expression.
          */
-        private Pomodoro.Expression? interpret (Token? token)
-                                                throws Pomodoro.ExpressionParserError
+        private Ft.Expression? interpret (Token? token)
+                                          throws Ft.ExpressionParserError
         {
             if (token == null) {
                 return null;
@@ -745,12 +744,12 @@ namespace Pomodoro
                 case TokenType.STRING_LITERAL:
                     assert (token.n_children () == 0);
 
-                    return new Pomodoro.Constant (this.cast_string_literal (token.text));
+                    return new Ft.Constant (this.cast_string_literal (token.text));
 
                 case TokenType.NUMERIC_LITERAL:
                     assert (token.n_children () == 0);
 
-                    return new Pomodoro.Constant (this.cast_numeric_literal (token.text));
+                    return new Ft.Constant (this.cast_numeric_literal (token.text));
 
                 case TokenType.IDENTIFIER:
                     assert (token.n_children () == 0);
@@ -768,8 +767,8 @@ namespace Pomodoro
             }
         }
 
-        public Pomodoro.Expression? parse (string text)
-                                           throws Pomodoro.ExpressionParserError
+        public Ft.Expression? parse (string text)
+                                     throws Ft.ExpressionParserError
         {
             var tokens = this.tokenize (text);
             unowned var root = this.build_token_tree (tokens);

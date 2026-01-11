@@ -6,7 +6,7 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * A primary monitor used to be defined in X11. Nowadays a primary monitor might be chosen
@@ -192,24 +192,24 @@ namespace Pomodoro
      */
     public class LightboxGroup : GLib.InitiallyUnowned
     {
-        private GLib.Type                           lightbox_type;
-        private GLib.GenericSet<Pomodoro.Lightbox>? lightboxes = null;
-        private Gtk.WindowGroup?                    window_group = null;
-        private GLib.ListModel?                     monitors = null;
-        private ulong                               monitors_changed_id = 0;
-        private uint                                updating_count = 0;
-        private uint                                update_idle_id = 0;
-        private GLib.SourceFunc?                    open_callback = null;
+        private GLib.Type                       lightbox_type;
+        private GLib.GenericSet<Ft.Lightbox>?   lightboxes = null;
+        private Gtk.WindowGroup?                window_group = null;
+        private GLib.ListModel?                 monitors = null;
+        private ulong                           monitors_changed_id = 0;
+        private uint                            updating_count = 0;
+        private uint                            update_idle_id = 0;
+        private GLib.SourceFunc?                open_callback = null;
 
         public LightboxGroup (GLib.Type lightbox_type)
         {
             this.lightbox_type = lightbox_type;
-            this.lightboxes = new GLib.GenericSet<Pomodoro.Lightbox> (GLib.direct_hash, GLib.direct_equal);
+            this.lightboxes = new GLib.GenericSet<Ft.Lightbox> (GLib.direct_hash, GLib.direct_equal);
         }
 
-        private unowned Pomodoro.Lightbox? get_first_lightbox ()
+        private unowned Ft.Lightbox? get_first_lightbox ()
         {
-            unowned Pomodoro.Lightbox? first_lightbox = null;
+            unowned Ft.Lightbox? first_lightbox = null;
 
             this.lightboxes.@foreach (
                 (lightbox) => {
@@ -221,7 +221,7 @@ namespace Pomodoro
             return first_lightbox;
         }
 
-        private Pomodoro.Lightbox create_lightbox (Gdk.Monitor? monitor_request)
+        private Ft.Lightbox create_lightbox (Gdk.Monitor? monitor_request)
         {
             var monitor_request_value = GLib.Value (typeof (Gdk.Monitor?));
             monitor_request_value.set_object (monitor_request);
@@ -229,7 +229,7 @@ namespace Pomodoro
             var show_contents_value = GLib.Value (typeof (bool));
             show_contents_value.set_boolean (false);
 
-            var lightbox = (Pomodoro.Lightbox) GLib.Object.new_with_properties (
+            var lightbox = (Ft.Lightbox) GLib.Object.new_with_properties (
                                         this.lightbox_type,
                                         { "monitor-request", "show-contents" },
                                         { monitor_request_value, show_contents_value });
@@ -248,7 +248,7 @@ namespace Pomodoro
             return lightbox;
         }
 
-        private void destroy_lightbox (Pomodoro.Lightbox lightbox)
+        private void destroy_lightbox (Ft.Lightbox lightbox)
         {
             lightbox.notify["monitor"].disconnect (this.on_lightbox_notify_monitor);
             lightbox.close_request.disconnect (this.on_lightbox_close_request);
@@ -280,7 +280,7 @@ namespace Pomodoro
 
             var paired_monitors = new GLib.GenericSet<unowned Gdk.Monitor> (
                                         GLib.direct_hash, GLib.direct_equal);
-            var paired_lightboxes = new GLib.GenericSet<unowned Pomodoro.Lightbox> (
+            var paired_lightboxes = new GLib.GenericSet<unowned Ft.Lightbox> (
                                         GLib.direct_hash, GLib.direct_equal);
 
             this.lightboxes.@foreach (
@@ -364,7 +364,7 @@ namespace Pomodoro
 
                     return GLib.Source.REMOVE;
                 });
-            GLib.Source.set_name_by_id (this.update_idle_id, "Pomodoro.LightboxGroup.update");
+            GLib.Source.set_name_by_id (this.update_idle_id, "Ft.LightboxGroup.update");
         }
 
         private void on_monitors_changed (GLib.ListModel model,
@@ -398,7 +398,7 @@ namespace Pomodoro
 
         private void on_lightbox_unrealize (Gtk.Widget widget)
         {
-            this.destroy_lightbox ((Pomodoro.Lightbox) widget);
+            this.destroy_lightbox ((Ft.Lightbox) widget);
         }
 
         public async void open (GLib.Cancellable? cancellable = null) throws GLib.Error
@@ -409,7 +409,7 @@ namespace Pomodoro
             }
 
             if (this.monitors == null) {
-                throw new Pomodoro.LightboxError.NO_MONITORS ("Could not list monitors.");
+                throw new Ft.LightboxError.NO_MONITORS ("Could not list monitors.");
             }
 
             if (this.monitors_changed_id == 0) {
@@ -562,7 +562,7 @@ namespace Pomodoro
         {
             unowned Gdk.Monitor? monitor;
 
-            var layout_manager = (Pomodoro.MonitorConstrainedLayoutManager) this.container.layout_manager;
+            var layout_manager = (Ft.MonitorConstrainedLayoutManager) this.container.layout_manager;
             var display = this.get_display ();
             var surface = this.get_surface ();
             var surface_monitor = surface != null

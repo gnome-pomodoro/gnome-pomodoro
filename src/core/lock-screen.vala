@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    public interface LockScreenProvider : Pomodoro.Provider
+    public interface LockScreenProvider : Ft.Provider
     {
         public abstract bool active { get; }
 
@@ -15,7 +15,7 @@ namespace Pomodoro
 
 
     [SingleInstance]
-    public class LockScreen : Pomodoro.ProvidedObject<Pomodoro.LockScreenProvider>
+    public class LockScreen : Ft.ProvidedObject<Ft.LockScreenProvider>
     {
         public bool active {
             get {
@@ -52,14 +52,14 @@ namespace Pomodoro
             this.providers.add (new Freedesktop.LockScreenProvider ());
         }
 
-        protected override void provider_enabled (Pomodoro.LockScreenProvider provider)
+        protected override void provider_enabled (Ft.LockScreenProvider provider)
         {
             provider.notify["active"].connect (this.on_notify_active);
 
             this.update_active ();
         }
 
-        protected override void provider_disabled (Pomodoro.LockScreenProvider provider)
+        protected override void provider_disabled (Ft.LockScreenProvider provider)
         {
             provider.notify["active"].disconnect (this.on_notify_active);
 

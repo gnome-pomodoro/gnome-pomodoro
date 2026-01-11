@@ -110,7 +110,7 @@ namespace Tests
         {
             // Apply v1 and v2 migrations
             try {
-                this.repository.migrate_sync (2U, Pomodoro.Database.migrate_repository);
+                this.repository.migrate_sync (2U, Ft.Database.migrate_repository);
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -140,7 +140,7 @@ namespace Tests
 
             // Apply v3 migration (populate stats and drop legacy tables)
             try {
-                repository.migrate_sync (3U, Pomodoro.Database.migrate_repository);
+                repository.migrate_sync (3U, Ft.Database.migrate_repository);
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -148,18 +148,18 @@ namespace Tests
 
             // Verify stats entries
             try {
-                var results = repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                var results = repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
                 // Find pomodoro entry
-                Pomodoro.StatsEntry? pomodoro_entry = null;
-                Pomodoro.StatsEntry? break_entry = null;
+                Ft.StatsEntry? pomodoro_entry = null;
+                Ft.StatsEntry? break_entry = null;
 
                 for (var index = 0; index < results.count; index++)
                 {
-                    var entry = (Pomodoro.StatsEntry?) results.get_index (index);
+                    var entry = (Ft.StatsEntry?) results.get_index (index);
 
                     if (entry.category == "pomodoro") {
                         pomodoro_entry = entry;
@@ -175,20 +175,20 @@ namespace Tests
                 // time = epoch micros of UTC datetime-string
                 assert_cmpstr (pomodoro_entry.date, GLib.CompareOperator.EQ, "1999-12-31");
                 assert_cmpvariant (new GLib.Variant.int64 (pomodoro_entry.offset),
-                                   new GLib.Variant.int64 ((24 + 3) * Pomodoro.Interval.HOUR));
+                                   new GLib.Variant.int64 ((24 + 3) * Ft.Interval.HOUR));
                 assert_cmpvariant (new GLib.Variant.int64 (pomodoro_entry.duration),
-                                   new GLib.Variant.int64 (120 * Pomodoro.Interval.SECOND));
+                                   new GLib.Variant.int64 (120 * Ft.Interval.SECOND));
 
                 assert_cmpstr (break_entry.date, GLib.CompareOperator.EQ, "2000-01-01");
                 assert_cmpvariant (new GLib.Variant.int64 (break_entry.offset),
-                                   new GLib.Variant.int64 (12 * Pomodoro.Interval.HOUR +
-                                                           34 * Pomodoro.Interval.MINUTE +
-                                                           56 * Pomodoro.Interval.SECOND));
+                                   new GLib.Variant.int64 (12 * Ft.Interval.HOUR +
+                                                           34 * Ft.Interval.MINUTE +
+                                                           56 * Ft.Interval.SECOND));
                 assert_cmpvariant (new GLib.Variant.int64 (break_entry.duration),
-                                   new GLib.Variant.int64 (300 * Pomodoro.Interval.SECOND));
+                                   new GLib.Variant.int64 (300 * Ft.Interval.SECOND));
 
                 // Aggregated stats should also be updated by triggers
-                var agg_results = repository.find_sync (typeof (Pomodoro.AggregatedStatsEntry), null);
+                var agg_results = repository.find_sync (typeof (Ft.AggregatedStatsEntry), null);
                 agg_results.fetch_sync (0U, agg_results.count);
 
                 var found_pomodoro_agg = false;
@@ -196,19 +196,19 @@ namespace Tests
 
                 for (var index = 0; index < agg_results.count; index++)
                 {
-                    var aggregated_entry = (Pomodoro.AggregatedStatsEntry?) agg_results.get_index (index);
+                    var aggregated_entry = (Ft.AggregatedStatsEntry?) agg_results.get_index (index);
 
                     if (aggregated_entry.category == "pomodoro") {
                         found_pomodoro_agg = true;
                         assert_cmpstr (aggregated_entry.date, GLib.CompareOperator.EQ, "1999-12-31");
                         assert_cmpvariant (new GLib.Variant.int64 (aggregated_entry.duration),
-                                           new GLib.Variant.int64 (120 * Pomodoro.Interval.SECOND));
+                                           new GLib.Variant.int64 (120 * Ft.Interval.SECOND));
                     }
                     else if (aggregated_entry.category == "break") {
                         found_break_agg = true;
                         assert_cmpstr (aggregated_entry.date, GLib.CompareOperator.EQ, "2000-01-01");
                         assert_cmpvariant (new GLib.Variant.int64 (aggregated_entry.duration),
-                                           new GLib.Variant.int64 (300 * Pomodoro.Interval.SECOND));
+                                           new GLib.Variant.int64 (300 * Ft.Interval.SECOND));
                     }
                 }
 

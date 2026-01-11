@@ -13,7 +13,7 @@ private void on_posix_signal (int signal)
     {
         case Posix.Signal.INT:
         case Posix.Signal.TERM:
-            var application = Pomodoro.Application.get_default ();
+            var application = Ft.Application.get_default ();
             if (application != null) {
                 application.quit ();
             }
@@ -38,7 +38,7 @@ public int main (string[] args)
     Posix.signal (Posix.Signal.INT, on_posix_signal);
     Posix.signal (Posix.Signal.TERM, on_posix_signal);
 
-    var application = new Pomodoro.Application ();
+    var application = new Ft.Application ();
 
     return application.run (args);
 }

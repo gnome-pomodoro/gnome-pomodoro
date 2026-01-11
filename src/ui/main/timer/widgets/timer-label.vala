@@ -6,7 +6,7 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/timer/widgets/timer-label.ui")]
     public class TimerLabel : Gtk.Widget, Gtk.Buildable
@@ -16,7 +16,7 @@ namespace Pomodoro
         private const uint   FADE_IN_DURATION = 500;
         private const uint   FADE_OUT_DURATION = 500;
 
-        public unowned Pomodoro.Timer timer {
+        public unowned Ft.Timer timer {
             get {
                 return this._timer;
             }
@@ -54,45 +54,44 @@ namespace Pomodoro
         }
 
         [GtkChild]
-        private unowned Gtk.Box                 placeholder_box;
+        private unowned Gtk.Box           placeholder_box;
         [GtkChild]
-        private unowned Pomodoro.MonospaceLabel placeholder_hours_label;
+        private unowned Ft.MonospaceLabel placeholder_hours_label;
         [GtkChild]
-        private unowned Pomodoro.MonospaceLabel placeholder_hours_separator_label;
+        private unowned Ft.MonospaceLabel placeholder_hours_separator_label;
         [GtkChild]
-        private unowned Pomodoro.MonospaceLabel placeholder_minutes_label;
+        private unowned Ft.MonospaceLabel placeholder_minutes_label;
         [GtkChild]
-        private unowned Pomodoro.MonospaceLabel placeholder_minutes_separator_label;
+        private unowned Ft.MonospaceLabel placeholder_minutes_separator_label;
         [GtkChild]
-        private unowned Pomodoro.MonospaceLabel placeholder_seconds_label;
+        private unowned Ft.MonospaceLabel placeholder_seconds_label;
         [GtkChild]
-        private unowned Gtk.Box                 box;
+        private unowned Gtk.Box           box;
         [GtkChild]
-        private unowned Pomodoro.MonospaceLabel hours_label;
+        private unowned Ft.MonospaceLabel hours_label;
         [GtkChild]
-        private unowned Pomodoro.MonospaceLabel hours_separator_label;
+        private unowned Ft.MonospaceLabel hours_separator_label;
         [GtkChild]
-        private unowned Pomodoro.MonospaceLabel minutes_label;
+        private unowned Ft.MonospaceLabel minutes_label;
         [GtkChild]
-        private unowned Pomodoro.MonospaceLabel minutes_separator_label;
+        private unowned Ft.MonospaceLabel minutes_separator_label;
         [GtkChild]
-        private unowned Pomodoro.MonospaceLabel seconds_label;
+        private unowned Ft.MonospaceLabel seconds_label;
 
-        private Pomodoro.Timer          _timer;
-        private ulong                   timer_state_changed_id = 0;
-        private ulong                   timer_tick_id = 0;
-        private Adw.TimedAnimation?     crossfade_animation;
-        private Adw.TimedAnimation?     blink_animation;
-        private Adw.TimedAnimation?     hours_animation;
-        private double                  reference_width_lower = 0.0;
-        private double                  reference_width_upper = 0.0;
-        private double                  reference_height = 0.0;
-        private double                  reference_baseline = 0.0;
-        private bool                    faded_in = false;
-        private bool                    _placeholder_has_hours = false;
-        private bool                    has_hours = false;
-        private double                  scale = 1.0;
-
+        private Ft.Timer            _timer;
+        private ulong               timer_state_changed_id = 0;
+        private ulong               timer_tick_id = 0;
+        private Adw.TimedAnimation? crossfade_animation;
+        private Adw.TimedAnimation? blink_animation;
+        private Adw.TimedAnimation? hours_animation;
+        private double              reference_width_lower = 0.0;
+        private double              reference_width_upper = 0.0;
+        private double              reference_height = 0.0;
+        private double              reference_baseline = 0.0;
+        private bool                faded_in = false;
+        private bool                _placeholder_has_hours = false;
+        private bool                has_hours = false;
+        private double              scale = 1.0;
 
         static construct
         {
@@ -101,7 +100,7 @@ namespace Pomodoro
 
         construct
         {
-            this._timer = Pomodoro.Timer.get_default ();
+            this._timer = Ft.Timer.get_default ();
 
             this.set_default_direction_ltr ();
         }
@@ -294,7 +293,7 @@ namespace Pomodoro
         private void update_remaining_time (int64 timestamp)
         {
             var remaining = this._timer.calculate_remaining (timestamp);
-            var remaining_uint = Pomodoro.Timestamp.to_seconds_uint (remaining);
+            var remaining_uint = Ft.Timestamp.to_seconds_uint (remaining);
             var has_hours = remaining_uint >= 3600;
 
             if (this.has_hours != has_hours)
@@ -408,7 +407,7 @@ namespace Pomodoro
         /**
          * Sync all of things with the timer state
          */
-        private void update (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        private void update (int64 timestamp = Ft.Timestamp.UNDEFINED)
         {
             if (this._timer.user_data != null) {
                 this.update_remaining_time (timestamp);
@@ -457,8 +456,8 @@ namespace Pomodoro
             this.update_remaining_time (timestamp);
         }
 
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
+        private void on_timer_state_changed (Ft.TimerState current_state,
+                                             Ft.TimerState previous_state)
         {
             if (this.get_mapped ()) {
                 this.update (this._timer.get_last_state_changed_time ());

@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    public interface TimeZoneMonitorProvider : Pomodoro.Provider
+    public interface TimeZoneMonitorProvider : Ft.Provider
     {
         public abstract string? identifier { get; }
     }
 
 
     [SingleInstance]
-    public class TimeZoneMonitor : Pomodoro.ProvidedObject<Pomodoro.TimeZoneMonitorProvider>
+    public class TimeZoneMonitor : Ft.ProvidedObject<Ft.TimeZoneMonitorProvider>
     {
         public GLib.TimeZone timezone {
             get {
@@ -56,7 +56,7 @@ namespace Pomodoro
         private void on_notify_identifier (GLib.Object    object,
                                            GLib.ParamSpec pspec)
         {
-            var provider = (Pomodoro.TimeZoneMonitorProvider) object;
+            var provider = (Ft.TimeZoneMonitorProvider) object;
 
             this.update_timezone (provider.identifier);
         }
@@ -72,14 +72,14 @@ namespace Pomodoro
             this.providers.add (new Freedesktop.TimeZoneMonitorProvider ());
         }
 
-        protected override void provider_enabled (Pomodoro.TimeZoneMonitorProvider provider)
+        protected override void provider_enabled (Ft.TimeZoneMonitorProvider provider)
         {
             provider.notify["identifier"].connect (this.on_notify_identifier);
 
             this.update_timezone (provider.identifier);
         }
 
-        protected override void provider_disabled (Pomodoro.TimeZoneMonitorProvider provider)
+        protected override void provider_disabled (Ft.TimeZoneMonitorProvider provider)
         {
             provider.notify["identifier"].disconnect (this.on_notify_identifier);
         }

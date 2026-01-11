@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     [DBus (name = "io.github.focustimerhq.FocusTimer")]
     public class ApplicationDBusService : GLib.Object
@@ -16,16 +16,16 @@ namespace Pomodoro
             get { return Config.PACKAGE_VERSION; }
         }
 
-        private Pomodoro.Application? application;
+        private Ft.Application? application;
 
-        public ApplicationDBusService (Pomodoro.Application application)
+        public ApplicationDBusService (Ft.Application application)
         {
             this.application = application;
         }
 
         public void show_window (string view) throws GLib.DBusError, GLib.IOError
         {
-            this.application.show_window (Pomodoro.WindowView.from_string (view));
+            this.application.show_window (Ft.WindowView.from_string (view));
         }
 
         public void show_preferences (string view) throws GLib.DBusError, GLib.IOError
@@ -61,7 +61,7 @@ namespace Pomodoro
                 return this._state.to_string ();
             }
             set {
-                var state = Pomodoro.State.from_string (value);
+                var state = Ft.State.from_string (value);
 
                 this.session_manager.advance_to_state (state);
             }
@@ -108,17 +108,17 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.Timer?           timer;
-        private Pomodoro.SessionManager?  session_manager;
-        private weak GLib.DBusConnection? connection;
-        private string                    object_path;
-        private Pomodoro.State            _state;
-        private Pomodoro.TimerState       timer_state;
+        private Ft.Timer?                   timer;
+        private Ft.SessionManager?          session_manager;
+        private weak GLib.DBusConnection?   connection;
+        private string                      object_path;
+        private Ft.State                    _state;
+        private Ft.TimerState               timer_state;
 
-        public TimerDBusService (GLib.DBusConnection     connection,
-                                 string                  object_path,
-                                 Pomodoro.Timer          timer,
-                                 Pomodoro.SessionManager session_manager)
+        public TimerDBusService (GLib.DBusConnection connection,
+                                 string              object_path,
+                                 Ft.Timer            timer,
+                                 Ft.SessionManager   session_manager)
         {
             this.connection      = connection;
             this.object_path     = object_path;
@@ -199,8 +199,8 @@ namespace Pomodoro
             }
         }
 
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
+        private void on_timer_state_changed (Ft.TimerState current_state,
+                                             Ft.TimerState previous_state)
         {
             this.update_properties ();
             this.changed ();
@@ -237,19 +237,19 @@ namespace Pomodoro
             return this.timer.is_finished ();
         }
 
-        public int64 get_elapsed (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        public int64 get_elapsed (int64 timestamp = Ft.Timestamp.UNDEFINED)
                                   throws GLib.DBusError, GLib.IOError
         {
             return this.timer.calculate_elapsed (timestamp);
         }
 
-        public int64 get_remaining (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        public int64 get_remaining (int64 timestamp = Ft.Timestamp.UNDEFINED)
                                     throws GLib.DBusError, GLib.IOError
         {
             return this.timer.calculate_remaining (timestamp);
         }
 
-        public double get_progress (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        public double get_progress (int64 timestamp = Ft.Timestamp.UNDEFINED)
                                     throws GLib.DBusError, GLib.IOError
         {
             return this.timer.calculate_progress (timestamp);
@@ -339,16 +339,16 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.SessionManager?  session_manager;
-        private weak GLib.DBusConnection? connection;
-        private string                    object_path;
-        private int64                     _start_time = Pomodoro.Timestamp.UNDEFINED;
-        private int64                     _end_time = Pomodoro.Timestamp.UNDEFINED;
-        private bool                      _has_uniform_breaks = false;
+        private Ft.SessionManager?          session_manager;
+        private weak GLib.DBusConnection?   connection;
+        private string                      object_path;
+        private int64                       _start_time = Ft.Timestamp.UNDEFINED;
+        private int64                       _end_time = Ft.Timestamp.UNDEFINED;
+        private bool                        _has_uniform_breaks = false;
 
         public SessionDBusService (GLib.DBusConnection connection,
                                    string              object_path,
-                                   Pomodoro.SessionManager session_manager)
+                                   Ft.SessionManager session_manager)
         {
             this.connection      = connection;
             this.object_path     = object_path;
@@ -382,10 +382,10 @@ namespace Pomodoro
 
             var start_time = current_session != null
                     ? current_session.start_time
-                    : Pomodoro.Timestamp.UNDEFINED;
+                    : Ft.Timestamp.UNDEFINED;
             var end_time = current_session != null
                     ? current_session.end_time
-                    : Pomodoro.Timestamp.UNDEFINED;
+                    : Ft.Timestamp.UNDEFINED;
             var has_uniform_breaks = this.session_manager.has_uniform_breaks;
 
             if (this._start_time != start_time) {
@@ -428,7 +428,7 @@ namespace Pomodoro
             }
         }
 
-        private GLib.Variant serialize_gap (Pomodoro.Gap? gap)
+        private GLib.Variant serialize_gap (Ft.Gap? gap)
         {
             var builder = new GLib.VariantBuilder (GLib.VariantType.VARDICT);
 
@@ -440,7 +440,7 @@ namespace Pomodoro
             return builder.end ();
         }
 
-        private GLib.Variant serialize_time_block (Pomodoro.TimeBlock? time_block)
+        private GLib.Variant serialize_time_block (Ft.TimeBlock? time_block)
         {
             var builder = new GLib.VariantBuilder (GLib.VariantType.VARDICT);
 
@@ -472,7 +472,7 @@ namespace Pomodoro
             return builder.end ();
         }
 
-        private GLib.Variant serialize_cycle (Pomodoro.Cycle? cycle)
+        private GLib.Variant serialize_cycle (Ft.Cycle? cycle)
         {
             var builder = new GLib.VariantBuilder (GLib.VariantType.VARDICT);
 
@@ -507,44 +507,44 @@ namespace Pomodoro
             this.update_properties ();
         }
 
-        private void on_enter_session (Pomodoro.Session session)
+        private void on_enter_session (Ft.Session session)
         {
             session.changed.connect (this.on_current_session_changed);
         }
 
-        private void on_leave_session (Pomodoro.Session session)
+        private void on_leave_session (Ft.Session session)
         {
             session.changed.disconnect (this.on_current_session_changed);
         }
 
-        private void on_enter_time_block (Pomodoro.TimeBlock time_block)
+        private void on_enter_time_block (Ft.TimeBlock time_block)
         {
             this.enter_time_block (this.serialize_time_block (time_block));
         }
 
-        private void on_leave_time_block (Pomodoro.TimeBlock time_block)
+        private void on_leave_time_block (Ft.TimeBlock time_block)
         {
             this.leave_time_block (this.serialize_time_block (time_block));
         }
 
-        private void on_advanced (Pomodoro.Session?   current_session,
-                                  Pomodoro.TimeBlock? current_time_block,
-                                  Pomodoro.Session?   previous_session,
-                                  Pomodoro.TimeBlock? previous_time_block)
+        private void on_advanced (Ft.Session?   current_session,
+                                  Ft.TimeBlock? current_time_block,
+                                  Ft.Session?   previous_session,
+                                  Ft.TimeBlock? previous_time_block)
         {
             if (current_session == null && previous_session != null) {
                 this.changed ();
             }
         }
 
-        private void on_confirm_advancement (Pomodoro.TimeBlock current_time_block,
-                                             Pomodoro.TimeBlock next_time_block)
+        private void on_confirm_advancement (Ft.TimeBlock current_time_block,
+                                             Ft.TimeBlock next_time_block)
         {
             this.confirm_advancement (this.serialize_time_block (current_time_block),
                                       this.serialize_time_block (next_time_block));
         }
 
-        private void on_current_session_changed (Pomodoro.Session session)
+        private void on_current_session_changed (Ft.Session session)
         {
             this.update_properties ();
             this.changed ();
@@ -557,7 +557,7 @@ namespace Pomodoro
 
         public void advance_to_state (string state) throws GLib.DBusError, GLib.IOError
         {
-            this.session_manager.advance_to_state (Pomodoro.State.from_string (state));
+            this.session_manager.advance_to_state (Ft.State.from_string (state));
         }
 
         public void reset () throws GLib.DBusError, GLib.IOError

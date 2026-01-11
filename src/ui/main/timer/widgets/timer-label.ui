@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
-  <template class="PomodoroTimerLabel" parent="GtkWidget">
+  <template class="FtTimerLabel" parent="GtkWidget">
     <child>
       <object class="GtkBox" id="placeholder_box">
         <property name="halign">end</property>
         <child>
-          <object class="PomodoroMonospaceLabel" id="placeholder_hours_label">
+          <object class="FtMonospaceLabel" id="placeholder_hours_label">
             <property name="halign">fill</property>
             <property name="hexpand">true</property>
             <property name="valign">baseline</property>
@@ -20,7 +20,7 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroMonospaceLabel" id="placeholder_hours_separator_label">
+          <object class="FtMonospaceLabel" id="placeholder_hours_separator_label">
             <property name="halign">fill</property>
             <property name="valign">baseline</property>
             <property name="xalign">0.5</property>
@@ -33,7 +33,7 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroMonospaceLabel" id="placeholder_minutes_label">
+          <object class="FtMonospaceLabel" id="placeholder_minutes_label">
             <property name="halign">fill</property>
             <property name="hexpand">true</property>
             <property name="valign">baseline</property>
@@ -46,7 +46,7 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroMonospaceLabel" id="placeholder_minutes_separator_label">
+          <object class="FtMonospaceLabel" id="placeholder_minutes_separator_label">
             <property name="halign">fill</property>
             <property name="valign">baseline</property>
             <property name="xalign">0.5</property>
@@ -58,7 +58,7 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroMonospaceLabel" id="placeholder_seconds_label">
+          <object class="FtMonospaceLabel" id="placeholder_seconds_label">
             <property name="halign">fill</property>
             <property name="valign">baseline</property>
             <property name="xalign">0.0</property>
@@ -75,7 +75,7 @@
       <object class="GtkBox" id="box">
         <property name="halign">end</property>
         <child>
-          <object class="PomodoroMonospaceLabel" id="hours_label">
+          <object class="FtMonospaceLabel" id="hours_label">
             <property name="name">hours</property>
             <property name="halign">fill</property>
             <property name="hexpand">true</property>
@@ -89,7 +89,7 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroMonospaceLabel" id="hours_separator_label">
+          <object class="FtMonospaceLabel" id="hours_separator_label">
             <property name="name">hours-separator</property>
             <property name="halign">fill</property>
             <property name="valign">baseline</property>
@@ -102,7 +102,7 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroMonospaceLabel" id="minutes_label">
+          <object class="FtMonospaceLabel" id="minutes_label">
             <property name="name">minutes</property>
             <property name="halign">fill</property>
             <property name="hexpand">true</property>
@@ -115,7 +115,7 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroMonospaceLabel" id="minutes_separator_label">
+          <object class="FtMonospaceLabel" id="minutes_separator_label">
             <property name="name">minutes-separator</property>
             <property name="halign">fill</property>
             <property name="valign">baseline</property>
@@ -127,7 +127,7 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroMonospaceLabel" id="seconds_label">
+          <object class="FtMonospaceLabel" id="seconds_label">
             <property name="name">seconds</property>
             <property name="halign">fill</property>
             <property name="valign">baseline</property>

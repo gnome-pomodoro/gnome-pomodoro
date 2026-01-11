@@ -6,7 +6,7 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public enum TimerProgressShape
     {
@@ -25,39 +25,39 @@ namespace Pomodoro
         private const uint   FADE_IN_DURATION = 500;
         private const uint   FADE_OUT_DURATION = 500;
 
-        public Pomodoro.Timer timer {
+        public Ft.Timer timer {
             get {
                 return this._timer;
             }
             construct {
                 this._timer = value != null
                         ? value
-                        : Pomodoro.Timer.get_default ();
+                        : Ft.Timer.get_default ();
             }
         }
 
         [CCode (notify = false)]
-        public Pomodoro.TimerProgressShape shape {
+        public Ft.TimerProgressShape shape {
             get {
                 return this._shape;
             }
             construct {
-                Pomodoro.Gizmo through;
-                Pomodoro.Gizmo highlight;
+                Ft.Gizmo through;
+                Ft.Gizmo highlight;
 
                 this._shape = value;
 
                 switch (this._shape)
                 {
-                    case Pomodoro.TimerProgressShape.BAR:
-                        through = new Pomodoro.Gizmo (
+                    case Ft.TimerProgressShape.BAR:
+                        through = new Ft.Gizmo (
                                 TimerProgressBar.measure_bar_cb,
                                 null,
                                 TimerProgressBar.snapshot_bar_through_cb,
                                 null,
                                 null,
                                 null);
-                        highlight = new Pomodoro.Gizmo (
+                        highlight = new Ft.Gizmo (
                                 TimerProgressBar.measure_bar_cb,
                                 null,
                                 TimerProgressBar.snapshot_bar_highlight_cb,
@@ -66,15 +66,15 @@ namespace Pomodoro
                                 null);
                         break;
 
-                    case Pomodoro.TimerProgressShape.RING:
-                        through = new Pomodoro.Gizmo (
+                    case Ft.TimerProgressShape.RING:
+                        through = new Ft.Gizmo (
                                 TimerProgressBar.measure_ring_cb,
                                 null,
                                 TimerProgressBar.snapshot_ring_through_cb,
                                 null,
                                 null,
                                 null);
-                        highlight = new Pomodoro.Gizmo (
+                        highlight = new Ft.Gizmo (
                                 TimerProgressBar.measure_ring_cb,
                                 null,
                                 TimerProgressBar.snapshot_ring_highlight_cb,
@@ -137,26 +137,26 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.TimerProgressShape _shape = Pomodoro.TimerProgressShape.BAR;
-        private Pomodoro.Timer              _timer;
-        private float                       _line_width = MIN_LINE_WIDTH;
-        private bool                        _line_width_set = false;
-        private double                      _display_value = 0.0;
-        private double                      display_value_from = 0.0;
-        private double                      display_value_to = 0.0;
-        private int64                       last_display_time = Pomodoro.Timestamp.UNDEFINED;
-        private Adw.TimedAnimation?         value_animation = null;
-        private Adw.TimedAnimation?         opacity_animation = null;
-        private unowned Pomodoro.Gizmo      through = null;
-        private unowned Pomodoro.Gizmo      highlight = null;
-        private ulong                       tick_id = 0U;
-        private uint                        tick_callback_id = 0U;
-        private uint                        timeout_id = 0U;
-        private uint                        timeout_interval = 0U;
-        private uint                        timeout_inhibit_count = 0U;
-        private float                       radius;
-        private float                       line_cap_radius;
-        private float                       line_cap_angle;
+        private Ft.TimerProgressShape   _shape = Ft.TimerProgressShape.BAR;
+        private Ft.Timer                _timer;
+        private float                   _line_width = MIN_LINE_WIDTH;
+        private bool                    _line_width_set = false;
+        private double                  _display_value = 0.0;
+        private double                  display_value_from = 0.0;
+        private double                  display_value_to = 0.0;
+        private int64                   last_display_time = Ft.Timestamp.UNDEFINED;
+        private Adw.TimedAnimation?     value_animation = null;
+        private Adw.TimedAnimation?     opacity_animation = null;
+        private unowned Ft.Gizmo        through = null;
+        private unowned Ft.Gizmo        highlight = null;
+        private ulong                   tick_id = 0U;
+        private uint                    tick_callback_id = 0U;
+        private uint                    timeout_id = 0U;
+        private uint                    timeout_interval = 0U;
+        private uint                    timeout_inhibit_count = 0U;
+        private float                   radius;
+        private float                   line_cap_radius;
+        private float                   line_cap_angle;
 
         static construct
         {
@@ -226,7 +226,7 @@ namespace Pomodoro
                         return GLib.Source.CONTINUE;
                     });
                 GLib.Source.set_name_by_id (this.timeout_id,
-                                            "Pomodoro.TimerProgressBar.queue_draw");
+                                            "Ft.TimerProgressBar.queue_draw");
             }
             else if (this.tick_callback_id == 0 && timeout_interval == 0)
             {
@@ -257,11 +257,11 @@ namespace Pomodoro
             }
         }
 
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
+        private void on_timer_state_changed (Ft.TimerState current_state,
+                                             Ft.TimerState previous_state)
         {
             var timestamp = this._timer.get_last_state_changed_time ();
-            var is_ring = this._shape == Pomodoro.TimerProgressShape.RING;
+            var is_ring = this._shape == Ft.TimerProgressShape.RING;
 
             if (!current_state.is_finished () && previous_state.is_finished () && is_ring) {
                 this.fade_in ();
@@ -274,7 +274,7 @@ namespace Pomodoro
             }
 
             if (this.opacity_animation == null &&
-                (timestamp - this.last_display_time) < 5 * Pomodoro.Interval.SECOND)
+                (timestamp - this.last_display_time) < 5 * Ft.Interval.SECOND)
             {
                 var value_from = this._display_value;
                 var value_to = this._timer.calculate_progress (timestamp);
@@ -321,11 +321,11 @@ namespace Pomodoro
 
             switch (this._shape)
             {
-                case Pomodoro.TimerProgressShape.BAR:
+                case Ft.TimerProgressShape.BAR:
                     distance = (int64) this.get_width ();
                     break;
 
-                case Pomodoro.TimerProgressShape.RING:
+                case Ft.TimerProgressShape.RING:
                     distance = (int64) Math.ceil (2.0 * Math.PI * (double) this.radius);
                     break;
 
@@ -336,7 +336,7 @@ namespace Pomodoro
             distance *= TIMEOUT_RESOLUTION;
 
             return distance > 0
-                    ? Pomodoro.Timestamp.to_milliseconds_uint (this._timer.duration / distance)
+                    ? Ft.Timestamp.to_milliseconds_uint (this._timer.duration / distance)
                     : 0;
         }
 
@@ -345,10 +345,10 @@ namespace Pomodoro
         {
             switch (this._shape)
             {
-                case Pomodoro.TimerProgressShape.BAR:
+                case Ft.TimerProgressShape.BAR:
                     return (uint)(Math.sqrt ((value_to - value_from).abs ()) * 500.0);
 
-                case Pomodoro.TimerProgressShape.RING:
+                case Ft.TimerProgressShape.RING:
                     return (uint)(Math.sqrt ((value_to - value_from).abs ()) * 1000.0);
 
                 default:
@@ -459,7 +459,7 @@ namespace Pomodoro
          * Bar shape
          */
 
-        private static void measure_bar_cb (Pomodoro.Gizmo  gizmo,
+        private static void measure_bar_cb (Ft.Gizmo        gizmo,
                                             Gtk.Orientation orientation,
                                             int             for_size,
                                             out int         minimum,
@@ -467,7 +467,7 @@ namespace Pomodoro
                                             out int         minimum_baseline,
                                             out int         natural_baseline)
         {
-            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
+            unowned var self = (Ft.TimerProgressBar) gizmo.parent;
 
             if (self != null) {
                 self.measure_bar (gizmo,
@@ -486,27 +486,27 @@ namespace Pomodoro
             }
         }
 
-        private static void snapshot_bar_through_cb (Pomodoro.Gizmo gizmo,
-                                                     Gtk.Snapshot   snapshot)
+        private static void snapshot_bar_through_cb (Ft.Gizmo     gizmo,
+                                                     Gtk.Snapshot snapshot)
         {
-            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
+            unowned var self = (Ft.TimerProgressBar) gizmo.parent;
 
             if (self != null) {
                 self.snapshot_bar_through (gizmo, snapshot);
             }
         }
 
-        private static void snapshot_bar_highlight_cb (Pomodoro.Gizmo gizmo,
-                                                       Gtk.Snapshot   snapshot)
+        private static void snapshot_bar_highlight_cb (Ft.Gizmo     gizmo,
+                                                       Gtk.Snapshot snapshot)
         {
-            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
+            unowned var self = (Ft.TimerProgressBar) gizmo.parent;
 
             if (self != null) {
                 self.snapshot_bar_highlight (gizmo, snapshot);
             }
         }
 
-        private void measure_bar (Pomodoro.Gizmo  gizmo,
+        private void measure_bar (Ft.Gizmo        gizmo,
                                   Gtk.Orientation orientation,
                                   int             for_size,
                                   out int         minimum,
@@ -528,8 +528,8 @@ namespace Pomodoro
             natural_baseline = -1;
         }
 
-        private void snapshot_bar_through (Pomodoro.Gizmo gizmo,
-                                           Gtk.Snapshot   snapshot)
+        private void snapshot_bar_through (Ft.Gizmo     gizmo,
+                                           Gtk.Snapshot snapshot)
         {
             var width  = (float) gizmo.get_width ();
             var height = (float) gizmo.get_height ();
@@ -553,8 +553,8 @@ namespace Pomodoro
             snapshot.pop ();
         }
 
-        private void snapshot_bar_highlight (Pomodoro.Gizmo gizmo,
-                                             Gtk.Snapshot   snapshot)
+        private void snapshot_bar_highlight (Ft.Gizmo     gizmo,
+                                             Gtk.Snapshot snapshot)
         {
             double display_value;
 
@@ -653,7 +653,7 @@ namespace Pomodoro
          * Ring shape
          */
 
-        private static void measure_ring_cb (Pomodoro.Gizmo  gizmo,
+        private static void measure_ring_cb (Ft.Gizmo        gizmo,
                                              Gtk.Orientation orientation,
                                              int             for_size,
                                              out int         minimum,
@@ -661,7 +661,7 @@ namespace Pomodoro
                                              out int         minimum_baseline,
                                              out int         natural_baseline)
         {
-            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
+            unowned var self = (Ft.TimerProgressBar) gizmo.parent;
 
             if (self != null) {
                 self.measure_ring (gizmo,
@@ -680,27 +680,27 @@ namespace Pomodoro
             }
         }
 
-        private static void snapshot_ring_through_cb (Pomodoro.Gizmo gizmo,
-                                                      Gtk.Snapshot   snapshot)
+        private static void snapshot_ring_through_cb (Ft.Gizmo     gizmo,
+                                                      Gtk.Snapshot snapshot)
         {
-            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
+            unowned var self = (Ft.TimerProgressBar) gizmo.parent;
 
             if (self != null) {
                 self.snapshot_ring_through (gizmo, snapshot);
             }
         }
 
-        private static void snapshot_ring_highlight_cb (Pomodoro.Gizmo gizmo,
-                                                        Gtk.Snapshot   snapshot)
+        private static void snapshot_ring_highlight_cb (Ft.Gizmo     gizmo,
+                                                        Gtk.Snapshot snapshot)
         {
-            unowned var self = (Pomodoro.TimerProgressBar) gizmo.parent;
+            unowned var self = (Ft.TimerProgressBar) gizmo.parent;
 
             if (self != null) {
                 self.snapshot_ring_highlight (gizmo, snapshot);
             }
         }
 
-        private void measure_ring (Pomodoro.Gizmo  gizmo,
+        private void measure_ring (Ft.Gizmo        gizmo,
                                    Gtk.Orientation orientation,
                                    int             for_size,
                                    out int         minimum,
@@ -714,8 +714,8 @@ namespace Pomodoro
             natural_baseline = -1;
         }
 
-        private void snapshot_ring_through (Pomodoro.Gizmo gizmo,
-                                            Gtk.Snapshot   snapshot)
+        private void snapshot_ring_through (Ft.Gizmo     gizmo,
+                                            Gtk.Snapshot snapshot)
         {
             var color = gizmo.get_color ();
             var origin = Graphene.Point () {
@@ -730,8 +730,8 @@ namespace Pomodoro
             snapshot.append_stroke (path_builder.to_path (), stroke, color);
         }
 
-        private void snapshot_ring_highlight (Pomodoro.Gizmo gizmo,
-                                              Gtk.Snapshot   snapshot)
+        private void snapshot_ring_highlight (Ft.Gizmo     gizmo,
+                                              Gtk.Snapshot snapshot)
         {
             double display_value;
 
@@ -891,11 +891,11 @@ namespace Pomodoro
             {
                 switch (this._shape)
                 {
-                    case Pomodoro.TimerProgressShape.BAR:
+                    case Ft.TimerProgressShape.BAR:
                         line_width = this.calculate_line_width (width);
                         break;
 
-                    case Pomodoro.TimerProgressShape.RING:
+                    case Ft.TimerProgressShape.RING:
                         var size = int.min (width, height);
                         line_width = this.calculate_line_width (size);
 

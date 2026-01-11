@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/charts/bubble-chart.ui")]
     public class BubbleChart : Gtk.Widget
@@ -89,7 +89,7 @@ namespace Pomodoro
         private uint                      _levels = 4U;
         private Category[]                categories;
         private Bucket[,]                 buckets;
-        private Pomodoro.Matrix3D?        data;
+        private Ft.Matrix3D?        data;
         private double                    max_value = 0.0;
         private int                       bubble_size;
         private float[]                   level_radii;
@@ -276,7 +276,7 @@ namespace Pomodoro
                 column_count   = uint.max (column_count, 1U);
                 category_count = uint.max (category_count, 1U);
 
-                this.data = new Pomodoro.Matrix3D (row_count, column_count, category_count);
+                this.data = new Ft.Matrix3D (row_count, column_count, category_count);
                 this.queue_update ();
             }
             else {
@@ -355,7 +355,7 @@ namespace Pomodoro
         }
 
         public void set_category_unit (uint          category_index,
-                                       Pomodoro.Unit unit)
+                                       Ft.Unit unit)
         {
             this.ensure_categories (category_index + 1);
 
@@ -654,7 +654,7 @@ namespace Pomodoro
             return grid;
         }
 
-        private void measure_bubble (Pomodoro.Gizmo  gizmo,
+        private void measure_bubble (Ft.Gizmo  gizmo,
                                      Gtk.Orientation orientation,
                                      int             for_size,
                                      out int         minimum,
@@ -668,7 +668,7 @@ namespace Pomodoro
             natural_baseline = -1;
         }
 
-        private void snapshot_bubble (Pomodoro.Gizmo gizmo,
+        private void snapshot_bubble (Ft.Gizmo gizmo,
                                       Gtk.Snapshot   snapshot)
         {
             var row            = gizmo.get_data<uint> ("row");
@@ -709,7 +709,7 @@ namespace Pomodoro
             }
         }
 
-        private bool contains_bubble (Pomodoro.Gizmo gizmo,
+        private bool contains_bubble (Ft.Gizmo gizmo,
                                       double         x,
                                       double         y)
         {
@@ -734,7 +734,7 @@ namespace Pomodoro
         private Gtk.Widget? create_bubble (uint row,
                                            uint column)
         {
-            var bubble = new Pomodoro.Gizmo (BubbleChart.measure_bubble_cb,
+            var bubble = new Ft.Gizmo (BubbleChart.measure_bubble_cb,
                                              null,
                                              BubbleChart.snapshot_bubble_cb,
                                              BubbleChart.contains_bubble_cb,
@@ -767,13 +767,13 @@ namespace Pomodoro
             return (Gtk.Widget) bubble;
         }
 
-        private static Pomodoro.BubbleChart? from_gizmo (Pomodoro.Gizmo gizmo)
+        private static Ft.BubbleChart? from_gizmo (Ft.Gizmo gizmo)
         {
             Gtk.Widget? widget = gizmo;
 
             while (widget != null)
             {
-                var chart = widget as Pomodoro.BubbleChart;
+                var chart = widget as Ft.BubbleChart;
 
                 if (chart != null) {
                     return chart;
@@ -785,13 +785,13 @@ namespace Pomodoro
             return null;
         }
 
-        private static Pomodoro.BubbleChart? from_widget (Gtk.Widget widget)
+        private static Ft.BubbleChart? from_widget (Gtk.Widget widget)
         {
             Gtk.Widget? current = widget;
 
             while (current != null)
             {
-                var chart = current as Pomodoro.BubbleChart;
+                var chart = current as Ft.BubbleChart;
 
                 if (chart != null) {
                     return chart;
@@ -803,7 +803,7 @@ namespace Pomodoro
             return null;
         }
 
-        private static void measure_bubble_cb (Pomodoro.Gizmo  gizmo,
+        private static void measure_bubble_cb (Ft.Gizmo  gizmo,
                                                Gtk.Orientation orientation,
                                                int             for_size,
                                                out int         minimum,
@@ -824,7 +824,7 @@ namespace Pomodoro
             }
         }
 
-        private static void snapshot_bubble_cb (Pomodoro.Gizmo gizmo,
+        private static void snapshot_bubble_cb (Ft.Gizmo gizmo,
                                                 Gtk.Snapshot   snapshot)
         {
             var self = BubbleChart.from_gizmo (gizmo);
@@ -834,7 +834,7 @@ namespace Pomodoro
             }
         }
 
-        private static bool contains_bubble_cb (Pomodoro.Gizmo gizmo,
+        private static bool contains_bubble_cb (Ft.Gizmo gizmo,
                                                 double         x,
                                                 double         y)
         {
@@ -870,7 +870,7 @@ namespace Pomodoro
 
         private static void on_clicked_cb (Gtk.Widget widget)
         {
-            var self   = BubbleChart.from_gizmo ((Pomodoro.Gizmo) widget);
+            var self   = BubbleChart.from_gizmo ((Ft.Gizmo) widget);
             var row    = widget.get_data<uint> ("row");
             var column = widget.get_data<uint> ("column");
 

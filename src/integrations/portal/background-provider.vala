@@ -9,7 +9,7 @@ using GLib;
 
 namespace Portal
 {
-    public class BackgroundProvider : Pomodoro.Provider, Pomodoro.BackgroundProvider
+    public class BackgroundProvider : Ft.Provider, Ft.BackgroundProvider
     {
         /**
          * Warn if underlying `Background` API version changes. Bump this value after testing.

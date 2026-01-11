@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     private struct Preset
     {
@@ -14,7 +14,7 @@ namespace Pomodoro
 
 
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/sounds/preferences-panel-sounds.ui")]
-    public class PreferencesPanelSounds : Pomodoro.PreferencesPanel
+    public class PreferencesPanelSounds : Ft.PreferencesPanel
     {
         private const Preset[] ALERT_PRESETS = {
             { "bell.ogg", N_("Bell") },
@@ -42,7 +42,7 @@ namespace Pomodoro
 
         construct
         {
-            this.settings = Pomodoro.get_settings ();
+            this.settings = Ft.get_settings ();
             this.settings.bind ("sounds", this.enable_switch, "active", GLib.SettingsBindFlags.DEFAULT);
             this.settings_changed_id = this.settings.changed.connect (this.on_settings_changed);
 
@@ -64,11 +64,11 @@ namespace Pomodoro
             return true;
         }
 
-        private Pomodoro.SoundChooserWindow create_sound_chooser (string   title,
-                                                                  string?  event_id,
-                                                                  Preset[] presets)
+        private Ft.SoundChooserWindow create_sound_chooser (string   title,
+                                                            string?  event_id,
+                                                            Preset[] presets)
         {
-            var chooser = new Pomodoro.SoundChooserWindow ();
+            var chooser = new Ft.SoundChooserWindow ();
             chooser.title = title;
             chooser.event_id = event_id;
             chooser.transient_for = (Gtk.Window) this.get_root ();

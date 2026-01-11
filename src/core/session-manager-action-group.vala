@@ -7,11 +7,11 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public class SessionManagerActionGroup : GLib.SimpleActionGroup
     {
-        public Pomodoro.SessionManager session_manager {
+        public Ft.SessionManager session_manager {
             get {
                 return this._session_manager;
             }
@@ -25,19 +25,18 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.SessionManager _session_manager;
-        private GLib.SimpleAction       state_action;
-        private GLib.SimpleAction       start_short_break_action;
-        private GLib.SimpleAction       start_long_break_action;
-        private GLib.SimpleAction       start_break_action;
-        private ulong                   notify_current_time_block_id = 0;
-        private ulong                   session_expired_id = 0;
-
+        private Ft.SessionManager   _session_manager;
+        private GLib.SimpleAction   state_action;
+        private GLib.SimpleAction   start_short_break_action;
+        private GLib.SimpleAction   start_long_break_action;
+        private GLib.SimpleAction   start_break_action;
+        private ulong               notify_current_time_block_id = 0;
+        private ulong               session_expired_id = 0;
 
         public SessionManagerActionGroup ()
         {
             GLib.Object (
-                session_manager: Pomodoro.SessionManager.get_default ()
+                session_manager: Ft.SessionManager.get_default ()
             );
         }
 
@@ -86,7 +85,7 @@ namespace Pomodoro
         private string get_current_state ()
         {
             var current_time_block = this.session_manager.current_time_block;
-            var current_state = current_time_block != null ? current_time_block.state : Pomodoro.State.STOPPED;
+            var current_state = current_time_block != null ? current_time_block.state : Ft.State.STOPPED;
 
             return current_state.to_string ();
         }
@@ -94,7 +93,7 @@ namespace Pomodoro
         private void activate_advance (GLib.SimpleAction action,
                                        GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("session-manager.advance");
+            Ft.Context.set_event_source ("session-manager.advance");
             this.session_manager.advance ();
         }
 
@@ -102,18 +101,18 @@ namespace Pomodoro
         //                                   GLib.Variant?     parameter)
         // {
         //     var current_time_block = this.session_manager.current_time_block;
-        //     var current_state = current_time_block != null ? current_time_block.state : Pomodoro.State.STOPPED;
+        //     var current_state = current_time_block != null ? current_time_block.state : Ft.State.STOPPED;
 
         //     if (current_state.is_break () || this.session_manager.timer.is_finished ())
         //     {
-        //         this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+        //         this.session_manager.advance_to_state (Ft.State.POMODORO);
         //     }
         // }
 
         private void activate_reset (GLib.SimpleAction action,
                                      GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("session-manager.reset");
+            Ft.Context.set_event_source ("session-manager.reset");
             this.session_manager.reset ();
         }
 
@@ -124,36 +123,36 @@ namespace Pomodoro
                 return;
             }
 
-            Pomodoro.Context.set_event_source (@"session-manager.state:$(parameter.get_string())");
-            this.session_manager.advance_to_state (Pomodoro.State.from_string (parameter.get_string ()));
+            Ft.Context.set_event_source (@"session-manager.state:$(parameter.get_string())");
+            this.session_manager.advance_to_state (Ft.State.from_string (parameter.get_string ()));
         }
 
         private void activate_start_pomodoro (GLib.SimpleAction action,
                                               GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("session-manager.start-pomodoro");
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            Ft.Context.set_event_source ("session-manager.start-pomodoro");
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
         }
 
         private void activate_start_short_break (GLib.SimpleAction action,
                                                  GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("session-manager.start-short-break");
-            this.session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK);
+            Ft.Context.set_event_source ("session-manager.start-short-break");
+            this.session_manager.advance_to_state (Ft.State.SHORT_BREAK);
         }
 
         private void activate_start_long_break (GLib.SimpleAction action,
                                                 GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("session-manager.start-long-break");
-            this.session_manager.advance_to_state (Pomodoro.State.LONG_BREAK);
+            Ft.Context.set_event_source ("session-manager.start-long-break");
+            this.session_manager.advance_to_state (Ft.State.LONG_BREAK);
         }
 
         private void activate_start_break (GLib.SimpleAction action,
                                            GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("session-manager.start-break");
-            this.session_manager.advance_to_state (Pomodoro.State.BREAK);
+            Ft.Context.set_event_source ("session-manager.start-break");
+            this.session_manager.advance_to_state (Ft.State.BREAK);
         }
 
         private void on_notify_current_time_block ()
@@ -161,10 +160,10 @@ namespace Pomodoro
             this.state_action.set_state (new Variant.string (this.get_current_state ()));
         }
 
-        private void on_session_expired (Pomodoro.Session session,
+        private void on_session_expired (Ft.Session session,
                                          int64            timestamp)
         {
-            Pomodoro.Context.set_event_source ("session-manager.session-expired", timestamp);
+            Ft.Context.set_event_source ("session-manager.session-expired", timestamp);
         }
 
         public override void dispose ()

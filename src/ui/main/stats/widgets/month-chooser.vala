@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/widgets/month-chooser.ui")]
     public sealed class MonthChooser : Adw.Bin
@@ -101,7 +101,7 @@ namespace Pomodoro
         private Gtk.Button create_month_button (GLib.Date date)
         {
             var button = new Gtk.Button ();
-            button.label = capitalize_words (Pomodoro.DateUtils.format_date (date, "%b"));
+            button.label = capitalize_words (Ft.DateUtils.format_date (date, "%b"));
             button.add_css_class ("pill");
             button.add_css_class ("flat");
             button.add_css_class ("month");
@@ -255,7 +255,7 @@ namespace Pomodoro
                 this.set_display_year (this._selected_date.get_year ());
             }
             else {
-                var today = Pomodoro.DateUtils.get_today ();
+                var today = Ft.DateUtils.get_today ();
 
                 this.set_display_year (today.get_year ());
             }

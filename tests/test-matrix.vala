@@ -25,7 +25,7 @@ namespace Tests
 
         public void test_get ()
         {
-            var matrix = new Pomodoro.Matrix.from_array ({
+            var matrix = new Ft.Matrix.from_array ({
                 { 4.0, 1.0, 3.0 },
                 { 2.0, 7.0, 8.0 }
             });
@@ -42,7 +42,7 @@ namespace Tests
 
         public void test_set ()
         {
-            var matrix = new Pomodoro.Matrix (2, 3);
+            var matrix = new Ft.Matrix (2, 3);
 
             matrix.@set (0, 0, 4.0);
             assert_cmpfloat (matrix.@get (0, 0), GLib.CompareOperator.EQ, 4.0);
@@ -62,12 +62,12 @@ namespace Tests
 
         public void test_resize ()
         {
-            var matrix = new Pomodoro.Matrix.from_array ({
+            var matrix = new Ft.Matrix.from_array ({
                 { 4.0, 1.0, 3.0 },
                 { 2.0, 7.0, 8.0 }
             });
 
-            var expected_result = new Pomodoro.Matrix.from_array ({
+            var expected_result = new Ft.Matrix.from_array ({
                 { 4.0, 1.0, 3.0, 0.0, 0.0 },
                 { 2.0, 7.0, 8.0, 0.0, 0.0 },
                 { 0.0, 0.0, 0.0, 0.0, 0.0 }
@@ -76,7 +76,7 @@ namespace Tests
             // GLib.debug ("result = %s", matrix.to_representation ());
             assert_true (matrix.equals (expected_result));
 
-            expected_result = new Pomodoro.Matrix.from_array ({
+            expected_result = new Ft.Matrix.from_array ({
                 { 4.0, 1.0 }
             });
             matrix.resize (1, 2);
@@ -86,7 +86,7 @@ namespace Tests
 
         public void test_resize__default_value ()
         {
-            var matrix = new Pomodoro.Matrix.from_array ({
+            var matrix = new Ft.Matrix.from_array ({
                 { 4.0, 1.0, 3.0 },
                 { 2.0, 7.0, 8.0 }
             });
@@ -105,15 +105,15 @@ namespace Tests
 
         public void test_add ()
         {
-            var matrix = new Pomodoro.Matrix.from_array ({
+            var matrix = new Ft.Matrix.from_array ({
                 { 4.0, 1.0, 3.0 },
                 { 2.0, 7.0, 8.0 }
             });
-            var other = new Pomodoro.Matrix.from_array ({
+            var other = new Ft.Matrix.from_array ({
                 { 0.0, 2.0, -3.0 },
                 { 6.0, 1.0, 1.0 }
             });
-            var expected_result = new Pomodoro.Matrix.from_array ({
+            var expected_result = new Ft.Matrix.from_array ({
                 { 4.0, 3.0, 0.0 },
                 { 8.0, 8.0, 9.0 }
             });
@@ -125,7 +125,7 @@ namespace Tests
 
         public void test_min ()
         {
-            var matrix = new Pomodoro.Matrix.from_array ({
+            var matrix = new Ft.Matrix.from_array ({
                 { 4.0, 1.0, 3.0 },
                 { 2.0, 7.0, 8.0 }
             });
@@ -134,7 +134,7 @@ namespace Tests
 
         public void test_max ()
         {
-            var matrix = new Pomodoro.Matrix.from_array ({
+            var matrix = new Ft.Matrix.from_array ({
                 { 4.0, 1.0, 3.0 },
                 { 2.0, 7.0, 8.0 }
             });
@@ -143,7 +143,7 @@ namespace Tests
 
         public void test_sum ()
         {
-            var matrix = new Pomodoro.Matrix.from_array ({
+            var matrix = new Ft.Matrix.from_array ({
                 { 4.0, 1.0, 3.0 },
                 { 2.0, 7.0, 8.0 }
             });
@@ -152,7 +152,7 @@ namespace Tests
 
         public void test_unstack ()
         {
-            var matrix = new Pomodoro.Matrix.from_array ({
+            var matrix = new Ft.Matrix.from_array ({
                 { 4.0, 1.0, 3.0 },
                 { 2.0, 7.0, 8.0 }
             });
@@ -187,7 +187,7 @@ namespace Tests
 
         public void test_get ()
         {
-            var matrix = new Pomodoro.Matrix3D.from_array ({
+            var matrix = new Ft.Matrix3D.from_array ({
                 {
                     { 4.0, -1.0 },
                     { 1.0, 0.0 },
@@ -211,7 +211,7 @@ namespace Tests
 
         public void test_set ()
         {
-            var matrix = new Pomodoro.Matrix3D (2, 3, 2);
+            var matrix = new Ft.Matrix3D (2, 3, 2);
 
             matrix.@set (0, 0, 1, 4.0);
             assert_cmpfloat (matrix.@get (0, 0, 1), GLib.CompareOperator.EQ, 4.0);
@@ -234,7 +234,7 @@ namespace Tests
 
         public void test_resize ()
         {
-            var matrix = new Pomodoro.Matrix3D.from_array ({
+            var matrix = new Ft.Matrix3D.from_array ({
                 {
                     { 4.0, -1.0 },
                     { 1.0, 0.0 },
@@ -246,7 +246,7 @@ namespace Tests
                     { 8.0, 0.0 }
                 }
             });
-            var expected_result = new Pomodoro.Matrix3D.from_array ({
+            var expected_result = new Ft.Matrix3D.from_array ({
                 {
                     { 4.0, -1.0, 0.0, 0.0 },
                     { 1.0, 0.0, 0.0, 0.0 },
@@ -272,7 +272,7 @@ namespace Tests
 
         public void test_resize__default_value ()
         {
-            var matrix = new Pomodoro.Matrix3D.from_array ({
+            var matrix = new Ft.Matrix3D.from_array ({
                 {
                     { 4.0, -1.0 },
                     { 1.0, 0.0 },
@@ -299,7 +299,7 @@ namespace Tests
 
         public void test_min ()
         {
-            var matrix = new Pomodoro.Matrix3D.from_array ({
+            var matrix = new Ft.Matrix3D.from_array ({
                 {
                     { 4.0, -1.0 },
                     { 1.0, 0.0 },
@@ -316,7 +316,7 @@ namespace Tests
 
         public void test_max ()
         {
-            var matrix = new Pomodoro.Matrix3D.from_array ({
+            var matrix = new Ft.Matrix3D.from_array ({
                 {
                     { 4.0, -1.0 },
                     { 1.0, 0.0 },
@@ -333,7 +333,7 @@ namespace Tests
 
         public void test_sum ()
         {
-            var matrix = new Pomodoro.Matrix3D.from_array ({
+            var matrix = new Ft.Matrix3D.from_array ({
                 {
                     { 4.0, -1.0 },
                     { 1.0, 0.0 },
@@ -350,7 +350,7 @@ namespace Tests
 
         public void test_unstack ()
         {
-            var matrix = new Pomodoro.Matrix3D.from_array ({
+            var matrix = new Ft.Matrix3D.from_array ({
                 {
                     { 4.0, -1.0 },
                     { 1.0, 0.0 },

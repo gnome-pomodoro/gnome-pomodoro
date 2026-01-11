@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public enum ExitStatus
     {
@@ -121,29 +121,29 @@ namespace Pomodoro
 
         private static Option[] OPTIONS;
 
-        public Pomodoro.Timer?               timer;
-        public Pomodoro.SessionManager?      session_manager;
-        public Pomodoro.CapabilityManager?   capability_manager;
+        public Ft.Timer?               timer;
+        public Ft.SessionManager?      session_manager;
+        public Ft.CapabilityManager?   capability_manager;
 
-        private Pomodoro.KeyboardManager?        keyboard_manager;
-        private Pomodoro.StatsManager?           stats_manager;
-        private Pomodoro.EventProducer?          event_producer;
-        private Pomodoro.EventBus?               event_bus;
-        private Pomodoro.Extension?              extension;
-        private Pomodoro.JobQueue?               job_queue;
-        private Pomodoro.ActionManager?          action_manager;
-        private Pomodoro.BackgroundManager?      background_manager;
-        private Pomodoro.Logger?                 logger;
-        private GLib.Settings?                   settings;
-        private uint                             save_idle_id = 0;
-        private Pomodoro.ApplicationDBusService? dbus_service;
-        private uint                             dbus_service_id;
-        private Pomodoro.TimerDBusService?       timer_dbus_service;
-        private uint                             timer_dbus_service_id;
-        private Pomodoro.SessionDBusService?     session_dbus_service;
-        private uint                             session_dbus_service_id;
-        private uint                             service_hold_id = 0U;
-        private bool                             preferences_requested = false;
+        private Ft.KeyboardManager?         keyboard_manager;
+        private Ft.StatsManager?            stats_manager;
+        private Ft.EventProducer?           event_producer;
+        private Ft.EventBus?                event_bus;
+        private Ft.Extension?               extension;
+        private Ft.JobQueue?                job_queue;
+        private Ft.ActionManager?           action_manager;
+        private Ft.BackgroundManager?       background_manager;
+        private Ft.Logger?                  logger;
+        private GLib.Settings?              settings;
+        private uint                        save_idle_id = 0;
+        private Ft.ApplicationDBusService?  dbus_service;
+        private uint                        dbus_service_id;
+        private Ft.TimerDBusService?        timer_dbus_service;
+        private uint                        timer_dbus_service_id;
+        private Ft.SessionDBusService?      session_dbus_service;
+        private uint                        session_dbus_service_id;
+        private uint                        service_hold_id = 0U;
+        private bool                        preferences_requested = false;
 
         static construct
         {
@@ -253,9 +253,9 @@ namespace Pomodoro
             );
         }
 
-        public new static unowned Pomodoro.Application get_default ()
+        public new static unowned Ft.Application get_default ()
         {
-            return GLib.Application.get_default () as Pomodoro.Application;
+            return GLib.Application.get_default () as Ft.Application;
         }
 
         public unowned Gtk.Window? get_last_focused_window ()
@@ -299,16 +299,16 @@ namespace Pomodoro
 
                 return GLib.Source.REMOVE;
             });
-            GLib.Source.set_name_by_id (this.save_idle_id, "Pomodoro.Application.schedule_save");
+            GLib.Source.set_name_by_id (this.save_idle_id, "Ft.Application.schedule_save");
         }
 
-        public void show_window (Pomodoro.WindowView view = Pomodoro.WindowView.DEFAULT)
+        public void show_window (Ft.WindowView view = Ft.WindowView.DEFAULT)
         {
-            var window = this.get_window<Pomodoro.Window> ();
+            var window = this.get_window<Ft.Window> ();
 
             if (window == null)
             {
-                window = new Pomodoro.Window ();
+                window = new Ft.Window ();
                 this.add_window (window);
 
                 if (this.application_id.has_suffix ("Devel")) {
@@ -316,7 +316,7 @@ namespace Pomodoro
                 }
             }
 
-            if (view != Pomodoro.WindowView.DEFAULT) {
+            if (view != Ft.WindowView.DEFAULT) {
                 window.view = view;
             }
 
@@ -325,11 +325,11 @@ namespace Pomodoro
 
         public void show_preferences (string panel_name = "")
         {
-            var preferences_window = this.get_window<Pomodoro.PreferencesWindow> ();
+            var preferences_window = this.get_window<Ft.PreferencesWindow> ();
 
             if (preferences_window == null)
             {
-                preferences_window = new Pomodoro.PreferencesWindow ();
+                preferences_window = new Ft.PreferencesWindow ();
                 this.add_window (preferences_window);
             }
 
@@ -342,11 +342,11 @@ namespace Pomodoro
 
         private void show_about_dialog ()
         {
-            var window = this.get_window<Pomodoro.Window> ();
+            var window = this.get_window<Ft.Window> ();
             var about_dialog = this.get_window<Adw.AboutDialog> ();
 
             if (about_dialog == null) {
-                about_dialog = Pomodoro.create_about_dialog ();
+                about_dialog = Ft.create_about_dialog ();
             }
 
             about_dialog.present (window);
@@ -371,11 +371,11 @@ namespace Pomodoro
                     break;
 
                 case "timer":
-                    action_group = new Pomodoro.TimerActionGroup ();
+                    action_group = new Ft.TimerActionGroup ();
                     break;
 
                 case "session-manager":
-                    action_group = new Pomodoro.SessionManagerActionGroup ();
+                    action_group = new Ft.SessionManagerActionGroup ();
                     break;
 
                 default:
@@ -389,7 +389,7 @@ namespace Pomodoro
         private void activate_window (GLib.SimpleAction action,
                                       GLib.Variant?     parameter)
         {
-            var view = Pomodoro.WindowView.from_string (parameter.get_string ());
+            var view = Ft.WindowView.from_string (parameter.get_string ());
 
             this.show_window (view);
         }
@@ -397,10 +397,10 @@ namespace Pomodoro
         private void activate_toggle_window (GLib.SimpleAction action,
                                              GLib.Variant?     parameter)
         {
-            var window = this.get_window<Pomodoro.Window> ();
+            var window = this.get_window<Ft.Window> ();
 
             if (window == null || !window.is_active) {
-                this.show_window (Pomodoro.WindowView.TIMER);
+                this.show_window (Ft.WindowView.TIMER);
             }
             else {
                 window.close_to_background ();
@@ -416,10 +416,10 @@ namespace Pomodoro
         private void activate_log (GLib.SimpleAction action,
                                    GLib.Variant?     parameter)
         {
-            var log_window = this.get_window<Pomodoro.LogWindow> ();
+            var log_window = this.get_window<Ft.LogWindow> ();
 
             if (log_window == null) {
-                log_window = new Pomodoro.LogWindow ();
+                log_window = new Ft.LogWindow ();
                 this.add_window (log_window);
             }
 
@@ -514,10 +514,10 @@ namespace Pomodoro
 
         private void setup_capabilities ()
         {
-            this.capability_manager = new Pomodoro.CapabilityManager ();
-            this.capability_manager.register (new Pomodoro.NotificationsCapability ());
-            this.capability_manager.register (new Pomodoro.GlobalShortcutsCapability ());
-            this.capability_manager.register (new Pomodoro.SoundsCapability ());
+            this.capability_manager = new Ft.CapabilityManager ();
+            this.capability_manager.register (new Ft.NotificationsCapability ());
+            this.capability_manager.register (new Ft.GlobalShortcutsCapability ());
+            this.capability_manager.register (new Ft.SoundsCapability ());
 
             this.hold ();
 
@@ -533,12 +533,12 @@ namespace Pomodoro
 
                 return GLib.Source.REMOVE;
             });
-            GLib.Source.set_name_by_id (idle_id, "Pomodoro.Application.setup_capabilities");
+            GLib.Source.set_name_by_id (idle_id, "Ft.Application.setup_capabilities");
         }
 
         private void setup_database ()
         {
-            Pomodoro.Database.open ();
+            Ft.Database.open ();
         }
 
         private void setup_actions ()
@@ -601,7 +601,7 @@ namespace Pomodoro
             this.set_accels_for_action ("window.close", {"<Control>w"});
             this.set_accels_for_action ("win.toggle-compact-size", {"F9"});
 
-            this.keyboard_manager = new Pomodoro.KeyboardManager ();
+            this.keyboard_manager = new Ft.KeyboardManager ();
             this.keyboard_manager.add_shortcut ("timer.start-stop",
                                                 _("Start or Stop"),
                                                 "<Control><Alt>p");
@@ -627,7 +627,7 @@ namespace Pomodoro
 
         private void setup_extension ()
         {
-            this.extension = new Pomodoro.Extension ();
+            this.extension = new Ft.Extension ();
 
             // TODO
             // this.capabilities.register_many (this.extension.capabilities);
@@ -660,16 +660,16 @@ namespace Pomodoro
 
             base.startup ();
 
-            this.settings           = Pomodoro.get_settings ();
-            this.session_manager    = Pomodoro.SessionManager.get_default ();
+            this.settings           = Ft.get_settings ();
+            this.session_manager    = Ft.SessionManager.get_default ();
             this.timer              = this.session_manager.timer;
-            this.stats_manager      = new Pomodoro.StatsManager ();
-            this.event_producer     = new Pomodoro.EventProducer ();
+            this.stats_manager      = new Ft.StatsManager ();
+            this.event_producer     = new Ft.EventProducer ();
             this.event_bus          = this.event_producer.bus;
-            this.job_queue          = new Pomodoro.JobQueue ();
-            this.action_manager     = new Pomodoro.ActionManager ();
-            this.logger             = new Pomodoro.Logger ();
-            this.background_manager = new Pomodoro.BackgroundManager ();
+            this.job_queue          = new Ft.JobQueue ();
+            this.action_manager     = new Ft.ActionManager ();
+            this.logger             = new Ft.Logger ();
+            this.background_manager = new Ft.BackgroundManager ();
 
             this.setup_resources ();
             this.setup_database ();
@@ -682,7 +682,7 @@ namespace Pomodoro
             this.event_bus.event.connect (this.on_event);
 
             this.session_manager.restore.begin (
-                Pomodoro.Timestamp.UNDEFINED,
+                Ft.Timestamp.UNDEFINED,
                 (obj, res) => {
                     this.session_manager.restore.end (res);
                     this.session_manager.ensure_session ();
@@ -700,7 +700,7 @@ namespace Pomodoro
             if (this.timer_dbus_service == null)
             {
                 try {
-                    this.timer_dbus_service = new Pomodoro.TimerDBusService (
+                    this.timer_dbus_service = new Ft.TimerDBusService (
                             dbus_connection,
                             dbus_object_path,
                             this.timer,
@@ -719,7 +719,7 @@ namespace Pomodoro
             if (this.session_dbus_service == null)
             {
                 try {
-                    this.session_dbus_service = new Pomodoro.SessionDBusService (
+                    this.session_dbus_service = new Ft.SessionDBusService (
                             dbus_connection,
                             dbus_object_path,
                             this.session_manager);
@@ -756,7 +756,7 @@ namespace Pomodoro
             var timestamp = this.timer.get_current_time ();
             var last_state_changed_time = this.timer.get_last_state_changed_time ();
 
-            if (timestamp - last_state_changed_time < Pomodoro.Interval.SECOND) {
+            if (timestamp - last_state_changed_time < Ft.Interval.SECOND) {
                 timestamp = last_state_changed_time;
             }
 
@@ -777,13 +777,13 @@ namespace Pomodoro
                                    glyph,
                                    this.session_manager.current_state.get_label ());
 
-            if (this.session_manager.current_state != Pomodoro.State.STOPPED)
+            if (this.session_manager.current_state != Ft.State.STOPPED)
             {
-                var seconds_uint = (uint) Pomodoro.Timestamp.to_seconds_uint (
+                var seconds_uint = (uint) Ft.Timestamp.to_seconds_uint (
                         this.timer.calculate_remaining (timestamp));
                 message.append_printf (
                         "   %s\n",
-                        _("%s remaining").printf (Pomodoro.format_time (seconds_uint)));
+                        _("%s remaining").printf (Ft.format_time (seconds_uint)));
             }
 
             command_line.print_literal (message.str);
@@ -832,10 +832,10 @@ namespace Pomodoro
 
             if (version_requested) {
                 this.print_version ();
-                return Pomodoro.ExitStatus.SUCCESS;
+                return Ft.ExitStatus.SUCCESS;
             }
 
-            return Pomodoro.ExitStatus.UNDEFINED;
+            return Ft.ExitStatus.UNDEFINED;
         }
 
         public override int command_line (GLib.ApplicationCommandLine command_line)
@@ -854,11 +854,11 @@ namespace Pomodoro
                 if (option.action_name != null) {
                     this.activate_prefixed_action (option.action_name,
                                                    option.get_action_parameter (value));
-                    exit_status = Pomodoro.ExitStatus.SUCCESS;
+                    exit_status = Ft.ExitStatus.SUCCESS;
                 }
                 else if (option.long_name == "status") {
                     this.print_timer_status (command_line);
-                    exit_status = Pomodoro.ExitStatus.SUCCESS;
+                    exit_status = Ft.ExitStatus.SUCCESS;
                 }
             }
 
@@ -870,7 +870,7 @@ namespace Pomodoro
             this.activate ();
             this.preferences_requested = false;
 
-            return Pomodoro.ExitStatus.SUCCESS;
+            return Ft.ExitStatus.SUCCESS;
         }
 
         public override void activate ()
@@ -943,9 +943,9 @@ namespace Pomodoro
             while (remaining > 0 && main_context.iteration (true));
 
             // Cleanup
-            Pomodoro.Database.close ();
-            Pomodoro.SessionManager.set_default (null);
-            Pomodoro.Timer.set_default (null);
+            Ft.Database.close ();
+            Ft.SessionManager.set_default (null);
+            Ft.Timer.set_default (null);
 
             this.event_producer = null;
             this.event_bus = null;
@@ -976,7 +976,7 @@ namespace Pomodoro
             if (this.dbus_service == null)
             {
                 try {
-                    this.dbus_service = new Pomodoro.ApplicationDBusService (this);
+                    this.dbus_service = new Ft.ApplicationDBusService (this);
                     this.dbus_service_id = connection.register_object (object_path, dbus_service);
                 }
                 catch (GLib.IOError error) {
@@ -1039,25 +1039,25 @@ namespace Pomodoro
             this.schedule_save ();
         }
 
-        private void on_enter_session (Pomodoro.Session session)
+        private void on_enter_session (Ft.Session session)
         {
             session.changed.connect (this.on_current_session_changed);
         }
 
-        private void on_leave_session (Pomodoro.Session session)
+        private void on_leave_session (Ft.Session session)
         {
             session.changed.disconnect (this.on_current_session_changed);
         }
 
-        private void on_advanced (Pomodoro.Session?   current_session,
-                                  Pomodoro.TimeBlock? current_time_block,
-                                  Pomodoro.Session?   previous_session,
-                                  Pomodoro.TimeBlock? previous_time_block)
+        private void on_advanced (Ft.Session?   current_session,
+                                  Ft.TimeBlock? current_time_block,
+                                  Ft.Session?   previous_session,
+                                  Ft.TimeBlock? previous_time_block)
         {
             this.schedule_save ();
         }
 
-        private void on_event (Pomodoro.Event event)
+        private void on_event (Ft.Event event)
         {
             this.logger.log_event (event);
         }

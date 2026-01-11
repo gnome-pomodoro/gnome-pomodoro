@@ -13,29 +13,29 @@ namespace Tests
 
     public abstract class BaseSchedulerTest : Tests.TestSuite
     {
-        protected Pomodoro.SessionTemplate session_template = Pomodoro.SessionTemplate () {
-            pomodoro_duration = 25 * Pomodoro.Interval.MINUTE,
-            short_break_duration = 5 * Pomodoro.Interval.MINUTE,
-            long_break_duration = 15 * Pomodoro.Interval.MINUTE,
+        protected Ft.SessionTemplate session_template = Ft.SessionTemplate () {
+            pomodoro_duration = 25 * Ft.Interval.MINUTE,
+            short_break_duration = 5 * Ft.Interval.MINUTE,
+            long_break_duration = 15 * Ft.Interval.MINUTE,
             cycles = 4U
         };
 
         public override void setup ()
         {
-            Pomodoro.Timestamp.freeze_to (2000000000 * Pomodoro.Interval.SECOND);
+            Ft.Timestamp.freeze_to (2000000000 * Ft.Interval.SECOND);
         }
 
         public override void teardown ()
         {
-            Pomodoro.Timestamp.thaw ();
+            Ft.Timestamp.thaw ();
 
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.revert ();
         }
 
-        public Pomodoro.Session create_session (Pomodoro.Scheduler scheduler)
+        public Ft.Session create_session (Ft.Scheduler scheduler)
         {
-            var session = new Pomodoro.Session.from_template (scheduler.session_template);
+            var session = new Ft.Session.from_template (scheduler.session_template);
             session.@foreach (
                 (time_block) => {
                     time_block.set_intended_duration (time_block.duration);
@@ -117,271 +117,271 @@ namespace Tests
 
         public void test_calculate_time_block_completion_time ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_1.set_time_range (now, now + 30 * Pomodoro.Interval.SECOND);
-            time_block_1.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_1.set_time_range (now, now + 30 * Ft.Interval.SECOND);
+            time_block_1.set_intended_duration (25 * Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (scheduler.calculate_time_block_completion_time (time_block_1)),
-                new GLib.Variant.int64 (now + 20 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 20 * Ft.Interval.MINUTE)
             );
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_2.set_time_range (now, now + 20 * Pomodoro.Interval.MINUTE);
-            time_block_2.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_2.set_time_range (now, now + 20 * Ft.Interval.MINUTE);
+            time_block_2.set_intended_duration (25 * Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (scheduler.calculate_time_block_completion_time (time_block_2)),
-                new GLib.Variant.int64 (now + 20 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 20 * Ft.Interval.MINUTE)
             );
 
-            var time_block_3 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_3.set_time_range (now, now + 50 * Pomodoro.Interval.MINUTE);
-            time_block_3.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
+            var time_block_3 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_3.set_time_range (now, now + 50 * Ft.Interval.MINUTE);
+            time_block_3.set_intended_duration (25 * Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (scheduler.calculate_time_block_completion_time (time_block_3)),
-                new GLib.Variant.int64 (now + 20 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 20 * Ft.Interval.MINUTE)
             );
 
-            var time_block_4 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block_4.set_time_range (now, now + 10 * Pomodoro.Interval.MINUTE);
-            time_block_4.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
+            var time_block_4 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block_4.set_time_range (now, now + 10 * Ft.Interval.MINUTE);
+            time_block_4.set_intended_duration (5 * Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (scheduler.calculate_time_block_completion_time (time_block_4)),
-                new GLib.Variant.int64 (now + 4 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 4 * Ft.Interval.MINUTE)
             );
 
-            var time_block_5 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block_5.set_time_range (now, now + 5 * Pomodoro.Interval.SECOND);
-            time_block_5.set_intended_duration (5 * Pomodoro.Interval.SECOND);
+            var time_block_5 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block_5.set_time_range (now, now + 5 * Ft.Interval.SECOND);
+            time_block_5.set_intended_duration (5 * Ft.Interval.SECOND);
             assert_cmpvariant (
                 new GLib.Variant.int64 (scheduler.calculate_time_block_completion_time (time_block_5)),
-                new GLib.Variant.int64 (now + 4 * Pomodoro.Interval.SECOND)
+                new GLib.Variant.int64 (now + 4 * Ft.Interval.SECOND)
             );
         }
 
         public void test_calculate_time_block_completion_time__with_gaps ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (25 * Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (scheduler.calculate_time_block_completion_time (time_block)),
-                new GLib.Variant.int64 (now + 20 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 20 * Ft.Interval.MINUTE)
             );
 
-            var gap = new Pomodoro.Gap ();
-            gap.set_time_range (now + 5 * Pomodoro.Interval.MINUTE, Pomodoro.Timestamp.UNDEFINED);
+            var gap = new Ft.Gap ();
+            gap.set_time_range (now + 5 * Ft.Interval.MINUTE, Ft.Timestamp.UNDEFINED);
             time_block.add_gap (gap);
             assert_cmpvariant (
                 new GLib.Variant.int64 (scheduler.calculate_time_block_completion_time (time_block)),
-                new GLib.Variant.int64 (now + 20 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 20 * Ft.Interval.MINUTE)
             );
 
-            gap.set_time_range (now + 5 * Pomodoro.Interval.MINUTE, now + 15 * Pomodoro.Interval.MINUTE);
+            gap.set_time_range (now + 5 * Ft.Interval.MINUTE, now + 15 * Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (scheduler.calculate_time_block_completion_time (time_block)),
-                new GLib.Variant.int64 (now + 30 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 30 * Ft.Interval.MINUTE)
             );
 
-            time_block.set_time_range (now, now + 35 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 35 * Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (scheduler.calculate_time_block_completion_time (time_block)),
-                new GLib.Variant.int64 (now + 30 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 30 * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_time_block_score__pomodoro ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var score = 0.0;
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (now + 20 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (25 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (now + 20 * Ft.Interval.MINUTE);
 
             // At different timestamps
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            score = scheduler.calculate_time_block_score (time_block, now + 19 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, now + 19 * Ft.Interval.MINUTE);
             assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
 
-            score = scheduler.calculate_time_block_score (time_block, now + 20 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, now + 20 * Ft.Interval.MINUTE);
             assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
 
-            score = scheduler.calculate_time_block_score (time_block, now + 99 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, now + 99 * Ft.Interval.MINUTE);
             assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
 
             // After marking time-block end time
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            time_block.set_time_range (now, now + 19 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 19 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
 
-            time_block.set_time_range (now, now + 20 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 20 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
 
-            time_block.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
 
-            time_block.set_time_range (now, now + (25 + 19) * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + (25 + 19) * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
 
-            time_block.set_time_range (now, now + (25 + 20) * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + (25 + 20) * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
 
             // Uncompleted status should have a priority
-            time_block.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            time_block.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
         }
 
         public void test_calculate_time_block_score__extended_pomodoro ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var score = 0.0;
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 50 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (now + 20 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 50 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (25 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (now + 20 * Ft.Interval.MINUTE);
 
             // At different timestamps
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            score = scheduler.calculate_time_block_score (time_block, now + 44 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, now + 44 * Ft.Interval.MINUTE);
             assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
 
-            score = scheduler.calculate_time_block_score (time_block, now + 45 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, now + 45 * Ft.Interval.MINUTE);
             assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
 
-            score = scheduler.calculate_time_block_score (time_block, now + 50 * Pomodoro.Interval.MINUTE);
+            score = scheduler.calculate_time_block_score (time_block, now + 50 * Ft.Interval.MINUTE);
             assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
 
             // After marking time-block end time
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            time_block.set_time_range (now, now + 44 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 44 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
 
-            time_block.set_time_range (now, now + 45 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 45 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
 
-            time_block.set_time_range (now, now + 50 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 50 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
 
             // Uncompleted status should have a priority
-            time_block.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            time_block.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
         }
 
         public void test_calculate_time_block_score__short_pomodoro ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var score = 0.0;
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_intended_duration (15 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (now + 20 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_intended_duration (15 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (now + 20 * Ft.Interval.MINUTE);
 
-            time_block.set_time_range (now, now + 11 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 11 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
 
-            time_block.set_time_range (now, now + 12 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 12 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
 
-            time_block.set_time_range (now, now + 30 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 30 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 1.0, EPSILON);
 
-            time_block.set_time_range (now, now + 40 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 40 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 2.0, EPSILON);
         }
 
         public void test_calculate_time_block_score__short_break ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var score = 0.0;
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var time_block = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block.set_intended_duration (5 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            time_block.set_time_range (now, now + 4 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 4 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
 
-            time_block.set_time_range (now, now + 5 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 5 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
         }
 
         public void test_calculate_time_block_score__long_break ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var score = 0.0;
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.LONG_BREAK);
-            time_block.set_intended_duration (15 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var time_block = new Ft.TimeBlock (Ft.State.LONG_BREAK);
+            time_block.set_intended_duration (15 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            time_block.set_time_range (now, now + 12 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 12 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
 
-            time_block.set_time_range (now, now + 15 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + 15 * Ft.Interval.MINUTE);
             score = scheduler.calculate_time_block_score (time_block, time_block.end_time);
             assert_cmpfloat_with_epsilon (score, 0.0, EPSILON);
         }
 
         public void test_calculate_time_block_score__uncompleted_pomodoro ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (now + 20 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (25 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (now + 20 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
-            time_block.duration = 1 * Pomodoro.Interval.MINUTE;
+            time_block.duration = 1 * Ft.Interval.MINUTE;
             assert_cmpfloat (
                 scheduler.calculate_time_block_score (time_block, time_block.end_time),
                 GLib.CompareOperator.EQ,
                 0.0
             );
 
-            time_block.duration = 20 * Pomodoro.Interval.MINUTE;
+            time_block.duration = 20 * Ft.Interval.MINUTE;
             assert_cmpfloat (
                 scheduler.calculate_time_block_score (time_block, time_block.end_time),
                 GLib.CompareOperator.EQ,
                 0.0
             );
 
-            time_block.duration = 25 * Pomodoro.Interval.MINUTE;
+            time_block.duration = 25 * Ft.Interval.MINUTE;
             assert_cmpfloat (
                 scheduler.calculate_time_block_score (time_block, time_block.end_time),
                 GLib.CompareOperator.EQ,
@@ -391,22 +391,22 @@ namespace Tests
 
         public void test_calculate_time_block_score__paused_pomodoro ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (now + 20 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (25 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (now + 20 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
             assert_cmpfloat (
                     scheduler.calculate_time_block_score (time_block, time_block.start_time),
                     GLib.CompareOperator.EQ,
                     0.0);
 
             // Start a pause
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (now + 5 * Pomodoro.Interval.MINUTE, Pomodoro.Timestamp.UNDEFINED);
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (now + 5 * Ft.Interval.MINUTE, Ft.Timestamp.UNDEFINED);
             time_block.add_gap (gap_1);
             assert_cmpfloat (
                     scheduler.calculate_time_block_score (time_block, gap_1.start_time),
@@ -418,9 +418,9 @@ namespace Tests
                     0.0);
 
             // Resume. Check if a long pause confuses the scheduler.
-            gap_1.duration = 30 * Pomodoro.Interval.MINUTE;
+            gap_1.duration = 30 * Ft.Interval.MINUTE;
             time_block.duration += gap_1.duration;
-            time_block.set_completion_time (time_block.end_time - 5 * Pomodoro.Interval.MINUTE);
+            time_block.set_completion_time (time_block.end_time - 5 * Ft.Interval.MINUTE);
             assert_cmpfloat (
                     scheduler.calculate_time_block_score (time_block, gap_1.end_time),
                     GLib.CompareOperator.EQ,
@@ -430,14 +430,14 @@ namespace Tests
                     GLib.CompareOperator.EQ,
                     1.0);
             assert_cmpfloat (
-                    scheduler.calculate_time_block_score (time_block, time_block.end_time + Pomodoro.Interval.HOUR),
+                    scheduler.calculate_time_block_score (time_block, time_block.end_time + Ft.Interval.HOUR),
                     GLib.CompareOperator.EQ,
                     1.0);
 
             // Pause after `completion_time`
-            now = time_block.end_time - Pomodoro.Interval.MINUTE;
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (now, Pomodoro.Timestamp.UNDEFINED);
+            now = time_block.end_time - Ft.Interval.MINUTE;
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (now, Ft.Timestamp.UNDEFINED);
             time_block.add_gap (gap_2);
             assert_cmpfloat (
                     scheduler.calculate_time_block_score (time_block, gap_2.start_time),
@@ -448,12 +448,12 @@ namespace Tests
                     GLib.CompareOperator.EQ,
                     1.0);
             assert_cmpfloat (
-                    scheduler.calculate_time_block_score (time_block, time_block.end_time + Pomodoro.Interval.HOUR),
+                    scheduler.calculate_time_block_score (time_block, time_block.end_time + Ft.Interval.HOUR),
                     GLib.CompareOperator.EQ,
                     1.0);
 
             // Resume. Check if a long pause confuses the scheduler.
-            gap_2.duration = 30 * Pomodoro.Interval.MINUTE;
+            gap_2.duration = 30 * Ft.Interval.MINUTE;
             time_block.duration += gap_2.duration;
             assert_cmpfloat (
                     scheduler.calculate_time_block_score (time_block, gap_2.start_time),
@@ -468,7 +468,7 @@ namespace Tests
                     GLib.CompareOperator.EQ,
                     1.0);
             assert_cmpfloat (
-                    scheduler.calculate_time_block_score (time_block, time_block.end_time + Pomodoro.Interval.HOUR),
+                    scheduler.calculate_time_block_score (time_block, time_block.end_time + Ft.Interval.HOUR),
                     GLib.CompareOperator.EQ,
                     1.0);
         }
@@ -478,57 +478,57 @@ namespace Tests
          */
         public void test_calculate_time_block_weight__paused_pomodoro ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_1.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
-            time_block_1.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_1.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
+            time_block_1.set_intended_duration (25 * Ft.Interval.MINUTE);
+            time_block_1.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
             assert_cmpfloat_with_epsilon (
                     scheduler.calculate_time_block_weight (time_block_1),
                     1.0,
                     EPSILON);
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (now + 5 * Pomodoro.Interval.MINUTE,
-                                  Pomodoro.Timestamp.UNDEFINED);
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (now + 5 * Ft.Interval.MINUTE,
+                                  Ft.Timestamp.UNDEFINED);
             time_block_1.add_gap (gap_1);
             assert_cmpfloat_with_epsilon (
                     scheduler.calculate_time_block_weight (time_block_1),
                     1.0,
                     EPSILON);
 
-            gap_1.set_time_range (now + 5 * Pomodoro.Interval.MINUTE,
-                                  now + 15 * Pomodoro.Interval.MINUTE);
+            gap_1.set_time_range (now + 5 * Ft.Interval.MINUTE,
+                                  now + 15 * Ft.Interval.MINUTE);
             assert_cmpfloat_with_epsilon (
                     scheduler.calculate_time_block_weight (time_block_1),
                     0.0,
                     EPSILON);
 
-            time_block_1.set_time_range (now, now + 35 * Pomodoro.Interval.MINUTE);
+            time_block_1.set_time_range (now, now + 35 * Ft.Interval.MINUTE);
             assert_cmpfloat_with_epsilon (
                     scheduler.calculate_time_block_weight (time_block_1),
                     1.0,
                     EPSILON);
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_2.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
-            time_block_2.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
-            time_block_2.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_2.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
+            time_block_2.set_intended_duration (25 * Ft.Interval.MINUTE);
+            time_block_2.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (now + 20 * Pomodoro.Interval.MINUTE,
-                                  Pomodoro.Timestamp.UNDEFINED);
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (now + 20 * Ft.Interval.MINUTE,
+                                  Ft.Timestamp.UNDEFINED);
             time_block_2.add_gap (gap_2);
             assert_cmpfloat_with_epsilon (
                     scheduler.calculate_time_block_weight (time_block_2),
                     1.0,
                     EPSILON);
 
-            var gap_3 = new Pomodoro.Gap ();
-            gap_3.set_time_range (now, now + 20 * Pomodoro.Interval.MINUTE);
+            var gap_3 = new Ft.Gap ();
+            gap_3.set_time_range (now, now + 20 * Ft.Interval.MINUTE);
             time_block_2.add_gap (gap_3);
             assert_cmpfloat_with_epsilon (
                     scheduler.calculate_time_block_weight (time_block_2),
@@ -537,7 +537,7 @@ namespace Tests
 
             time_block_2.set_time_range (
                     time_block_2.start_time,
-                    time_block_2.end_time + 50 * Pomodoro.Interval.MINUTE);
+                    time_block_2.end_time + 50 * Ft.Interval.MINUTE);
             assert_cmpfloat_with_epsilon (
                     scheduler.calculate_time_block_weight (time_block_2),
                     2.0,
@@ -549,43 +549,43 @@ namespace Tests
          */
         public void test_is_time_block_completed__pomodoro ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
             var time_block = session.get_nth_time_block (0);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var timestamp_1 = time_block.start_time + 20 * Pomodoro.Interval.MINUTE - Pomodoro.Interval.SECOND;
+            var timestamp_1 = time_block.start_time + 20 * Ft.Interval.MINUTE - Ft.Interval.SECOND;
             assert_false (scheduler.is_time_block_completed (time_block, timestamp_1));
 
-            var timestamp_2 = time_block.start_time + 20 * Pomodoro.Interval.MINUTE;
+            var timestamp_2 = time_block.start_time + 20 * Ft.Interval.MINUTE;
             assert_true (scheduler.is_time_block_completed (time_block, timestamp_2));
         }
 
         public void test_is_time_block_completed__short_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
             var time_block = session.get_nth_time_block (1);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var timestamp_1 = time_block.start_time + 4 * Pomodoro.Interval.MINUTE - Pomodoro.Interval.SECOND;
+            var timestamp_1 = time_block.start_time + 4 * Ft.Interval.MINUTE - Ft.Interval.SECOND;
             assert_false (scheduler.is_time_block_completed (time_block, timestamp_1));
 
-            var timestamp_2 = time_block.start_time + 4 * Pomodoro.Interval.MINUTE;
+            var timestamp_2 = time_block.start_time + 4 * Ft.Interval.MINUTE;
             assert_true (scheduler.is_time_block_completed (time_block, timestamp_2));
         }
 
         public void test_is_time_block_completed__long_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
             var time_block = session.get_last_time_block ();
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var timestamp_1 = time_block.start_time + 4 * Pomodoro.Interval.MINUTE - Pomodoro.Interval.SECOND;
+            var timestamp_1 = time_block.start_time + 4 * Ft.Interval.MINUTE - Ft.Interval.SECOND;
             assert_false (scheduler.is_time_block_completed (time_block, timestamp_1));
 
-            var timestamp_2 = time_block.start_time + 12 * Pomodoro.Interval.MINUTE;
+            var timestamp_2 = time_block.start_time + 12 * Ft.Interval.MINUTE;
             assert_true (scheduler.is_time_block_completed (time_block, timestamp_2));
         }
 
@@ -594,19 +594,19 @@ namespace Tests
          */
         public void test_resolve_context__update_state ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            Pomodoro.State[] states = {
-                Pomodoro.State.STOPPED,
-                Pomodoro.State.POMODORO,
-                Pomodoro.State.SHORT_BREAK,
-                Pomodoro.State.LONG_BREAK
+            Ft.State[] states = {
+                Ft.State.STOPPED,
+                Ft.State.POMODORO,
+                Ft.State.SHORT_BREAK,
+                Ft.State.LONG_BREAK
             };
 
             foreach (var state in states)
             {
-                var context = Pomodoro.SchedulerContext ();
-                var time_block = new Pomodoro.TimeBlock (state);
+                var context = Ft.SchedulerContext ();
+                var time_block = new Ft.TimeBlock (state);
                 time_block.set_time_range (20, 30);
                 time_block.set_intended_duration (time_block.duration);
 
@@ -617,21 +617,21 @@ namespace Tests
 
         public void test_resolve_context__update_timestamp ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
             int64[] timestamps = {
-                now + Pomodoro.Interval.MINUTE,
-                now + 5 * Pomodoro.Interval.MINUTE,
-                now + 10 * Pomodoro.Interval.MINUTE
+                now + Ft.Interval.MINUTE,
+                now + 5 * Ft.Interval.MINUTE,
+                now + 10 * Ft.Interval.MINUTE
             };
 
             foreach (var timestamp in timestamps)
             {
-                var context = Pomodoro.SchedulerContext ();
+                var context = Ft.SchedulerContext ();
 
-                var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-                time_block.set_time_range (timestamp, timestamp + Pomodoro.Interval.MINUTE);
+                var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+                time_block.set_time_range (timestamp, timestamp + Ft.Interval.MINUTE);
 
                 scheduler.resolve_context (time_block, true, time_block.end_time, ref context);
                 assert_cmpvariant (
@@ -646,21 +646,21 @@ namespace Tests
          */
         public void test_resolve_context__completed_pomodoro ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 9 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 9 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (5 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 score = 0.0,
             };
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state = Pomodoro.State.POMODORO,
+                state = Ft.State.POMODORO,
                 score = 1.0,
             };
             scheduler.resolve_context (time_block, true, time_block.end_time, ref context);
@@ -672,21 +672,21 @@ namespace Tests
 
         public void test_resolve_context__completed_short_break ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block.set_time_range (now, now + 5 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block.set_time_range (now, now + 5 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var context = Pomodoro.SchedulerContext () {
+            var context = Ft.SchedulerContext () {
                 timestamp = time_block.start_time,
-                state = Pomodoro.State.STOPPED,
+                state = Ft.State.STOPPED,
                 score = 1.0,
             };
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state = Pomodoro.State.SHORT_BREAK,
+                state = Ft.State.SHORT_BREAK,
                 score = 1.0,
             };
             scheduler.resolve_context (time_block, true, time_block.end_time, ref context);
@@ -701,23 +701,23 @@ namespace Tests
          */
         public void test_resolve_context__completed_long_break ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.LONG_BREAK);
-            time_block.set_time_range (now, now + 15 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.LONG_BREAK);
+            time_block.set_time_range (now, now + 15 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var context = Pomodoro.SchedulerContext () {
+            var context = Ft.SchedulerContext () {
                 timestamp = time_block.start_time,
-                state = Pomodoro.State.STOPPED,
+                state = Ft.State.STOPPED,
                 is_session_completed = false,
                 needs_long_break = true,
                 score = 4.0,
             };
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state = Pomodoro.State.LONG_BREAK,
+                state = Ft.State.LONG_BREAK,
                 is_session_completed = true,
                 needs_long_break = false,
                 score = 4.0,
@@ -731,21 +731,21 @@ namespace Tests
 
         public void test_resolve_context__uncompleted_pomodoro ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
-            time_block.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
-            time_block.set_time_range (now, now + 3 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
+            time_block.set_intended_duration (5 * Ft.Interval.MINUTE);
+            time_block.set_time_range (now, now + 3 * Ft.Interval.MINUTE);
 
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 score = 0.0,
             };
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state = Pomodoro.State.POMODORO,
+                state = Ft.State.POMODORO,
                 score = 0.0,
             };
             scheduler.resolve_context (time_block, true, time_block.end_time, ref context);
@@ -757,17 +757,17 @@ namespace Tests
 
         public void test_resolve_context__uncompleted_short_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 score = 1.0,
             };
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state     = Pomodoro.State.SHORT_BREAK,
+                state     = Ft.State.SHORT_BREAK,
                 score     = 1.0,
             };
             scheduler.resolve_context (time_block, true, time_block.end_time, ref context);
@@ -779,18 +779,18 @@ namespace Tests
 
         public void test_resolve_context__uncompleted_long_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.LONG_BREAK);
-            time_block.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var time_block = new Ft.TimeBlock (Ft.State.LONG_BREAK);
+            time_block.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 is_session_completed = false,
                 needs_long_break = true,
                 score = 4.0,
             };
 
-            var expected_context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.LONG_BREAK,
+            var expected_context = Ft.SchedulerContext () {
+                state = Ft.State.LONG_BREAK,
                 is_session_completed = false,
                 needs_long_break = true,
                 score = 4.0,
@@ -804,18 +804,18 @@ namespace Tests
 
         public void test_resolve_context__uncompleted_last_pomodoro ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 is_session_completed = false,
                 needs_long_break = false,
                 score = 3.0,
             };
 
-            var expected_context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.POMODORO,
+            var expected_context = Ft.SchedulerContext () {
+                state = Ft.State.POMODORO,
                 is_session_completed = false,
                 needs_long_break = false,
                 score = 3.0,
@@ -829,21 +829,21 @@ namespace Tests
 
         public void test_resolve_context__in_progress_pomodoro ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 9 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (now + 4 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 9 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (5 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (now + 4 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 score = 0.0,
             };
 
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state = Pomodoro.State.POMODORO,
+                state = Ft.State.POMODORO,
                 score = 1.0,
             };
             scheduler.resolve_context (time_block, true, time_block.end_time, ref context);
@@ -855,21 +855,21 @@ namespace Tests
 
         public void test_resolve_context__in_progress_short_break ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block.set_time_range (now, now + 5 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (now + 4 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var time_block = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block.set_time_range (now, now + 5 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (5 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (now + 4 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 score = 1.0,
             };
 
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state = Pomodoro.State.SHORT_BREAK,
+                state = Ft.State.SHORT_BREAK,
                 score = 1.0,
             };
             scheduler.resolve_context (time_block, true, time_block.end_time, ref context);
@@ -881,24 +881,24 @@ namespace Tests
 
         public void test_resolve_context__in_progress_long_break ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var cycles = (double) this.session_template.cycles;
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.LONG_BREAK);
-            time_block.set_time_range (now, now + 15 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (12 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (now + 12 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var time_block = new Ft.TimeBlock (Ft.State.LONG_BREAK);
+            time_block.set_time_range (now, now + 15 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (12 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (now + 12 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 is_session_completed = false,
                 needs_long_break = true,
                 score = cycles,
             };
 
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state = Pomodoro.State.LONG_BREAK,
+                state = Ft.State.LONG_BREAK,
                 is_session_completed = true,
                 needs_long_break = false,
                 score = cycles,
@@ -912,25 +912,25 @@ namespace Tests
 
         public void test_resolve_context__paused_pomodoro ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 5 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (now + 4 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 5 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (5 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (now + 4 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var gap = new Pomodoro.Gap.with_start_time (now + 1 * Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap.with_start_time (now + 1 * Ft.Interval.MINUTE);
             time_block.add_gap (gap);
 
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 score = 0.0,
             };
 
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state = Pomodoro.State.POMODORO,
+                state = Ft.State.POMODORO,
                 score = 1.0,
             };
             scheduler.resolve_context (time_block, true, time_block.end_time, ref context);
@@ -942,25 +942,25 @@ namespace Tests
 
         public void test_resolve_context__paused_short_break ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block.set_time_range (now, now + 5 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (now + 4 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var time_block = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block.set_time_range (now, now + 5 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (5 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (now + 4 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var gap = new Pomodoro.Gap.with_start_time (now + 1 * Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap.with_start_time (now + 1 * Ft.Interval.MINUTE);
             time_block.add_gap (gap);
 
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 score = 0.0,
             };
 
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state = Pomodoro.State.SHORT_BREAK,
+                state = Ft.State.SHORT_BREAK,
                 score = 0.0,
             };
             scheduler.resolve_context (time_block, true, time_block.end_time, ref context);
@@ -972,22 +972,22 @@ namespace Tests
 
         public void test_resolve_context__needs_long_break ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var cycles = (double) this.session_template.cycles;
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
-            time_block.set_intended_duration (5 * Pomodoro.Interval.MINUTE);
-            time_block.set_time_range (now, now + 4 * Pomodoro.Interval.MINUTE);
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
+            time_block.set_intended_duration (5 * Ft.Interval.MINUTE);
+            time_block.set_time_range (now, now + 4 * Ft.Interval.MINUTE);
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
                 needs_long_break = false,
                 score = cycles - 1.0,
             };
 
-            var expected_context = Pomodoro.SchedulerContext () {
+            var expected_context = Ft.SchedulerContext () {
                 timestamp = time_block.end_time,
-                state = Pomodoro.State.POMODORO,
+                state = Ft.State.POMODORO,
                 needs_long_break = true,
                 score = cycles,
             };
@@ -1001,41 +1001,41 @@ namespace Tests
 
         public void test_resolve_time_block__pomodoro ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
-            var context_1 = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.STOPPED,
+            var context_1 = Ft.SchedulerContext () {
+                state = Ft.State.STOPPED,
             };
             var time_block_1 = scheduler.resolve_time_block (context_1);
-            assert_true (time_block_1.state == Pomodoro.State.POMODORO);
+            assert_true (time_block_1.state == Ft.State.POMODORO);
 
-            var context_2 = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.SHORT_BREAK,
+            var context_2 = Ft.SchedulerContext () {
+                state = Ft.State.SHORT_BREAK,
             };
             var time_block_2 = scheduler.resolve_time_block (context_2);
-            assert_true (time_block_2.state == Pomodoro.State.POMODORO);
+            assert_true (time_block_2.state == Ft.State.POMODORO);
         }
 
         public void test_resolve_time_block__short_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.POMODORO,
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.POMODORO,
             };
 
             var time_block = scheduler.resolve_time_block (context);
-            assert_true (time_block.state == Pomodoro.State.SHORT_BREAK);
+            assert_true (time_block.state == Ft.State.SHORT_BREAK);
         }
 
         public void test_resolve_time_block__long_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.POMODORO,
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.POMODORO,
                 needs_long_break = true,
             };
             var time_block = scheduler.resolve_time_block (context);
-            assert_true (time_block.state == Pomodoro.State.LONG_BREAK);
+            assert_true (time_block.state == Ft.State.LONG_BREAK);
         }
 
         /**
@@ -1043,9 +1043,9 @@ namespace Tests
          */
         public void test_resolve_time_block__completed_session ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var context = Pomodoro.SchedulerContext () {
-                state = Pomodoro.State.LONG_BREAK,
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var context = Ft.SchedulerContext () {
+                state = Ft.State.LONG_BREAK,
                 score = (double) this.session_template.cycles,
                 is_session_completed = true,
             };
@@ -1059,9 +1059,9 @@ namespace Tests
          */
         public void test_reschedule_session__populate ()
         {
-            var timestamp = Pomodoro.Timestamp.advance (0) + Pomodoro.Interval.MINUTE;
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var session = new Pomodoro.Session ();
+            var timestamp = Ft.Timestamp.advance (0) + Ft.Interval.MINUTE;
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var session = new Ft.Session ();
 
             var session_changed_emitted = 0;
             session.changed.connect (() => { session_changed_emitted++; });
@@ -1075,13 +1075,13 @@ namespace Tests
             );
 
             var time_block_1 = session.get_nth_time_block (0);
-            assert_true (time_block_1.state == Pomodoro.State.POMODORO);
+            assert_true (time_block_1.state == Ft.State.POMODORO);
 
             var time_block_2 = session.get_nth_time_block (1);
-            assert_true (time_block_2.state == Pomodoro.State.SHORT_BREAK);
+            assert_true (time_block_2.state == Ft.State.SHORT_BREAK);
 
             var last_time_block = session.get_last_time_block ();
-            assert_true (last_time_block.state == Pomodoro.State.LONG_BREAK);
+            assert_true (last_time_block.state == Ft.State.LONG_BREAK);
 
             assert_cmpuint (session_changed_emitted, GLib.CompareOperator.EQ, 1);
         }
@@ -1093,12 +1093,12 @@ namespace Tests
          */
         public void test_reschedule_session__completed_session ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
             var session = this.create_session (scheduler);
             session.@foreach (
                 (time_block) => {
-                    time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+                    time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
                 }
             );
             scheduler.ensure_session_meta (session);
@@ -1113,12 +1113,12 @@ namespace Tests
 
         public void test_reschedule_session__uncompleted_pomodoro ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session   = this.create_session (scheduler);
 
             var time_block_1 = session.get_nth_time_block (0);
-            time_block_1.duration = Pomodoro.Interval.MINUTE;
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            time_block_1.duration = Ft.Interval.MINUTE;
+            time_block_1.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
             var time_block_2 = session.get_nth_time_block (1);
 
@@ -1139,15 +1139,15 @@ namespace Tests
 
         public void test_reschedule_session__uncompleted_short_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session   = this.create_session (scheduler);
 
             var time_block_1 = session.get_nth_time_block (0);  // Pomodoro
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            time_block_1.set_status (Ft.TimeBlockStatus.COMPLETED);
 
             var time_block_2 = session.get_nth_time_block (1);  // Short break
-            time_block_2.duration = Pomodoro.Interval.MINUTE;
-            time_block_2.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            time_block_2.duration = Ft.Interval.MINUTE;
+            time_block_2.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
             var time_block_3 = session.get_nth_time_block (2);  // Pomodoro
 
@@ -1169,7 +1169,7 @@ namespace Tests
 
         public void test_reschedule_session__uncompleted_last_pomodoro ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session   = this.create_session (scheduler);
 
             var long_break_1 = session.get_last_time_block ();
@@ -1178,20 +1178,20 @@ namespace Tests
             session.@foreach (
                 (time_block) => {
                     if (time_block != last_pomodoro && time_block != long_break_1) {
-                        time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+                        time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
                     }
                 }
             );
 
-            last_pomodoro.duration = Pomodoro.Interval.MINUTE;
-            last_pomodoro.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            last_pomodoro.duration = Ft.Interval.MINUTE;
+            last_pomodoro.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
             scheduler.ensure_session_meta (session);
 
             // Rescheule
             var now = last_pomodoro.end_time;
 
-            Pomodoro.Timestamp.freeze_to (now);
+            Ft.Timestamp.freeze_to (now);
             scheduler.reschedule_session (session, null, true, now);
 
             var extra_short_break = session.get_next_time_block (last_pomodoro);
@@ -1200,16 +1200,16 @@ namespace Tests
                 new GLib.Variant.int64 (extra_short_break.start_time),
                 new GLib.Variant.int64 (now)
             );
-            assert_true (extra_short_break.state == Pomodoro.State.SHORT_BREAK);
-            assert_true (extra_short_break.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
+            assert_true (extra_short_break.state == Ft.State.SHORT_BREAK);
+            assert_true (extra_short_break.get_status () == Ft.TimeBlockStatus.SCHEDULED);
 
             var extra_pomodoro = session.get_next_time_block (extra_short_break);
             assert_nonnull (extra_pomodoro);
-            assert_true (extra_pomodoro.state == Pomodoro.State.POMODORO);
+            assert_true (extra_pomodoro.state == Ft.State.POMODORO);
 
             var long_break_2 = session.get_next_time_block (extra_pomodoro);
             assert_nonnull (long_break_2);
-            assert_true (long_break_2.state == Pomodoro.State.LONG_BREAK);
+            assert_true (long_break_2.state == Ft.State.LONG_BREAK);
 
             assert_cmpuint (
                 session.count_visible_cycles (),
@@ -1223,26 +1223,26 @@ namespace Tests
 
         public void test_reschedule_session__uncompleted_long_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session   = this.create_session (scheduler);
 
             session.@foreach (
                 (time_block) => {
-                    if (time_block.state != Pomodoro.State.LONG_BREAK) {
-                        time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+                    if (time_block.state != Ft.State.LONG_BREAK) {
+                        time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
                     }
                 }
             );
 
             var long_break = session.get_last_time_block ();
-            long_break.duration = Pomodoro.Interval.MINUTE;
-            long_break.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            long_break.duration = Ft.Interval.MINUTE;
+            long_break.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
             scheduler.ensure_session_meta (session);
 
             // Rescheule
             var now = long_break.end_time;
-            Pomodoro.Timestamp.freeze_to (now);
+            Ft.Timestamp.freeze_to (now);
             scheduler.reschedule_session (session, null, true, now);
 
             var extra_pomodoro = session.get_next_time_block (long_break);
@@ -1251,8 +1251,8 @@ namespace Tests
                 new GLib.Variant.int64 (extra_pomodoro.start_time),
                 new GLib.Variant.int64 (now)
             );
-            assert_true (extra_pomodoro.state == Pomodoro.State.POMODORO);
-            assert_true (extra_pomodoro.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
+            assert_true (extra_pomodoro.state == Ft.State.POMODORO);
+            assert_true (extra_pomodoro.get_status () == Ft.TimeBlockStatus.SCHEDULED);
 
             var extra_long_break = session.get_next_time_block (extra_pomodoro);
             assert_nonnull (extra_long_break);
@@ -1260,8 +1260,8 @@ namespace Tests
                 new GLib.Variant.int64 (extra_long_break.start_time),
                 new GLib.Variant.int64 (extra_pomodoro.end_time)
             );
-            assert_true (extra_long_break.state == Pomodoro.State.LONG_BREAK);
-            assert_true (extra_long_break.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
+            assert_true (extra_long_break.state == Ft.State.LONG_BREAK);
+            assert_true (extra_long_break.get_status () == Ft.TimeBlockStatus.SCHEDULED);
 
             assert_cmpuint (
                 session.count_visible_cycles (),
@@ -1274,51 +1274,51 @@ namespace Tests
         }
 
         /**
-         * Run reschedule after stopping extra pomodoro.
+         * Run reschedule after stopping extra Ft.
          *
          * Expect extra cycle as as we haven't completed a long-break.
          */
         public void test_reschedule_session__uncompleted_extra_pomodoro ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
             var session = this.create_session (scheduler);
             session.@foreach (
                 (time_block) => {
-                    if (time_block.state != Pomodoro.State.LONG_BREAK) {
-                        time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+                    if (time_block.state != Ft.State.LONG_BREAK) {
+                        time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
                     }
                 }
             );
 
             var long_break_1 = session.get_last_time_block ();
-            long_break_1.end_time = long_break_1.start_time + Pomodoro.Interval.MINUTE;
-            long_break_1.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            long_break_1.end_time = long_break_1.start_time + Ft.Interval.MINUTE;
+            long_break_1.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
-            var extra_pomodoro = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var extra_pomodoro = new Ft.TimeBlock (Ft.State.POMODORO);
             extra_pomodoro.set_time_range (
                     long_break_1.end_time,
-                    long_break_1.end_time + 25 * Pomodoro.Interval.MINUTE);
-            extra_pomodoro.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+                    long_break_1.end_time + 25 * Ft.Interval.MINUTE);
+            extra_pomodoro.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var long_break_2 = new Pomodoro.TimeBlock (Pomodoro.State.LONG_BREAK);
+            var long_break_2 = new Ft.TimeBlock (Ft.State.LONG_BREAK);
             long_break_2.set_time_range (
                     extra_pomodoro.end_time,
-                    extra_pomodoro.end_time + 15 * Pomodoro.Interval.MINUTE);
-            long_break_2.set_status (Pomodoro.TimeBlockStatus.SCHEDULED);
+                    extra_pomodoro.end_time + 15 * Ft.Interval.MINUTE);
+            long_break_2.set_status (Ft.TimeBlockStatus.SCHEDULED);
 
             session.append (extra_pomodoro);
             session.append (long_break_2);
             scheduler.ensure_session_meta (session);
 
             // Skip long-break
-            var now = long_break_1.start_time + Pomodoro.Interval.MINUTE;
+            var now = long_break_1.start_time + Ft.Interval.MINUTE;
 
-            Pomodoro.Timestamp.freeze_to (now);
+            Ft.Timestamp.freeze_to (now);
             scheduler.reschedule_session (session, null, true, now);
 
             long_break_1.end_time = now;
-            long_break_1.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            long_break_1.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
         }
 
         /**
@@ -1328,34 +1328,34 @@ namespace Tests
          */
         public void test_reschedule_session__skip_uncompleted_long_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session   = this.create_session (scheduler);
 
             session.@foreach (
                 (time_block) => {
-                    if (time_block.state != Pomodoro.State.LONG_BREAK) {
-                        time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+                    if (time_block.state != Ft.State.LONG_BREAK) {
+                        time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
                     }
                 }
             );
 
             var long_break_1 = session.get_last_time_block ();
-            long_break_1.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            long_break_1.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
             scheduler.ensure_session_meta (session);
 
             // Skip long-break
-            var now = long_break_1.start_time + Pomodoro.Interval.MINUTE;
+            var now = long_break_1.start_time + Ft.Interval.MINUTE;
 
-            Pomodoro.Timestamp.freeze_to (now);
+            Ft.Timestamp.freeze_to (now);
             scheduler.reschedule_session (session, null, true, now);
 
             long_break_1.end_time = now;
-            long_break_1.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            long_break_1.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
             var extra_pomodoro = session.get_next_time_block (long_break_1);
             assert_nonnull (extra_pomodoro);
-            assert_true (extra_pomodoro.state == Pomodoro.State.POMODORO);
+            assert_true (extra_pomodoro.state == Ft.State.POMODORO);
             assert_cmpvariant (
                 new GLib.Variant.int64 (extra_pomodoro.start_time),
                 new GLib.Variant.int64 (now)
@@ -1364,7 +1364,7 @@ namespace Tests
             var long_break_2 = session.get_next_time_block (extra_pomodoro);
             assert_nonnull (long_break_2);
             assert_true (long_break_2 != long_break_1);
-            assert_true (long_break_2.state == Pomodoro.State.LONG_BREAK);
+            assert_true (long_break_2.state == Ft.State.LONG_BREAK);
 
             assert_cmpuint (
                 session.count_visible_cycles (),
@@ -1374,52 +1374,52 @@ namespace Tests
         }
 
         /**
-         * Run reschedule after skipping extra pomodoro.
+         * Run reschedule after skipping extra Ft.
          *
          * We start an extra cycle, but skip it shortly after.
          * Expect the number of visible cycles to be reduced, as we jump to a long-break.
          */
         public void test_reschedule_session__skip_uncompleted_extra_pomodoro ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
 
             var session = this.create_session (scheduler);
             session.@foreach (
                 (time_block) => {
-                    if (time_block.state != Pomodoro.State.LONG_BREAK) {
-                        time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+                    if (time_block.state != Ft.State.LONG_BREAK) {
+                        time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
                     }
                 }
             );
 
             var long_break_1 = session.get_last_time_block ();
-            long_break_1.end_time = long_break_1.start_time + Pomodoro.Interval.MINUTE;
-            long_break_1.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            long_break_1.end_time = long_break_1.start_time + Ft.Interval.MINUTE;
+            long_break_1.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
-            var extra_pomodoro = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var extra_pomodoro = new Ft.TimeBlock (Ft.State.POMODORO);
             extra_pomodoro.set_time_range (
                     long_break_1.end_time,
-                    long_break_1.end_time + 25 * Pomodoro.Interval.MINUTE);
-            extra_pomodoro.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+                    long_break_1.end_time + 25 * Ft.Interval.MINUTE);
+            extra_pomodoro.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var long_break_2 = new Pomodoro.TimeBlock (Pomodoro.State.LONG_BREAK);
+            var long_break_2 = new Ft.TimeBlock (Ft.State.LONG_BREAK);
             long_break_2.set_time_range (
                     extra_pomodoro.end_time,
-                    extra_pomodoro.end_time + 15 * Pomodoro.Interval.MINUTE);
-            long_break_2.set_status (Pomodoro.TimeBlockStatus.SCHEDULED);
+                    extra_pomodoro.end_time + 15 * Ft.Interval.MINUTE);
+            long_break_2.set_status (Ft.TimeBlockStatus.SCHEDULED);
 
             session.append (extra_pomodoro);
             session.append (long_break_2);
             scheduler.ensure_session_meta (session);
 
             // Skip extra pomodoro
-            var now = extra_pomodoro.start_time + Pomodoro.Interval.MINUTE;
+            var now = extra_pomodoro.start_time + Ft.Interval.MINUTE;
 
-            Pomodoro.Timestamp.freeze_to (now);
+            Ft.Timestamp.freeze_to (now);
             scheduler.reschedule_session (session, long_break_2, true, now);
 
             extra_pomodoro.end_time = now;
-            extra_pomodoro.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            extra_pomodoro.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (long_break_2.start_time),
@@ -1440,17 +1440,17 @@ namespace Tests
          */
         public void test_reschedule_session__resume_session_1 ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session   = this.create_session (scheduler);
 
             var time_block_1 = session.get_nth_time_block (0);
-            time_block_1.duration = Pomodoro.Interval.MINUTE;
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            time_block_1.duration = Ft.Interval.MINUTE;
+            time_block_1.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
             var time_block_2 = session.get_nth_time_block (1);
 
             // Prepare session before entering time_block_2
-            var now = time_block_1.end_time + Pomodoro.Interval.MINUTE;
+            var now = time_block_1.end_time + Ft.Interval.MINUTE;
             scheduler.reschedule_session (session, null, true, now);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block_2.start_time),
@@ -1463,7 +1463,7 @@ namespace Tests
             );
 
             // Enter time_block_2
-            time_block_2.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block_2.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
             scheduler.reschedule_session (session, null, true, now);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block_2.start_time),
@@ -1476,7 +1476,7 @@ namespace Tests
             );
 
             // Ensure that `reschedule_session` behaves OK while time_block_2 is in progress
-            scheduler.reschedule_session (session, null, true, now + Pomodoro.Interval.MINUTE);
+            scheduler.reschedule_session (session, null, true, now + Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block_2.start_time),
                 new GLib.Variant.int64 (now)
@@ -1491,21 +1491,21 @@ namespace Tests
         /**
          * Simulate resuming session after stopping the timer.
          *
-         * Real-world use, where we insert a new pomodoro.
+         * Real-world use, where we insert a new Ft.
          */
         public void test_reschedule_session__resume_session_2 ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session   = this.create_session (scheduler);
 
             var time_block_1 = session.get_nth_time_block (0);
-            time_block_1.duration = Pomodoro.Interval.MINUTE;
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            time_block_1.duration = Ft.Interval.MINUTE;
+            time_block_1.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
             // Simulate `initialize_next_time_block`
-            var now = time_block_1.end_time + 30 * Pomodoro.Interval.MINUTE;
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_2.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
+            var now = time_block_1.end_time + 30 * Ft.Interval.MINUTE;
+            var time_block_2 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_2.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
             session.insert_after (time_block_2, time_block_1);
 
             scheduler.reschedule_session (session, time_block_2, true, now);
@@ -1522,22 +1522,22 @@ namespace Tests
 
         public void test_reschedule_session__starting_with_long_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session   = this.create_session (scheduler);
 
             var time_block_1 = session.get_first_time_block ();
-            time_block_1.duration = Pomodoro.Interval.MINUTE;
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            time_block_1.duration = Ft.Interval.MINUTE;
+            time_block_1.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.LONG_BREAK);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.LONG_BREAK);
             time_block_2.set_time_range (time_block_1.end_time,
-                                         time_block_1.end_time + 15 * Pomodoro.Interval.MINUTE);
-            time_block_2.set_status (Pomodoro.TimeBlockStatus.SCHEDULED);
-            time_block_2.set_intended_duration (15 * Pomodoro.Interval.MINUTE);
+                                         time_block_1.end_time + 15 * Ft.Interval.MINUTE);
+            time_block_2.set_status (Ft.TimeBlockStatus.SCHEDULED);
+            time_block_2.set_intended_duration (15 * Ft.Interval.MINUTE);
             time_block_2.set_completion_time (time_block_2.end_time);
             session.insert_after (time_block_2, time_block_1);
 
-            Pomodoro.Timestamp.freeze_to (time_block_2.start_time);
+            Ft.Timestamp.freeze_to (time_block_2.start_time);
             scheduler.reschedule_session (session, time_block_2, true, time_block_2.start_time);
 
             assert_cmpuint (
@@ -1557,31 +1557,31 @@ namespace Tests
          */
         public void test_reschedule_session__in_progress_time_block ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
 
             var time_block_1 = session.get_nth_time_block (0);  // Pomodoro
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            time_block_1.set_status (Ft.TimeBlockStatus.COMPLETED);
             time_block_1.set_intended_duration (time_block_1.duration);
             time_block_1.set_weight (1.0);
 
             var time_block_2 = session.get_nth_time_block (1);  // Short break
-            time_block_2.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            time_block_2.set_status (Ft.TimeBlockStatus.COMPLETED);
             time_block_2.set_intended_duration (time_block_2.duration);
             time_block_2.set_weight (0.0);
 
             var time_block_3 = session.get_nth_time_block (2);  // Pomodoro
-            time_block_3.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block_3.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
             time_block_3.set_intended_duration (time_block_3.duration);
             time_block_3.set_weight (1.0);
 
             // Reschedule session
-            var now = time_block_3.end_time - Pomodoro.Interval.MINUTE;
-            Pomodoro.Timestamp.freeze_to (now);
+            var now = time_block_3.end_time - Ft.Interval.MINUTE;
+            Ft.Timestamp.freeze_to (now);
             scheduler.reschedule_session (session, null, true, now);
 
             var pomodoros_count = session.count_time_blocks (
-                    time_block => time_block.state == Pomodoro.State.POMODORO);
+                    time_block => time_block.state == Ft.State.POMODORO);
             assert_cmpuint (pomodoros_count, GLib.CompareOperator.EQ, 4U);
 
             assert_cmpfloat_with_epsilon (
@@ -1603,21 +1603,21 @@ namespace Tests
          */
         public void test_reschedule_session__paused_pomodoro ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
 
             var time_block = session.get_nth_time_block (0);  // Pomodoro
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
             time_block.set_intended_duration (time_block.duration);
             time_block.set_weight (1.0);
 
-            var gap = new Pomodoro.Gap.with_start_time (
-                    time_block.start_time + Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap.with_start_time (
+                    time_block.start_time + Ft.Interval.MINUTE);
             time_block.add_gap (gap);
 
             // Reschedule session
-            var timestamp = gap.start_time + 5 * Pomodoro.Interval.MINUTE;
-            Pomodoro.Timestamp.freeze_to (timestamp);
+            var timestamp = gap.start_time + 5 * Ft.Interval.MINUTE;
+            Ft.Timestamp.freeze_to (timestamp);
             scheduler.reschedule_session (session, null, true, time_block.end_time);
             assert_cmpfloat_with_epsilon (
                 time_block.get_weight (),
@@ -1633,26 +1633,26 @@ namespace Tests
 
         public void test_reschedule_session__paused_short_break ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
 
             var time_block_1 = session.get_nth_time_block (0);  // Pomodoro
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            time_block_1.set_status (Ft.TimeBlockStatus.COMPLETED);
             time_block_1.set_intended_duration (time_block_1.duration);
             time_block_1.set_weight (1.0);
 
             var time_block_2 = session.get_nth_time_block (1);  // Short break
-            time_block_2.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block_2.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
             time_block_2.set_intended_duration (time_block_2.duration);
             time_block_2.set_weight (0.0);
 
-            var gap = new Pomodoro.Gap.with_start_time (
-                    time_block_2.start_time + Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap.with_start_time (
+                    time_block_2.start_time + Ft.Interval.MINUTE);
             time_block_2.add_gap (gap);
 
             // Reschedule session
-            var timestamp = gap.start_time + 5 * Pomodoro.Interval.MINUTE;
-            Pomodoro.Timestamp.freeze_to (timestamp);
+            var timestamp = gap.start_time + 5 * Ft.Interval.MINUTE;
+            Ft.Timestamp.freeze_to (timestamp);
             scheduler.reschedule_session (session, null, true, time_block_2.end_time);
             assert_cmpfloat_with_epsilon (
                 time_block_2.get_weight (),
@@ -1673,18 +1673,18 @@ namespace Tests
          */
         public void test_reschedule_session__extended_pomodoro_1x ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
 
             var time_block = session.get_nth_time_block (0);  // Pomodoro
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
             time_block.set_intended_duration (this.session_template.pomodoro_duration);
 
-            var now = time_block.end_time - 10 * Pomodoro.Interval.SECOND;
-            time_block.end_time = now + Pomodoro.Interval.MINUTE;
+            var now = time_block.end_time - 10 * Ft.Interval.SECOND;
+            time_block.end_time = now + Ft.Interval.MINUTE;
             time_block.set_weight (scheduler.calculate_time_block_weight (time_block));
 
-            Pomodoro.Timestamp.freeze_to (now);
+            Ft.Timestamp.freeze_to (now);
             scheduler.reschedule_session (session, null, true, now);
 
             assert_cmpfloat (
@@ -1707,19 +1707,19 @@ namespace Tests
          */
         public void test_reschedule_session__extended_pomodoro_2x ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
 
             var time_block = session.get_nth_time_block (0);  // Pomodoro
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
             time_block.set_intended_duration (this.session_template.pomodoro_duration);
 
-            var now = time_block.end_time - 10 * Pomodoro.Interval.SECOND;
+            var now = time_block.end_time - 10 * Ft.Interval.SECOND;
             time_block.end_time = now + time_block.duration;
 
             time_block.set_weight (scheduler.calculate_time_block_weight (time_block));
 
-            Pomodoro.Timestamp.freeze_to (now);
+            Ft.Timestamp.freeze_to (now);
             scheduler.reschedule_session (session, null, true, now);
 
             assert_cmpfloat (
@@ -1741,8 +1741,8 @@ namespace Tests
          */
         public void test_ensure_session_meta__scheduled ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
 
             scheduler.ensure_session_meta (session);
 
@@ -1750,26 +1750,26 @@ namespace Tests
                 (time_block) => {
                     var meta = time_block.get_meta ();
 
-                    if (time_block.state == Pomodoro.State.POMODORO) {
+                    if (time_block.state == Ft.State.POMODORO) {
                         assert_cmpvariant (
                             new GLib.Variant.int64 (meta.intended_duration),
                             new GLib.Variant.int64 (this.session_template.pomodoro_duration)
                         );
                     }
-                    else if (time_block.state == Pomodoro.State.SHORT_BREAK) {
+                    else if (time_block.state == Ft.State.SHORT_BREAK) {
                         assert_cmpvariant (
                             new GLib.Variant.int64 (meta.intended_duration),
                             new GLib.Variant.int64 (this.session_template.short_break_duration)
                         );
                     }
-                    else if (time_block.state == Pomodoro.State.LONG_BREAK) {
+                    else if (time_block.state == Ft.State.LONG_BREAK) {
                         assert_cmpvariant (
                             new GLib.Variant.int64 (meta.intended_duration),
                             new GLib.Variant.int64 (this.session_template.long_break_duration)
                         );
                     }
 
-                    assert_true (Pomodoro.Timestamp.is_defined (meta.completion_time));
+                    assert_true (Ft.Timestamp.is_defined (meta.completion_time));
                     assert_true (meta.completion_time > time_block.start_time);
                     assert_true (meta.completion_time <= time_block.end_time);
                 }
@@ -1789,25 +1789,25 @@ namespace Tests
          */
         public void test_ensure_session_meta__completed ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
 
             var time_block_1 = session.get_nth_time_block (0);
             var time_block_2 = session.get_nth_time_block (1);
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
-            time_block_2.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            time_block_1.set_status (Ft.TimeBlockStatus.COMPLETED);
+            time_block_2.set_status (Ft.TimeBlockStatus.COMPLETED);
 
             scheduler.ensure_session_meta (session);
 
             var meta_1 = time_block_1.get_meta ();
-            assert_true (Pomodoro.Timestamp.is_defined (meta_1.completion_time));
+            assert_true (Ft.Timestamp.is_defined (meta_1.completion_time));
             assert_cmpvariant (
                 new GLib.Variant.int64 (meta_1.intended_duration),
                 new GLib.Variant.int64 (this.session_template.pomodoro_duration)
             );
 
             var meta_2 = time_block_2.get_meta ();
-            assert_true (Pomodoro.Timestamp.is_defined (meta_2.completion_time));
+            assert_true (Ft.Timestamp.is_defined (meta_2.completion_time));
 
             assert_cmpuint (
                 session.count_visible_cycles (),
@@ -1821,16 +1821,16 @@ namespace Tests
          */
         public void test_ensure_session_meta__uncompleted ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
 
             var time_block = session.get_nth_time_block (0);
-            time_block.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            time_block.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
 
             scheduler.ensure_session_meta (session);
 
             var meta = time_block.get_meta ();
-            assert_true (Pomodoro.Timestamp.is_defined (meta.completion_time));
+            assert_true (Ft.Timestamp.is_defined (meta.completion_time));
             assert_cmpvariant (
                 new GLib.Variant.int64 (meta.intended_duration),
                 new GLib.Variant.int64 (this.session_template.pomodoro_duration)
@@ -1847,16 +1847,16 @@ namespace Tests
          */
         public void test_ensure_session_meta__in_progress ()
         {
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
             var session = this.create_session (scheduler);
 
             var time_block = session.get_nth_time_block (0);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
             scheduler.ensure_session_meta (session);
 
             var meta = time_block.get_meta ();
-            assert_true (Pomodoro.Timestamp.is_defined (meta.completion_time));
+            assert_true (Ft.Timestamp.is_defined (meta.completion_time));
             assert_cmpvariant (
                 new GLib.Variant.int64 (meta.intended_duration),
                 new GLib.Variant.int64 (this.session_template.pomodoro_duration)
@@ -1875,17 +1875,17 @@ namespace Tests
          */
         public void test_ensure_session_meta__with_gaps ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var session = new Pomodoro.Session ();
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var session = new Ft.Session ();
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 35 * Pomodoro.Interval.MINUTE);
-            time_block.set_intended_duration (25 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 35 * Ft.Interval.MINUTE);
+            time_block.set_intended_duration (25 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var gap = new Pomodoro.Gap ();
-            gap.set_time_range (now + 5 * Pomodoro.Interval.MINUTE, now + 15 * Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap ();
+            gap.set_time_range (now + 5 * Ft.Interval.MINUTE, now + 15 * Ft.Interval.MINUTE);
             time_block.add_gap (gap);
 
             session.append (time_block);
@@ -1896,7 +1896,7 @@ namespace Tests
             // Completion time should be: start + 20 minutes (80% of 25) + 10 minutes (gap duration)
             assert_cmpvariant (
                 new GLib.Variant.int64 (meta.completion_time),
-                new GLib.Variant.int64 (now + 30 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 30 * Ft.Interval.MINUTE)
             );
             assert_cmpuint (session.count_visible_cycles (), GLib.CompareOperator.EQ, 1U);
         }
@@ -1913,42 +1913,42 @@ namespace Tests
          */
         public void test_ensure_session_meta__mixed_states ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var scheduler = new Pomodoro.SimpleScheduler.with_template (this.session_template);
-            var session = new Pomodoro.Session ();
+            var now = Ft.Timestamp.peek ();
+            var scheduler = new Ft.SimpleScheduler.with_template (this.session_template);
+            var session = new Ft.Session ();
 
             // Completed pomodoro with normal duration
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_1.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_1.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
+            time_block_1.set_status (Ft.TimeBlockStatus.COMPLETED);
             session.append (time_block_1);
 
             // Completed short break
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block_2.set_time_range (time_block_1.end_time, time_block_1.end_time + 5 * Pomodoro.Interval.MINUTE);
-            time_block_2.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block_2.set_time_range (time_block_1.end_time, time_block_1.end_time + 5 * Ft.Interval.MINUTE);
+            time_block_2.set_status (Ft.TimeBlockStatus.COMPLETED);
             session.append (time_block_2);
 
             // Uncompleted pomodoro (was interrupted early)
-            var time_block_3 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_3.set_time_range (time_block_2.end_time, time_block_2.end_time + 10 * Pomodoro.Interval.MINUTE);
-            time_block_3.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            var time_block_3 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_3.set_time_range (time_block_2.end_time, time_block_2.end_time + 10 * Ft.Interval.MINUTE);
+            time_block_3.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
             session.append (time_block_3);
 
             // In-progress pomodoro with a gap (pause)
-            var time_block_4 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_4.set_time_range (time_block_3.end_time, time_block_3.end_time + 30 * Pomodoro.Interval.MINUTE);
-            time_block_4.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
-            var gap = new Pomodoro.Gap ();
-            gap.set_time_range (time_block_4.start_time + 10 * Pomodoro.Interval.MINUTE,
-                               time_block_4.start_time + 15 * Pomodoro.Interval.MINUTE);
+            var time_block_4 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_4.set_time_range (time_block_3.end_time, time_block_3.end_time + 30 * Ft.Interval.MINUTE);
+            time_block_4.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
+            var gap = new Ft.Gap ();
+            gap.set_time_range (time_block_4.start_time + 10 * Ft.Interval.MINUTE,
+                               time_block_4.start_time + 15 * Ft.Interval.MINUTE);
             time_block_4.add_gap (gap);
             session.append (time_block_4);
 
             // Scheduled short break
-            var time_block_5 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block_5.set_time_range (time_block_4.end_time, time_block_4.end_time + 5 * Pomodoro.Interval.MINUTE);
-            time_block_5.set_status (Pomodoro.TimeBlockStatus.SCHEDULED);
+            var time_block_5 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block_5.set_time_range (time_block_4.end_time, time_block_4.end_time + 5 * Ft.Interval.MINUTE);
+            time_block_5.set_status (Ft.TimeBlockStatus.SCHEDULED);
             session.append (time_block_5);
 
             // Restore session
@@ -1960,14 +1960,14 @@ namespace Tests
                 new GLib.Variant.int64 (meta_1.intended_duration),
                 new GLib.Variant.int64 (this.session_template.pomodoro_duration)
             );
-            assert_true (Pomodoro.Timestamp.is_defined (meta_1.completion_time));
+            assert_true (Ft.Timestamp.is_defined (meta_1.completion_time));
 
             var meta_2 = time_block_2.get_meta ();
             assert_cmpvariant (
                 new GLib.Variant.int64 (meta_2.intended_duration),
                 new GLib.Variant.int64 (this.session_template.short_break_duration)
             );
-            assert_true (Pomodoro.Timestamp.is_defined (meta_2.completion_time));
+            assert_true (Ft.Timestamp.is_defined (meta_2.completion_time));
 
             // Uncompleted pomodoro should still have meta updated
             var meta_3 = time_block_3.get_meta ();
@@ -1975,7 +1975,7 @@ namespace Tests
                 new GLib.Variant.int64 (meta_3.intended_duration),
                 new GLib.Variant.int64 (this.session_template.pomodoro_duration)
             );
-            assert_true (Pomodoro.Timestamp.is_defined (meta_3.completion_time));
+            assert_true (Ft.Timestamp.is_defined (meta_3.completion_time));
 
             // In-progress with gap should have completion time adjusted for gap
             var meta_4 = time_block_4.get_meta ();
@@ -1983,7 +1983,7 @@ namespace Tests
                 new GLib.Variant.int64 (meta_4.intended_duration),
                 new GLib.Variant.int64 (this.session_template.pomodoro_duration)
             );
-            assert_true (Pomodoro.Timestamp.is_defined (meta_4.completion_time));
+            assert_true (Ft.Timestamp.is_defined (meta_4.completion_time));
             // Completion should be after the gap ends
             assert_true (meta_4.completion_time > gap.end_time);
 
@@ -1993,10 +1993,10 @@ namespace Tests
                 new GLib.Variant.int64 (meta_5.intended_duration),
                 new GLib.Variant.int64 (this.session_template.short_break_duration)
             );
-            assert_true (Pomodoro.Timestamp.is_defined (meta_5.completion_time));
+            assert_true (Ft.Timestamp.is_defined (meta_5.completion_time));
 
             // Verify session structure is intact (no time-blocks removed)
-            Pomodoro.TimeBlock[] time_blocks = {};
+            Ft.TimeBlock[] time_blocks = {};
             session.@foreach ((time_block) => {
                 time_blocks += time_block;
             });

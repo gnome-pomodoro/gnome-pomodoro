@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     private class TimezoneEntry : Gom.Resource
     {

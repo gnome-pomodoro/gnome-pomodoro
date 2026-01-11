@@ -6,7 +6,7 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/automation/action/command-entryrow.ui")]
     public class CommandEntryRow : Adw.EntryRow
@@ -23,11 +23,11 @@ namespace Pomodoro
             }
         }
 
-        private bool                 _use_subshell = false;
-        private Pomodoro.Command     _command = null;
-        private unowned Gtk.Image    edit_icon = null;
-        private unowned Gtk.Text?    text_widget = null;
-        private bool                 text_changed = false;
+        private bool                _use_subshell = false;
+        private Ft.Command          _command = null;
+        private unowned Gtk.Image   edit_icon = null;
+        private unowned Gtk.Text?   text_widget = null;
+        private bool                text_changed = false;
 
         construct
         {
@@ -64,7 +64,7 @@ namespace Pomodoro
         private void update ()
         {
             if (this._command == null) {
-                this._command = new Pomodoro.Command (this.text);
+                this._command = new Ft.Command (this.text);
                 this._command.use_subshell = this._use_subshell;
             }
             else {
@@ -84,7 +84,7 @@ namespace Pomodoro
                 this.tooltip_text = "";
                 this.remove_css_class ("error");
             }
-            catch (Pomodoro.CommandError error)
+            catch (Ft.CommandError error)
             {
                 if (this.edit_icon != null) {
                     this.edit_icon.icon_name = "dialog-warning-symbolic";

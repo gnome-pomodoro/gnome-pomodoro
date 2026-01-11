@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public enum WindowSize
     {
@@ -87,7 +87,7 @@ namespace Pomodoro
 
 
         [CCode (notify = false)]
-        public Pomodoro.WindowSize size {
+        public Ft.WindowSize size {
             get {
                 return this._size;
             }
@@ -104,7 +104,7 @@ namespace Pomodoro
         }
 
         [CCode (notify = false)]
-        public Pomodoro.WindowView view {
+        public Ft.WindowView view {
             get {
                 return this._view;
             }
@@ -116,7 +116,7 @@ namespace Pomodoro
                 this._view = value;
 
                 var resolved_view = value;
-                if (resolved_view == Pomodoro.WindowView.DEFAULT) {
+                if (resolved_view == Ft.WindowView.DEFAULT) {
                     resolved_view = this.get_default_view ();
                 }
 
@@ -126,46 +126,46 @@ namespace Pomodoro
         }
 
         [GtkChild]
-        private unowned Pomodoro.SizeStack size_stack;
+        private unowned Ft.SizeStack size_stack;
         [GtkChild]
         private unowned Adw.ViewStack view_stack;
         [GtkChild]
         private unowned Adw.ToastOverlay toast_overlay;
         [GtkChild]
-        private unowned Pomodoro.TimerView timer_view;
+        private unowned Ft.TimerView timer_view;
 
-        private Pomodoro.WindowSize         _size = Pomodoro.WindowSize.NORMAL;
-        private Pomodoro.WindowView         _view = Pomodoro.WindowView.DEFAULT;
-        private Pomodoro.SessionManager?    session_manager = null;
-        private Pomodoro.Timer?             timer = null;
-        private Pomodoro.BackgroundManager? background_manager = null;
-        private Pomodoro.Extension?         extension = null;
-        private Adw.Toast?                  install_extension_toast = null;
-        private static bool                 install_extension_toast_dismissed = false;
-        private static uint                 background_hold_id = 0U;
+        private Ft.WindowSize           _size = Ft.WindowSize.NORMAL;
+        private Ft.WindowView           _view = Ft.WindowView.DEFAULT;
+        private Ft.SessionManager?      session_manager = null;
+        private Ft.Timer?               timer = null;
+        private Ft.BackgroundManager?   background_manager = null;
+        private Ft.Extension?           extension = null;
+        private Adw.Toast?              install_extension_toast = null;
+        private static bool             install_extension_toast_dismissed = false;
+        private static uint             background_hold_id = 0U;
 
         construct
         {
             // TODO: this.default_page should be set from application.vala
-            // var application = Pomodoro.Application.get_default ();
-            var settings = Pomodoro.get_settings ();
+            // var application = Ft.Application.get_default ();
+            var settings = Ft.get_settings ();
 
-            this.session_manager = Pomodoro.SessionManager.get_default ();
+            this.session_manager = Ft.SessionManager.get_default ();
             this.timer           = session_manager.timer;
             this.timer.state_changed.connect (() => {
                 this.update_timer_indicator ();
             });
 
-            this.insert_action_group ("session-manager", new Pomodoro.SessionManagerActionGroup ());
-            this.insert_action_group ("timer", new Pomodoro.TimerActionGroup ());
+            this.insert_action_group ("session-manager", new Ft.SessionManagerActionGroup ());
+            this.insert_action_group ("timer", new Ft.TimerActionGroup ());
 
             if (settings.get_boolean ("prefer-compact-size")) {
-                this.size = Pomodoro.WindowSize.COMPACT;
+                this.size = Ft.WindowSize.COMPACT;
             }
 
-            this.background_manager = new Pomodoro.BackgroundManager ();
+            this.background_manager = new Ft.BackgroundManager ();
 
-            this.extension = new Pomodoro.Extension ();
+            this.extension = new Ft.Extension ();
             this.extension.notify["available"].connect (this.on_extension_notify_available);
 
             this.notify["is-active"].connect (this.on_notify_is_active);
@@ -177,7 +177,7 @@ namespace Pomodoro
 
         private void update_title ()
         {
-            var page = this._size == Pomodoro.WindowSize.NORMAL
+            var page = this._size == Ft.WindowSize.NORMAL
                 ? this.view_stack.get_page (this.view_stack.visible_child)
                 : null;
 
@@ -187,7 +187,7 @@ namespace Pomodoro
         private void update_timer_indicator ()
         {
             var timer_page = this.view_stack.get_page (this.timer_view);
-            var timer      = Pomodoro.Timer.get_default ();
+            var timer      = Ft.Timer.get_default ();
 
             timer_page.needs_attention = this.view_stack.visible_child != timer_page.child &&
                                          timer.is_started ();
@@ -215,19 +215,19 @@ namespace Pomodoro
             }
         }
 
-        public Pomodoro.WindowView get_default_view ()
-                                                     ensures (result != Pomodoro.WindowView.DEFAULT)
+        public Ft.WindowView get_default_view ()
+                                               ensures (result != Ft.WindowView.DEFAULT)
         {
-            return Pomodoro.WindowView.TIMER;
+            return Ft.WindowView.TIMER;
         }
 
         private async void close_to_background_internal ()
         {
-            var window_id = yield Pomodoro.get_window_identifier (this);
+            var window_id = yield Ft.get_window_identifier (this);
 
-            Pomodoro.Window.background_hold_id = yield this.background_manager.hold (window_id);
+            Ft.Window.background_hold_id = yield this.background_manager.hold (window_id);
 
-            if (Pomodoro.Window.background_hold_id != 0U) {
+            if (Ft.Window.background_hold_id != 0U) {
                 this.close ();
             }
             else {
@@ -278,7 +278,7 @@ namespace Pomodoro
 
         public void add_toast (owned Adw.Toast toast)
         {
-            if (toast.timeout != 0 && this._size == Pomodoro.WindowSize.NORMAL)
+            if (toast.timeout != 0 && this._size == Ft.WindowSize.NORMAL)
             {
                 if (Gtk.StateFlags.BACKDROP in this.get_state_flags ()) {
                     this.dismiss_toast_once_focused (toast);
@@ -293,7 +293,7 @@ namespace Pomodoro
 
         private void show_install_extension_toast ()
         {
-            if (Pomodoro.Window.install_extension_toast_dismissed ||
+            if (Ft.Window.install_extension_toast_dismissed ||
                 this.install_extension_toast != null)
             {
                 return;
@@ -305,7 +305,7 @@ namespace Pomodoro
             toast.timeout = 0;
             toast.button_clicked.connect (
                 () => {
-                    var dialog = new Pomodoro.InstallExtensionDialog ();
+                    var dialog = new Ft.InstallExtensionDialog ();
 
                     dialog.present (this);
                     this.install_extension_toast = null;
@@ -363,17 +363,17 @@ namespace Pomodoro
         private void on_size_stack_visible_child_notify (GLib.Object    object,
                                                          GLib.ParamSpec pspec)
         {
-            this.size = Pomodoro.WindowSize.from_string (this.size_stack.visible_child_name);
+            this.size = Ft.WindowSize.from_string (this.size_stack.visible_child_name);
         }
 
         [GtkCallback]
         private void on_view_stack_visible_child_notify (GLib.Object    object,
                                                          GLib.ParamSpec pspec)
         {
-            var view = Pomodoro.WindowView.from_string (this.view_stack.visible_child_name);
+            var view = Ft.WindowView.from_string (this.view_stack.visible_child_name);
 
-            this._view = this._view == Pomodoro.WindowView.DEFAULT && this.get_default_view () == view
-                ? Pomodoro.WindowView.DEFAULT
+            this._view = this._view == Ft.WindowView.DEFAULT && this.get_default_view () == view
+                ? Ft.WindowView.DEFAULT
                 : view;
 
             this.update_title ();
@@ -420,9 +420,9 @@ namespace Pomodoro
         private void on_notify_is_active (GLib.Object    object,
                                           GLib.ParamSpec pspec)
         {
-            if (this.is_active && Pomodoro.Window.background_hold_id != 0U) {
-                this.background_manager.release (Pomodoro.Window.background_hold_id);
-                Pomodoro.Window.background_hold_id = 0U;
+            if (this.is_active && Ft.Window.background_hold_id != 0U) {
+                this.background_manager.release (Ft.Window.background_hold_id);
+                Ft.Window.background_hold_id = 0U;
             }
         }
 
@@ -449,26 +449,26 @@ namespace Pomodoro
         {
             this.install_extension_toast = null;
 
-            Pomodoro.Window.install_extension_toast_dismissed = true;
+            Ft.Window.install_extension_toast_dismissed = true;
         }
 
         private void on_compact_size_activate (GLib.SimpleAction action,
                                                GLib.Variant?     parameter)
         {
-            this.size = Pomodoro.WindowSize.COMPACT;
+            this.size = Ft.WindowSize.COMPACT;
         }
 
         private void on_normal_size_activate (GLib.SimpleAction action,
                                               GLib.Variant?     parameter)
         {
-            this.size = Pomodoro.WindowSize.NORMAL;
-            this.view = Pomodoro.WindowView.TIMER;
+            this.size = Ft.WindowSize.NORMAL;
+            this.view = Ft.WindowView.TIMER;
         }
 
         private void on_toggle_compact_size_activate (GLib.SimpleAction action,
                                                       GLib.Variant?     parameter)
         {
-            if (this.size == Pomodoro.WindowSize.NORMAL) {
+            if (this.size == Ft.WindowSize.NORMAL) {
                 this.lookup_action ("compact-size").activate (null);
             }
             else {

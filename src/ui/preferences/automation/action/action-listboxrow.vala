@@ -7,12 +7,12 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/automation/action/action-listboxrow.ui")]
     public class ActionListBoxRow : Gtk.ListBoxRow
     {
-        public Pomodoro.Action action {
+        public Ft.Action action {
             get {
                 return this._action;
             }
@@ -43,13 +43,13 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Switch enabled_switch;
 
-        private Pomodoro.Action?      _action = null;
+        private Ft.Action?            _action = null;
         private unowned GLib.Binding? enabled_switch_binding = null;
         private double                drag_x;
         private double                drag_y;
         private Gtk.ListBox?          drag_widget = null;
 
-        public ActionListBoxRow (Pomodoro.Action action)
+        public ActionListBoxRow (Ft.Action action)
         {
             GLib.Object (
                 action: action
@@ -75,7 +75,7 @@ namespace Pomodoro
             this.drag_x = x;
             this.drag_y = y;
 
-            var drag_value = GLib.Value (typeof (Pomodoro.ActionListBoxRow));
+            var drag_value = GLib.Value (typeof (Ft.ActionListBoxRow));
             drag_value.set_object (this);
 
             return new Gdk.ContentProvider.for_value (drag_value);
@@ -84,7 +84,7 @@ namespace Pomodoro
         [GtkCallback]
         private void on_drag_begin (Gdk.Drag drag)
         {
-            var row = new Pomodoro.ActionListBoxRow (this._action);
+            var row = new Ft.ActionListBoxRow (this._action);
 
             this.drag_widget = new Gtk.ListBox ();
             this.drag_widget.set_size_request (this.get_width (), this.get_height ());
@@ -102,11 +102,11 @@ namespace Pomodoro
                               double     x,
                               double     y)
         {
-            if (!value.holds (typeof (Pomodoro.ActionListBoxRow))) {
+            if (!value.holds (typeof (Ft.ActionListBoxRow))) {
                 return false;
             }
 
-            var source = (Pomodoro.ActionListBoxRow) value.get_object ();
+            var source = (Ft.ActionListBoxRow) value.get_object ();
 
             source.move_row (this);
 
@@ -114,7 +114,7 @@ namespace Pomodoro
         }
 
         [HasEmitter]
-        public signal void move_row (Pomodoro.ActionListBoxRow destination_row);
+        public signal void move_row (Ft.ActionListBoxRow destination_row);
 
         public override void dispose ()
         {

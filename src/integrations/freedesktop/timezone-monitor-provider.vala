@@ -6,7 +6,7 @@
 
 namespace Freedesktop
 {
-    public class TimeZoneMonitorProvider : Pomodoro.Provider, Pomodoro.TimeZoneMonitorProvider
+    public class TimeZoneMonitorProvider : Ft.Provider, Ft.TimeZoneMonitorProvider
     {
         public string? identifier {
             get {

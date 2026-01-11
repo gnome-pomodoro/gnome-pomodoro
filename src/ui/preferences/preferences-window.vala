@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     private class PreferencesPanelInfo : GLib.Object
     {
@@ -21,46 +21,46 @@ namespace Pomodoro
 
     private Gtk.SingleSelection create_model ()
     {
-        Pomodoro.PreferencesPanelInfo? panel_info;
+        Ft.PreferencesPanelInfo? panel_info;
 
-        var model = new GLib.ListStore (typeof (Pomodoro.PreferencesPanelInfo));
+        var model = new GLib.ListStore (typeof (Ft.PreferencesPanelInfo));
 
         panel_info = new PreferencesPanelInfo ();
         panel_info.name = "timer";
         panel_info.title = _("Timer");
         panel_info.icon_name = "timer-symbolic";
-        panel_info.content_class = typeof (Pomodoro.PreferencesPanelTimer);
+        panel_info.content_class = typeof (Ft.PreferencesPanelTimer);
         model.append (panel_info);
 
         panel_info = new PreferencesPanelInfo ();
         panel_info.name = "notifications";
         panel_info.title = _("Notifications");
         panel_info.icon_name = "preferences-notifications-symbolic";
-        panel_info.content_class = typeof (Pomodoro.PreferencesPanelNotifications);
+        panel_info.content_class = typeof (Ft.PreferencesPanelNotifications);
         model.append (panel_info);
 
         panel_info = new PreferencesPanelInfo ();
         panel_info.name = "sounds";
         panel_info.title = _("Sounds");
         panel_info.icon_name = "preferences-sounds-symbolic";
-        panel_info.content_class = typeof (Pomodoro.PreferencesPanelSounds);
+        panel_info.content_class = typeof (Ft.PreferencesPanelSounds);
         model.append (panel_info);
 
         panel_info = new PreferencesPanelInfo ();
         panel_info.name = "appearance";
         panel_info.title = _("Appearance");
         panel_info.icon_name = "preferences-appearance-symbolic";
-        panel_info.content_class = typeof (Pomodoro.PreferencesPanelAppearance);
+        panel_info.content_class = typeof (Ft.PreferencesPanelAppearance);
         model.append (panel_info);
 
         panel_info = new PreferencesPanelInfo ();
         panel_info.name = "keyboard-shortcuts";
         panel_info.title = _("Keyboard Shortcuts");
         panel_info.icon_name = "preferences-keyboard-shortcuts-symbolic";
-        panel_info.content_class = typeof (Pomodoro.PreferencesPanelKeyboardShortcuts);
+        panel_info.content_class = typeof (Ft.PreferencesPanelKeyboardShortcuts);
         model.append (panel_info);
 
-        var keyboard_manager = new Pomodoro.KeyboardManager ();
+        var keyboard_manager = new Ft.KeyboardManager ();
         keyboard_manager.bind_property ("global-shortcuts-supported",
                                         panel_info,
                                         "visible",
@@ -70,7 +70,7 @@ namespace Pomodoro
         panel_info.name = "automation";
         panel_info.title = _("Automation");
         panel_info.icon_name = "custom-action-symbolic";
-        panel_info.content_class = typeof (Pomodoro.PreferencesPanelAutomation);
+        panel_info.content_class = typeof (Ft.PreferencesPanelAutomation);
         model.append (panel_info);
 
         return new Gtk.SingleSelection ((owned) model);
@@ -100,14 +100,14 @@ namespace Pomodoro
         [GtkChild]
         private unowned Adw.NavigationSplitView split_view;
         [GtkChild]
-        private unowned Pomodoro.PreferencesSidebar sidebar;
+        private unowned Ft.PreferencesSidebar sidebar;
 
         private Gtk.SingleSelection? _model = null;
         private GLib.Settings?       settings = null;
 
         construct
         {
-            this.settings = Pomodoro.get_settings ();
+            this.settings = Ft.get_settings ();
 
             this.load_window_state ();
 
@@ -158,11 +158,11 @@ namespace Pomodoro
 
         private void update_split_view_content ()
         {
-            var panel_info = (Pomodoro.PreferencesPanelInfo?) this._model.selected_item;
+            var panel_info = (Ft.PreferencesPanelInfo?) this._model.selected_item;
 
             if (panel_info != null)
             {
-                var content = (Pomodoro.PreferencesPanel) GLib.Object.@new (panel_info.content_class);
+                var content = (Ft.PreferencesPanel) GLib.Object.@new (panel_info.content_class);
                 content.title = panel_info.title;
 
                 this.split_view.content = content;
@@ -190,7 +190,7 @@ namespace Pomodoro
 
             for (var position = 0U; position < n_items; position++)
             {
-                var panel_info = (Pomodoro.PreferencesPanelInfo?) this._model.get_item (position);
+                var panel_info = (Ft.PreferencesPanelInfo?) this._model.get_item (position);
 
                 if (panel_info.name == panel_name) {
                     this._model.select_item (position, true);

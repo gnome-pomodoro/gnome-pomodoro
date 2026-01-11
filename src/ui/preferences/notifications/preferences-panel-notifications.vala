@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/notifications/preferences-panel-notifications.ui")]
-    public class PreferencesPanelNotifications : Pomodoro.PreferencesPanel
+    public class PreferencesPanelNotifications : Ft.PreferencesPanel
     {
         private const uint[] IDLE_DELAY_CHOICES = { 15U, 30U, 60U, 120U, 180U, 300U, 0U };
 
@@ -20,15 +20,15 @@ namespace Pomodoro
         [GtkChild]
         private unowned Adw.ComboRow screen_overlay_reopen_delay_comborow;
 
-        private GLib.Settings?        settings;
-        private Pomodoro.IdleMonitor? idle_monitor = null;
+        private GLib.Settings?  settings;
+        private Ft.IdleMonitor? idle_monitor = null;
 
         construct
         {
-            this.settings = Pomodoro.get_settings ();
+            this.settings = Ft.get_settings ();
             this.settings.changed.connect (this.on_settings_changed);
 
-            this.idle_monitor = new Pomodoro.IdleMonitor ();
+            this.idle_monitor = new Ft.IdleMonitor ();
 
             // Announcements
             this.settings.bind ("announce-about-to-end",

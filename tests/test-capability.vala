@@ -8,7 +8,7 @@
 
 namespace Tests
 {
-    public class AntiGravityCapability : Pomodoro.Capability
+    public class AntiGravityCapability : Ft.Capability
     {
         public uint initialize_count = 0;
         public uint uninitialize_count = 0;
@@ -16,8 +16,8 @@ namespace Tests
         public uint disable_count = 0;
         public uint activate_count = 0;
 
-        public AntiGravityCapability (string            name,
-                                      Pomodoro.Priority priority = Pomodoro.Priority.DEFAULT)
+        public AntiGravityCapability (string      name,
+                                      Ft.Priority priority = Ft.Priority.DEFAULT)
         {
             base (name, priority);
         }
@@ -82,7 +82,7 @@ namespace Tests
             var capability = new AntiGravityCapability ("anti-gravity");
             capability.initialize ();
 
-            assert_true (capability.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.DISABLED);
             assert_cmpuint (capability.initialize_count, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (capability.uninitialize_count, GLib.CompareOperator.EQ, 0);
         }
@@ -93,7 +93,7 @@ namespace Tests
             capability.initialize ();
             capability.uninitialize ();
 
-            assert_true (capability.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability.status == Ft.CapabilityStatus.NULL);
             assert_cmpuint (capability.initialize_count, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (capability.uninitialize_count, GLib.CompareOperator.EQ, 1);
         }
@@ -104,7 +104,7 @@ namespace Tests
             capability.initialize ();
             capability.enable ();
 
-            assert_true (capability.status == Pomodoro.CapabilityStatus.ENABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.ENABLED);
             assert_cmpuint (capability.enable_count, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (capability.disable_count, GLib.CompareOperator.EQ, 0);
         }
@@ -116,7 +116,7 @@ namespace Tests
             capability.enable ();
             capability.disable ();
 
-            assert_true (capability.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.DISABLED);
             assert_cmpuint (capability.enable_count, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (capability.disable_count, GLib.CompareOperator.EQ, 1);
         }

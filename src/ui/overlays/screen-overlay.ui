@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
-  <template class="PomodoroScreenOverlay" parent="PomodoroLightbox">
+  <template class="FtScreenOverlay" parent="FtLightbox">
     <property name="title" translatable="yes">Take a Break</property>
     <property name="startup-id">focus-timer-screen-overlay</property>
     <property name="can-focus">true</property>
@@ -55,7 +55,7 @@
             <property name="spacing">6</property>
             <property name="margin-bottom">50</property>
             <child>
-              <object class="PomodoroTimerLabel">
+              <object class="FtTimerLabel">
                 <property name="halign">center</property>
               </object>
             </child>

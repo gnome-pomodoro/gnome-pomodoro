@@ -7,14 +7,14 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/stats-day-page.ui")]
-    public class StatsDayPage : Adw.Bin, Pomodoro.StatsPage
+    public class StatsDayPage : Adw.Bin, Ft.StatsPage
     {
-        private const int64 DEFAULT_INTERVAL = 1 * Pomodoro.Interval.HOUR;
-        private const int64 MIN_INTERVAL = 15 * Pomodoro.Interval.MINUTE;
-        private const int64 MAX_INTERVAL = 2 * Pomodoro.Interval.HOUR;
+        private const int64 DEFAULT_INTERVAL = 1 * Ft.Interval.HOUR;
+        private const int64 MIN_INTERVAL = 15 * Ft.Interval.MINUTE;
+        private const int64 MAX_INTERVAL = 2 * Ft.Interval.HOUR;
 
         // Default display hours for histogram x-axis
         private const int BASE_START_HOUR = 9;
@@ -24,7 +24,7 @@ namespace Pomodoro
         private const int MIN_HISTOGRAM_BAR_COUNT = 8;
 
         // Minimum duration threshold for range expansion
-        private const int64 MIN_SIGNIFICANT_DURATION = Pomodoro.Interval.MINUTE;
+        private const int64 MIN_SIGNIFICANT_DURATION = Ft.Interval.MINUTE;
 
         public GLib.Date date { get; construct; }
 
@@ -54,44 +54,44 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Button zoom_out_button;
         [GtkChild]
-        private unowned Pomodoro.BarChart histogram;
+        private unowned Ft.BarChart histogram;
         [GtkChild]
-        private unowned Pomodoro.StatsCard pomodoro_card;
+        private unowned Ft.StatsCard pomodoro_card;
         [GtkChild]
-        private unowned Pomodoro.StatsCard breaks_card;
+        private unowned Ft.StatsCard breaks_card;
         [GtkChild]
-        private unowned Pomodoro.StatsCard interruptions_card;
+        private unowned Ft.StatsCard interruptions_card;
         [GtkChild]
-        private unowned Pomodoro.StatsCard break_ratio_card;
+        private unowned Ft.StatsCard break_ratio_card;
 
-        private int64                     _interval = DEFAULT_INTERVAL;
-        private Pomodoro.StatsManager?    stats_manager;
-        private Pomodoro.TimezoneHistory? timezone_history;
-        private GLib.DateTime?            datetime;
-        private int64                     timestamp;
-        private int64                     start_time;
-        private int64                     end_time;
-        private int64                     entries_start_time = Pomodoro.Timestamp.UNDEFINED;
-        private int64                     entries_end_time = Pomodoro.Timestamp.UNDEFINED;
-        private string                    time_format;
-        private Pomodoro.Matrix?          histogram_data;
+        private int64               _interval = DEFAULT_INTERVAL;
+        private Ft.StatsManager?    stats_manager;
+        private Ft.TimezoneHistory? timezone_history;
+        private GLib.DateTime?      datetime;
+        private int64               timestamp;
+        private int64               start_time;
+        private int64               end_time;
+        private int64               entries_start_time = Ft.Timestamp.UNDEFINED;
+        private int64               entries_end_time = Ft.Timestamp.UNDEFINED;
+        private string              time_format;
+        private Ft.Matrix?          histogram_data;
 
         construct
         {
-            this.stats_manager    = new Pomodoro.StatsManager ();
-            this.timezone_history = new Pomodoro.TimezoneHistory ();
+            this.stats_manager    = new Ft.StatsManager ();
+            this.timezone_history = new Ft.TimezoneHistory ();
             this.datetime         = this.stats_manager.get_midnight (this.date);
-            this.timestamp        = Pomodoro.Timestamp.from_datetime (this.datetime);
+            this.timestamp        = Ft.Timestamp.from_datetime (this.datetime);
 
             this.histogram.set_category_label (
-                    Pomodoro.StatsCategory.POMODORO, _("Pomodoro"));
+                    Ft.StatsCategory.POMODORO, _("Pomodoro"));
             this.histogram.set_category_unit (
-                    Pomodoro.StatsCategory.POMODORO, Pomodoro.Unit.INTERVAL);
+                    Ft.StatsCategory.POMODORO, Ft.Unit.INTERVAL);
 
             this.histogram.set_category_label (
-                    Pomodoro.StatsCategory.BREAK, _("Breaks"));
+                    Ft.StatsCategory.BREAK, _("Breaks"));
             this.histogram.set_category_unit (
-                    Pomodoro.StatsCategory.BREAK, Pomodoro.Unit.INTERVAL);
+                    Ft.StatsCategory.BREAK, Ft.Unit.INTERVAL);
 
             this.update_time_format ();
             this.update_histogram_y_spacing ();
@@ -116,24 +116,22 @@ namespace Pomodoro
          * Create data container sampled at `MIN_INTERVAL` for the whole day.
          * `this.histogram` by comparison is holding displayed time range only.
          */
-        private Pomodoro.Matrix create_histogram_data ()
+        private Ft.Matrix create_histogram_data ()
         {
             // Add a buffer of 12h for potential timezone changes or other edge cases
-            var bucket_count = (uint)(36 * Pomodoro.Interval.HOUR / MIN_INTERVAL);
+            var bucket_count = (uint)(36 * Ft.Interval.HOUR / MIN_INTERVAL);
 
-            return new Pomodoro.Matrix (bucket_count, this.histogram.get_categories_count ());
+            return new Ft.Matrix (bucket_count, this.histogram.get_categories_count ());
         }
 
         private static string format_hours (double value)
         {
-            return Pomodoro.Interval.format_short (Pomodoro.Interval.from_seconds (value),
-                                                   Pomodoro.Interval.HOUR);
+            return Ft.Interval.format_short (Ft.Interval.from_seconds (value), Ft.Interval.HOUR);
         }
 
         private static string format_minutes (double value)
         {
-            return Pomodoro.Interval.format_short (Pomodoro.Interval.from_seconds (value),
-                                                   Pomodoro.Interval.MINUTE);
+            return Ft.Interval.format_short (Ft.Interval.from_seconds (value), Ft.Interval.MINUTE);
         }
 
         private inline string format_time (GLib.DateTime datetime)
@@ -157,19 +155,19 @@ namespace Pomodoro
         private void update_category_colors ()
         {
             var foreground_color = this.histogram.get_color ();
-            var pomodoro_color = Pomodoro.get_chart_primary_color (foreground_color);
-            var break_color = Pomodoro.get_chart_secondary_color (foreground_color);
+            var pomodoro_color = Ft.get_chart_primary_color (foreground_color);
+            var break_color = Ft.get_chart_secondary_color (foreground_color);
 
-            this.histogram.set_category_color (Pomodoro.StatsCategory.POMODORO, pomodoro_color);
-            this.histogram.set_category_color (Pomodoro.StatsCategory.BREAK, break_color);
+            this.histogram.set_category_color (Ft.StatsCategory.POMODORO, pomodoro_color);
+            this.histogram.set_category_color (Ft.StatsCategory.BREAK, break_color);
         }
 
         private void update_time_format ()
         {
-            var use_12h_format = Pomodoro.Locale.use_12h_format ();
+            var use_12h_format = Ft.Locale.use_12h_format ();
             var time_format = "%H";
 
-            if (this._interval < Pomodoro.Interval.HOUR || !use_12h_format) {
+            if (this._interval < Ft.Interval.HOUR || !use_12h_format) {
                 time_format += ":%M";
             }
 
@@ -182,12 +180,12 @@ namespace Pomodoro
 
         private void update_histogram_y_spacing ()
         {
-            var y_spacing = this._interval <= Pomodoro.Interval.HOUR
-                    ? (float) Pomodoro.Interval.to_seconds (this._interval) / 3.0f
+            var y_spacing = this._interval <= Ft.Interval.HOUR
+                    ? (float) Ft.Interval.to_seconds (this._interval) / 3.0f
                     : 3600.0f;
 
             this.histogram.y_spacing = y_spacing;
-            this.histogram.reference_value = (float) Pomodoro.Interval.to_seconds (this._interval);
+            this.histogram.reference_value = (float) Ft.Interval.to_seconds (this._interval);
 
             if (y_spacing >= 3600.0f) {
                 this.histogram.set_format_value_func (format_hours);
@@ -207,7 +205,7 @@ namespace Pomodoro
                 this.end_time + this._interval,
                 (start_time, end_time, timezone) => {
                     while (timestamp < end_time) {
-                        datetimes += Pomodoro.Timestamp.to_datetime (timestamp, timezone);
+                        datetimes += Ft.Timestamp.to_datetime (timestamp, timezone);
                         timestamp += this._interval;
                     }
                 });
@@ -241,21 +239,21 @@ namespace Pomodoro
 
         private async Gom.ResourceGroup? fetch_entries ()
         {
-            var repository = Pomodoro.Database.get_repository ();
+            var repository = Ft.Database.get_repository ();
 
             var date_value = GLib.Value (typeof (string));
-            date_value.set_string (Pomodoro.Database.serialize_date (this.date));
+            date_value.set_string (Ft.Database.serialize_date (this.date));
 
             var date_filter = new Gom.Filter.eq (
-                    typeof (Pomodoro.StatsEntry),
+                    typeof (Ft.StatsEntry),
                     "date",
                     date_value);
 
             var sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
-            sorting.add (typeof (Pomodoro.StatsEntry), "time", Gom.SortingMode.ASCENDING);
+            sorting.add (typeof (Ft.StatsEntry), "time", Gom.SortingMode.ASCENDING);
 
             try {
-                var entries = yield repository.find_sorted_async (typeof (Pomodoro.StatsEntry),
+                var entries = yield repository.find_sorted_async (typeof (Ft.StatsEntry),
                                                                   date_filter,
                                                                   sorting);
                 yield entries.fetch_async (0U, entries.count);
@@ -291,22 +289,22 @@ namespace Pomodoro
             }
         }
 
-        private void process_entry (Pomodoro.StatsEntry entry,
-                                    int                 sign = 1)
+        private void process_entry (Ft.StatsEntry entry,
+                                    int           sign = 1)
                                     requires (sign == 1 || sign == -1)
         {
             GLib.return_if_fail (this.histogram_data != null);
 
-            var entry_category = Pomodoro.StatsCategory.from_string (entry.category);
+            var entry_category = Ft.StatsCategory.from_string (entry.category);
             var entry_time     = entry.time;
             var entry_duration = entry.duration;
 
             // Validate if entry is relevant
-            if (entry_category == Pomodoro.StatsCategory.INVALID) {
+            if (entry_category == Ft.StatsCategory.INVALID) {
                 return;
             }
 
-            if (entry.date != Pomodoro.Database.serialize_date (this.date)) {
+            if (entry.date != Ft.Database.serialize_date (this.date)) {
                 return;
             }
 
@@ -316,7 +314,7 @@ namespace Pomodoro
                 entry_time = this.timestamp;
             }
 
-            if (entry_category != Pomodoro.StatsCategory.INTERRUPTION &&
+            if (entry_category != Ft.StatsCategory.INTERRUPTION &&
                 entry_duration >= MIN_SIGNIFICANT_DURATION)
             {
                 this.extend_time_range (entry_time, entry_time + entry_duration);
@@ -334,11 +332,11 @@ namespace Pomodoro
             while (remaining_duration > 0 &&
                    bucket_index < this.histogram_data.shape[0] &&
                    category_index < this.histogram_data.shape[1] &&
-                   category_index != Pomodoro.StatsCategory.INTERRUPTION)
+                   category_index != Ft.StatsCategory.INTERRUPTION)
             {
                 var consumed_duration = int64.min (remaining_duration,
                                                    MIN_INTERVAL - remaining_offset);
-                var bucket_value = Pomodoro.Interval.to_seconds (sign * consumed_duration);
+                var bucket_value = Ft.Interval.to_seconds (sign * consumed_duration);
 
                 this.histogram_data.add_value (bucket_index, category_index, bucket_value);
 
@@ -357,15 +355,15 @@ namespace Pomodoro
             // Update cards
             switch (entry_category)
             {
-                case Pomodoro.StatsCategory.POMODORO:
-                    this.pomodoro_card.value += Pomodoro.Interval.to_seconds (sign * entry_duration);
+                case Ft.StatsCategory.POMODORO:
+                    this.pomodoro_card.value += Ft.Interval.to_seconds (sign * entry_duration);
                     break;
 
-                case Pomodoro.StatsCategory.BREAK:
-                    this.breaks_card.value += Pomodoro.Interval.to_seconds (sign * entry_duration);
+                case Ft.StatsCategory.BREAK:
+                    this.breaks_card.value += Ft.Interval.to_seconds (sign * entry_duration);
                     break;
 
-                case Pomodoro.StatsCategory.INTERRUPTION:
+                case Ft.StatsCategory.INTERRUPTION:
                     this.interruptions_card.value += (double) sign;
                     break;
 
@@ -422,8 +420,8 @@ namespace Pomodoro
          */
         private void update_entries_time_range (Gom.ResourceGroup? entries)
         {
-            this.entries_start_time = Pomodoro.Timestamp.UNDEFINED;
-            this.entries_end_time = Pomodoro.Timestamp.UNDEFINED;
+            this.entries_start_time = Ft.Timestamp.UNDEFINED;
+            this.entries_end_time = Ft.Timestamp.UNDEFINED;
 
             if (entries == null) {
                 return;
@@ -431,7 +429,7 @@ namespace Pomodoro
 
             for (var index = 0U; index < entries.count; index++)
             {
-                var entry = (Pomodoro.StatsEntry) entries.get_index (index);
+                var entry = (Ft.StatsEntry) entries.get_index (index);
                 var entry_start_time = entry.time;
                 var entry_end_time = entry.time + entry.duration;
 
@@ -442,13 +440,13 @@ namespace Pomodoro
                 // XXX: we do not validate category here
 
                 if (entry_start_time < this.entries_start_time ||
-                    Pomodoro.Timestamp.is_undefined (this.entries_start_time))
+                    Ft.Timestamp.is_undefined (this.entries_start_time))
                 {
                     this.entries_start_time = entry_start_time;
                 }
 
                 if (entry_end_time > this.entries_end_time ||
-                    Pomodoro.Timestamp.is_undefined (this.entries_end_time))
+                    Ft.Timestamp.is_undefined (this.entries_end_time))
                 {
                     this.entries_end_time = entry_end_time;
                 }
@@ -460,23 +458,22 @@ namespace Pomodoro
          */
         private void update_time_range ()
         {
-            var midnight_hour = (int)(
-                    Pomodoro.StatsManager.MIDNIGHT_OFFSET / Pomodoro.Interval.HOUR);
+            var midnight_hour = (int)(Ft.StatsManager.MIDNIGHT_OFFSET / Ft.Interval.HOUR);
 
             // Ensure time range includes working hours
-            var start_time = Pomodoro.Timestamp.from_datetime (
+            var start_time = Ft.Timestamp.from_datetime (
                     this.datetime.add_hours (BASE_START_HOUR - midnight_hour));
-            var end_time = Pomodoro.Timestamp.from_datetime (
+            var end_time = Ft.Timestamp.from_datetime (
                     this.datetime.add_hours (BASE_END_HOUR - midnight_hour));
 
             // Extend time range to entries
-            if (Pomodoro.Timestamp.is_defined (this.entries_start_time) &&
+            if (Ft.Timestamp.is_defined (this.entries_start_time) &&
                 start_time > this.entries_start_time)
             {
                 start_time = this.entries_start_time;
             }
 
-            if (Pomodoro.Timestamp.is_defined (this.entries_end_time) &&
+            if (Ft.Timestamp.is_defined (this.entries_end_time) &&
                 end_time < this.entries_end_time)
             {
                 end_time = this.entries_end_time;
@@ -531,7 +528,7 @@ namespace Pomodoro
             this.reset ();
 
             for (var index = 0U; index < entries.count; index++) {
-                this.process_entry ((Pomodoro.StatsEntry) entries.get_index (index));
+                this.process_entry ((Ft.StatsEntry) entries.get_index (index));
             }
         }
 
@@ -553,14 +550,14 @@ namespace Pomodoro
             this.zoom_out_button.sensitive = this._interval < MAX_INTERVAL;
         }
 
-        private void on_entry_saved (Pomodoro.StatsEntry entry)
+        private void on_entry_saved (Ft.StatsEntry entry)
         {
             if (this.histogram_data != null) {
                 this.process_entry (entry, 1);
             }
         }
 
-        private void on_entry_deleted (Pomodoro.StatsEntry entry)
+        private void on_entry_deleted (Ft.StatsEntry entry)
         {
             if (this.histogram_data != null) {
                 this.process_entry (entry, -1);

@@ -9,20 +9,20 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public class TimerActionGroup : GLib.SimpleActionGroup
     {
-        public Pomodoro.Timer timer { get; construct; }
+        public Ft.Timer timer { get; construct; }
 
         public TimerActionGroup ()
         {
             GLib.Object (
-                timer: Pomodoro.Timer.get_default ()
+                timer: Ft.Timer.get_default ()
             );
         }
 
-        public TimerActionGroup.with_timer (Pomodoro.Timer timer)
+        public TimerActionGroup.with_timer (Ft.Timer timer)
         {
             GLib.Object (
                 timer: timer
@@ -79,28 +79,28 @@ namespace Pomodoro
         private void activate_start (GLib.SimpleAction action,
                                      GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("timer.start");
+            Ft.Context.set_event_source ("timer.start");
             this.timer.start ();
         }
 
         private void activate_reset (GLib.SimpleAction action,
                                      GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("timer.reset");
+            Ft.Context.set_event_source ("timer.reset");
             this.timer.reset ();
         }
 
         private void activate_pause (GLib.SimpleAction action,
                                      GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("timer.pause");
+            Ft.Context.set_event_source ("timer.pause");
             this.timer.pause ();
         }
 
         private void activate_resume (GLib.SimpleAction action,
                                       GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("timer.resume");
+            Ft.Context.set_event_source ("timer.resume");
             this.timer.resume ();
         }
 
@@ -108,10 +108,10 @@ namespace Pomodoro
                                       GLib.Variant?     parameter)
         {
             var interval = parameter != null
-                    ? parameter.get_int32 () * Pomodoro.Interval.SECOND
-                    : Pomodoro.Interval.MINUTE;
+                    ? parameter.get_int32 () * Ft.Interval.SECOND
+                    : Ft.Interval.MINUTE;
 
-            Pomodoro.Context.set_event_source ("timer.rewind");
+            Ft.Context.set_event_source ("timer.rewind");
             this.timer.rewind (interval);
         }
 
@@ -119,11 +119,11 @@ namespace Pomodoro
                                           GLib.Variant?     parameter)
         {
             if (!this.timer.is_started ()) {
-                Pomodoro.Context.set_event_source ("timer.start");
+                Ft.Context.set_event_source ("timer.start");
                 this.timer.start ();
             }
             else {
-                Pomodoro.Context.set_event_source ("timer.reset");
+                Ft.Context.set_event_source ("timer.reset");
                 this.timer.reset ();
             }
         }
@@ -132,15 +132,15 @@ namespace Pomodoro
                                                   GLib.Variant?     parameter)
         {
             if (!this.timer.is_started ()) {
-                Pomodoro.Context.set_event_source ("timer.start");
+                Ft.Context.set_event_source ("timer.start");
                 this.timer.start ();
             }
             else if (this.timer.is_paused ()) {
-                Pomodoro.Context.set_event_source ("timer.resume");
+                Ft.Context.set_event_source ("timer.resume");
                 this.timer.resume ();
             }
             else {
-                Pomodoro.Context.set_event_source ("timer.pause");
+                Ft.Context.set_event_source ("timer.pause");
                 this.timer.pause ();
             }
         }
@@ -149,8 +149,8 @@ namespace Pomodoro
                                       GLib.Variant?     parameter)
         {
             var interval = parameter != null
-                    ? parameter.get_int32 () * Pomodoro.Interval.SECOND
-                    : Pomodoro.Interval.MINUTE;
+                    ? parameter.get_int32 () * Ft.Interval.SECOND
+                    : Ft.Interval.MINUTE;
 
             this.timer.duration += interval;
         }

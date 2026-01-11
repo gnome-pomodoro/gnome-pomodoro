@@ -10,11 +10,11 @@ namespace Tests
 {
     public class EventProducerTest : Tests.TestSuite
     {
-        private Pomodoro.Timer                     timer;
-        private Pomodoro.SessionManager            session_manager;
-        private Pomodoro.EventProducer             producer;
-        private Pomodoro.SessionManagerActionGroup session_manager_action_group;
-        private Pomodoro.TimerActionGroup          timer_action_group;
+        private Ft.Timer                     timer;
+        private Ft.SessionManager            session_manager;
+        private Ft.EventProducer             producer;
+        private Ft.SessionManagerActionGroup session_manager_action_group;
+        private Ft.TimerActionGroup          timer_action_group;
 
         public EventProducerTest ()
         {
@@ -40,10 +40,10 @@ namespace Tests
 
         public override void setup ()
         {
-            Pomodoro.Timestamp.freeze_to (2000000000 * Pomodoro.Interval.SECOND);
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            Ft.Timestamp.freeze_to (2000000000 * Ft.Interval.SECOND);
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
 
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_uint ("pomodoro-duration", 1500);
             settings.set_uint ("short-break-duration", 300);
             settings.set_uint ("long-break-duration", 900);
@@ -51,20 +51,20 @@ namespace Tests
             settings.set_boolean ("confirm-starting-break", false);
             settings.set_boolean ("confirm-starting-pomodoro", false);
 
-            this.timer = new Pomodoro.Timer ();
-            Pomodoro.Timer.set_default (this.timer);
+            this.timer = new Ft.Timer ();
+            Ft.Timer.set_default (this.timer);
 
-            this.session_manager = new Pomodoro.SessionManager.with_timer (this.timer);
-            Pomodoro.SessionManager.set_default (this.session_manager);
+            this.session_manager = new Ft.SessionManager.with_timer (this.timer);
+            Ft.SessionManager.set_default (this.session_manager);
 
-            this.producer = new Pomodoro.EventProducer ();
+            this.producer = new Ft.EventProducer ();
             assert (producer.session_manager == this.session_manager);
             assert (producer.timer == this.timer);
 
-            this.session_manager_action_group = new Pomodoro.SessionManagerActionGroup ();
+            this.session_manager_action_group = new Ft.SessionManagerActionGroup ();
             assert (this.session_manager_action_group.session_manager == this.session_manager);
 
-            this.timer_action_group = new Pomodoro.TimerActionGroup ();
+            this.timer_action_group = new Ft.TimerActionGroup ();
             assert (this.timer_action_group.timer == this.timer);
         }
 
@@ -74,12 +74,12 @@ namespace Tests
             this.session_manager_action_group = null;
             this.timer_action_group = null;
 
-            Pomodoro.SessionManager.set_default (null);
-            Pomodoro.Timer.set_default (null);
+            Ft.SessionManager.set_default (null);
+            Ft.Timer.set_default (null);
 
-            Pomodoro.Context.unset_event_source ();
+            Ft.Context.unset_event_source ();
 
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.revert ();
         }
 
@@ -93,8 +93,8 @@ namespace Tests
 
             var time_block = this.session_manager.current_session.get_first_time_block ();
 
-            var expected_timestamp = Pomodoro.Timestamp.from_now ();
-            var expected_state = Pomodoro.TimerState () {
+            var expected_timestamp = Ft.Timestamp.from_now ();
+            var expected_state = Ft.TimerState () {
                 duration = time_block.duration,
                 started_time = expected_timestamp,
                 user_data = (void*) time_block
@@ -111,14 +111,14 @@ namespace Tests
                         expected_state.to_variant ()
                     );
                     assert_nonnull (event.context.time_block);
-                    assert_true (event.context.time_block.state == Pomodoro.State.POMODORO);
+                    assert_true (event.context.time_block.state == Ft.State.POMODORO);
                     assert_cmpvariant (
                         new GLib.Variant.int64 (event.context.timestamp),
                         new GLib.Variant.int64 (expected_timestamp)
                     );
                 });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.timer_action_group.activate_action ("start", null);
 
             assert_cmpstrv (event_names, {
@@ -133,8 +133,8 @@ namespace Tests
         {
             this.timer.start ();
 
-            var expected_timestamp = Pomodoro.Timestamp.from_now ();
-            var expected_state = Pomodoro.TimerState ();
+            var expected_timestamp = Ft.Timestamp.from_now ();
+            var expected_state = Ft.TimerState ();
             var event_names = new string[0];
 
             this.producer.flush ();
@@ -153,7 +153,7 @@ namespace Tests
                     );
                 });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.timer_action_group.activate_action ("reset", null);
 
             assert_cmpstrv (event_names, {
@@ -169,8 +169,8 @@ namespace Tests
             this.timer.start ();
             this.timer.pause ();
 
-            var expected_timestamp = this.timer.state.paused_time + Pomodoro.Interval.MINUTE;
-            var expected_state = Pomodoro.TimerState ();
+            var expected_timestamp = this.timer.state.paused_time + Ft.Interval.MINUTE;
+            var expected_state = Ft.TimerState ();
             var event_names = new string[0];
 
             this.producer.flush ();
@@ -189,7 +189,7 @@ namespace Tests
                     );
                 });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.timer_action_group.activate_action ("reset", null);
 
             // Expect "resume" event not to be triggered.
@@ -205,7 +205,7 @@ namespace Tests
         {
             this.timer.start ();
 
-            var expected_timestamp = this.timer.state.started_time + Pomodoro.Interval.MINUTE;
+            var expected_timestamp = this.timer.state.started_time + Ft.Interval.MINUTE;
             var expected_state = this.timer.state;
             expected_state.paused_time = expected_timestamp;
 
@@ -226,7 +226,7 @@ namespace Tests
                     );
                 });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.timer_action_group.activate_action ("pause", null);
 
             assert_cmpstrv (event_names, {
@@ -239,13 +239,13 @@ namespace Tests
         {
             this.timer.start ();
 
-            Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (5 * Ft.Interval.MINUTE);
             this.timer.pause ();
 
-            var expected_timestamp = this.timer.state.paused_time + Pomodoro.Interval.MINUTE;
+            var expected_timestamp = this.timer.state.paused_time + Ft.Interval.MINUTE;
             var expected_state = this.timer.state;
-            expected_state.offset = Pomodoro.Interval.MINUTE;
-            expected_state.paused_time = Pomodoro.Timestamp.UNDEFINED;
+            expected_state.offset = Ft.Interval.MINUTE;
+            expected_state.paused_time = Ft.Timestamp.UNDEFINED;
 
             var event_names = new string[0];
 
@@ -264,7 +264,7 @@ namespace Tests
                     );
                 });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.timer_action_group.activate_action ("resume", null);
 
             assert_cmpstrv (event_names, {
@@ -278,9 +278,9 @@ namespace Tests
         {
             this.timer.start ();
 
-            var expected_timestamp = this.timer.state.started_time + 5 * Pomodoro.Interval.MINUTE;
+            var expected_timestamp = this.timer.state.started_time + 5 * Ft.Interval.MINUTE;
             var expected_state = this.timer.state;
-            expected_state.offset = Pomodoro.Interval.MINUTE;
+            expected_state.offset = Ft.Interval.MINUTE;
 
             var event_names = new string[0];
 
@@ -299,7 +299,7 @@ namespace Tests
                     );
                 });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.timer_action_group.activate_action ("rewind", null);
 
             assert_cmpstrv (event_names, {
@@ -322,7 +322,7 @@ namespace Tests
             expected_state_1.finished_time = finished_time;
 
             var time_block_2 = this.session_manager.current_session.get_nth_time_block (1);
-            var expected_state_2 = Pomodoro.TimerState () {
+            var expected_state_2 = Ft.TimerState () {
                 duration = time_block_2.duration,
                 started_time = finished_time,
                 user_data = time_block_2
@@ -350,7 +350,7 @@ namespace Tests
                     }
                 });
 
-            Pomodoro.Timestamp.freeze_to (finished_time);
+            Ft.Timestamp.freeze_to (finished_time);
             this.timer.finish ();
 
             assert_cmpstrv (event_names, {
@@ -363,13 +363,13 @@ namespace Tests
 
         public void test_timer_finished__wait_for_activity ()
         {
-            var idle_monitor = new Pomodoro.IdleMonitor ();
-            assert_true (idle_monitor.provider is Pomodoro.DummyIdleMonitorProvider);
+            var idle_monitor = new Ft.IdleMonitor ();
+            assert_true (idle_monitor.provider is Ft.DummyIdleMonitorProvider);
 
-            this.session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK);
+            this.session_manager.advance_to_state (Ft.State.SHORT_BREAK);
 
             var finished_time = this.session_manager.current_time_block.end_time;
-            var activity_time = finished_time + Pomodoro.Interval.MINUTE;
+            var activity_time = finished_time + Ft.Interval.MINUTE;
             var expected_timestamp = finished_time;
             var event_names = new string[0];
             var finished = false;
@@ -380,9 +380,9 @@ namespace Tests
             expected_state_1.finished_time = finished_time;
 
             var time_block_2 = this.session_manager.current_session.get_next_time_block (time_block_1);
-            var expected_state_2 = Pomodoro.TimerState () {
+            var expected_state_2 = Ft.TimerState () {
                 duration = time_block_2.duration,
-                started_time = Pomodoro.Timestamp.UNDEFINED,
+                started_time = Ft.Timestamp.UNDEFINED,
                 user_data = time_block_2
             };
 
@@ -414,7 +414,7 @@ namespace Tests
                     }
                 });
 
-            Pomodoro.Timestamp.freeze_to (finished_time);
+            Ft.Timestamp.freeze_to (finished_time);
             this.timer.finish ();
 
             assert_cmpstrv (event_names, {
@@ -429,7 +429,7 @@ namespace Tests
             expected_timestamp = activity_time;
             event_names = {};
 
-            Pomodoro.Timestamp.freeze_to (activity_time);
+            Ft.Timestamp.freeze_to (activity_time);
             idle_monitor.provider.became_active ();
 
             assert_cmpstrv (event_names, {
@@ -440,14 +440,14 @@ namespace Tests
 
         public void test_timer_finished__manual ()
         {
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_boolean ("confirm-starting-break", true);
             settings.set_boolean ("confirm-starting-pomodoro", true);
 
             this.timer.start ();
 
             var finished_time = this.session_manager.current_time_block.end_time;
-            var confirmed_time = finished_time + Pomodoro.Interval.MINUTE;
+            var confirmed_time = finished_time + Ft.Interval.MINUTE;
             var expected_timestamp = finished_time;
             var event_names = new string[0];
             var confirmed = false;
@@ -457,7 +457,7 @@ namespace Tests
             expected_state_1.finished_time = finished_time;
 
             var time_block_2 = this.session_manager.current_session.get_next_time_block (time_block_1);
-            var expected_state_2 = Pomodoro.TimerState () {
+            var expected_state_2 = Ft.TimerState () {
                 duration = time_block_2.duration,
                 started_time = confirmed_time,
                 user_data = time_block_2
@@ -481,7 +481,7 @@ namespace Tests
                     }
                 });
 
-            Pomodoro.Timestamp.freeze_to (finished_time);
+            Ft.Timestamp.freeze_to (finished_time);
             this.timer.finish ();
 
             assert_cmpstrv (event_names, {
@@ -494,7 +494,7 @@ namespace Tests
             expected_timestamp = confirmed_time;
             event_names = {};
 
-            Pomodoro.Timestamp.freeze_to (confirmed_time);
+            Ft.Timestamp.freeze_to (confirmed_time);
             this.session_manager_action_group.activate_action ("advance", null);
 
             assert_cmpstrv (event_names, {
@@ -511,7 +511,7 @@ namespace Tests
 
         public void test_session_manager_advance__uncompleted ()
         {
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
 
             var event_names = new string[0];
 
@@ -523,7 +523,7 @@ namespace Tests
                     // TODO: check context
                 });
 
-            Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (Ft.Interval.MINUTE);
             this.session_manager_action_group.activate_action ("advance", null);
 
             assert_cmpstrv (event_names, {
@@ -537,9 +537,9 @@ namespace Tests
 
         public void test_session_manager_advance__completed ()
         {
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
 
-            var expected_timestamp = this.session_manager.current_time_block.end_time - Pomodoro.Interval.MINUTE;
+            var expected_timestamp = this.session_manager.current_time_block.end_time - Ft.Interval.MINUTE;
             var event_names = new string[0];
 
             this.producer.flush ();
@@ -550,7 +550,7 @@ namespace Tests
                     // TODO: check context
                 });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.session_manager_action_group.activate_action ("advance", null);
 
             // Expect no "skip" event, because time-block got completed
@@ -564,12 +564,12 @@ namespace Tests
 
         public void test_session_manager_advance__uncompleted_paused_pomodoro ()
         {
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
 
-            Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (Ft.Interval.MINUTE);
             this.timer.pause ();
 
-            var expected_timestamp = Pomodoro.Timestamp.peek () + Pomodoro.Interval.MINUTE;
+            var expected_timestamp = Ft.Timestamp.peek () + Ft.Interval.MINUTE;
             var event_names = new string[0];
 
             this.producer.flush ();
@@ -578,7 +578,7 @@ namespace Tests
                     event_names += event.spec.name;
                 });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.session_manager_action_group.activate_action ("advance", null);
 
             assert_cmpstrv (event_names, {
@@ -592,12 +592,12 @@ namespace Tests
 
         public void test_session_manager_advance__completed_paused_pomodoro ()
         {
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
 
-            Pomodoro.Timestamp.advance (24 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (24 * Ft.Interval.MINUTE);
             this.timer.pause ();
 
-            var expected_timestamp = Pomodoro.Timestamp.peek () + Pomodoro.Interval.MINUTE;
+            var expected_timestamp = Ft.Timestamp.peek () + Ft.Interval.MINUTE;
             var event_names = new string[0];
 
             this.producer.flush ();
@@ -606,7 +606,7 @@ namespace Tests
                     event_names += event.spec.name;
                 });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.session_manager_action_group.activate_action ("advance", null);
 
             // Expect no "skip" event, because time-block got completed
@@ -620,14 +620,14 @@ namespace Tests
 
         public void test_session_manager_confirm_advancement ()
         {
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_boolean ("confirm-starting-break", true);
             settings.set_boolean ("confirm-starting-pomodoro", true);
 
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
 
             var finished_time = this.session_manager.current_time_block.end_time;
-            var confirmed_time = finished_time + Pomodoro.Interval.MINUTE;
+            var confirmed_time = finished_time + Ft.Interval.MINUTE;
             var expected_timestamp = finished_time;
             var event_names = new string[0];
 
@@ -639,7 +639,7 @@ namespace Tests
                     // TODO: check context
                 });
 
-            Pomodoro.Timestamp.freeze_to (finished_time);
+            Ft.Timestamp.freeze_to (finished_time);
             this.timer.finish ();
 
             assert_cmpstrv (event_names, {
@@ -651,7 +651,7 @@ namespace Tests
             expected_timestamp = confirmed_time;
             event_names = {};
 
-            Pomodoro.Timestamp.freeze_to (confirmed_time);
+            Ft.Timestamp.freeze_to (confirmed_time);
             this.session_manager_action_group.activate_action ("advance", null);
 
             assert_cmpstrv (event_names, {
@@ -682,7 +682,7 @@ namespace Tests
                 session_expired_emitted++;
             });
 
-            Pomodoro.Timestamp.advance (Pomodoro.SessionManager.SESSION_EXPIRY_TIMEOUT + Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (Ft.SessionManager.SESSION_EXPIRY_TIMEOUT + Ft.Interval.MINUTE);
             this.session_manager.check_current_session_expired ();
 
             assert_cmpuint (session_expired_emitted, GLib.CompareOperator.EQ, 1);
@@ -698,7 +698,7 @@ namespace Tests
         {
             this.timer.start ();
 
-            Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (Ft.Interval.MINUTE);
             this.timer.reset ();
 
             var event_names = new string[0];

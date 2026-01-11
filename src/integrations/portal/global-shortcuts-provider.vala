@@ -19,7 +19,7 @@ namespace Portal
     }
 
 
-    public class GlobalShortcutsProvider : Pomodoro.Provider, Pomodoro.GlobalShortcutsProvider
+    public class GlobalShortcutsProvider : Ft.Provider, Ft.GlobalShortcutsProvider
     {
         /**
          * Warn if underlying `GlobalShortcuts` API version changes. Bump this value after testing.
@@ -40,7 +40,7 @@ namespace Portal
         {
             if (!this.is_configured)
             {
-                var settings = Pomodoro.get_settings ();
+                var settings = Ft.get_settings ();
                 settings.set_boolean ("global-shortcuts-configured", true);
 
                 this.is_configured = true;
@@ -49,7 +49,7 @@ namespace Portal
 
         private async void create_session () throws GlobalShortcutsError
         {
-            var timestamp = Pomodoro.Timestamp.to_seconds_uint32 (Pomodoro.Timestamp.from_now ());
+            var timestamp = Ft.Timestamp.to_seconds_uint32 (Ft.Timestamp.from_now ());
 
             try {
                 var handle_token = yield Portal.create_request (
@@ -291,7 +291,7 @@ namespace Portal
          */
         private Portal.Shortcut[] mutulate_shortcuts ()
         {
-            var timestamp = Pomodoro.Timestamp.to_seconds_uint32 (Pomodoro.Timestamp.from_now ());
+            var timestamp = Ft.Timestamp.to_seconds_uint32 (Ft.Timestamp.from_now ());
             var shortcut_id = @"unused-$(timestamp)";
             var shortcut_properties = new GLib.HashTable<string, GLib.Variant> (GLib.str_hash,
                                                                                 GLib.str_equal);
@@ -426,7 +426,7 @@ namespace Portal
                 ? cancellable
                 : new GLib.Cancellable ();
 
-            this.is_configured = Pomodoro.get_settings ().get_boolean ("global-shortcuts-configured");
+            this.is_configured = Ft.get_settings ().get_boolean ("global-shortcuts-configured");
 
             try {
                 this.proxy = yield GLib.Bus.get_proxy<Portal.GlobalShortcuts>

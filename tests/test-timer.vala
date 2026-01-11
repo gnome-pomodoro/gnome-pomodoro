@@ -8,11 +8,11 @@
 
 namespace Tests
 {
-    private int64 TEST_TIME = 2000000000 * Pomodoro.Interval.SECOND;
+    private int64 TEST_TIME = 2000000000 * Ft.Interval.SECOND;
 
     private uint get_timestamp_call_count ()
     {
-        var call_count = Pomodoro.Timestamp.subtract (Pomodoro.Timestamp.advance (0), TEST_TIME);
+        var call_count = Ft.Timestamp.subtract (Ft.Timestamp.advance (0), TEST_TIME);
 
         // Vala doesn't allow casting int64 to uint, so convert through string...
         return uint.parse (call_count.to_string ());
@@ -23,81 +23,77 @@ namespace Tests
      * Fixtures
      */
 
-    private Pomodoro.TimerState create_initial_state (
-                                   int64 duration = 10 * Pomodoro.Interval.MINUTE,
-                                   void* user_data = null)
+    private Ft.TimerState create_initial_state (int64 duration = 10 * Ft.Interval.MINUTE,
+                                                void* user_data = null)
     {
-        return Pomodoro.TimerState () {
+        return Ft.TimerState () {
             duration = duration,
             offset = 0,
-            started_time = Pomodoro.Timestamp.UNDEFINED,
-            paused_time = Pomodoro.Timestamp.UNDEFINED,
-            finished_time = Pomodoro.Timestamp.UNDEFINED,
+            started_time = Ft.Timestamp.UNDEFINED,
+            paused_time = Ft.Timestamp.UNDEFINED,
+            finished_time = Ft.Timestamp.UNDEFINED,
             user_data = user_data
         };
     }
 
-    private Pomodoro.TimerState create_started_state (
-                                   int64 duration = 10 * Pomodoro.Interval.MINUTE,
-                                   int64 elapsed = 0 * Pomodoro.Interval.MINUTE,
-                                   int64 timestamp = -1,
-                                   void* user_data = null)
+    private Ft.TimerState create_started_state (int64 duration = 10 * Ft.Interval.MINUTE,
+                                                int64 elapsed = 0 * Ft.Interval.MINUTE,
+                                                int64 timestamp = -1,
+                                                void* user_data = null)
     {
-        var now = Pomodoro.Timestamp.advance (0);
+        var now = Ft.Timestamp.advance (0);
 
         if (timestamp < 0) {
             timestamp = now - elapsed;
         }
 
-        return Pomodoro.TimerState () {
+        return Ft.TimerState () {
             duration = duration,
             offset = now - timestamp - elapsed,
             started_time = timestamp,
-            paused_time = Pomodoro.Timestamp.UNDEFINED,
-            finished_time = Pomodoro.Timestamp.UNDEFINED,
+            paused_time = Ft.Timestamp.UNDEFINED,
+            finished_time = Ft.Timestamp.UNDEFINED,
             user_data = user_data
         };
     }
 
-    private Pomodoro.TimerState create_paused_state (
-                                   int64 duration = 10 * Pomodoro.Interval.MINUTE,
-                                   int64 elapsed = 0 * Pomodoro.Interval.MINUTE,
-                                   int64 timestamp = -1,
-                                   void* user_data = null)
+    private Ft.TimerState create_paused_state (int64 duration = 10 * Ft.Interval.MINUTE,
+                                               int64 elapsed = 0 * Ft.Interval.MINUTE,
+                                               int64 timestamp = -1,
+                                               void* user_data = null)
     {
-        var now = Pomodoro.Timestamp.advance (0);
+        var now = Ft.Timestamp.advance (0);
 
         if (timestamp < 0) {
             timestamp = now - elapsed;
         }
 
-        return Pomodoro.TimerState () {
+        return Ft.TimerState () {
             duration = duration,
             offset = now - timestamp - elapsed,
             started_time = timestamp,
             paused_time = now,
-            finished_time = Pomodoro.Timestamp.UNDEFINED,
+            finished_time = Ft.Timestamp.UNDEFINED,
             user_data = user_data
         };
     }
 
-    private Pomodoro.TimerState create_finished_state (
-                                   int64 duration = 10 * Pomodoro.Interval.MINUTE,
-                                   int64 elapsed = 10 * Pomodoro.Interval.MINUTE,
-                                   int64 timestamp = -1,
-                                   void* user_data = null)
+    private Ft.TimerState create_finished_state (int64 duration = 10 * Ft.Interval.MINUTE,
+                                                 int64 elapsed = 10 * Ft.Interval.MINUTE,
+                                                 int64 timestamp = -1,
+                                                 void* user_data = null)
     {
-        var now = Pomodoro.Timestamp.advance (0);
+        var now = Ft.Timestamp.advance (0);
 
         if (timestamp < 0) {
             timestamp = now - elapsed;
         }
 
-        return Pomodoro.TimerState () {
+        return Ft.TimerState () {
             duration = duration,
             offset = now - timestamp - elapsed,
             started_time = timestamp,
-            paused_time = Pomodoro.Timestamp.UNDEFINED,
+            paused_time = Ft.Timestamp.UNDEFINED,
             finished_time = now,
             user_data = user_data
         };
@@ -106,16 +102,16 @@ namespace Tests
     /**
      * Wait until timer finishes
      */
-    private bool run_timer (Pomodoro.Timer timer,
+    private bool run_timer (Ft.Timer timer,
                             uint           timeout = 0)
-                            requires (!Pomodoro.Timestamp.is_frozen ())
+                            requires (!Ft.Timestamp.is_frozen ())
     {
         var timeout_id = (uint) 0;
         var cancellable = new GLib.Cancellable ();
 
         if (timeout == 0) {
-            timeout = Pomodoro.Timestamp.to_milliseconds_uint (
-                timer.calculate_remaining () + 2 * Pomodoro.Interval.SECOND);
+            timeout = Ft.Timestamp.to_milliseconds_uint (
+                timer.calculate_remaining () + 2 * Ft.Interval.SECOND);
         }
 
         timeout_id = GLib.Timeout.add (timeout, () => {
@@ -145,7 +141,7 @@ namespace Tests
 
         public void test_copy ()
         {
-            var expected_state = Pomodoro.TimerState () {
+            var expected_state = Ft.TimerState () {
                 duration = 1,
                 offset = 2,
                 started_time = 3,
@@ -286,15 +282,15 @@ namespace Tests
 
         public override void setup ()
         {
-            Pomodoro.Timestamp.freeze_to (TEST_TIME);
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            Ft.Timestamp.freeze_to (TEST_TIME);
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
         }
 
         public override void teardown ()
         {
-            Pomodoro.Timestamp.thaw ();
+            Ft.Timestamp.thaw ();
 
-            Pomodoro.Timer.set_default (null);
+            Ft.Timer.set_default (null);
         }
 
 
@@ -306,7 +302,7 @@ namespace Tests
         {
             var expected_state = create_initial_state (0);
 
-            var timer = new Pomodoro.Timer ();
+            var timer = new Ft.Timer ();
             assert_cmpvariant (
                 timer.state.to_variant (),
                 expected_state.to_variant ()
@@ -322,7 +318,7 @@ namespace Tests
             // Expect constructor to not fetch system time
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.get_last_state_changed_time ()),
-                new GLib.Variant.int64 (Pomodoro.Timestamp.UNDEFINED)
+                new GLib.Variant.int64 (Ft.Timestamp.UNDEFINED)
             );
             assert_cmpuint (get_timestamp_call_count (), GLib.CompareOperator.EQ, 0);
         }
@@ -330,10 +326,10 @@ namespace Tests
         public void test_new__with_args ()
         {
             var user_data = GLib.MainContext.@default ();
-            var expected_state = create_initial_state (Pomodoro.Interval.MINUTE,
+            var expected_state = create_initial_state (Ft.Interval.MINUTE,
                                                        user_data);
 
-            var timer = new Pomodoro.Timer (expected_state.duration,
+            var timer = new Ft.Timer (expected_state.duration,
                                             expected_state.user_data);
             assert_cmpvariant (
                 timer.state.to_variant (),
@@ -352,7 +348,7 @@ namespace Tests
         public void test_new_with__paused_state ()
         {
             var paused_state = create_paused_state ();
-            var timer = new Pomodoro.Timer.with_state (paused_state);
+            var timer = new Ft.Timer.with_state (paused_state);
             assert_cmpvariant (
                 timer.state.to_variant (),
                 paused_state.to_variant ()
@@ -364,7 +360,7 @@ namespace Tests
         public void test_new_with__started_state ()
         {
             var started_state = create_started_state ();
-            var timer = new Pomodoro.Timer.with_state (started_state);
+            var timer = new Ft.Timer.with_state (started_state);
             assert_cmpvariant (
                 timer.state.to_variant (),
                 started_state.to_variant ()
@@ -381,7 +377,7 @@ namespace Tests
         public void test_set_default ()
         {
             // Expect timer to be created on demand
-            var default_timer = Pomodoro.Timer.get_default ();
+            var default_timer = Ft.Timer.get_default ();
             assert_nonnull (default_timer);
 
             // Check whether default timer holds a reference
@@ -392,14 +388,14 @@ namespace Tests
             default_timer = null;
             assert_false (destroyed);
 
-            Pomodoro.Timer.set_default (null);
+            Ft.Timer.set_default (null);
             assert_true (destroyed);
 
             // Check setting a custom timer
-            var custom_timer = new Pomodoro.Timer ();
+            var custom_timer = new Ft.Timer ();
             assert_false (custom_timer.is_default ());
-            Pomodoro.Timer.set_default (custom_timer);
-            assert_true (Pomodoro.Timer.get_default () == custom_timer);
+            Ft.Timer.set_default (custom_timer);
+            assert_true (Ft.Timer.get_default () == custom_timer);
             assert_true (custom_timer.is_default ());
         }
 
@@ -409,7 +405,7 @@ namespace Tests
          */
         public void test_state ()
         {
-            var timer = new Pomodoro.Timer ();
+            var timer = new Ft.Timer ();
 
             var notify_state_emitted = 0;
             timer.notify["state"].connect (() => {
@@ -433,14 +429,14 @@ namespace Tests
 
         public void test_duration ()
         {
-            var timer = new Pomodoro.Timer ();
+            var timer = new Ft.Timer ();
 
             var notify_duration_emitted = 0;
             timer.notify["duration"].connect (() => {
                 notify_duration_emitted++;
             });
 
-            var duration_1 = Pomodoro.Interval.MINUTE;
+            var duration_1 = Ft.Interval.MINUTE;
             timer.duration = duration_1;
             assert_true (timer.duration == duration_1);
             assert_cmpint (notify_duration_emitted, GLib.CompareOperator.EQ, 1);
@@ -449,7 +445,7 @@ namespace Tests
             assert_true (timer.duration == duration_1);
             assert_cmpint (notify_duration_emitted, GLib.CompareOperator.EQ, 1);  // unchanged
 
-            var duration_2 = 2 * Pomodoro.Interval.MINUTE;
+            var duration_2 = 2 * Ft.Interval.MINUTE;
             timer.duration = duration_2;
             assert_true (timer.duration == duration_2);
             assert_cmpint (notify_duration_emitted, GLib.CompareOperator.EQ, 2);
@@ -457,7 +453,7 @@ namespace Tests
 
         public void test_started_time ()
         {
-            var timer = new Pomodoro.Timer ();
+            var timer = new Ft.Timer ();
 
             var notify_started_time_emitted = 0;
             timer.notify["started-time"].connect (() => {
@@ -473,7 +469,7 @@ namespace Tests
             timer.state = state_2;
             assert_cmpint (notify_started_time_emitted, GLib.CompareOperator.EQ, 1);  // unchanged
 
-            Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (Ft.Interval.MINUTE);
 
             var state_3 = create_started_state ();
             timer.state = state_3;
@@ -482,7 +478,7 @@ namespace Tests
 
         public void test_offset ()
         {
-            var timer = new Pomodoro.Timer ();
+            var timer = new Ft.Timer ();
 
             var notify_offset_emitted = 0;
             timer.notify["offset"].connect (() => {
@@ -490,24 +486,24 @@ namespace Tests
             });
 
             var state_1 = create_started_state ();
-            state_1.offset = Pomodoro.Interval.MINUTE;
+            state_1.offset = Ft.Interval.MINUTE;
             timer.state = state_1;
             assert_cmpint (notify_offset_emitted, GLib.CompareOperator.EQ, 1);
 
             var state_2 = create_started_state ();
-            state_2.offset = Pomodoro.Interval.MINUTE;
+            state_2.offset = Ft.Interval.MINUTE;
             timer.state = state_2;
             assert_cmpint (notify_offset_emitted, GLib.CompareOperator.EQ, 1);  // unchanged
 
             var state_3 = create_started_state ();
-            state_3.offset = 2 * Pomodoro.Interval.MINUTE;
+            state_3.offset = 2 * Ft.Interval.MINUTE;
             timer.state = state_3;
             assert_cmpint (notify_offset_emitted, GLib.CompareOperator.EQ, 2);
         }
 
         public void test_user_data ()
         {
-            var timer = new Pomodoro.Timer ();
+            var timer = new Ft.Timer ();
 
             var notify_user_data_emitted = 0;
             timer.notify["user-data"].connect (() => {
@@ -537,68 +533,68 @@ namespace Tests
         public void test_is_running ()
         {
             assert_true (
-                new Pomodoro.Timer.with_state (create_started_state ()).is_running ()
+                new Ft.Timer.with_state (create_started_state ()).is_running ()
             );
 
             assert_false (
-                new Pomodoro.Timer.with_state (create_initial_state ()).is_running ()
+                new Ft.Timer.with_state (create_initial_state ()).is_running ()
             );
             assert_false (
-                new Pomodoro.Timer.with_state (create_paused_state ()).is_running ()
+                new Ft.Timer.with_state (create_paused_state ()).is_running ()
             );
             assert_false (
-                new Pomodoro.Timer.with_state (create_finished_state ()).is_running ()
+                new Ft.Timer.with_state (create_finished_state ()).is_running ()
             );
         }
 
         public void test_is_started ()
         {
             assert_true (
-                new Pomodoro.Timer.with_state (create_started_state ()).is_started ()
+                new Ft.Timer.with_state (create_started_state ()).is_started ()
             );
             assert_true (
-                new Pomodoro.Timer.with_state (create_paused_state ()).is_started ()
+                new Ft.Timer.with_state (create_paused_state ()).is_started ()
             );
             assert_true (
-                new Pomodoro.Timer.with_state (create_finished_state ()).is_started ()
+                new Ft.Timer.with_state (create_finished_state ()).is_started ()
             );
 
             assert_false (
-                new Pomodoro.Timer.with_state (create_initial_state ()).is_started ()
+                new Ft.Timer.with_state (create_initial_state ()).is_started ()
             );
         }
 
         public void test_is_paused ()
         {
             assert_true (
-                new Pomodoro.Timer.with_state (create_paused_state ()).is_paused ()
+                new Ft.Timer.with_state (create_paused_state ()).is_paused ()
             );
 
             assert_false (
-                new Pomodoro.Timer.with_state (create_initial_state ()).is_paused ()
+                new Ft.Timer.with_state (create_initial_state ()).is_paused ()
             );
             assert_false (
-                new Pomodoro.Timer.with_state (create_started_state ()).is_paused ()
+                new Ft.Timer.with_state (create_started_state ()).is_paused ()
             );
             assert_false (
-                new Pomodoro.Timer.with_state (create_finished_state ()).is_paused ()
+                new Ft.Timer.with_state (create_finished_state ()).is_paused ()
             );
         }
 
         public void test_is_finished ()
         {
             assert_true (
-                new Pomodoro.Timer.with_state (create_finished_state ()).is_finished ()
+                new Ft.Timer.with_state (create_finished_state ()).is_finished ()
             );
 
             assert_false (
-                new Pomodoro.Timer.with_state (create_initial_state ()).is_finished ()
+                new Ft.Timer.with_state (create_initial_state ()).is_finished ()
             );
             assert_false (
-                new Pomodoro.Timer.with_state (create_started_state ()).is_finished ()
+                new Ft.Timer.with_state (create_started_state ()).is_finished ()
             );
             assert_false (
-                new Pomodoro.Timer.with_state (create_paused_state ()).is_finished ()
+                new Ft.Timer.with_state (create_paused_state ()).is_finished ()
             );
         }
 
@@ -609,22 +605,22 @@ namespace Tests
 
         public void test_calculate_elapsed__initial_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_initial_state (
-                    20 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_elapsed (now - Pomodoro.Interval.MINUTE)
+                    timer.calculate_elapsed (now - Ft.Interval.MINUTE)
                 ),
                 new GLib.Variant.int64 (0)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_elapsed (now + Pomodoro.Interval.MINUTE)
+                    timer.calculate_elapsed (now + Ft.Interval.MINUTE)
                 ),
                 new GLib.Variant.int64 (0)
             );
@@ -632,117 +628,117 @@ namespace Tests
 
         public void test_calculate_elapsed__started_state ()
         {
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_started_state (
-                    20 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_elapsed (timer.state.started_time - Pomodoro.Interval.MINUTE)
+                    timer.calculate_elapsed (timer.state.started_time - Ft.Interval.MINUTE)
                 ),
                 new GLib.Variant.int64 (0)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_elapsed (timer.state.started_time + Pomodoro.Interval.MINUTE)
+                    timer.calculate_elapsed (timer.state.started_time + Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_elapsed (timer.state.started_time + timer.duration + Pomodoro.Interval.MINUTE)
+                    timer.calculate_elapsed (timer.state.started_time + timer.duration + Ft.Interval.MINUTE)
                 ),
                 new GLib.Variant.int64 (timer.duration)
             );
 
-            var now = Pomodoro.Timestamp.peek ();
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            var now = Ft.Timestamp.peek ();
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
 
-            var timer_with_offset = new Pomodoro.Timer.with_state (
+            var timer_with_offset = new Ft.Timer.with_state (
                 create_started_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    4 * Pomodoro.Interval.MINUTE,
-                    now - 5 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    4 * Ft.Interval.MINUTE,
+                    now - 5 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
                     timer_with_offset.calculate_elapsed (
-                        timer_with_offset.state.started_time + timer_with_offset.state.offset + Pomodoro.Interval.MINUTE
+                        timer_with_offset.state.started_time + timer_with_offset.state.offset + Ft.Interval.MINUTE
                     )
                 ),
-                new GLib.Variant.int64 (Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
                     timer_with_offset.calculate_elapsed (
-                        timer_with_offset.state.started_time + 5 * Pomodoro.Interval.MINUTE
+                        timer_with_offset.state.started_time + 5 * Ft.Interval.MINUTE
                     )
                 ),
-                new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (4 * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_elapsed__paused_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_paused_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    4 * Pomodoro.Interval.MINUTE,
-                    now - 5 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    4 * Ft.Interval.MINUTE,
+                    now - 5 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_elapsed (now - Pomodoro.Interval.MINUTE)
+                    timer.calculate_elapsed (now - Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (3 * Pomodoro.Interval.MINUTE)  // estimation
+                new GLib.Variant.int64 (3 * Ft.Interval.MINUTE)  // estimation
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
                     timer.calculate_elapsed (now)
                 ),
-                new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (4 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_elapsed (now + Pomodoro.Interval.MINUTE)
+                    timer.calculate_elapsed (now + Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (4 * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_elapsed__finished_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_finished_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    4 * Pomodoro.Interval.MINUTE,
-                    now - 5 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    4 * Ft.Interval.MINUTE,
+                    now - 5 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_elapsed (now - Pomodoro.Interval.MINUTE)
+                    timer.calculate_elapsed (now - Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (3 * Pomodoro.Interval.MINUTE)  // estimation
+                new GLib.Variant.int64 (3 * Ft.Interval.MINUTE)  // estimation
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
                     timer.calculate_elapsed (now)
                 ),
-                new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (4 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_elapsed (now + Pomodoro.Interval.MINUTE)
+                    timer.calculate_elapsed (now + Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (4 * Ft.Interval.MINUTE)
             );
         }
 
@@ -753,109 +749,109 @@ namespace Tests
 
         public void test_calculate_remaining__initial_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_initial_state (
-                    20 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_remaining (now - Pomodoro.Interval.MINUTE)
+                    timer.calculate_remaining (now - Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (20 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (20 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_remaining (now + Pomodoro.Interval.MINUTE)
+                    timer.calculate_remaining (now + Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (20 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (20 * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_remaining__started_state ()
         {
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_started_state (
-                    20 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_remaining (timer.state.started_time - Pomodoro.Interval.MINUTE)
+                    timer.calculate_remaining (timer.state.started_time - Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (20 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (20 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_remaining (timer.state.started_time + Pomodoro.Interval.MINUTE)
+                    timer.calculate_remaining (timer.state.started_time + Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (19 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (19 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_remaining (timer.state.started_time + timer.duration + Pomodoro.Interval.MINUTE)
+                    timer.calculate_remaining (timer.state.started_time + timer.duration + Ft.Interval.MINUTE)
                 ),
                 new GLib.Variant.int64 (0)
             );
 
-            var now = Pomodoro.Timestamp.peek ();
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            var now = Ft.Timestamp.peek ();
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
 
-            var timer_with_offset = new Pomodoro.Timer.with_state (
+            var timer_with_offset = new Ft.Timer.with_state (
                 create_started_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    4 * Pomodoro.Interval.MINUTE,
-                    now - 5 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    4 * Ft.Interval.MINUTE,
+                    now - 5 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
                     timer_with_offset.calculate_remaining (
-                        timer_with_offset.state.started_time + timer_with_offset.state.offset + Pomodoro.Interval.MINUTE
+                        timer_with_offset.state.started_time + timer_with_offset.state.offset + Ft.Interval.MINUTE
                     )
                 ),
-                new GLib.Variant.int64 (19 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (19 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
                     timer_with_offset.calculate_remaining (
-                        timer_with_offset.state.started_time + 5 * Pomodoro.Interval.MINUTE
+                        timer_with_offset.state.started_time + 5 * Ft.Interval.MINUTE
                     )
                 ),
-                new GLib.Variant.int64 (16 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (16 * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_remaining__paused_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_paused_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    4 * Pomodoro.Interval.MINUTE,
-                    now - 5 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    4 * Ft.Interval.MINUTE,
+                    now - 5 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_remaining (now - Pomodoro.Interval.MINUTE)
+                    timer.calculate_remaining (now - Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (17 * Pomodoro.Interval.MINUTE)  // estimation
+                new GLib.Variant.int64 (17 * Ft.Interval.MINUTE)  // estimation
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
                     timer.calculate_remaining (now)
                 ),
-                new GLib.Variant.int64 (16 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (16 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_remaining (now + Pomodoro.Interval.MINUTE)
+                    timer.calculate_remaining (now + Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (16 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (16 * Ft.Interval.MINUTE)
             );
         }
 
@@ -865,33 +861,33 @@ namespace Tests
          */
         public void test_calculate_remaining__finished_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_finished_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    4 * Pomodoro.Interval.MINUTE,
-                    now - 5 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    4 * Ft.Interval.MINUTE,
+                    now - 5 * Ft.Interval.MINUTE
                 )
             );
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_remaining (now - Pomodoro.Interval.MINUTE)
+                    timer.calculate_remaining (now - Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (17 * Pomodoro.Interval.MINUTE)  // estimation
+                new GLib.Variant.int64 (17 * Ft.Interval.MINUTE)  // estimation
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
                     timer.calculate_remaining (now)
                 ),
-                new GLib.Variant.int64 (16 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (16 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (
-                    timer.calculate_remaining (now + Pomodoro.Interval.MINUTE)
+                    timer.calculate_remaining (now + Ft.Interval.MINUTE)
                 ),
-                new GLib.Variant.int64 (16 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (16 * Ft.Interval.MINUTE)
             );
         }
 
@@ -902,66 +898,66 @@ namespace Tests
 
         public void test_calculate_progress__initial_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_initial_state (
-                    20 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpvariant (
-                timer.calculate_progress (now - Pomodoro.Interval.MINUTE),
+                timer.calculate_progress (now - Ft.Interval.MINUTE),
                 0.0
             );
             assert_cmpvariant (
-                timer.calculate_progress (now + Pomodoro.Interval.MINUTE),
+                timer.calculate_progress (now + Ft.Interval.MINUTE),
                 0.0
             );
         }
 
         public void test_calculate_progress__started_state ()
         {
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_started_state (
-                    20 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpfloat (
-                timer.calculate_progress (timer.state.started_time - Pomodoro.Interval.MINUTE),
+                timer.calculate_progress (timer.state.started_time - Ft.Interval.MINUTE),
                 GLib.CompareOperator.EQ,
                 0.0 / 20.0
             );
             assert_cmpfloat (
-                timer.calculate_progress (timer.state.started_time + Pomodoro.Interval.MINUTE),
+                timer.calculate_progress (timer.state.started_time + Ft.Interval.MINUTE),
                 GLib.CompareOperator.EQ,
                 1.0 / 20.0
             );
             assert_cmpfloat (
-                timer.calculate_progress (timer.state.started_time + timer.duration + Pomodoro.Interval.MINUTE),
+                timer.calculate_progress (timer.state.started_time + timer.duration + Ft.Interval.MINUTE),
                 GLib.CompareOperator.EQ,
                 20.0 / 20.0
             );
 
-            var now = Pomodoro.Timestamp.peek ();
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            var now = Ft.Timestamp.peek ();
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
 
-            var timer_with_offset = new Pomodoro.Timer.with_state (
+            var timer_with_offset = new Ft.Timer.with_state (
                 create_started_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    4 * Pomodoro.Interval.MINUTE,
-                    now - 5 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    4 * Ft.Interval.MINUTE,
+                    now - 5 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpfloat (
                 timer_with_offset.calculate_progress (
-                    timer_with_offset.state.started_time + timer_with_offset.state.offset + Pomodoro.Interval.MINUTE
+                    timer_with_offset.state.started_time + timer_with_offset.state.offset + Ft.Interval.MINUTE
                 ),
                 GLib.CompareOperator.EQ,
                 1.0 / 20.0
             );
             assert_cmpfloat (
                 timer_with_offset.calculate_progress (
-                    timer_with_offset.state.started_time + 5 * Pomodoro.Interval.MINUTE
+                    timer_with_offset.state.started_time + 5 * Ft.Interval.MINUTE
                 ),
                 GLib.CompareOperator.EQ,
                 4.0 / 20.0
@@ -970,17 +966,17 @@ namespace Tests
 
         public void test_calculate_progress__paused_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_paused_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    4 * Pomodoro.Interval.MINUTE,
-                    now - 5 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    4 * Ft.Interval.MINUTE,
+                    now - 5 * Ft.Interval.MINUTE
                 )
             );
             assert_cmpfloat (
-                timer.calculate_progress (now - Pomodoro.Interval.MINUTE),
+                timer.calculate_progress (now - Ft.Interval.MINUTE),
                 GLib.CompareOperator.EQ,
                 3.0 / 20.0
             );
@@ -990,7 +986,7 @@ namespace Tests
                 4.0 / 20.0
             );
             assert_cmpfloat (
-                timer.calculate_progress (now + Pomodoro.Interval.MINUTE),
+                timer.calculate_progress (now + Ft.Interval.MINUTE),
                 GLib.CompareOperator.EQ,
                 4.0 / 20.0
             );
@@ -1002,18 +998,18 @@ namespace Tests
          */
         public void test_calculate_progress__finished_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_finished_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    4 * Pomodoro.Interval.MINUTE,
-                    now - 5 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    4 * Ft.Interval.MINUTE,
+                    now - 5 * Ft.Interval.MINUTE
                 )
             );
 
             assert_cmpfloat (
-                timer.calculate_progress (now - Pomodoro.Interval.MINUTE),
+                timer.calculate_progress (now - Ft.Interval.MINUTE),
                 GLib.CompareOperator.EQ,
                 3.0 / 20.0
             );
@@ -1023,7 +1019,7 @@ namespace Tests
                 4.0 / 20.0
             );
             assert_cmpfloat (
-                timer.calculate_progress (now + Pomodoro.Interval.MINUTE),
+                timer.calculate_progress (now + Ft.Interval.MINUTE),
                 GLib.CompareOperator.EQ,
                 4.0 / 20.0
             );
@@ -1036,14 +1032,14 @@ namespace Tests
 
         public void test_reset ()
         {
-            var expected_state = Pomodoro.TimerState ();
-            expected_state.duration = Pomodoro.Interval.SECOND;
+            var expected_state = Ft.TimerState ();
+            expected_state.duration = Ft.Interval.SECOND;
 
             var signals = new string[0];
 
-            var timer = new Pomodoro.Timer.with_state (
-                Pomodoro.TimerState () {
-                    duration = Pomodoro.Interval.MINUTE,
+            var timer = new Ft.Timer.with_state (
+                Ft.TimerState () {
+                    duration = Ft.Interval.MINUTE,
                     offset = 1,
                     started_time = 2,
                     paused_time = 3,
@@ -1073,16 +1069,16 @@ namespace Tests
 
         public void test_start__initial_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
             var signals = new string[0];
-            var state_changed_time = Pomodoro.Timestamp.UNDEFINED;
+            var state_changed_time = Ft.Timestamp.UNDEFINED;
 
             var initial_state = create_initial_state ();
             var expected_state = initial_state.copy ();
-            expected_state.started_time = now + 5 * Pomodoro.Interval.MINUTE;
-            expected_state.paused_time = Pomodoro.Timestamp.UNDEFINED;
+            expected_state.started_time = now + 5 * Ft.Interval.MINUTE;
+            expected_state.paused_time = Ft.Timestamp.UNDEFINED;
 
-            var timer = new Pomodoro.Timer.with_state (initial_state);
+            var timer = new Ft.Timer.with_state (initial_state);
             timer.resolve_state.connect (() => {
                 signals += "resolve-state";
             });
@@ -1091,7 +1087,7 @@ namespace Tests
                 state_changed_time = timer.get_last_state_changed_time ();
             });
 
-            now = Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            now = Ft.Timestamp.advance (5 * Ft.Interval.MINUTE);
             timer.start (now);
 
             assert_cmpvariant (
@@ -1117,14 +1113,14 @@ namespace Tests
             var started_state = create_started_state ();
             var expected_state = started_state.copy ();
 
-            var timer = new Pomodoro.Timer.with_state (started_state);
+            var timer = new Ft.Timer.with_state (started_state);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (5 * Ft.Interval.MINUTE);
             timer.start ();
 
             assert_cmpvariant (
@@ -1144,19 +1140,19 @@ namespace Tests
         public void test_start__paused_state ()
         {
             var paused_state = create_paused_state (
-                20 * Pomodoro.Interval.MINUTE,
-                4 * Pomodoro.Interval.MINUTE
+                20 * Ft.Interval.MINUTE,
+                4 * Ft.Interval.MINUTE
             );
             var expected_state = paused_state.copy ();
 
-            var timer = new Pomodoro.Timer.with_state (paused_state);
+            var timer = new Ft.Timer.with_state (paused_state);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (5 * Ft.Interval.MINUTE);
             timer.start ();
 
             assert_cmpvariant (
@@ -1177,8 +1173,8 @@ namespace Tests
             var finished_state = create_finished_state ();
             var expected_state = finished_state.copy ();
 
-            var timer = new Pomodoro.Timer.with_state (finished_state);
-            Pomodoro.Timestamp.advance (1 * Pomodoro.Interval.MINUTE);
+            var timer = new Ft.Timer.with_state (finished_state);
+            Ft.Timestamp.advance (1 * Ft.Interval.MINUTE);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
@@ -1208,14 +1204,14 @@ namespace Tests
             var initial_state = create_initial_state ();
             var expected_state = initial_state.copy ();
 
-            var timer = new Pomodoro.Timer.with_state (initial_state);
+            var timer = new Ft.Timer.with_state (initial_state);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (5 * Ft.Interval.MINUTE);
             timer.pause ();
 
             assert_cmpvariant (
@@ -1233,22 +1229,22 @@ namespace Tests
         {
             var started_state = create_started_state ();
             var expected_state = started_state.copy ();
-            expected_state.paused_time = expected_state.started_time + 5 * Pomodoro.Interval.MINUTE;
+            expected_state.paused_time = expected_state.started_time + 5 * Ft.Interval.MINUTE;
 
-            var timer = new Pomodoro.Timer.with_state (started_state);
+            var timer = new Ft.Timer.with_state (started_state);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.freeze_to (expected_state.paused_time);
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            Ft.Timestamp.freeze_to (expected_state.paused_time);
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
             timer.pause (expected_state.paused_time);
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed (expected_state.paused_time)),
-                new GLib.Variant.int64 (5 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (5 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 timer.state.to_variant (),
@@ -1269,14 +1265,14 @@ namespace Tests
             var paused_state = create_paused_state ();
             var expected_state = paused_state.copy ();
 
-            var timer = new Pomodoro.Timer.with_state (paused_state);
+            var timer = new Ft.Timer.with_state (paused_state);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.advance (1 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (1 * Ft.Interval.MINUTE);
             timer.pause ();
 
             assert_cmpvariant (
@@ -1298,14 +1294,14 @@ namespace Tests
             var finished_state = create_finished_state ();
             var expected_state = finished_state.copy ();
 
-            var timer = new Pomodoro.Timer.with_state (finished_state);
+            var timer = new Ft.Timer.with_state (finished_state);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.advance (1 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (1 * Ft.Interval.MINUTE);
             timer.pause ();
 
             assert_cmpvariant (
@@ -1323,21 +1319,21 @@ namespace Tests
         public void test_pause__align_to_seconds ()
         {
             var started_state = create_started_state ();
-            var timer = new Pomodoro.Timer.with_state (started_state);
-            var pause_time = timer.state.started_time + 3200 * Pomodoro.Interval.MILLISECOND;
+            var timer = new Ft.Timer.with_state (started_state);
+            var pause_time = timer.state.started_time + 3200 * Ft.Interval.MILLISECOND;
 
-            Pomodoro.Timestamp.freeze_to (pause_time);
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            Ft.Timestamp.freeze_to (pause_time);
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed (pause_time)),
-                new GLib.Variant.int64 (3200 * Pomodoro.Interval.MILLISECOND)
+                new GLib.Variant.int64 (3200 * Ft.Interval.MILLISECOND)
             );
 
             timer.pause (pause_time);
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed (pause_time)),
-                new GLib.Variant.int64 (3 * Pomodoro.Interval.SECOND)
+                new GLib.Variant.int64 (3 * Ft.Interval.SECOND)
             );
         }
 
@@ -1353,14 +1349,14 @@ namespace Tests
             var initial_state = create_initial_state ();
             var expected_state = initial_state.copy ();
 
-            var timer = new Pomodoro.Timer.with_state (initial_state);
+            var timer = new Ft.Timer.with_state (initial_state);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (5 * Ft.Interval.MINUTE);
             timer.resume ();
 
             assert_cmpvariant (
@@ -1379,14 +1375,14 @@ namespace Tests
             var started_state = create_started_state ();
             var expected_state = started_state.copy ();
 
-            var timer = new Pomodoro.Timer.with_state (started_state);
+            var timer = new Ft.Timer.with_state (started_state);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (5 * Ft.Interval.MINUTE);
             timer.resume ();
 
             assert_cmpvariant (
@@ -1402,22 +1398,22 @@ namespace Tests
          */
         public void test_resume__paused_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
             var paused_state = create_paused_state ();
             var expected_state = paused_state.copy ();
-            expected_state.offset += 1 * Pomodoro.Interval.MINUTE;
-            expected_state.paused_time = Pomodoro.Timestamp.UNDEFINED;
+            expected_state.offset += 1 * Ft.Interval.MINUTE;
+            expected_state.paused_time = Ft.Timestamp.UNDEFINED;
 
-            var timer = new Pomodoro.Timer.with_state (paused_state);
+            var timer = new Ft.Timer.with_state (paused_state);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.freeze_to (now + Pomodoro.Interval.MINUTE);
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            Ft.Timestamp.freeze_to (now + Ft.Interval.MINUTE);
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
 
             timer.resume ();
 
@@ -1440,14 +1436,14 @@ namespace Tests
             var finished_state = create_finished_state ();
             var expected_state = finished_state.copy ();
 
-            var timer = new Pomodoro.Timer.with_state (finished_state);
+            var timer = new Ft.Timer.with_state (finished_state);
 
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.advance (1 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (1 * Ft.Interval.MINUTE);
             timer.resume ();
 
             assert_cmpvariant (
@@ -1471,14 +1467,14 @@ namespace Tests
             var initial_state = create_initial_state ();
             var expected_state = initial_state.copy ();
 
-            var timer = new Pomodoro.Timer.with_state (initial_state);
+            var timer = new Ft.Timer.with_state (initial_state);
             var state_changed_emitted = 0;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
             });
 
-            Pomodoro.Timestamp.advance (5 * Pomodoro.Interval.MINUTE);
-            timer.rewind (Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (5 * Ft.Interval.MINUTE);
+            timer.rewind (Ft.Interval.MINUTE);
 
             assert_cmpvariant (
                 timer.state.to_variant (),
@@ -1494,13 +1490,13 @@ namespace Tests
          */
         public void test_rewind__started_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_started_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    5 * Pomodoro.Interval.MINUTE,
-                    now - 7 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    5 * Ft.Interval.MINUTE,
+                    now - 7 * Ft.Interval.MINUTE
                 )
             );
             var state_changed_emitted = 0;
@@ -1510,21 +1506,21 @@ namespace Tests
             var expected_started_time = timer.state.started_time;
 
             // Rewind 1 minute
-            timer.rewind (Pomodoro.Interval.MINUTE, now);
+            timer.rewind (Ft.Interval.MINUTE, now);
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.started_time),
                 new GLib.Variant.int64 (expected_started_time)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed (now)),
-                new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (4 * Ft.Interval.MINUTE)
             );
             assert_true (timer.is_running ());
             assert_false (timer.is_paused ());
             assert_cmpint (state_changed_emitted, GLib.CompareOperator.EQ, 1);
 
             // Rewind 5 minutes
-            timer.rewind (5 * Pomodoro.Interval.MINUTE, now);
+            timer.rewind (5 * Ft.Interval.MINUTE, now);
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.started_time),
                 new GLib.Variant.int64 (expected_started_time)
@@ -1546,13 +1542,13 @@ namespace Tests
          */
         public void test_rewind__paused_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_paused_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    5 * Pomodoro.Interval.MINUTE,
-                    now - 7 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    5 * Ft.Interval.MINUTE,
+                    now - 7 * Ft.Interval.MINUTE
                 )
             );
             var state_changed_emitted = 0;
@@ -1563,25 +1559,25 @@ namespace Tests
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed ()),
-                new GLib.Variant.int64 (5 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (5 * Ft.Interval.MINUTE)
             );
 
             // Rewind 1 minute
-            timer.rewind (Pomodoro.Interval.MINUTE, now);
+            timer.rewind (Ft.Interval.MINUTE, now);
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.started_time),
                 new GLib.Variant.int64 (expected_started_time)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed (now)),
-                new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (4 * Ft.Interval.MINUTE)
             );
             assert_false (timer.is_running ());
             assert_true (timer.is_paused ());
             assert_cmpint (state_changed_emitted, GLib.CompareOperator.EQ, 1);
 
             // Rewind 5 minutes
-            timer.rewind (5 * Pomodoro.Interval.MINUTE, now);
+            timer.rewind (5 * Ft.Interval.MINUTE, now);
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.started_time),
                 new GLib.Variant.int64 (expected_started_time)
@@ -1597,13 +1593,13 @@ namespace Tests
 
         public void test_rewind__finished_state ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var timer = new Pomodoro.Timer.with_state (
+            var timer = new Ft.Timer.with_state (
                 create_finished_state (
-                    20 * Pomodoro.Interval.MINUTE,
-                    5 * Pomodoro.Interval.MINUTE,
-                    now - 7 * Pomodoro.Interval.MINUTE
+                    20 * Ft.Interval.MINUTE,
+                    5 * Ft.Interval.MINUTE,
+                    now - 7 * Ft.Interval.MINUTE
                 )
             );
             var state_changed_emitted = 0;
@@ -1613,14 +1609,14 @@ namespace Tests
             var expected_started_time = timer.state.started_time;
 
             // Rewind 1 minute
-            timer.rewind (Pomodoro.Interval.MINUTE, now);
+            timer.rewind (Ft.Interval.MINUTE, now);
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.started_time),
                 new GLib.Variant.int64 (expected_started_time)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed (now)),
-                new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (4 * Ft.Interval.MINUTE)
             );
             assert_true (timer.is_running ());
             assert_false (timer.is_paused ());
@@ -1628,7 +1624,7 @@ namespace Tests
             assert_cmpint (state_changed_emitted, GLib.CompareOperator.EQ, 1);
 
             // Rewind 5 minutes
-            timer.rewind (5 * Pomodoro.Interval.MINUTE, now);
+            timer.rewind (5 * Ft.Interval.MINUTE, now);
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.state.started_time),
                 new GLib.Variant.int64 (expected_started_time)
@@ -1649,23 +1645,23 @@ namespace Tests
          */
         public void test_rewind__align_to_seconds ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var timer = new Pomodoro.Timer.with_state (
+            var now = Ft.Timestamp.peek ();
+            var timer = new Ft.Timer.with_state (
                 create_started_state (
-                    Pomodoro.Interval.MINUTE,
-                    3200 * Pomodoro.Interval.MILLISECOND
+                    Ft.Interval.MINUTE,
+                    3200 * Ft.Interval.MILLISECOND
                 )
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed (now)),
-                new GLib.Variant.int64 (3200 * Pomodoro.Interval.MILLISECOND)
+                new GLib.Variant.int64 (3200 * Ft.Interval.MILLISECOND)
             );
 
             // Rewind 1s. Expect tick time and elapsed time to be rounded to seconds.
-            timer.rewind (Pomodoro.Interval.SECOND, now);
+            timer.rewind (Ft.Interval.SECOND, now);
             assert_cmpvariant (
                 new GLib.Variant.int64 (timer.calculate_elapsed (now)),
-                new GLib.Variant.int64 (2000 * Pomodoro.Interval.MILLISECOND)
+                new GLib.Variant.int64 (2000 * Ft.Interval.MILLISECOND)
             );
 
             // Rewind to start. Expect displayed time will be same as state duration.
@@ -1676,8 +1672,8 @@ namespace Tests
                     new GLib.Variant.int64 (0)
                 );
             });
-            now = Pomodoro.Timestamp.advance (100 * Pomodoro.Interval.MILLISECOND);
-            timer.rewind (Pomodoro.Interval.MINUTE, now);
+            now = Ft.Timestamp.advance (100 * Ft.Interval.MILLISECOND);
+            timer.rewind (Ft.Interval.MINUTE, now);
         }
 
         /*
@@ -1686,10 +1682,10 @@ namespace Tests
 
         public void test_state_changed_signal ()
         {
-            var timer = new Pomodoro.Timer (1 * Pomodoro.Interval.MINUTE);
+            var timer = new Ft.Timer (1 * Ft.Interval.MINUTE);
 
             var state_changed_emitted = 0;
-            var state_changed_time = Pomodoro.Timestamp.UNDEFINED;
+            var state_changed_time = Ft.Timestamp.UNDEFINED;
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
                 state_changed_time = timer.get_last_state_changed_time ();
@@ -1714,7 +1710,7 @@ namespace Tests
             var paused_state          = create_paused_state ();
             var resolve_state_emitted = 0;
 
-            var timer = new Pomodoro.Timer.with_state (create_initial_state ());
+            var timer = new Ft.Timer.with_state (create_initial_state ());
             timer.resolve_state.connect ((ref state) => {
                 resolve_state_emitted++;
 
@@ -1740,14 +1736,14 @@ namespace Tests
 
         public void test_finished_signal__0s ()
         {
-            Pomodoro.Timestamp.thaw ();
+            Ft.Timestamp.thaw ();
 
-            var timer = new Pomodoro.Timer (0 * Pomodoro.Interval.SECOND);
+            var timer = new Ft.Timer (0 * Ft.Interval.SECOND);
 
             var finished_emitted = 0;
             var state_changed_emitted = 0;
-            var finished_time_in_state_changed = Pomodoro.Timestamp.UNDEFINED;
-            var finished_time_in_finished = Pomodoro.Timestamp.UNDEFINED;
+            var finished_time_in_state_changed = Ft.Timestamp.UNDEFINED;
+            var finished_time_in_finished = Ft.Timestamp.UNDEFINED;
 
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
@@ -1761,7 +1757,7 @@ namespace Tests
                 finished_time_in_finished = state.finished_time;
 
                 assert_cmpint (state_changed_emitted, GLib.CompareOperator.GT, 0);
-                assert_true (Pomodoro.Timestamp.is_defined (finished_time_in_state_changed));
+                assert_true (Ft.Timestamp.is_defined (finished_time_in_state_changed));
                 assert_cmpvariant (
                     new GLib.Variant.int64 (finished_time_in_finished),
                     new GLib.Variant.int64 (finished_time_in_state_changed)
@@ -1784,14 +1780,14 @@ namespace Tests
 
         public void test_finished_signal__1s ()
         {
-            Pomodoro.Timestamp.thaw ();
+            Ft.Timestamp.thaw ();
 
-            var timer = new Pomodoro.Timer (1 * Pomodoro.Interval.SECOND);
+            var timer = new Ft.Timer (1 * Ft.Interval.SECOND);
 
             var finished_emitted = 0;
             var state_changed_emitted = 0;
-            var finished_time_in_state_changed = Pomodoro.Timestamp.UNDEFINED;
-            var finished_time_in_finished = Pomodoro.Timestamp.UNDEFINED;
+            var finished_time_in_state_changed = Ft.Timestamp.UNDEFINED;
+            var finished_time_in_finished = Ft.Timestamp.UNDEFINED;
 
             timer.state_changed.connect ((current_state, previous_state) => {
                 state_changed_emitted++;
@@ -1805,7 +1801,7 @@ namespace Tests
                 finished_time_in_finished = state.finished_time;
 
                 assert_cmpint (state_changed_emitted, GLib.CompareOperator.GT, 0);
-                assert_true (Pomodoro.Timestamp.is_defined (finished_time_in_state_changed));
+                assert_true (Ft.Timestamp.is_defined (finished_time_in_state_changed));
                 assert_cmpvariant (
                     new GLib.Variant.int64 (finished_time_in_finished),
                     new GLib.Variant.int64 (finished_time_in_state_changed)
@@ -1828,9 +1824,9 @@ namespace Tests
 
         public void test_tick_signal ()
         {
-            Pomodoro.Timestamp.thaw ();
+            Ft.Timestamp.thaw ();
 
-            var timer           = new Pomodoro.Timer (3 * Pomodoro.Interval.SECOND);
+            var timer           = new Ft.Timer (3 * Ft.Interval.SECOND);
             var call_count      = 0;
             int64 real_times[5] = {-1, -1, -1, -1 -1};
             int64 tick_times[5] = {-1, -1, -1, -1 -1};
@@ -1851,7 +1847,7 @@ namespace Tests
             assert_cmpint (call_count, GLib.CompareOperator.GE, 2);
 
             var mean_deviation = sum_deviation / call_count;
-            assert_cmpuint (Pomodoro.Timestamp.to_milliseconds_uint (mean_deviation.abs ()), GLib.CompareOperator.LT, 100);
+            assert_cmpuint (Ft.Timestamp.to_milliseconds_uint (mean_deviation.abs ()), GLib.CompareOperator.LT, 100);
         }
     }
 }

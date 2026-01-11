@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     /**
-     * Pomodoro.State
+     * Ft.State
      *
      * In general, there are main states STOPPED, POMODORO and BREAK.
      * BREAK may be resolved to either SHORT_BREAK or LONG_BREAK by the session-manager / scheduler,
@@ -46,7 +46,7 @@ namespace Pomodoro
             }
         }
 
-        public static Pomodoro.State from_string (string? state)
+        public static Ft.State from_string (string? state)
         {
             switch (state)
             {
@@ -91,13 +91,13 @@ namespace Pomodoro
            }
         }
 
-        public bool is_a (Pomodoro.State other)
+        public bool is_a (Ft.State other)
         {
             if (this == BREAK) {
                 return other.is_break ();
             }
 
-            if (other == Pomodoro.State.BREAK) {
+            if (other == Ft.State.BREAK) {
                 return this.is_break ();
             }
 
@@ -113,7 +113,7 @@ namespace Pomodoro
 
         public int64 get_default_duration ()
         {
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             uint seconds;
 
             switch (this)
@@ -136,7 +136,7 @@ namespace Pomodoro
                     break;
             }
 
-            return (int64) seconds * Pomodoro.Interval.SECOND;
+            return (int64) seconds * Ft.Interval.SECOND;
         }
     }
 }

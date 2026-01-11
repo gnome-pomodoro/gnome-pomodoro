@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public Adw.AboutDialog create_about_dialog ()
     {

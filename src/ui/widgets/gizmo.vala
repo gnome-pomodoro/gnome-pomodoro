@@ -4,25 +4,25 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    public delegate void GizmoMeasureFunc (Pomodoro.Gizmo gizmo,
+    public delegate void GizmoMeasureFunc (Ft.Gizmo        gizmo,
                                            Gtk.Orientation orientation,
-                                           int for_size,
-                                           out int minimum,
-                                           out int natural,
-                                           out int minimum_baseline,
-                                           out int natural_baseline);
+                                           int             for_size,
+                                           out int         minimum,
+                                           out int         natural,
+                                           out int         minimum_baseline,
+                                           out int         natural_baseline);
 
-    public delegate void GizmoAllocateFunc (Pomodoro.Gizmo gizmo, int width, int height, int baseline);
+    public delegate void GizmoAllocateFunc (Ft.Gizmo gizmo, int width, int height, int baseline);
 
-    public delegate void GizmoSnapshotFunc (Pomodoro.Gizmo gizmo, Gtk.Snapshot snapshot);
+    public delegate void GizmoSnapshotFunc (Ft.Gizmo gizmo, Gtk.Snapshot snapshot);
 
-    public delegate bool GizmoContainsFunc (Pomodoro.Gizmo gizmo, double x, double y);
+    public delegate bool GizmoContainsFunc (Ft.Gizmo gizmo, double x, double y);
 
-    public delegate bool GizmoFocusFunc (Pomodoro.Gizmo gizmo, Gtk.DirectionType direction);
+    public delegate bool GizmoFocusFunc (Ft.Gizmo gizmo, Gtk.DirectionType direction);
 
-    public delegate bool GizmoGrabFocusFunc (Pomodoro.Gizmo gizmo);
+    public delegate bool GizmoGrabFocusFunc (Ft.Gizmo gizmo);
 
 
     /**
@@ -32,19 +32,19 @@ namespace Pomodoro
      */
     public sealed class Gizmo : Gtk.Widget
     {
-        private Pomodoro.GizmoMeasureFunc?   measure_func;
-        private Pomodoro.GizmoAllocateFunc?  allocate_func;
-        private Pomodoro.GizmoSnapshotFunc?  snapshot_func;
-        private Pomodoro.GizmoContainsFunc?  contains_func;
-        private Pomodoro.GizmoFocusFunc?     focus_func;
-        private Pomodoro.GizmoGrabFocusFunc? grab_focus_func;
+        private Ft.GizmoMeasureFunc?   measure_func;
+        private Ft.GizmoAllocateFunc?  allocate_func;
+        private Ft.GizmoSnapshotFunc?  snapshot_func;
+        private Ft.GizmoContainsFunc?  contains_func;
+        private Ft.GizmoFocusFunc?     focus_func;
+        private Ft.GizmoGrabFocusFunc? grab_focus_func;
 
-        public Gizmo (owned Pomodoro.GizmoMeasureFunc?   measure_func,
-                      owned Pomodoro.GizmoAllocateFunc?  allocate_func,
-                      owned Pomodoro.GizmoSnapshotFunc?  snapshot_func,
-                      owned Pomodoro.GizmoContainsFunc?  contains_func,
-                      owned Pomodoro.GizmoFocusFunc?     focus_func,
-                      owned Pomodoro.GizmoGrabFocusFunc? grab_focus_func)
+        public Gizmo (owned Ft.GizmoMeasureFunc?   measure_func,
+                      owned Ft.GizmoAllocateFunc?  allocate_func,
+                      owned Ft.GizmoSnapshotFunc?  snapshot_func,
+                      owned Ft.GizmoContainsFunc?  contains_func,
+                      owned Ft.GizmoFocusFunc?     focus_func,
+                      owned Ft.GizmoGrabFocusFunc? grab_focus_func)
         {
             this.measure_func    = (owned) measure_func;
             this.allocate_func   = (owned) allocate_func;
@@ -55,12 +55,12 @@ namespace Pomodoro
         }
 
         public Gizmo.with_role (Gtk.AccessibleRole                 role,
-                                owned Pomodoro.GizmoMeasureFunc?   measure_func,
-                                owned Pomodoro.GizmoAllocateFunc?  allocate_func,
-                                owned Pomodoro.GizmoSnapshotFunc?  snapshot_func,
-                                owned Pomodoro.GizmoContainsFunc?  contains_func,
-                                owned Pomodoro.GizmoFocusFunc?     focus_func,
-                                owned Pomodoro.GizmoGrabFocusFunc? grab_focus_func)
+                                owned Ft.GizmoMeasureFunc?   measure_func,
+                                owned Ft.GizmoAllocateFunc?  allocate_func,
+                                owned Ft.GizmoSnapshotFunc?  snapshot_func,
+                                owned Ft.GizmoContainsFunc?  contains_func,
+                                owned Ft.GizmoFocusFunc?     focus_func,
+                                owned Ft.GizmoGrabFocusFunc? grab_focus_func)
         {
             GLib.Object (
                 accessible_role: role
@@ -80,11 +80,11 @@ namespace Pomodoro
         }
 
         public override void measure (Gtk.Orientation orientation,
-                                      int for_size,
-                                      out int minimum,
-                                      out int natural,
-                                      out int minimum_baseline,
-                                      out int natural_baseline)
+                                      int             for_size,
+                                      out int         minimum,
+                                      out int         natural,
+                                      out int         minimum_baseline,
+                                      out int         natural_baseline)
         {
             if (this.measure_func != null) {
                 this.measure_func (this,

@@ -16,7 +16,7 @@ namespace Tests
     }
 
 
-    public class AntiGravityCapability : Pomodoro.Capability
+    public class AntiGravityCapability : Ft.Capability
     {
         public uint initialize_count = 0;
         public uint uninitialize_count = 0;
@@ -24,8 +24,8 @@ namespace Tests
         public uint disable_count = 0;
         public uint activate_count = 0;
 
-        public AntiGravityCapability (string            name,
-                                      Pomodoro.Priority priority = Pomodoro.Priority.DEFAULT)
+        public AntiGravityCapability (string      name,
+                                      Ft.Priority priority = Ft.Priority.DEFAULT)
         {
             base (name, priority);
         }
@@ -85,28 +85,28 @@ namespace Tests
 
         public void test_register ()
         {
-            var manager = new Pomodoro.CapabilityManager ();
+            var manager = new Ft.CapabilityManager ();
 
             var capability_1 = new AntiGravityCapability ("anti-gravity");
-            assert_true (capability_1.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability_1.status == Ft.CapabilityStatus.NULL);
             assert_false (manager.is_enabled ("anti-gravity"));
 
             manager.register (capability_1);
             assert_false (manager.is_enabled ("anti-gravity"));
-            assert_true (capability_1.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability_1.status == Ft.CapabilityStatus.DISABLED);
         }
 
         public void test_enable__before_register ()
         {
             var capability = new AntiGravityCapability ("anti-gravity");
-            var manager    = new Pomodoro.CapabilityManager ();
+            var manager    = new Ft.CapabilityManager ();
 
             manager.enable ("anti-gravity");
             assert_false (manager.is_enabled ("anti-gravity"));
 
             manager.register (capability);
             assert_true (manager.is_enabled ("anti-gravity"));
-            assert_true (capability.status == Pomodoro.CapabilityStatus.ENABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.ENABLED);
         }
     }
 }

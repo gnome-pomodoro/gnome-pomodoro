@@ -6,16 +6,16 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    public interface BackgroundProvider : Pomodoro.Provider
+    public interface BackgroundProvider : Ft.Provider
     {
         public abstract async bool request_background (string parent_window);
     }
 
 
     [SingleInstance]
-    public class BackgroundManager : Pomodoro.ProvidedObject<Pomodoro.BackgroundProvider>
+    public class BackgroundManager : Ft.ProvidedObject<Ft.BackgroundProvider>
     {
         public bool active {
             get {
@@ -74,7 +74,7 @@ namespace Pomodoro
 
         public async uint hold (string parent_window = "")
         {
-            var hold_id = Pomodoro.BackgroundManager.next_hold_id;
+            var hold_id = Ft.BackgroundManager.next_hold_id;
             BackgroundManager.next_hold_id++;
 
             this.holds.add (hold_id);
@@ -111,14 +111,14 @@ namespace Pomodoro
             // TODO: add a permissive provider if the Background portal is not available
         }
 
-        protected override void provider_enabled (Pomodoro.BackgroundProvider provider)
+        protected override void provider_enabled (Ft.BackgroundProvider provider)
         {
             if (this.holds.length > 0U) {
                 this.request_background.begin ();
             }
         }
 
-        protected override void provider_disabled (Pomodoro.BackgroundProvider provider)
+        protected override void provider_disabled (Ft.BackgroundProvider provider)
         {
             // TODO: use SetStatus to withdraw request?
 

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/keyboard-shortcuts/accelerator-row.ui")]
     public class AcceleratorRow : Adw.ActionRow
@@ -43,8 +43,8 @@ namespace Pomodoro
         private void update_label ()
         {
             var accelerator = this._accelerator != ""
-                ? Pomodoro.Accelerator.from_string (this._accelerator)
-                : Pomodoro.Accelerator.empty ();
+                    ? Ft.Accelerator.from_string (this._accelerator)
+                    : Ft.Accelerator.empty ();
 
             if (accelerator.is_empty ()) {
                 this.accelerator_label.label = _("Disabled");
@@ -56,16 +56,16 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.AcceleratorChooserWindow create_accelerator_chooser ()
+        private Ft.AcceleratorChooserWindow create_accelerator_chooser ()
         {
-            var chooser = new Pomodoro.AcceleratorChooserWindow (this.description, this.accelerator);
+            var chooser = new Ft.AcceleratorChooserWindow (this.description, this.accelerator);
             chooser.transient_for = (Gtk.Window) this.get_root ();
 
             return chooser;
         }
 
-        private void on_chooser_response (Pomodoro.AcceleratorChooserWindow chooser,
-                                          int                               response_id)
+        private void on_chooser_response (Ft.AcceleratorChooserWindow chooser,
+                                          int                         response_id)
         {
             if (response_id != Gtk.ResponseType.APPLY) {
                 return;

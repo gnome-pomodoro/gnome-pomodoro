@@ -6,7 +6,7 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public interface Job : GLib.Object
     {
@@ -24,15 +24,15 @@ namespace Pomodoro
     [SingleInstance]
     public class JobQueue : GLib.Object
     {
-        private GLib.AsyncQueue<Pomodoro.Job> queue;
+        private GLib.AsyncQueue<Ft.Job> queue;
         private bool running = false;
 
         construct
         {
-            this.queue = new GLib.AsyncQueue<Pomodoro.Job> ();
+            this.queue = new GLib.AsyncQueue<Ft.Job> ();
         }
 
-        private void run_job (Pomodoro.Job job)
+        private void run_job (Ft.Job job)
                               requires (!this.running)
         {
             this.running = true;
@@ -68,7 +68,7 @@ namespace Pomodoro
             }
         }
 
-        public void push (Pomodoro.Job job)
+        public void push (Ft.Job job)
         {
             this.queue.push (job);
 

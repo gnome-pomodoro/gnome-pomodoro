@@ -5,7 +5,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroAcceleratorChooserWindow" parent="AdwWindow">
+  <template class="FtAcceleratorChooserWindow" parent="AdwWindow">
     <property name="default-width">400</property>
     <property name="width-request">400</property>
     <property name="height-request">300</property>
@@ -59,7 +59,7 @@
                 <property name="halign">center</property>
                 <property name="valign">center</property>
                 <property name="vexpand">true</property>
-                <property name="accelerator" bind-source="PomodoroAcceleratorChooserWindow" bind-property="accelerator" bind-flags="sync-create"/>
+                <property name="accelerator" bind-source="FtAcceleratorChooserWindow" bind-property="accelerator" bind-flags="sync-create"/>
                 <property name="disabled-text" translatable="yes">Disabled</property>
               </object>
             </child>

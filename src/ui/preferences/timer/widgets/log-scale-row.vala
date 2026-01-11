@@ -6,7 +6,7 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     // TODO: rename to DurationRow
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/timer/widgets/log-scale-row.ui")]
@@ -35,7 +35,7 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Label value_label;
         [GtkChild]
-        private unowned Pomodoro.LogScale scale;
+        private unowned Ft.LogScale scale;
 
         private Gtk.Adjustment _adjustment;
         private ulong          value_changed_id = 0;
@@ -53,7 +53,7 @@ namespace Pomodoro
             if (this._adjustment != null) {
                 var seconds = (int) Math.round (this._adjustment.value).clamp (0, int.MAX);
 
-                this.value_label.label = Pomodoro.format_time (seconds);
+                this.value_label.label = Ft.format_time (seconds);
             }
         }
 

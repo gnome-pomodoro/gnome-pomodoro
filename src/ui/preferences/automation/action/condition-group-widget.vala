@@ -6,11 +6,11 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public interface ExpressionWidget : Gtk.Widget
     {
-        public abstract Pomodoro.Expression? expression { get; set; }
+        public abstract Ft.Expression? expression { get; set; }
 
         public abstract bool removable { get; set; }
 
@@ -19,7 +19,7 @@ namespace Pomodoro
 
 
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/automation/action/condition-group-widget.ui")]
-    public sealed class ConditionGroupWidget : Gtk.Widget, Pomodoro.ExpressionWidget
+    public sealed class ConditionGroupWidget : Gtk.Widget, Ft.ExpressionWidget
     {
         private const int BRACKET_WIDTH = 24;
         private const int MIN_BRACKET_HEIGHT = 20;
@@ -31,12 +31,12 @@ namespace Pomodoro
         private const float LINE_WIDTH = 2.0f;
 
         [CCode (notify = false)]
-        public Pomodoro.Expression? expression {
+        public Ft.Expression? expression {
             get {
-                return (Pomodoro.Expression?) this._operation;
+                return (Ft.Expression?) this._operation;
             }
             set {
-                var operation = value as Pomodoro.Operation;
+                var operation = value as Ft.Operation;
 
                 if (this._operation == operation) {
                     return;
@@ -57,7 +57,7 @@ namespace Pomodoro
             }
         }
 
-        public Pomodoro.Operator operator {
+        public Ft.Operator operator {
             get {
                 return this._operator;
             }
@@ -100,11 +100,11 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Box buttons_box;
 
-        private Pomodoro.Operation? _operation = null;
-        private Pomodoro.Operator   _operator = Pomodoro.Operator.AND;
-        private bool                _removable = false;
-        private Pomodoro.Gizmo?     top_bracket;
-        private Pomodoro.Gizmo?     bottom_bracket;
+        private Ft.Operation? _operation = null;
+        private Ft.Operator   _operator = Ft.Operator.AND;
+        private bool          _removable = false;
+        private Ft.Gizmo?     top_bracket;
+        private Ft.Gizmo?     bottom_bracket;
 
         static construct
         {
@@ -113,7 +113,7 @@ namespace Pomodoro
 
         construct
         {
-            var top_bracket = new Pomodoro.Gizmo (
+            var top_bracket = new Ft.Gizmo (
                     ConditionGroupWidget.measure_bracket_child_cb,
                     null,
                     ConditionGroupWidget.snapshot_top_bracket_cb,
@@ -123,7 +123,7 @@ namespace Pomodoro
             top_bracket.focusable = false;
             top_bracket.set_parent (this);
 
-            var bottom_bracket = new Pomodoro.Gizmo (
+            var bottom_bracket = new Ft.Gizmo (
                     ConditionGroupWidget.measure_bracket_child_cb,
                     null,
                     ConditionGroupWidget.snapshot_bottom_bracket_cb,
@@ -139,13 +139,13 @@ namespace Pomodoro
             this.populate ();
         }
 
-        private static Pomodoro.ConditionGroupWidget? from_gizmo (Pomodoro.Gizmo gizmo)
+        private static Ft.ConditionGroupWidget? from_gizmo (Ft.Gizmo gizmo)
         {
             Gtk.Widget? widget = gizmo;
 
             while (widget != null)
             {
-                var group = widget as Pomodoro.ConditionGroupWidget;
+                var group = widget as Ft.ConditionGroupWidget;
 
                 if (group != null) {
                     return group;
@@ -157,7 +157,7 @@ namespace Pomodoro
             return null;
         }
 
-        private static void measure_bracket_child_cb (Pomodoro.Gizmo  gizmo,
+        private static void measure_bracket_child_cb (Ft.Gizmo        gizmo,
                                                       Gtk.Orientation orientation,
                                                       int             for_size,
                                                       out int         minimum,
@@ -184,8 +184,8 @@ namespace Pomodoro
             }
         }
 
-        private static void snapshot_top_bracket_cb (Pomodoro.Gizmo gizmo,
-                                                     Gtk.Snapshot   snapshot)
+        private static void snapshot_top_bracket_cb (Ft.Gizmo     gizmo,
+                                                     Gtk.Snapshot snapshot)
         {
             var self = ConditionGroupWidget.from_gizmo (gizmo);
 
@@ -194,8 +194,8 @@ namespace Pomodoro
             }
         }
 
-        private static void snapshot_bottom_bracket_cb (Pomodoro.Gizmo gizmo,
-                                                        Gtk.Snapshot   snapshot)
+        private static void snapshot_bottom_bracket_cb (Ft.Gizmo     gizmo,
+                                                        Gtk.Snapshot snapshot)
         {
             var self = ConditionGroupWidget.from_gizmo (gizmo);
 
@@ -204,33 +204,33 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.ExpressionWidget create_condition (Pomodoro.Expression? expression = null)
+        private Ft.ExpressionWidget create_condition (Ft.Expression? expression = null)
         {
-            var child = new Pomodoro.ConditionWidget ();
+            var child = new Ft.ConditionWidget ();
             child.removable = true;
             child.expression = expression;
             child.notify["expression"].connect (this.on_argument_notify_expression);
             child.request_remove.connect (this.on_argument_request_remove);
 
-            return (Pomodoro.ExpressionWidget) child;
+            return (Ft.ExpressionWidget) child;
         }
 
-        private Pomodoro.ExpressionWidget create_condition_group (Pomodoro.Expression? expression = null)
+        private Ft.ExpressionWidget create_condition_group (Ft.Expression? expression = null)
         {
-            var child = new Pomodoro.ConditionGroupWidget ();
-            child.operator = this.operator != Pomodoro.Operator.AND
-                ? Pomodoro.Operator.AND
-                : Pomodoro.Operator.OR;
+            var child = new Ft.ConditionGroupWidget ();
+            child.operator = this.operator != Ft.Operator.AND
+                ? Ft.Operator.AND
+                : Ft.Operator.OR;
             child.removable = true;
             child.is_nested = true;
             child.request_remove.connect (this.on_argument_request_remove);
 
-            return (Pomodoro.ExpressionWidget) child;
+            return (Ft.ExpressionWidget) child;
         }
 
         private void populate ()
         {
-            var existing_arguments = new GLib.HashTable<string, Pomodoro.ExpressionWidget> (
+            var existing_arguments = new GLib.HashTable<string, Ft.ExpressionWidget> (
                     GLib.str_hash, GLib.str_equal);
 
             this.foreach_argument (
@@ -264,10 +264,10 @@ namespace Pomodoro
                     var argument_key = ensure_string (argument_expression?.to_string ());
                     var argument = existing_arguments.lookup (argument_key);
 
-                    var operation = argument_expression as Pomodoro.Operation;
+                    var operation = argument_expression as Ft.Operation;
                     var is_condition_group =
                             operation != null &&
-                            operation.operator.get_category () == Pomodoro.OperatorCategory.LOGICAL;
+                            operation.operator.get_category () == Ft.OperatorCategory.LOGICAL;
 
                     if (argument == null) {
                         argument = is_condition_group
@@ -287,13 +287,13 @@ namespace Pomodoro
             this.update_operator_label ();
         }
 
-        private void foreach_argument (GLib.Func<Pomodoro.ExpressionWidget> func)
+        private void foreach_argument (GLib.Func<Ft.ExpressionWidget> func)
         {
             var child = this.arguments_box.get_first_child ();
 
             while (child != null)
             {
-                var argument = child as Pomodoro.ExpressionWidget;
+                var argument = child as Ft.ExpressionWidget;
                 var next_sibling = child.get_next_sibling ();
 
                 if (argument != null) {
@@ -319,7 +319,7 @@ namespace Pomodoro
         private void update_remove_buttons ()
         {
             var arguments_count = 0;
-            unowned Pomodoro.ExpressionWidget? first_argument = null;
+            unowned Ft.ExpressionWidget? first_argument = null;
 
             this.foreach_argument (
                 (argument) => {
@@ -340,14 +340,14 @@ namespace Pomodoro
 
         private void update_operator_label ()
         {
-            this.operator_button.label = this.operator == Pomodoro.Operator.AND
-                ? _("AND")
-                : _("OR");
+            this.operator_button.label = this.operator == Ft.Operator.AND
+                    ? _("AND")
+                    : _("OR");
         }
 
         private void update_expression ()
         {
-            Pomodoro.Expression[] arguments = {};
+            Ft.Expression[] arguments = {};
 
             this.foreach_argument (
                 (argument) => {
@@ -360,13 +360,13 @@ namespace Pomodoro
                 });
 
             this._operation = arguments.length > 0
-                ? new Pomodoro.Operation.with_argv (this.operator, arguments)
+                ? new Ft.Operation.with_argv (this.operator, arguments)
                 : null;
 
             this.notify_property ("expression");
         }
 
-        private void measure_bracket_child (Pomodoro.Gizmo  gizmo,
+        private void measure_bracket_child (Ft.Gizmo        gizmo,
                                             Gtk.Orientation orientation,
                                             int             for_size,
                                             out int         minimum,
@@ -380,9 +380,9 @@ namespace Pomodoro
             natural_baseline = 0;
         }
 
-        private void snapshot_bracket (Pomodoro.Gizmo gizmo,
-                                       Gtk.Snapshot   snapshot,
-                                       bool           is_top)
+        private void snapshot_bracket (Ft.Gizmo     gizmo,
+                                       Gtk.Snapshot snapshot,
+                                       bool         is_top)
         {
             var width           = (float) gizmo.get_width ();
             var height          = (float) gizmo.get_height ();
@@ -410,14 +410,14 @@ namespace Pomodoro
             snapshot.append_stroke (path_builder.to_path (), stroke, color);
         }
 
-        private void snapshot_top_bracket (Pomodoro.Gizmo gizmo,
-                                           Gtk.Snapshot   snapshot)
+        private void snapshot_top_bracket (Ft.Gizmo     gizmo,
+                                           Gtk.Snapshot snapshot)
         {
             this.snapshot_bracket (gizmo, snapshot, true);
         }
 
-        private void snapshot_bottom_bracket (Pomodoro.Gizmo gizmo,
-                                              Gtk.Snapshot   snapshot)
+        private void snapshot_bottom_bracket (Ft.Gizmo     gizmo,
+                                              Gtk.Snapshot snapshot)
         {
             this.snapshot_bracket (gizmo, snapshot, false);
         }
@@ -428,7 +428,7 @@ namespace Pomodoro
             this.update_expression ();
         }
 
-        private void on_argument_request_remove (Pomodoro.ExpressionWidget argument)
+        private void on_argument_request_remove (Ft.ExpressionWidget argument)
         {
             this.arguments_box.remove ((Gtk.Widget) argument);
 
@@ -459,9 +459,9 @@ namespace Pomodoro
         [GtkCallback]
         private void on_operator_button_clicked (Gtk.Button button)
         {
-            this.operator = this.operator == Pomodoro.Operator.AND
-                ? Pomodoro.Operator.OR
-                : Pomodoro.Operator.AND;
+            this.operator = this.operator == Ft.Operator.AND
+                    ? Ft.Operator.OR
+                    : Ft.Operator.AND;
         }
 
         [GtkCallback]
@@ -632,7 +632,7 @@ namespace Pomodoro
             }
 
             // HACK: Without this children do not get disposed properly
-            this.dispose_template (typeof (Pomodoro.ConditionGroupWidget));
+            this.dispose_template (typeof (Ft.ConditionGroupWidget));
 
             base.dispose ();
         }

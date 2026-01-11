@@ -5,7 +5,7 @@
  */
 
 
-namespace Pomodoro
+namespace Ft
 {
     private inline Gtk.StackPage? get_stack_page_by_name (Gtk.Stack stack,
                                                           string name)
@@ -67,8 +67,8 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Image skip_image;
 
-        private Pomodoro.SessionManager?      session_manager;
-        private Pomodoro.Timer?               timer;
+        private Ft.SessionManager?            session_manager;
+        private Ft.Timer?                     timer;
         private ulong                         timer_state_changed_id = 0;
         private ulong                         session_manager_notify_current_session_id = 0;
         private GLib.List<Adw.TimedAnimation> animations;
@@ -81,8 +81,8 @@ namespace Pomodoro
 
         construct
         {
-            this.session_manager = Pomodoro.SessionManager.get_default ();
-            this.timer           = Pomodoro.Timer.get_default ();
+            this.session_manager = Ft.SessionManager.get_default ();
+            this.timer           = Ft.Timer.get_default ();
 
             this.update_images ();
         }
@@ -344,8 +344,8 @@ namespace Pomodoro
                     : "timer-skip-symbolic";
         }
 
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
+        private void on_timer_state_changed (Ft.TimerState current_state,
+                                             Ft.TimerState previous_state)
         {
             this.update_buttons ();
         }

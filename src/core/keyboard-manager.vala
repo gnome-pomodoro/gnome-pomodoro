@@ -9,9 +9,9 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
-    public interface GlobalShortcutsProvider : Pomodoro.Provider
+    public interface GlobalShortcutsProvider : Ft.Provider
     {
         public abstract void add_shortcut (string name,
                                            string description,
@@ -64,19 +64,18 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.ProviderSet<Pomodoro.GlobalShortcutsProvider> providers;
-        private unowned Pomodoro.GlobalShortcutsProvider?              provider = null;
-
-        private GLib.HashTable<string, Shortcut>        shortcuts = null;
-        private bool                                    inhibited = false;
-        private bool                                    _global_shortcuts_supported = false;
+        private Ft.ProviderSet<Ft.GlobalShortcutsProvider> providers;
+        private unowned Ft.GlobalShortcutsProvider?        provider = null;
+        private GLib.HashTable<string, Shortcut>           shortcuts = null;
+        private bool                                       inhibited = false;
+        private bool                                       _global_shortcuts_supported = false;
 
         construct
         {
             this.shortcuts = new GLib.HashTable<string, Shortcut> (GLib.str_hash, GLib.str_equal);
 
-            this.providers = new Pomodoro.ProviderSet<Pomodoro.GlobalShortcutsProvider> (
-                    Pomodoro.SelectionMode.SINGLE);
+            this.providers = new Ft.ProviderSet<Ft.GlobalShortcutsProvider> (
+                    Ft.SelectionMode.SINGLE);
             this.providers.provider_selected.connect (this.on_provider_selected);
             this.providers.provider_unselected.connect (this.on_provider_unselected);
             this.providers.provider_enabled.connect (this.on_provider_enabled);
@@ -98,7 +97,7 @@ namespace Pomodoro
         private void on_provider_notify_available (GLib.Object object,
                                                    GLib.ParamSpec pspec)
         {
-            var provider = (Pomodoro.GlobalShortcutsProvider) object;
+            var provider = (Ft.GlobalShortcutsProvider) object;
 
             if (!this._global_shortcuts_supported && provider.available) {
                 this._global_shortcuts_supported = true;
@@ -118,7 +117,7 @@ namespace Pomodoro
             this.shortcut_changed (shortcut_name);
         }
 
-        private void on_provider_selected (Pomodoro.GlobalShortcutsProvider provider)
+        private void on_provider_selected (Ft.GlobalShortcutsProvider provider)
         {
             provider.notify["available"].connect (this.on_provider_notify_available);
             provider.shortcut_activated.connect (this.on_shortcut_activated);
@@ -130,7 +129,7 @@ namespace Pomodoro
             }
         }
 
-        private void on_provider_unselected (Pomodoro.GlobalShortcutsProvider provider)
+        private void on_provider_unselected (Ft.GlobalShortcutsProvider provider)
         {
             provider.notify["available"].disconnect (this.on_provider_notify_available);
             provider.shortcut_activated.disconnect (this.on_shortcut_activated);
@@ -142,7 +141,7 @@ namespace Pomodoro
             }
         }
 
-        private void on_provider_enabled (Pomodoro.GlobalShortcutsProvider provider)
+        private void on_provider_enabled (Ft.GlobalShortcutsProvider provider)
         {
             this.provider = provider;
 
@@ -151,7 +150,7 @@ namespace Pomodoro
             }
         }
 
-        private void on_provider_disabled (Pomodoro.GlobalShortcutsProvider provider)
+        private void on_provider_disabled (Ft.GlobalShortcutsProvider provider)
         {
             if (this.provider == provider) {
                 this.provider = null;

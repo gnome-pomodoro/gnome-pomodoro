@@ -6,7 +6,7 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public abstract class ProvidedObject<T> : GLib.Object
     {
@@ -45,7 +45,7 @@ namespace Pomodoro
                 return (T) this._provider;
             }
             private set {
-                var provider = value as Pomodoro.Provider;
+                var provider = value as Ft.Provider;
 
                 if (this._provider != provider)
                 {
@@ -58,20 +58,20 @@ namespace Pomodoro
             }
         }
 
-        protected Pomodoro.ProviderSet<T> providers = null;
+        protected Ft.ProviderSet<T> providers = null;
 
-        private Pomodoro.Provider       _provider = null;
-        private bool                    _available = false;
-        private bool                    _enabled = false;
-        private ulong                   provider_selected_id = 0;
-        private ulong                   provider_unselected_id = 0;
-        private ulong                   provider_enabled_id = 0;
-        private ulong                   provider_disabled_id = 0;
+        private Ft.Provider _provider = null;
+        private bool        _available = false;
+        private bool        _enabled = false;
+        private ulong       provider_selected_id = 0;
+        private ulong       provider_unselected_id = 0;
+        private ulong       provider_enabled_id = 0;
+        private ulong       provider_disabled_id = 0;
 
 
         construct
         {
-            this.providers              = new Pomodoro.ProviderSet<Pomodoro.Provider> (Pomodoro.SelectionMode.SINGLE);
+            this.providers              = new Ft.ProviderSet<Ft.Provider> (Ft.SelectionMode.SINGLE);
             this.provider_selected_id   = this.providers.provider_selected.connect (this.on_provider_selected);
             this.provider_unselected_id = this.providers.provider_unselected.connect (this.on_provider_unselected);
             this.provider_enabled_id    = this.providers.provider_enabled.connect (this.on_provider_enabled);
@@ -87,7 +87,7 @@ namespace Pomodoro
                                                    GLib.ParamSpec pspec)
 
         {
-            var provider = (Pomodoro.Provider) object;
+            var provider = (Ft.Provider) object;
 
             if (this._provider == provider) {
                 this.available = provider.available;
@@ -96,7 +96,7 @@ namespace Pomodoro
 
         private void on_provider_selected (T provider)
         {
-            var _provider = (Pomodoro.Provider) provider;
+            var _provider = (Ft.Provider) provider;
             _provider.notify["available"].connect (this.on_provider_notify_available);
 
             this.provider = _provider;
@@ -104,7 +104,7 @@ namespace Pomodoro
 
         private void on_provider_unselected (T provider)
         {
-            var _provider = (Pomodoro.Provider) provider;
+            var _provider = (Ft.Provider) provider;
             _provider.notify["available"].disconnect (this.on_provider_notify_available);
 
             if (this._provider == _provider) {

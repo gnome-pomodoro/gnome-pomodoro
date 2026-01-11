@@ -21,7 +21,7 @@
       </item>
     </section>
   </menu>
-  <template class="PomodoroCompactTimerView" parent="AdwBin">
+  <template class="FtCompactTimerView" parent="AdwBin">
     <property name="width-request">300</property>
     <child>
       <object class="GtkGrid">
@@ -42,12 +42,12 @@
                 <property name="menu-model">state_menu</property>
                 <style>
                   <class name="title-3"/>
-                  <class name="pomodoro-state-menu"/>
+                  <class name="ft-state-menu"/>
                 </style>
               </object>
             </child>
             <child>
-              <object class="PomodoroTimerLabel" id="timer_label">
+              <object class="FtTimerLabel" id="timer_label">
                 <property name="can-focus">false</property>
                 <property name="halign">end</property>
                 <property name="valign">center</property>
@@ -64,7 +64,7 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroTimerProgressBar">
+          <object class="FtTimerProgressBar">
             <property name="line-width">5</property>
             <property name="hexpand">true</property>
             <layout>
@@ -77,7 +77,7 @@
           <object class="GtkBox">
             <property name="hexpand">true</property>
             <child type="center">
-              <object class="PomodoroTimerControlButtons">
+              <object class="FtTimerControlButtons">
                 <property name="halign">center</property>
                 <property name="hexpand">true</property>
                 <property name="spacing">5</property>

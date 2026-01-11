@@ -6,7 +6,7 @@
 
 namespace Freedesktop
 {
-    public class NotificationsProvider : Pomodoro.Provider, Pomodoro.NotificationsProvider
+    public class NotificationsProvider : Ft.Provider, Ft.NotificationsProvider
     {
         public string name {
             get {

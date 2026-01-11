@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * Class responsible for time-tracking and collecting stats
@@ -17,7 +17,7 @@ namespace Pomodoro
     [SingleInstance]
     public sealed class StatsManager : GLib.Object
     {
-        public const int64 MIDNIGHT_OFFSET = 4 * Pomodoro.Interval.HOUR;  // 4 AM
+        public const int64 MIDNIGHT_OFFSET = 4 * Ft.Interval.HOUR;  // 4 AM
 
         private struct Segment
         {
@@ -27,7 +27,7 @@ namespace Pomodoro
 
             public inline bool is_valid ()
             {
-                return Pomodoro.Timestamp.is_defined (this.timestamp) &&
+                return Ft.Timestamp.is_defined (this.timestamp) &&
                        this.datetime != null &&
                        this.duration > 0;
             }
@@ -51,7 +51,7 @@ namespace Pomodoro
             }
         }
 
-        public unowned Pomodoro.SessionManager session_manager {
+        public unowned Ft.SessionManager session_manager {
             get {
                 return this._session_manager;
             }
@@ -62,23 +62,23 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.SessionManager?   _session_manager = null;
-        private Pomodoro.TimezoneHistory?  timezone_history = null;
-        private Pomodoro.AsyncQueue<Item?> queue = null;
-        private bool                       is_processing = false;
-        private Callback[]                 flush_callbacks;
+        private Ft.SessionManager?      _session_manager = null;
+        private Ft.TimezoneHistory?     timezone_history = null;
+        private Ft.AsyncQueue<Item?>    queue = null;
+        private bool                    is_processing = false;
+        private Callback[]              flush_callbacks;
 
         construct
         {
-            this.timezone_history = new Pomodoro.TimezoneHistory ();
-            this.queue            = new Pomodoro.AsyncQueue<Item?> ();
+            this.timezone_history = new Ft.TimezoneHistory ();
+            this.queue            = new Ft.AsyncQueue<Item?> ();
             this.flush_callbacks  = {};
         }
 
         public StatsManager ()
         {
             GLib.Object (
-                session_manager: Pomodoro.SessionManager.get_default ()
+                session_manager: Ft.SessionManager.get_default ()
             );
         }
 
@@ -90,7 +90,7 @@ namespace Pomodoro
                 GLib.warning ("Did not find timezone for timestamp %s", timestamp.to_string ());
             }
 
-            return Pomodoro.Timestamp.to_datetime (timestamp, timezone);
+            return Ft.Timestamp.to_datetime (timestamp, timezone);
         }
 
         private void transform_datetime (GLib.DateTime datetime,
@@ -102,28 +102,28 @@ namespace Pomodoro
                           (GLib.DateMonth) datetime.get_month (),
                           (GLib.DateYear) datetime.get_year ());
 
-            offset = datetime.get_hour () * Pomodoro.Interval.HOUR +
-                     datetime.get_minute () * Pomodoro.Interval.MINUTE +
-                     datetime.get_second () * Pomodoro.Interval.SECOND +
+            offset = datetime.get_hour () * Ft.Interval.HOUR +
+                     datetime.get_minute () * Ft.Interval.MINUTE +
+                     datetime.get_second () * Ft.Interval.SECOND +
                      datetime.get_microsecond ();
 
             // Adjust for virtual midnight
             if (offset < MIDNIGHT_OFFSET) {
                 date.subtract_days (1U);
-                offset += 24 * Pomodoro.Interval.HOUR;
+                offset += 24 * Ft.Interval.HOUR;
             }
         }
 
-        private string? transform_state (Pomodoro.State state)
+        private string? transform_state (Ft.State state)
         {
             switch (state)
             {
-                case Pomodoro.State.POMODORO:
+                case Ft.State.POMODORO:
                     return "pomodoro";
 
-                case Pomodoro.State.BREAK:
-                case Pomodoro.State.SHORT_BREAK:
-                case Pomodoro.State.LONG_BREAK:
+                case Ft.State.BREAK:
+                case Ft.State.SHORT_BREAK:
+                case Ft.State.LONG_BREAK:
                     return "break";
 
                 default:
@@ -140,7 +140,7 @@ namespace Pomodoro
         {
             Segment[] segments = {};
 
-            if (Pomodoro.Timestamp.is_undefined (timestamp) || duration <= 0) {
+            if (Ft.Timestamp.is_undefined (timestamp) || duration <= 0) {
                 return segments;
             }
 
@@ -170,11 +170,11 @@ namespace Pomodoro
                             0,
                             0);
                     midnight = midnight.add_seconds (
-                            Pomodoro.Timestamp.to_seconds (MIDNIGHT_OFFSET));
+                            Ft.Timestamp.to_seconds (MIDNIGHT_OFFSET));
 
                     while (true)
                     {
-                        var midnight_timestamp = Pomodoro.Timestamp.from_datetime (midnight);
+                        var midnight_timestamp = Ft.Timestamp.from_datetime (midnight);
 
                         if (midnight_timestamp > end_time) {
                             break;
@@ -213,9 +213,9 @@ namespace Pomodoro
          * It's intended for testing `StatsManager` alone. If a `SessionManager` is used,
          * the session manager is responsible for saving time-block/gap entries.
          */
-        private void try_save_time_block (Pomodoro.TimeBlock time_block)
+        private void try_save_time_block (Ft.TimeBlock time_block)
         {
-            if (!Pomodoro.is_test () || time_block.session == null) {
+            if (!Ft.is_test () || time_block.session == null) {
                 return;
             }
 
@@ -261,7 +261,7 @@ namespace Pomodoro
             category_value.set_string (category);
 
             var category_filter = new Gom.Filter.eq (
-                    typeof (Pomodoro.StatsEntry),
+                    typeof (Ft.StatsEntry),
                     "category",
                     category_value);
 
@@ -271,7 +271,7 @@ namespace Pomodoro
                 source_id_value.set_int64 (source_id);
 
                 var source_id_filter = new Gom.Filter.eq (
-                        typeof (Pomodoro.StatsEntry),
+                        typeof (Ft.StatsEntry),
                         "source-id",
                         source_id_value);
 
@@ -282,14 +282,14 @@ namespace Pomodoro
                 time_value.set_int64 (timestamp);
 
                 var time_filter = new Gom.Filter.eq (
-                        typeof (Pomodoro.StatsEntry),
+                        typeof (Ft.StatsEntry),
                         "time",
                         time_value);
 
                 filter = new Gom.Filter.and (category_filter, time_filter);
             }
 
-            return yield repository.find_async (typeof (Pomodoro.StatsEntry), filter);
+            return yield repository.find_async (typeof (Ft.StatsEntry), filter);
         }
 
         private async void process_item (Item item) throws GLib.Error
@@ -298,7 +298,7 @@ namespace Pomodoro
             var source_id = item.source_id;
             var segments  = item.segments;
 
-            var repository = Pomodoro.Database.get_repository ();
+            var repository = Ft.Database.get_repository ();
 
             var entries = yield this.fetch_entries (repository,
                                                     category,
@@ -309,18 +309,18 @@ namespace Pomodoro
             var to_save = (Gom.ResourceGroup) GLib.Object.@new (
                     typeof (Gom.ResourceGroup),
                     repository: repository,
-                    resource_type: typeof (Pomodoro.StatsEntry),
+                    resource_type: typeof (Ft.StatsEntry),
                     is_writable: true);
             var to_save_count = 0;
             var to_delete = (Gom.ResourceGroup) GLib.Object.@new (
                     typeof (Gom.ResourceGroup),
                     repository: repository,
-                    resource_type: typeof (Pomodoro.StatsEntry),
+                    resource_type: typeof (Ft.StatsEntry),
                     is_writable: true);
             var to_delete_count = 0;
 
-            Pomodoro.StatsEntry[] saved_entries = {};
-            Pomodoro.StatsEntry[] deleted_entries = {};
+            Ft.StatsEntry[] saved_entries = {};
+            Ft.StatsEntry[] deleted_entries = {};
 
             if (entries.count > 0) {
                 yield entries.fetch_async (0U, entries.count);
@@ -328,9 +328,9 @@ namespace Pomodoro
 
             foreach (var segment in segments)
             {
-                Pomodoro.StatsEntry entry;
-                GLib.Date           date;
-                int64               offset;
+                Ft.StatsEntry entry;
+                GLib.Date     date;
+                int64         offset;
 
                 if (!segment.is_valid ()) {
                     continue;
@@ -338,7 +338,7 @@ namespace Pomodoro
 
                 if (entry_index < entries.count)
                 {
-                    entry = (Pomodoro.StatsEntry?) entries.get_index (entry_index);
+                    entry = (Ft.StatsEntry?) entries.get_index (entry_index);
                     entry_index++;
 
                     if (entry.time == segment.timestamp &&
@@ -352,7 +352,7 @@ namespace Pomodoro
                     // TODO: test if editing entries work OK
                 }
                 else {
-                    entry = new Pomodoro.StatsEntry ();
+                    entry = new Ft.StatsEntry ();
                     entry.repository = repository;
                 }
 
@@ -360,7 +360,7 @@ namespace Pomodoro
 
                 entry.category = category;
                 entry.time = segment.timestamp;
-                entry.date = Pomodoro.Database.serialize_date (date);
+                entry.date = Ft.Database.serialize_date (date);
                 entry.offset = offset;
                 entry.duration = segment.duration;
                 entry.source_id = source_id;
@@ -375,7 +375,7 @@ namespace Pomodoro
 
             while (entry_index < entries.count)
             {
-                var entry = (Pomodoro.StatsEntry?) entries.get_index (entry_index);
+                var entry = (Ft.StatsEntry?) entries.get_index (entry_index);
                 entry_index++;
                 assert (entry != null);
 
@@ -450,7 +450,7 @@ namespace Pomodoro
                            int64  duration,
                            int64  source_id = 0)
         {
-            if (Pomodoro.Timestamp.is_undefined (timestamp) || duration <= 0) {
+            if (Ft.Timestamp.is_undefined (timestamp) || duration <= 0) {
                 return;
             }
 
@@ -519,7 +519,7 @@ namespace Pomodoro
             return result;
         }
 
-        public void track_time_block (Pomodoro.TimeBlock time_block)
+        public void track_time_block (Ft.TimeBlock time_block)
         {
             this.try_save_time_block (time_block);
 
@@ -528,7 +528,7 @@ namespace Pomodoro
             var         category         = this.transform_state (time_block.state);
             Segment[]   segments         = {};
 
-            if (time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED)
+            if (time_block.get_status () == Ft.TimeBlockStatus.SCHEDULED)
             {
                 // Assume that we do not change status back to SCHEDULED.
                 // Otherwise, we should delete stats entries.
@@ -562,9 +562,9 @@ namespace Pomodoro
                     timestamp = gap.end_time;
                 });
 
-            if (Pomodoro.Timestamp.is_defined (time_block.end_time) &&
+            if (Ft.Timestamp.is_defined (time_block.end_time) &&
                 time_block.end_time > timestamp &&
-                time_block.get_status () != Pomodoro.TimeBlockStatus.IN_PROGRESS)
+                time_block.get_status () != Ft.TimeBlockStatus.IN_PROGRESS)
             {
                 segments += Segment () {
                     timestamp = timestamp,
@@ -580,7 +580,7 @@ namespace Pomodoro
             this.track_internal (category, time_block_entry.id, segments);
         }
 
-        public void track_gap (Pomodoro.Gap gap)
+        public void track_gap (Ft.Gap gap)
         {
             this.try_save_time_block (gap.time_block);
 
@@ -591,13 +591,13 @@ namespace Pomodoro
                 return;
             }
 
-            if (Pomodoro.Timestamp.is_undefined (gap.end_time) ||
-                gap.time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED)
+            if (Ft.Timestamp.is_undefined (gap.end_time) ||
+                gap.time_block.get_status () == Ft.TimeBlockStatus.SCHEDULED)
             {
                 return;
             }
 
-            if (gap.has_flag (Pomodoro.GapFlags.INTERRUPTION))
+            if (gap.has_flag (Ft.GapFlags.INTERRUPTION))
             {
                 this.track ("interruption",
                             gap.start_time,
@@ -620,14 +620,14 @@ namespace Pomodoro
         {
             var timezone = this.timezone_history.search_by_date (
                     date,
-                    Pomodoro.StatsManager.MIDNIGHT_OFFSET);
+                    Ft.StatsManager.MIDNIGHT_OFFSET);
 
             if (timezone == null) {
                 timezone = new GLib.TimeZone.local ();
             }
 
             var midnight_hour = (int) (
-                    Pomodoro.StatsManager.MIDNIGHT_OFFSET / Pomodoro.Interval.HOUR);
+                    Ft.StatsManager.MIDNIGHT_OFFSET / Ft.Interval.HOUR);
             var midnight = new GLib.DateTime (
                     timezone,
                     date.get_year (),
@@ -645,7 +645,7 @@ namespace Pomodoro
          */
         public GLib.Date get_today ()
         {
-            var datetime = this.transform_timestamp (Pomodoro.Timestamp.from_now ());
+            var datetime = this.transform_timestamp (Ft.Timestamp.from_now ());
             var today    = GLib.Date ();
 
             this.transform_datetime (datetime, out today, null);
@@ -653,21 +653,21 @@ namespace Pomodoro
             return today;
         }
 
-        private void on_time_block_saved (Pomodoro.TimeBlock      time_block,
-                                          Pomodoro.TimeBlockEntry time_block_entry)
+        private void on_time_block_saved (Ft.TimeBlock      time_block,
+                                          Ft.TimeBlockEntry time_block_entry)
         {
             this.track_time_block (time_block);
         }
 
-        private void on_gap_saved (Pomodoro.Gap      gap,
-                                   Pomodoro.GapEntry gap_entry)
+        private void on_gap_saved (Ft.Gap      gap,
+                                   Ft.GapEntry gap_entry)
         {
             this.track_gap (gap);
         }
 
-        public signal void entry_saved (Pomodoro.StatsEntry entry);
+        public signal void entry_saved (Ft.StatsEntry entry);
 
-        public signal void entry_deleted (Pomodoro.StatsEntry entry);
+        public signal void entry_deleted (Ft.StatsEntry entry);
 
         public override void dispose ()
         {

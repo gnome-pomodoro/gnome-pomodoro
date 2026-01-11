@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public enum Timeframe
     {
@@ -15,7 +15,7 @@ namespace Pomodoro
         WEEK,
         MONTH;
 
-        public static Pomodoro.Timeframe from_string (string? timeframe)
+        public static Ft.Timeframe from_string (string? timeframe)
         {
             switch (timeframe)
             {
@@ -83,7 +83,7 @@ namespace Pomodoro
                     break;
 
                 case WEEK:
-                    var first_day_of_week = Pomodoro.Locale.get_first_day_of_week ();
+                    var first_day_of_week = Ft.Locale.get_first_day_of_week ();
                     var offset = (int) date.get_weekday () - (int) first_day_of_week;
 
                     if (offset < 0) {
@@ -116,7 +116,7 @@ namespace Pomodoro
     public class StatsViewModel : GLib.Object
     {
         [CCode (notify = false)]
-        public Pomodoro.Timeframe timeframe {
+        public Ft.Timeframe timeframe {
             get {
                 return this._timeframe;
             }
@@ -182,23 +182,23 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.Timeframe     _timeframe = Pomodoro.Timeframe.DAY;
-        private GLib.Date              _date;
-        private GLib.Date              _min_date;
-        private GLib.Date              _max_date;
-        private GLib.Date              user_selected_date;
-        private Gom.Repository?        repository = null;
-        private Pomodoro.StatsManager? stats_manager = null;
-        private Pomodoro.SleepMonitor? sleep_monitor = null;
-        private GLib.Cancellable?      navigation_cancellable = null;
-        private ulong                  woke_up_id = 0;
-        private ulong                  entry_saved_id = 0;
+        private Ft.Timeframe        _timeframe = Ft.Timeframe.DAY;
+        private GLib.Date           _date;
+        private GLib.Date           _min_date;
+        private GLib.Date           _max_date;
+        private GLib.Date           user_selected_date;
+        private Gom.Repository?     repository = null;
+        private Ft.StatsManager?    stats_manager = null;
+        private Ft.SleepMonitor?    sleep_monitor = null;
+        private GLib.Cancellable?   navigation_cancellable = null;
+        private ulong               woke_up_id = 0;
+        private ulong               entry_saved_id = 0;
 
         construct
         {
-            this.repository      = Pomodoro.Database.get_repository ();
-            this.stats_manager   = new Pomodoro.StatsManager ();
-            this.sleep_monitor   = new Pomodoro.SleepMonitor ();
+            this.repository      = Ft.Database.get_repository ();
+            this.stats_manager   = new Ft.StatsManager ();
+            this.sleep_monitor   = new Ft.SleepMonitor ();
 
             var today = this.stats_manager.get_today ();
 
@@ -230,11 +230,11 @@ namespace Pomodoro
 
             switch (this._timeframe)
             {
-                case Pomodoro.Timeframe.DAY:
+                case Ft.Timeframe.DAY:
                     is_valid = this.user_selected_date.compare (this._date) == 0;
                     break;
 
-                case Pomodoro.Timeframe.WEEK:
+                case Ft.Timeframe.WEEK:
                     var week_start = this._date.copy ();
                     var week_end = this._date.copy ();
                     week_end.add_days (6U);
@@ -243,7 +243,7 @@ namespace Pomodoro
                                this.user_selected_date.compare (week_end) <= 0;
                     break;
 
-                case Pomodoro.Timeframe.MONTH:
+                case Ft.Timeframe.MONTH:
                     is_valid = this.user_selected_date.get_month () == this._date.get_month () &&
                                this.user_selected_date.get_year () == this._date.get_year ();
                     break;
@@ -263,13 +263,13 @@ namespace Pomodoro
             this.date = this._timeframe.normalize_date (date);
         }
 
-        public void select_timeframe (Pomodoro.Timeframe timeframe)
+        public void select_timeframe (Ft.Timeframe timeframe)
         {
             this.timeframe = timeframe;
         }
 
         public void select (GLib.Date          date,
-                            Pomodoro.Timeframe timeframe)
+                            Ft.Timeframe timeframe)
         {
             this.user_selected_date = date.copy ();
 
@@ -317,11 +317,11 @@ namespace Pomodoro
             }
 
             var sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
-            sorting.add (typeof (Pomodoro.AggregatedStatsEntry), "date", Gom.SortingMode.ASCENDING);
+            sorting.add (typeof (Ft.AggregatedStatsEntry), "date", Gom.SortingMode.ASCENDING);
 
             try {
                 var results = yield this.repository.find_sorted_async (
-                        typeof (Pomodoro.AggregatedStatsEntry),
+                        typeof (Ft.AggregatedStatsEntry),
                         null,
                         sorting);
 
@@ -329,10 +329,10 @@ namespace Pomodoro
                 {
                     yield results.fetch_async (0U, 1U);
 
-                    var entry = (Pomodoro.AggregatedStatsEntry?) results.get_index (0);
+                    var entry = (Ft.AggregatedStatsEntry?) results.get_index (0);
 
                     if (entry != null && entry.date != null) {
-                        return Pomodoro.Database.parse_date (entry.date);
+                        return Ft.Database.parse_date (entry.date);
                     }
                 }
             }
@@ -352,11 +352,11 @@ namespace Pomodoro
             }
 
             var sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
-            sorting.add (typeof (Pomodoro.AggregatedStatsEntry), "date", Gom.SortingMode.ASCENDING);
+            sorting.add (typeof (Ft.AggregatedStatsEntry), "date", Gom.SortingMode.ASCENDING);
 
             try {
                 var results = this.repository.find_sorted_sync (
-                        typeof (Pomodoro.AggregatedStatsEntry),
+                        typeof (Ft.AggregatedStatsEntry),
                         null,
                         sorting);
 
@@ -364,10 +364,10 @@ namespace Pomodoro
                 {
                     results.fetch_sync (0U, 1U);
 
-                    var entry = (Pomodoro.AggregatedStatsEntry?) results.get_index (0);
+                    var entry = (Ft.AggregatedStatsEntry?) results.get_index (0);
 
                     if (entry != null && entry.date != null) {
-                        return Pomodoro.Database.parse_date (entry.date);
+                        return Ft.Database.parse_date (entry.date);
                     }
                 }
             }
@@ -386,35 +386,35 @@ namespace Pomodoro
             }
 
             var date_value = GLib.Value (typeof (string));
-            date_value.set_string (Pomodoro.Database.serialize_date (date));
+            date_value.set_string (Ft.Database.serialize_date (date));
 
             var category_value = GLib.Value (typeof (string));
             category_value.set_string ("pomodoro");
 
             var duration_value = GLib.Value (typeof (int64));
-            duration_value.set_int64 (Pomodoro.Interval.MINUTE);
+            duration_value.set_int64 (Ft.Interval.MINUTE);
 
             Gom.Filter date_filter;
             var sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
 
             if (direction == NavigationDirection.FORWARD) {
                 date_filter = new Gom.Filter.gte (
-                        typeof (Pomodoro.AggregatedStatsEntry), "date", date_value);
+                        typeof (Ft.AggregatedStatsEntry), "date", date_value);
                 sorting.add (
-                        typeof (Pomodoro.AggregatedStatsEntry), "date", Gom.SortingMode.ASCENDING);
+                        typeof (Ft.AggregatedStatsEntry), "date", Gom.SortingMode.ASCENDING);
             }
             else {
                 date_filter = new Gom.Filter.lte (
-                        typeof (Pomodoro.AggregatedStatsEntry), "date", date_value);
+                        typeof (Ft.AggregatedStatsEntry), "date", date_value);
                 sorting.add (
-                        typeof (Pomodoro.AggregatedStatsEntry), "date", Gom.SortingMode.DESCENDING);
+                        typeof (Ft.AggregatedStatsEntry), "date", Gom.SortingMode.DESCENDING);
             }
 
             var category_filter = new Gom.Filter.eq (
-                    typeof (Pomodoro.AggregatedStatsEntry), "category", category_value);
+                    typeof (Ft.AggregatedStatsEntry), "category", category_value);
 
             var duration_filter = new Gom.Filter.gte (
-                    typeof (Pomodoro.AggregatedStatsEntry), "duration", duration_value);
+                    typeof (Ft.AggregatedStatsEntry), "duration", duration_value);
 
             var filter = new Gom.Filter.and (
                     new Gom.Filter.and (date_filter, category_filter),
@@ -422,7 +422,7 @@ namespace Pomodoro
 
             try {
                 var results = yield this.repository.find_sorted_async (
-                        typeof (Pomodoro.AggregatedStatsEntry),
+                        typeof (Ft.AggregatedStatsEntry),
                         filter,
                         sorting);
 
@@ -434,10 +434,10 @@ namespace Pomodoro
 
                 yield results.fetch_async (0U, 1U);
 
-                var entry = (Pomodoro.AggregatedStatsEntry?) results.get_index (0);
+                var entry = (Ft.AggregatedStatsEntry?) results.get_index (0);
 
                 return entry != null
-                        ? Pomodoro.Database.parse_date (entry.date)
+                        ? Ft.Database.parse_date (entry.date)
                         : date;
             }
             catch (GLib.Error error)
@@ -459,15 +459,15 @@ namespace Pomodoro
             {
                 switch (timeframe)
                 {
-                    case Pomodoro.Timeframe.DAY:
+                    case Ft.Timeframe.DAY:
                         date.add_days (1);
                         break;
 
-                    case Pomodoro.Timeframe.WEEK:
+                    case Ft.Timeframe.WEEK:
                         date.add_days (7);
                         break;
 
-                    case Pomodoro.Timeframe.MONTH:
+                    case Ft.Timeframe.MONTH:
                         date.add_months (1);
                         break;
 
@@ -490,15 +490,15 @@ namespace Pomodoro
 
             switch (this._timeframe)
             {
-                case Pomodoro.Timeframe.DAY:
+                case Ft.Timeframe.DAY:
                     skipped = (uint) (current_date.days_between (date).abs ());
                     break;
 
-                case Pomodoro.Timeframe.WEEK:
+                case Ft.Timeframe.WEEK:
                     skipped = (uint) ((current_date.days_between (date).abs ()) / 7);
                     break;
 
-                case Pomodoro.Timeframe.MONTH:
+                case Ft.Timeframe.MONTH:
                     var skipped_int =
                             ((int) date.get_year () - (int) current_date.get_year ()) * 12 +
                             ((int) date.get_month () - (int) current_date.get_month ());
@@ -540,9 +540,9 @@ namespace Pomodoro
             base.dispose ();
         }
 
-        public signal void navigated (Pomodoro.NavigationDirection direction,
-                                      GLib.Date                    date,
-                                      uint                         skipped);
+        public signal void navigated (Ft.NavigationDirection direction,
+                                      GLib.Date              date,
+                                      uint                   skipped);
     }
 
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/stats-view.ui")]
@@ -552,7 +552,7 @@ namespace Pomodoro
         private const uint TOAST_DISMISS_TIMEOUT = 2;
 
         public int64 daily_interval {
-            get; set; default = Pomodoro.Interval.HOUR;
+            get; set; default = Ft.Interval.HOUR;
         }
 
         [GtkChild]
@@ -562,24 +562,24 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Label subtitle_label;
         [GtkChild]
-        private unowned Pomodoro.StatsDatePopover date_popover;
+        private unowned Ft.StatsDatePopover date_popover;
         [GtkChild]
         private unowned Gtk.Button up_button;
         [GtkChild]
         private unowned Gtk.Stack pages;
 
-        private Pomodoro.StatsViewModel?               model = null;
-        private GLib.SimpleAction?                     previous_action = null;
-        private GLib.SimpleAction?                     next_action = null;
-        private GLib.SimpleAction?                     today_action = null;
-        private GLib.SimpleAction?                     up_action = null;
-        private GLib.SimpleAction?                     timeframe_action = null;
-        private GLib.Queue<unowned Pomodoro.StatsPage> pages_history = null;
-        private GLib.Cancellable?                      navigation_cancellable = null;
-        private Adw.Toast?                             last_toast = null;
-        private int64                                  last_user_active_time = Pomodoro.Timestamp.UNDEFINED;
-        private uint                                   update_page_idle_id = 0U;
-        private uint                                   timeout_id = 0U;
+        private Ft.StatsViewModel?                  model = null;
+        private GLib.SimpleAction?                  previous_action = null;
+        private GLib.SimpleAction?                  next_action = null;
+        private GLib.SimpleAction?                  today_action = null;
+        private GLib.SimpleAction?                  up_action = null;
+        private GLib.SimpleAction?                  timeframe_action = null;
+        private GLib.Queue<unowned Ft.StatsPage>    pages_history = null;
+        private GLib.Cancellable?                   navigation_cancellable = null;
+        private Adw.Toast?                          last_toast = null;
+        private int64                               last_user_active_time = Ft.Timestamp.UNDEFINED;
+        private uint                                update_page_idle_id = 0U;
+        private uint                                timeout_id = 0U;
 
         static construct
         {
@@ -630,8 +630,8 @@ namespace Pomodoro
 
         construct
         {
-            this.model         = new Pomodoro.StatsViewModel ();
-            this.pages_history = new GLib.Queue<unowned Pomodoro.StatsPage> ();
+            this.model         = new Ft.StatsViewModel ();
+            this.pages_history = new GLib.Queue<unowned Ft.StatsPage> ();
 
             this.initialize_action_group ();
 
@@ -706,22 +706,22 @@ namespace Pomodoro
                 });
         }
 
-        private string build_page_name (Pomodoro.Timeframe timeframe,
+        private string build_page_name (Ft.Timeframe timeframe,
                                         GLib.Date          date)
         {
             return "%s:%s".printf (timeframe.to_string (),
-                                   Pomodoro.DateUtils.format_date (date, "%d-%m-%Y"));
+                                   Ft.DateUtils.format_date (date, "%d-%m-%Y"));
         }
 
-        private Pomodoro.StatsPage? create_page (Pomodoro.Timeframe timeframe,
+        private Ft.StatsPage? create_page (Ft.Timeframe timeframe,
                                                  GLib.Date          date)
         {
-            Pomodoro.StatsPage? page;
+            Ft.StatsPage? page;
 
             switch (timeframe)
             {
-                case Pomodoro.Timeframe.DAY:
-                    page = new Pomodoro.StatsDayPage (date);
+                case Ft.Timeframe.DAY:
+                    page = new Ft.StatsDayPage (date);
                     this.bind_property (
                             "daily-interval",
                             page,
@@ -729,12 +729,12 @@ namespace Pomodoro
                             GLib.BindingFlags.SYNC_CREATE | GLib.BindingFlags.BIDIRECTIONAL);
                     break;
 
-                case Pomodoro.Timeframe.WEEK:
-                    page = new Pomodoro.StatsWeekPage (date);
+                case Ft.Timeframe.WEEK:
+                    page = new Ft.StatsWeekPage (date);
                     break;
 
-                case Pomodoro.Timeframe.MONTH:
-                    page = new Pomodoro.StatsMonthPage (date);
+                case Ft.Timeframe.MONTH:
+                    page = new Ft.StatsMonthPage (date);
                     break;
 
                 default:
@@ -746,12 +746,12 @@ namespace Pomodoro
             return page;
         }
 
-        private Pomodoro.StatsPage? get_page (string name)
+        private Ft.StatsPage? get_page (string name)
         {
-            return this.pages.get_child_by_name (name) as Pomodoro.StatsPage;
+            return this.pages.get_child_by_name (name) as Ft.StatsPage;
         }
 
-        private Pomodoro.StatsPage get_or_create_page (Pomodoro.Timeframe timeframe,
+        private Ft.StatsPage get_or_create_page (Ft.Timeframe timeframe,
                                                        GLib.Date          date)
         {
             var page_name = this.build_page_name (timeframe, date);
@@ -827,19 +827,19 @@ namespace Pomodoro
 
             switch (this.model.timeframe)
             {
-                case Pomodoro.Timeframe.DAY:
+                case Ft.Timeframe.DAY:
                     message = ngettext ("Skipped %u day",
                                         "Skipped %u days",
                                         count).printf (count);
                     break;
 
-                case Pomodoro.Timeframe.WEEK:
+                case Ft.Timeframe.WEEK:
                     message = ngettext ("Skipped %u week",
                                         "Skipped %u weeks",
                                         count).printf (count);
                     break;
 
-                case Pomodoro.Timeframe.MONTH:
+                case Ft.Timeframe.MONTH:
                     message = ngettext ("Skipped %u month",
                                         "Skipped %u months",
                                         count).printf (count);
@@ -855,7 +855,7 @@ namespace Pomodoro
             toast.timeout = TOAST_DISMISS_TIMEOUT;
             toast.dismissed.connect (() => { this.last_toast = null; });
 
-            var window = this.get_root () as Pomodoro.Window;
+            var window = this.get_root () as Ft.Window;
             if (window == null) {
                 GLib.warning ("Unable to show a toast '%s'", message);
                 return;
@@ -878,15 +878,15 @@ namespace Pomodoro
 
             switch (timeframe)
             {
-                case Pomodoro.Timeframe.DAY:
-                    timeframe = Pomodoro.Timeframe.WEEK;
+                case Ft.Timeframe.DAY:
+                    timeframe = Ft.Timeframe.WEEK;
                     break;
 
-                case Pomodoro.Timeframe.WEEK:
-                    timeframe = Pomodoro.Timeframe.MONTH;
+                case Ft.Timeframe.WEEK:
+                    timeframe = Ft.Timeframe.MONTH;
                     break;
 
-                case Pomodoro.Timeframe.MONTH:
+                case Ft.Timeframe.MONTH:
                     return;
 
                 default:
@@ -932,7 +932,7 @@ namespace Pomodoro
         private void activate_timeframe (GLib.SimpleAction action,
                                          GLib.Variant?     parameter)
         {
-            this.model.select_timeframe (Pomodoro.Timeframe.from_string (parameter.get_string ()));
+            this.model.select_timeframe (Ft.Timeframe.from_string (parameter.get_string ()));
         }
 
         private void activate_set_timeframe (GLib.SimpleAction action,
@@ -950,10 +950,10 @@ namespace Pomodoro
                 return;
             }
 
-            var date = Pomodoro.DateUtils.date_from_variant (parameter);
+            var date = Ft.DateUtils.date_from_variant (parameter);
 
             if (date.valid ()) {
-                this.model.select (date, Pomodoro.Timeframe.DAY);
+                this.model.select (date, Ft.Timeframe.DAY);
             }
         }
 
@@ -1011,16 +1011,16 @@ namespace Pomodoro
 
         private bool is_user_idle ()
         {
-            var now = Pomodoro.Timestamp.from_now ();
+            var now = Ft.Timestamp.from_now ();
 
-            return Pomodoro.Timestamp.is_defined (this.last_user_active_time)
-                    ? now - this.last_user_active_time > Pomodoro.Interval.HOUR
+            return Ft.Timestamp.is_defined (this.last_user_active_time)
+                    ? now - this.last_user_active_time > Ft.Interval.HOUR
                     : false;
         }
 
         private void mark_user_active ()
         {
-            this.last_user_active_time = Pomodoro.Timestamp.from_now ();
+            this.last_user_active_time = Ft.Timestamp.from_now ();
         }
 
         private void update_title ()
@@ -1034,31 +1034,31 @@ namespace Pomodoro
 
             switch (timeframe)
             {
-                case Pomodoro.Timeframe.DAY:
-                    subtitle = capitalize_words (Pomodoro.DateUtils.format_date (date, "%A"));
+                case Ft.Timeframe.DAY:
+                    subtitle = capitalize_words (Ft.DateUtils.format_date (date, "%A"));
 
                     if (date.compare (today) == 0) {
                         title = _("Today");
                         subtitle += capitalize_words (
-                                Pomodoro.DateUtils.format_date (date, ", %e %B").replace (" ", ""));
+                                Ft.DateUtils.format_date (date, ", %e %B").replace (" ", ""));
                     }
                     else if (date.days_between (today) == 1) {
                         title = _("Yesterday");
                         subtitle += capitalize_words (
-                                Pomodoro.DateUtils.format_date (date, ", %e %B").replace (" ", ""));
+                                Ft.DateUtils.format_date (date, ", %e %B").replace (" ", ""));
                     }
                     else if (date.get_year () == today.get_year ()) {
                         title = capitalize_words (
-                                Pomodoro.DateUtils.format_date (date, "%e %B").replace (" ", ""));
+                                Ft.DateUtils.format_date (date, "%e %B").replace (" ", ""));
                     }
                     else {
                         title = capitalize_words (
-                                Pomodoro.DateUtils.format_date (date, "%e %B %Y").replace (" ", ""));
+                                Ft.DateUtils.format_date (date, "%e %B %Y").replace (" ", ""));
                     }
 
                     break;
 
-                case Pomodoro.Timeframe.WEEK:
+                case Ft.Timeframe.WEEK:
                     var week_start_date = date.copy ();
                     var week_end_date = week_start_date.copy ();
                     week_end_date.add_days (6U);
@@ -1067,7 +1067,7 @@ namespace Pomodoro
                         title = _("This week");
                     }
                     else {
-                        var first_day_of_week = Pomodoro.Locale.get_first_day_of_week ();
+                        var first_day_of_week = Ft.Locale.get_first_day_of_week ();
                         var first_week_date = GLib.Date ();
                         first_week_date.set_dmy (1, 1, week_end_date.get_year ());
 
@@ -1100,16 +1100,16 @@ namespace Pomodoro
                     }
 
                     subtitle = capitalize_words ("%s – %s".printf (
-                        Pomodoro.DateUtils.format_date (week_start_date, week_start_format).replace (" ", ""),
-                        Pomodoro.DateUtils.format_date (week_end_date, week_end_format).replace (" ", "")));
+                        Ft.DateUtils.format_date (week_start_date, week_start_format).replace (" ", ""),
+                        Ft.DateUtils.format_date (week_end_date, week_end_format).replace (" ", "")));
                     break;
 
-                case Pomodoro.Timeframe.MONTH:
+                case Ft.Timeframe.MONTH:
                     title = capitalize_words (
-                            Pomodoro.DateUtils.get_month_name (date.get_month ()));
+                            Ft.DateUtils.get_month_name (date.get_month ()));
 
                     if (date.get_year () != today.get_year ()) {
-                        title += Pomodoro.DateUtils.format_date (date, " %Y");
+                        title += Ft.DateUtils.format_date (date, " %Y");
                     }
 
                     subtitle = "";
@@ -1134,7 +1134,7 @@ namespace Pomodoro
             this.previous_action.set_enabled (min_date.valid () && date.compare (min_date) > 0);
             this.next_action.set_enabled (max_date.valid () && date.compare (max_date) < 0);
             this.today_action.set_enabled (this.next_action.get_enabled ());
-            this.up_action.set_enabled (timeframe != Pomodoro.Timeframe.MONTH);
+            this.up_action.set_enabled (timeframe != Ft.Timeframe.MONTH);
 
             this.timeframe_action.set_state (new GLib.Variant.string (timeframe.to_string ()));
         }
@@ -1163,7 +1163,7 @@ namespace Pomodoro
 
                     return GLib.Source.REMOVE;
                 });
-            GLib.Source.set_name_by_id (this.timeout_id, "Pomodoro.StatsView.navigate_to_today");
+            GLib.Source.set_name_by_id (this.timeout_id, "Ft.StatsView.navigate_to_today");
         }
 
         private void update_placeholder ()
@@ -1179,8 +1179,8 @@ namespace Pomodoro
         }
 
         [GtkCallback]
-        private void on_timeframe_selected (Pomodoro.StatsDatePopover date_popover,
-                                            Pomodoro.Timeframe        timeframe)
+        private void on_timeframe_selected (Ft.StatsDatePopover date_popover,
+                                            Ft.Timeframe        timeframe)
         {
             this.model.select_timeframe (timeframe);
 
@@ -1188,7 +1188,7 @@ namespace Pomodoro
         }
 
         [GtkCallback]
-        private void on_date_selected (Pomodoro.StatsDatePopover date_popover,
+        private void on_date_selected (Ft.StatsDatePopover date_popover,
                                        GLib.Date                 date)
         {
             this.model.select_date (date);

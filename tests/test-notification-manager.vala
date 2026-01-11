@@ -1,6 +1,6 @@
 namespace Tests
 {
-    private class MockNotificationBackend : GLib.Object, Pomodoro.NotificationBackend
+    private class MockNotificationBackend : GLib.Object, Ft.NotificationBackend
     {
         public string[] log;
 
@@ -38,9 +38,9 @@ namespace Tests
 
     public class NotificationManagerTest : Tests.MainLoopTestSuite
     {
-        private Pomodoro.Timer timer;
-        private Pomodoro.SessionManager session_manager;
-        private Pomodoro.NotificationManager notification_manager;
+        private Ft.Timer timer;
+        private Ft.SessionManager session_manager;
+        private Ft.NotificationManager notification_manager;
 
         public NotificationManagerTest ()
         {
@@ -57,20 +57,20 @@ namespace Tests
 
         public override void setup ()
         {
-            Pomodoro.Timestamp.freeze_to (2000000000 * Pomodoro.Interval.SECOND);
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            Ft.Timestamp.freeze_to (2000000000 * Ft.Interval.SECOND);
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
 
-            this.timer = new Pomodoro.Timer ();
-            Pomodoro.Timer.set_default (this.timer);
+            this.timer = new Ft.Timer ();
+            Ft.Timer.set_default (this.timer);
 
-            this.session_manager = new Pomodoro.SessionManager.with_timer (this.timer);
-            Pomodoro.SessionManager.set_default (this.session_manager);
+            this.session_manager = new Ft.SessionManager.with_timer (this.timer);
+            Ft.SessionManager.set_default (this.session_manager);
 
-            this.notification_manager = new Pomodoro.NotificationManager.with_backend (
+            this.notification_manager = new Ft.NotificationManager.with_backend (
                     new MockNotificationBackend ());
             assert (!this.notification_manager.get_data<bool> ("teardown"));
 
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_uint ("pomodoro-duration", 1500);
             settings.set_uint ("short-break-duration", 300);
             settings.set_uint ("long-break-duration", 900);
@@ -92,8 +92,8 @@ namespace Tests
             this.session_manager = null;
             this.timer = null;
 
-            Pomodoro.SessionManager.set_default (null);
-            Pomodoro.Timer.set_default (null);
+            Ft.SessionManager.set_default (null);
+            Ft.Timer.set_default (null);
 
             base.teardown ();
         }
@@ -119,7 +119,7 @@ namespace Tests
             this.timer.start ();
 
             // Pause and resume to trigger notify_time_block_running
-            Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.advance (Ft.Interval.MINUTE);
 
             var backend = this.get_mock_backend ();
             backend.clear ();
@@ -138,7 +138,7 @@ namespace Tests
 
         public void test_time_block_about_to_end ()
         {
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_boolean ("announce-about-to-end", true);
 
             this.timer.start ();
@@ -149,14 +149,14 @@ namespace Tests
             var time_block = this.session_manager.current_time_block;
 
             // Advance time to just BEFORE about-to-end threshold
-            var timestamp_1 = time_block.end_time - 16 * Pomodoro.Interval.SECOND;
-            Pomodoro.Timestamp.freeze_to (timestamp_1);
+            var timestamp_1 = time_block.end_time - 16 * Ft.Interval.SECOND;
+            Ft.Timestamp.freeze_to (timestamp_1);
             this.timer.tick (timestamp_1);
             assert_cmpint (backend.log.length, GLib.CompareOperator.EQ, 0);
 
             // Advance time into the threshold
-            var timestamp_2 = time_block.end_time - 10 * Pomodoro.Interval.SECOND;
-            Pomodoro.Timestamp.freeze_to (timestamp_2);
+            var timestamp_2 = time_block.end_time - 10 * Ft.Interval.SECOND;
+            Ft.Timestamp.freeze_to (timestamp_2);
             this.timer.tick (timestamp_2);
             assert_cmpstrv (backend.log, {
                 @"send:timer:pomodoro:time-block-about-to-end:$(timestamp_2)"
@@ -164,24 +164,24 @@ namespace Tests
 
             // Another tick should NOT trigger another notification
             backend.clear ();
-            var timestamp_3 = time_block.end_time - 9 * Pomodoro.Interval.SECOND;
-            Pomodoro.Timestamp.freeze_to (timestamp_3);
+            var timestamp_3 = time_block.end_time - 9 * Ft.Interval.SECOND;
+            Ft.Timestamp.freeze_to (timestamp_3);
             this.timer.tick (timestamp_3);
             assert_cmpstrv (backend.log, {});
         }
 
         public void test_time_block_ended ()
         {
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_boolean ("confirm-starting-pomodoro", false);
 
-            this.session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK);
+            this.session_manager.advance_to_state (Ft.State.SHORT_BREAK);
 
             var backend = this.get_mock_backend ();
             backend.clear ();
 
             var now = this.session_manager.current_time_block.end_time;
-            Pomodoro.Timestamp.freeze_to (now);
+            Ft.Timestamp.freeze_to (now);
             this.timer.finish (now);
             assert_cmpstrv (backend.log, {
                 "send:timer:short-break:time-block-ended"
@@ -190,10 +190,10 @@ namespace Tests
 
         public void test_confirm_advancement__break ()
         {
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_boolean ("confirm-starting-break", true);
 
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
 
             var backend = this.get_mock_backend ();
             backend.clear ();
@@ -206,7 +206,7 @@ namespace Tests
                 });
 
             var now = this.session_manager.current_time_block.end_time;
-            Pomodoro.Timestamp.freeze_to (now);
+            Ft.Timestamp.freeze_to (now);
             this.timer.finish (now);
             assert_cmpint (
                 confirm_advancement_emitted,
@@ -220,10 +220,10 @@ namespace Tests
 
         public void test_confirm_advancement__pomodoro ()
         {
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_boolean ("confirm-starting-pomodoro", true);
 
-            this.session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK);
+            this.session_manager.advance_to_state (Ft.State.SHORT_BREAK);
 
             var backend = this.get_mock_backend ();
             backend.clear ();
@@ -236,7 +236,7 @@ namespace Tests
                 });
 
             var now = this.session_manager.current_time_block.end_time;
-            Pomodoro.Timestamp.freeze_to (now);
+            Ft.Timestamp.freeze_to (now);
             this.timer.finish (now);
             assert_cmpint (
                 confirm_advancement_emitted,
@@ -250,7 +250,7 @@ namespace Tests
 
         public void test_withdraw_notifications__pause ()
         {
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
 
             var backend = this.get_mock_backend ();
             backend.clear ();
@@ -263,7 +263,7 @@ namespace Tests
 
         public void test_withdraw_notifications__stop ()
         {
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
 
             var backend = this.get_mock_backend ();
             backend.clear ();
@@ -276,7 +276,7 @@ namespace Tests
 
         public void test_request_screen_overlay ()
         {
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_boolean ("screen-overlay", true);
 
             var backend = this.get_mock_backend ();
@@ -287,10 +287,10 @@ namespace Tests
                 open_requested = true;
             });
 
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
             backend.clear ();
 
-            this.session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK);
+            this.session_manager.advance_to_state (Ft.State.SHORT_BREAK);
             assert_true (open_requested);
             assert_cmpstrv (backend.log, {});
 
@@ -301,7 +301,7 @@ namespace Tests
             });
 
             // Simulate overlay closed
-            var tick_time = Pomodoro.Timestamp.advance (Pomodoro.Interval.MINUTE);
+            var tick_time = Ft.Timestamp.advance (Ft.Interval.MINUTE);
             this.timer.tick (tick_time);
             backend.clear ();
             this.notification_manager.screen_overlay_closed ();

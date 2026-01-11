@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroMonthChooser" parent="AdwBin">
+  <template class="FtMonthChooser" parent="AdwBin">
     <property name="child">
       <object class="GtkBox">
         <property name="orientation">vertical</property>

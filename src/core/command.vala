@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     private struct CommandVariable
     {
@@ -120,7 +120,7 @@ namespace Pomodoro
             return null;
         }
 
-        if (Pomodoro.is_flatpak ())
+        if (Ft.is_flatpak ())
         {
             string standard_output;
             int wait_status;
@@ -177,7 +177,7 @@ namespace Pomodoro
      *
      * It's an object because we may display it in the Log UI and updates are applied on its own.
      */
-    public class CommandExecution : GLib.Object, Pomodoro.Job
+    public class CommandExecution : GLib.Object, Ft.Job
     {
         private const GLib.SpawnFlags SPAWN_FLAGS = GLib.SpawnFlags.SEARCH_PATH |
                                                     GLib.SpawnFlags.LEAVE_DESCRIPTORS_OPEN |
@@ -278,7 +278,7 @@ namespace Pomodoro
             this.cancellable = new GLib.Cancellable ();
 
             try {
-                if (Pomodoro.is_flatpak ())
+                if (Ft.is_flatpak ())
                 {
                     string[] flatpak_spawn_args = { "flatpak-spawn", "--host" };
 
@@ -376,13 +376,13 @@ namespace Pomodoro
                         () => {
                             timeout_id = 0;
 
-                            this.error = new Pomodoro.CommandError.FAILED (_("Reached timeout"));
+                            this.error = new Ft.CommandError.FAILED (_("Reached timeout"));
 
                             this.cancellable.cancel ();
 
                             return GLib.Source.REMOVE;
                         });
-                    GLib.Source.set_name_by_id (timeout_id, "Pomodoro.CommandExecution.run");
+                    GLib.Source.set_name_by_id (timeout_id, "Ft.CommandExecution.run");
                 }
 
                 this.cancellable.cancelled.connect (
@@ -405,7 +405,7 @@ namespace Pomodoro
                 var command_line = string.joinv (" ", this.args);
                 GLib.warning ("Error while spawning command `%s`: %s", command_line, error.message);
 
-                this.error = new Pomodoro.CommandError.FAILED (_("Failed to execute command"));
+                this.error = new Ft.CommandError.FAILED (_("Failed to execute command"));
 
                 throw this.error;
             }
@@ -481,14 +481,14 @@ namespace Pomodoro
             );
         }
 
-        private void prepare_args () throws Pomodoro.CommandError
+        private void prepare_args () throws Ft.CommandError
         {
             if (this._use_subshell)
             {
                 var line = this._line.strip ();
 
                 if (line.length == 0) {
-                    throw new Pomodoro.CommandError.EMPTY_LINE (_("Command is empty"));
+                    throw new Ft.CommandError.EMPTY_LINE (_("Command is empty"));
                 }
 
                 // We don't have a way to validate the shell command, so use it as is.
@@ -503,28 +503,28 @@ namespace Pomodoro
                     this.args = { line };
 
                     if (error is GLib.ShellError.EMPTY_STRING) {
-                        throw new Pomodoro.CommandError.EMPTY_LINE (_("Command is empty"));
+                        throw new Ft.CommandError.EMPTY_LINE (_("Command is empty"));
                     }
 
                     if (error is GLib.ShellError.BAD_QUOTING) {
-                        throw new Pomodoro.CommandError.SYNTAX_ERROR (_("Unclosed quotation mark"));
+                        throw new Ft.CommandError.SYNTAX_ERROR (_("Unclosed quotation mark"));
                     }
 
                     GLib.warning ("Unexpected error while parsing command '%s': %s",
                                   this._line, error.message);
-                    throw new Pomodoro.CommandError.SYNTAX_ERROR (_("Invalid command"));
+                    throw new Ft.CommandError.SYNTAX_ERROR (_("Invalid command"));
                 }
             }
         }
 
-        private void prepare_variables () throws Pomodoro.CommandError
+        private void prepare_variables () throws Ft.CommandError
                                         requires (this.args != null)
         {
             var variables = new CommandVariable[0];
 
             for (var index = 0; index < this.args.length; index++)
             {
-                Pomodoro.CommandError? error = null;
+                Ft.CommandError? error = null;
 
                 find_variables (
                     this.args[index],
@@ -535,14 +535,14 @@ namespace Pomodoro
 
                         if (variable.name != "")
                         {
-                            if (Pomodoro.find_variable (variable.name) == null) {
-                                error = new Pomodoro.CommandError.UNKNOWN_VARIABLE (
+                            if (Ft.find_variable (variable.name) == null) {
+                                error = new Ft.CommandError.UNKNOWN_VARIABLE (
                                         _("Unknown variable \"%s\""), variable.name_raw);
                                 return;
                             }
 
-                            if (!Pomodoro.find_variable_format (variable.name, variable.format)) {
-                                error = new Pomodoro.CommandError.UNKNOWN_VARIABLE_FORMAT (
+                            if (!Ft.find_variable_format (variable.name, variable.format)) {
+                                error = new Ft.CommandError.UNKNOWN_VARIABLE_FORMAT (
                                         _("Unknown format \"%s\""), variable.format_raw);
                                 return;
                             }
@@ -560,7 +560,7 @@ namespace Pomodoro
             this.variables = variables;
         }
 
-        private string[] interpolate_args (Pomodoro.Context context)
+        private string[] interpolate_args (Ft.Context context)
                                            requires (this.args != null)
         {
             var args = this.args.copy ();
@@ -580,7 +580,7 @@ namespace Pomodoro
                             ? variable_variant.get_string ()
                             : variable_variant.print (false);
                     }
-                    catch (Pomodoro.ExpressionError error) {
+                    catch (Ft.ExpressionError error) {
                         // Error should be cough earlier, during prepare.
                     }
                 }
@@ -594,7 +594,7 @@ namespace Pomodoro
         }
 
         private void prepare_internal ()
-                                       throws Pomodoro.CommandError
+                                       throws Ft.CommandError
         {
             if (!this.prepared) {
                 this.prepare_args ();
@@ -606,7 +606,7 @@ namespace Pomodoro
             }
         }
 
-        public void validate () throws Pomodoro.CommandError
+        public void validate () throws Ft.CommandError
         {
             this.prepare_internal ();
 
@@ -616,32 +616,32 @@ namespace Pomodoro
                 var program_path = find_program_in_host_path (this.args[0]);
 
                 if (program_path == null) {
-                    throw new Pomodoro.CommandError.NOT_FOUND (_("Program \"%s\" not found"), this.args[0]);
+                    throw new Ft.CommandError.NOT_FOUND (_("Program \"%s\" not found"), this.args[0]);
                 }
             }
 
             // TODO: validate working directory
         }
 
-        public Pomodoro.CommandExecution? prepare (Pomodoro.Context context)  // TODO: make it private or remove; just execute and allow to cancel job
+        public Ft.CommandExecution? prepare (Ft.Context context)  // TODO: make it private or remove; just execute and allow to cancel job
         {
-            Pomodoro.CommandExecution? execution = null;
+            Ft.CommandExecution? execution = null;
 
             try {
                 this.prepare_internal ();
 
-                execution = new Pomodoro.CommandExecution (this.interpolate_args (context),
+                execution = new Ft.CommandExecution (this.interpolate_args (context),
                                                            this.working_directory);
 
                 if (this.pass_input) {
                     execution.input = context.to_json ();
                 }
             }
-            catch (Pomodoro.CommandError error)
+            catch (Ft.CommandError error)
             {
-                if (!(error is Pomodoro.CommandError.EMPTY_LINE))
+                if (!(error is Ft.CommandError.EMPTY_LINE))
                 {
-                    execution = new Pomodoro.CommandExecution (this.args,
+                    execution = new Ft.CommandExecution (this.args,
                                                                this.working_directory);
                     execution.error = error;
                     execution.completed = true;
@@ -651,7 +651,7 @@ namespace Pomodoro
             return execution;
         }
 
-        public Pomodoro.CommandExecution? execute (Pomodoro.Context context)
+        public Ft.CommandExecution? execute (Ft.Context context)
         {
             var execution = this.prepare (context);
 
@@ -671,7 +671,7 @@ namespace Pomodoro
             return execution;
         }
 
-        public async Pomodoro.CommandExecution? execute_async (Pomodoro.Context context)
+        public async Ft.CommandExecution? execute_async (Ft.Context context)
         {
             var execution = this.prepare (context);
 

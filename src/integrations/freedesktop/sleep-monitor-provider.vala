@@ -6,7 +6,7 @@
 
 namespace Freedesktop
 {
-    public class SleepMonitorProvider : Pomodoro.Provider, Pomodoro.SleepMonitorProvider
+    public class SleepMonitorProvider : Ft.Provider, Ft.SleepMonitorProvider
     {
         private Freedesktop.LoginManager? login_manager_proxy = null;
         private uint                      watcher_id = 0;

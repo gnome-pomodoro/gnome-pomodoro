@@ -5,7 +5,7 @@
  */
 
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/timer/timer-view.ui")]
     public class TimerView : Gtk.Widget, Gtk.Buildable
@@ -52,31 +52,31 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Box inner_box;
         [GtkChild]
-        private unowned Pomodoro.TimerProgressBar timer_progressbar;
+        private unowned Ft.TimerProgressBar timer_progressbar;
         [GtkChild]
-        private unowned Pomodoro.SessionProgressBar session_progressbar;
+        private unowned Ft.SessionProgressBar session_progressbar;
         [GtkChild]
-        private unowned Pomodoro.TimerLabel timer_label;
+        private unowned Ft.TimerLabel timer_label;
         [GtkChild]
-        private unowned Pomodoro.TimerControlButtons timer_control_buttons;
+        private unowned Ft.TimerControlButtons timer_control_buttons;
         [GtkChild]
         private unowned Gtk.GestureClick click_gesture;
         [GtkChild]
         private unowned Gtk.GestureDrag drag_gesture;
 
-        private Pomodoro.SessionManager session_manager;
-        private Pomodoro.Timer          timer;
-        private GLib.Settings?          settings = null;
-        private GLib.MenuModel?         state_menu;
-        private GLib.MenuModel?         uniform_state_menu;
-        private ulong                   timer_state_changed_id = 0;
-        private ulong                   session_expired_id = 0;
-        private ulong                   notify_current_time_block_id = 0;
-        private ulong                   notify_has_uniform_breaks_id = 0;
-        private ulong                   current_time_block_changed_id = 0;
-        private ulong                   settings_changed_id = 0;
-        private Adw.Toast?              session_expired_toast;
-        private Pomodoro.TimeBlock?     current_time_block;
+        private Ft.SessionManager   session_manager;
+        private Ft.Timer            timer;
+        private GLib.Settings?      settings = null;
+        private GLib.MenuModel?     state_menu;
+        private GLib.MenuModel?     uniform_state_menu;
+        private ulong               timer_state_changed_id = 0;
+        private ulong               session_expired_id = 0;
+        private ulong               notify_current_time_block_id = 0;
+        private ulong               notify_has_uniform_breaks_id = 0;
+        private ulong               current_time_block_changed_id = 0;
+        private ulong               settings_changed_id = 0;
+        private Adw.Toast?          session_expired_toast;
+        private Ft.TimeBlock?       current_time_block;
 
         static construct
         {
@@ -85,9 +85,9 @@ namespace Pomodoro
 
         construct
         {
-            this.session_manager = Pomodoro.SessionManager.get_default ();
+            this.session_manager = Ft.SessionManager.get_default ();
             this.timer           = session_manager.timer;
-            this.settings = Pomodoro.get_settings ();
+            this.settings = Ft.get_settings ();
 
             var builder = new Gtk.Builder.from_resource ("/io/github/focustimerhq/FocusTimer/ui/main/timer/menus.ui");
             this.state_menu = (GLib.MenuModel) builder.get_object ("state_menu");
@@ -114,7 +114,7 @@ namespace Pomodoro
         {
             var current_time_block = this.session_manager.current_time_block;
             var current_state = current_time_block != null
-                    ? current_time_block.state : Pomodoro.State.STOPPED;
+                    ? current_time_block.state : Ft.State.STOPPED;
 
             return current_state.get_label ();
         }
@@ -123,7 +123,7 @@ namespace Pomodoro
         {
             var current_state = this.current_time_block != null
                     ? this.current_time_block.state
-                    : Pomodoro.State.STOPPED;
+                    : Ft.State.STOPPED;
 
             this.state_menubutton.label = !this.timer.is_finished ()
                     ? this.get_state_label ()
@@ -140,7 +140,7 @@ namespace Pomodoro
             var session_template = this.session_manager.scheduler.session_template;
 
             this.timer_label.placeholder_has_hours =
-                    session_template.pomodoro_duration >= Pomodoro.Interval.HOUR;
+                    session_template.pomodoro_duration >= Ft.Interval.HOUR;
         }
 
         private void update ()
@@ -153,8 +153,8 @@ namespace Pomodoro
             }
         }
 
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
+        private void on_timer_state_changed (Ft.TimerState current_state,
+                                             Ft.TimerState previous_state)
         {
             this.update ();
         }
@@ -221,26 +221,26 @@ namespace Pomodoro
          * We want to notify that the app stopped the timer because session has expired.
          * But, its not worth users attention in cases where resetting a session is to be expected.
          */
-        private void on_session_expired (Pomodoro.Session session)
+        private void on_session_expired (Ft.Session session)
         {
-            var timestamp = Pomodoro.Timestamp.from_now ();
+            var timestamp = Ft.Timestamp.from_now ();
 
             // Skip the toast if the timer was stopped and no pomodoro has been completed.
             var completed_time_blocks_count = session.count_time_blocks (
                 (time_block) => {
-                    return time_block.state == Pomodoro.State.POMODORO &&
-                           time_block.get_status () == Pomodoro.TimeBlockStatus.COMPLETED;
+                    return time_block.state == Ft.State.POMODORO &&
+                           time_block.get_status () == Ft.TimeBlockStatus.COMPLETED;
                 });
             if (!this.timer.is_started () && completed_time_blocks_count == 0U) {
                 return;
             }
 
             // Skip the toast if session expired more than 4 hours ago.
-            if (timestamp - session.expiry_time >= 4 * Pomodoro.Interval.HOUR) {
+            if (timestamp - session.expiry_time >= 4 * Ft.Interval.HOUR) {
                 return;
             }
 
-            var window = this.get_root () as Pomodoro.Window;
+            var window = this.get_root () as Ft.Window;
             assert (window != null);
 
             var toast = new Adw.Toast (_("Session has expired"));
@@ -630,7 +630,7 @@ namespace Pomodoro
             this.settings = null;
 
             // HACK: Without this children do not get disposed properly
-            this.dispose_template (typeof (Pomodoro.TimerView));
+            this.dispose_template (typeof (Ft.TimerView));
 
             base.dispose ();
         }

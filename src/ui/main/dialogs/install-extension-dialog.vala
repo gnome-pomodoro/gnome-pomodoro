@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/dialogs/install-extension-dialog.ui")]
     public class InstallExtensionDialog : Adw.Dialog
@@ -21,12 +21,12 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.TextView error_text_view;
 
-        private Pomodoro.Extension? extension = null;
-        private uint                timeout_id = 0U;
+        private Ft.Extension? extension = null;
+        private uint          timeout_id = 0U;
 
         construct
         {
-            this.extension = new Pomodoro.Extension ();
+            this.extension = new Ft.Extension ();
         }
 
         private void close_after_timeout (uint seconds)
@@ -44,7 +44,7 @@ namespace Pomodoro
                     return GLib.Source.REMOVE;
                 });
             GLib.Source.set_name_by_id (this.timeout_id,
-                                        "Pomodoro.ExtensionDialog.close_after_timeout");
+                                        "Ft.ExtensionDialog.close_after_timeout");
         }
 
         private void show_spinner ()
@@ -78,21 +78,21 @@ namespace Pomodoro
                             this.close ();
                         }
                     }
-                    catch (Pomodoro.ExtensionError error)
+                    catch (Ft.ExtensionError error)
                     {
                         switch (error.code)
                         {
-                            case Pomodoro.ExtensionError.TIMED_OUT:
+                            case Ft.ExtensionError.TIMED_OUT:
                                 this.error_message_label.label = _("Time-out reached");
                                 this.error_message_label.visible = true;
                                 break;
 
-                            case Pomodoro.ExtensionError.NOT_ALLOWED:
+                            case Ft.ExtensionError.NOT_ALLOWED:
                                 this.error_message_label.label = _("Installing extensions is not allowed");
                                 this.error_message_label.visible = true;
                                 break;
 
-                            case Pomodoro.ExtensionError.DOWNLOAD_FAILED:
+                            case Ft.ExtensionError.DOWNLOAD_FAILED:
                                 this.error_message_label.label = _("Failed to download the extension");
                                 this.error_message_label.visible = true;
                                 break;

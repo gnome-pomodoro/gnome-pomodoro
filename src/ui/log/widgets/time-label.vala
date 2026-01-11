@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public sealed class TimeLabel : Gtk.Widget
     {
@@ -28,7 +28,7 @@ namespace Pomodoro
             }
         }
 
-        private int64      _timestamp = Pomodoro.Timestamp.UNDEFINED;
+        private int64      _timestamp = Ft.Timestamp.UNDEFINED;
         private Gtk.Label? label;
 
         construct
@@ -46,14 +46,14 @@ namespace Pomodoro
                 return "";
             }
 
-            var seconds = this._timestamp / Pomodoro.Interval.SECOND;
+            var seconds = this._timestamp / Ft.Interval.SECOND;
             var datetime = (new GLib.DateTime.from_unix_utc (seconds)).to_local ();
 
             // TODO: include days ago / relative time
             return datetime.format ("%H:%M");
         }
 
-        private void update_label (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        private void update_label (int64 timestamp = Ft.Timestamp.UNDEFINED)
         {
             this.label.label = this.format_timestamp ();
         }

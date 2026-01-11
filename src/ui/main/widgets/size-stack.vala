@@ -6,7 +6,7 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public class SizeStackPage : GLib.Object
     {
@@ -80,13 +80,13 @@ namespace Pomodoro
         // The animation duration, in milliseconds.
         public uint transition_duration { get; set; default = 500; }
 
-        private GLib.List<Pomodoro.SizeStackPage> pages = null;
-        private Adw.TimedAnimation?               transition_animation = null;
-        private unowned Pomodoro.SizeStackPage?   current_page = null;
-        private unowned Pomodoro.SizeStackPage?   previous_page = null;
-        private bool                              size_request_set = false;
+        private GLib.List<Ft.SizeStackPage> pages = null;
+        private Adw.TimedAnimation?         transition_animation = null;
+        private unowned Ft.SizeStackPage?   current_page = null;
+        private unowned Ft.SizeStackPage?   previous_page = null;
+        private bool                        size_request_set = false;
 
-        private unowned Pomodoro.SizeStackPage? find_page_by_child (Gtk.Widget child)
+        private unowned Ft.SizeStackPage? find_page_by_child (Gtk.Widget child)
         {
             unowned var link = this.pages.first ();
 
@@ -102,7 +102,7 @@ namespace Pomodoro
             return null;
         }
 
-        private unowned Pomodoro.SizeStackPage? find_page_by_name (string name)
+        private unowned Ft.SizeStackPage? find_page_by_name (string name)
         {
             unowned var link = this.pages.first ();
 
@@ -160,7 +160,7 @@ namespace Pomodoro
                     return GLib.Source.REMOVE;
                 });
                 GLib.Source.set_name_by_id (timeout_id,
-                                            "Pomodoro.SizeStack.on_transition_animation_done");
+                                            "Ft.SizeStack.on_transition_animation_done");
                 */
             }
             else {
@@ -250,8 +250,8 @@ namespace Pomodoro
             this.transition_animation.play ();
         }
 
-        private void select_page (Pomodoro.SizeStackPage page,
-                                  bool                   transition = true)
+        private void select_page (Ft.SizeStackPage page,
+                                  bool             transition = true)
         {
             if (page == this.current_page || this.in_destruction ()) {
                 return;
@@ -329,7 +329,7 @@ namespace Pomodoro
             this.notify_property ("visible-child-name");
         }
 
-        private void remove_page (Pomodoro.SizeStackPage page)
+        private void remove_page (Ft.SizeStackPage page)
         {
             if (this.pages.index (page) < 0) {
                 return;
@@ -348,7 +348,7 @@ namespace Pomodoro
             this.pages.remove (page);
         }
 
-        private void add_page (Pomodoro.SizeStackPage page)
+        private void add_page (Ft.SizeStackPage page)
         {
             if (this.pages.index (page) >= 0) {
                 return;
@@ -369,11 +369,11 @@ namespace Pomodoro
                                    GLib.Object object,
                                    string?     type)
         {
-            if (object is Pomodoro.SizeStackPage) {
-                this.add_page ((Pomodoro.SizeStackPage) object);
+            if (object is Ft.SizeStackPage) {
+                this.add_page ((Ft.SizeStackPage) object);
             }
             else if (object is Gtk.Widget) {
-                this.add_page (new Pomodoro.SizeStackPage ((Gtk.Widget) object));
+                this.add_page (new Ft.SizeStackPage ((Gtk.Widget) object));
             }
             else {
                 base.add_child (builder, object, type);
@@ -458,7 +458,7 @@ namespace Pomodoro
                 var t = this.get_transition_progress ();
 
                 natural = (int) GLib.Math.roundf (
-                        Pomodoro.lerpf ((float) previous_size, (float) natural, t));
+                        Ft.lerpf ((float) previous_size, (float) natural, t));
             }
 
             if (natural < minimum) {

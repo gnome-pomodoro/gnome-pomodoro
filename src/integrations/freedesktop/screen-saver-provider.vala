@@ -6,7 +6,7 @@
 
 namespace Freedesktop
 {
-    public class ScreenSaverProvider : Pomodoro.Provider, Pomodoro.ScreenSaverProvider
+    public class ScreenSaverProvider : Ft.Provider, Ft.ScreenSaverProvider
     {
         public bool active {
             get {

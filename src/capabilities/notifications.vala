@@ -7,17 +7,17 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
-    public class NotificationsCapability : Pomodoro.Capability
+    public class NotificationsCapability : Ft.Capability
     {
-        private Pomodoro.NotificationManager?                        notification_manager = null;
-        private GLib.Cancellable?                                    cancellable = null;
-        private Pomodoro.ProviderSet<Pomodoro.NotificationsProvider> providers;
+        private Ft.NotificationManager?                  notification_manager = null;
+        private GLib.Cancellable?                        cancellable = null;
+        private Ft.ProviderSet<Ft.NotificationsProvider> providers;
 
         public NotificationsCapability ()
         {
-            base ("notifications", Pomodoro.Priority.DEFAULT);
+            base ("notifications", Ft.Priority.DEFAULT);
         }
 
         private void show_screen_overlay (bool pass_through)
@@ -27,7 +27,7 @@ namespace Pomodoro
                 return;
             }
 
-            var screen_overlay_group = new Pomodoro.LightboxGroup (typeof (Pomodoro.ScreenOverlay));
+            var screen_overlay_group = new Ft.LightboxGroup (typeof (Ft.ScreenOverlay));
             var cancellable = new GLib.Cancellable ();
 
             screen_overlay_group.open.begin (
@@ -55,7 +55,7 @@ namespace Pomodoro
             }
         }
 
-        private void on_provider_enabled (Pomodoro.NotificationsProvider provider)
+        private void on_provider_enabled (Ft.NotificationsProvider provider)
         {
             this.remove_all_details ();
 
@@ -81,7 +81,7 @@ namespace Pomodoro
 
         public override void initialize ()
         {
-            this.providers = new Pomodoro.ProviderSet<Pomodoro.NotificationsProvider> (Pomodoro.SelectionMode.SINGLE);
+            this.providers = new Ft.ProviderSet<Ft.NotificationsProvider> (Ft.SelectionMode.SINGLE);
             this.providers.provider_enabled.connect (this.on_provider_enabled);
             this.providers.add (new Freedesktop.NotificationsProvider ());
             this.providers.enable ();
@@ -93,7 +93,7 @@ namespace Pomodoro
         {
             if (this.notification_manager == null)
             {
-                var notification_manager = new Pomodoro.NotificationManager ();
+                var notification_manager = new Ft.NotificationManager ();
                 notification_manager.request_screen_overlay_open.connect (this.on_request_screen_overlay_open);
                 notification_manager.request_screen_overlay_close.connect (this.on_request_screen_overlay_close);
 

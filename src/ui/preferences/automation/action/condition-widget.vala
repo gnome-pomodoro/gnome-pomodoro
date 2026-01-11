@@ -6,48 +6,48 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/automation/action/condition-widget.ui")]
-    private class ConditionWidget : Gtk.Box, Pomodoro.ExpressionWidget
+    private class ConditionWidget : Gtk.Box, Ft.ExpressionWidget
     {
         // NOTE: Keep choices synced with the .ui file.
-        private const Pomodoro.Operator[] ENUM_OPERATOR_CHOICES = {
-            Pomodoro.Operator.EQ,
-            Pomodoro.Operator.NOT_EQ
+        private const Ft.Operator[] ENUM_OPERATOR_CHOICES = {
+            Ft.Operator.EQ,
+            Ft.Operator.NOT_EQ
         };
-        private const Pomodoro.Operator[] NUMERICAL_OPERATOR_CHOICES = {
-            Pomodoro.Operator.EQ,
-            Pomodoro.Operator.GT,
-            Pomodoro.Operator.LT
+        private const Ft.Operator[] NUMERICAL_OPERATOR_CHOICES = {
+            Ft.Operator.EQ,
+            Ft.Operator.GT,
+            Ft.Operator.LT
         };
-        private const Pomodoro.State[] STATE_CHOICES = {
-            Pomodoro.State.POMODORO,
-            Pomodoro.State.BREAK,
-            Pomodoro.State.STOPPED
+        private const Ft.State[] STATE_CHOICES = {
+            Ft.State.POMODORO,
+            Ft.State.BREAK,
+            Ft.State.STOPPED
         };
         private const bool[] BOOLEAN_CHOICES = {
             true,
             false
         };
         private const int64[] INTERVAL_UNIT_CHOICES = {
-            Pomodoro.Interval.MINUTE,
-            Pomodoro.Interval.SECOND,
-            Pomodoro.Interval.HOUR
+            Ft.Interval.MINUTE,
+            Ft.Interval.SECOND,
+            Ft.Interval.HOUR
         };
 
         private class FieldItem : GLib.Object
         {
             public string name { get; construct; }
             public string label { get; construct; }
-            public Pomodoro.VariableSpec? variable_spec { get; construct; }
+            public Ft.VariableSpec? variable_spec { get; construct; }
 
             public FieldItem (string name, string label)
             {
                 GLib.Object (
                     name: name,
                     label: label,
-                    variable_spec: Pomodoro.find_variable (name)
+                    variable_spec: Ft.find_variable (name)
                 );
             }
         }
@@ -57,16 +57,16 @@ namespace Pomodoro
          * to extend it to handle more types of expressions, like using variables directly.
          */
         [CCode (notify = false)]
-        public Pomodoro.Expression? expression
+        public Ft.Expression? expression
         {
             get {
-                return (Pomodoro.Expression?) this._comparison;
+                return (Ft.Expression?) this._comparison;
             }
             set {
-                var comparison = value as Pomodoro.Comparison;
+                var comparison = value as Ft.Comparison;
 
                 if (value != null && comparison == null) {
-                    comparison = new Pomodoro.Comparison.is_true (value);
+                    comparison = new Ft.Comparison.is_true (value);
                 }
 
                 if (this._comparison == comparison) {
@@ -99,7 +99,7 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.DropDown interval_unit_dropdown;
 
-        private Pomodoro.Comparison? _comparison = null;
+        private Ft.Comparison? _comparison = null;
         private uint                 update_idle_id = 0;
 
         static construct
@@ -152,15 +152,15 @@ namespace Pomodoro
 
         private static int64 guess_interval_unit (int64 interval)
         {
-            if (interval % Pomodoro.Interval.HOUR == 0) {
-                return Pomodoro.Interval.HOUR;
+            if (interval % Ft.Interval.HOUR == 0) {
+                return Ft.Interval.HOUR;
             }
 
-            if (interval % Pomodoro.Interval.MINUTE == 0) {
-                return Pomodoro.Interval.MINUTE;
+            if (interval % Ft.Interval.MINUTE == 0) {
+                return Ft.Interval.MINUTE;
             }
 
-            return Pomodoro.Interval.SECOND;
+            return Ft.Interval.SECOND;
         }
 
         private FieldItem? get_selected_field_item ()
@@ -170,7 +170,7 @@ namespace Pomodoro
             return field_item != null && field_item.name != "" ? field_item : null;
         }
 
-        private Pomodoro.Operator get_selected_operator ()
+        private Ft.Operator get_selected_operator ()
         {
             if (this.enum_operator_dropdown.parent != null)
             {
@@ -188,17 +188,17 @@ namespace Pomodoro
                 return NUMERICAL_OPERATOR_CHOICES[index];
             }
 
-            return Pomodoro.Operator.EQ;
+            return Ft.Operator.EQ;
         }
 
-        private Pomodoro.Value? get_selected_value ()
+        private Ft.Value? get_selected_value ()
         {
             if (this.state_dropdown.parent != null)
             {
                 var index = this.state_dropdown.selected;
                 assert (index < STATE_CHOICES.length);
 
-                return new Pomodoro.StateValue (STATE_CHOICES[index]);
+                return new Ft.StateValue (STATE_CHOICES[index]);
             }
 
             if (this.boolean_dropdown.parent != null)
@@ -206,7 +206,7 @@ namespace Pomodoro
                 var index = this.boolean_dropdown.selected;
                 assert (index < BOOLEAN_CHOICES.length);
 
-                return new Pomodoro.BooleanValue (BOOLEAN_CHOICES[index]);
+                return new Ft.BooleanValue (BOOLEAN_CHOICES[index]);
             }
 
             if (this.interval_spinbutton.parent != null)
@@ -214,9 +214,9 @@ namespace Pomodoro
                 var index = this.interval_unit_dropdown.selected;
                 assert (index < INTERVAL_UNIT_CHOICES.length);
 
-                var interval = Pomodoro.Interval.from_value ((int) this.interval_spinbutton.value,
+                var interval = Ft.Interval.from_value ((int) this.interval_spinbutton.value,
                                                              INTERVAL_UNIT_CHOICES[index]);
-                return new Pomodoro.IntervalValue (interval);
+                return new Ft.IntervalValue (interval);
             }
 
             return null;
@@ -237,10 +237,10 @@ namespace Pomodoro
                 selected_field_item?.name != null &&
                 selected_value != null)
             {
-                this._comparison = new Pomodoro.Comparison (
-                    new Pomodoro.Variable (selected_field_item.name),
+                this._comparison = new Ft.Comparison (
+                    new Ft.Variable (selected_field_item.name),
                     selected_operator,
-                    new Pomodoro.Constant (selected_value)
+                    new Ft.Constant (selected_value)
                 );
             }
             else
@@ -284,7 +284,7 @@ namespace Pomodoro
             return false;
         }
 
-        private bool select_operator (Pomodoro.Operator operator)
+        private bool select_operator (Ft.Operator operator)
         {
             if (this.enum_operator_dropdown.parent != null)
             {
@@ -311,11 +311,11 @@ namespace Pomodoro
             return false;
         }
 
-        private bool select_value (Pomodoro.Value? value)
+        private bool select_value (Ft.Value? value)
         {
-            if (value is Pomodoro.StateValue)
+            if (value is Ft.StateValue)
             {
-                var state_value = ((Pomodoro.StateValue) value).data;
+                var state_value = ((Ft.StateValue) value).data;
 
                 for (var index = 0; index < STATE_CHOICES.length; index++)
                 {
@@ -328,9 +328,9 @@ namespace Pomodoro
                 assert_not_reached ();
             }
 
-            if (value is Pomodoro.BooleanValue)
+            if (value is Ft.BooleanValue)
             {
-                var boolean_value = ((Pomodoro.BooleanValue) value).data;
+                var boolean_value = ((Ft.BooleanValue) value).data;
 
                 for (var index = 0; index < BOOLEAN_CHOICES.length; index++)
                 {
@@ -343,9 +343,9 @@ namespace Pomodoro
                 assert_not_reached ();
             }
 
-            if (value is Pomodoro.IntervalValue)
+            if (value is Ft.IntervalValue)
             {
-                var interval_value = ((Pomodoro.IntervalValue) value).data;
+                var interval_value = ((Ft.IntervalValue) value).data;
                 var interval_unit = guess_interval_unit (interval_value);
 
                 interval_value /= interval_unit;
@@ -369,8 +369,8 @@ namespace Pomodoro
         {
             if (this._comparison != null)
             {
-                var argument_lhs = this._comparison.argument_lhs as Pomodoro.Variable;
-                var argument_rhs = this._comparison.argument_rhs as Pomodoro.Constant;
+                var argument_lhs = this._comparison.argument_lhs as Ft.Variable;
+                var argument_rhs = this._comparison.argument_rhs as Ft.Constant;
 
                 this.select_field (argument_lhs?.name);
                 this.select_operator (this._comparison.operator);
@@ -416,11 +416,11 @@ namespace Pomodoro
                 this.fields.remove (this.numerical_operator_dropdown);
             }
 
-            if (value_type == typeof (Pomodoro.StateValue)) {
+            if (value_type == typeof (Ft.StateValue)) {
                 this.fields.insert (this.enum_operator_dropdown, 1);
             }
 
-            if (value_type == typeof (Pomodoro.IntervalValue)) {
+            if (value_type == typeof (Ft.IntervalValue)) {
                 this.fields.insert (this.numerical_operator_dropdown, 1);
             }
 
@@ -456,15 +456,15 @@ namespace Pomodoro
                 this.fields.remove (this.interval_unit_dropdown);
             }
 
-            if (value_type == typeof (Pomodoro.StateValue)) {
+            if (value_type == typeof (Ft.StateValue)) {
                 this.fields.append (this.state_dropdown);
             }
 
-            if (value_type == typeof (Pomodoro.BooleanValue)) {
+            if (value_type == typeof (Ft.BooleanValue)) {
                 this.fields.append (this.boolean_dropdown);
             }
 
-            if (value_type == typeof (Pomodoro.IntervalValue)) {
+            if (value_type == typeof (Ft.IntervalValue)) {
                 this.fields.append (this.interval_spinbutton);
                 this.fields.append (this.interval_unit_dropdown);
             }
@@ -586,7 +586,7 @@ namespace Pomodoro
             this._comparison = null;
 
             // HACK: Without this children do not get disposed properly
-            this.dispose_template (typeof (Pomodoro.ConditionGroupWidget));
+            this.dispose_template (typeof (Ft.ConditionGroupWidget));
 
             base.dispose ();
         }

@@ -9,32 +9,32 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * Snapshot of timer/session state at a given time.
      */
     public class Context  // TODO: make it compact class?
     {
-        public string?             event_source;
-        public int64               timestamp;
-        public Pomodoro.TimerState timer_state;
-        public Pomodoro.TimeBlock? time_block;
-        public Pomodoro.Session?   session;
+        public string?       event_source;
+        public int64         timestamp;
+        public Ft.TimerState timer_state;
+        public Ft.TimeBlock? time_block;
+        public Ft.Session?   session;
 
         private string?            json = null;
         private static string      current_event_source = null;
-        private static int64       current_event_source_timestamp = Pomodoro.Timestamp.UNDEFINED;
+        private static int64       current_event_source_timestamp = Ft.Timestamp.UNDEFINED;
 
-        public Context.build (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        public Context.build (int64 timestamp = Ft.Timestamp.UNDEFINED)
         {
-            Pomodoro.ensure_timestamp (ref timestamp);
-            Pomodoro.Variables.ensure_initialized ();
+            Ft.ensure_timestamp (ref timestamp);
+            Ft.Variables.ensure_initialized ();
 
-            var session_manager = Pomodoro.SessionManager.get_default ();
+            var session_manager = Ft.SessionManager.get_default ();
             var timer = session_manager.timer;
 
-            if (Pomodoro.Timestamp.is_undefined (current_event_source_timestamp)) {
+            if (Ft.Timestamp.is_undefined (current_event_source_timestamp)) {
                 current_event_source_timestamp = timestamp;
             } else if (current_event_source_timestamp != timestamp) {
                 unset_event_source ();
@@ -70,7 +70,7 @@ namespace Pomodoro
         }
 
         public static void set_event_source (string event_source,
-                                             int64  timestamp = Pomodoro.Timestamp.UNDEFINED)
+                                             int64  timestamp = Ft.Timestamp.UNDEFINED)
         {
             current_event_source = event_source;
             current_event_source_timestamp = timestamp;
@@ -79,7 +79,7 @@ namespace Pomodoro
         public static void unset_event_source ()
         {
             current_event_source = null;
-            current_event_source_timestamp = Pomodoro.Timestamp.UNDEFINED;
+            current_event_source_timestamp = Ft.Timestamp.UNDEFINED;
         }
 
         /*
@@ -117,8 +117,8 @@ namespace Pomodoro
             builder.end_object ();
         }
 
-        private void json_add_time_block (Json.Builder        builder,
-                                          Pomodoro.TimeBlock? time_block)
+        private void json_add_time_block (Json.Builder  builder,
+                                          Ft.TimeBlock? time_block)
         {
             if (time_block == null) {
                 builder.add_null_value ();
@@ -195,7 +195,7 @@ namespace Pomodoro
                             // Hide scheduled time-blocks when the timer has stopped. This data can be misleading.
                             // We need those blocks to display session indicator, but here they don't make sense.
                             if (this.time_block == null &&
-                                time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED) {
+                                time_block.get_status () == Ft.TimeBlockStatus.SCHEDULED) {
                                 return;
                             }
 
@@ -221,9 +221,9 @@ namespace Pomodoro
          * Variables
          */
 
-        public Pomodoro.Value? evaluate_variable (string variable_name)
+        public Ft.Value? evaluate_variable (string variable_name)
         {
-            unowned var variable_spec = Pomodoro.find_variable (variable_name);
+            unowned var variable_spec = Ft.find_variable (variable_name);
 
             return variable_spec != null
                 ? variable_spec.evaluate (this)

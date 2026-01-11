@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk+" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroActionListBoxRow" parent="GtkListBoxRow">
+  <template class="FtActionListBoxRow" parent="GtkListBoxRow">
     <property name="activatable">true</property>
     <property name="child">
       <object class="GtkBox">
@@ -59,7 +59,7 @@
     <child>
       <object class="GtkDropTarget">
         <property name="actions">move</property>
-        <property name="formats">PomodoroActionListBoxRow</property>
+        <property name="formats">FtActionListBoxRow</property>
         <signal name="drop" handler="on_drop"/>
       </object>
     </child>

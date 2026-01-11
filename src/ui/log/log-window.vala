@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     private string get_event_icon_name (string event_name)
     {
@@ -116,14 +116,14 @@ namespace Pomodoro
 
         private static inline int64 calculate_hash (int64 timestamp)
         {
-            return timestamp / Pomodoro.Interval.MINUTE;
+            return timestamp / Ft.Interval.MINUTE;
         }
 
         public void get_section (uint     position,
                                  out uint out_start,
                                  out uint out_end)
         {
-            var reference_item = (Pomodoro.LogEntry) this._model.get_item (position);
+            var reference_item = (Ft.LogEntry) this._model.get_item (position);
             var reference_hash = calculate_hash (reference_item.timestamp);
             var n_items = this._model.get_n_items ();
 
@@ -132,7 +132,7 @@ namespace Pomodoro
 
             while (out_start > 0)
             {
-                var item = (Pomodoro.LogEntry) this._model.get_item (out_start - 1);
+                var item = (Ft.LogEntry) this._model.get_item (out_start - 1);
 
                 if (calculate_hash (item.timestamp) == reference_hash) {
                     out_start--;
@@ -144,7 +144,7 @@ namespace Pomodoro
 
             while (out_end < n_items)
             {
-                var item = (Pomodoro.LogEntry) this._model.get_item (out_end);
+                var item = (Ft.LogEntry) this._model.get_item (out_end);
 
                 if (calculate_hash (item.timestamp) == reference_hash) {
                     out_end++;
@@ -199,13 +199,13 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Label command_execution_time_label;
 
-        private Pomodoro.Logger    logger;
-        private Pomodoro.LogEntry? selected_entry;
-        private uint               update_contents_id = 0;
+        private Ft.Logger    logger;
+        private Ft.LogEntry? selected_entry;
+        private uint         update_contents_id = 0;
 
         construct
         {
-            this.logger = new Pomodoro.Logger ();
+            this.logger = new Ft.Logger ();
 
             var model = new Gtk.SingleSelection (new SectionedLogModel (this.logger.model));
             model.autoselect = true;
@@ -233,11 +233,11 @@ namespace Pomodoro
             }
 
             var model = (Gtk.SingleSelection?) this.listview.model;
-            var entry = (Pomodoro.LogEntry?) model?.selected_item;
+            var entry = (Ft.LogEntry?) model?.selected_item;
 
             if (entry != null)
             {
-                var datetime = new GLib.DateTime.from_unix_utc (entry.timestamp / Pomodoro.Interval.SECOND);
+                var datetime = new GLib.DateTime.from_unix_utc (entry.timestamp / Ft.Interval.SECOND);
 
                 this.header_label.label = entry.label;
                 this.datetime_label.label = datetime != null ? datetime.to_local ().format ("%c") : "";
@@ -251,9 +251,9 @@ namespace Pomodoro
                 this.command_output_label.visible = false;
                 this.command_exit_code_box.visible = false;
 
-                if (entry is Pomodoro.ActionLogEntry)
+                if (entry is Ft.ActionLogEntry)
                 {
-                    var action_entry = (Pomodoro.ActionLogEntry) entry;
+                    var action_entry = (Ft.ActionLogEntry) entry;
 
                     if (action_entry.command_line != "") {
                         this.command_line_label.label = action_entry.command_line;
@@ -277,7 +277,7 @@ namespace Pomodoro
                         this.command_exit_code_box.visible = true;
                         this.command_exit_code_label.label = action_entry.command_exit_code.to_string ();
                         this.command_execution_time_label.label = "%u ms".printf (
-                            Pomodoro.Timestamp.to_milliseconds_uint (action_entry.command_execution_time));
+                            Ft.Timestamp.to_milliseconds_uint (action_entry.command_execution_time));
                     }
                 }
 
@@ -338,28 +338,28 @@ namespace Pomodoro
         private void setup_list_item (GLib.Object object)
         {
             var list_item = (Gtk.ListItem) object;
-            list_item.child = new Pomodoro.SidebarRow ();
+            list_item.child = new Ft.SidebarRow ();
         }
 
         [GtkCallback]
         private void bind_list_item (GLib.Object object)
         {
             var list_item = (Gtk.ListItem) object;
-            var entry = (Pomodoro.LogEntry) list_item.item;
-            var row = (Pomodoro.SidebarRow?) list_item.child;
+            var entry = (Ft.LogEntry) list_item.item;
+            var row = (Ft.SidebarRow?) list_item.child;
 
             if (row == null) {
                 return;
             }
 
-            if (entry is Pomodoro.EventLogEntry) {
-                var event_entry = (Pomodoro.EventLogEntry) entry;
+            if (entry is Ft.EventLogEntry) {
+                var event_entry = (Ft.EventLogEntry) entry;
                 row.icon_name = get_event_icon_name (event_entry.event_name);
             }
 
-            if (entry is Pomodoro.ActionLogEntry)
+            if (entry is Ft.ActionLogEntry)
             {
-                var action_entry = (Pomodoro.ActionLogEntry) entry;
+                var action_entry = (Ft.ActionLogEntry) entry;
                 row.icon_name = get_action_icon_name (action_entry.event_name);
 
                 if (action_entry.command_error_message != null) {
@@ -398,7 +398,7 @@ namespace Pomodoro
 
             for (var position = 0; position < n_items; position++)
             {
-                var entry = (Pomodoro.LogEntry) model.get_item (position);
+                var entry = (Ft.LogEntry) model.get_item (position);
 
                 if (entry.id == entry_id) {
                     model.set_selected (position);

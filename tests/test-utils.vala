@@ -20,7 +20,7 @@ namespace Tests
 
         public void test_push ()
         {
-            var queue = new Pomodoro.AsyncQueue<string> ();
+            var queue = new Ft.AsyncQueue<string> ();
             assert_cmpuint (queue.length (), GLib.CompareOperator.EQ, 0U);
 
             queue.push ("a");
@@ -32,7 +32,7 @@ namespace Tests
 
         public void test_pop ()
         {
-            var queue = new Pomodoro.AsyncQueue<string> ();
+            var queue = new Ft.AsyncQueue<string> ();
 
             var item = queue.pop ();
             assert_null (item);
@@ -46,7 +46,7 @@ namespace Tests
 
         public void test_length ()
         {
-            var queue = new Pomodoro.AsyncQueue<string> ();
+            var queue = new Ft.AsyncQueue<string> ();
             assert_cmpuint (queue.length (), GLib.CompareOperator.EQ, 0U);
 
             queue.push ("a");
@@ -61,7 +61,7 @@ namespace Tests
 
         public void test_wait ()
         {
-            var queue = new Pomodoro.AsyncQueue<string> ();
+            var queue = new Ft.AsyncQueue<string> ();
             var completed = false;
 
             // Fill queue, then wait for it to become empty

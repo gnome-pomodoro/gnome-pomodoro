@@ -8,7 +8,7 @@
 
 namespace Tests
 {
-    private class DummyJob : GLib.Object, Pomodoro.Job
+    private class DummyJob : GLib.Object, Ft.Job
     {
         public uint delay { get; construct; }
 
@@ -48,7 +48,7 @@ namespace Tests
 
         public void test_push__simple ()
         {
-            var queue = new Pomodoro.JobQueue ();
+            var queue = new Ft.JobQueue ();
             var job = new DummyJob (10);
 
             job.notify["completed"].connect (() => {
@@ -63,7 +63,7 @@ namespace Tests
 
         public void test_push__many ()
         {
-            var queue = new Pomodoro.JobQueue ();
+            var queue = new Ft.JobQueue ();
             var job_1 = new DummyJob (10);
             var job_2 = new DummyJob (10);
             var job_3 = new DummyJob (10);
@@ -109,7 +109,7 @@ namespace Tests
 
         public void test_wait__empty ()
         {
-            var queue = new Pomodoro.JobQueue ();
+            var queue = new Ft.JobQueue ();
 
             var returned = false;
             queue.wait.begin ((obj, res) => {
@@ -124,7 +124,7 @@ namespace Tests
 
         public void test_wait ()
         {
-            var queue = new Pomodoro.JobQueue ();
+            var queue = new Ft.JobQueue ();
             var job_1 = new DummyJob (10);
             var job_2 = new DummyJob (10);
             var job_3 = new DummyJob (10);

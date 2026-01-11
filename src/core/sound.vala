@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public enum Easing
     {
@@ -50,18 +50,18 @@ namespace Pomodoro
             }
         }
 
-        private double          _value = 1.0;
-        private double          _value_from = 1.0;
-        private double          _value_to = 1.0;
-        private int64           monotonic_time_from = Pomodoro.Timestamp.UNDEFINED;
-        private int64           monotonic_time_to = Pomodoro.Timestamp.UNDEFINED;
-        private Pomodoro.Easing easing = Pomodoro.Easing.IN;
-        private double          slope = 0.0;
-        private uint            timeout_id = 0;
+        private double      _value = 1.0;
+        private double      _value_from = 1.0;
+        private double      _value_to = 1.0;
+        private int64       monotonic_time_from = Ft.Timestamp.UNDEFINED;
+        private int64       monotonic_time_to = Ft.Timestamp.UNDEFINED;
+        private Ft.Easing   easing = Ft.Easing.IN;
+        private double      slope = 0.0;
+        private uint        timeout_id = 0;
 
-        public void animate_to (double          value,
-                                int64           duration,
-                                Pomodoro.Easing easing = Pomodoro.Easing.IN)
+        public void animate_to (double    value,
+                                int64     duration,
+                                Ft.Easing easing = Ft.Easing.IN)
         {
             var monotonic_time = GLib.get_monotonic_time ();
 
@@ -79,7 +79,7 @@ namespace Pomodoro
 
                 if (this.timeout_id == 0) {
                     this.timeout_id = GLib.Timeout.add (uint.max (interval, 10), this.on_timeout);
-                    GLib.Source.set_name_by_id (this.timeout_id, "Pomodoro.VolumeAnimation.on_timeout");
+                    GLib.Source.set_name_by_id (this.timeout_id, "Ft.VolumeAnimation.on_timeout");
                 }
 
                 this.notify_property ("value-to");
@@ -108,14 +108,14 @@ namespace Pomodoro
 
             switch (this.easing)
             {
-                case Pomodoro.Easing.OUT:
+                case Ft.Easing.OUT:
                     return 2.0 * (1.0 - t) * (this._value_to - this._value_from) +
                            (3.0 * t - 4.0) * this.slope * t + this.slope;
 
-                case Pomodoro.Easing.IN:
+                case Ft.Easing.IN:
                     return (2.0 * (this._value_to - this._value_from - this.slope * t) - this.slope) * t + this.slope;
 
-                case Pomodoro.Easing.IN_OUT:
+                case Ft.Easing.IN_OUT:
                     return 6.0 * (1.0 - t) * t * (this._value_to - this._value_from - this.slope * t);
 
                 default:
@@ -131,17 +131,17 @@ namespace Pomodoro
 
             switch (this.easing)
             {
-                case Pomodoro.Easing.OUT:
+                case Ft.Easing.OUT:
                     return lerp (this._value_from + this.slope * t,
                                  this._value_to,
                                  (2.0 - t) * t);
 
-                case Pomodoro.Easing.IN:
+                case Ft.Easing.IN:
                     return lerp (this._value_from + this.slope * t,
                                  this._value_to,
                                  t * t);
 
-                case Pomodoro.Easing.IN_OUT:
+                case Ft.Easing.IN_OUT:
                     return lerp (this._value_from + this.slope * t,
                                  this._value_to,
                                  (3.0 - 2.0 * t) * (t * t));
@@ -331,7 +331,7 @@ namespace Pomodoro
     }
 
 
-    private class GStreamerBackend : GLib.Object, Pomodoro.SoundBackend
+    private class GStreamerBackend : GLib.Object, Ft.SoundBackend
     {
         public string uri {
             get {
@@ -402,7 +402,7 @@ namespace Pomodoro
             dynamic Gst.Element volume_filter = Gst.ElementFactory.make ("volume", "volume");
 
             if (pipeline == null || volume_filter == null) {
-                throw new Pomodoro.SoundError.NOT_INITIALIZED (_("Failed to initialize playback"));
+                throw new Ft.SoundError.NOT_INITIALIZED (_("Failed to initialize playback"));
             }
 
             pipeline.flags = GstPlayFlags.AUDIO;
@@ -421,9 +421,9 @@ namespace Pomodoro
             };
         }
 
-        public static bool can_play (Pomodoro.Sound sound,
-                                     GLib.File?     file,
-                                     string         content_type)
+        public static bool can_play (Ft.Sound   sound,
+                                     GLib.File? file,
+                                     string     content_type)
         {
             return file != null && is_mime_type (content_type, GStreamerBackend.get_supported_mime_types ());
         }
@@ -555,7 +555,7 @@ namespace Pomodoro
     }
 
 
-    private class CanberraBackend : GLib.Object, Pomodoro.SoundBackend
+    private class CanberraBackend : GLib.Object, Ft.SoundBackend
     {
         public string event_id { get; set; }
 
@@ -602,7 +602,7 @@ namespace Pomodoro
             catch (GLib.Error error) {
                 GLib.warning ("Error while initializing canberra: %s", error.message);
 
-                throw new Pomodoro.SoundError.NOT_INITIALIZED (_("Failed to initialize playback"));
+                throw new Ft.SoundError.NOT_INITIALIZED (_("Failed to initialize playback"));
             }
         }
 
@@ -616,11 +616,11 @@ namespace Pomodoro
             };
         }
 
-        public static bool can_play (Pomodoro.Sound sound,
-                                     GLib.File?     file,
-                                     string         content_type)
+        public static bool can_play (Ft.Sound   sound,
+                                     GLib.File? file,
+                                     string     content_type)
         {
-            var alert_sound = sound as Pomodoro.AlertSound;
+            var alert_sound = sound as Ft.AlertSound;
 
             if (alert_sound == null || alert_sound.event_id == "") {
                 return false;
@@ -659,7 +659,7 @@ namespace Pomodoro
             catch (GLib.Error error) {
                 GLib.warning ("Error while playing %s: %s", this._path, error.message);
 
-                this.playback_error (new Pomodoro.SoundError.NOT_INITIALIZED (_("Failed to initialize playback")));
+                this.playback_error (new Ft.SoundError.NOT_INITIALIZED (_("Failed to initialize playback")));
             }
         }
 
@@ -729,7 +729,7 @@ namespace Pomodoro
         public double volume { get; set; default = 1.0; }
 
         [CCode (notify = false)]
-        public Pomodoro.SoundBackend? backend {
+        public Ft.SoundBackend? backend {
             get {
                 return this._backend;
             }
@@ -737,8 +737,8 @@ namespace Pomodoro
 
         public GLib.Error? error { get; private set; }
 
-        private string                 _uri = "";
-        private Pomodoro.SoundBackend? _backend = null;
+        private string           _uri = "";
+        private Ft.SoundBackend? _backend = null;
 
         private void on_playback_error (GLib.Error error)
         {
@@ -754,7 +754,7 @@ namespace Pomodoro
             try {
                 // Validate file.
                 if (file != null && !file.query_exists ()) {
-                    throw new Pomodoro.SoundError.NOT_FOUND (_("File not found"));
+                    throw new Ft.SoundError.NOT_FOUND (_("File not found"));
                 }
 
                 // Select backend.
@@ -772,7 +772,7 @@ namespace Pomodoro
                 }
                 else {
                     if (file != null) {
-                        throw new Pomodoro.SoundError.NOT_SUPPORTED (_("File type not supported"));
+                        throw new Ft.SoundError.NOT_SUPPORTED (_("File type not supported"));
                     }
 
                     return;
@@ -858,7 +858,7 @@ namespace Pomodoro
     }
 
 
-    public class AlertSound : Pomodoro.Sound
+    public class AlertSound : Ft.Sound
     {
         public string event_id { get; construct; }
 
@@ -889,21 +889,21 @@ namespace Pomodoro
     }
 
 
-    public class BackgroundSound : Pomodoro.Sound
+    public class BackgroundSound : Ft.Sound
     {
         public bool repeat { get; set; default = false; }
 
-        private Pomodoro.VolumeAnimation? volume_animation = null;
-        private int64                     pending_fade_out_duration = 0;
-        private int64                     pending_fade_out_easing = Pomodoro.Easing.IN_OUT;
+        private Ft.VolumeAnimation? volume_animation = null;
+        private int64               pending_fade_out_duration = 0;
+        private int64               pending_fade_out_easing = Ft.Easing.IN_OUT;
 
         construct
         {
-            this.volume_animation = new Pomodoro.VolumeAnimation ();
+            this.volume_animation = new Ft.VolumeAnimation ();
             this.volume_animation.done.connect (this.on_volume_animation_done);
         }
 
-        private void on_volume_animation_done (Pomodoro.VolumeAnimation volume_animation)
+        private void on_volume_animation_done (Ft.VolumeAnimation volume_animation)
         {
             var fade_out_duration = this.pending_fade_out_duration;
             var fade_out_easing = this.pending_fade_out_easing;
@@ -938,8 +938,8 @@ namespace Pomodoro
             base.destroy_backend ();
         }
 
-        public void fade_in (int64           duration,
-                             Pomodoro.Easing easing = Pomodoro.Easing.OUT)
+        public void fade_in (int64     duration,
+                             Ft.Easing easing = Ft.Easing.OUT)
         {
             if (!this.is_playing ()) {
                 this.play ();
@@ -952,8 +952,8 @@ namespace Pomodoro
             }
         }
 
-        public void fade_out (int64           duration,
-                              Pomodoro.Easing easing = Pomodoro.Easing.IN)
+        public void fade_out (int64     duration,
+                              Ft.Easing easing = Ft.Easing.IN)
         {
             if (this.volume_animation.value_to == 0.0) {
                 return;
@@ -983,12 +983,12 @@ namespace Pomodoro
             if (this.volume_animation.value_to != volume)
             {
                 this.pending_fade_out_duration = 2 * (duration / 3);
-                this.pending_fade_out_easing = Pomodoro.Easing.IN_OUT;
+                this.pending_fade_out_easing = Ft.Easing.IN_OUT;
 
-                this.volume_animation.animate_to (volume, duration / 3, Pomodoro.Easing.OUT);
+                this.volume_animation.animate_to (volume, duration / 3, Ft.Easing.OUT);
             }
             else {
-                this.fade_out (duration, Pomodoro.Easing.IN_OUT);
+                this.fade_out (duration, Ft.Easing.IN_OUT);
             }
         }
 

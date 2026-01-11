@@ -6,14 +6,14 @@
 
 namespace Gnome
 {
-    public class IdleMonitorProvider : Pomodoro.Provider, Pomodoro.IdleMonitorProvider
+    public class IdleMonitorProvider : Ft.Provider, Ft.IdleMonitorProvider
     {
         /**
          * We typically define the timeout relative to a given reference-time. Mutter counts idle-time from the
          * perspective of a user and refers to idle-time as an interval since the watch may be triggered repeatedly.
          * Allow some tolerance in order not to schedule relative timeouts, and prefer native intervals.
          */
-        private const int64 TIMEOUT_TOLERANCE = 100 * Pomodoro.Interval.MILLISECOND;
+        private const int64 TIMEOUT_TOLERANCE = 100 * Ft.Interval.MILLISECOND;
 
         [Compact]
         class Watch
@@ -21,7 +21,7 @@ namespace Gnome
             public uint32 id = 0;
             public int64  absolute_timeout = 0;
             public int64  relative_timeout = 0;
-            public int64  reference_time = Pomodoro.Timestamp.UNDEFINED;
+            public int64  reference_time = Ft.Timestamp.UNDEFINED;
             public bool   has_active_watch = false;
             public bool   invalid = false;
         }
@@ -42,14 +42,14 @@ namespace Gnome
 
         private inline int64 from_milliseconds (uint64 milliseconds)
         {
-            return milliseconds < int64.MAX / Pomodoro.Interval.MILLISECOND
-                    ? (int64) milliseconds * Pomodoro.Interval.MILLISECOND
+            return milliseconds < int64.MAX / Ft.Interval.MILLISECOND
+                    ? (int64) milliseconds * Ft.Interval.MILLISECOND
                     : int64.MAX;
         }
 
         private inline uint64 to_milliseconds (int64 interval)
         {
-            return (uint64) int64.max (interval, 0) / Pomodoro.Interval.MILLISECOND;
+            return (uint64) int64.max (interval, 0) / Ft.Interval.MILLISECOND;
         }
 
         private void freeze_idle_time ()
@@ -231,7 +231,7 @@ namespace Gnome
             int64 absolute_timeout = timeout;
             int64 idle_time;
 
-            if (Pomodoro.Timestamp.is_undefined (monotonic_time)) {
+            if (Ft.Timestamp.is_undefined (monotonic_time)) {
                 monotonic_time = GLib.get_monotonic_time () - relative_timeout;
             }
             else {

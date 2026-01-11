@@ -6,12 +6,12 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * Widget for displaying a bar chart or a histogram.
      */
-    public class BarChart : Pomodoro.Chart
+    public class BarChart : Ft.Chart
     {
         private const int    MIN_BAR_WIDTH = 16;
         private const int    MAX_BAR_WIDTH = 30;
@@ -65,18 +65,18 @@ namespace Pomodoro
             }
         }
 
-        private bool             _stacked = true;
-        private bool             _show_empty_bars = false;
-        private double           transform_slope = 1.0;
-        private double           transform_intercept = 0.0;
-        private Bucket[]         buckets;
-        private Category[]       categories;
-        private Pomodoro.Matrix? data;
-        private int              bar_width;
-        private int              bar_height;
-        private int              bar_radius;
-        private int              tooltip_bar_index = -1;
-        private Gtk.Widget?      tooltip_widget;
+        private bool        _stacked = true;
+        private bool        _show_empty_bars = false;
+        private double      transform_slope = 1.0;
+        private double      transform_intercept = 0.0;
+        private Bucket[]    buckets;
+        private Category[]  categories;
+        private Ft.Matrix?  data;
+        private int         bar_width;
+        private int         bar_height;
+        private int         bar_radius;
+        private int         tooltip_bar_index = -1;
+        private Gtk.Widget? tooltip_widget;
 
         construct
         {
@@ -186,7 +186,7 @@ namespace Pomodoro
                 var bucket_count = this.buckets.length;
                 var category_count = this.categories.length;
 
-                this.data = new Pomodoro.Matrix (bucket_count, category_count);
+                this.data = new Ft.Matrix (bucket_count, category_count);
             }
         }
 
@@ -289,8 +289,8 @@ namespace Pomodoro
             this.queue_draw ();
         }
 
-        public void set_category_unit (uint         category_index,
-                                      Pomodoro.Unit unit)
+        public void set_category_unit (uint   category_index,
+                                      Ft.Unit unit)
         {
             this.ensure_categories (category_index + 1);
 
@@ -432,16 +432,16 @@ namespace Pomodoro
 
         private Gtk.Widget create_bar ()
         {
-            var bar = new Pomodoro.Gizmo (Pomodoro.BarChart.measure_bar_cb,
-                                          null,
-                                          Pomodoro.BarChart.snapshot_bar_cb,
-                                          Pomodoro.BarChart.contains_bar_cb,
-                                          null,
-                                          null);
+            var bar = new Ft.Gizmo (Ft.BarChart.measure_bar_cb,
+                                    null,
+                                    Ft.BarChart.snapshot_bar_cb,
+                                    Ft.BarChart.contains_bar_cb,
+                                    null,
+                                    null);
             bar.focusable = false;
             bar.has_tooltip = true;
             bar.add_css_class ("bar");
-            bar.query_tooltip.connect (Pomodoro.BarChart.on_query_tooltip_cb);
+            bar.query_tooltip.connect (Ft.BarChart.on_query_tooltip_cb);
 
             if (this.activate_on_click)
             {
@@ -462,13 +462,13 @@ namespace Pomodoro
             return bar;
         }
 
-        private static Pomodoro.BarChart? from_gizmo (Pomodoro.Gizmo gizmo)
+        private static Ft.BarChart? from_gizmo (Ft.Gizmo gizmo)
         {
             Gtk.Widget? widget = gizmo;
 
             while (widget != null)
             {
-                var chart = widget as Pomodoro.BarChart;
+                var chart = widget as Ft.BarChart;
 
                 if (chart != null) {
                     return chart;
@@ -480,13 +480,13 @@ namespace Pomodoro
             return null;
         }
 
-        private static Pomodoro.BarChart? from_widget (Gtk.Widget widget)
+        private static Ft.BarChart? from_widget (Gtk.Widget widget)
         {
             Gtk.Widget? current = widget;
 
             while (current != null)
             {
-                var chart = current as Pomodoro.BarChart;
+                var chart = current as Ft.BarChart;
 
                 if (chart != null) {
                     return chart;
@@ -498,7 +498,7 @@ namespace Pomodoro
             return null;
         }
 
-        private static void measure_bar_cb (Pomodoro.Gizmo  gizmo,
+        private static void measure_bar_cb (Ft.Gizmo        gizmo,
                                             Gtk.Orientation orientation,
                                             int             for_size,
                                             out int         minimum,
@@ -525,8 +525,8 @@ namespace Pomodoro
             }
         }
 
-        private static void snapshot_bar_cb (Pomodoro.Gizmo gizmo,
-                                             Gtk.Snapshot   snapshot)
+        private static void snapshot_bar_cb (Ft.Gizmo     gizmo,
+                                             Gtk.Snapshot snapshot)
         {
             var self = BarChart.from_gizmo (gizmo);
 
@@ -535,9 +535,9 @@ namespace Pomodoro
             }
         }
 
-        private static bool contains_bar_cb (Pomodoro.Gizmo gizmo,
-                                             double         x,
-                                             double         y)
+        private static bool contains_bar_cb (Ft.Gizmo gizmo,
+                                             double   x,
+                                             double   y)
         {
             var self = BarChart.from_gizmo (gizmo);
 
@@ -559,7 +559,7 @@ namespace Pomodoro
 
         private static void on_clicked_cb (Gtk.Widget widget)
         {
-            var self      = BarChart.from_gizmo ((Pomodoro.Gizmo) widget);
+            var self      = BarChart.from_gizmo ((Ft.Gizmo) widget);
             var bar_index = widget.get_data<uint> ("index");
 
             if (self != null) {
@@ -585,7 +585,7 @@ namespace Pomodoro
             }
         }
 
-        private void measure_bar (Pomodoro.Gizmo  gizmo,
+        private void measure_bar (Ft.Gizmo        gizmo,
                                   Gtk.Orientation orientation,
                                   int             for_size,
                                   out int         minimum,
@@ -599,8 +599,8 @@ namespace Pomodoro
             natural_baseline = -1;
         }
 
-        private void snapshot_bar (Pomodoro.Gizmo gizmo,
-                                   Gtk.Snapshot   snapshot)
+        private void snapshot_bar (Ft.Gizmo     gizmo,
+                                   Gtk.Snapshot snapshot)
         {
             var bar_index = gizmo.get_data<uint> ("index");
 
@@ -670,9 +670,9 @@ namespace Pomodoro
             }
         }
 
-        private bool contains_bar (Pomodoro.Gizmo gizmo,
-                                   double         x,
-                                   double         y)
+        private bool contains_bar (Ft.Gizmo gizmo,
+                                   double   x,
+                                   double   y)
         {
             if (!gizmo.get_mapped ()) {
                 return false;
@@ -729,12 +729,12 @@ namespace Pomodoro
          * Charts `width` depends more on content and can be scrolled horizontally.
          * `height` is determined by the `Chart` using aspect-ratio.
          */
-        public override Gtk.SizeRequestMode get_contents_request_mode (Pomodoro.Canvas canvas)
+        public override Gtk.SizeRequestMode get_contents_request_mode (Ft.Canvas canvas)
         {
             return Gtk.SizeRequestMode.WIDTH_FOR_HEIGHT;
         }
 
-        public override void update_canvas (Pomodoro.Canvas canvas)
+        public override void update_canvas (Ft.Canvas canvas)
         {
             var bars_count = this.get_bars_count ();
             var bar_index = 0U;
@@ -766,7 +766,7 @@ namespace Pomodoro
             this.x_spacing = (float) this.transform_slope;
         }
 
-        public override void measure_canvas (Pomodoro.Canvas canvas,
+        public override void measure_canvas (Ft.Canvas       canvas,
                                              Gtk.Orientation orientation,
                                              int             for_size,
                                              out int         minimum,
@@ -805,7 +805,7 @@ namespace Pomodoro
             }
         }
 
-        public override void measure_working_area (Pomodoro.Canvas   canvas,
+        public override void measure_working_area (Ft.Canvas         canvas,
                                                    int               available_width,
                                                    int               available_height,
                                                    out Gdk.Rectangle working_area)

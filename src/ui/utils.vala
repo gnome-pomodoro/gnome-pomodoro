@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     internal Gdk.RGBA blend_colors (Gdk.RGBA background_color,
                                     Gdk.RGBA foreground_color)

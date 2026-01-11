@@ -6,13 +6,13 @@
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * Time between the start of provider initialization to resolution of availability.
      */
-    private const int64 AVAILABILITY_TIMEOUT = Pomodoro.Interval.MILLISECOND * 100;
-    private const int64 AVAILABILITY_TIMEOUT_TOLERANCE = Pomodoro.Interval.MILLISECOND * 20;
+    private const int64 AVAILABILITY_TIMEOUT = Ft.Interval.MILLISECOND * 100;
+    private const int64 AVAILABILITY_TIMEOUT_TOLERANCE = Ft.Interval.MILLISECOND * 20;
 
 
     public enum SelectionMode
@@ -52,16 +52,16 @@ namespace Pomodoro
 
     private class ProviderInfo
     {
-        public Pomodoro.Provider             instance;
-        public Pomodoro.Priority             priority;
-        public Pomodoro.ProviderStatus       status = Pomodoro.ProviderStatus.NOT_INITIALIZED;
-        public bool                          selected = false;
-        public bool                          destroying = false;
-        public GLib.Cancellable?             cancellable = null;
-        public int64                         initialization_time = Pomodoro.Timestamp.UNDEFINED;
+        public Ft.Provider       instance;
+        public Ft.Priority       priority;
+        public Ft.ProviderStatus status = Ft.ProviderStatus.NOT_INITIALIZED;
+        public bool              selected = false;
+        public bool              destroying = false;
+        public GLib.Cancellable? cancellable = null;
+        public int64             initialization_time = Ft.Timestamp.UNDEFINED;
 
-        public ProviderInfo (Pomodoro.Provider instance,
-                             Pomodoro.Priority priority)
+        public ProviderInfo (Ft.Provider instance,
+                             Ft.Priority priority)
         {
             this.instance = instance;
             this.priority = priority;
@@ -73,11 +73,11 @@ namespace Pomodoro
                 return 0;
             }
 
-            if (Pomodoro.Timestamp.is_undefined (this.initialization_time)) {
+            if (Ft.Timestamp.is_undefined (this.initialization_time)) {
                 return 0;
             }
 
-            if (Pomodoro.Timestamp.is_undefined (monotonic_time)) {
+            if (Ft.Timestamp.is_undefined (monotonic_time)) {
                 monotonic_time = GLib.get_monotonic_time ();
             }
 
@@ -98,15 +98,15 @@ namespace Pomodoro
 
     public class ProviderSet<T> : GLib.Object
     {
-        private GLib.GenericSet<Pomodoro.ProviderInfo> providers = null;
-        private Pomodoro.SelectionMode                 _selection_mode = Pomodoro.SelectionMode.ALL;
-        private uint                                   update_selection_timeout_id = 0;
-        private uint                                   update_selection_idle_id = 0;
-        private bool                                   selection_invalid = false;
-        private bool                                   updating_selection = false;
-        private bool                                   should_enable = false;
+        private GLib.GenericSet<Ft.ProviderInfo> providers = null;
+        private Ft.SelectionMode                 _selection_mode = Ft.SelectionMode.ALL;
+        private uint                             update_selection_timeout_id = 0;
+        private uint                             update_selection_idle_id = 0;
+        private bool                             selection_invalid = false;
+        private bool                             updating_selection = false;
+        private bool                             should_enable = false;
 
-        public Pomodoro.SelectionMode selection_mode
+        public Ft.SelectionMode selection_mode
         {
             get {
                 return this._selection_mode;
@@ -118,11 +118,11 @@ namespace Pomodoro
 
         construct
         {
-            this.providers = new GLib.GenericSet<Pomodoro.ProviderInfo> (GLib.direct_hash,
-                                                                         GLib.direct_equal);
+            this.providers = new GLib.GenericSet<Ft.ProviderInfo> (GLib.direct_hash,
+                                                                   GLib.direct_equal);
         }
 
-        public ProviderSet (Pomodoro.SelectionMode selection_mode = Pomodoro.SelectionMode.ALL)
+        public ProviderSet (Ft.SelectionMode selection_mode = Ft.SelectionMode.ALL)
         {
             GLib.Object (
                 selection_mode: selection_mode
@@ -134,7 +134,7 @@ namespace Pomodoro
          *
          * It should be called after every async action or status changed.
          */
-        private void check_provider_status (Pomodoro.ProviderInfo provider_info)
+        private void check_provider_status (Ft.ProviderInfo provider_info)
         {
             var provider = provider_info.instance;
 
@@ -146,9 +146,9 @@ namespace Pomodoro
 
             if (provider_info.selected && !provider_info.destroying)
             {
-                if (provider_info.status == Pomodoro.ProviderStatus.NOT_INITIALIZED)
+                if (provider_info.status == Ft.ProviderStatus.NOT_INITIALIZED)
                 {
-                    provider_info.status = Pomodoro.ProviderStatus.INITIALIZING;
+                    provider_info.status = Ft.ProviderStatus.INITIALIZING;
                     provider_info.cancellable = new GLib.Cancellable ();
                     provider_info.initialization_time = GLib.get_monotonic_time ();
                     provider.initialize.begin (
@@ -156,7 +156,7 @@ namespace Pomodoro
                         (obj, res) => {
                             try {
                                 provider.initialize.end (res);
-                                provider_info.status = Pomodoro.ProviderStatus.DISABLED;
+                                provider_info.status = Ft.ProviderStatus.DISABLED;
 
                                 this.check_provider_status (provider_info);
                             }
@@ -164,22 +164,22 @@ namespace Pomodoro
                                 GLib.warning ("Error while initializing %s: %s",
                                               provider.get_type ().name (),
                                               error.message);
-                                provider_info.status = Pomodoro.ProviderStatus.NOT_INITIALIZED;
+                                provider_info.status = Ft.ProviderStatus.NOT_INITIALIZED;
                             }
                         });
                 }
                 else if (this.should_enable &&
-                         provider_info.status == Pomodoro.ProviderStatus.DISABLED &&
+                         provider_info.status == Ft.ProviderStatus.DISABLED &&
                          provider.available)
                 {
-                    provider_info.status = Pomodoro.ProviderStatus.ENABLING;
+                    provider_info.status = Ft.ProviderStatus.ENABLING;
                     provider_info.cancellable = new GLib.Cancellable ();
                     provider.enable.begin (
                         provider_info.cancellable,
                         (obj, res) => {
                             try {
                                 provider.enable.end (res);
-                                provider_info.status = Pomodoro.ProviderStatus.ENABLED;
+                                provider_info.status = Ft.ProviderStatus.ENABLED;
                                 provider.enabled = true;
                                 this.check_provider_status (provider_info);
                             }
@@ -187,20 +187,20 @@ namespace Pomodoro
                                 GLib.warning ("Error while enabling %s: %s",
                                               provider.get_type ().name (),
                                               error.message);
-                                provider_info.status = Pomodoro.ProviderStatus.DISABLED;
+                                provider_info.status = Ft.ProviderStatus.DISABLED;
                             }
                         });
                 }
                 else if (!this.should_enable &&
-                         provider_info.status == Pomodoro.ProviderStatus.ENABLED)
+                         provider_info.status == Ft.ProviderStatus.ENABLED)
                 {
-                    provider_info.status = Pomodoro.ProviderStatus.DISABLING;
+                    provider_info.status = Ft.ProviderStatus.DISABLING;
                     provider.enabled = false;
                     provider.disable.begin (
                         (obj, res) => {
                             try {
                                 provider.disable.end (res);
-                                provider_info.status = Pomodoro.ProviderStatus.DISABLED;
+                                provider_info.status = Ft.ProviderStatus.DISABLED;
 
                                 this.check_provider_status (provider_info);
                             }
@@ -208,17 +208,17 @@ namespace Pomodoro
                                 GLib.warning ("Error while disabling %s: %s",
                                               provider.get_type ().name (),
                                               error.message);
-                                provider_info.status = Pomodoro.ProviderStatus.DISABLED;
+                                provider_info.status = Ft.ProviderStatus.DISABLED;
                             }
                         });
                 }
             }
-            else if (provider_info.status == Pomodoro.ProviderStatus.ENABLED)
+            else if (provider_info.status == Ft.ProviderStatus.ENABLED)
             {
                 // Ensure provider is disabled and uninitialized before destroying.
                 // We try to disable provider even if it's unavailable.
 
-                provider_info.status = Pomodoro.ProviderStatus.DISABLING;
+                provider_info.status = Ft.ProviderStatus.DISABLING;
                 provider.enabled = false;
                 provider.disable.begin (
                     (obj, res) => {
@@ -232,14 +232,14 @@ namespace Pomodoro
                         }
 
                         // We always mark it here as DISABLED, so that it will be deallocated when destroying.
-                        provider_info.status = Pomodoro.ProviderStatus.DISABLED;
+                        provider_info.status = Ft.ProviderStatus.DISABLED;
 
                         this.check_provider_status (provider_info);
                     });
             }
-            else if (provider_info.status == Pomodoro.ProviderStatus.DISABLED && provider_info.destroying)
+            else if (provider_info.status == Ft.ProviderStatus.DISABLED && provider_info.destroying)
             {
-                provider_info.status = Pomodoro.ProviderStatus.UNINITIALIZING;
+                provider_info.status = Ft.ProviderStatus.UNINITIALIZING;
                 provider.uninitialize.begin (
                     (obj, res) => {
                         try {
@@ -252,15 +252,15 @@ namespace Pomodoro
                         }
 
                         // We always mark it here as NOT_INITIALIZED when destroying.
-                        provider_info.status = Pomodoro.ProviderStatus.NOT_INITIALIZED;
+                        provider_info.status = Ft.ProviderStatus.NOT_INITIALIZED;
                     });
             }
         }
 
-        private static int compare (Pomodoro.ProviderInfo provider_info,
-                                    int64                 provider_timeout,
-                                    Pomodoro.ProviderInfo other_info,
-                                    int64                 other_timeout)
+        private static int compare (Ft.ProviderInfo provider_info,
+                                    int64           provider_timeout,
+                                    Ft.ProviderInfo other_info,
+                                    int64           other_timeout)
         {
             var provider_available = provider_info.instance.available_set
                     ? provider_info.instance.available
@@ -284,12 +284,12 @@ namespace Pomodoro
             return 0;
         }
 
-        private void get_preferred_provider_info (out unowned Pomodoro.ProviderInfo? preferred_provider_info,
-                                                  out int64                          preferred_provider_timeout)
+        private void get_preferred_provider_info (out unowned Ft.ProviderInfo? preferred_provider_info,
+                                                  out int64                    preferred_provider_timeout)
         {
-            unowned Pomodoro.ProviderInfo? tmp_preferred_provider_info = null;
+            unowned Ft.ProviderInfo? tmp_preferred_provider_info = null;
             int64                          tmp_preferred_provider_timeout = 0;
-            int64                          monotonic_time = Pomodoro.Timestamp.UNDEFINED;
+            int64                          monotonic_time = Ft.Timestamp.UNDEFINED;
 
             this.providers.@foreach (
                 (provider_info) => {
@@ -321,9 +321,9 @@ namespace Pomodoro
          */
         private void select_single ()
         {
-            unowned Pomodoro.ProviderInfo? preferred_provider_info = null;
-            int64                          preferred_provider_timeout = 0;
-            var                            selection_changed = false;
+            unowned Ft.ProviderInfo? preferred_provider_info = null;
+            int64                    preferred_provider_timeout = 0;
+            var                      selection_changed = false;
 
             this.get_preferred_provider_info (out preferred_provider_info,
                                               out preferred_provider_timeout);
@@ -331,11 +331,11 @@ namespace Pomodoro
             if (preferred_provider_timeout > 0)
             {
                 this.update_selection_timeout_id = GLib.Timeout.add (
-                        Pomodoro.Timestamp.to_milliseconds_uint (preferred_provider_timeout +
-                                                                 AVAILABILITY_TIMEOUT_TOLERANCE),
+                        Ft.Timestamp.to_milliseconds_uint (preferred_provider_timeout +
+                                                           AVAILABILITY_TIMEOUT_TOLERANCE),
                         this.on_update_selection_timeout);
                 GLib.Source.set_name_by_id (this.update_selection_timeout_id,
-                                            "Pomodoro.ProviderSet.on_update_selection_timeout");
+                                            "Ft.ProviderSet.on_update_selection_timeout");
                 return;
             }
 
@@ -431,15 +431,15 @@ namespace Pomodoro
 
             switch (this._selection_mode)
             {
-                case Pomodoro.SelectionMode.NONE:
+                case Ft.SelectionMode.NONE:
                     this.select_none ();
                     break;
 
-                case Pomodoro.SelectionMode.SINGLE:
+                case Ft.SelectionMode.SINGLE:
                     this.select_single ();
                     break;
 
-                case Pomodoro.SelectionMode.ALL:
+                case Ft.SelectionMode.ALL:
                     this.select_all ();
                     break;
 
@@ -468,12 +468,12 @@ namespace Pomodoro
                     return GLib.Source.REMOVE;
                 });
             GLib.Source.set_name_by_id (this.update_selection_idle_id,
-                                        "Pomodoro.ProviderSet.update_selection");
+                                        "Ft.ProviderSet.update_selection");
         }
 
-        private unowned Pomodoro.ProviderInfo? lookup_info (Pomodoro.Provider instance)
+        private unowned Ft.ProviderInfo? lookup_info (Ft.Provider instance)
         {
-            unowned Pomodoro.ProviderInfo provider_info = null;
+            unowned Ft.ProviderInfo provider_info = null;
 
             this.providers.@foreach (
                 (_provider_info) => {
@@ -496,7 +496,7 @@ namespace Pomodoro
         private void on_provider_notify_available (GLib.Object    object,
                                                    GLib.ParamSpec pspec)
         {
-            var provider = (Pomodoro.Provider) object;
+            var provider = (Ft.Provider) object;
             var provider_info = this.lookup_info (provider);
 
             assert (provider_info != null);
@@ -512,7 +512,7 @@ namespace Pomodoro
         private void on_provider_notify_enabled (GLib.Object    object,
                                                  GLib.ParamSpec pspec)
         {
-            var provider = (Pomodoro.Provider) object;
+            var provider = (Ft.Provider) object;
 
             if (provider.enabled) {
                 this.provider_enabled ((T) provider);
@@ -522,7 +522,7 @@ namespace Pomodoro
             }
         }
 
-        private void destroy_info (Pomodoro.ProviderInfo provider_info)
+        private void destroy_info (Ft.ProviderInfo provider_info)
         {
             provider_info.instance.notify["available"].disconnect (this.on_provider_notify_available);
             provider_info.instance.notify["enabled"].connect (this.on_provider_notify_enabled);
@@ -537,10 +537,10 @@ namespace Pomodoro
             this.check_provider_status (provider_info);
         }
 
-        public void add (T                 provider,
-                         Pomodoro.Priority priority = Pomodoro.Priority.DEFAULT)
+        public void add (T           provider,
+                         Ft.Priority priority = Ft.Priority.DEFAULT)
         {
-            var instance = provider as Pomodoro.Provider;
+            var instance = provider as Ft.Provider;
 
             assert (instance != null);
 
@@ -550,7 +550,7 @@ namespace Pomodoro
                 existing_provider_info.priority = priority;
             }
             else {
-                var provider_info = new Pomodoro.ProviderInfo (instance, priority);
+                var provider_info = new Ft.ProviderInfo (instance, priority);
 
                 if (this.providers.add (provider_info)) {
                     provider_info.instance.notify["available"].connect (this.on_provider_notify_available);
@@ -563,7 +563,7 @@ namespace Pomodoro
 
         public void remove (T provider)
         {
-            var instance = provider as Pomodoro.Provider;
+            var instance = provider as Ft.Provider;
 
             assert (instance != null);
 

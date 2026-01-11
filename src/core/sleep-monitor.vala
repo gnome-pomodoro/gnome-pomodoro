@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    public interface SleepMonitorProvider : Pomodoro.Provider
+    public interface SleepMonitorProvider : Ft.Provider
     {
         public signal void prepare_for_sleep ();
         public signal void woke_up ();
@@ -14,7 +14,7 @@ namespace Pomodoro
 
 
     [SingleInstance]
-    public class SleepMonitor : Pomodoro.ProvidedObject<Pomodoro.SleepMonitorProvider>
+    public class SleepMonitor : Ft.ProvidedObject<Ft.SleepMonitorProvider>
     {
         private void on_prepare_for_sleep ()
         {
@@ -36,13 +36,13 @@ namespace Pomodoro
             this.providers.add (new Freedesktop.SleepMonitorProvider ());
         }
 
-        protected override void provider_enabled (Pomodoro.SleepMonitorProvider provider)
+        protected override void provider_enabled (Ft.SleepMonitorProvider provider)
         {
             provider.prepare_for_sleep.connect (this.on_prepare_for_sleep);
             provider.woke_up.connect (this.on_woke_up);
         }
 
-        protected override void provider_disabled (Pomodoro.SleepMonitorProvider provider)
+        protected override void provider_disabled (Ft.SleepMonitorProvider provider)
         {
             provider.prepare_for_sleep.disconnect (this.on_prepare_for_sleep);
             provider.woke_up.disconnect (this.on_woke_up);

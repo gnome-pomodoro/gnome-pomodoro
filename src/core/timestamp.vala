@@ -9,7 +9,7 @@
 /**
  * Helper functions for handling duration.
  */
-namespace Pomodoro.Interval
+namespace Ft.Interval
 {
     public const int64 MICROSECOND = 1;
     public const int64 MILLISECOND = 1000;
@@ -28,7 +28,7 @@ namespace Pomodoro.Interval
 
     public int64 from_seconds (double seconds)
     {
-        return (int64) Math.floor (seconds * (double) Pomodoro.Interval.SECOND);
+        return (int64) Math.floor (seconds * (double) Ft.Interval.SECOND);
     }
 
     public int64 add (int64 interval,
@@ -74,29 +74,29 @@ namespace Pomodoro.Interval
 
     public int64 round_seconds (int64 interval)
     {
-        return round (interval, Pomodoro.Interval.SECOND);
+        return round (interval, Ft.Interval.SECOND);
     }
 
     public double to_seconds (int64 interval)
     {
-        return ((double) interval) / ((double) Pomodoro.Interval.SECOND);
+        return ((double) interval) / ((double) Ft.Interval.SECOND);
     }
 
     public string format_short (int64 interval,
                                 int64 unit = -1)
     {
-        var seconds = (int) (interval / Pomodoro.Interval.SECOND);
+        var seconds = (int) (interval / Ft.Interval.SECOND);
         var hours = 0;
         var minutes = 0;
         var show_hours = false;
         var show_minutes = false;
         var result = new GLib.StringBuilder ();
 
-        if (unit == Pomodoro.Interval.HOUR) {
+        if (unit == Ft.Interval.HOUR) {
             hours = seconds / 3600;
             show_hours = true;
         }
-        else if (unit == Pomodoro.Interval.MINUTE) {
+        else if (unit == Ft.Interval.MINUTE) {
             minutes = seconds / 60;
             show_minutes = true;
         }
@@ -134,7 +134,7 @@ namespace Pomodoro.Interval
 /**
  * Helper functions for handling time.
  */
-namespace Pomodoro.Timestamp
+namespace Ft.Timestamp
 {
     // Special value indicating that timestamp is not set. Assume that timestamps do not go below 0.
     public const int64 UNDEFINED = -1;
@@ -160,17 +160,17 @@ namespace Pomodoro.Timestamp
 
     public int64 from_seconds (double seconds)
     {
-        return (int64) Math.round (seconds * (double) Pomodoro.Interval.SECOND);
+        return (int64) Math.round (seconds * (double) Ft.Interval.SECOND);
     }
 
     public int64 from_seconds_uint (uint seconds)
     {
-        return (int64) seconds * Pomodoro.Interval.SECOND;
+        return (int64) seconds * Ft.Interval.SECOND;
     }
 
     public int64 from_milliseconds_uint (uint milliseconds)
     {
-        return (int64) milliseconds * Pomodoro.Interval.MILLISECOND;
+        return (int64) milliseconds * Ft.Interval.MILLISECOND;
     }
 
     public int64 from_iso8601 (string text)
@@ -178,38 +178,38 @@ namespace Pomodoro.Timestamp
         var datetime = new GLib.DateTime.from_iso8601 (text, null);
 
         return datetime != null
-            ? datetime.to_unix () * Pomodoro.Interval.SECOND + datetime.get_microsecond ()
-            : Pomodoro.Timestamp.UNDEFINED;
+            ? datetime.to_unix () * Ft.Interval.SECOND + datetime.get_microsecond ()
+            : Ft.Timestamp.UNDEFINED;
     }
 
     public int64 from_datetime (GLib.DateTime datetime)
     {
-        return datetime.to_unix () * Pomodoro.Interval.SECOND;
+        return datetime.to_unix () * Ft.Interval.SECOND;
     }
 
     public double to_seconds (int64 timestamp)
     {
-        return ((double) timestamp) / ((double) Pomodoro.Interval.SECOND);
+        return ((double) timestamp) / ((double) Ft.Interval.SECOND);
     }
 
     public uint to_seconds_uint (int64 timestamp)
     {
-        return (uint) (timestamp / Pomodoro.Interval.SECOND).clamp (0, uint.MAX);
+        return (uint) (timestamp / Ft.Interval.SECOND).clamp (0, uint.MAX);
     }
 
     public uint to_seconds_uint32 (int64 timestamp)
     {
-        return (uint32) (timestamp / Pomodoro.Interval.SECOND).clamp (0, uint32.MAX);
+        return (uint32) (timestamp / Ft.Interval.SECOND).clamp (0, uint32.MAX);
     }
 
     public double to_milliseconds (int64 timestamp)
     {
-        return ((double) timestamp) / ((double) Pomodoro.Interval.MILLISECOND);
+        return ((double) timestamp) / ((double) Ft.Interval.MILLISECOND);
     }
 
     public uint to_milliseconds_uint (int64 timestamp)
     {
-        return (uint) (timestamp / Pomodoro.Interval.MILLISECOND).clamp (0, uint.MAX);
+        return (uint) (timestamp / Ft.Interval.MILLISECOND).clamp (0, uint.MAX);
     }
 
     public GLib.DateTime? to_datetime (int64          timestamp,
@@ -219,7 +219,7 @@ namespace Pomodoro.Timestamp
             return null;
         }
 
-        var datetime = new GLib.DateTime.from_unix_utc (timestamp / Pomodoro.Interval.SECOND);
+        var datetime = new GLib.DateTime.from_unix_utc (timestamp / Ft.Interval.SECOND);
 
         return timezone != null
             ? datetime.to_timezone (timezone)
@@ -232,8 +232,8 @@ namespace Pomodoro.Timestamp
             return "";
         }
 
-        var seconds = timestamp / Pomodoro.Interval.SECOND;
-        var microseconds = timestamp % Pomodoro.Interval.SECOND;
+        var seconds = timestamp / Ft.Interval.SECOND;
+        var microseconds = timestamp % Ft.Interval.SECOND;
         var datetime_string = (new GLib.DateTime.from_unix_utc (seconds)).format_iso8601 ();  // TODO: do we really need UTC, local may be prefferable?
 
         if (microseconds > 0) {
@@ -245,12 +245,12 @@ namespace Pomodoro.Timestamp
 
     public inline bool is_defined (int64 timestamp)
     {
-        return timestamp >= Pomodoro.Timestamp.MIN;
+        return timestamp >= Ft.Timestamp.MIN;
     }
 
     public inline bool is_undefined (int64 timestamp)
     {
-        return timestamp < Pomodoro.Timestamp.MIN;
+        return timestamp < Ft.Timestamp.MIN;
     }
 
     public int64 add_interval (int64 timestamp,
@@ -303,13 +303,13 @@ namespace Pomodoro.Timestamp
                         int64 unit)
     {
         return is_defined (timestamp)
-            ? Pomodoro.Interval.round (timestamp, unit)
-            : Pomodoro.Timestamp.UNDEFINED;
+            ? Ft.Interval.round (timestamp, unit)
+            : Ft.Timestamp.UNDEFINED;
     }
 
     public int64 round_seconds (int64 timestamp)
     {
-        return round (timestamp, Pomodoro.Interval.SECOND);
+        return round (timestamp, Ft.Interval.SECOND);
     }
 
     /*
@@ -317,19 +317,19 @@ namespace Pomodoro.Timestamp
      */
 
     /**
-     * Freeze `Pomodoro.Timestamp.from_now()` to current time. Used in unittests.
+     * Freeze `Ft.Timestamp.from_now()` to current time. Used in unittests.
      */
     public int64 freeze ()
     {
-        if (Pomodoro.Timestamp.is_undefined (current_time)) {
-            current_time = Pomodoro.Timestamp.from_now ();
+        if (Ft.Timestamp.is_undefined (current_time)) {
+            current_time = Ft.Timestamp.from_now ();
         }
 
         return current_time;
     }
 
     /**
-     * Freeze `Pomodoro.Timestamp.from_now()` to a given value. Used in unittests.
+     * Freeze `Ft.Timestamp.from_now()` to a given value. Used in unittests.
      */
     public void freeze_to (int64 timestamp)
     {
@@ -341,12 +341,12 @@ namespace Pomodoro.Timestamp
      */
     public void thaw ()
     {
-        current_time = Pomodoro.Timestamp.UNDEFINED;
+        current_time = Ft.Timestamp.UNDEFINED;
     }
 
     public bool is_frozen ()
     {
-        return Pomodoro.Timestamp.is_defined (current_time);
+        return Ft.Timestamp.is_defined (current_time);
     }
 
     /**
@@ -364,7 +364,7 @@ namespace Pomodoro.Timestamp
                           requires (interval >= 0)
     {
         if (!is_frozen ()) {
-            Pomodoro.Timestamp.freeze ();
+            Ft.Timestamp.freeze ();
         }
 
         current_time += interval;
@@ -373,7 +373,7 @@ namespace Pomodoro.Timestamp
     }
 
     /**
-     * If frozen, make every call `Pomodoro.Timestamp.from_now ()` advance by given interval. Used in unittests.
+     * If frozen, make every call `Ft.Timestamp.from_now ()` advance by given interval. Used in unittests.
      */
     public void set_auto_advance (int64 interval)
                                   requires (interval >= 0)

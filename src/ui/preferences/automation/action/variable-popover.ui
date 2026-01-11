@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroVariablePopover" parent="GtkPopover">
+  <template class="FtVariablePopover" parent="GtkPopover">
     <style>
       <class name="menu"/>
     </style>

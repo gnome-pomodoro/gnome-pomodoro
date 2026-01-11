@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroLogWindow" parent="AdwApplicationWindow">
+  <template class="FtLogWindow" parent="AdwApplicationWindow">
     <property name="title" translatable="yes">Log</property>
     <property name="default-width">900</property>
     <property name="default-height">720</property>
@@ -54,7 +54,7 @@
                 <property name="sidebar-position">start</property>
                 <property name="sidebar">
                   <object class="AdwNavigationPage">
-                    <property name="title" bind-source="PomodoroLogWindow" bind-property="title" bind-flags="sync-create"/>
+                    <property name="title" bind-source="FtLogWindow" bind-property="title" bind-flags="sync-create"/>
                     <property name="child">
                       <object class="AdwToolbarView">
                         <child type="top">
@@ -81,11 +81,11 @@
 <interface>
   <template class="GtkListHeader">
     <property name="child">
-      <object class="PomodoroTimeLabel">
+      <object class="FtTimeLabel">
         <property name="xalign">0.0</property>
         <property name="halign">start</property>
         <binding name="timestamp">
-          <lookup name="timestamp" type="PomodoroLogEntry">
+          <lookup name="timestamp" type="FtLogEntry">
             <lookup name="item">GtkListHeader</lookup>
           </lookup>
         </binding>

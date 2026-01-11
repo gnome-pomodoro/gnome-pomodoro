@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/sounds/sound-chooser-window.ui")]
     public class SoundChooserWindow : Adw.Window
@@ -54,20 +54,20 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.CheckButton radio_group;
         [GtkChild]
-        private unowned Pomodoro.VolumeSlider volume_slider;
+        private unowned Ft.VolumeSlider volume_slider;
 
-        private string                 _uri = "";
-        private string                 _event_id = "";
-        private unowned Gtk.ListBox?   list_box = null;
-        private Pomodoro.Sound?        sound = null;
-        private Pomodoro.SoundManager? sound_manager = null;
-        private Adw.Toast?             toast = null;
-        private int                    next_position = 1;
-        private GLib.Cancellable?      cancellable = null;
+        private string                  _uri = "";
+        private string                  _event_id = "";
+        private unowned Gtk.ListBox?    list_box = null;
+        private Ft.Sound?               sound = null;
+        private Ft.SoundManager?        sound_manager = null;
+        private Adw.Toast?              toast = null;
+        private int                     next_position = 1;
+        private GLib.Cancellable?       cancellable = null;
 
         construct
         {
-            this.sound_manager = new Pomodoro.SoundManager ();
+            this.sound_manager = new Ft.SoundManager ();
 
             this.none_row.set_data<string> ("uri", "");
 
@@ -90,10 +90,10 @@ namespace Pomodoro
             }
 
             if (this._event_id != "" && this._event_id != null) {
-                this.sound = new Pomodoro.AlertSound (this._event_id);
+                this.sound = new Ft.AlertSound (this._event_id);
             }
             else {
-                this.sound = new Pomodoro.BackgroundSound ();
+                this.sound = new Ft.BackgroundSound ();
             }
 
             this.sound.notify["error"].connect (this.on_sound_error);

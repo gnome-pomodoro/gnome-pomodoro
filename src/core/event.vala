@@ -9,32 +9,32 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
-    private bool trigger_start_event (Pomodoro.TimerState current_state,
-                                      Pomodoro.TimerState previous_state)
+    private bool trigger_start_event (Ft.TimerState current_state,
+                                      Ft.TimerState previous_state)
     {
-        if (Pomodoro.Context.get_event_source () != "timer.start") {
+        if (Ft.Context.get_event_source () != "timer.start") {
             return false;
         }
 
         return current_state.user_data != null && previous_state.user_data == null;
     }
 
-    private bool trigger_stop_event (Pomodoro.TimerState current_state,
-                                     Pomodoro.TimerState previous_state)
+    private bool trigger_stop_event (Ft.TimerState current_state,
+                                     Ft.TimerState previous_state)
     {
-        if (Pomodoro.Context.get_event_source () != "timer.reset") {
+        if (Ft.Context.get_event_source () != "timer.reset") {
             return false;
         }
 
         return current_state.user_data == null && previous_state.user_data != null;
     }
 
-    private bool trigger_pause_event (Pomodoro.TimerState current_state,
-                                      Pomodoro.TimerState previous_state)
+    private bool trigger_pause_event (Ft.TimerState current_state,
+                                      Ft.TimerState previous_state)
     {
-        if (Pomodoro.Context.get_event_source () != "timer.pause") {
+        if (Ft.Context.get_event_source () != "timer.pause") {
             return false;
         }
 
@@ -42,10 +42,10 @@ namespace Pomodoro
                current_state.is_paused () && !previous_state.is_paused ();
     }
 
-    private bool trigger_resume_event (Pomodoro.TimerState current_state,
-                                       Pomodoro.TimerState previous_state)
+    private bool trigger_resume_event (Ft.TimerState current_state,
+                                       Ft.TimerState previous_state)
     {
-        if (Pomodoro.Context.get_event_source () != "timer.resume") {
+        if (Ft.Context.get_event_source () != "timer.resume") {
             return false;
         }
 
@@ -53,10 +53,10 @@ namespace Pomodoro
                !current_state.is_paused () && previous_state.is_paused ();
     }
 
-    private bool trigger_rewind_event (Pomodoro.TimerState current_state,
-                                       Pomodoro.TimerState previous_state)
+    private bool trigger_rewind_event (Ft.TimerState current_state,
+                                       Ft.TimerState previous_state)
     {
-        if (Pomodoro.Context.get_event_source () != "timer.rewind") {
+        if (Ft.Context.get_event_source () != "timer.rewind") {
             return false;
         }
 
@@ -65,12 +65,12 @@ namespace Pomodoro
                current_state.offset != previous_state.offset;
     }
 
-    private bool trigger_skip_event (Pomodoro.Session?   current_session,
-                                     Pomodoro.TimeBlock? current_time_block,
-                                     Pomodoro.Session?   previous_session,
-                                     Pomodoro.TimeBlock? previous_time_block)
+    private bool trigger_skip_event (Ft.Session?   current_session,
+                                     Ft.TimeBlock? current_time_block,
+                                     Ft.Session?   previous_session,
+                                     Ft.TimeBlock? previous_time_block)
     {
-        if (Pomodoro.Context.get_event_source () != "session-manager.advance") {
+        if (Ft.Context.get_event_source () != "session-manager.advance") {
             return false;
         }
 
@@ -78,8 +78,8 @@ namespace Pomodoro
             return false;
         }
 
-        if (current_time_block.state != Pomodoro.State.POMODORO &&
-            previous_time_block.state != Pomodoro.State.POMODORO)
+        if (current_time_block.state != Ft.State.POMODORO &&
+            previous_time_block.state != Ft.State.POMODORO)
         {
             return false;
         }
@@ -88,16 +88,16 @@ namespace Pomodoro
             return false;
         }
 
-        return current_time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS &&
-               previous_time_block.get_status () == Pomodoro.TimeBlockStatus.UNCOMPLETED;
+        return current_time_block.get_status () == Ft.TimeBlockStatus.IN_PROGRESS &&
+               previous_time_block.get_status () == Ft.TimeBlockStatus.UNCOMPLETED;
     }
 
-    private bool trigger_reset_event (Pomodoro.Session?   current_session,
-                                      Pomodoro.TimeBlock? current_time_block,
-                                      Pomodoro.Session?   previous_session,
-                                      Pomodoro.TimeBlock? previous_time_block)
+    private bool trigger_reset_event (Ft.Session?   current_session,
+                                      Ft.TimeBlock? current_time_block,
+                                      Ft.Session?   previous_session,
+                                      Ft.TimeBlock? previous_time_block)
     {
-        if (Pomodoro.Context.get_event_source () != "session-manager.reset") {
+        if (Ft.Context.get_event_source () != "session-manager.reset") {
             return false;
         }
 
@@ -112,22 +112,22 @@ namespace Pomodoro
         return !previous_session.is_completed ();
     }
 
-    private bool trigger_finish_event (Pomodoro.TimerState current_state,
-                                       Pomodoro.TimerState previous_state)
+    private bool trigger_finish_event (Ft.TimerState current_state,
+                                       Ft.TimerState previous_state)
     {
         return current_state.is_finished () && !previous_state.is_finished ();
     }
 
-    private bool trigger_confirm_advancement_event (Pomodoro.TimeBlock next_time_block,
-                                                    Pomodoro.TimeBlock previous_time_block)
+    private bool trigger_confirm_advancement_event (Ft.TimeBlock next_time_block,
+                                                    Ft.TimeBlock previous_time_block)
     {
         return true;
     }
 
-    private bool trigger_advance_event (Pomodoro.Session?   current_session,
-                                        Pomodoro.TimeBlock? current_time_block,
-                                        Pomodoro.Session?   previous_session,
-                                        Pomodoro.TimeBlock? previous_time_block)
+    private bool trigger_advance_event (Ft.Session?   current_session,
+                                        Ft.TimeBlock? current_time_block,
+                                        Ft.Session?   previous_session,
+                                        Ft.TimeBlock? previous_time_block)
     {
         // Internally `SessionManager.advanced` includes a stopped state, as it follows the call to `advance_*`
         // methods. For user this behaviour may not be obvious. The second thing is that it would intersect with
@@ -137,8 +137,8 @@ namespace Pomodoro
         return current_time_block != null && previous_time_block != null;
     }
 
-    private bool trigger_change_event (Pomodoro.TimerState current_state,
-                                       Pomodoro.TimerState previous_state)
+    private bool trigger_change_event (Ft.TimerState current_state,
+                                       Ft.TimerState previous_state)
     {
         // If timer finishes no true change has been done - the timer finished according to plan.
         if (current_state.is_finished () && current_state.user_data == previous_state.user_data) {
@@ -148,18 +148,18 @@ namespace Pomodoro
         return !current_state.equals (previous_state);
     }
 
-    private bool trigger_state_change_event (Pomodoro.State current_state,
-                                             Pomodoro.State previous_state)
+    private bool trigger_state_change_event (Ft.State current_state,
+                                             Ft.State previous_state)
     {
         return true;
     }
 
-    private bool trigger_reschedule_event (Pomodoro.Session session)
+    private bool trigger_reschedule_event (Ft.Session session)
     {
         return true;
     }
 
-    private bool trigger_expire_event (Pomodoro.Session session)
+    private bool trigger_expire_event (Ft.Session session)
     {
         return true;
     }
@@ -193,7 +193,7 @@ namespace Pomodoro
             }
         }
 
-        public static void @foreach (GLib.Func<Pomodoro.EventCategory> func)
+        public static void @foreach (GLib.Func<Ft.EventCategory> func)
         {
             func (ACTIONS);
             func (COUNTDOWN);
@@ -208,28 +208,28 @@ namespace Pomodoro
         public string                 name;
         public string                 display_name;
         public string                 description;
-        public Pomodoro.EventCategory category;
+        public Ft.EventCategory category;
 
-        internal Pomodoro.Trigger[] triggers;
+        internal Ft.Trigger[] triggers;
 
-        public EventSpec (string                 name,
-                          string                 display_name,
-                          string                 description,
-                          Pomodoro.EventCategory category = Pomodoro.EventCategory.OTHER)
+        public EventSpec (string            name,
+                          string            display_name,
+                          string            description,
+                          Ft.EventCategory category = Ft.EventCategory.OTHER)
         {
             this.name = name;
             this.display_name = display_name;
             this.description = description;
             this.category = category;
-            this.triggers = new Pomodoro.Trigger[0];
+            this.triggers = new Ft.Trigger[0];
         }
 
-        public void add_trigger (Pomodoro.TriggerHook trigger_hook,
-                                 Pomodoro.TriggerFunc trigger_func)
+        public void add_trigger (Ft.TriggerHook trigger_hook,
+                                 Ft.TriggerFunc trigger_func)
         {
             unowned var self = this;
 
-            this.triggers += Pomodoro.Trigger () {
+            this.triggers += Ft.Trigger () {
                 event_spec = self,
                 hook       = trigger_hook,
                 func       = trigger_func
@@ -241,11 +241,11 @@ namespace Pomodoro
     [Compact]
     public class Event
     {
-        public Pomodoro.EventSpec spec;
-        public Pomodoro.Context   context;
+        public Ft.EventSpec spec;
+        public Ft.Context   context;
 
-        public Event (Pomodoro.EventSpec spec,
-                      Pomodoro.Context   context)
+        public Event (Ft.EventSpec spec,
+                      Ft.Context   context)
         {
             this.spec = spec;
             this.context = context;
@@ -259,123 +259,123 @@ namespace Pomodoro
     }
 
 
-    internal void initialize_events (Pomodoro.EventProducer producer)
+    internal void initialize_events (Ft.EventProducer producer)
     {
-        Pomodoro.EventSpec event_spec;
+        Ft.EventSpec event_spec;
 
         // Actions
-        event_spec = new Pomodoro.EventSpec ("start",
-                                             _("Start"),
-                                             _("Started the timer."),
-                                             Pomodoro.EventCategory.ACTIONS);
-        event_spec.add_trigger (Pomodoro.TriggerHook.TIMER_STATE_CHANGED,
-                                (Pomodoro.TriggerFunc) trigger_start_event);
+        event_spec = new Ft.EventSpec ("start",
+                                       _("Start"),
+                                       _("Started the timer."),
+                                       Ft.EventCategory.ACTIONS);
+        event_spec.add_trigger (Ft.TriggerHook.TIMER_STATE_CHANGED,
+                                (Ft.TriggerFunc) trigger_start_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("stop",
-                                             _("Stop"),
-                                             _("Stopped the timer manually."),
-                                             Pomodoro.EventCategory.ACTIONS);
-        event_spec.add_trigger (Pomodoro.TriggerHook.TIMER_STATE_CHANGED,
-                                (Pomodoro.TriggerFunc) trigger_stop_event);
+        event_spec = new Ft.EventSpec ("stop",
+                                       _("Stop"),
+                                       _("Stopped the timer manually."),
+                                       Ft.EventCategory.ACTIONS);
+        event_spec.add_trigger (Ft.TriggerHook.TIMER_STATE_CHANGED,
+                                (Ft.TriggerFunc) trigger_stop_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("pause",
-                                             _("Pause"),
-                                             _("The countdown has been manually paused. Not triggered when locking the screen or when suspending the system."),
-                                             Pomodoro.EventCategory.ACTIONS);
-        event_spec.add_trigger (Pomodoro.TriggerHook.TIMER_STATE_CHANGED,
-                                (Pomodoro.TriggerFunc) trigger_pause_event);
+        event_spec = new Ft.EventSpec ("pause",
+                                       _("Pause"),
+                                       _("The countdown has been manually paused. Not triggered when locking the screen or when suspending the system."),
+                                       Ft.EventCategory.ACTIONS);
+        event_spec.add_trigger (Ft.TriggerHook.TIMER_STATE_CHANGED,
+                                (Ft.TriggerFunc) trigger_pause_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("resume",
-                                             _("Resume"),
-                                             _("The countdown has been manually resumed."),
-                                             Pomodoro.EventCategory.ACTIONS);
-        event_spec.add_trigger (Pomodoro.TriggerHook.TIMER_STATE_CHANGED,
-                                (Pomodoro.TriggerFunc) trigger_resume_event);
+        event_spec = new Ft.EventSpec ("resume",
+                                       _("Resume"),
+                                       _("The countdown has been manually resumed."),
+                                       Ft.EventCategory.ACTIONS);
+        event_spec.add_trigger (Ft.TriggerHook.TIMER_STATE_CHANGED,
+                                (Ft.TriggerFunc) trigger_resume_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("skip",
-                                             _("Skip"),
-                                             _("Jumped to a next time-block before the countdown has finished."),
-                                             Pomodoro.EventCategory.ACTIONS);
-        event_spec.add_trigger (Pomodoro.TriggerHook.SESSION_MANAGER_ADVANCED,
-                                (Pomodoro.TriggerFunc) trigger_skip_event);
+        event_spec = new Ft.EventSpec ("skip",
+                                       _("Skip"),
+                                       _("Jumped to a next time-block before the countdown has finished."),
+                                       Ft.EventCategory.ACTIONS);
+        event_spec.add_trigger (Ft.TriggerHook.SESSION_MANAGER_ADVANCED,
+                                (Ft.TriggerFunc) trigger_skip_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("rewind",
-                                             _("Rewind"),
-                                             _("Rewind action has been used. It adds a pause in the past."),
-                                             Pomodoro.EventCategory.ACTIONS);
-        event_spec.add_trigger (Pomodoro.TriggerHook.TIMER_STATE_CHANGED,
-                                (Pomodoro.TriggerFunc) trigger_rewind_event);
+        event_spec = new Ft.EventSpec ("rewind",
+                                       _("Rewind"),
+                                       _("Rewind action has been used. It adds a pause in the past."),
+                                       Ft.EventCategory.ACTIONS);
+        event_spec.add_trigger (Ft.TriggerHook.TIMER_STATE_CHANGED,
+                                (Ft.TriggerFunc) trigger_rewind_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("reset",
-                                             _("Reset"),
-                                             _("Manually cleared the session."),
-                                             Pomodoro.EventCategory.ACTIONS);
-        event_spec.add_trigger (Pomodoro.TriggerHook.SESSION_MANAGER_ADVANCED,
-                                (Pomodoro.TriggerFunc) trigger_reset_event);
+        event_spec = new Ft.EventSpec ("reset",
+                                       _("Reset"),
+                                       _("Manually cleared the session."),
+                                       Ft.EventCategory.ACTIONS);
+        event_spec.add_trigger (Ft.TriggerHook.SESSION_MANAGER_ADVANCED,
+                                (Ft.TriggerFunc) trigger_reset_event);
         producer.install_event (event_spec);
 
         // Countdown
-        event_spec = new Pomodoro.EventSpec ("finish",
-                                             _("Finished"),
-                                             _("The countdown has finished. If waiting for confirmation, the duration of the time-block still may be altered."),
-                                             Pomodoro.EventCategory.COUNTDOWN);
-        event_spec.add_trigger (Pomodoro.TriggerHook.TIMER_STATE_CHANGED,
-                                (Pomodoro.TriggerFunc) trigger_finish_event);
+        event_spec = new Ft.EventSpec ("finish",
+                                       _("Finished"),
+                                       _("The countdown has finished. If waiting for confirmation, the duration of the time-block still may be altered."),
+                                       Ft.EventCategory.COUNTDOWN);
+        event_spec.add_trigger (Ft.TriggerHook.TIMER_STATE_CHANGED,
+                                (Ft.TriggerFunc) trigger_finish_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("change",
-                                             _("Changed"),
-                                             _("Triggered on any change related to the countdown."),
-                                             Pomodoro.EventCategory.COUNTDOWN);
-        event_spec.add_trigger (Pomodoro.TriggerHook.TIMER_STATE_CHANGED,
-                                (Pomodoro.TriggerFunc) trigger_change_event);
+        event_spec = new Ft.EventSpec ("change",
+                                       _("Changed"),
+                                       _("Triggered on any change related to the countdown."),
+                                       Ft.EventCategory.COUNTDOWN);
+        event_spec.add_trigger (Ft.TriggerHook.TIMER_STATE_CHANGED,
+                                (Ft.TriggerFunc) trigger_change_event);
         producer.install_event (event_spec);
 
         // Session
-        event_spec = new Pomodoro.EventSpec ("confirm-advancement",
-                                             _("Confirm Advancement"),
-                                             _("A manual confirmation is required to start next time-block."),
-                                             Pomodoro.EventCategory.SESSION);
-        event_spec.add_trigger (Pomodoro.TriggerHook.SESSION_MANAGER_CONFIRM_ADVANCEMENT,
-                                (Pomodoro.TriggerFunc) trigger_confirm_advancement_event);
+        event_spec = new Ft.EventSpec ("confirm-advancement",
+                                       _("Confirm Advancement"),
+                                       _("A manual confirmation is required to start next time-block."),
+                                       Ft.EventCategory.SESSION);
+        event_spec.add_trigger (Ft.TriggerHook.SESSION_MANAGER_CONFIRM_ADVANCEMENT,
+                                (Ft.TriggerFunc) trigger_confirm_advancement_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("advance",
-                                             _("Advanced"),
-                                             _("Transitioned or skipped to a next time-block."),
-                                             Pomodoro.EventCategory.SESSION);
-        event_spec.add_trigger (Pomodoro.TriggerHook.SESSION_MANAGER_ADVANCED,
-                                (Pomodoro.TriggerFunc) trigger_advance_event);
+        event_spec = new Ft.EventSpec ("advance",
+                                       _("Advanced"),
+                                       _("Transitioned or skipped to a next time-block."),
+                                       Ft.EventCategory.SESSION);
+        event_spec.add_trigger (Ft.TriggerHook.SESSION_MANAGER_ADVANCED,
+                                (Ft.TriggerFunc) trigger_advance_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("state-change",
-                                             _("State Changed"),
-                                             _("Transitioned to a next time-block or when a break gets relabelled."),
-                                             Pomodoro.EventCategory.SESSION);
-        event_spec.add_trigger (Pomodoro.TriggerHook.SESSION_MANAGER_NOTIFY_CURRENT_STATE,
-                                (Pomodoro.TriggerFunc) trigger_state_change_event);
+        event_spec = new Ft.EventSpec ("state-change",
+                                       _("State Changed"),
+                                       _("Transitioned to a next time-block or when a break gets relabelled."),
+                                       Ft.EventCategory.SESSION);
+        event_spec.add_trigger (Ft.TriggerHook.SESSION_MANAGER_NOTIFY_CURRENT_STATE,
+                                (Ft.TriggerFunc) trigger_state_change_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("reschedule",
-                                             _("Rescheduled"),  // translators: Change of plan
-                                             _("Triggered when scheduled time-blocks have changed."),
-                                             Pomodoro.EventCategory.SESSION);
-        event_spec.add_trigger (Pomodoro.TriggerHook.SESSION_MANAGER_SESSION_RESCHEDULED,
-                                (Pomodoro.TriggerFunc) trigger_reschedule_event);
+        event_spec = new Ft.EventSpec ("reschedule",
+                                       _("Rescheduled"),  // translators: Change of plan
+                                       _("Triggered when scheduled time-blocks have changed."),
+                                       Ft.EventCategory.SESSION);
+        event_spec.add_trigger (Ft.TriggerHook.SESSION_MANAGER_SESSION_RESCHEDULED,
+                                (Ft.TriggerFunc) trigger_reschedule_event);
         producer.install_event (event_spec);
 
-        event_spec = new Pomodoro.EventSpec ("expire",
-                                             _("Expired"),
-                                             _("Triggered when session is about to be reset due to inactivity."),
-                                             Pomodoro.EventCategory.SESSION);
-        event_spec.add_trigger (Pomodoro.TriggerHook.SESSION_MANAGER_SESSION_EXPIRED,
-                                (Pomodoro.TriggerFunc) trigger_expire_event);
+        event_spec = new Ft.EventSpec ("expire",
+                                       _("Expired"),
+                                       _("Triggered when session is about to be reset due to inactivity."),
+                                       Ft.EventCategory.SESSION);
+        event_spec.add_trigger (Ft.TriggerHook.SESSION_MANAGER_SESSION_EXPIRED,
+                                (Ft.TriggerFunc) trigger_expire_event);
         producer.install_event (event_spec);
     }
 }
