@@ -34,11 +34,6 @@ namespace Ft
          */
         private const int64 OVERDUE_TIMEOUT = Ft.Interval.HOUR;
 
-        /**
-         * Idle time to require confirmation to advance to a break.
-         */
-        private const int64 CONTINOUS_ADVANCEMENT_IDLE_TIME_LIMIT = Ft.Interval.MINUTE;
-
         private static Ft.SessionManager? instance = null;
 
         public Ft.Timer timer {
@@ -844,17 +839,6 @@ namespace Ft
 
             switch (advancement_mode)
             {
-                case Ft.AdvancementMode.CONTINUOUS:
-                    // Require activity before starting a break if user is idle at the end of
-                    // a Ft.
-                    if (this._timer.is_finished () &&
-                        this.idle_monitor.enabled &&
-                        this.idle_monitor.is_idle (CONTINOUS_ADVANCEMENT_IDLE_TIME_LIMIT))
-                    {
-                        advancement_mode = Ft.AdvancementMode.WAIT_FOR_ACTIVITY;
-                    }
-                    break;
-
                 case Ft.AdvancementMode.WAIT_FOR_ACTIVITY:
                     // If `IdleMonitor` is not available, use manual confirmation.
                     if (!this.idle_monitor.enabled) {
