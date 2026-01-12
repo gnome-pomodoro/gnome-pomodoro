@@ -1,14 +1,14 @@
 # Swedish translation for focus-timer
-# Copyright © 2017, 2025 Free Software Foundation, Inc.
+# Copyright © 2017, 2025, 2026 Free Software Foundation, Inc.
 # This file is distributed under the same license as the focus-timer package.
-# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2017, 2025.
+# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2017, 2025, 2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-10 11:02+0100\n"
-"PO-Revision-Date: 2025-12-22 16:18+0100\n"
+"PO-Revision-Date: 2026-01-13 00:53+0100\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -23,7 +23,7 @@ msgstr ""
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:9 src/main.vala:34
 #: src/ui/main/dialogs/about-dialog.vala:17
 msgid "Focus Timer"
-msgstr ""
+msgstr "Focus Timer"
 
 #: data/io.github.focustimerhq.FocusTimer.desktop.in.in:3
 msgid "Time management utility"
@@ -32,7 +32,7 @@ msgstr "Tidshanteringsverktyg"
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: data/io.github.focustimerhq.FocusTimer.desktop.in.in:5
 msgid "pomodoro;timer;"
-msgstr ""
+msgstr "pomodoro;timer;tidtagare;"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:10
 msgid "Maintain focus by taking frequent breaks"
@@ -222,15 +222,15 @@ msgstr "Starta Pomodoro"
 
 #: src/application.vala:160
 msgid "Start break"
-msgstr ""
+msgstr "Starta rast"
 
 #: src/application.vala:163
 msgid "Start short break"
-msgstr ""
+msgstr "Starta kort rast"
 
 #: src/application.vala:166
 msgid "Start long break"
-msgstr ""
+msgstr "Starta lång rast"
 
 #. Actions
 #: src/application.vala:169 src/application.vala:611 src/core/event.vala:268
@@ -267,7 +267,7 @@ msgstr "Spola tillbaka"
 
 #: src/application.vala:185 src/application.vala:188
 msgid "SECONDS"
-msgstr ""
+msgstr "SEKUNDER"
 
 #: src/application.vala:187
 msgid "Extend current pomodoro or break"
@@ -280,7 +280,7 @@ msgstr "Återställ"
 
 #: src/application.vala:193
 msgid "Print timer status"
-msgstr ""
+msgstr "Skriv ut tidtagarstatus"
 
 #: src/application.vala:196
 msgid "Show preferences"
@@ -296,16 +296,16 @@ msgstr "Skriv ut versionsinformation och avsluta"
 
 #: src/application.vala:236
 msgid "Timer Options:"
-msgstr ""
+msgstr "Tidtagaralternativ:"
 
 #: src/application.vala:237
 msgid "Show options for controlling the timer"
-msgstr ""
+msgstr "Visa alternativ för att styra tidtagaren"
 
 #: src/application.vala:244
 #, c-format
 msgid "Bugs may be reported at: %s"
-msgstr ""
+msgstr "Fel kan rapporteras på: %s"
 
 #: src/application.vala:623
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
@@ -321,6 +321,7 @@ msgstr "%s återstår"
 #: src/application.vala:829
 msgid "Invalid use. Pass one flag for controlling the timer at a time."
 msgstr ""
+"Ogiltig användning. Skicka en flagga för att styra tidtagaren åt gången."
 
 #: src/core/action-manager.vala:111
 #, c-format
@@ -1538,21 +1539,3 @@ msgstr "Tillämpa"
 msgctxt "accessibility"
 msgid "Sidebar"
 msgstr "Sidopanel"
-
-#~ msgid "@APPLICATION_NAME@"
-#~ msgstr "@APPLICATION_NAME@"
-
-#~ msgid "timer;"
-#~ msgstr "tidtagare;timer;"
-
-#~ msgid "Start/Stop"
-#~ msgstr "Starta/Stoppa"
-
-#~ msgid "Pause/Resume"
-#~ msgstr "Pausa/Återuppta"
-
-#~ msgid "Skip to a pomodoro or to a break"
-#~ msgstr "Hoppa till en pomodoro eller till en paus"
-
-#~ msgid "Reset current session"
-#~ msgstr "Återställ aktuell session"
