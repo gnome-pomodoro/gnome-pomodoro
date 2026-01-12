@@ -122,6 +122,7 @@ namespace Ft
         private GLib.Queue<unowned Ft.EventSpec>     queue = null;
         private uint                                 idle_id = 0;
         private int64                                event_source_timestamp = Ft.Timestamp.UNDEFINED;
+        private int64                                last_session_rescheduled_time = Ft.Timestamp.UNDEFINED;
         private bool                                 destroying = false;
 
         private Ft.Trigger[]                         timer_state_change_triggers;
@@ -368,6 +369,15 @@ namespace Ft
         private void on_session_manager_session_rescheduled (Ft.Session session,
                                                              int64      timestamp)
         {
+            // Workaround for redundant signals.
+            // FIXME: It should be fixed in SessionManager - it calls rescheduling too often at times
+            if (timestamp == this.last_session_rescheduled_time) {
+                GLib.debug ("Detected duplicate 'session-rescheduled' event. Dropping...");
+                return;
+            }
+
+            this.last_session_rescheduled_time = timestamp;
+
             foreach (var trigger in this.session_manager_session_rescheduled_triggers)
             {
                 var trigger_func = (Ft.SessionManagerSessionRescheduledTriggerFunc) trigger.func;
