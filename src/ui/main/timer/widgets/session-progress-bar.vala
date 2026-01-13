@@ -1289,7 +1289,7 @@ namespace Ft
         private void on_timer_state_changed (Ft.TimerState current_state,
                                              Ft.TimerState previous_state)
         {
-            unowned Segment? segment = (Segment?) this.get_first_child ();
+            unowned var segment = (Segment?) this.get_first_child ();
             unowned var current_time_block = (Ft.TimeBlock?) current_state.user_data;
 
             if (current_time_block == null) {
@@ -1298,7 +1298,10 @@ namespace Ft
 
             while (segment != null)
             {
-                if (segment.cycle?.contains (current_time_block) && !segment.has_timeout ()) {
+                if (segment.cycle != null &&
+                    segment.cycle.contains (current_time_block) &&
+                    !segment.has_timeout ())
+                {
                     segment.update_timeout ();
                     break;
                 }
