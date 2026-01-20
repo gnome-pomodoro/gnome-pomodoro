@@ -41,7 +41,7 @@
     <binary>focus-timer</binary>
     <dbus type="user">io.github.focustimerhq.FocusTimer</dbus>
   </provides>
-  <content_rating type="oars-1.1" />
+  <content_rating type="oars-1.1"/>
   <update_contact>kamilprusko@gmail.com</update_contact>
 
   <!-- Branding -->
@@ -49,15 +49,19 @@
   <developer id="io.github.focustimerhq">
     <name translate="no">Kamil Prusko</name>
   </developer>
+  <branding>
+    <color type="primary" scheme_preference="light">#adcae6</color>
+    <color type="primary" scheme_preference="dark">#94b4d1</color>
+  </branding>
 
   <!-- License -->
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
 
   <!-- URLs -->
-  <url type="homepage">https://github.com/focustimerhq/focus-timer</url>
-  <url type="bugtracker">https://github.com/focustimerhq/focus-timer/issues</url>
-  <url type="vcs-browser">https://github.com/focustimerhq/focus-timer</url>
+  <url type="homepage">https://github.com/focustimerhq/FocusTimer</url>
+  <url type="bugtracker">https://github.com/focustimerhq/FocusTimer/issues</url>
+  <url type="vcs-browser">https://github.com/focustimerhq/FocusTimer</url>
   <url type="donation">https://liberapay.com/kamilprusko</url>
 
   <!-- Screenshots -->
@@ -65,10 +69,6 @@
     <screenshot type="default">
       <image>https://gnomepomodoro.org/release/1.0/timer.png</image>
       <caption>Timer</caption>
-    </screenshot>
-    <screenshot>
-      <image>https://gnomepomodoro.org/release/1.0/compact-timer.png</image>
-      <caption>Compact timer</caption>
     </screenshot>
     <screenshot>
       <image>https://gnomepomodoro.org/release/1.0/stats-daily.png</image>

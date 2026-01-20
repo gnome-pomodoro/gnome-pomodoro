@@ -14,8 +14,8 @@
 
   <repository>
     <GitRepository>
-      <browse rdf:resource="https://github.com/focustimerhq/focus-timer" />
-      <location rdf:resource="git@github.com:focustimerhq/focus-timer.git" />
+      <browse rdf:resource="https://github.com/focustimerhq/FocusTimer" />
+      <location rdf:resource="git@github.com:focustimerhq/FocusTimer.git" />
     </GitRepository>
   </repository>
 
