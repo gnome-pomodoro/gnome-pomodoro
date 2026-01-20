@@ -45,38 +45,6 @@
   ],
   "modules": [
     {
-      "name": "gsound",
-      "buildsystem": "meson",
-      "builddir": true,
-      "config-opts": [
-        "--libdir=/app/lib"
-      ],
-      "sources": [
-        {
-          "type": "git",
-          "url": "https://gitlab.gnome.org/GNOME/gsound.git",
-          "tag": "1.0.3"
-        }
-      ],
-      "modules": [
-        {
-          "name": "libcanberra",
-          "config-opts": [
-            "--disable-alsa",
-            "--disable-null",
-            "--disable-oss"
-          ],
-          "sources": [
-            {
-              "type": "archive",
-              "url": "http://0pointer.de/lennart/projects/libcanberra/libcanberra-0.30.tar.xz",
-              "sha256": "c2b671e67e0c288a69fc33dc1b6f1b534d07882c2aceed37004bf48c601afa72"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "name": "libpeas",
       "buildsystem": "meson",
       "builddir": true,

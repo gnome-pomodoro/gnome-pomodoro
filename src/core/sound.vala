@@ -555,142 +555,6 @@ namespace Ft
     }
 
 
-    private class CanberraBackend : GLib.Object, Ft.SoundBackend
-    {
-        public string event_id { get; set; }
-
-        public string path {
-            get {
-                return this._path;
-            }
-            set {
-                this._path = value;
-
-                if (this.cancellable != null) {
-                    this.cancellable.cancel ();
-                    this.cancellable = null;
-                }
-
-                if (this._path != "" && this.event_id != "")
-                {
-                    try {
-                        this.context.cache (GSound.Attribute.EVENT_ID, this.event_id,
-                                            GSound.Attribute.MEDIA_FILENAME, this._path);
-                    }
-                    catch (GLib.Error error) {
-                        GLib.warning ("Error while caching '%s': %s", this._path, error.message);
-                    };
-                }
-            }
-        }
-
-        public double volume { get; set; default = 1.0; }
-
-        private string            _path = "";
-        private GSound.Context?   context = null;
-        private GLib.Cancellable? cancellable = null;
-
-        public CanberraBackend () throws GLib.Error
-        {
-            try {
-                context = new GSound.Context ();
-                context.set_attributes (GSound.Attribute.APPLICATION_ID, Config.APPLICATION_ID,
-                                        GSound.Attribute.APPLICATION_NAME, Config.PACKAGE_NAME,
-                                        GSound.Attribute.APPLICATION_ICON_NAME, Config.APPLICATION_ID);
-                context.open ();
-            }
-            catch (GLib.Error error) {
-                GLib.warning ("Error while initializing canberra: %s", error.message);
-
-                throw new Ft.SoundError.NOT_INITIALIZED (_("Failed to initialize playback"));
-            }
-        }
-
-        public static string[] get_supported_mime_types ()
-        {
-            return {
-                "audio/ogg",
-                "audio/vnd.wave",
-                "audio/x-vorbis+ogg",
-                "audio/x-wav"
-            };
-        }
-
-        public static bool can_play (Ft.Sound   sound,
-                                     GLib.File? file,
-                                     string     content_type)
-        {
-            var alert_sound = sound as Ft.AlertSound;
-
-            if (alert_sound == null || alert_sound.event_id == "") {
-                return false;
-            }
-
-            return file != null && file.is_native () && is_mime_type (content_type, get_supported_mime_types ());
-        }
-
-        public void play ()
-                          requires (this.context != null)
-                          requires (this.event_id != "")
-        {
-            if (this._path == "" || this.volume <= 0.0) {
-                return;
-            }
-
-            if (this.cancellable != null) {
-                this.cancellable.cancel ();
-            }
-
-            var cancellable = new GLib.Cancellable ();
-            var decibels = amplitude_to_decibels (this.volume);
-
-            try {
-                this.context.play_simple (cancellable,
-                                          GSound.Attribute.MEDIA_ROLE, "alert",
-                                          GSound.Attribute.MEDIA_FILENAME, this._path,
-                                          GSound.Attribute.CANBERRA_VOLUME, "%.3f".printf (decibels),
-                                          GSound.Attribute.EVENT_ID, this.event_id);
-                this.cancellable = cancellable;
-
-                // Note: currently these signals are not emitted
-                //       this.playback_started ();
-                //       this.playback_stopped ();
-            }
-            catch (GLib.Error error) {
-                GLib.warning ("Error while playing %s: %s", this._path, error.message);
-
-                this.playback_error (new Ft.SoundError.NOT_INITIALIZED (_("Failed to initialize playback")));
-            }
-        }
-
-        public void stop ()
-        {
-            if (this.cancellable != null) {
-                this.cancellable.cancel ();
-            }
-        }
-
-        public bool is_playing ()
-        {
-            // Event sounds do not need to report that they are playing.
-
-            return false;
-        }
-
-        public override void dispose ()
-        {
-            if (this.cancellable != null) {
-                this.cancellable.cancel ();
-                this.cancellable = null;
-            }
-
-            this.context = null;
-
-            base.dispose ();
-        }
-    }
-
-
     public errordomain SoundError
     {
         NOT_FOUND,
@@ -758,13 +622,7 @@ namespace Ft
                 }
 
                 // Select backend.
-                if (CanberraBackend.can_play (this, file, content_type))
-                {
-                    if (!(backend is CanberraBackend)) {
-                        backend = new CanberraBackend ();
-                    }
-                }
-                else if (GStreamerBackend.can_play (this, file, content_type))
+                if (GStreamerBackend.can_play (this, file, content_type))
                 {
                     if (!(backend is GStreamerBackend)) {
                         backend = new GStreamerBackend ();
@@ -872,13 +730,6 @@ namespace Ft
         protected override void initialize_backend ()
         {
             base.initialize_backend ();
-
-            if (this.backend is CanberraBackend)
-            {
-                this.bind_property ("event-id", backend, "event-id", GLib.BindingFlags.SYNC_CREATE);
-                this.bind_property ("uri", backend, "path", GLib.BindingFlags.SYNC_CREATE, transform_uri_to_path, null);
-                this.bind_property ("volume", backend, "volume", GLib.BindingFlags.SYNC_CREATE);
-            }
 
             if (this.backend is GStreamerBackend)
             {
