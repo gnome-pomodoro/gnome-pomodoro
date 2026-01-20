@@ -1,3 +1,11 @@
+2026-01-20  Kamil Prusko  <kamilprusko@gmail.com>
+	Release version 1.0-beta:
+
+    * Ported the app to GTK+4 and libadwaita
+    * Updated Swedish translation (thanks @haaninjo)
+    * Updated Georgian translation (thanks @NorwayFun)
+    * Updated Indonesian translation (thanks @atriwidada)
+
 2025-12-18  Kamil Prusko  <kamilprusko@gmail.com>
 	Release version 0.28.1:
 

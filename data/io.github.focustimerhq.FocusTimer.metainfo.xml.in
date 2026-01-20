@@ -90,68 +90,14 @@
 
   <!-- Releases -->
   <releases>
-    <release version="0.28.1" date="2025-12-18">
+    <release version="1.0-beta" date="2026-01-20">
       <description translate="no">
-        <p>Overview of changes in gnome-pomodoro 0.28.1</p>
+        <p>Overview of changes in focus-timer 1.0-beta</p>
         <ul>
-          <li>Added Tamil translation (thanks @omeritzics)</li>
-          <li>Added Hebrew translation (thanks @Killersparrow1)</li>
-        </ul>
-      </description>
-    </release>
-    <release version="0.28.0" date="2025-09-18">
-      <description translate="no">
-        <p>Overview of changes in gnome-pomodoro 0.28.0</p>
-        <ul>
-          <li>Support for GNOME Shell 49 (thanks @aleasto)</li>
-          <li>Updated German translation (thanks @daPhipz)</li>
-        </ul>
-      </description>
-    </release>
-    <release version="0.27.0" date="2025-02-22">
-      <description translate="no">
-        <p>Overview of changes in gnome-pomodoro 0.27.0</p>
-        <ul>
-          <li>Support for GNOME Shell 48</li>
-          <li>Split time spent across midnight</li>
-          <li>Added Telugu translation (thanks @SpaciousCoder78)</li>
-        </ul>
-      </description>
-    </release>
-    <release version="0.26.0" date="2024-09-10">
-      <description translate="no">
-        <p>Overview of changes in gnome-pomodoro 0.26.0</p>
-        <ul>
-          <li>Support for GNOME Shell 47</li>
-          <li>Allow to dismiss screen overlay by gesture when a video is playing</li>
-          <li>Added Georgian translation (thanks @NorwayFun)</li>
-          <li>Adjusted translations in appdata (thanks @yakushabb)</li>
-        </ul>
-      </description>
-    </release>
-    <release version="0.25.2" date="2024-05-31">
-      <description translate="no">
-        <p>Overview of changes in gnome-pomodoro 0.25.2</p>
-        <ul>
-          <li>Fix keeping notification after extending Pomodoro</li>
-        </ul>
-      </description>
-    </release>
-    <release version="0.25.1" date="2024-03-28">
-      <description translate="no">
-        <p>Overview of changes in gnome-pomodoro 0.25.1</p>
-        <ul>
-          <li>Fixes for GNOME Shell 46</li>
-          <li>Drop support for GNOME Shell 45</li>
-        </ul>
-      </description>
-    </release>
-    <release version="0.25.0" date="2024-03-05">
-      <description translate="no">
-        <p>Overview of changes in gnome-pomodoro 0.25.0</p>
-        <ul>
-          <li>Support for GNOME Shell 46</li>
-          <li>Adjust build script to meson 0.59.0 (thanks @mattst88)</li>
+          <li>Ported the app to GTK+4 and libadwaita</li>
+          <li>Updated Swedish translation (thanks @haaninjo)</li>
+          <li>Updated Georgian translation (thanks @NorwayFun)</li>
+          <li>Updated Indonesian translation (thanks @atriwidada)</li>
         </ul>
       </description>
     </release>
