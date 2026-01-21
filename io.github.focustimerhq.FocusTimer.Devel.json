@@ -23,7 +23,7 @@
     "--talk-name=org.gnome.ScreenSaver",
     "--talk-name=org.gnome.Shell",
     "--talk-name=org.gtk.vfs.*",
-    "--filesystem=~/.local/share/gnome-pomodoro/:ro",
+    "--persist=.local/share/gnome-pomodoro",
     "--filesystem=xdg-run/gvfsd",
     "--env=G_MESSAGES_DEBUG=focus-timer",
     "--env=G_ENABLE_DIAGNOSTIC=1"
@@ -69,8 +69,7 @@
       "builddir": true,
       "config-opts": [
         "-Dexamples=false",
-        "-Dtests=false",
-        "--libdir=/app/lib"
+        "-Dtests=false"
       ],
       "sources": [
         {
@@ -84,9 +83,6 @@
           "name": "libsass",
           "buildsystem": "meson",
           "builddir": true,
-          "config-opts": [
-            "--libdir=/app/lib"
-          ],
           "sources": [
             {
               "type": "git",
@@ -99,9 +95,6 @@
           "name": "sassc",
           "buildsystem": "meson",
           "builddir": true,
-          "config-opts": [
-            "--libdir=/app/lib"
-          ],
           "sources": [
             {
               "type": "git",
@@ -116,9 +109,6 @@
       "name": "gom",
       "buildsystem": "meson",
       "builddir": true,
-      "config-opts": [
-        "--libdir=/app/lib"
-      ],
       "sources": [
         {
           "type": "git",

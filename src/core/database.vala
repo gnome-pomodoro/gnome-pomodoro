@@ -193,14 +193,20 @@ namespace Ft.Database
             var file_path = GLib.Path.build_filename (directory_path, "database.sqlite");
             file = GLib.File.new_for_path (file_path);
 
-            var old_file_path = GLib.Path.build_filename (GLib.Environment.get_home_dir (),
+            var old_file_path = GLib.Path.build_filename (GLib.Environment.get_user_data_dir (),
+                                                          "gnome-pomodoro",
+                                                          "database.sqlite");
+            if (Ft.is_flatpak ()) {
+                old_file_path = GLib.Path.build_filename (GLib.Environment.get_home_dir (),
                                                           ".local",
                                                           "share",
                                                           "gnome-pomodoro",
                                                           "database.sqlite");
+            }
+
             var old_file = GLib.File.new_for_path (old_file_path);
 
-            if (old_file.query_exists () && !file.query_exists ())
+            if (!file.query_exists () && old_file.query_exists ())
             {
                 try {
                     old_file.copy (file, GLib.FileCopyFlags.NONE, null, null);
