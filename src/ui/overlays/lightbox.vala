@@ -133,9 +133,12 @@ namespace Ft
         {
             if (this._monitor != null)
             {
+                // Divide by scale_factor because monitor.geometry may return
+                // physical pixels on some systems (e.g., Wayland with HiDPI)
+                var scale = widget.get_scale_factor ();
                 minimum = natural = orientation == Gtk.Orientation.HORIZONTAL
-                    ? this._monitor.geometry.width
-                    : this._monitor.geometry.height;
+                    ? this._monitor.geometry.width / scale
+                    : this._monitor.geometry.height / scale;
             }
             else {
                 minimum = natural = 0;
@@ -159,11 +162,14 @@ namespace Ft
 
             if (this._monitor != null)
             {
+                // Divide by scale_factor because monitor.geometry may return
+                // physical pixels on some systems (e.g., Wayland with HiDPI)
+                var scale = widget.get_scale_factor ();
                 var monitor_geometry = this._monitor.get_geometry ();
-                allocation.x = monitor_geometry.x;
-                allocation.y = monitor_geometry.y;
-                allocation.width = monitor_geometry.width;
-                allocation.height = monitor_geometry.height;
+                allocation.x = monitor_geometry.x / scale;
+                allocation.y = monitor_geometry.y / scale;
+                allocation.width = monitor_geometry.width / scale;
+                allocation.height = monitor_geometry.height / scale;
             }
 
             var child = widget.get_first_child ();
@@ -737,19 +743,23 @@ namespace Ft
         {
             var monitor = this._monitor != null ? this._monitor : this._monitor_request;
 
+            // Divide by scale_factor because monitor.geometry may return
+            // physical pixels on some systems (e.g., Wayland with HiDPI)
+            var scale = this.get_scale_factor ();
+
             if (this._monitor_request == null && this.monitors.length > 1)
             {
                 var display_geometry = get_display_geometry (this.get_display ());
 
                 minimum = natural = orientation == Gtk.Orientation.HORIZONTAL
-                    ? display_geometry.width : display_geometry.height;
+                    ? display_geometry.width / scale : display_geometry.height / scale;
             }
             else if (monitor != null && this.monitors.length == 1)
             {
                 var monitor_geometry = monitor.geometry;
 
                 minimum  = natural = orientation == Gtk.Orientation.HORIZONTAL
-                    ? monitor_geometry.width : monitor_geometry.height;
+                    ? monitor_geometry.width / scale : monitor_geometry.height / scale;
             }
             else {
                 base.measure (orientation,
