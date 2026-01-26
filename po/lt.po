@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-10 11:31+0100\n"
-"PO-Revision-Date: 2023-03-25 14:35+0100\n"
+"PO-Revision-Date: 2026-01-26 08:59+0200\n"
 "Last-Translator: Paulius Šukys <paul.sukys@gmail.com>\n"
 "Language-Team: Lithuanian\n"
 "Language: lt\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 ? 0 : n%10>=2 && (n%100<10 || "
 "n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.8\n"
 
 #. translators: consider 'Concentration Timer' as an alternative, whichever sounds more natural
 #: data/io.github.focustimerhq.FocusTimer.desktop.in.in:2
@@ -29,7 +29,6 @@ msgid "Focus Timer"
 msgstr ""
 
 #: data/io.github.focustimerhq.FocusTimer.desktop.in.in:3
-#, fuzzy
 msgid "Time management utility"
 msgstr "Laiko valdymo įrankis"
 
@@ -39,12 +38,10 @@ msgid "pomodoro;timer;"
 msgstr ""
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:10
-#, fuzzy
 msgid "Maintain focus by taking frequent breaks"
 msgstr "Išlaikykite susikaupimą darydami dažnas pertraukas"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:12
-#, fuzzy
 msgid ""
 "A productivity timer that helps you work more effectively by breaking your "
 "time into focused work sessions followed by short breaks. Work for 25 "
@@ -57,37 +54,30 @@ msgstr ""
 "išvengtumėte perdegimo."
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:16
-#, fuzzy
 msgid "Key features:"
 msgstr "Pagrindinės savybės:"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:20
-#, fuzzy
 msgid "Customizable work session and break lengths"
 msgstr "Pritaikoma darbo sesijų ir pertraukų trukmė"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:21
-#, fuzzy
 msgid "Visual and audio notifications"
 msgstr "Vaizdiniai ir garsiniai pranešimai"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:22
-#, fuzzy
 msgid "Time tracking and statistics"
 msgstr "Laiko sekimas ir statistika"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:23
-#, fuzzy
 msgid "GNOME desktop integration"
 msgstr "Integracija su GNOME aplinka"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:24
-#, fuzzy
 msgid "Screen overlay during breaks"
 msgstr "Ekrano užsklanda pertraukų metu"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:25
-#, fuzzy
 msgid "Run custom commands after Pomodoro or break"
 msgstr "Vykdykite pasirinktines komandas po Pomodoro sesijos ar pertraukos"
 
@@ -103,17 +93,14 @@ msgid "Timer"
 msgstr "Laikmatis"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:71
-#, fuzzy
 msgid "Compact timer"
 msgstr "Kompaktiškas laikmatis"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:75
-#, fuzzy
 msgid "Daily stats"
 msgstr "Dienos statistika"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:79
-#, fuzzy
 msgid "Monthly stats"
 msgstr "Mėnesio statistika"
 
@@ -123,7 +110,6 @@ msgid "Preferences"
 msgstr "Nustatymai"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:87
-#, fuzzy
 msgid "Screen overlay"
 msgstr "Ekrano užsklanda"
 
@@ -244,13 +230,11 @@ msgstr "Sukūrimo skriptas pritaikytas meson 0.59.0 (ačiū @mattst88)"
 
 #: src/application.vala:151 src/application.vala:606
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:40
-#, fuzzy
 msgid "Start or Stop"
 msgstr "Pradėti arba sustabdyti"
 
 #: src/application.vala:154 src/application.vala:609
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:47
-#, fuzzy
 msgid "Start, Pause or Resume"
 msgstr "Pradėti, pristabdyti arba tęsti"
 
@@ -264,15 +248,15 @@ msgstr "Pradėti Pomodoro"
 
 #: src/application.vala:160
 msgid "Start break"
-msgstr ""
+msgstr "Pradėti pertrauką"
 
 #: src/application.vala:163
 msgid "Start short break"
-msgstr ""
+msgstr "Pradėti trumpą pertrauką"
 
 #: src/application.vala:166
 msgid "Start long break"
-msgstr ""
+msgstr "Pradėti ilgą pertrauką"
 
 #. Actions
 #: src/application.vala:169 src/application.vala:611 src/core/event.vala:268
@@ -304,13 +288,12 @@ msgid "Skip"
 msgstr "Praleisti"
 
 #: src/application.vala:184 src/application.vala:621 src/core/event.vala:308
-#, fuzzy
 msgid "Rewind"
 msgstr "Atsukti"
 
 #: src/application.vala:185 src/application.vala:188
 msgid "SECONDS"
-msgstr ""
+msgstr "SEKUNDĖS"
 
 #: src/application.vala:187
 msgid "Extend current pomodoro or break"
@@ -318,13 +301,12 @@ msgstr "Pratęskite dabartinį pomodoro arba pertrauką"
 
 #: src/application.vala:190 src/core/event.vala:316
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:39
-#, fuzzy
 msgid "Reset"
 msgstr "Atstatyti"
 
 #: src/application.vala:193
 msgid "Print timer status"
-msgstr ""
+msgstr "Atspausdinti laikmačio būseną"
 
 #: src/application.vala:196
 msgid "Show preferences"
@@ -340,75 +322,71 @@ msgstr "Spausdinti versijos informaciją ir išeiti"
 
 #: src/application.vala:236
 msgid "Timer Options:"
-msgstr ""
+msgstr "Laikmačio Pasirinkimai"
 
 #: src/application.vala:237
 msgid "Show options for controlling the timer"
-msgstr ""
+msgstr "Rodyti laikmačio kontrolės nustatymus"
 
 #: src/application.vala:244
 #, c-format
 msgid "Bugs may be reported at: %s"
-msgstr ""
+msgstr "Pranešti apie defektus: %s"
 
 #: src/application.vala:623
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:106
-#, fuzzy
 msgid "Bring to Focus"
 msgstr "Iškelti į priekį"
 
 #. translators: time remaining eg. "3 minutes 50 seconds remaining"
 #: src/application.vala:786 src/core/notification-manager.vala:188
-#, fuzzy, c-format
+#, c-format
 msgid "%s remaining"
 msgstr "Liko %s"
 
 #: src/application.vala:829
 msgid "Invalid use. Pass one flag for controlling the timer at a time."
 msgstr ""
+"Negalima konfigūracija. Pateikite po vieną žymą vienu metu laikmačio "
+"kontrolei."
 
 #: src/core/action-manager.vala:111
-#, fuzzy, c-format
+#, c-format
 msgid "Custom action \"%s\" has failed"
 msgstr "Pasirinktinis veiksmas „%s“ nepavyko"
 
 #: src/core/command.vala:379
-#, fuzzy
 msgid "Reached timeout"
 msgstr "Baigėsi laikas"
 
 #: src/core/command.vala:408
-#, fuzzy
 msgid "Failed to execute command"
 msgstr "Nepavyko įvykdyti komandos"
 
 #: src/core/command.vala:491 src/core/command.vala:506
-#, fuzzy
 msgid "Command is empty"
 msgstr "Komanda yra tuščia"
 
 #: src/core/command.vala:510
-#, fuzzy
 msgid "Unclosed quotation mark"
 msgstr "Neuždaryta kabutė"
 
 #: src/core/command.vala:515
-#, fuzzy
 msgid "Invalid command"
 msgstr "Neteisinga komanda"
 
 #: src/core/command.vala:540 src/core/expression.vala:859
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown variable \"%s\""
 msgstr "Nežinomas kintamasis „%s“"
 
 #: src/core/command.vala:546 src/core/expression.vala:236
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown format \"%s\""
 msgstr "Nežinomas formatas „%s“"
 
 #: src/core/command.vala:619
-#, fuzzy, c-format
+#, c-format
 msgid "Program \"%s\" not found"
 msgstr "Programa „%s“ nerasta"
 
@@ -418,33 +396,27 @@ msgid "Actions"
 msgstr "Veiksmai"
 
 #: src/core/event.vala:183
-#, fuzzy
 msgid "Countdown"
 msgstr "Atgalinis skaičiavimas"
 
 #: src/core/event.vala:186
 #: src/ui/preferences/timer/preferences-panel-timer.ui:17
-#, fuzzy
 msgid "Session"
 msgstr "Sesija"
 
 #: src/core/event.vala:189
-#, fuzzy
 msgid "Other"
 msgstr "Kita"
 
 #: src/core/event.vala:269
-#, fuzzy
 msgid "Started the timer."
 msgstr "Laikmatis paleistas."
 
 #: src/core/event.vala:277
-#, fuzzy
 msgid "Stopped the timer manually."
 msgstr "Laikmatis sustabdytas rankiniu būdu."
 
 #: src/core/event.vala:285
-#, fuzzy
 msgid ""
 "The countdown has been manually paused. Not triggered when locking the "
 "screen or when suspending the system."
@@ -453,22 +425,18 @@ msgstr ""
 "ekraną ar užmigdant sistemą."
 
 #: src/core/event.vala:293
-#, fuzzy
 msgid "The countdown has been manually resumed."
 msgstr "Skaičiavimas buvo pratęstas rankiniu būdu."
 
 #: src/core/event.vala:301
-#, fuzzy
 msgid "Jumped to a next time-block before the countdown has finished."
 msgstr "Pereita prie kito laiko bloko nepasibaigus skaičiavimui."
 
 #: src/core/event.vala:309
-#, fuzzy
 msgid "Rewind action has been used. It adds a pause in the past."
 msgstr "Panaudotas atsukimo veiksmas. Jis prideda pauzę praeityje."
 
 #: src/core/event.vala:317
-#, fuzzy
 msgid "Manually cleared the session."
 msgstr "Sesija išvalyta rankiniu būdu."
 
@@ -476,12 +444,10 @@ msgstr "Sesija išvalyta rankiniu būdu."
 #: src/core/event.vala:325
 #: src/ui/preferences/automation/action/action-edit-window.ui:20
 #: src/ui/preferences/automation/action/condition-widget.vala:120
-#, fuzzy
 msgid "Finished"
 msgstr "Baigta"
 
 #: src/core/event.vala:326
-#, fuzzy
 msgid ""
 "The countdown has finished. If waiting for confirmation, the duration of the "
 "time-block still may be altered."
@@ -490,64 +456,53 @@ msgstr ""
 "gali būti pakeista."
 
 #: src/core/event.vala:333
-#, fuzzy
 msgid "Changed"
 msgstr "Pasikeitė"
 
 #: src/core/event.vala:334
-#, fuzzy
 msgid "Triggered on any change related to the countdown."
-msgstr "Aktyvuojama įvykus bet kokiam su skaičiavimu susijusiam pokyčiui."
+msgstr ""
+"Aktyvuojama įvykus bet kokiam su atgaliniu skaičiavimu susijusiam pokyčiui."
 
 #. Session
 #: src/core/event.vala:342
-#, fuzzy
 msgid "Confirm Advancement"
 msgstr "Patvirtinti eigą"
 
 #: src/core/event.vala:343
-#, fuzzy
 msgid "A manual confirmation is required to start next time-block."
 msgstr "Norint pradėti kitą laiko bloką, reikalingas rankinis patvirtinimas."
 
 #: src/core/event.vala:350
-#, fuzzy
 msgid "Advanced"
 msgstr "Pažengta"
 
 #: src/core/event.vala:351
-#, fuzzy
 msgid "Transitioned or skipped to a next time-block."
 msgstr "Pereita arba praleista į kitą laiko bloką."
 
 #: src/core/event.vala:358
-#, fuzzy
 msgid "State Changed"
 msgstr "Būsena pasikeitė"
 
 #: src/core/event.vala:359
-#, fuzzy
 msgid "Transitioned to a next time-block or when a break gets relabelled."
 msgstr "Pereita į kitą laiko bloką arba kai pertrauka pervardijama."
 
 #: src/core/event.vala:366
-#, fuzzy
 msgid "Rescheduled"
 msgstr "Perplanuota"
 
 #. translators: Change of plan
 #: src/core/event.vala:367
-#, fuzzy
 msgid "Triggered when scheduled time-blocks have changed."
 msgstr "Aktyvuojama pasikeitus suplanuotiems laiko blokams."
 
 #: src/core/event.vala:374
-#, fuzzy
 msgid "Expired"
 msgstr "Baigėsi laikas"
 
 #: src/core/event.vala:375
-#, fuzzy
 msgid "Triggered when session is about to be reset due to inactivity."
 msgstr "Aktyvuojama, kai sesija turi būti atstatyta dėl neaktyvumo."
 
@@ -584,7 +539,6 @@ msgstr "Pomodoro tuoj baigsis"
 #: src/core/notification-manager.vala:603
 #: src/core/notification-manager.vala:608
 #: src/core/notification-manager.vala:613 src/ui/overlays/screen-overlay.ui:5
-#, fuzzy
 msgid "Take a Break"
 msgstr "Metas pertraukai"
 
@@ -593,7 +547,6 @@ msgid "Break is about to end"
 msgstr "Pertrauka tuoj baigsis"
 
 #: src/core/notification-manager.vala:511
-#, fuzzy
 msgid "+1 minute"
 msgstr "+1 minutė"
 
@@ -603,33 +556,27 @@ msgstr "Pasiruošk…"
 
 #: src/core/notification-manager.vala:541
 #: src/core/notification-manager.vala:581
-#, fuzzy
 msgid "Pomodoro is over!"
 msgstr "Pomodoro sesija baigėsi!"
 
 #: src/core/notification-manager.vala:547
 #: src/core/notification-manager.vala:587
-#, fuzzy
 msgid "Break is over!"
 msgstr "Pertrauka baigėsi!"
 
 #: src/core/notification-manager.vala:597
-#, fuzzy
 msgid "Confirm the start of a Pomodoro…"
 msgstr "Patvirtinkite Pomodoro pradžią…"
 
 #: src/core/notification-manager.vala:602
-#, fuzzy
 msgid "Confirm the start of a break…"
 msgstr "Patvirtinkite pertraukos pradžią…"
 
 #: src/core/notification-manager.vala:607
-#, fuzzy
 msgid "Confirm the start of a short break…"
-msgstr "Patvirtinkite trumpos pertraukėlės pradžią…"
+msgstr "Patvirtinkite trumpos pertraukos pradžią…"
 
 #: src/core/notification-manager.vala:612
-#, fuzzy
 msgid "Confirm the start of a long break…"
 msgstr "Patvirtinkite ilgos pertraukos pradžią…"
 
@@ -638,24 +585,20 @@ msgid "Skip Break"
 msgstr "Praleisti pertrauką"
 
 #: src/core/sound.vala:405 src/core/sound.vala:605 src/core/sound.vala:662
-#, fuzzy
 msgid "Failed to initialize playback"
-msgstr "Nepavyko inicijuoti atkūrimo"
+msgstr "Nepavyko pradėti atkūrimo"
 
 #. Validate file.
 #: src/core/sound.vala:757
-#, fuzzy
 msgid "File not found"
 msgstr "Failas nerastas"
 
 #: src/core/sound.vala:775
-#, fuzzy
 msgid "File type not supported"
 msgstr "Failo tipas nepalaikomas"
 
 #: src/core/state.vala:75
 #: src/ui/preferences/automation/action/condition-widget.ui:55
-#, fuzzy
 msgid "Stopped"
 msgstr "Sustabdyta"
 
@@ -674,18 +617,18 @@ msgstr "Ilga pertrauka"
 
 #. translators: Short form for number of hours
 #: src/core/timestamp.vala:117
-#, fuzzy, c-format
+#, c-format
 msgid "%uh"
 msgstr "%u val."
 
 #. translators: Short form for number of minutes
 #: src/core/timestamp.vala:126
-#, fuzzy, c-format
+#, c-format
 msgid "%um"
 msgstr "%u min."
 
 #: src/core/utils.vala:72
-#, fuzzy, c-format
+#, c-format
 msgid "%u hour"
 msgid_plural "%u hours"
 msgstr[0] "%u valanda"
@@ -693,7 +636,7 @@ msgstr[1] "%u valandos"
 msgstr[2] "%u valandų"
 
 #: src/core/utils.vala:81
-#, fuzzy, c-format
+#, c-format
 msgid "%u minute"
 msgid_plural "%u minutes"
 msgstr[0] "%u minutė"
@@ -701,7 +644,7 @@ msgstr[1] "%u minutės"
 msgstr[2] "%u minučių"
 
 #: src/core/utils.vala:90
-#, fuzzy, c-format
+#, c-format
 msgid "%u second"
 msgid_plural "%u seconds"
 msgstr[0] "%u sekundė"
@@ -709,100 +652,82 @@ msgstr[1] "%u sekundės"
 msgstr[2] "%u sekundžių"
 
 #: src/core/variables.vala:116
-#, fuzzy
 msgid "The exact time of the current event."
 msgstr "Tikslus dabartinio įvykio laikas."
 
 #: src/core/variables.vala:121
-#, fuzzy
 msgid ""
 "The current phase of the Pomodoro cycle. Possible values: <tt>stopped</tt>, "
 "<tt>pomodoro</tt>, <tt>break</tt>, <tt>short-break</tt>, <tt>long-break</tt>."
 msgstr ""
-"Dabartinė Pomodoro ciklo fazė. Galimos reikšmės: <tt>stopped</tt> "
-"(sustabdyta), <tt>pomodoro</tt>, <tt>break</tt> (pertrauka), <tt>short-"
-"break</tt> (trumpa pertrauka), <tt>long-break</tt> (ilga pertrauka)."
+"Dabartinė Pomodoro ciklo fazė. Galimos reikšmės: <tt>sustabdyta</tt>, "
+"<tt>pomodoro</tt>, <tt>pertrauka</tt>, <tt>trumpa petrauka</tt>, <tt>ilga "
+"pertrauka</tt>."
 
 #: src/core/variables.vala:126
-#, fuzzy
 msgid ""
 "Status of the current time-block. Possible values: <tt>scheduled</tt>, "
 "<tt>in-progress</tt>, <tt>completed</tt>, <tt>uncompleted</tt>."
 msgstr ""
-"Dabartinio laiko bloko būsena. Galimos reikšmės: <tt>scheduled</tt> "
-"(suplanuota), <tt>in-progress</tt> (vykdoma), <tt>completed</tt> (baigta), "
-"<tt>uncompleted</tt> (nebaigta)."
+"Dabartinio laiko bloko būsena. Galimos reikšmės: <tt>suplanuota</tt>, "
+"<tt>vykdoma</tt>, <tt>baigta</tt>, <tt>nebaigta</tt>."
 
 #: src/core/variables.vala:131
-#, fuzzy
 msgid "A flag indicating whether countdown has begun."
-msgstr "Žyma, nurodanti, ar skaičiavimas prasidėjo."
+msgstr "Žyma, nurodanti atgalinio skaičiavimo pradžią."
 
 #: src/core/variables.vala:136
-#, fuzzy
 msgid "A flag indicating whether countdown is paused."
-msgstr "Žyma, nurodanti, ar skaičiavimas pristabdytas."
+msgstr "Žyma, nurodanti atgalinio skaičiavimo pristabdymą."
 
 #: src/core/variables.vala:141
-#, fuzzy
 msgid "A flag indicating whether countdown has finished."
-msgstr "Žyma, nurodanti, ar skaičiavimas baigėsi."
+msgstr "Žyma, nurodanti atgalinio skaičiavimo pabaigą."
 
 #: src/core/variables.vala:146
-#, fuzzy
 msgid "A flag indicating whether the timer is actively counting down."
-msgstr "Žyma, nurodanti, ar laikmatis aktyviai skaičiuoja laiką."
+msgstr "Žyma, nurodanti, ar laikmatis aktyviai skaičiuoja laiką atgal."
 
 #: src/core/variables.vala:151
-#, fuzzy
 msgid "Duration of the current countdown."
-msgstr "Dabartinio skaičiavimo trukmė."
+msgstr "Dabartinio atgalinio skaičiavimo trukmė."
 
 #. translators: Time difference between displayed value on the timer and real time. Think of it as a lost time.
 #: src/core/variables.vala:157
-#, fuzzy
 msgid "Discrepancy between elapsed time and the time passed."
-msgstr "Skirtumas tarp rodomo praėjusio laiko ir faktinio laiko."
+msgstr "Skirtumas tarp rodomo laiko trukmės ir faktinio laiko."
 
 #. translators: Time since the start of countdown
 #: src/core/variables.vala:163
-#, fuzzy
 msgid "The amount of time spent on the countdown."
-msgstr "Laikas, praleistas skaičiuojant."
+msgstr "Laikas, praleistas skaičiuojant atgal."
 
 #. translators: Displayed timer value.
 #: src/core/variables.vala:169
-#, fuzzy
 msgid "The amount of time left before the countdown ends."
-msgstr "Likęs laikas iki skaičiavimo pabaigos."
+msgstr "Likęs laikas iki skaičiavimo atgal pabaigos."
 
 #: src/core/variables.vala:174
-#, fuzzy
 msgid "Time when the countdown has started."
-msgstr "Laikas, kada prasidėjo skaičiavimas."
+msgstr "Laikas, kada prasidėjo atgalinis skaičiavimas."
 
 #: src/integrations/portal/global-shortcuts-provider.vala:298
-#, fuzzy
 msgid "Unused"
 msgstr "Nenaudojama"
 
 #: src/ui/log/log-window.ui:6
-#, fuzzy
 msgid "Log"
 msgstr "Žurnalas"
 
 #: src/ui/log/log-window.ui:37
-#, fuzzy
 msgid "Empty Log"
 msgstr "Žurnalas tuščias"
 
 #: src/ui/log/log-window.ui:38
-#, fuzzy
 msgid "Entries will show up here once you start the timer."
 msgstr "Įrašai atsiras čia, kai paleisite laikmatį."
 
 #: src/ui/log/log-window.ui:164
-#, fuzzy
 msgid "Context"
 msgstr "Kontekstas"
 
@@ -812,22 +737,18 @@ msgid "Command"
 msgstr "Komanda"
 
 #: src/ui/log/log-window.ui:213
-#, fuzzy
 msgid "Output"
 msgstr "Išvestis"
 
 #: src/ui/log/log-window.ui:237
-#, fuzzy
 msgid "Error"
 msgstr "Klaida"
 
 #: src/ui/log/log-window.ui:266
-#, fuzzy
 msgid "Exit Code:"
 msgstr "Išėjimo kodas:"
 
 #: src/ui/log/log-window.ui:277
-#, fuzzy
 msgid "Execution Time:"
 msgstr "Vykdymo laikas:"
 
@@ -836,55 +757,45 @@ msgid "translator-credits"
 msgstr "Paulius Šukys <paul.sukys@gmail.com>"
 
 #: src/ui/main/dialogs/about-dialog.vala:36
-#, fuzzy
 msgid "Donate"
 msgstr "Paremkite"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:6
-#, fuzzy
 msgid "GNOME Shell Extension"
 msgstr "GNOME Shell plėtinys"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:57
-#, fuzzy
 msgid "Get the best experience!"
 msgstr "Gaukite geriausią patirtį!"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:68
-#, fuzzy
 msgid "Enable <b>GNOME Shell extension</b> for seamless desktop integration"
 msgstr "Įjunkite <b>GNOME Shell plėtinį</b> sklandžiai integracijai su aplinka"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:95
-#, fuzzy
 msgid "Always within reach"
 msgstr "Visada pasiekiama"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:106
-#, fuzzy
 msgid "Control timer directly from the top bar without opening the app"
 msgstr ""
 "Valdykite laikmatį tiesiai iš viršutinės juostos neatidarydami programos"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:132
-#, fuzzy
 msgid "Less distractions"
 msgstr "Mažiau trukdžių"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:143
-#, fuzzy
 msgid ""
 "Let <b>Pomodoro</b> manage system notifications while the timer is running"
 msgstr ""
 "Leiskite <b>Pomodoro</b> valdyti sistemos pranešimus, kol veikia laikmatis"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:170
-#, fuzzy
 msgid "Refined break reminders"
 msgstr "Patobulinti priminimai apie pertraukas"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:181
-#, fuzzy
 msgid ""
 "Elegant full-screen overlay that make taking breaks a more pleasant "
 "experience"
@@ -892,56 +803,46 @@ msgstr "Elegantiška viso ekrano užsklanda, padaranti pertraukas malonesnes"
 
 #. translators: "It" refers to installing GNOME Shell extension
 #: src/ui/main/dialogs/install-extension-dialog.ui:195
-#, fuzzy
 msgid "Ready to try it?"
 msgstr "Pasiruošę išbandyti?"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:219
 #: src/ui/main/dialogs/install-extension-dialog.ui:252
-#, fuzzy
 msgid "_Install Extension"
 msgstr "Į_diegti plėtinį"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:229
 #: src/ui/main/dialogs/install-extension-dialog.ui:245
-#, fuzzy
 msgid "_Not Now"
 msgstr "_Ne dabar"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:317
-#, fuzzy
 msgid "Something went wrong"
 msgstr "Kažkas nepavyko"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:364
-#, fuzzy
 msgid "Copy to clipboard"
 msgstr "Kopijuoti į iškarpinę"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:383
 #: src/ui/main/dialogs/install-extension-dialog.ui:416
-#, fuzzy
 msgid "_Try Again"
 msgstr "_Bandykite dar kartą"
 
 #: src/ui/main/dialogs/install-extension-dialog.ui:393
 #: src/ui/main/dialogs/install-extension-dialog.ui:409
-#, fuzzy
 msgid "_Abort"
-msgstr "Nutraukti"
+msgstr "_Atšaukti"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:86
-#, fuzzy
 msgid "Time-out reached"
 msgstr "Baigėsi laikas"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:91
-#, fuzzy
 msgid "Installing extensions is not allowed"
 msgstr "Plėtinių diegimas neleidžiamas"
 
 #: src/ui/main/dialogs/install-extension-dialog.vala:96
-#, fuzzy
 msgid "Failed to download the extension"
 msgstr "Nepavyko atsisiųsti plėtinio"
 
@@ -951,7 +852,6 @@ msgstr "Nepavyko atsisiųsti plėtinio"
 #: src/ui/main/stats/stats-month-page.vala:48
 #: src/ui/main/stats/stats-week-page.ui:46
 #: src/ui/main/stats/stats-week-page.vala:46
-#, fuzzy
 msgid "Breaks"
 msgstr "Pertraukos"
 
@@ -960,14 +860,12 @@ msgstr "Pertraukos"
 #: src/ui/main/stats/stats-month-page.vala:53
 #: src/ui/main/stats/stats-week-page.ui:53
 #: src/ui/main/stats/stats-week-page.vala:51
-#, fuzzy
 msgid "Interruptions"
 msgstr "Pertraukimai"
 
 #: src/ui/main/stats/stats-day-page.ui:119
 #: src/ui/main/stats/stats-month-page.ui:56
 #: src/ui/main/stats/stats-week-page.ui:60
-#, fuzzy
 msgid "Break Ratio"
 msgstr "Pertraukų santykis"
 
@@ -987,17 +885,15 @@ msgid "Month"
 msgstr "Mėnuo"
 
 #: src/ui/main/stats/stats-view.ui:39
-#, fuzzy
 msgid "Nothing to see here yet"
 msgstr "Dar nėra ką pamatyti"
 
 #: src/ui/main/stats/stats-view.ui:40
-#, fuzzy
 msgid "Finish a few Pomodoros to fill this up!"
 msgstr "Užbaikite keletą Pomodoro sesijų, kad čia atsirastų duomenų!"
 
 #: src/ui/main/stats/stats-view.vala:831
-#, fuzzy, c-format
+#, c-format
 msgid "Skipped %u day"
 msgid_plural "Skipped %u days"
 msgstr[0] "Praleista %u diena"
@@ -1005,7 +901,7 @@ msgstr[1] "Praleista %u dienos"
 msgstr[2] "Praleista %u dienų"
 
 #: src/ui/main/stats/stats-view.vala:837
-#, fuzzy, c-format
+#, c-format
 msgid "Skipped %u week"
 msgid_plural "Skipped %u weeks"
 msgstr[0] "Praleista %u savaitė"
@@ -1013,7 +909,7 @@ msgstr[1] "Praleista %u savaitės"
 msgstr[2] "Praleista %u savaičių"
 
 #: src/ui/main/stats/stats-view.vala:843
-#, fuzzy, c-format
+#, c-format
 msgid "Skipped %u month"
 msgid_plural "Skipped %u months"
 msgstr[0] "Praleistas %u mėnuo"
@@ -1033,12 +929,12 @@ msgid "This week"
 msgstr "Šią savaitę"
 
 #: src/ui/main/stats/stats-view.vala:1087
-#, fuzzy, c-format
+#, c-format
 msgid "Week %u"
 msgstr "%u savaitė"
 
 #: src/ui/main/stats/stats-view.vala:1088
-#, fuzzy, c-format
+#, c-format
 msgid "Week %u of %u"
 msgstr "%u savaitė iš %u"
 
@@ -1057,37 +953,31 @@ msgstr "_Ilga pertrauka"
 
 #: src/ui/main/timer/compact-timer-view.vala:74
 #: src/ui/main/timer/timer-view.vala:130
-#, fuzzy
 msgid "Finished!"
 msgstr "Baigta!"
 
 #: src/ui/main/timer/menus.ui:26
-#, fuzzy
 msgid "_Break"
 msgstr "_Pertrauka"
 
 #: src/ui/main/timer/timer-view.ui:23
-#, fuzzy
 msgid "Open screen overlay"
 msgstr "Atidaryti ekrano užsklandą"
 
 #: src/ui/main/timer/timer-view.vala:246
-#, fuzzy
 msgid "Session has expired"
-msgstr "Sesija baigėsi"
+msgstr "Sesija nebegalioja"
 
 #: src/ui/main/timer/widgets/session-progress-bar.vala:1472
-#, fuzzy, c-format
+#, c-format
 msgid "Long break due in <b>%s</b>"
-msgstr "Ilga pertrauka po <b>%s</b>"
+msgstr "Ilga pertrauka už <b>%s</b>"
 
 #: src/ui/main/timer/widgets/timer-control-buttons.ui:25
-#, fuzzy
 msgid "Rewind one minute"
 msgstr "Atsukti vieną minutę"
 
 #: src/ui/main/window.ui:8
-#, fuzzy
 msgid "_Compact View"
 msgstr "_Kompaktiškas vaizdas"
 
@@ -1104,7 +994,6 @@ msgid "_Quit"
 msgstr "_Išeiti"
 
 #: src/ui/main/window.ui:62
-#, fuzzy
 msgid "Primary Menu"
 msgstr "Pagrindinis meniu"
 
@@ -1113,22 +1002,18 @@ msgid "Stats"
 msgstr "Statistika"
 
 #: src/ui/main/window.vala:302
-#, fuzzy
 msgid "GNOME Shell extension available"
 msgstr "Yra GNOME Shell plėtinys"
 
 #: src/ui/main/window.vala:303
-#, fuzzy
 msgid "Learn More"
 msgstr "Sužinoti daugiau"
 
 #: src/ui/main/window.vala:325
-#, fuzzy
 msgid "Keep timer running?"
 msgstr "Palikti laikmatį veikiantį?"
 
 #: src/ui/main/window.vala:326
-#, fuzzy
 msgid ""
 "You can keep it running in the background — notifications and keyboard "
 "shortcuts will still work."
@@ -1141,7 +1026,6 @@ msgid "Quit"
 msgstr "Išeiti"
 
 #: src/ui/main/window.vala:333
-#, fuzzy
 msgid "Run in background"
 msgstr "Veikti fone"
 
@@ -1151,34 +1035,28 @@ msgstr "Laikas padaryti pertrauką"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:17
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:103
-#, fuzzy
 msgid "Main Window"
 msgstr "Pagrindinis langas"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:20
-#, fuzzy
 msgid "Prefer Dark Theme"
 msgstr "Naudoti tamsią temą"
 
 #: src/ui/preferences/appearance/preferences-panel-appearance.ui:25
-#, fuzzy
 msgid "Prefer Compact View"
 msgstr "Naudoti kompaktišką vaizdą"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:12
 #: src/ui/preferences/automation/action/condition-widget.vala:117
-#, fuzzy
 msgid "Started"
 msgstr "Pradėta"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:16
 #: src/ui/preferences/automation/action/condition-widget.vala:118
-#, fuzzy
 msgid "Paused"
 msgstr "Pristabdyta"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:26
-#, fuzzy
 msgid "Edit Custom Action"
 msgstr "Redaguoti pasirinktinį veiksmą"
 
@@ -1188,7 +1066,6 @@ msgid "_Cancel"
 msgstr "_Atsisakyti"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:46
-#, fuzzy
 msgid "_Save"
 msgstr "Iš_saugoti"
 
@@ -1197,60 +1074,49 @@ msgid "Name"
 msgstr "Vardas"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:76
-#, fuzzy
 msgid "Trigger"
-msgstr "Aktyviklis"
+msgstr "Trigeris"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:80
-#, fuzzy
 msgid "Event"
 msgstr "Įvykis"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:81
-#, fuzzy
 msgid "Execute command after an event."
 msgstr "Vykdyti komandą po įvykio."
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:96
 #: src/ui/preferences/automation/action/action-edit-window.ui:174
-#, fuzzy
 msgid "Condition"
 msgstr "Sąlyga"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:97
-#, fuzzy
 msgid "Ensure execution of a second command once condition is no longer met."
 msgstr "Užtikrinti antros komandos vykdymą, kai sąlyga nebetenkinama."
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:114
-#, fuzzy
 msgid "Events"
 msgstr "Įvykiai"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:125
-#, fuzzy
 msgid "Add _Event"
 msgstr "Pridėti į_vykį"
 
 #. translators: Filter (verb)
 #: src/ui/preferences/automation/action/action-edit-window.ui:140
-#, fuzzy
 msgid "_Filter"
 msgstr "_Filtras"
 
 #. translators: Filter (noun)
 #: src/ui/preferences/automation/action/action-edit-window.ui:160
-#, fuzzy
 msgid "Filter"
 msgstr "Filtras"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:191
-#, fuzzy
 msgid "Shell Command"
 msgstr "Shell komanda"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:199
-#, fuzzy
 msgid "Commands"
 msgstr "Komandos"
 
