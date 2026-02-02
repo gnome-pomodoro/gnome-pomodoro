@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: focus-timer 1.0-alpha\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-10 11:31+0100\n"
-"PO-Revision-Date: 2026-01-26 08:59+0200\n"
+"PO-Revision-Date: 2026-02-02 18:07+0200\n"
 "Last-Translator: Paulius Šukys <paul.sukys@gmail.com>\n"
 "Language-Team: Lithuanian\n"
 "Language: lt\n"
@@ -114,117 +114,94 @@ msgid "Screen overlay"
 msgstr "Ekrano užsklanda"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:95
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.1"
 msgstr "Pakeitimų apžvalga gnome-pomodoro 0.28.1"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:97
-#, fuzzy
 msgid "Added Tamil translation (thanks @omeritzics)"
 msgstr "Pridėtas tamilų kalbos vertimas (ačiū @omeritzics)"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:98
-#, fuzzy
 msgid "Added Hebrew translation (thanks @Killersparrow1)"
 msgstr "Pridėtas hebrajų kalbos vertimas (ačiū @Killersparrow1)"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:104
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.28.0"
 msgstr "Pakeitimų apžvalga gnome-pomodoro 0.28.0"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:106
-#, fuzzy
 msgid "Support for GNOME Shell 49 (thanks @aleasto)"
 msgstr "Palaikymas GNOME Shell 49 (ačiū @aleasto)"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:107
-#, fuzzy
 msgid "Updated German translation (thanks @daPhipz)"
 msgstr "Atnaujintas vokiečių kalbos vertimas (ačiū @daPhipz)"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:113
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.27.0"
 msgstr "Pakeitimų apžvalga gnome-pomodoro 0.27.0"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:115
-#, fuzzy
 msgid "Support for GNOME Shell 48"
 msgstr "Palaikymas GNOME Shell 48"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:116
-#, fuzzy
 msgid "Split time spent across midnight"
 msgstr "Padalinti laiką einantį per vidurnaktį"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:117
-#, fuzzy
 msgid "Added Telugu translation (thanks @SpaciousCoder78)"
 msgstr "Pridėtas telugų kalbos vertimas (ačiū @SpaciousCoder78)"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:123
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.26.0"
 msgstr "Pakeitimų apžvalga gnome-pomodoro 0.26.0"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:125
-#, fuzzy
 msgid "Support for GNOME Shell 47"
 msgstr "Palaikymas GNOME Shell 47"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:126
-#, fuzzy
 msgid "Allow to dismiss screen overlay by gesture when a video is playing"
 msgstr "Leisti išjungti ekrano užsklandą gestu, kai rodomas vaizdo įrašas"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:127
-#, fuzzy
 msgid "Added Georgian translation (thanks @NorwayFun)"
 msgstr "Pridėtas gruzinų kalbos vertimas (ačiū @NorwayFun)"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:128
-#, fuzzy
 msgid "Adjusted translations in appdata (thanks @yakushabb)"
 msgstr "Pakoreguoti vertimai appdata faile (ačiū @yakushabb)"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:134
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.2"
 msgstr "Pakeitimų apžvalga gnome-pomodoro 0.25.2"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:136
-#, fuzzy
 msgid "Fix keeping notification after extending Pomodoro"
 msgstr "Ištaisyta klaida, kai pranešimas lieka pratęsus Pomodoro"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:142
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.1"
 msgstr "Pakeitimų apžvalga gnome-pomodoro 0.25.1"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:144
-#, fuzzy
 msgid "Fixes for GNOME Shell 46"
 msgstr "Pataisymai GNOME Shell 46 versijai"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:145
-#, fuzzy
 msgid "Drop support for GNOME Shell 45"
 msgstr "Nebepalaikoma GNOME Shell 45"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:151
-#, fuzzy
 msgid "Overview of changes in gnome-pomodoro 0.25.0"
 msgstr "Pakeitimų apžvalga gnome-pomodoro 0.25.0"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:153
-#, fuzzy
 msgid "Support for GNOME Shell 46"
 msgstr "Palaikymas GNOME Shell 46"
 
 #: data/io.github.focustimerhq.FocusTimer.metainfo.xml.in:154
-#, fuzzy
 msgid "Adjust build script to meson 0.59.0 (thanks @mattst88)"
 msgstr "Sukūrimo skriptas pritaikytas meson 0.59.0 (ačiū @mattst88)"
 
@@ -632,7 +609,7 @@ msgstr "%u min."
 msgid "%u hour"
 msgid_plural "%u hours"
 msgstr[0] "%u valanda"
-msgstr[1] "%u valandos"
+msgstr[1] "%u valandas"
 msgstr[2] "%u valandų"
 
 #: src/core/utils.vala:81
@@ -1121,72 +1098,58 @@ msgid "Commands"
 msgstr "Komandos"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:204
-#, fuzzy
 msgid "Condition Met Command"
 msgstr "Komanda, kai sąlyga tenkinama"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:210
-#, fuzzy
 msgid "Condition Not Met Command"
 msgstr "Komanda, kai sąlyga netenkinama"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:221
-#, fuzzy
 msgid "Working Directory"
 msgstr "Darbinis katalogas"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:236
-#, fuzzy
 msgid "Use Subshell"
 msgstr "Naudoti Subshell"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:237
-#, fuzzy
 msgid "Run the program from a subshell such as sh -c ''"
 msgstr "Vykdyti programą iš subshell, pvz., sh -c ''"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:242
-#, fuzzy
 msgid "Pass Input Data"
 msgstr "Perduoti įvesties duomenis"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:243
-#, fuzzy
 msgid "Instead of passing variables you can process a JSON object."
 msgstr "Vietoj kintamųjų perdavimo galite apdoroti JSON objektą."
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:248
-#, fuzzy
 msgid "Wait For Completion"
 msgstr "Laukti pabaigos"
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:249
-#, fuzzy
 msgid "Block execution of other commands until the command completes."
 msgstr "Blokuoti kitų komandų vykdymą, kol ši komanda bus baigta."
 
 #: src/ui/preferences/automation/action/action-edit-window.ui:259
-#, fuzzy
 msgid "_Delete Action"
 msgstr "Iš_trinti veiksmą"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:230
-#, fuzzy
 msgid "No events specified yet."
 msgstr "Įvykių dar nenurodyta."
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:248
-#, fuzzy
 msgid "Add Custom Action"
 msgstr "Pridėti pasirinktinį veiksmą"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:249
-#, fuzzy
 msgid "_Add"
 msgstr "_Pridėti"
 
 #: src/ui/preferences/automation/action/action-edit-window.vala:438
-#, fuzzy
 msgid "Select Working Directory"
 msgstr "Pasirinkti darbinį katalogą"
 
@@ -1196,17 +1159,14 @@ msgid "_Select"
 msgstr "_Pasirinkti"
 
 #: src/ui/preferences/automation/action/action-listboxrow.vala:67
-#, fuzzy
 msgid "Untitled action"
 msgstr "Bevardis veiksmas"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:28
-#, fuzzy
 msgid "Add Condition"
 msgstr "Pridėti sąlygą"
 
 #: src/ui/preferences/automation/action/condition-group-widget.ui:45
-#, fuzzy
 msgid "Add Group"
 msgstr "Pridėti grupę"
 
@@ -1219,58 +1179,47 @@ msgid "OR"
 msgstr "ARBA"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:26
-#, fuzzy
 msgid "Is"
 msgstr "Yra"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:27
-#, fuzzy
 msgid "Is Not"
 msgstr "Nėra"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:39
-#, fuzzy
 msgid "Equals"
 msgstr "Lygu"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:40
-#, fuzzy
 msgid "Greater Than"
 msgstr "Daugiau nei"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:41
-#, fuzzy
 msgid "Less Than"
 msgstr "Mažiau nei"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:67
-#, fuzzy
 msgid "Yes"
 msgstr "Taip"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:68
-#, fuzzy
 msgid "No"
 msgstr "Ne"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:95
-#, fuzzy
 msgid "Minutes"
 msgstr "Minutės"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:96
-#, fuzzy
 msgid "Seconds"
 msgstr "Sekundės"
 
 #: src/ui/preferences/automation/action/condition-widget.ui:97
-#, fuzzy
 msgid "Hours"
 msgstr "Valandos"
 
 #. translators: No field selected when defining a condition.
 #: src/ui/preferences/automation/action/condition-widget.vala:115
-#, fuzzy
 msgid "Select Field…"
 msgstr "Pasirinkite lauką…"
 
@@ -1279,38 +1228,31 @@ msgid "State"
 msgstr "Būsena"
 
 #: src/ui/preferences/automation/action/condition-widget.vala:119
-#, fuzzy
 msgid "Running"
 msgstr "Vykdoma"
 
 #: src/ui/preferences/automation/action/condition-widget.vala:121
-#, fuzzy
 msgid "Duration"
 msgstr "Trukmė"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:19
 #: src/ui/preferences/automation/action/variable-popover.ui:161
-#, fuzzy
 msgid "Insert Variable"
 msgstr "Įterpti kintamąjį"
 
 #: src/ui/preferences/automation/action/variable-popover.ui:132
-#, fuzzy
 msgid "Format"
 msgstr "Formatas"
 
 #: src/ui/preferences/automation/preferences-panel-automation.ui:13
-#, fuzzy
 msgid "_Log"
 msgstr "Ž_urnalas"
 
 #: src/ui/preferences/automation/preferences-panel-automation.ui:15
-#, fuzzy
 msgid "Show execution log"
 msgstr "Rodyti vykdymo žurnalą"
 
 #: src/ui/preferences/automation/preferences-panel-automation.ui:24
-#, fuzzy
 msgid ""
 "Run shell commands automatically on timer events or conditions. <a "
 "href=\"\">Learn more.</a>"
@@ -1319,23 +1261,19 @@ msgstr ""
 "href=\"\">Sužinokite daugiau.</a>"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:14
-#, fuzzy
 msgid "Set Shortcut"
 msgstr "Nustatyti spartųjį klavišą"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:28
-#, fuzzy
 msgid "_Set"
 msgstr "Nu_statyti"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:63
 #: src/ui/preferences/keyboard-shortcuts/accelerator-row.vala:50
-#, fuzzy
 msgid "Disabled"
 msgstr "Išjungti"
 
 #: src/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui:77
-#, fuzzy
 msgid ""
 "Press <b>Esc</b> to cancel or <b>Backspace</b> to disable the keyboard "
 "shortcut"
@@ -1344,7 +1282,6 @@ msgstr ""
 "spartųjį klavišą"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:17
-#, fuzzy
 msgid ""
 "Global shortcuts let you control the app even when it’s not on screen. They "
 "work as long as the app is running in the background."
@@ -1353,150 +1290,122 @@ msgstr ""
 "ekrane. Jie veikia tol, kol programa veikia fone."
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:20
-#, fuzzy
 msgid "Open app settings for editing global shortcuts"
 msgstr "Atidaryti nustatymus visuotinių sparčiųjų klavišų redagavimui"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:25
-#, fuzzy
 msgid "_Edit"
 msgstr "R_edaguoti"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:41
-#, fuzzy
 msgid "Enter new shortcut for starting or stopping the timer"
 msgstr "Įveskite naują spartųjį klavišą laikmačio paleidimui arba sustabdymui"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:48
-#, fuzzy
 msgid "Enter new shortcut to start/pause/resume the timer"
 msgstr "Įveskite naują spartųjį klavišą laikmačio paleidimui/pauzei/tęsimui"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:58
-#, fuzzy
 msgid "Enter new shortcut for starting the timer"
 msgstr "Įveskite naują spartųjį klavišą laikmačio paleidimui"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:65
-#, fuzzy
 msgid "Enter new shortcut for stopping the timer"
 msgstr "Įveskite naują spartųjį klavišą laikmačio sustabdymui"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:72
-#, fuzzy
 msgid "Enter new shortcut for pausing the timer"
 msgstr "Įveskite naują spartųjį klavišą laikmačio pristabdymui"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:79
-#, fuzzy
 msgid "Enter new shortcut for resuming the timer"
 msgstr "Įveskite naują spartųjį klavišą laikmačio pratęsimui"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:86
-#, fuzzy
 msgid "Enter new shortcut for skipping"
 msgstr "Įveskite naują spartųjį klavišą praleidimui"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:92
-#, fuzzy
 msgid "Rewind One Minute"
 msgstr "Atsukti vieną minutę"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:93
-#, fuzzy
 msgid "Enter new shortcut for rewinding"
 msgstr "Įveskite naują spartųjį klavišą atsukimui"
 
 #: src/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui:107
-#, fuzzy
 msgid "Enter new shortcut for bringing window to focus"
 msgstr "Įveskite naują spartųjį klavišą lango iškėlimui"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:17
-#, fuzzy
 msgid "Announcements"
 msgstr "Pranešimai"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:20
-#, fuzzy
 msgid "Time Running Out"
 msgstr "Laikas baigiasi"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:21
-#, fuzzy
 msgid "Notify when Pomodoro or break is about to end."
 msgstr "Pranešti, kai Pomodoro arba pertrauka tuoj baigsis."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:28
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:32
-#, fuzzy
 msgid "Screen Overlay"
 msgstr "Ekrano užsklanda"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:29
-#, fuzzy
 msgid "A full-screen notification intended to enforce taking a break."
 msgstr "Viso ekrano pranešimas, skirtas priversti padaryti pertrauką."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:37
-#, fuzzy
 msgid "Lock Delay"
 msgstr "Užrakinimo delsa"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:38
-#, fuzzy
 msgid "Period of inactivity to lock the screen."
 msgstr "Neaktyvumo laikotarpis, po kurio užrakinamas ekranas."
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:42
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:61
-#, fuzzy
 msgid "15 seconds"
 msgstr "15 sekundžių"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:43
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:62
-#, fuzzy
 msgid "30 seconds"
 msgstr "30 sekundžių"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:44
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:63
-#, fuzzy
 msgid "1 minute"
 msgstr "1 minutė"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:45
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:64
-#, fuzzy
 msgid "2 minutes"
 msgstr "2 minutės"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:46
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:65
-#, fuzzy
 msgid "3 minutes"
 msgstr "3 minutės"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:47
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:66
-#, fuzzy
 msgid "5 minutes"
 msgstr "5 minutės"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:48
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:67
-#, fuzzy
 msgid "Never"
 msgstr "Niekada"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:56
-#, fuzzy
 msgid "Reopen Delay"
 msgstr "Pakartotinio atidarymo delsa"
 
 #: src/ui/preferences/notifications/preferences-panel-notifications.ui:57
-#, fuzzy
 msgid "Period of inactivity to reopen the overlay after it gets dismissed."
 msgstr "Neaktyvumo laikotarpis, po kurio vėl rodoma užsklanda ją išjungus."
 
@@ -1505,48 +1414,39 @@ msgid "Notifications"
 msgstr "Pranešimai"
 
 #: src/ui/preferences/preferences-window.vala:44
-#, fuzzy
 msgid "Sounds"
 msgstr "Garsai"
 
 #: src/ui/preferences/preferences-window.vala:51
-#, fuzzy
 msgid "Appearance"
 msgstr "Išvaizda"
 
 #: src/ui/preferences/preferences-window.vala:58
-#, fuzzy
 msgid "Keyboard Shortcuts"
 msgstr "Spartieji klaviatūros klavišai"
 
 #: src/ui/preferences/preferences-window.vala:71
-#, fuzzy
 msgid "Automation"
 msgstr "Automatizavimas"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:24
-#, fuzzy
 msgid "Sounds Are Disabled"
 msgstr "Garsai išjungti"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:36
-#, fuzzy
 msgid "Alert Sounds"
 msgstr "Įspėjimų garsai"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:39
-#, fuzzy
 msgid "Pomodoro Finished Sound"
 msgstr "Pomodoro pabaigos garsas"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:64
-#, fuzzy
 msgid "Break Finished Sound"
 msgstr "Pertraukos pabaigos garsas"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:91
 #: src/ui/preferences/sounds/preferences-panel-sounds.ui:94
-#, fuzzy
 msgid "Background Sound"
 msgstr "Fono garsas"
 
@@ -1567,13 +1467,11 @@ msgid "Timer Ticking"
 msgstr "Laikmačio tiksėjimas"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:26
-#, fuzzy
 msgid "Birds"
 msgstr "Paukščiai"
 
 #: src/ui/preferences/sounds/preferences-panel-sounds.vala:86
 #: src/ui/preferences/sounds/sound-chooser-window.ui:25
-#, fuzzy
 msgid "None"
 msgstr "Nėra"
 
@@ -1586,73 +1484,59 @@ msgid "Select Custom Sound"
 msgstr "Pasirinkti kitą garsą"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:20
-#, fuzzy
 msgid "Pomodoro Duration"
 msgstr "Pomodoro trukmė"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:31
-#, fuzzy
 msgid "Short Break Duration"
 msgstr "Trumpos pertraukos trukmė"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:42
-#, fuzzy
 msgid "Long Break Duration"
 msgstr "Ilgosios pertraukos trukmė"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:53
-#, fuzzy
 msgid "Number of Cycles"
 msgstr "Ciklų skaičius"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:93
-#, fuzzy
 msgid "Behavior"
 msgstr "Elgsena"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:96
-#, fuzzy
 msgid "Pause By Locking The Screen"
 msgstr "Pristabdyti užrakinant ekraną"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:101
-#, fuzzy
 msgid "Confirm Starting a Break"
 msgstr "Patvirtinti pertraukos pradžią"
 
 #: src/ui/preferences/timer/preferences-panel-timer.ui:106
-#, fuzzy
 msgid "Confirm Starting a Pomodoro"
 msgstr "Patvirtinti Pomodoro pradžią"
 
 #. translators: time formatted as text: "5 minutes 30 seconds"
 #: src/ui/preferences/timer/preferences-panel-timer.vala:94
-#, fuzzy, c-format
 msgid "A single session will take <b>%s</b>."
 msgstr "Viena sesija truks <b>%s</b>."
 
 #: src/ui/preferences/timer/preferences-panel-timer.vala:95
-#, fuzzy, c-format
 msgid "<b>%u%%</b> of the time will be allocated for breaks."
 msgstr "<b>%u%%</b> laiko bus skirta pertraukoms."
 
 #: src/ui/preferences/timer/preferences-panel-timer.vala:143
-#, fuzzy
 msgid "Apply changes to ongoing Pomodoro?"
 msgstr "Pritaikyti pakeitimus vykstančiam Pomodoro?"
 
 #: src/ui/preferences/timer/preferences-panel-timer.vala:144
-#, fuzzy
 msgid "Apply changes to ongoing break?"
 msgstr "Pritaikyti pakeitimus vykstančiai pertraukai?"
 
 #: src/ui/preferences/timer/preferences-panel-timer.vala:146
-#, fuzzy
 msgid "Apply"
 msgstr "Pritaikyti"
 
 #: src/ui/preferences/widgets/preferences-sidebar.vala:73
-#, fuzzy
 msgctxt "accessibility"
 msgid "Sidebar"
 msgstr "Šoninė juosta"
@@ -1684,19 +1568,15 @@ msgstr "Šoninė juosta"
 #~ msgid "A simple time management utility"
 #~ msgstr "Paprastas laiko valdymo įrankis"
 
-#, fuzzy
 #~ msgid "_Stopped"
 #~ msgstr "Stabdyti"
 
-#, fuzzy
 #~ msgid "Extension for GNOME Shell is available"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
-#, fuzzy
 #~ msgid "Failed to install extension"
 #~ msgstr "Nepavyko įjungti įskiepio"
 
-#, fuzzy, c-format
 #~ msgid "Long break due in %s"
 #~ msgstr "Ilgosios pertraukos trukmė"
 
@@ -1718,39 +1598,30 @@ msgstr "Šoninė juosta"
 #~ msgid "Indicator for GNOME Shell"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
-#, fuzzy
 #~ msgid "Support for GNOME Shell 42 (@milotype and @kappa)"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
-#, fuzzy
 #~ msgid "Support for GNOME Shell 41 (@mbooth101)"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
-#, fuzzy
 #~ msgid "Support GNOME Shell 40.0, not 4.0"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
-#, fuzzy
 #~ msgid "Support for GNOME Shell 4.0"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
-#, fuzzy
 #~ msgid "Support for GNOME Shell 3.38 (@ignapk and @szpak)"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
-#, fuzzy
 #~ msgid "Support for GNOME Shell 3.36"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
-#, fuzzy
 #~ msgid "Support for GNOME Shell 3.34 only"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
-#, fuzzy
 #~ msgid "Support for GNOME Shell 3.32 (@demokritos)"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
-#, fuzzy
 #~ msgid "Support for GNOME Shell 3.28 and 3.30 (@aerostitch)"
 #~ msgstr "Indikatorius GNOME aplinkai"
 
