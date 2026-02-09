@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<interface domain="gnome-pomodoro">
+<interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
   <menu id="stats_menu">
@@ -21,7 +21,7 @@
       </item>
     </section>
   </menu>
-  <template class="PomodoroStatsView" parent="AdwBreakpointBin">
+  <template class="FtStatsView" parent="AdwBreakpointBin">
     <property name="width-request">360</property>
     <property name="height-request">520</property>
     <property name="child">
@@ -77,7 +77,7 @@
                                   <class name="flat"/>
                                 </style>
                                 <property name="popover">
-                                  <object class="PomodoroStatsDatePopover" id="date_popover">
+                                  <object class="FtStatsDatePopover" id="date_popover">
                                     <signal name="timeframe-selected" handler="on_timeframe_selected"/>
                                     <signal name="date-selected" handler="on_date_selected"/>
                                   </object>

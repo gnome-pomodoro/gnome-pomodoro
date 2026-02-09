@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2025 gnome-pomodoro contributors
+ * Copyright (c) 2016-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,20 +9,20 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public class TimerActionGroup : GLib.SimpleActionGroup
     {
-        public Pomodoro.Timer timer { get; construct; }
+        public Ft.Timer timer { get; construct; }
 
         public TimerActionGroup ()
         {
             GLib.Object (
-                timer: Pomodoro.Timer.get_default ()
+                timer: Ft.Timer.get_default ()
             );
         }
 
-        public TimerActionGroup.with_timer (Pomodoro.Timer timer)
+        public TimerActionGroup.with_timer (Ft.Timer timer)
         {
             GLib.Object (
                 timer: timer
@@ -51,6 +51,10 @@ namespace Pomodoro
             rewind_action.activate.connect (this.activate_rewind);
             this.add_action (rewind_action);
 
+            var rewind_by_action = new GLib.SimpleAction ("rewind-by", GLib.VariantType.INT32);
+            rewind_by_action.activate.connect (this.activate_rewind);
+            this.add_action (rewind_by_action);
+
             var toggle_action = new GLib.SimpleAction ("toggle", null);  // alias for start-stop
             toggle_action.activate.connect (this.activate_start_stop);
             this.add_action (toggle_action);
@@ -62,54 +66,64 @@ namespace Pomodoro
             var start_pause_resume_action = new GLib.SimpleAction ("start-pause-resume", null);
             start_pause_resume_action.activate.connect (this.activate_start_pause_resume);
             this.add_action (start_pause_resume_action);
+
+            var extend_action = new GLib.SimpleAction ("extend", null);
+            extend_action.activate.connect (this.activate_extend);
+            this.add_action (extend_action);
+
+            var extend_by_action = new GLib.SimpleAction ("extend-by", GLib.VariantType.INT32);
+            extend_by_action.activate.connect (this.activate_extend);
+            this.add_action (extend_by_action);
         }
 
         private void activate_start (GLib.SimpleAction action,
                                      GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("timer.start");
+            Ft.Context.set_event_source ("timer.start");
             this.timer.start ();
         }
 
         private void activate_reset (GLib.SimpleAction action,
                                      GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("timer.reset");
+            Ft.Context.set_event_source ("timer.reset");
             this.timer.reset ();
         }
 
         private void activate_pause (GLib.SimpleAction action,
                                      GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("timer.pause");
+            Ft.Context.set_event_source ("timer.pause");
             this.timer.pause ();
         }
 
         private void activate_resume (GLib.SimpleAction action,
                                       GLib.Variant?     parameter)
         {
-            Pomodoro.Context.set_event_source ("timer.resume");
+            Ft.Context.set_event_source ("timer.resume");
             this.timer.resume ();
         }
 
         private void activate_rewind (GLib.SimpleAction action,
                                       GLib.Variant?     parameter)
         {
-            // TODO: take microseconds from param
+            var interval = parameter != null
+                    ? parameter.get_int32 () * Ft.Interval.SECOND
+                    : Ft.Interval.MINUTE;
 
-            Pomodoro.Context.set_event_source ("timer.rewind");
-            this.timer.rewind (Pomodoro.Interval.MINUTE);
+            Ft.Context.set_event_source ("timer.rewind");
+            this.timer.rewind (interval);
         }
 
         private void activate_start_stop (GLib.SimpleAction action,
                                           GLib.Variant?     parameter)
         {
             if (!this.timer.is_started ()) {
-                Pomodoro.Context.set_event_source ("timer.start");
+                Ft.Context.set_event_source ("timer.start");
                 this.timer.start ();
             }
             else {
-                Pomodoro.Context.set_event_source ("timer.reset");
+                Ft.Context.set_event_source ("timer.reset");
                 this.timer.reset ();
             }
         }
@@ -118,17 +132,27 @@ namespace Pomodoro
                                                   GLib.Variant?     parameter)
         {
             if (!this.timer.is_started ()) {
-                Pomodoro.Context.set_event_source ("timer.start");
+                Ft.Context.set_event_source ("timer.start");
                 this.timer.start ();
             }
             else if (this.timer.is_paused ()) {
-                Pomodoro.Context.set_event_source ("timer.resume");
+                Ft.Context.set_event_source ("timer.resume");
                 this.timer.resume ();
             }
             else {
-                Pomodoro.Context.set_event_source ("timer.pause");
+                Ft.Context.set_event_source ("timer.pause");
                 this.timer.pause ();
             }
+        }
+
+        private void activate_extend (GLib.SimpleAction action,
+                                      GLib.Variant?     parameter)
+        {
+            var interval = parameter != null
+                    ? parameter.get_int32 () * Ft.Interval.SECOND
+                    : Ft.Interval.MINUTE;
+
+            this.timer.duration += interval;
         }
     }
 }

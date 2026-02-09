@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * A lightweight equivalent of `TimezoneEntry`
@@ -48,19 +48,19 @@ namespace Pomodoro
     {
         private const uint FETCH_LIMIT = 50;
 
-        private GLib.Array<Pomodoro.TimezoneMarker> data;  // TODO: consider a linked list
-        private int64 fetched_timestamp = Pomodoro.Timestamp.UNDEFINED;
+        private GLib.Array<Ft.TimezoneMarker> data;  // TODO: consider a linked list
+        private int64 fetched_timestamp = Ft.Timestamp.UNDEFINED;
         private bool fetched_all = false;
 
         construct
         {
-            this.data = new GLib.Array<Pomodoro.TimezoneMarker> ();
+            this.data = new GLib.Array<Ft.TimezoneMarker> ();
         }
 
-        private inline Pomodoro.TimezoneMarker create_marker (int64         timestamp,
-                                                              GLib.TimeZone timezone)
+        private inline Ft.TimezoneMarker create_marker (int64         timestamp,
+                                                        GLib.TimeZone timezone)
         {
-            return new Pomodoro.TimezoneMarker (timestamp, timezone);
+            return new Ft.TimezoneMarker (timestamp, timezone);
         }
 
         /**
@@ -76,19 +76,19 @@ namespace Pomodoro
                 return 0U;
             }
 
-            if (Pomodoro.Timestamp.is_defined (this.fetched_timestamp)) {
-                filter = new Gom.Filter.lt (typeof (Pomodoro.TimezoneEntry),
+            if (Ft.Timestamp.is_defined (this.fetched_timestamp)) {
+                filter = new Gom.Filter.lt (typeof (Ft.TimezoneEntry),
                                             "time",
                                             this.fetched_timestamp);
             }
 
             var sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
-            sorting.add (typeof (Pomodoro.TimezoneEntry), "time", Gom.SortingMode.DESCENDING);
+            sorting.add (typeof (Ft.TimezoneEntry), "time", Gom.SortingMode.DESCENDING);
 
-            var repository = Pomodoro.Database.get_repository ();
+            var repository = Ft.Database.get_repository ();
 
             try {
-                var results = repository.find_sorted_sync (typeof (Pomodoro.TimezoneEntry),
+                var results = repository.find_sorted_sync (typeof (Ft.TimezoneEntry),
                                                            filter,
                                                            sorting);
                 var results_count = results.count;
@@ -98,7 +98,7 @@ namespace Pomodoro
 
                 for (var index = 0; index < fetch_count; index++)
                 {
-                    var entry = (Pomodoro.TimezoneEntry) results.get_index (index);
+                    var entry = (Ft.TimezoneEntry) results.get_index (index);
 
                     this.data.append_val (this.create_marker (
                             entry.time,
@@ -125,15 +125,15 @@ namespace Pomodoro
             var timestamp_value = GLib.Value (typeof (int64));
             timestamp_value.set_int64 (timestamp);
 
-            var repository = Pomodoro.Database.get_repository ();
+            var repository = Ft.Database.get_repository ();
             var filter = new Gom.Filter.eq (
-                    typeof (Pomodoro.TimezoneEntry),
+                    typeof (Ft.TimezoneEntry),
                     "time",
                     timestamp_value);
 
             try {
-                var entry = (Pomodoro.TimezoneEntry?) repository.find_one_sync (
-                        typeof (Pomodoro.TimezoneEntry),
+                var entry = (Ft.TimezoneEntry?) repository.find_one_sync (
+                        typeof (Ft.TimezoneEntry),
                         filter);
                 if (entry == null) {
                     return false;
@@ -151,9 +151,9 @@ namespace Pomodoro
 
         public void insert (int64         timestamp,
                             GLib.TimeZone timezone)
-                            requires (Pomodoro.Timestamp.is_defined (timestamp))
+                            requires (Ft.Timestamp.is_defined (timestamp))
         {
-            unowned Pomodoro.TimezoneMarker? existing_marker;
+            unowned Ft.TimezoneMarker? existing_marker;
             uint index;
 
             this.search_internal (timestamp, out existing_marker, out index);
@@ -174,8 +174,8 @@ namespace Pomodoro
                 this.data.append_val (this.create_marker (timestamp, timezone));
             }
 
-            var entry = new Pomodoro.TimezoneEntry ();
-            entry.repository = Pomodoro.Database.get_repository ();
+            var entry = new Ft.TimezoneEntry ();
+            entry.repository = Ft.Database.get_repository ();
             entry.time = timestamp;
             entry.identifier = timezone.get_identifier ();
 
@@ -194,9 +194,9 @@ namespace Pomodoro
             }
         }
 
-        private inline void search_internal (int64                                timestamp,
-                                             out unowned Pomodoro.TimezoneMarker? marker,
-                                             out uint                             index)
+        private inline void search_internal (int64                          timestamp,
+                                             out unowned Ft.TimezoneMarker? marker,
+                                             out uint                       index)
         {
             marker = null;
             index = 0U;
@@ -222,7 +222,7 @@ namespace Pomodoro
 
         public unowned GLib.TimeZone? search (int64 timestamp)
         {
-            unowned Pomodoro.TimezoneMarker? marker;
+            unowned Ft.TimezoneMarker? marker;
 
             this.search_internal (timestamp, out marker, null);
 
@@ -232,8 +232,8 @@ namespace Pomodoro
         public unowned GLib.TimeZone? search_by_date (GLib.Date date,
                                                       int64     offset = 0)
         {
-            unowned Pomodoro.TimezoneMarker? marker = null;
-            unowned Pomodoro.TimezoneMarker? last_valid_marker = null;
+            unowned Ft.TimezoneMarker? marker = null;
+            unowned Ft.TimezoneMarker? last_valid_marker = null;
             uint index;
 
             var estimated_datetime = new GLib.DateTime.utc (
@@ -260,7 +260,7 @@ namespace Pomodoro
                         date.get_day (),
                         0, 0, 0);
                 if (offset != 0) {
-                    datetime = datetime.add_seconds (Pomodoro.Interval.to_seconds (offset));
+                    datetime = datetime.add_seconds (Ft.Interval.to_seconds (offset));
                 }
 
                 if (marker.timestamp > datetime.to_unix ()) {
@@ -282,25 +282,25 @@ namespace Pomodoro
          * It only considers one such occurrence for a given time range. For our purposes
          * it's good enough - we need it to be reliable up to a day, preferably up to a month.
          */
-        private inline void split_timezone (int64                     start_time,
-                                            int64                     end_time,
-                                            GLib.TimeZone             timezone,
-                                            Pomodoro.TimezoneScanFunc func)
+        private inline void split_timezone (int64               start_time,
+                                            int64               end_time,
+                                            GLib.TimeZone       timezone,
+                                            Ft.TimezoneScanFunc func)
         {
             var start_interval_id = timezone.find_interval (
                     GLib.TimeType.UNIVERSAL,
-                    start_time / Pomodoro.Interval.SECOND);
+                    start_time / Ft.Interval.SECOND);
             var end_interval_id = timezone.find_interval (
                     GLib.TimeType.UNIVERSAL,
-                    end_time / Pomodoro.Interval.SECOND);
+                    end_time / Ft.Interval.SECOND);
             var start_offset = timezone.get_offset (start_interval_id);
             var end_offset = timezone.get_offset (end_interval_id);
 
             if (start_offset != end_offset)
             {
                 // Use binary search for finding the transition time.
-                var range_start_time = start_time / Pomodoro.Interval.SECOND;
-                var range_end_time = end_time / Pomodoro.Interval.SECOND;
+                var range_start_time = start_time / Ft.Interval.SECOND;
+                var range_end_time = end_time / Ft.Interval.SECOND;
                 var range_mid_time = range_start_time;
                 var range_mid_offset = start_offset;
 
@@ -323,7 +323,7 @@ namespace Pomodoro
                     range_mid_time += 1;
                 }
 
-                var split_time = range_mid_time * Pomodoro.Interval.SECOND;
+                var split_time = range_mid_time * Ft.Interval.SECOND;
 
                 if (start_time < split_time) {
                     func (start_time, split_time, timezone);
@@ -338,21 +338,21 @@ namespace Pomodoro
             }
         }
 
-        public void scan (int64                     start_time,
-                          int64                     end_time,
-                          Pomodoro.TimezoneScanFunc func)
+        public void scan (int64               start_time,
+                          int64               end_time,
+                          Ft.TimezoneScanFunc func)
         {
             if (start_time > end_time) {
                 return;
             }
 
-            unowned Pomodoro.TimezoneMarker? marker;
-            unowned Pomodoro.TimezoneMarker? next_marker;
+            unowned Ft.TimezoneMarker? marker;
+            unowned Ft.TimezoneMarker? next_marker;
             uint index;
 
             this.search_internal (start_time, out marker, out index);
 
-            if (marker == null && !Pomodoro.is_test ())  // XXX: avoid `is_test`; specify a fallback-timezone
+            if (marker == null && !Ft.is_test ())  // XXX: avoid `is_test`; specify a fallback-timezone
             {
                 func (start_time,
                       marker != null ? marker.timestamp : end_time,
@@ -386,8 +386,8 @@ namespace Pomodoro
 
         public void clear_cache ()
         {
-            this.data = new GLib.Array<Pomodoro.TimezoneMarker> ();
-            this.fetched_timestamp = Pomodoro.Timestamp.UNDEFINED;
+            this.data = new GLib.Array<Ft.TimezoneMarker> ();
+            this.fetched_timestamp = Ft.Timestamp.UNDEFINED;
             this.fetched_all = false;
         }
 

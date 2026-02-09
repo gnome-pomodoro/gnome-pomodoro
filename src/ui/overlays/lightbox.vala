@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ * Copyright (c) 2023-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * A primary monitor used to be defined in X11. Nowadays a primary monitor might be chosen
@@ -133,9 +133,12 @@ namespace Pomodoro
         {
             if (this._monitor != null)
             {
+                // Divide by scale_factor because monitor.geometry may return
+                // physical pixels on some systems (e.g., Wayland with HiDPI)
+                var scale = widget.get_scale_factor ();
                 minimum = natural = orientation == Gtk.Orientation.HORIZONTAL
-                    ? this._monitor.geometry.width
-                    : this._monitor.geometry.height;
+                    ? this._monitor.geometry.width / scale
+                    : this._monitor.geometry.height / scale;
             }
             else {
                 minimum = natural = 0;
@@ -159,11 +162,14 @@ namespace Pomodoro
 
             if (this._monitor != null)
             {
+                // Divide by scale_factor because monitor.geometry may return
+                // physical pixels on some systems (e.g., Wayland with HiDPI)
+                var scale = widget.get_scale_factor ();
                 var monitor_geometry = this._monitor.get_geometry ();
-                allocation.x = monitor_geometry.x;
-                allocation.y = monitor_geometry.y;
-                allocation.width = monitor_geometry.width;
-                allocation.height = monitor_geometry.height;
+                allocation.x = monitor_geometry.x / scale;
+                allocation.y = monitor_geometry.y / scale;
+                allocation.width = monitor_geometry.width / scale;
+                allocation.height = monitor_geometry.height / scale;
             }
 
             var child = widget.get_first_child ();
@@ -192,24 +198,24 @@ namespace Pomodoro
      */
     public class LightboxGroup : GLib.InitiallyUnowned
     {
-        private GLib.Type                           lightbox_type;
-        private GLib.GenericSet<Pomodoro.Lightbox>? lightboxes = null;
-        private Gtk.WindowGroup?                    window_group = null;
-        private GLib.ListModel?                     monitors = null;
-        private ulong                               monitors_changed_id = 0;
-        private uint                                updating_count = 0;
-        private uint                                update_idle_id = 0;
-        private GLib.SourceFunc?                    open_callback = null;
+        private GLib.Type                       lightbox_type;
+        private GLib.GenericSet<Ft.Lightbox>?   lightboxes = null;
+        private Gtk.WindowGroup?                window_group = null;
+        private GLib.ListModel?                 monitors = null;
+        private ulong                           monitors_changed_id = 0;
+        private uint                            updating_count = 0;
+        private uint                            update_idle_id = 0;
+        private GLib.SourceFunc?                open_callback = null;
 
         public LightboxGroup (GLib.Type lightbox_type)
         {
             this.lightbox_type = lightbox_type;
-            this.lightboxes = new GLib.GenericSet<Pomodoro.Lightbox> (GLib.direct_hash, GLib.direct_equal);
+            this.lightboxes = new GLib.GenericSet<Ft.Lightbox> (GLib.direct_hash, GLib.direct_equal);
         }
 
-        private unowned Pomodoro.Lightbox? get_first_lightbox ()
+        private unowned Ft.Lightbox? get_first_lightbox ()
         {
-            unowned Pomodoro.Lightbox? first_lightbox = null;
+            unowned Ft.Lightbox? first_lightbox = null;
 
             this.lightboxes.@foreach (
                 (lightbox) => {
@@ -221,7 +227,7 @@ namespace Pomodoro
             return first_lightbox;
         }
 
-        private Pomodoro.Lightbox create_lightbox (Gdk.Monitor? monitor_request)
+        private Ft.Lightbox create_lightbox (Gdk.Monitor? monitor_request)
         {
             var monitor_request_value = GLib.Value (typeof (Gdk.Monitor?));
             monitor_request_value.set_object (monitor_request);
@@ -229,7 +235,7 @@ namespace Pomodoro
             var show_contents_value = GLib.Value (typeof (bool));
             show_contents_value.set_boolean (false);
 
-            var lightbox = (Pomodoro.Lightbox) GLib.Object.new_with_properties (
+            var lightbox = (Ft.Lightbox) GLib.Object.new_with_properties (
                                         this.lightbox_type,
                                         { "monitor-request", "show-contents" },
                                         { monitor_request_value, show_contents_value });
@@ -248,7 +254,7 @@ namespace Pomodoro
             return lightbox;
         }
 
-        private void destroy_lightbox (Pomodoro.Lightbox lightbox)
+        private void destroy_lightbox (Ft.Lightbox lightbox)
         {
             lightbox.notify["monitor"].disconnect (this.on_lightbox_notify_monitor);
             lightbox.close_request.disconnect (this.on_lightbox_close_request);
@@ -280,7 +286,7 @@ namespace Pomodoro
 
             var paired_monitors = new GLib.GenericSet<unowned Gdk.Monitor> (
                                         GLib.direct_hash, GLib.direct_equal);
-            var paired_lightboxes = new GLib.GenericSet<unowned Pomodoro.Lightbox> (
+            var paired_lightboxes = new GLib.GenericSet<unowned Ft.Lightbox> (
                                         GLib.direct_hash, GLib.direct_equal);
 
             this.lightboxes.@foreach (
@@ -364,7 +370,7 @@ namespace Pomodoro
 
                     return GLib.Source.REMOVE;
                 });
-            GLib.Source.set_name_by_id (this.update_idle_id, "Pomodoro.LightboxGroup.update");
+            GLib.Source.set_name_by_id (this.update_idle_id, "Ft.LightboxGroup.update");
         }
 
         private void on_monitors_changed (GLib.ListModel model,
@@ -398,7 +404,7 @@ namespace Pomodoro
 
         private void on_lightbox_unrealize (Gtk.Widget widget)
         {
-            this.destroy_lightbox ((Pomodoro.Lightbox) widget);
+            this.destroy_lightbox ((Ft.Lightbox) widget);
         }
 
         public async void open (GLib.Cancellable? cancellable = null) throws GLib.Error
@@ -409,7 +415,7 @@ namespace Pomodoro
             }
 
             if (this.monitors == null) {
-                throw new Pomodoro.LightboxError.NO_MONITORS ("Could not list monitors.");
+                throw new Ft.LightboxError.NO_MONITORS ("Could not list monitors.");
             }
 
             if (this.monitors_changed_id == 0) {
@@ -473,7 +479,7 @@ namespace Pomodoro
     }
 
 
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/overlays/lightbox.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/overlays/lightbox.ui")]
     public class Lightbox : Gtk.Window, Gtk.Buildable
     {
         public Gdk.Monitor? monitor_request
@@ -562,7 +568,7 @@ namespace Pomodoro
         {
             unowned Gdk.Monitor? monitor;
 
-            var layout_manager = (Pomodoro.MonitorConstrainedLayoutManager) this.container.layout_manager;
+            var layout_manager = (Ft.MonitorConstrainedLayoutManager) this.container.layout_manager;
             var display = this.get_display ();
             var surface = this.get_surface ();
             var surface_monitor = surface != null
@@ -737,19 +743,23 @@ namespace Pomodoro
         {
             var monitor = this._monitor != null ? this._monitor : this._monitor_request;
 
+            // Divide by scale_factor because monitor.geometry may return
+            // physical pixels on some systems (e.g., Wayland with HiDPI)
+            var scale = this.get_scale_factor ();
+
             if (this._monitor_request == null && this.monitors.length > 1)
             {
                 var display_geometry = get_display_geometry (this.get_display ());
 
                 minimum = natural = orientation == Gtk.Orientation.HORIZONTAL
-                    ? display_geometry.width : display_geometry.height;
+                    ? display_geometry.width / scale : display_geometry.height / scale;
             }
             else if (monitor != null && this.monitors.length == 1)
             {
                 var monitor_geometry = monitor.geometry;
 
                 minimum  = natural = orientation == Gtk.Orientation.HORIZONTAL
-                    ? monitor_geometry.width : monitor_geometry.height;
+                    ? monitor_geometry.width / scale : monitor_geometry.height / scale;
             }
             else {
                 base.measure (orientation,

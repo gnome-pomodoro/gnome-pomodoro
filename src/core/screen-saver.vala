@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    public interface ScreenSaverProvider : Pomodoro.Provider
+    public interface ScreenSaverProvider : Ft.Provider
     {
         public abstract bool active { get; }
     }
 
 
     [SingleInstance]
-    public class ScreenSaver : Pomodoro.ProvidedObject<Pomodoro.ScreenSaverProvider>
+    public class ScreenSaver : Ft.ProvidedObject<Ft.ScreenSaverProvider>
     {
         public bool active {
             get {
@@ -48,17 +48,17 @@ namespace Pomodoro
         protected override void setup_providers ()
         {
             this.providers.add (new Freedesktop.ScreenSaverProvider ());
-            this.providers.add (new Gnome.ScreenSaverProvider (), Pomodoro.Priority.HIGH);
+            this.providers.add (new Gnome.ScreenSaverProvider (), Ft.Priority.HIGH);
         }
 
-        protected override void provider_enabled (Pomodoro.ScreenSaverProvider provider)
+        protected override void provider_enabled (Ft.ScreenSaverProvider provider)
         {
             provider.notify["active"].connect (this.on_notify_active);
 
             this.update_active ();
         }
 
-        protected override void provider_disabled (Pomodoro.ScreenSaverProvider provider)
+        protected override void provider_disabled (Ft.ScreenSaverProvider provider)
         {
             provider.notify["active"].disconnect (this.on_notify_active);
 

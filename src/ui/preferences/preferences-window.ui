@@ -2,14 +2,13 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroPreferencesWindow" parent="AdwApplicationWindow">
+  <template class="FtPreferencesWindow" parent="AdwApplicationWindow">
     <property name="title" translatable="yes">Preferences</property>
-    <property name="default_width">900</property>
-    <property name="default_height">720</property>
+    <property name="default-width">900</property>
+    <property name="default-height">720</property>
     <property name="width-request">360</property>
     <property name="height-request">200</property>
-    <property name="icon_name">gnome-pomodoro</property>
-    <property name="startup_id">gnome-pomodoro-preferences</property>
+    <property name="startup-id">focus-timer-preferences</property>
     <child>
       <object class="AdwBreakpoint">
         <condition>max-width: 660sp</condition>
@@ -23,7 +22,7 @@
             <property name="min-sidebar-width">200</property>
             <property name="sidebar">
               <object class="AdwNavigationPage">
-                <property name="title" bind-source="PomodoroPreferencesWindow" bind-property="title" bind-flags="sync-create"/>
+                <property name="title" bind-source="FtPreferencesWindow" bind-property="title" bind-flags="sync-create"/>
                 <property name="child">
                   <object class="AdwToolbarView">
                     <child type="top">
@@ -32,8 +31,8 @@
                       </object>
                     </child>
                     <property name="content">
-                      <object class="PomodoroPreferencesSidebar" id="sidebar">
-                        <property name="model" bind-source="PomodoroPreferencesWindow" bind-property="model" bind-flags="sync-create"/>
+                      <object class="FtPreferencesSidebar" id="sidebar">
+                        <property name="model" bind-source="FtPreferencesWindow" bind-property="model" bind-flags="sync-create"/>
                       </object>
                     </property>
                   </object>

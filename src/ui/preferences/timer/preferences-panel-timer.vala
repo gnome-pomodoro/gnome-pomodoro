@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ * Copyright (c) 2023-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/timer/preferences-panel-timer.ui")]
-    public class PreferencesPanelTimer : Pomodoro.PreferencesPanel
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/timer/preferences-panel-timer.ui")]
+    public class PreferencesPanelTimer : Ft.PreferencesPanel
     {
         private const uint MIN_TOAST_TIMEOUT = 3;
         private const uint MAX_TOAST_TIMEOUT = 30;
@@ -25,30 +25,31 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Label breaks_stats_label;
         [GtkChild]
-        private unowned Adw.SwitchRow pomodoro_pause_on_lockscreen_switchrow;
+        private unowned Adw.SwitchRow pause_on_lockscreen_switchrow;
         [GtkChild]
         private unowned Adw.SwitchRow confirm_starting_break_switchrow;
         [GtkChild]
         private unowned Adw.SwitchRow confirm_starting_pomodoro_switchrow;
         [GtkChild]
-        private unowned Pomodoro.LogScaleRow long_break_row;
+        private unowned Ft.LogScaleRow long_break_row;
 
         private GLib.Settings?  settings;
         private ulong           settings_changed_id = 0;
-        private Pomodoro.Timer? timer;
+        private Ft.Timer?       timer;
         private ulong           timer_state_changed_id = 0;
+        private Ft.IdleMonitor? idle_monitor;
         private Adw.Toast?      apply_changes_toast;
 
         construct
         {
-            this.settings = Pomodoro.get_settings ();
+            this.settings = Ft.get_settings ();
             this.settings.bind ("pomodoro-duration", this.pomodoro_duration_adjustment, "value", GLib.SettingsBindFlags.DEFAULT);
             this.settings.bind ("short-break-duration", this.short_break_duration_adjustment, "value", GLib.SettingsBindFlags.DEFAULT);
             this.settings.bind ("long-break-duration", this.long_break_duration_adjustment, "value", GLib.SettingsBindFlags.DEFAULT);
             this.settings.bind ("cycles", this.cycles_adjustment, "value", GLib.SettingsBindFlags.DEFAULT);
 
             this.settings.bind ("pause-on-lockscreen",
-                                 this.pomodoro_pause_on_lockscreen_switchrow,
+                                 this.pause_on_lockscreen_switchrow,
                                  "active",
                                  GLib.SettingsBindFlags.DEFAULT);
             this.settings.bind ("confirm-starting-break",
@@ -60,9 +61,15 @@ namespace Pomodoro
                                  "active",
                                  GLib.SettingsBindFlags.DEFAULT);
 
+            this.idle_monitor = new Ft.IdleMonitor ();
+            this.idle_monitor.bind_property ("enabled",
+                                             this.confirm_starting_pomodoro_switchrow,
+                                             "visible",
+                                             GLib.BindingFlags.SYNC_CREATE);
+
             this.settings_changed_id = settings.changed.connect (this.on_settings_changed);
 
-            this.timer = Pomodoro.Timer.get_default ();
+            this.timer = Ft.Timer.get_default ();
 
             if (this.timer_state_changed_id == 0) {
                 this.timer_state_changed_id = this.timer.state_changed.connect (this.on_timer_state_changed);
@@ -79,18 +86,18 @@ namespace Pomodoro
 
         private void update_stats_labels ()
         {
-            var session_template = Pomodoro.SessionTemplate.with_defaults ();
-            var total_duration = Pomodoro.Timestamp.to_seconds_uint (session_template.calculate_total_duration ());
+            var session_template = Ft.SessionTemplate.with_defaults ();
+            var total_duration = Ft.Timestamp.to_seconds_uint (session_template.calculate_total_duration ());
             var break_percentage = (uint) Math.round (session_template.calculate_break_percentage ());
 
             // translators: time formatted as text: "5 minutes 30 seconds"
-            this.session_stats_label.label = _("A single session will take <b>%s</b>.").printf (Pomodoro.format_time (total_duration));
+            this.session_stats_label.label = _("A single session will take <b>%s</b>.").printf (Ft.format_time (total_duration));
             this.breaks_stats_label.label = _("<b>%u%%</b> of the time will be allocated for breaks.").printf (break_percentage);
         }
 
         private void apply_changes ()
         {
-            var current_time_block = this.timer.user_data as Pomodoro.TimeBlock;
+            var current_time_block = this.timer.user_data as Ft.TimeBlock;
 
             if (current_time_block != null)
             {
@@ -101,9 +108,9 @@ namespace Pomodoro
             }
         }
 
-        private uint calculate_apply_changes_toast_timeout (Pomodoro.State changed_state)
+        private uint calculate_apply_changes_toast_timeout (Ft.State changed_state)
         {
-            var current_time_block = this.timer.user_data as Pomodoro.TimeBlock;
+            var current_time_block = this.timer.user_data as Ft.TimeBlock;
 
             if (current_time_block == null ||
                 current_time_block.state != changed_state ||
@@ -116,23 +123,24 @@ namespace Pomodoro
                 return MAX_TOAST_TIMEOUT;
             }
 
-            var timeout = Pomodoro.Timestamp.to_seconds_uint (current_time_block.state.get_default_duration () -
-                                                              this.timer.calculate_elapsed ());
+            var timeout = Ft.Timestamp.to_seconds_uint (
+                    current_time_block.state.get_default_duration () -
+                    this.timer.calculate_elapsed ());
 
             return uint.min (timeout, MAX_TOAST_TIMEOUT);
         }
 
-        private void show_apply_changes_toast (Pomodoro.State changed_state,
-                                               uint           timeout)
+        private void show_apply_changes_toast (Ft.State changed_state,
+                                               uint     timeout)
         {
-            var window = this.get_root () as Pomodoro.PreferencesWindow;
+            var window = this.get_root () as Ft.PreferencesWindow;
             assert (window != null);
 
             var toast = this.apply_changes_toast;
 
             if (toast == null)
             {
-                toast = new Adw.Toast (changed_state == Pomodoro.State.POMODORO
+                toast = new Adw.Toast (changed_state == Ft.State.POMODORO
                                        ? _("Apply changes to ongoing Pomodoro?")
                                        : _("Apply changes to ongoing break?"));
                 toast.use_markup = false;
@@ -160,8 +168,8 @@ namespace Pomodoro
             }
         }
 
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
+        private void on_timer_state_changed (Ft.TimerState current_state,
+                                             Ft.TimerState previous_state)
         {
             this.hide_apply_changes_toast ();
         }
@@ -169,25 +177,25 @@ namespace Pomodoro
         private void on_settings_changed (GLib.Settings settings,
                                           string        key)
         {
-            var changed_state = Pomodoro.State.STOPPED;
-            var session_manager = Pomodoro.SessionManager.get_default ();
+            var changed_state = Ft.State.STOPPED;
+            var session_manager = Ft.SessionManager.get_default ();
 
             switch (key)
             {
                 case "pomodoro-duration":
-                    changed_state = Pomodoro.State.POMODORO;
+                    changed_state = Ft.State.POMODORO;
                     this.update_stats_labels ();
                     break;
 
                 case "short-break-duration":
                     changed_state = settings.get_uint ("cycles") > 1
-                        ? Pomodoro.State.SHORT_BREAK
-                        : Pomodoro.State.BREAK;
+                        ? Ft.State.SHORT_BREAK
+                        : Ft.State.BREAK;
                     this.update_stats_labels ();
                     break;
 
                 case "long-break-duration":
-                    changed_state = Pomodoro.State.LONG_BREAK;
+                    changed_state = Ft.State.LONG_BREAK;
                     this.update_stats_labels ();
                     break;
 
@@ -230,6 +238,7 @@ namespace Pomodoro
 
             this.settings = null;
             this.timer = null;
+            this.idle_monitor = null;
 
             base.dispose ();
         }

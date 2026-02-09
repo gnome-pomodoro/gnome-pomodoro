@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2025 gnome-pomodoro contributors
+ * Copyright (c) 2017-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public errordomain ExtensionError
     {
@@ -19,7 +19,7 @@ namespace Pomodoro
         OTHER
     }
 
-    public interface ExtensionProvider : Pomodoro.Provider
+    public interface ExtensionProvider : Ft.Provider
     {
         public abstract bool extension_enabled { get; }
 
@@ -27,7 +27,7 @@ namespace Pomodoro
 
         public abstract async bool disable_extension ();
 
-        public abstract async bool install_extension () throws Pomodoro.ExtensionError;
+        public abstract async bool install_extension () throws Ft.ExtensionError;
 
         public abstract async bool uninstall_extension ();
 
@@ -50,34 +50,33 @@ namespace Pomodoro
             }
         }
 
-        public unowned Pomodoro.CapabilitySet capabilities {
+        public unowned Ft.CapabilitySet capabilities {
             get {
                 return this._capabilities;
             }
         }
 
-        public unowned Pomodoro.Provider provider {
+        public unowned Ft.Provider provider {
             get {
                 return this._provider;
             }
         }
 
-        private Pomodoro.ProviderSet<Pomodoro.ExtensionProvider> providers = null;
-        private Pomodoro.ExtensionProvider? _provider = null;
-        private Pomodoro.CapabilitySet?     _capabilities = null;
-        private bool                        _available = false;
-        private bool                        _enabled = false;
+        private Ft.ProviderSet<Ft.ExtensionProvider> providers = null;
+        private Ft.ExtensionProvider? _provider = null;
+        private Ft.CapabilitySet?     _capabilities = null;
+        private bool                  _available = false;
+        private bool                  _enabled = false;
 
         construct
         {
-            this.providers = new Pomodoro.ProviderSet<Pomodoro.ExtensionProvider> (
-                    Pomodoro.SelectionMode.SINGLE);
+            this.providers = new Ft.ProviderSet<Ft.ExtensionProvider> (Ft.SelectionMode.SINGLE);
             this.providers.provider_selected.connect (this.on_provider_selected);
             this.providers.provider_unselected.connect (this.on_provider_unselected);
             this.providers.provider_enabled.connect (this.on_provider_enabled);
             this.providers.provider_disabled.connect (this.on_provider_disabled);
 
-            this._capabilities = new Pomodoro.CapabilitySet ();
+            this._capabilities = new Ft.CapabilitySet ();
 
             this.setup_providers ();
 
@@ -86,7 +85,7 @@ namespace Pomodoro
 
         private void setup_providers ()
         {
-            this.providers.add (new Gnome.ExtensionProvider (), Pomodoro.Priority.HIGH);
+            this.providers.add (new Gnome.ExtensionProvider (), Ft.Priority.HIGH);
         }
 
         private void update_status ()
@@ -113,7 +112,7 @@ namespace Pomodoro
             this.update_status ();
         }
 
-        private void on_provider_selected (Pomodoro.ExtensionProvider provider)
+        private void on_provider_selected (Ft.ExtensionProvider provider)
         {
             if (this._provider != provider) {
                 this._provider = provider;
@@ -123,7 +122,7 @@ namespace Pomodoro
             this.update_status ();
         }
 
-        private void on_provider_unselected (Pomodoro.ExtensionProvider provider)
+        private void on_provider_unselected (Ft.ExtensionProvider provider)
         {
             if (this._provider == provider) {
                 this._provider = null;
@@ -133,14 +132,14 @@ namespace Pomodoro
             this.update_status ();
         }
 
-        private void on_provider_enabled (Pomodoro.ExtensionProvider provider)
+        private void on_provider_enabled (Ft.ExtensionProvider provider)
         {
             provider.notify["extension-enabled"].connect (this.on_notify_extension_enabled);
 
             this.update_status ();
         }
 
-        private void on_provider_disabled (Pomodoro.ExtensionProvider provider)
+        private void on_provider_disabled (Ft.ExtensionProvider provider)
         {
             provider.notify["extension-enabled"].disconnect (this.on_notify_extension_enabled);
 
@@ -168,7 +167,7 @@ namespace Pomodoro
                     : false;
         }
 
-        public async bool install () throws Pomodoro.ExtensionError
+        public async bool install () throws Ft.ExtensionError
         {
             return this._provider != null
                     ? yield this._provider.install_extension ()

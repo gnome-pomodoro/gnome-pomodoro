@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroSoundChooserWindow" parent="AdwWindow">
+  <template class="FtSoundChooserWindow" parent="AdwWindow">
     <property name="default-width">400</property>
     <property name="width-request">400</property>
     <property name="height-request">420</property>
@@ -64,7 +64,7 @@
                               </object>
                             </child>
                             <child>
-                              <object class="PomodoroVolumeSlider" id="volume_slider"/>
+                              <object class="FtVolumeSlider" id="volume_slider"/>
                             </child>
                           </object>
                         </child>

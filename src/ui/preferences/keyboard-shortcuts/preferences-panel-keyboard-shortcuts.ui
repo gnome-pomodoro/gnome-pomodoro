@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroPreferencesPanelKeyboardShortcuts" parent="PomodoroPreferencesPanel">
+  <template class="FtPreferencesPanelKeyboardShortcuts" parent="FtPreferencesPanel">
     <property name="child">
       <object class="AdwToolbarView">
         <child type="top">
@@ -36,14 +36,14 @@
               <object class="AdwPreferencesGroup">
                 <property name="title" translatable="yes">Timer</property>
                 <child>
-                  <object class="PomodoroAcceleratorRow" id="start_stop_timer_row">
+                  <object class="FtAcceleratorRow" id="start_stop_timer_row">
                     <property name="title" translatable="yes">Start or Stop</property>
                     <property name="description" translatable="yes">Enter new shortcut for starting or stopping the timer</property>
                     <property name="activatable">false</property>
                   </object>
                 </child>
                 <child>
-                  <object class="PomodoroAcceleratorRow" id="start_pause_resume_timer_row">
+                  <object class="FtAcceleratorRow" id="start_pause_resume_timer_row">
                     <property name="title" translatable="yes">Start, Pause or Resume</property>
                     <property name="description" translatable="yes">Enter new shortcut to start/pause/resume the timer</property>
                     <property name="activatable">false</property>
@@ -53,42 +53,42 @@
                   <object class="AdwExpanderRow">
                     <property name="title" translatable="yes">Actions</property>
                     <child>
-                      <object class="PomodoroAcceleratorRow" id="start_timer_row">
+                      <object class="FtAcceleratorRow" id="start_timer_row">
                         <property name="title" translatable="yes">Start</property>
                         <property name="description" translatable="yes">Enter new shortcut for starting the timer</property>
                         <property name="activatable">false</property>
                       </object>
                     </child>
                     <child>
-                      <object class="PomodoroAcceleratorRow" id="stop_timer_row">
+                      <object class="FtAcceleratorRow" id="stop_timer_row">
                         <property name="title" translatable="yes">Stop</property>
                         <property name="description" translatable="yes">Enter new shortcut for stopping the timer</property>
                         <property name="activatable">false</property>
                       </object>
                     </child>
                     <child>
-                      <object class="PomodoroAcceleratorRow" id="pause_timer_row">
+                      <object class="FtAcceleratorRow" id="pause_timer_row">
                         <property name="title" translatable="yes">Pause</property>
                         <property name="description" translatable="yes">Enter new shortcut for pausing the timer</property>
                         <property name="activatable">false</property>
                       </object>
                     </child>
                     <child>
-                      <object class="PomodoroAcceleratorRow" id="resume_timer_row">
+                      <object class="FtAcceleratorRow" id="resume_timer_row">
                         <property name="title" translatable="yes">Resume</property>
                         <property name="description" translatable="yes">Enter new shortcut for resuming the timer</property>
                         <property name="activatable">false</property>
                       </object>
                     </child>
                     <child>
-                      <object class="PomodoroAcceleratorRow" id="skip_timer_row">
+                      <object class="FtAcceleratorRow" id="skip_timer_row">
                         <property name="title" translatable="yes">Skip</property>
                         <property name="description" translatable="yes">Enter new shortcut for skipping</property>
                         <property name="activatable">false</property>
                       </object>
                     </child>
                     <child>
-                      <object class="PomodoroAcceleratorRow" id="rewind_timer_row">
+                      <object class="FtAcceleratorRow" id="rewind_timer_row">
                         <property name="title" translatable="yes">Rewind One Minute</property>
                         <property name="description" translatable="yes">Enter new shortcut for rewinding</property>
                         <property name="activatable">false</property>
@@ -102,7 +102,7 @@
               <object class="AdwPreferencesGroup">
                 <property name="title" translatable="yes">Main Window</property>
                 <child>
-                  <object class="PomodoroAcceleratorRow" id="toggle_window_row">
+                  <object class="FtAcceleratorRow" id="toggle_window_row">
                     <property name="title" translatable="yes">Bring to Focus</property>
                     <property name="description" translatable="yes">Enter new shortcut for bringing window to focus</property>
                     <property name="activatable">false</property>

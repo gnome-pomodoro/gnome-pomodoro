@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ * Copyright (c) 2023-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/notifications/preferences-panel-notifications.ui")]
-    public class PreferencesPanelNotifications : Pomodoro.PreferencesPanel
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/notifications/preferences-panel-notifications.ui")]
+    public class PreferencesPanelNotifications : Ft.PreferencesPanel
     {
         private const uint[] IDLE_DELAY_CHOICES = { 15U, 30U, 60U, 120U, 180U, 300U, 0U };
 
@@ -21,12 +21,14 @@ namespace Pomodoro
         private unowned Adw.ComboRow screen_overlay_reopen_delay_comborow;
 
         private GLib.Settings?  settings;
-        private ulong           settings_changed_id = 0;
+        private Ft.IdleMonitor? idle_monitor = null;
 
         construct
         {
-            this.settings = Pomodoro.get_settings ();
-            this.settings_changed_id = settings.changed.connect (this.on_settings_changed);
+            this.settings = Ft.get_settings ();
+            this.settings.changed.connect (this.on_settings_changed);
+
+            this.idle_monitor = new Ft.IdleMonitor ();
 
             // Announcements
             this.settings.bind ("announce-about-to-end",
@@ -57,6 +59,16 @@ namespace Pomodoro
                                 idle_delay_set_mapping,
                                 null,
                                 null);
+            this.idle_monitor.bind_property (
+                                "enabled",
+                                this.screen_overlay_lock_delay_comborow,
+                                "visible",
+                                GLib.BindingFlags.SYNC_CREATE);
+            this.idle_monitor.bind_property (
+                                "enabled",
+                                this.screen_overlay_reopen_delay_comborow,
+                                "visible",
+                                GLib.BindingFlags.SYNC_CREATE);
             this.screen_overlay_switchrow.bind_property (
                                 "active",
                                 this.screen_overlay_lock_delay_comborow,
@@ -112,12 +124,12 @@ namespace Pomodoro
 
         public override void dispose ()
         {
-            if (this.settings_changed_id != 0) {
-                this.settings.disconnect (this.settings_changed_id);
-                this.settings_changed_id = 0;
+            if (this.settings != null) {
+                this.settings.changed.disconnect (this.on_settings_changed);
+                this.settings = null;
             }
 
-            this.settings = null;
+            this.idle_monitor = null;
 
             base.dispose ();
         }

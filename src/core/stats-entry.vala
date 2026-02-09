@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public class StatsEntry : Gom.Resource
     {
@@ -32,10 +32,10 @@ namespace Pomodoro
             // Therefore, we treat it like an integer.
         }
 
-        public Pomodoro.StatsEntry copy ()
+        public Ft.StatsEntry copy ()
         {
-            return (Pomodoro.StatsEntry) GLib.Object.@new (
-                    typeof (Pomodoro.StatsEntry),
+            return (Ft.StatsEntry) GLib.Object.@new (
+                    typeof (Ft.StatsEntry),
                     id: this.id,
                     time: this.time,
                     date: this.date,

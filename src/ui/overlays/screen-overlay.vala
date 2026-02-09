@@ -1,22 +1,22 @@
 /*
- * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ * Copyright (c) 2023-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/overlays/screen-overlay.ui")]
-    public class ScreenOverlay : Pomodoro.Lightbox
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/overlays/screen-overlay.ui")]
+    public class ScreenOverlay : Ft.Lightbox
     {
         [GtkChild]
         private unowned Gtk.Button lock_screen_button;
 
-        private Pomodoro.LockScreen? lock_screen;
+        private Ft.LockScreen? lock_screen;
 
         construct
         {
-            this.lock_screen = new Pomodoro.LockScreen ();
+            this.lock_screen = new Ft.LockScreen ();
 
             this.lock_screen.bind_property ("enabled",
                                             this.lock_screen_button,
@@ -41,7 +41,7 @@ namespace Pomodoro
         //     base.map ();
         //
         //    // TODO: Reset user idle-time to delay the screen-saver.
-        //    // Pomodoro.wake_up_screen ();
+        //    // Ft.wake_up_screen ();
         // }
 
         public override void dispose ()

@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 [CCode (cprefix = "")]
-namespace Pomodoro.Locale
+namespace Ft.Locale
 {
     #if HAVE_ALTMON
     [CCode (cheader_filename = "langinfo.h", cprefix = "", has_type_id = false)]

@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroInstallExtensionDialog" parent="AdwDialog">
+  <template class="FtInstallExtensionDialog" parent="AdwDialog">
     <property name="title" translatable="yes">GNOME Shell Extension</property>
     <property name="follows-content-size">true</property>
     <property name="width-request">300</property>
@@ -140,7 +140,7 @@
                             </child>
                             <child>
                               <object class="GtkLabel">
-                                <property name="label" translatable="yes"><![CDATA[Let <b>Pomodoro</b> manage system notifications while the timer is running]]></property>
+                                <property name="label" translatable="yes"><![CDATA[Let <b>Focus Timer</b> manage system notifications while the timer is running]]></property>
                                 <property name="use-markup">true</property>
                                 <property name="wrap">true</property>
                                 <property name="justify">center</property>
@@ -282,7 +282,7 @@
           <object class="GtkStackPage">
             <property name="name">success</property>
             <property name="child">
-              <object class="PomodoroCheckmark">
+              <object class="FtCheckmark">
                 <property name="pixel-size">32</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>

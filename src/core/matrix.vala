@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * Class for representing a variable-size vector.
@@ -35,9 +35,9 @@ namespace Pomodoro
             this.data = null;
         }
 
-        public Pomodoro.Vector copy ()
+        public Ft.Vector copy ()
         {
-            var result = new Pomodoro.Vector (this.data.length);
+            var result = new Ft.Vector (this.data.length);
             for (var i = 0; i < this.data.length; i++) {
                 result.data[i] = this.data[i];
             }
@@ -73,7 +73,7 @@ namespace Pomodoro
             }
         }
 
-        public bool equals (Pomodoro.Vector other)
+        public bool equals (Ft.Vector other)
         {
             if (this.data.length != data.length) {
                 return false;
@@ -89,7 +89,7 @@ namespace Pomodoro
             return true;
         }
 
-        public bool add (Pomodoro.Vector other)
+        public bool add (Ft.Vector other)
         {
             if (other.data.length != this.data.length) {
                 return false;
@@ -198,9 +198,9 @@ namespace Pomodoro
             this.data  = null;
         }
 
-        public Pomodoro.Matrix copy ()
+        public Ft.Matrix copy ()
         {
-            var result = new Pomodoro.Matrix (this.shape[0], this.shape[1]);
+            var result = new Ft.Matrix (this.shape[0], this.shape[1]);
             for (var i = 0; i < this.shape[0]; i++)
             {
                 for (var j = 0; j < this.shape[1]; j++) {
@@ -310,7 +310,7 @@ namespace Pomodoro
             }
         }
 
-        public bool equals (Pomodoro.Matrix other)
+        public bool equals (Ft.Matrix other)
         {
             if (this.shape[0] != other.shape[0] || this.shape[1] != other.shape[1]) {
                 return false;
@@ -329,7 +329,7 @@ namespace Pomodoro
             return true;
         }
 
-        public bool add (Pomodoro.Matrix other)
+        public bool add (Ft.Matrix other)
         {
             if (other.shape[0] != this.shape[0] || other.shape[1] != this.shape[1]) {
                 return false;
@@ -371,7 +371,7 @@ namespace Pomodoro
                         data[j] = this.data[index, j];
                     }
 
-                    return new Pomodoro.Vector.from_array (data);
+                    return new Ft.Vector.from_array (data);
 
                 case 1:
                     var data = new double[this.data.length[0]];
@@ -380,14 +380,14 @@ namespace Pomodoro
                         data[i] = this.data[i, index];
                     }
 
-                    return new Pomodoro.Vector.from_array (data);
+                    return new Ft.Vector.from_array (data);
 
                 default:
                     assert_not_reached ();
             }
         }
 
-        public Pomodoro.Vector? get_vector (int axis,
+        public Ft.Vector? get_vector (int axis,
                                             int index)
         {
             if (!this.validate_index (ref axis, ref index)) {
@@ -650,7 +650,7 @@ namespace Pomodoro
             }
         }
 
-        public bool equals (Pomodoro.Matrix3D other)
+        public bool equals (Ft.Matrix3D other)
         {
             if (this.shape[0] != other.shape[0] ||
                 this.shape[1] != other.shape[1] ||
@@ -675,8 +675,8 @@ namespace Pomodoro
             return true;
         }
 
-        public inline Pomodoro.Matrix? get_matrix_internal (int axis,
-                                                            int index)
+        public inline Ft.Matrix? get_matrix_internal (int axis,
+                                                      int index)
         {
             switch (axis)
             {
@@ -690,7 +690,7 @@ namespace Pomodoro
                         }
                     }
 
-                    return new Pomodoro.Matrix.from_array (data);
+                    return new Ft.Matrix.from_array (data);
 
                 case 1:
                     var data = new double[this.data.length[0], this.data.length[2]];
@@ -702,7 +702,7 @@ namespace Pomodoro
                         }
                     }
 
-                    return new Pomodoro.Matrix.from_array (data);
+                    return new Ft.Matrix.from_array (data);
 
                 case 2:
                     var data = new double[this.data.length[0], this.data.length[1]];
@@ -714,15 +714,15 @@ namespace Pomodoro
                         }
                     }
 
-                    return new Pomodoro.Matrix.from_array (data);
+                    return new Ft.Matrix.from_array (data);
 
                 default:
                     assert_not_reached ();
             }
         }
 
-        public Pomodoro.Matrix? get_matrix (int axis,
-                                            int index)
+        public Ft.Matrix? get_matrix (int axis,
+                                      int index)
         {
             if (!this.validate_index (ref axis, ref index)) {
                 return null;
@@ -800,7 +800,7 @@ namespace Pomodoro
          * Splitting will replace those vectors with numeric values, and will return same number of
          * matrices as the vectors length.
          */
-        public Pomodoro.Matrix[] unstack (int axis = -1)
+        public Ft.Matrix[] unstack (int axis = -1)
         {
             assert (validate_axis (ref axis));
 
@@ -816,7 +816,7 @@ namespace Pomodoro
                 }
             }
 
-            var result = new Pomodoro.Matrix[this.shape[axis]];
+            var result = new Ft.Matrix[this.shape[axis]];
 
             for (var index = 0; index < this.shape[axis]; index++) {
                 result[index] = this.get_matrix (axis, index);

@@ -1,20 +1,28 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     public class BaseStatsManagerTest : Tests.MainLoopTestSuite
     {
-        protected Pomodoro.Timer?           timer;
-        protected Pomodoro.SessionManager?  session_manager;
-        protected Pomodoro.StatsManager?    stats_manager;
-        protected Pomodoro.TimezoneHistory? timezone_history;
-        protected Gom.Repository?           repository;
+        protected Ft.Timer?             timer;
+        protected Ft.SessionManager?    session_manager;
+        protected Ft.StatsManager?      stats_manager;
+        protected Ft.TimezoneHistory?   timezone_history;
+        protected Gom.Repository?       repository;
 
         public override void setup ()
         {
             base.setup ();
 
-            Pomodoro.Database.open ();
+            Ft.Database.open ();
 
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_uint ("pomodoro-duration", 1500);
             settings.set_uint ("short-break-duration", 300);
             settings.set_uint ("long-break-duration", 900);
@@ -22,16 +30,16 @@ namespace Tests
             settings.set_boolean ("confirm-starting-break", false);
             settings.set_boolean ("confirm-starting-pomodoro", false);
 
-            this.repository = Pomodoro.Database.get_repository ();
-            this.timezone_history = new Pomodoro.TimezoneHistory ();
+            this.repository = Ft.Database.get_repository ();
+            this.timezone_history = new Ft.TimezoneHistory ();
 
-            this.timer = new Pomodoro.Timer ();
-            Pomodoro.Timer.set_default (this.timer);
+            this.timer = new Ft.Timer ();
+            Ft.Timer.set_default (this.timer);
 
-            this.session_manager = new Pomodoro.SessionManager.with_timer (this.timer);
-            Pomodoro.SessionManager.set_default (this.session_manager);
+            this.session_manager = new Ft.SessionManager.with_timer (this.timer);
+            Ft.SessionManager.set_default (this.session_manager);
 
-            this.stats_manager = new Pomodoro.StatsManager ();
+            this.stats_manager = new Ft.StatsManager ();
             assert (!this.stats_manager.get_data<bool> ("teardown"));
         }
 
@@ -46,13 +54,13 @@ namespace Tests
             this.timezone_history = null;
             this.repository = null;
 
-            Pomodoro.SessionManager.set_default (null);
-            Pomodoro.Timer.set_default (null);
+            Ft.SessionManager.set_default (null);
+            Ft.Timer.set_default (null);
 
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.revert ();
 
-            Pomodoro.Database.close ();
+            Ft.Database.close ();
 
             base.teardown ();
         }
@@ -67,20 +75,20 @@ namespace Tests
             category_value.set_string (category);
 
             var date_filter = new Gom.Filter.eq (
-                    typeof (Pomodoro.StatsEntry),
+                    typeof (Ft.StatsEntry),
                     "date",
                     date_value);
             var category_filter = new Gom.Filter.eq (
-                    typeof (Pomodoro.StatsEntry),
+                    typeof (Ft.StatsEntry),
                     "category",
                     category_value);
             var filter = new Gom.Filter.and (date_filter, category_filter);
 
-            return this.repository.find_sync (typeof (Pomodoro.StatsEntry), filter);
+            return this.repository.find_sync (typeof (Ft.StatsEntry), filter);
         }
 
-        protected Pomodoro.AggregatedStatsEntry? fetch_aggregated (string date,
-                                                                   string category) throws GLib.Error
+        protected Ft.AggregatedStatsEntry? fetch_aggregated (string date,
+                                                             string category) throws GLib.Error
         {
             var date_value = GLib.Value (typeof (string));
             date_value.set_string (date);
@@ -89,17 +97,17 @@ namespace Tests
             category_value.set_string (category);
 
             var date_filter = new Gom.Filter.eq (
-                    typeof (Pomodoro.AggregatedStatsEntry),
+                    typeof (Ft.AggregatedStatsEntry),
                     "date",
                     date_value);
             var category_filter = new Gom.Filter.eq (
-                    typeof (Pomodoro.AggregatedStatsEntry),
+                    typeof (Ft.AggregatedStatsEntry),
                     "category",
                     category_value);
             var filter = new Gom.Filter.and (date_filter, category_filter);
 
-            return (Pomodoro.AggregatedStatsEntry?) this.repository.find_one_sync (
-                    typeof (Pomodoro.AggregatedStatsEntry), filter);
+            return (Ft.AggregatedStatsEntry?) this.repository.find_one_sync (
+                    typeof (Ft.AggregatedStatsEntry), filter);
         }
 
         protected uint count (string date,
@@ -145,7 +153,7 @@ namespace Tests
 
                 for (var index = 0U; index < results.count; index++)
                 {
-                    var entry = (Pomodoro.StatsEntry?) results.get_index (index);
+                    var entry = (Ft.StatsEntry?) results.get_index (index);
 
                     duration += entry.duration;
                 }
@@ -227,7 +235,7 @@ namespace Tests
             base.setup ();
 
             // Sat January 01 2000 08:00:00 UTC
-            Pomodoro.Timestamp.freeze_to (Pomodoro.Timestamp.from_seconds_uint (946713600));
+            Ft.Timestamp.freeze_to (Ft.Timestamp.from_seconds_uint (946713600));
 
             try {
                 this.new_york_timezone = new GLib.TimeZone.identifier ("America/New_York");  // 3 AM
@@ -238,7 +246,7 @@ namespace Tests
                 assert_no_error (error);
             }
 
-            this.timezone_history.insert (Pomodoro.Timestamp.peek (), this.new_york_timezone);
+            this.timezone_history.insert (Ft.Timestamp.peek (), this.new_york_timezone);
         }
 
         private void run_flush ()
@@ -255,22 +263,22 @@ namespace Tests
 
         public void test_track ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 7, 0, 0));
             var source_id = (int64) 12345;
 
-            this.stats_manager.track ("test", timestamp, Pomodoro.Interval.MINUTE, source_id);
+            this.stats_manager.track ("test", timestamp, Ft.Interval.MINUTE, source_id);
 
             this.run_flush ();
 
             try {
                 Gom.ResourceGroup results;
 
-                results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1U);
 
-                var stats_entry = (Pomodoro.StatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.StatsEntry), null);
+                var stats_entry = (Ft.StatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.StatsEntry), null);
                 assert_cmpstr (
                         stats_entry.category,
                         GLib.CompareOperator.EQ,
@@ -281,17 +289,17 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry.offset),
-                        new GLib.Variant.int64 (7 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (7 * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry.duration),
-                        new GLib.Variant.int64 (Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (Ft.Interval.MINUTE));
 
                 // Expect aggregated entries to be up to date
-                results = this.repository.find_sync (typeof (Pomodoro.AggregatedStatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1U);
 
-                var aggregated_entry = (Pomodoro.AggregatedStatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.AggregatedStatsEntry), null);
+                var aggregated_entry = (Ft.AggregatedStatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpstr (
                         aggregated_entry.category,
                         GLib.CompareOperator.EQ,
@@ -302,7 +310,7 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.duration),
-                        new GLib.Variant.int64 (Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.count),
                         new GLib.Variant.int64 (1));
@@ -314,35 +322,35 @@ namespace Tests
 
         public void test_track__many ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 7, 0, 0));
-            timestamp += Pomodoro.Interval.HOUR;
+            timestamp += Ft.Interval.HOUR;
 
             this.stats_manager.track ("other",
                                       timestamp,
-                                      2 * Pomodoro.Interval.HOUR,
+                                      2 * Ft.Interval.HOUR,
                                       (int64) 1);  // extra entry
             this.stats_manager.track ("test",
                                       timestamp,
-                                      Pomodoro.Interval.MINUTE,
+                                      Ft.Interval.MINUTE,
                                       (int64) 2);
 
-            timestamp += Pomodoro.Interval.MINUTE;
+            timestamp += Ft.Interval.MINUTE;
             this.stats_manager.track ("test",
                                       timestamp,
-                                      2 * Pomodoro.Interval.MINUTE,
+                                      2 * Ft.Interval.MINUTE,
                                       (int64) 3);
 
-            timestamp += Pomodoro.Interval.MINUTE;
+            timestamp += Ft.Interval.MINUTE;
             this.stats_manager.track ("test",
                                       timestamp,
-                                      Pomodoro.Interval.HOUR,
+                                      Ft.Interval.HOUR,
                                       (int64) 4);
 
-            timestamp += 24 * Pomodoro.Interval.HOUR;
+            timestamp += 24 * Ft.Interval.HOUR;
             this.stats_manager.track ("test",
                                       timestamp,
-                                      2 * Pomodoro.Interval.HOUR,
+                                      2 * Ft.Interval.HOUR,
                                       (int64) 5);  // extra entry
 
             this.run_flush ();
@@ -350,7 +358,7 @@ namespace Tests
             try {
                 assert_cmpvariant (
                         new GLib.Variant.int64 (this.sum ("2000-01-01", "test")),
-                        new GLib.Variant.int64 (Pomodoro.Interval.HOUR + 3 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (Ft.Interval.HOUR + 3 * Ft.Interval.MINUTE));
                 assert_cmpuint (
                         this.count ("2000-01-01", "test"),
                         GLib.CompareOperator.EQ,
@@ -358,7 +366,7 @@ namespace Tests
 
                 assert_cmpvariant (
                         new GLib.Variant.int64 (this.sum_aggregated ("2000-01-01", "test")),
-                        new GLib.Variant.int64 (Pomodoro.Interval.HOUR + 3 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (Ft.Interval.HOUR + 3 * Ft.Interval.MINUTE));
                 assert_cmpuint (
                         this.count_aggregated ("2000-01-01", "test"),
                         GLib.CompareOperator.EQ,
@@ -371,56 +379,56 @@ namespace Tests
 
         public void test_track__update ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 12, 0, 0));
 
             this.stats_manager.track (  // entry to keep
                     "test",
                     timestamp - 1,
-                    Pomodoro.Interval.MINUTE);
+                    Ft.Interval.MINUTE);
             this.stats_manager.track (
                     "test",
                     timestamp,
-                    5 * Pomodoro.Interval.MINUTE);
+                    5 * Ft.Interval.MINUTE);
             this.run_flush ();
 
             this.stats_manager.track (
                     "test",
                     timestamp,
-                    6 * Pomodoro.Interval.MINUTE);
+                    6 * Ft.Interval.MINUTE);
             this.run_flush ();
 
             try {
-                var results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                var results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2);
 
                 var time_value = GLib.Value (typeof (int64));
                 time_value.set_int64 (timestamp);
 
                 var time_filter = new Gom.Filter.eq (
-                        typeof (Pomodoro.StatsEntry),
+                        typeof (Ft.StatsEntry),
                         "time",
                         time_value);
 
-                var stats_entry = (Pomodoro.StatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.StatsEntry), time_filter);
+                var stats_entry = (Ft.StatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.StatsEntry), time_filter);
                 assert_cmpstr (
                         stats_entry.category,
                         GLib.CompareOperator.EQ,
                         "test");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry.duration),
-                        new GLib.Variant.int64 (6 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (6 * Ft.Interval.MINUTE));
 
-                var aggregated_entry = (Pomodoro.AggregatedStatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.AggregatedStatsEntry), null);
+                var aggregated_entry = (Ft.AggregatedStatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpstr (
                         aggregated_entry.category,
                         GLib.CompareOperator.EQ,
                         "test");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.duration),
-                        new GLib.Variant.int64 ((1 + 6) * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 ((1 + 6) * Ft.Interval.MINUTE));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -429,24 +437,24 @@ namespace Tests
 
         public void test_track__duplicate_1 ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 12, 0, 0));
             var source_id = 2;
 
             this.stats_manager.track (
                     "test",
                     timestamp,
-                    Pomodoro.Interval.MINUTE,
+                    Ft.Interval.MINUTE,
                     source_id);
             this.stats_manager.track (
                     "test",
                     timestamp,
-                    Pomodoro.Interval.MINUTE,
+                    Ft.Interval.MINUTE,
                     source_id);
             this.run_flush ();
 
             try {
-                var results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                var results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1);
             }
             catch (GLib.Error error) {
@@ -456,26 +464,26 @@ namespace Tests
 
         public void test_track__duplicate_2 ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 12, 0, 0));
             var source_id = 2;
 
             this.stats_manager.track (
                     "test",
                     timestamp,
-                    Pomodoro.Interval.MINUTE,
+                    Ft.Interval.MINUTE,
                     source_id);
             this.run_flush ();
 
             this.stats_manager.track (
                     "test",
                     timestamp,
-                    Pomodoro.Interval.MINUTE,
+                    Ft.Interval.MINUTE,
                     source_id);
             this.run_flush ();
 
             try {
-                var results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                var results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1U);
             }
             catch (GLib.Error error) {
@@ -485,19 +493,19 @@ namespace Tests
 
         public void test_track_time_block__pomodoro_1 ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 7, 0, 0));
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (timestamp, timestamp + 5 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (timestamp, timestamp + 5 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var gap = new Pomodoro.Gap (Pomodoro.GapFlags.INTERRUPTION);
-            gap.set_time_range (timestamp + 1 * Pomodoro.Interval.MINUTE,
-                                timestamp + 3 * Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap (Ft.GapFlags.INTERRUPTION);
+            gap.set_time_range (timestamp + 1 * Ft.Interval.MINUTE,
+                                timestamp + 3 * Ft.Interval.MINUTE);
             time_block.add_gap (gap);
 
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
             session.append (time_block);
 
             this.stats_manager.track_time_block (time_block);
@@ -509,16 +517,16 @@ namespace Tests
                 Gom.ResourceGroup results;
 
                 var sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
-                sorting.add (typeof (Pomodoro.StatsEntry), "time", Gom.SortingMode.ASCENDING);
+                sorting.add (typeof (Ft.StatsEntry), "time", Gom.SortingMode.ASCENDING);
 
-                results = this.repository.find_sorted_sync (typeof (Pomodoro.StatsEntry),
+                results = this.repository.find_sorted_sync (typeof (Ft.StatsEntry),
                                                             null,
                                                             sorting);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -532,12 +540,12 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 (7 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (7 * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 (1 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (1 * Ft.Interval.MINUTE));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -551,18 +559,18 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 (7 * Pomodoro.Interval.HOUR +
-                                                3 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (7 * Ft.Interval.HOUR +
+                                                3 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (2 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (2 * Ft.Interval.MINUTE));
 
                 // Expect aggregated entries to be up to date
-                results = this.repository.find_sync (typeof (Pomodoro.AggregatedStatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1U);
 
-                var aggregated_entry = (Pomodoro.AggregatedStatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.AggregatedStatsEntry), null);
+                var aggregated_entry = (Ft.AggregatedStatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpstr (
                         aggregated_entry.category,
                         GLib.CompareOperator.EQ,
@@ -573,7 +581,7 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.duration),
-                        new GLib.Variant.int64 (3 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (3 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.count),
                         new GLib.Variant.int64 (1));
@@ -585,26 +593,26 @@ namespace Tests
 
         public void test_track_time_block__pomodoro_2 ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 7, 0, 0));
 
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_1.set_time_range (timestamp, timestamp + 5 * Pomodoro.Interval.MINUTE);
-            time_block_1.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_1.set_time_range (timestamp, timestamp + 5 * Ft.Interval.MINUTE);
+            time_block_1.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var gap = new Pomodoro.Gap (Pomodoro.GapFlags.INTERRUPTION);
-            gap.set_time_range (timestamp + 1 * Pomodoro.Interval.MINUTE,
-                                  timestamp + 3 * Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap (Ft.GapFlags.INTERRUPTION);
+            gap.set_time_range (timestamp + 1 * Ft.Interval.MINUTE,
+                                  timestamp + 3 * Ft.Interval.MINUTE);
             time_block_1.add_gap (gap);
 
             // Second pomodoro later the same day
-            var timestamp_2 = Pomodoro.Timestamp.from_datetime (
+            var timestamp_2 = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 9, 0, 0));
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_2.set_time_range (timestamp_2, timestamp_2 + 10 * Pomodoro.Interval.MINUTE);
-            time_block_2.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_2.set_time_range (timestamp_2, timestamp_2 + 10 * Ft.Interval.MINUTE);
+            time_block_2.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
             session.append (time_block_1);
             session.append (time_block_2);
 
@@ -614,8 +622,8 @@ namespace Tests
             this.run_flush ();
 
             try {
-                var aggregated_entry = (Pomodoro.AggregatedStatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.AggregatedStatsEntry), null);
+                var aggregated_entry = (Ft.AggregatedStatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpstr (
                         aggregated_entry.category,
                         GLib.CompareOperator.EQ,
@@ -626,7 +634,7 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.duration),
-                        new GLib.Variant.int64 (13 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (13 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.count),
                         new GLib.Variant.int64 (2));
@@ -641,19 +649,19 @@ namespace Tests
          */
         public void test_track_time_block__break ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 7, 0, 0));
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block.set_time_range (timestamp, timestamp + 5 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block.set_time_range (timestamp, timestamp + 5 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var gap = new Pomodoro.Gap (Pomodoro.GapFlags.INTERRUPTION);
-            gap.set_time_range (timestamp + 1 * Pomodoro.Interval.MINUTE,
-                                timestamp + 3 * Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap (Ft.GapFlags.INTERRUPTION);
+            gap.set_time_range (timestamp + 1 * Ft.Interval.MINUTE,
+                                timestamp + 3 * Ft.Interval.MINUTE);
             time_block.add_gap (gap);
 
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
             session.append (time_block);
 
             this.stats_manager.track_time_block (time_block);
@@ -665,16 +673,16 @@ namespace Tests
                 Gom.ResourceGroup results;
 
                 var sorting = (Gom.Sorting) GLib.Object.@new (typeof (Gom.Sorting));
-                sorting.add (typeof (Pomodoro.StatsEntry), "time", Gom.SortingMode.ASCENDING);
+                sorting.add (typeof (Ft.StatsEntry), "time", Gom.SortingMode.ASCENDING);
 
-                results = this.repository.find_sorted_sync (typeof (Pomodoro.StatsEntry),
+                results = this.repository.find_sorted_sync (typeof (Ft.StatsEntry),
                                                             null,
                                                             sorting);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -688,12 +696,12 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 (7 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (7 * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 (1 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (1 * Ft.Interval.MINUTE));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -707,18 +715,18 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 (7 * Pomodoro.Interval.HOUR +
-                                                3 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (7 * Ft.Interval.HOUR +
+                                                3 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (2 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (2 * Ft.Interval.MINUTE));
 
                 // Expect aggregated entries to be up to date
-                results = this.repository.find_sync (typeof (Pomodoro.AggregatedStatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1U);
 
-                var aggregated_entry = (Pomodoro.AggregatedStatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.AggregatedStatsEntry), null);
+                var aggregated_entry = (Ft.AggregatedStatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpstr (
                         aggregated_entry.category,
                         GLib.CompareOperator.EQ,
@@ -729,7 +737,7 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.duration),
-                        new GLib.Variant.int64 (3 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (3 * Ft.Interval.MINUTE));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -741,20 +749,19 @@ namespace Tests
          */
         public void test_track_time_block__skip_unfinished ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 7, 0, 0));
 
-            var time_block = new Pomodoro.TimeBlock.with_start_time (timestamp,
-                                                                     Pomodoro.State.POMODORO);
-            time_block.end_time = Pomodoro.Timestamp.UNDEFINED;
+            var time_block = new Ft.TimeBlock.with_start_time (timestamp, Ft.State.POMODORO);
+            time_block.end_time = Ft.Timestamp.UNDEFINED;
 
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
             session.append (time_block);
 
             this.stats_manager.track_time_block (time_block);
 
             try {
-                var results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                var results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 0U);
             }
             catch (GLib.Error error) {
@@ -764,35 +771,35 @@ namespace Tests
 
         public void test_track_time_block__update ()
         {
-            Pomodoro.StatsEntry? original_stats_entry = null;
+            Ft.StatsEntry? original_stats_entry = null;
 
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 7, 0, 0));
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (timestamp, timestamp + 5 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (timestamp, timestamp + 5 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
             session.append (time_block);
 
             this.stats_manager.track_time_block (time_block);
             this.run_flush ();
 
             try {
-                original_stats_entry = (Pomodoro.StatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.StatsEntry), null);
+                original_stats_entry = (Ft.StatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.StatsEntry), null);
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
             }
 
             // Edit pomodoro
-            time_block.set_time_range (timestamp, timestamp + 9 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (timestamp, timestamp + 9 * Ft.Interval.MINUTE);
 
-            var gap = new Pomodoro.Gap (Pomodoro.GapFlags.INTERRUPTION);
-            gap.set_time_range (timestamp + 4 * Pomodoro.Interval.MINUTE,
-                                timestamp + 6 * Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap (Ft.GapFlags.INTERRUPTION);
+            gap.set_time_range (timestamp + 4 * Ft.Interval.MINUTE,
+                                timestamp + 6 * Ft.Interval.MINUTE);
             time_block.add_gap (gap);
 
             this.stats_manager.track_time_block (time_block);
@@ -801,12 +808,12 @@ namespace Tests
             try {
                 Gom.ResourceGroup results;
 
-                results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -819,15 +826,15 @@ namespace Tests
                         new GLib.Variant.int64 (original_stats_entry.id));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (4 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 (7 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (7 * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.time),
                         new GLib.Variant.int64 (time_block.start_time));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -837,27 +844,27 @@ namespace Tests
                         new GLib.Variant.int64 (original_stats_entry.source_id));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (3 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (3 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 (7 * Pomodoro.Interval.HOUR +
-                                                6 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (7 * Ft.Interval.HOUR +
+                                                6 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.time),
                         new GLib.Variant.int64 (gap.end_time));
 
-                results = this.repository.find_sync (typeof (Pomodoro.AggregatedStatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1U);
 
-                var aggregated_entry = (Pomodoro.AggregatedStatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.AggregatedStatsEntry), null);
+                var aggregated_entry = (Ft.AggregatedStatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpstr (
                         aggregated_entry.category,
                         GLib.CompareOperator.EQ,
                         "pomodoro");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.duration),
-                        new GLib.Variant.int64 (7 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (7 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.count),
                         new GLib.Variant.int64 (1));
@@ -869,24 +876,24 @@ namespace Tests
 
         public void test_track_gap ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 7, 0, 0));
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (timestamp, timestamp + 30 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (timestamp, timestamp + 30 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
             session.append (time_block);
 
-            var gap_1 = new Pomodoro.Gap (Pomodoro.GapFlags.INTERRUPTION);
-            gap_1.set_time_range (time_block.start_time + 4 * Pomodoro.Interval.MINUTE,
-                                  time_block.start_time + 5 * Pomodoro.Interval.MINUTE);
+            var gap_1 = new Ft.Gap (Ft.GapFlags.INTERRUPTION);
+            gap_1.set_time_range (time_block.start_time + 4 * Ft.Interval.MINUTE,
+                                  time_block.start_time + 5 * Ft.Interval.MINUTE);
             time_block.add_gap (gap_1);
 
-            var gap_2 = new Pomodoro.Gap (Pomodoro.GapFlags.INTERRUPTION);
-            gap_2.set_time_range (time_block.start_time + 6 * Pomodoro.Interval.MINUTE,
-                                  time_block.start_time + 10 * Pomodoro.Interval.MINUTE);
+            var gap_2 = new Ft.Gap (Ft.GapFlags.INTERRUPTION);
+            gap_2.set_time_range (time_block.start_time + 6 * Ft.Interval.MINUTE,
+                                  time_block.start_time + 10 * Ft.Interval.MINUTE);
             time_block.add_gap (gap_2);
 
             this.stats_manager.track_gap (gap_1);
@@ -897,12 +904,12 @@ namespace Tests
             try {
                 Gom.ResourceGroup results;
 
-                results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -913,13 +920,13 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 (7 * Pomodoro.Interval.HOUR +
-                                                4 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (7 * Ft.Interval.HOUR +
+                                                4 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 (Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (Ft.Interval.MINUTE));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -930,17 +937,17 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 (7 * Pomodoro.Interval.HOUR +
-                                                6 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (7 * Ft.Interval.HOUR +
+                                                6 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (4 * Ft.Interval.MINUTE));
 
-                results = this.repository.find_sync (typeof (Pomodoro.AggregatedStatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1U);
 
-                var aggregated_entry = (Pomodoro.AggregatedStatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.AggregatedStatsEntry), null);
+                var aggregated_entry = (Ft.AggregatedStatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpstr (
                         aggregated_entry.category,
                         GLib.CompareOperator.EQ,
@@ -951,7 +958,7 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.duration),
-                        new GLib.Variant.int64 (5 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (5 * Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.count),
                         new GLib.Variant.int64 (2));
@@ -966,19 +973,19 @@ namespace Tests
          */
         public void test_track_gap__skip_unfinished ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 7, 0, 0));
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (timestamp, timestamp + 30 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (timestamp, timestamp + 30 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
             session.append (time_block);
 
-            var gap = new Pomodoro.Gap.with_start_time (
-                    time_block.start_time + 4 * Pomodoro.Interval.MINUTE,
-                    Pomodoro.GapFlags.INTERRUPTION);
+            var gap = new Ft.Gap.with_start_time (
+                    time_block.start_time + 4 * Ft.Interval.MINUTE,
+                    Ft.GapFlags.INTERRUPTION);
             time_block.add_gap (gap);
 
             this.stats_manager.track_gap (gap);
@@ -986,7 +993,7 @@ namespace Tests
             this.run_flush ();
 
             try {
-                var results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                var results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 0U);
             }
             catch (GLib.Error error) {
@@ -999,19 +1006,19 @@ namespace Tests
          */
         public void test_track_gap__skip_non_interruption ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 7, 0, 0));
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.BREAK);
-            time_block.set_time_range (timestamp, timestamp + 30 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.BREAK);
+            time_block.set_time_range (timestamp, timestamp + 30 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
             session.append (time_block);
 
-            var gap = new Pomodoro.Gap ();
-            gap.set_time_range (time_block.start_time + 4 * Pomodoro.Interval.MINUTE,
-                                time_block.start_time + 5 * Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap ();
+            gap.set_time_range (time_block.start_time + 4 * Ft.Interval.MINUTE,
+                                time_block.start_time + 5 * Ft.Interval.MINUTE);
             time_block.add_gap (gap);
 
             this.stats_manager.track_gap (gap);
@@ -1019,7 +1026,7 @@ namespace Tests
             this.run_flush ();
 
             try {
-                var results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                var results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 0U);
             }
             catch (GLib.Error error) {
@@ -1029,52 +1036,52 @@ namespace Tests
 
         public void test_gap__update ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 12, 0, 0));
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (timestamp, timestamp + 30 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (timestamp, timestamp + 30 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
             session.append (time_block);
 
-            var gap = new Pomodoro.Gap (Pomodoro.GapFlags.INTERRUPTION);
-            gap.set_time_range (time_block.start_time + 4 * Pomodoro.Interval.MINUTE,
-                                time_block.start_time + 5 * Pomodoro.Interval.MINUTE);
+            var gap = new Ft.Gap (Ft.GapFlags.INTERRUPTION);
+            gap.set_time_range (time_block.start_time + 4 * Ft.Interval.MINUTE,
+                                time_block.start_time + 5 * Ft.Interval.MINUTE);
             time_block.add_gap (gap);
 
             this.stats_manager.track_gap (gap);
             this.run_flush ();
 
-            gap.set_time_range (time_block.start_time + 4 * Pomodoro.Interval.MINUTE,
-                                time_block.start_time + 6 * Pomodoro.Interval.MINUTE);
+            gap.set_time_range (time_block.start_time + 4 * Ft.Interval.MINUTE,
+                                time_block.start_time + 6 * Ft.Interval.MINUTE);
             this.stats_manager.track_gap (gap);
             this.run_flush ();
 
             try {
-                var results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                var results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1);
 
-                var stats_entry = (Pomodoro.StatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.StatsEntry), null);
+                var stats_entry = (Ft.StatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.StatsEntry), null);
                 assert_cmpstr (
                         stats_entry.category,
                         GLib.CompareOperator.EQ,
                         "interruption");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry.duration),
-                        new GLib.Variant.int64 (2 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (2 * Ft.Interval.MINUTE));
 
-                var aggregated_entry = (Pomodoro.AggregatedStatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.AggregatedStatsEntry), null);
+                var aggregated_entry = (Ft.AggregatedStatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpstr (
                         aggregated_entry.category,
                         GLib.CompareOperator.EQ,
                         "interruption");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (aggregated_entry.duration),
-                        new GLib.Variant.int64 (2 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (2 * Ft.Interval.MINUTE));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -1087,25 +1094,25 @@ namespace Tests
          */
         public void test_midnight_split__before_true_midnight ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 23, 0, 0));
 
             this.stats_manager.track (
                     "test",
                     timestamp,
-                    5 * Pomodoro.Interval.HOUR + 30 * Pomodoro.Interval.MINUTE);
+                    5 * Ft.Interval.HOUR + 30 * Ft.Interval.MINUTE);
 
             this.run_flush ();
 
             try {
                 Gom.ResourceGroup results;
 
-                results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -1116,12 +1123,12 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 (23 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (23 * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 (5 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (5 * Ft.Interval.HOUR));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -1132,19 +1139,19 @@ namespace Tests
                         "2000-01-02");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 (Pomodoro.StatsManager.MIDNIGHT_OFFSET));
+                        new GLib.Variant.int64 (Ft.StatsManager.MIDNIGHT_OFFSET));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (30 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (30 * Ft.Interval.MINUTE));
 
                 // Expect an aggregated entry for each day
                 results = this.repository.find_sync (
-                        typeof (Pomodoro.AggregatedStatsEntry), null);
+                        typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var agg_stats_entry_1 = (Pomodoro.AggregatedStatsEntry?) results.get_index (0U);
+                var agg_stats_entry_1 = (Ft.AggregatedStatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         agg_stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -1155,9 +1162,9 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (agg_stats_entry_1.duration),
-                        new GLib.Variant.int64 (5 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (5 * Ft.Interval.HOUR));
 
-                var agg_stats_entry_2 = (Pomodoro.AggregatedStatsEntry?) results.get_index (1U);
+                var agg_stats_entry_2 = (Ft.AggregatedStatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         agg_stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -1168,7 +1175,7 @@ namespace Tests
                         "2000-01-02");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (agg_stats_entry_2.duration),
-                        new GLib.Variant.int64 (30 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (30 * Ft.Interval.MINUTE));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -1181,25 +1188,25 @@ namespace Tests
          */
         public void test_midnight_split__after_true_midnight ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 3, 0, 0));
 
             this.stats_manager.track (
                     "test",
                     timestamp,
-                    90 * Pomodoro.Interval.MINUTE);
+                    90 * Ft.Interval.MINUTE);
 
             this.run_flush ();
 
             try {
                 Gom.ResourceGroup results;
 
-                results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -1210,12 +1217,12 @@ namespace Tests
                         "1999-12-31");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 ((24 + 3) * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 ((24 + 3) * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 (Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (Ft.Interval.HOUR));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -1226,18 +1233,18 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 (Pomodoro.StatsManager.MIDNIGHT_OFFSET));
+                        new GLib.Variant.int64 (Ft.StatsManager.MIDNIGHT_OFFSET));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (30 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (30 * Ft.Interval.MINUTE));
 
                 // Expect an aggregated entry for each day
-                results = this.repository.find_sync (typeof (Pomodoro.AggregatedStatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.AggregatedStatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var agg_stats_entry_1 = (Pomodoro.AggregatedStatsEntry?) results.get_index (0U);
+                var agg_stats_entry_1 = (Ft.AggregatedStatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         agg_stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -1248,9 +1255,9 @@ namespace Tests
                         "1999-12-31");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (agg_stats_entry_1.duration),
-                        new GLib.Variant.int64 (Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (Ft.Interval.HOUR));
 
-                var agg_stats_entry_2 = (Pomodoro.AggregatedStatsEntry?) results.get_index (1U);
+                var agg_stats_entry_2 = (Ft.AggregatedStatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         agg_stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -1261,7 +1268,7 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (agg_stats_entry_2.duration),
-                        new GLib.Variant.int64 (30 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (30 * Ft.Interval.MINUTE));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -1273,9 +1280,9 @@ namespace Tests
          */
         public void test_midnight_split__multiple_days ()
         {
-            var start_time = Pomodoro.Timestamp.from_datetime (
+            var start_time = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 3, 9, 0, 0));
-            var end_time = Pomodoro.Timestamp.from_datetime (
+            var end_time = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 7, 17, 0, 0));
 
             this.stats_manager.track ("test", start_time, end_time - start_time);
@@ -1285,12 +1292,12 @@ namespace Tests
             try {
                 Gom.ResourceGroup results;
 
-                results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 5U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -1301,12 +1308,12 @@ namespace Tests
                         "2000-01-03");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 (9 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (9 * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 ((24 - 9) * Pomodoro.Interval.HOUR + Pomodoro.StatsManager.MIDNIGHT_OFFSET));
+                        new GLib.Variant.int64 ((24 - 9) * Ft.Interval.HOUR + Ft.StatsManager.MIDNIGHT_OFFSET));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -1317,12 +1324,12 @@ namespace Tests
                         "2000-01-04");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 (Pomodoro.StatsManager.MIDNIGHT_OFFSET));
+                        new GLib.Variant.int64 (Ft.StatsManager.MIDNIGHT_OFFSET));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (24 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (24 * Ft.Interval.HOUR));
 
-                var stats_entry_5 = (Pomodoro.StatsEntry?) results.get_index (4U);
+                var stats_entry_5 = (Ft.StatsEntry?) results.get_index (4U);
                 assert_cmpstr (
                         stats_entry_5.category,
                         GLib.CompareOperator.EQ,
@@ -1333,10 +1340,10 @@ namespace Tests
                         "2000-01-07");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_5.offset),
-                        new GLib.Variant.int64 (Pomodoro.StatsManager.MIDNIGHT_OFFSET));
+                        new GLib.Variant.int64 (Ft.StatsManager.MIDNIGHT_OFFSET));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_5.duration),
-                        new GLib.Variant.int64 (17 * Pomodoro.Interval.HOUR - Pomodoro.StatsManager.MIDNIGHT_OFFSET));
+                        new GLib.Variant.int64 (17 * Ft.Interval.HOUR - Ft.StatsManager.MIDNIGHT_OFFSET));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -1348,28 +1355,28 @@ namespace Tests
          */
         public void test_timezone_change__forward ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 12, 0, 0));
 
-            this.timezone_history.insert (timestamp + Pomodoro.Interval.MINUTE,
+            this.timezone_history.insert (timestamp + Ft.Interval.MINUTE,
                                           this.london_timezone);
 
             this.stats_manager.track (
                     "test",
                     timestamp,
-                    5 * Pomodoro.Interval.MINUTE);
+                    5 * Ft.Interval.MINUTE);
 
             this.run_flush ();
 
             try {
                 Gom.ResourceGroup results;
 
-                results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -1380,12 +1387,12 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 (12 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (12 * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 (Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (Ft.Interval.MINUTE));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -1396,11 +1403,11 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 ((12 + 5) * Pomodoro.Interval.HOUR +
-                                                Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 ((12 + 5) * Ft.Interval.HOUR +
+                                                Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (4 * Ft.Interval.MINUTE));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -1412,28 +1419,28 @@ namespace Tests
          */
         public void test_timezone_change__backward ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 12, 0, 0));
 
-            this.timezone_history.insert (timestamp + Pomodoro.Interval.MINUTE,
+            this.timezone_history.insert (timestamp + Ft.Interval.MINUTE,
                                           this.los_angeles_timezone);
 
             this.stats_manager.track (
                     "test",
                     timestamp,
-                    5 * Pomodoro.Interval.MINUTE);
+                    5 * Ft.Interval.MINUTE);
 
             this.run_flush ();
 
             try {
                 Gom.ResourceGroup results;
 
-                results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -1444,12 +1451,12 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 (12 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (12 * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 (Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (Ft.Interval.MINUTE));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -1460,11 +1467,11 @@ namespace Tests
                         "2000-01-01");
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 ((12 - 3) * Pomodoro.Interval.HOUR +
-                                                Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 ((12 - 3) * Ft.Interval.HOUR +
+                                                Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (4 * Ft.Interval.MINUTE));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -1476,25 +1483,25 @@ namespace Tests
          */
         public void test_dst_change__forward ()
         {
-            var dst_switch_time = Pomodoro.Timestamp.from_datetime (
+            var dst_switch_time = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 4, 2, 2, 0, 0));
 
             this.stats_manager.track (
                     "test",
-                    dst_switch_time - Pomodoro.Interval.MINUTE,
-                    5 * Pomodoro.Interval.MINUTE);
+                    dst_switch_time - Ft.Interval.MINUTE,
+                    5 * Ft.Interval.MINUTE);
 
             this.run_flush ();
 
             try {
                 Gom.ResourceGroup results;
 
-                results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -1505,12 +1512,12 @@ namespace Tests
                         "2000-04-01");  // adjusted to virtual midnight
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 ((24 + 2) * Pomodoro.Interval.HOUR - Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 ((24 + 2) * Ft.Interval.HOUR - Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 (Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (Ft.Interval.MINUTE));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -1521,10 +1528,10 @@ namespace Tests
                         "2000-04-01");  // adjusted to virtual midnight
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 ((24 + 3) * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 ((24 + 3) * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (4 * Ft.Interval.MINUTE));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -1536,9 +1543,9 @@ namespace Tests
          */
         public void test_dst_change__backward ()
         {
-            var dst_switch_time = Pomodoro.Timestamp.from_datetime (
+            var dst_switch_time = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2001, 10, 28, 0, 59, 59)) +
-                    Pomodoro.Interval.HOUR + Pomodoro.Interval.SECOND;
+                    Ft.Interval.HOUR + Ft.Interval.SECOND;
 
             var current_timezone = this.timezone_history.search (dst_switch_time);
             assert_cmpstr (current_timezone.get_identifier (),
@@ -1547,20 +1554,20 @@ namespace Tests
 
             this.stats_manager.track (
                     "test",
-                    dst_switch_time - Pomodoro.Interval.MINUTE,
-                    5 * Pomodoro.Interval.MINUTE);
+                    dst_switch_time - Ft.Interval.MINUTE,
+                    5 * Ft.Interval.MINUTE);
 
             this.run_flush ();
 
             try {
                 Gom.ResourceGroup results;
 
-                results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 2U);
 
                 results.fetch_sync (0U, results.count);
 
-                var stats_entry_1 = (Pomodoro.StatsEntry?) results.get_index (0U);
+                var stats_entry_1 = (Ft.StatsEntry?) results.get_index (0U);
                 assert_cmpstr (
                         stats_entry_1.category,
                         GLib.CompareOperator.EQ,
@@ -1571,12 +1578,12 @@ namespace Tests
                         "2001-10-27");  // adjusted to virtual midnight
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.offset),
-                        new GLib.Variant.int64 ((24 + 2) * Pomodoro.Interval.HOUR - Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 ((24 + 2) * Ft.Interval.HOUR - Ft.Interval.MINUTE));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_1.duration),
-                        new GLib.Variant.int64 (Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (Ft.Interval.MINUTE));
 
-                var stats_entry_2 = (Pomodoro.StatsEntry?) results.get_index (1U);
+                var stats_entry_2 = (Ft.StatsEntry?) results.get_index (1U);
                 assert_cmpstr (
                         stats_entry_2.category,
                         GLib.CompareOperator.EQ,
@@ -1587,10 +1594,10 @@ namespace Tests
                         "2001-10-27");  // adjusted to virtual midnight
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.offset),
-                        new GLib.Variant.int64 ((24 + 1) * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 ((24 + 1) * Ft.Interval.HOUR));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry_2.duration),
-                        new GLib.Variant.int64 (4 * Pomodoro.Interval.MINUTE));
+                        new GLib.Variant.int64 (4 * Ft.Interval.MINUTE));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -1620,8 +1627,8 @@ namespace Tests
             base.setup ();
 
             // Sat Jan 01 2000 08:00:00 UTC+0000
-            Pomodoro.Timestamp.freeze_to (Pomodoro.Timestamp.from_seconds_uint (946713600));
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            Ft.Timestamp.freeze_to (Ft.Timestamp.from_seconds_uint (946713600));
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
 
             try {
                 this.new_york_timezone = new GLib.TimeZone.identifier ("America/New_York");  // 3 AM
@@ -1630,7 +1637,7 @@ namespace Tests
                 assert_no_error (error);
             }
 
-            this.timezone_history.insert (Pomodoro.Timestamp.peek (), this.new_york_timezone);
+            this.timezone_history.insert (Ft.Timestamp.peek (), this.new_york_timezone);
         }
 
         private void run_save ()
@@ -1654,12 +1661,12 @@ namespace Tests
 
         public void test_save__pomodoro ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 12, 0, 0));
 
-            Pomodoro.Timestamp.freeze_to (timestamp);
+            Ft.Timestamp.freeze_to (timestamp);
 
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
             this.session_manager.advance (this.session_manager.current_time_block.end_time);
 
             var time_block = this.session_manager.current_session.get_first_time_block ();
@@ -1674,11 +1681,11 @@ namespace Tests
             assert_cmpuint (time_block_saved_emitted, GLib.CompareOperator.EQ, 2U);
 
             try {
-                var results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                var results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1);
 
-                var stats_entry = (Pomodoro.StatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.StatsEntry), null);
+                var stats_entry = (Ft.StatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.StatsEntry), null);
                 assert_cmpstr (
                         stats_entry.category,
                         GLib.CompareOperator.EQ,
@@ -1692,7 +1699,7 @@ namespace Tests
                         new GLib.Variant.int64 (time_block.duration));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry.offset),
-                        new GLib.Variant.int64 (12 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (12 * Ft.Interval.HOUR));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -1701,12 +1708,12 @@ namespace Tests
 
         public void test_save__break ()
         {
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 12, 0, 0));
 
-            Pomodoro.Timestamp.freeze_to (timestamp);
+            Ft.Timestamp.freeze_to (timestamp);
 
-            this.session_manager.advance_to_state (Pomodoro.State.SHORT_BREAK);
+            this.session_manager.advance_to_state (Ft.State.SHORT_BREAK);
             this.session_manager.advance (this.session_manager.current_time_block.end_time);
 
             var time_block = this.session_manager.current_session.get_first_time_block ();
@@ -1721,11 +1728,11 @@ namespace Tests
             assert_cmpuint (time_block_saved_emitted, GLib.CompareOperator.EQ, 2U);
 
             try {
-                var results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), null);
+                var results = this.repository.find_sync (typeof (Ft.StatsEntry), null);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1U);
 
-                var stats_entry = (Pomodoro.StatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.StatsEntry), null);
+                var stats_entry = (Ft.StatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.StatsEntry), null);
                 assert_cmpstr (
                         stats_entry.category,
                         GLib.CompareOperator.EQ,
@@ -1739,7 +1746,7 @@ namespace Tests
                         new GLib.Variant.int64 (time_block.duration));
                 assert_cmpvariant (
                         new GLib.Variant.int64 (stats_entry.offset),
-                        new GLib.Variant.int64 (12 * Pomodoro.Interval.HOUR));
+                        new GLib.Variant.int64 (12 * Ft.Interval.HOUR));
             }
             catch (GLib.Error error) {
                 assert_no_error (error);
@@ -1748,9 +1755,9 @@ namespace Tests
 
         public void test_save__interruption ()
         {
-            var timer_action_group = new Pomodoro.TimerActionGroup.with_timer (this.timer);
+            var timer_action_group = new Ft.TimerActionGroup.with_timer (this.timer);
 
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 12, 0, 0));
 
             var time_block_saved_emitted = 0U;
@@ -1765,13 +1772,13 @@ namespace Tests
                     gap_saved_emitted++;
                 });
 
-            Pomodoro.Timestamp.freeze_to (timestamp);
+            Ft.Timestamp.freeze_to (timestamp);
             timer_action_group.activate_action ("start", null);
 
-            Pomodoro.Timestamp.freeze_to (timestamp + 5 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.freeze_to (timestamp + 5 * Ft.Interval.MINUTE);
             timer_action_group.activate_action ("pause", null);
 
-            Pomodoro.Timestamp.freeze_to (timestamp + 6 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.freeze_to (timestamp + 6 * Ft.Interval.MINUTE);
             timer_action_group.activate_action ("resume", null);
 
             this.run_save ();
@@ -1786,15 +1793,15 @@ namespace Tests
                 category_value.set_string ("pomodoro");
 
                 var category_filter = new Gom.Filter.neq (
-                        typeof (Pomodoro.StatsEntry),
+                        typeof (Ft.StatsEntry),
                         "category",
                         category_value);
 
-                var results = this.repository.find_sync (typeof (Pomodoro.StatsEntry), category_filter);
+                var results = this.repository.find_sync (typeof (Ft.StatsEntry), category_filter);
                 assert_cmpuint (results.count, GLib.CompareOperator.EQ, 1U);
 
-                var stats_entry = (Pomodoro.StatsEntry?) this.repository.find_one_sync (
-                        typeof (Pomodoro.StatsEntry), category_filter);
+                var stats_entry = (Ft.StatsEntry?) this.repository.find_one_sync (
+                        typeof (Ft.StatsEntry), category_filter);
                 assert_cmpstr (
                         stats_entry.category,
                         GLib.CompareOperator.EQ,
@@ -1814,26 +1821,26 @@ namespace Tests
 
         public void test_save__pomodoro_with_interruptions ()
         {
-            var timer_action_group = new Pomodoro.TimerActionGroup.with_timer (this.timer);
+            var timer_action_group = new Ft.TimerActionGroup.with_timer (this.timer);
 
-            var timestamp = Pomodoro.Timestamp.from_datetime (
+            var timestamp = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 1, 1, 12, 0, 0));
 
-            Pomodoro.Timestamp.freeze_to (timestamp);
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            Ft.Timestamp.freeze_to (timestamp);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
 
             // First interruption: 12:02 - 12:03
-            Pomodoro.Timestamp.freeze_to (timestamp + 2 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.freeze_to (timestamp + 2 * Ft.Interval.MINUTE);
             timer_action_group.activate_action ("pause", null);
 
-            Pomodoro.Timestamp.freeze_to (timestamp + 3 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.freeze_to (timestamp + 3 * Ft.Interval.MINUTE);
             timer_action_group.activate_action ("resume", null);
 
             // Second interruption: 12:10 - 12:11
-            Pomodoro.Timestamp.freeze_to (timestamp + 10 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.freeze_to (timestamp + 10 * Ft.Interval.MINUTE);
             timer_action_group.activate_action ("pause", null);
 
-            Pomodoro.Timestamp.freeze_to (timestamp + 11 * Pomodoro.Interval.MINUTE);
+            Ft.Timestamp.freeze_to (timestamp + 11 * Ft.Interval.MINUTE);
             timer_action_group.activate_action ("resume", null);
 
             // Mark the time-block end at its scheduled end time

@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroConditionGroupWidget" parent="GtkWidget">
+  <template class="FtConditionGroupWidget" parent="GtkWidget">
     <child>
       <object class="GtkButton" id="operator_button">
         <style>
@@ -39,7 +39,7 @@
             </child>
             <child>
               <object class="GtkButton">
-                <property name="visible" bind-source="PomodoroConditionGroupWidget" bind-property="is-nested" bind-flags="invert-boolean | sync-create"/>
+                <property name="visible" bind-source="FtConditionGroupWidget" bind-property="is-nested" bind-flags="invert-boolean | sync-create"/>
                 <child>
                   <object class="AdwButtonContent">
                     <property name="label" translatable="yes">Add Group</property>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,10 +9,10 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     /**
-     * A `Gtk.LayoutChild` for `Pomodoro.Canvas` widgets, storing per-child layout properties
+     * A `Gtk.LayoutChild` for `Ft.Canvas` widgets, storing per-child layout properties
      */
     public sealed class CanvasLayoutChild : Gtk.LayoutChild
     {
@@ -88,9 +88,9 @@ namespace Pomodoro
         /**
          * Calculate child's bounds in `Canvas` coordinates.
          */
-        private inline Gdk.Rectangle calculate_child_bounds (Pomodoro.CanvasLayoutChild child,
-                                                             float                      x_scale,
-                                                             float                      y_scale)
+        private inline Gdk.Rectangle calculate_child_bounds (Ft.CanvasLayoutChild child,
+                                                             float                x_scale,
+                                                             float                y_scale)
         {
             child.absolute_bounds    = child.calculate_bounds ();  // cache result
             child.absolute_bounds.x += (int) Math.roundf (x_scale * child.x);
@@ -104,7 +104,7 @@ namespace Pomodoro
          */
         private Gdk.Rectangle calculate_bounds (Gtk.Widget widget)
         {
-            var canvas         = (Pomodoro.Canvas) widget;
+            var canvas         = (Ft.Canvas) widget;
             var x_scale        = canvas.x_scale;
             var y_scale        = canvas.y_scale;
             var bounds         = Gdk.Rectangle ();
@@ -114,7 +114,7 @@ namespace Pomodoro
                  child_widget != null;
                  child_widget = child_widget.get_next_sibling ())
             {
-                var layout_child = (Pomodoro.CanvasLayoutChild) this.get_layout_child (child_widget);
+                var layout_child = (Ft.CanvasLayoutChild) this.get_layout_child (child_widget);
 
                 if (layout_child == null) {
                     continue;
@@ -160,7 +160,7 @@ namespace Pomodoro
                  child_widget != null;
                  child_widget = child_widget.get_next_sibling ())
             {
-                var layout_child = (Pomodoro.CanvasLayoutChild) this.get_layout_child (child_widget);
+                var layout_child = (Ft.CanvasLayoutChild) this.get_layout_child (child_widget);
 
                 if (layout_child == null) {
                     continue;
@@ -187,7 +187,7 @@ namespace Pomodoro
                                       out int    x_origin,
                                       out int    y_origin)
         {
-            var canvas = widget as Pomodoro.Canvas;
+            var canvas = widget as Ft.Canvas;
 
             if (canvas != null)
             {
@@ -217,7 +217,7 @@ namespace Pomodoro
         public override Gtk.LayoutChild create_layout_child (Gtk.Widget widget,
                                                              Gtk.Widget for_child)
         {
-            return (Gtk.LayoutChild) GLib.Object.@new (typeof (Pomodoro.CanvasLayoutChild),
+            return (Gtk.LayoutChild) GLib.Object.@new (typeof (Ft.CanvasLayoutChild),
                                                        "layout-manager", this,
                                                        "child-widget", for_child);
         }
@@ -253,7 +253,7 @@ namespace Pomodoro
                                        int        height,
                                        int        baseline)
         {
-            var canvas = (Pomodoro.Canvas) widget;
+            var canvas = (Ft.Canvas) widget;
 
             canvas.update_origin ();
 
@@ -265,7 +265,7 @@ namespace Pomodoro
                  child_widget != null;
                  child_widget = child_widget.get_next_sibling ())
              {
-                var layout_child = (Pomodoro.CanvasLayoutChild?) this.get_layout_child (child_widget);
+                var layout_child = (Ft.CanvasLayoutChild?) this.get_layout_child (child_widget);
 
                 if (layout_child == null) {
                     continue;

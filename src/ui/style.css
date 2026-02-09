@@ -4,28 +4,28 @@
  * Most of custom widgets require that colors are opaque, so we can't rely on
  * theme variables unfortunately.
  */
-@define-color pomodoro_primary_color color-mix(in srgb, @window_fg_color 97.5%, @window_bg_color);
-@define-color pomodoro_unfocused_primary_color color-mix(in srgb, @window_fg_color 49.5%, @window_bg_color);
-@define-color pomodoro_insensitive_primary_color color-mix(in srgb, @window_fg_color 30%, @window_bg_color);
+@define-color ft_primary_color color-mix(in srgb, @window_fg_color 97.5%, @window_bg_color);
+@define-color ft_unfocused_primary_color color-mix(in srgb, @window_fg_color 49.5%, @window_bg_color);
+@define-color ft_insensitive_primary_color color-mix(in srgb, @window_fg_color 30%, @window_bg_color);
 
-@define-color pomodoro_secondary_color color-mix(in srgb, @pomodoro_primary_color 50%, @window_bg_color);
-@define-color pomodoro_unfocused_secondary_color color-mix(in srgb, @pomodoro_unfocused_primary_color 50%, @window_bg_color);
-@define-color pomodoro_insensitive_secondary_color color-mix(in srgb, @pomodoro_insensitive_primary_color 50%, @window_bg_color);
+@define-color ft_secondary_color color-mix(in srgb, @ft_primary_color 50%, @window_bg_color);
+@define-color ft_unfocused_secondary_color color-mix(in srgb, @ft_unfocused_primary_color 50%, @window_bg_color);
+@define-color ft_insensitive_secondary_color color-mix(in srgb, @ft_insensitive_primary_color 50%, @window_bg_color);
 
-@define-color pomodoro_support_color color-mix(in srgb, @pomodoro_primary_color 13.5%, @window_bg_color);
-@define-color pomodoro_unfocused_support_color color-mix(in srgb, @pomodoro_support_color 50%, @window_bg_color);
-@define-color pomodoro_insensitive_support_color color-mix(in srgb, @pomodoro_support_color 50%, @window_bg_color);
+@define-color ft_support_color color-mix(in srgb, @ft_primary_color 13.5%, @window_bg_color);
+@define-color ft_unfocused_support_color color-mix(in srgb, @ft_support_color 50%, @window_bg_color);
+@define-color ft_insensitive_support_color color-mix(in srgb, @ft_support_color 50%, @window_bg_color);
 
 
 /*
  * Misc
  */
-.pomodoro-header-bar viewswitcher.wide image {
+.ft-header-bar viewswitcher.wide image {
     opacity: 0.001;  /* setting opacity to 0 causes errors */
     margin-right: -16px;
 }
 
-.pomodoro-header-bar viewswitcher.wide label {
+.ft-header-bar viewswitcher.wide label {
     margin-right: 2px;
 }
 
@@ -42,24 +42,24 @@
 }
 
 
-row.pomodoro-log-scale {
+row.ft-log-scale {
     padding: 14px 14px 7px 14px;
 }
 
-.pomodoro-list > row.pomodoro-slim-row {
+.ft-list > row.ft-slim-row {
     padding-top: 8px;
     padding-bottom: 8px;
 }
 
-.pomodoro-plugin-name {
+.ft-plugin-name {
     font-weight: bold;
 }
 
-.pomodoro-plugin-description {
+.ft-plugin-description {
     font-size: small;
 }
 
-.pomodoro-state-button {
+.ft-state-button {
     padding-top: 5px;
     padding-bottom: 6px;
     font-size: 1.2em;
@@ -68,7 +68,7 @@ row.pomodoro-log-scale {
 
 
 /**
- * PomodoroTimerControlButtons widget
+ * FtTimerControlButtons widget
  */
 timercontrolbuttons.circular button {
     border-radius: 50%;
@@ -76,55 +76,55 @@ timercontrolbuttons.circular button {
 
 
 /**
- * PomodoroSessionProgressBar widget
+ * FtSessionProgressBar widget
  */
 sessionprogressbar .through {
-    color: @pomodoro_support_color;
+    color: @ft_support_color;
 }
 
 sessionprogressbar:backdrop .through {
-    color: @pomodoro_unfocused_support_color;
+    color: @ft_unfocused_support_color;
 }
 
 sessionprogressbar:disabled .through {
-    color: @pomodoro_insensitive_support_color;
+    color: @ft_insensitive_support_color;
 }
 
 sessionprogressbar .highlight {
-    color: @pomodoro_primary_color;
+    color: @ft_primary_color;
 }
 
 sessionprogressbar:backdrop .highlight {
-    color: @pomodoro_unfocused_primary_color;
+    color: @ft_unfocused_primary_color;
 }
 
 
 /**
- * PomodoroTimerProgressBar widget
+ * FtTimerProgressBar widget
  */
 timerprogressbar .through {
-    color: @pomodoro_support_color;
+    color: @ft_support_color;
 }
 
 timerprogressbar:backdrop .through {
-    color: @pomodoro_unfocused_support_color;
+    color: @ft_unfocused_support_color;
 }
 
 timerprogressbar:disabled .through {
-    color: @pomodoro_insensitive_support_color;
+    color: @ft_insensitive_support_color;
 }
 
 timerprogressbar .highlight {
-    color: @pomodoro_primary_color;
+    color: @ft_primary_color;
 }
 
 timerprogressbar:backdrop .highlight {
-    color: @pomodoro_unfocused_primary_color;
+    color: @ft_unfocused_primary_color;
 }
 
 
 /**
- * PomodoroTimerLabel widget
+ * FtTimerLabel widget
  */
 timerlabel .placeholder {
     color: @unfocused_borders;
@@ -132,7 +132,7 @@ timerlabel .placeholder {
 
 
 /**
- * PomodoroTimerView widget
+ * FtTimerView widget
  */
 timerview button:backdrop,
 timerview button:disabled {
@@ -180,11 +180,11 @@ timerview .suggested-action:disabled {
     background-color: @insensitive_fg_color;
 }
 
-timerview .pomodoro-state-menu > button {
+timerview .ft-state-menu > button {
     padding: 8px 12px 8px 16px;
 }
 
-timerview .pomodoro-state-menu arrow {
+timerview .ft-state-menu arrow {
     opacity: 0;
     margin: 0;
     margin-left: -16px;
@@ -192,21 +192,21 @@ timerview .pomodoro-state-menu arrow {
 
 timerview timerlabel:backdrop,
 timerview timerstatemenu label:backdrop {
-    color: @pomodoro_unfocused_primary_color;
+    color: @ft_unfocused_primary_color;
 }
 
-timerview:dir(rtl) .pomodoro-state-menu > button {
+timerview:dir(rtl) .ft-state-menu > button {
     padding: 8px 16px 8px 12px;
 }
 
-timerview:dir(rtl) .pomodoro-state-menu arrow {
+timerview:dir(rtl) .ft-state-menu arrow {
     margin: 0;
     margin-right: -16px;
 }
 
 
 /**
- * PomodoroCompactTimerView widget
+ * FtCompactTimerView widget
  */
 compacttimerview {
     min-width: 300px;
@@ -217,11 +217,11 @@ compacttimerview > grid > separator {
     margin-left: 7px;
 }
 
-compacttimerview .pomodoro-state-menu > button {
+compacttimerview .ft-state-menu > button {
     padding: 3px 5px 3px 9px;
 }
 
-compacttimerview .pomodoro-state-menu arrow {
+compacttimerview .ft-state-menu arrow {
     opacity: 0;
     margin: 0;
     margin-left: -16px;
@@ -245,11 +245,11 @@ compacttimerview:dir(rtl) > grid > separator {
     margin-right: 7px;
 }
 
-compacttimerview:dir(rtl) .pomodoro-state-menu > button {
+compacttimerview:dir(rtl) .ft-state-menu > button {
     padding: 3px 9px 3px 5px;
 }
 
-compacttimerview:dir(rtl) .pomodoro-state-menu arrow {
+compacttimerview:dir(rtl) .ft-state-menu arrow {
     margin: 0;
     margin-right: -16px;
 }
@@ -259,12 +259,12 @@ compacttimerview:dir(rtl) timerprogressbar {
 }
 
 compacttimerview:backdrop timerprogressbar .highlight {
-    color: @pomodoro_primary_color;
+    color: @ft_primary_color;
 }
 
 
 /**
- * PomodoroStatsView
+ * FtStatsView
  */
 
 statsview #title > button {
@@ -321,7 +321,7 @@ chartgrid {
 
 
 /**
- * PomodoroStatsCard
+ * FtStatsCard
  */
 statscard {
     padding: 12px;
@@ -359,7 +359,7 @@ statscard .pill.negative {
 
 
 /**
- * PomodoroBarChart, PomodoroBubbleChart widgets
+ * FtBarChart, FtBubbleChart widgets
  */
 chart scrolledwindow undershoot.left {
     background: linear-gradient(to right, @theme_bg_color, transparent 100%);
@@ -376,7 +376,7 @@ chart .bubble:not(:disabled):hover {
 
 
 /**
- * PomodoroDayChooser widgets
+ * FtDayChooser widgets
  */
 calendar {
     border: none;
@@ -460,7 +460,7 @@ calendar grid .pill.week {
 
 
 /**
- * PomodoroCondition widget
+ * FtCondition widget
  */
 condition.card {
     padding: 6px;
@@ -468,7 +468,7 @@ condition.card {
 
 
 /**
- * PomodoroConditionGroup widget
+ * FtConditionGroup widget
  */
 button.small.pill {
     font-size: 90%;
@@ -565,7 +565,7 @@ shortcut label.keycap {
 
 
 /*
- * PomodoroExtensionDialog widget
+ * FtExtensionDialog widget
  */
 
 .extension-dialog carouselindicatordots {
@@ -633,11 +633,11 @@ shortcut label.keycap {
 
 
 /*
- * PomodoroCheckmark widget
+ * FtCheckmark widget
  */
 
 checkmark {
-    background: @pomodoro_primary_color;
+    background: @ft_primary_color;
     color: @window_bg_color;
     border-radius: 50%;
     padding: 16px;
@@ -645,7 +645,7 @@ checkmark {
 }
 
 checkmark:backdrop {
-    background: @pomodoro_unfocused_primary_color;
+    background: @ft_unfocused_primary_color;
 }
 
 

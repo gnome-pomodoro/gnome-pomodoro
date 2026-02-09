@@ -1,3 +1,11 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     public class SessionTemplateTest : Tests.TestSuite
@@ -9,35 +17,35 @@ namespace Tests
 
         public void test_calculate_break_percentage ()
         {
-            var session_template_1 = Pomodoro.SessionTemplate () {
-                pomodoro_duration = 25 * Pomodoro.Interval.MINUTE,
-                short_break_duration = 0 * Pomodoro.Interval.MINUTE,
-                long_break_duration = 0 * Pomodoro.Interval.MINUTE,
+            var session_template_1 = Ft.SessionTemplate () {
+                pomodoro_duration = 25 * Ft.Interval.MINUTE,
+                short_break_duration = 0 * Ft.Interval.MINUTE,
+                long_break_duration = 0 * Ft.Interval.MINUTE,
                 cycles = 4
             };
             assert_cmpfloat_with_epsilon (session_template_1.calculate_break_percentage (), 0.0, 0.0001);
 
-            var session_template_2 = Pomodoro.SessionTemplate () {
-                pomodoro_duration = 0 * Pomodoro.Interval.MINUTE,
-                short_break_duration = 5 * Pomodoro.Interval.MINUTE,
-                long_break_duration = 15 * Pomodoro.Interval.MINUTE,
+            var session_template_2 = Ft.SessionTemplate () {
+                pomodoro_duration = 0 * Ft.Interval.MINUTE,
+                short_break_duration = 5 * Ft.Interval.MINUTE,
+                long_break_duration = 15 * Ft.Interval.MINUTE,
                 cycles = 4
             };
             assert_cmpfloat_with_epsilon (session_template_2.calculate_break_percentage (), 100.0, 0.0001);
 
-            var session_template_3 = Pomodoro.SessionTemplate () {
-                pomodoro_duration = 3 * Pomodoro.Interval.MINUTE,
-                short_break_duration = 1 * Pomodoro.Interval.MINUTE,
-                long_break_duration = 1 * Pomodoro.Interval.MINUTE,
+            var session_template_3 = Ft.SessionTemplate () {
+                pomodoro_duration = 3 * Ft.Interval.MINUTE,
+                short_break_duration = 1 * Ft.Interval.MINUTE,
+                long_break_duration = 1 * Ft.Interval.MINUTE,
                 cycles = 1
             };
             // 1 / (3 + 1)
             assert_cmpfloat_with_epsilon (session_template_3.calculate_break_percentage (), 25.0, 0.0001);
 
-            var session_template_4 = Pomodoro.SessionTemplate () {
-                pomodoro_duration = 25 * Pomodoro.Interval.MINUTE,
-                short_break_duration = 5 * Pomodoro.Interval.MINUTE,
-                long_break_duration = 10 * Pomodoro.Interval.MINUTE,
+            var session_template_4 = Ft.SessionTemplate () {
+                pomodoro_duration = 25 * Ft.Interval.MINUTE,
+                short_break_duration = 5 * Ft.Interval.MINUTE,
+                long_break_duration = 10 * Ft.Interval.MINUTE,
                 cycles = 4
             };
             // (5 + 5 + 5 + 10) / (25 + 5 + 25 + 5 + 25 + 5 + 25 + 10)
@@ -48,10 +56,10 @@ namespace Tests
 
     public class SessionTest : Tests.TestSuite
     {
-        private Pomodoro.SessionTemplate session_template = Pomodoro.SessionTemplate () {
-            pomodoro_duration = 25 * Pomodoro.Interval.MINUTE,
-            short_break_duration = 5 * Pomodoro.Interval.MINUTE,
-            long_break_duration = 15 * Pomodoro.Interval.MINUTE,
+        private Ft.SessionTemplate session_template = Ft.SessionTemplate () {
+            pomodoro_duration = 25 * Ft.Interval.MINUTE,
+            short_break_duration = 5 * Ft.Interval.MINUTE,
+            long_break_duration = 15 * Ft.Interval.MINUTE,
             cycles = 4
         };
 
@@ -99,14 +107,14 @@ namespace Tests
 
         public override void setup ()
         {
-            Pomodoro.Timestamp.freeze_to (2000000000 * Pomodoro.Interval.SECOND);
+            Ft.Timestamp.freeze_to (2000000000 * Ft.Interval.SECOND);
         }
 
         public override void teardown ()
         {
-            Pomodoro.Timestamp.thaw ();
+            Ft.Timestamp.thaw ();
 
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.revert ();
         }
 
@@ -117,7 +125,7 @@ namespace Tests
          */
         public void test_new ()
         {
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
 
             var first_time_block = session.get_first_time_block ();
             assert_null (first_time_block);
@@ -127,11 +135,11 @@ namespace Tests
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (session.start_time),
-                new GLib.Variant.int64 (Pomodoro.Timestamp.UNDEFINED)
+                new GLib.Variant.int64 (Ft.Timestamp.UNDEFINED)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (session.end_time),
-                new GLib.Variant.int64 (Pomodoro.Timestamp.UNDEFINED)
+                new GLib.Variant.int64 (Ft.Timestamp.UNDEFINED)
             );
             // assert_cmpuint (session.get_cycles ().length (), GLib.CompareOperator.EQ, 0);
         }
@@ -143,10 +151,10 @@ namespace Tests
          */
         public void test_new_from_template ()
         {
-            var now = Pomodoro.Timestamp.advance (0);
+            var now = Ft.Timestamp.advance (0);
             var template = this.session_template;
-            var session = new Pomodoro.Session.from_template (template);
-            Pomodoro.TimeBlock[] time_blocks = {};
+            var session = new Ft.Session.from_template (template);
+            Ft.TimeBlock[] time_blocks = {};
 
             session.@foreach ((time_block) => {
                 time_blocks += time_block;
@@ -166,21 +174,21 @@ namespace Tests
                 var time_block = time_blocks[index];
 
                 if ((index & 1) == 0) {
-                    assert_true (time_block.state == Pomodoro.State.POMODORO);
+                    assert_true (time_block.state == Ft.State.POMODORO);
                     assert_cmpvariant (
                         new GLib.Variant.int64 (time_block.duration),
                         new GLib.Variant.int64 (template.pomodoro_duration)
                     );
                 }
                 else if (index < time_blocks.length - 1) {
-                    assert_true (time_block.state == Pomodoro.State.SHORT_BREAK);
+                    assert_true (time_block.state == Ft.State.SHORT_BREAK);
                     assert_cmpvariant (
                         new GLib.Variant.int64 (time_block.duration),
                         new GLib.Variant.int64 (template.short_break_duration)
                     );
                 }
                 else {
-                    assert_true (time_block.state == Pomodoro.State.LONG_BREAK);
+                    assert_true (time_block.state == Ft.State.LONG_BREAK);
                     assert_cmpvariant (
                         new GLib.Variant.int64 (time_block.duration),
                         new GLib.Variant.int64 (template.long_break_duration)
@@ -217,58 +225,58 @@ namespace Tests
         public void test_duration ()
         {
             var notify_duration_emitted = 0;
-            var now = Pomodoro.Timestamp.advance (0);
+            var now = Ft.Timestamp.advance (0);
 
-            var session_0 = new Pomodoro.Session ();
+            var session_0 = new Ft.Session ();
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_0.duration),
                 new GLib.Variant.int64 (0)
             );
 
-            var session_1 = new Pomodoro.Session ();
+            var session_1 = new Ft.Session ();
             session_1.notify["duration"].connect (() => {
                 notify_duration_emitted++;
             });
 
-            var time_block_1 = new Pomodoro.TimeBlock ();
-            time_block_1.set_time_range (now, now + 2 * Pomodoro.Interval.MINUTE);
+            var time_block_1 = new Ft.TimeBlock ();
+            time_block_1.set_time_range (now, now + 2 * Ft.Interval.MINUTE);
             session_1.append (time_block_1);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.duration),
-                new GLib.Variant.int64 (2 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (2 * Ft.Interval.MINUTE)
             );
             assert_cmpuint (notify_duration_emitted, GLib.CompareOperator.EQ, 1);
 
-            var time_block_2 = new Pomodoro.TimeBlock ();
-            time_block_2.set_time_range (now, now + 3 * Pomodoro.Interval.MINUTE);
+            var time_block_2 = new Ft.TimeBlock ();
+            time_block_2.set_time_range (now, now + 3 * Ft.Interval.MINUTE);
             session_1.append (time_block_2);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.duration),
-                new GLib.Variant.int64 (5 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (5 * Ft.Interval.MINUTE)
             );
             assert_cmpuint (notify_duration_emitted, GLib.CompareOperator.EQ, 2);
 
             // Adding a gap between time-blocks should increase duration.
-            time_block_2.move_by (Pomodoro.Interval.MINUTE);
+            time_block_2.move_by (Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.duration),
-                new GLib.Variant.int64 (6 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (6 * Ft.Interval.MINUTE)
             );
             assert_cmpuint (notify_duration_emitted, GLib.CompareOperator.EQ, 3);
 
             // Moving a session shouldn't emit notify signal.
-            session_1.move_by (Pomodoro.Interval.MINUTE);
+            session_1.move_by (Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.duration),
-                new GLib.Variant.int64 (6 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (6 * Ft.Interval.MINUTE)
             );
             assert_cmpuint (notify_duration_emitted, GLib.CompareOperator.EQ, 3);
 
             // Uncompleted time-blocks should be included in duration.
-            session_1.set_time_block_status (time_block_2, Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            session_1.set_time_block_status (time_block_2, Ft.TimeBlockStatus.UNCOMPLETED);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.duration),
-                new GLib.Variant.int64 (6 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (6 * Ft.Interval.MINUTE)
             );
             assert_cmpuint (notify_duration_emitted, GLib.CompareOperator.EQ, 3);
         }
@@ -276,22 +284,22 @@ namespace Tests
         public void test_start_time ()
         {
             var notify_start_time_emitted = 0;
-            var now = Pomodoro.Timestamp.advance (0);
+            var now = Ft.Timestamp.advance (0);
 
-            var session_0 = new Pomodoro.Session ();
+            var session_0 = new Ft.Session ();
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_0.start_time),
-                new GLib.Variant.int64 (Pomodoro.Timestamp.UNDEFINED)
+                new GLib.Variant.int64 (Ft.Timestamp.UNDEFINED)
             );
 
-            var session_1 = new Pomodoro.Session ();
+            var session_1 = new Ft.Session ();
             session_1.notify["start-time"].connect (() => {
                 notify_start_time_emitted++;
             });
 
-            var time_block_2 = new Pomodoro.TimeBlock ();
-            time_block_2.set_time_range (now + 4 * Pomodoro.Interval.MINUTE,
-                                         now + 5 * Pomodoro.Interval.MINUTE);
+            var time_block_2 = new Ft.TimeBlock ();
+            time_block_2.set_time_range (now + 4 * Ft.Interval.MINUTE,
+                                         now + 5 * Ft.Interval.MINUTE);
             session_1.prepend (time_block_2);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.start_time),
@@ -299,9 +307,9 @@ namespace Tests
             );
             assert_cmpuint (notify_start_time_emitted, GLib.CompareOperator.EQ, 1);
 
-            var time_block_1 = new Pomodoro.TimeBlock ();
-            time_block_1.set_time_range (now + 3 * Pomodoro.Interval.MINUTE,
-                                         now + 4 * Pomodoro.Interval.MINUTE);
+            var time_block_1 = new Ft.TimeBlock ();
+            time_block_1.set_time_range (now + 3 * Ft.Interval.MINUTE,
+                                         now + 4 * Ft.Interval.MINUTE);
             session_1.prepend (time_block_1);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.start_time),
@@ -310,8 +318,8 @@ namespace Tests
             assert_cmpuint (notify_start_time_emitted, GLib.CompareOperator.EQ, 2);
 
             // Moving first time-block should affect start_time.
-            var expected_start_time = time_block_1.start_time + Pomodoro.Interval.MINUTE;
-            time_block_1.move_by (Pomodoro.Interval.MINUTE);
+            var expected_start_time = time_block_1.start_time + Ft.Interval.MINUTE;
+            time_block_1.move_by (Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.start_time),
                 new GLib.Variant.int64 (expected_start_time)
@@ -319,7 +327,7 @@ namespace Tests
             assert_cmpuint (notify_start_time_emitted, GLib.CompareOperator.EQ, 3);
 
             // Moving a session should emit notify signal.
-            expected_start_time = session_1.start_time + Pomodoro.Interval.MINUTE;
+            expected_start_time = session_1.start_time + Ft.Interval.MINUTE;
             session_1.move_to (expected_start_time);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.start_time),
@@ -329,7 +337,7 @@ namespace Tests
 
             // Moving second time-block should not affect start_time.
             expected_start_time = session_1.start_time;
-            time_block_2.move_to (time_block_2.start_time + Pomodoro.Interval.MINUTE);
+            time_block_2.move_to (time_block_2.start_time + Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.start_time),
                 new GLib.Variant.int64 (expected_start_time)
@@ -338,7 +346,7 @@ namespace Tests
 
             // Uncompleted time-blocks should be included in start_time.
             expected_start_time = session_1.start_time;
-            session_1.set_time_block_status (time_block_1, Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            session_1.set_time_block_status (time_block_1, Ft.TimeBlockStatus.UNCOMPLETED);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.start_time),
                 new GLib.Variant.int64 (expected_start_time)
@@ -349,22 +357,22 @@ namespace Tests
         public void test_end_time ()
         {
             var notify_end_time_emitted = 0;
-            var now = Pomodoro.Timestamp.advance (0);
+            var now = Ft.Timestamp.advance (0);
 
-            var session_0 = new Pomodoro.Session ();
+            var session_0 = new Ft.Session ();
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_0.end_time),
-                new GLib.Variant.int64 (Pomodoro.Timestamp.UNDEFINED)
+                new GLib.Variant.int64 (Ft.Timestamp.UNDEFINED)
             );
 
-            var session_1 = new Pomodoro.Session ();
+            var session_1 = new Ft.Session ();
             session_1.notify["end-time"].connect (() => {
                 notify_end_time_emitted++;
             });
 
-            var time_block_1 = new Pomodoro.TimeBlock ();
-            time_block_1.set_time_range (now + 3 * Pomodoro.Interval.MINUTE,
-                                         now + 4 * Pomodoro.Interval.MINUTE);
+            var time_block_1 = new Ft.TimeBlock ();
+            time_block_1.set_time_range (now + 3 * Ft.Interval.MINUTE,
+                                         now + 4 * Ft.Interval.MINUTE);
             session_1.append (time_block_1);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.end_time),
@@ -372,9 +380,9 @@ namespace Tests
             );
             assert_cmpuint (notify_end_time_emitted, GLib.CompareOperator.EQ, 1);
 
-            var time_block_2 = new Pomodoro.TimeBlock ();
-            time_block_2.set_time_range (now + 4 * Pomodoro.Interval.MINUTE,
-                                         now + 5 * Pomodoro.Interval.MINUTE);
+            var time_block_2 = new Ft.TimeBlock ();
+            time_block_2.set_time_range (now + 4 * Ft.Interval.MINUTE,
+                                         now + 5 * Ft.Interval.MINUTE);
             session_1.append (time_block_2);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.end_time),
@@ -383,8 +391,8 @@ namespace Tests
             assert_cmpuint (notify_end_time_emitted, GLib.CompareOperator.EQ, 2);
 
             // Moving second time-block should affect end_time.
-            var expected_end_time = time_block_2.end_time + Pomodoro.Interval.MINUTE;
-            time_block_2.move_by (Pomodoro.Interval.MINUTE);
+            var expected_end_time = time_block_2.end_time + Ft.Interval.MINUTE;
+            time_block_2.move_by (Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.end_time),
                 new GLib.Variant.int64 (expected_end_time)
@@ -392,8 +400,8 @@ namespace Tests
             assert_cmpuint (notify_end_time_emitted, GLib.CompareOperator.EQ, 3);
 
             // Moving a session should emit notify signal.
-            expected_end_time = session_1.end_time + Pomodoro.Interval.MINUTE;
-            session_1.move_by (Pomodoro.Interval.MINUTE);
+            expected_end_time = session_1.end_time + Ft.Interval.MINUTE;
+            session_1.move_by (Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.end_time),
                 new GLib.Variant.int64 (expected_end_time)
@@ -402,7 +410,7 @@ namespace Tests
 
             // Moving first time-block should not affect end_time.
             expected_end_time = session_1.end_time;
-            time_block_1.move_by (-Pomodoro.Interval.MINUTE);
+            time_block_1.move_by (-Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.end_time),
                 new GLib.Variant.int64 (expected_end_time)
@@ -411,7 +419,7 @@ namespace Tests
 
             // Uncompleted time-blocks should be included in end_time.
             expected_end_time = session_1.end_time;
-            session_1.set_time_block_status (time_block_1, Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            session_1.set_time_block_status (time_block_1, Ft.TimeBlockStatus.UNCOMPLETED);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session_1.end_time),
                 new GLib.Variant.int64 (expected_end_time)
@@ -421,36 +429,36 @@ namespace Tests
 
         public void test_get_first_time_block ()
         {
-            var time_blocks = new Pomodoro.TimeBlock[0];
-            var session     = new Pomodoro.Session.from_template (this.session_template);
+            var time_blocks = new Ft.TimeBlock[0];
+            var session     = new Ft.Session.from_template (this.session_template);
             session.@foreach ((time_block) => {
                 time_blocks += time_block;
             });
 
             assert_true (session.get_first_time_block () == time_blocks[0]);
 
-            var empty_session = new Pomodoro.Session ();
+            var empty_session = new Ft.Session ();
             assert_null (empty_session.get_first_time_block ());
         }
 
         public void test_get_last_time_block ()
         {
-            var time_blocks = new Pomodoro.TimeBlock[0];
-            var session     = new Pomodoro.Session.from_template (this.session_template);
+            var time_blocks = new Ft.TimeBlock[0];
+            var session     = new Ft.Session.from_template (this.session_template);
             session.@foreach ((time_block) => {
                 time_blocks += time_block;
             });
 
             assert_true (session.get_last_time_block () == time_blocks[7]);
 
-            var empty_session = new Pomodoro.Session ();
+            var empty_session = new Ft.Session ();
             assert_null (empty_session.get_last_time_block ());
         }
 
         public void test_get_next_time_block ()
         {
-            var time_blocks = new Pomodoro.TimeBlock[0];
-            var session     = new Pomodoro.Session.from_template (this.session_template);
+            var time_blocks = new Ft.TimeBlock[0];
+            var session     = new Ft.Session.from_template (this.session_template);
             session.@foreach ((time_block) => {
                 time_blocks += time_block;
             });
@@ -465,14 +473,14 @@ namespace Tests
                 session.get_next_time_block (time_blocks[7])
             );
             assert_null (
-                session.get_next_time_block (new Pomodoro.TimeBlock (Pomodoro.State.POMODORO))
+                session.get_next_time_block (new Ft.TimeBlock (Ft.State.POMODORO))
             );
         }
 
         public void test_get_previous_time_block ()
         {
-            var time_blocks = new Pomodoro.TimeBlock[0];
-            var session     = new Pomodoro.Session.from_template (this.session_template);
+            var time_blocks = new Ft.TimeBlock[0];
+            var session     = new Ft.Session.from_template (this.session_template);
             session.@foreach ((time_block) => {
                 time_blocks += time_block;
             });
@@ -487,14 +495,14 @@ namespace Tests
                 session.get_previous_time_block (time_blocks[0])
             );
             assert_null (
-                session.get_previous_time_block (new Pomodoro.TimeBlock (Pomodoro.State.POMODORO))
+                session.get_previous_time_block (new Ft.TimeBlock (Ft.State.POMODORO))
             );
         }
 
         public void test_append ()
         {
-            var session = new Pomodoro.Session ();
-            var now     = Pomodoro.Timestamp.from_now ();
+            var session = new Ft.Session ();
+            var now     = Ft.Timestamp.from_now ();
 
             var added_emitted = 0;
             session.added.connect (() => {
@@ -506,8 +514,8 @@ namespace Tests
                 changed_emitted++;
             });
 
-            var time_block_1 = new Pomodoro.TimeBlock ();
-            time_block_1.set_time_range (now, now + Pomodoro.Interval.MINUTE);
+            var time_block_1 = new Ft.TimeBlock ();
+            time_block_1.set_time_range (now, now + Ft.Interval.MINUTE);
             session.append (time_block_1);
             assert_cmpuint (added_emitted, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 1);
@@ -517,8 +525,8 @@ namespace Tests
                 new GLib.Variant.int64 (now)
             );
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_2.set_time_range (now, now + Pomodoro.Interval.MINUTE);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_2.set_time_range (now, now + Ft.Interval.MINUTE);
             session.append (time_block_2);
             assert_cmpuint (added_emitted, GLib.CompareOperator.EQ, 2);
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 2);
@@ -531,7 +539,7 @@ namespace Tests
 
         public void test_prepend ()
         {
-            var session = new Pomodoro.Session ();
+            var session = new Ft.Session ();
 
             var added_emitted = 0;
             session.added.connect (() => {
@@ -543,13 +551,13 @@ namespace Tests
                 changed_emitted++;
             });
 
-            var time_block_1 = new Pomodoro.TimeBlock ();
+            var time_block_1 = new Ft.TimeBlock ();
             session.prepend (time_block_1);
             assert_cmpuint (added_emitted, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 1);
             assert_true (session.get_first_time_block () == time_block_1);
 
-            var time_block_2 = new Pomodoro.TimeBlock ();
+            var time_block_2 = new Ft.TimeBlock ();
             session.prepend (time_block_2);
             assert_cmpuint (added_emitted, GLib.CompareOperator.EQ, 2);
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 2);
@@ -558,7 +566,7 @@ namespace Tests
 
         public void test_insert_before ()
         {
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
 
             var added_emitted = 0;
             session.added.connect (() => {
@@ -572,13 +580,13 @@ namespace Tests
 
             var reference_time_block = session.get_last_time_block ();
 
-            var time_block_1 = new Pomodoro.TimeBlock ();
+            var time_block_1 = new Ft.TimeBlock ();
             session.insert_before (time_block_1, reference_time_block);
             assert_cmpuint (added_emitted, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 1);
             assert_true (session.get_previous_time_block (reference_time_block) == time_block_1);
 
-            var time_block_2 = new Pomodoro.TimeBlock ();
+            var time_block_2 = new Ft.TimeBlock ();
             session.insert_before (time_block_2, session.get_first_time_block ());
             assert_cmpuint (added_emitted, GLib.CompareOperator.EQ, 2);
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 2);
@@ -587,7 +595,7 @@ namespace Tests
 
         public void test_insert_after ()
         {
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
 
             var added_emitted = 0;
             session.added.connect (() => {
@@ -601,13 +609,13 @@ namespace Tests
 
             var reference_time_block = session.get_last_time_block ();
 
-            var time_block_1 = new Pomodoro.TimeBlock ();
+            var time_block_1 = new Ft.TimeBlock ();
             session.insert_after (time_block_1, reference_time_block);
             assert_cmpuint (added_emitted, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 1);
             assert_true (session.get_next_time_block (reference_time_block) == time_block_1);
 
-            var time_block_2 = new Pomodoro.TimeBlock ();
+            var time_block_2 = new Ft.TimeBlock ();
             session.insert_after (time_block_2, session.get_last_time_block ());
             assert_cmpuint (added_emitted, GLib.CompareOperator.EQ, 2);
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 2);
@@ -616,8 +624,8 @@ namespace Tests
 
         public void test_contains ()
         {
-            var session = new Pomodoro.Session.from_template (this.session_template);
-            var time_block = new Pomodoro.TimeBlock ();
+            var session = new Ft.Session.from_template (this.session_template);
+            var time_block = new Ft.TimeBlock ();
 
             assert_false (session.contains (time_block));
 
@@ -627,7 +635,7 @@ namespace Tests
 
         public void test_move_by ()
         {
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
             var first_time_block = session.get_first_time_block ();
 
             var changed_emitted = 0;
@@ -635,8 +643,8 @@ namespace Tests
                 changed_emitted++;
             });
 
-            var expected_start_time = session.start_time + Pomodoro.Interval.MINUTE;
-            session.move_by (Pomodoro.Interval.MINUTE);
+            var expected_start_time = session.start_time + Ft.Interval.MINUTE;
+            session.move_by (Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session.start_time),
                 new GLib.Variant.int64 (expected_start_time)
@@ -650,7 +658,7 @@ namespace Tests
 
         public void test_move_to ()
         {
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
             var first_time_block = session.get_first_time_block ();
 
             var changed_emitted = 0;
@@ -658,7 +666,7 @@ namespace Tests
                 changed_emitted++;
             });
 
-            var expected_start_time = session.start_time + Pomodoro.Interval.MINUTE;
+            var expected_start_time = session.start_time + Ft.Interval.MINUTE;
             session.move_to (expected_start_time);
             assert_cmpvariant (
                 new GLib.Variant.int64 (session.start_time),
@@ -676,7 +684,7 @@ namespace Tests
             var removed_emitted = 0;
             var weak_notify_emitted = 0;
 
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
             session.removed.connect (() => { removed_emitted++; });
 
             var time_block = session.get_last_time_block ();
@@ -697,7 +705,7 @@ namespace Tests
             var removed_emitted = 0;
             var weak_notify_emitted = 0;
 
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
             session.removed.connect (() => { removed_emitted++; });
 
             var time_block_1 = session.get_first_time_block ();
@@ -721,7 +729,7 @@ namespace Tests
             var removed_emitted = 0;
             var weak_notify_emitted = 0;
 
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
             session.removed.connect (() => { removed_emitted++; });
 
             var time_block_1 = session.get_first_time_block ();
@@ -742,71 +750,71 @@ namespace Tests
 
         public void test_set_time_block_status__completed ()
         {
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
 
             var time_block_1 = session.get_nth_time_block (0);
             var time_block_2 = session.get_nth_time_block (1);
             var time_block_3 = session.get_nth_time_block (2);
 
-            session.set_time_block_status (time_block_1, Pomodoro.TimeBlockStatus.COMPLETED);
+            session.set_time_block_status (time_block_1, Ft.TimeBlockStatus.COMPLETED);
             assert_cmpuint (time_block_1.get_status (),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.TimeBlockStatus.COMPLETED);
+                            Ft.TimeBlockStatus.COMPLETED);
             assert_cmpuint (time_block_2.get_status (),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.TimeBlockStatus.SCHEDULED);
+                            Ft.TimeBlockStatus.SCHEDULED);
 
-            session.set_time_block_status (time_block_1, Pomodoro.TimeBlockStatus.UNCOMPLETED);
-            session.set_time_block_status (time_block_3, Pomodoro.TimeBlockStatus.COMPLETED);
+            session.set_time_block_status (time_block_1, Ft.TimeBlockStatus.UNCOMPLETED);
+            session.set_time_block_status (time_block_3, Ft.TimeBlockStatus.COMPLETED);
             assert_cmpuint (time_block_3.get_status (),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.TimeBlockStatus.COMPLETED);
+                            Ft.TimeBlockStatus.COMPLETED);
             assert_cmpuint (time_block_2.get_status (),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.TimeBlockStatus.UNCOMPLETED);  // change from scheduled
+                            Ft.TimeBlockStatus.UNCOMPLETED);  // change from scheduled
             assert_cmpuint (time_block_1.get_status (),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.TimeBlockStatus.UNCOMPLETED);  // no change
+                            Ft.TimeBlockStatus.UNCOMPLETED);  // no change
         }
 
         public void test_set_time_block_status__uncompleted ()
         {
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
 
             var time_block_1 = session.get_nth_time_block (0);
             var time_block_2 = session.get_nth_time_block (1);
             var time_block_3 = session.get_nth_time_block (2);
 
-            session.set_time_block_status (time_block_1, Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            session.set_time_block_status (time_block_1, Ft.TimeBlockStatus.UNCOMPLETED);
             assert_cmpuint (time_block_1.get_status (),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.TimeBlockStatus.UNCOMPLETED);
+                            Ft.TimeBlockStatus.UNCOMPLETED);
             assert_cmpuint (time_block_2.get_status (),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.TimeBlockStatus.SCHEDULED);
+                            Ft.TimeBlockStatus.SCHEDULED);
 
-            session.set_time_block_status (time_block_1, Pomodoro.TimeBlockStatus.COMPLETED);
-            session.set_time_block_status (time_block_3, Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            session.set_time_block_status (time_block_1, Ft.TimeBlockStatus.COMPLETED);
+            session.set_time_block_status (time_block_3, Ft.TimeBlockStatus.UNCOMPLETED);
             assert_cmpuint (time_block_3.get_status (),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.TimeBlockStatus.UNCOMPLETED);
+                            Ft.TimeBlockStatus.UNCOMPLETED);
             assert_cmpuint (time_block_2.get_status (),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.TimeBlockStatus.UNCOMPLETED);  // change from scheduled
+                            Ft.TimeBlockStatus.UNCOMPLETED);  // change from scheduled
             assert_cmpuint (time_block_1.get_status (),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.TimeBlockStatus.COMPLETED);  // no change
+                            Ft.TimeBlockStatus.COMPLETED);  // no change
         }
 
         public void test_is_expired ()
         {
-            var now = Pomodoro.Timestamp.advance (0);
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var now = Ft.Timestamp.advance (0);
+            var session = new Ft.Session.from_template (this.session_template);
             assert_false (session.is_expired (now));
 
-            session.expiry_time = now + Pomodoro.Interval.MINUTE;
+            session.expiry_time = now + Ft.Interval.MINUTE;
             assert_false (session.is_expired (now));
-            assert_true (session.is_expired (now + Pomodoro.Interval.MINUTE));
+            assert_true (session.is_expired (now + Ft.Interval.MINUTE));
         }
 
         public void test_calculate_elapsed ()
@@ -825,7 +833,7 @@ namespace Tests
 
         // public void test_calculate_pomodoro_break_ratio ()
         // {
-        //     var session = new Pomodoro.Session ();
+        //     var session = new Ft.Session ();
         //
         //     assert_cmpfloat_with_epsilon (
         //         session.calculate_pomodoro_break_ratio (),
@@ -836,11 +844,11 @@ namespace Tests
 
         public void test_calculate_break_ratio ()
         {
-            var session = new Pomodoro.Session.from_template (
-                Pomodoro.SessionTemplate () {
-                    pomodoro_duration = 25 * Pomodoro.Interval.MINUTE,
-                    short_break_duration = 5 * Pomodoro.Interval.MINUTE,
-                    long_break_duration = 10 * Pomodoro.Interval.MINUTE,
+            var session = new Ft.Session.from_template (
+                Ft.SessionTemplate () {
+                    pomodoro_duration = 25 * Ft.Interval.MINUTE,
+                    short_break_duration = 5 * Ft.Interval.MINUTE,
+                    long_break_duration = 10 * Ft.Interval.MINUTE,
                     cycles = 2
                 }
             );
@@ -865,58 +873,58 @@ namespace Tests
 
         public void test_get_cycles ()
         {
-            var session_0 = new Pomodoro.Session ();
+            var session_0 = new Ft.Session ();
             assert_cmpuint (session_0.get_cycles ().length (), GLib.CompareOperator.EQ, 0);
 
-            var session_1 = new Pomodoro.Session.from_template (
-                Pomodoro.SessionTemplate () {
-                    pomodoro_duration = 25 * Pomodoro.Interval.MINUTE,
-                    short_break_duration = 5 * Pomodoro.Interval.MINUTE,
-                    long_break_duration = 15 * Pomodoro.Interval.MINUTE,
+            var session_1 = new Ft.Session.from_template (
+                Ft.SessionTemplate () {
+                    pomodoro_duration = 25 * Ft.Interval.MINUTE,
+                    short_break_duration = 5 * Ft.Interval.MINUTE,
+                    long_break_duration = 15 * Ft.Interval.MINUTE,
                     cycles = 1
                 }
             );
             assert_cmpuint (session_1.get_cycles ().length (), GLib.CompareOperator.EQ, 1);
 
-            var session_2 = new Pomodoro.Session.from_template (
-                Pomodoro.SessionTemplate () {
-                    pomodoro_duration = 25 * Pomodoro.Interval.MINUTE,
-                    short_break_duration = 5 * Pomodoro.Interval.MINUTE,
-                    long_break_duration = 15 * Pomodoro.Interval.MINUTE,
+            var session_2 = new Ft.Session.from_template (
+                Ft.SessionTemplate () {
+                    pomodoro_duration = 25 * Ft.Interval.MINUTE,
+                    short_break_duration = 5 * Ft.Interval.MINUTE,
+                    long_break_duration = 15 * Ft.Interval.MINUTE,
                     cycles = 2
                 }
             );
             assert_cmpuint (session_2.get_cycles ().length (), GLib.CompareOperator.EQ, 2);
 
             // When session starts with a break, expect cycles to be 0.
-            var session_3 = new Pomodoro.Session ();
-            session_3.append (new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK));
+            var session_3 = new Ft.Session ();
+            session_3.append (new Ft.TimeBlock (Ft.State.SHORT_BREAK));
             assert_cmpuint (session_3.get_cycles ().length (), GLib.CompareOperator.EQ, 1);
-            session_3.append (new Pomodoro.TimeBlock (Pomodoro.State.POMODORO));
+            session_3.append (new Ft.TimeBlock (Ft.State.POMODORO));
             assert_cmpuint (session_3.get_cycles ().length (), GLib.CompareOperator.EQ, 2);
 
             // When pomodoros are after one another, expect cycle to increment; though it's not a true cycle.
             // In normal case pomodoro would be extended and counted properly.
-            var session_4 = new Pomodoro.Session ();
-            session_4.append (new Pomodoro.TimeBlock (Pomodoro.State.POMODORO));
+            var session_4 = new Ft.Session ();
+            session_4.append (new Ft.TimeBlock (Ft.State.POMODORO));
             assert_cmpuint (session_4.get_cycles ().length (), GLib.CompareOperator.EQ, 1);
-            session_4.append (new Pomodoro.TimeBlock (Pomodoro.State.POMODORO));
+            session_4.append (new Ft.TimeBlock (Ft.State.POMODORO));
             assert_cmpuint (session_4.get_cycles ().length (), GLib.CompareOperator.EQ, 2);
 
             // Treat undefined states same as breaks.
-            var session_5 = new Pomodoro.Session ();
-            session_5.append (new Pomodoro.TimeBlock (Pomodoro.State.STOPPED));
+            var session_5 = new Ft.Session ();
+            session_5.append (new Ft.TimeBlock (Ft.State.STOPPED));
             assert_cmpuint (session_5.get_cycles ().length (), GLib.CompareOperator.EQ, 1);
-            session_5.append (new Pomodoro.TimeBlock (Pomodoro.State.POMODORO));
+            session_5.append (new Ft.TimeBlock (Ft.State.POMODORO));
             assert_cmpuint (session_5.get_cycles ().length (), GLib.CompareOperator.EQ, 2);
 
             // Cycles with uncompleted time-blocks still should be included.
-            var session_6 = new Pomodoro.Session ();
-            var uncompleted_time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var session_6 = new Ft.Session ();
+            var uncompleted_time_block = new Ft.TimeBlock (Ft.State.POMODORO);
             session_6.append (uncompleted_time_block);
-            session_6.set_time_block_status (uncompleted_time_block, Pomodoro.TimeBlockStatus.UNCOMPLETED);
+            session_6.set_time_block_status (uncompleted_time_block, Ft.TimeBlockStatus.UNCOMPLETED);
             assert_cmpuint (session_6.get_cycles ().length (), GLib.CompareOperator.EQ, 1);
-            session_6.append (new Pomodoro.TimeBlock (Pomodoro.State.POMODORO));
+            session_6.append (new Ft.TimeBlock (Ft.State.POMODORO));
             assert_cmpuint (session_6.get_cycles ().length (), GLib.CompareOperator.EQ, 2);
         }
 
@@ -926,10 +934,10 @@ namespace Tests
          */
         public void test_get_cycles__remove_time_block ()
         {
-            var session = new Pomodoro.Session.from_template (this.session_template);
+            var session = new Ft.Session.from_template (this.session_template);
             var cycle = session.get_cycles ().first ().data;
 
-            weak Pomodoro.TimeBlock time_block = session.get_first_time_block ();
+            weak Ft.TimeBlock time_block = session.get_first_time_block ();
 
             assert_true (cycle.contains (time_block));
             session.remove (time_block);

@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2021-2025 gnome-pomodoro contributors
+ * Copyright (c) 2021-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public sealed class SessionProgressBar : Gtk.Widget
     {
@@ -23,7 +23,7 @@ namespace Pomodoro
 
         sealed class Segment : Gtk.Widget
         {
-            public Pomodoro.Timer timer {
+            public Ft.Timer timer {
                 get {
                     return this._timer;
                 }
@@ -32,7 +32,7 @@ namespace Pomodoro
                 }
             }
 
-            public Pomodoro.Cycle cycle {
+            public Ft.Cycle cycle {
                 get {
                     return this._cycle;
                 }
@@ -73,6 +73,9 @@ namespace Pomodoro
                 get {
                     return this._weight;
                 }
+                set {
+                    this._weight = value;
+                }
             }
 
             [CCode (notify = false)]
@@ -96,44 +99,48 @@ namespace Pomodoro
                 }
             }
 
-            private Pomodoro.Cycle?        _cycle = null;
-            private Pomodoro.Timer?        _timer = null;
-            private float                  _line_width;
-            private float                  _span_start = 0.0f;
-            private float                  _span_end = 0.0f;
-            private float                  _weight = 0.0f;
-            private float                  _display_value = 0.0f;
-            private ulong                  cycle_changed_id = 0U;
-            private ulong                  tick_id = 0U;
-            private uint                   tick_callback_id = 0U;
-            private uint                   timeout_id = 0U;
-            private uint                   timeout_interval = 0U;
-            private unowned Pomodoro.Gizmo through = null;
-            private unowned Pomodoro.Gizmo highlight = null;
-            private Graphene.Rect          bounds;
-            private Gsk.RoundedRect        outline;
-            internal float                 display_value_from = 0.0f;
-            internal float                 display_value_to = 0.0f;
-            private float                  value_animation_progress = 1.0f;
+            private Ft.Cycle?           _cycle = null;
+            private Ft.Timer?           _timer = null;
+            private float               _line_width;
+            private float               _span_start = 0.0f;
+            private float               _span_end = 0.0f;
+            private float               _weight = 0.0f;
+            private float               _display_value = 0.0f;
+            private ulong               cycle_changed_id = 0U;
+            private ulong               tick_id = 0U;
+            private uint                tick_callback_id = 0U;
+            private uint                timeout_id = 0U;
+            private uint                timeout_interval = 0U;
+            private unowned Ft.Gizmo    through = null;
+            private unowned Ft.Gizmo    highlight = null;
+            private Graphene.Rect       bounds;
+            private Gsk.RoundedRect     outline;
+            private float               value_animation_progress = 1.0f;
+            private Adw.TimedAnimation? weight_animation = null;
+
+            internal float              display_value_from = 0.0f;
+            internal float              display_value_to = 0.0f;
 
             construct
             {
-                var through = new Pomodoro.Gizmo (Segment.measure_child_cb,
-                                                  null,
-                                                  Segment.snapshot_through_cb,
-                                                  null,
-                                                  null,
-                                                  null);
+                var through = new Ft.Gizmo (
+                        Segment.measure_child_cb,
+                        null,
+                        Segment.snapshot_through_cb,
+                        null,
+                        null,
+                        null);
                 through.focusable = false;
                 through.add_css_class ("through");
                 through.set_parent (this);
 
-                var highlight = new Pomodoro.Gizmo (Segment.measure_child_cb,
-                                                    null,
-                                                    Segment.snapshot_highlight_cb,
-                                                    null,
-                                                    null,
-                                                    null);
+                var highlight = new Ft.Gizmo (
+                        Segment.measure_child_cb,
+                        null,
+                        Segment.snapshot_highlight_cb,
+                        null,
+                        null,
+                        null);
                 highlight.focusable = false;
                 highlight.add_css_class ("highlight");
                 highlight.insert_after (this, through);
@@ -142,12 +149,19 @@ namespace Pomodoro
                 this.through = through;
             }
 
-            public Segment (Pomodoro.Cycle cycle)
+            public Segment (Ft.Cycle cycle)
             {
                 GLib.Object (
-                    timer: Pomodoro.Timer.get_default (),
+                    timer: Ft.Timer.get_default (),
                     cycle: cycle
                 );
+            }
+
+            private inline int64 get_current_time ()
+            {
+                return this._timer.is_running ()
+                        ? this._timer.get_current_time (this.get_frame_clock ().get_frame_time ())
+                        : this._timer.get_last_state_changed_time ();
             }
 
             internal void prepare_value_animation (float display_value_from,
@@ -155,9 +169,9 @@ namespace Pomodoro
             {
                 this.display_value_from = display_value_from;
                 this.display_value_to = display_value_to;
-                this.value_animation_progress = display_value_to != this._display_value
-                        ? 0.0f
-                        : 1.0f;
+                this.value_animation_progress = this._display_value == display_value_to
+                        ? 1.0f
+                        : 0.0f;
             }
 
             internal void finish_value_animation ()
@@ -176,6 +190,32 @@ namespace Pomodoro
                 }
             }
 
+            internal void animate_weight (float weight_from,
+                                          float weight_to,
+                                          owned Adw.CallbackAnimationTarget target)
+            {
+                if (weight_to == weight_from) {
+                    return;
+                }
+
+                if (this.weight_animation != null) {
+                    this.weight_animation.pause ();
+                    this.weight_animation = null;
+                }
+
+                this.weight_animation = new Adw.TimedAnimation (this,
+                                                                (double) weight_from,
+                                                                (double) weight_to,
+                                                                SCALE_ANIMATION_DURATION,
+                                                                target);
+                this.weight_animation.set_easing (Adw.Easing.EASE_OUT_QUAD);
+                this.weight_animation.done.connect (
+                    () => {
+                        this.weight_animation = null;
+                    });
+                this.weight_animation.play ();
+            }
+
             private inline void queue_draw_all ()
             {
                 this.queue_draw ();
@@ -183,7 +223,7 @@ namespace Pomodoro
                 this.highlight.queue_draw ();
             }
 
-            private static void measure_child_cb (Pomodoro.Gizmo  gizmo,
+            private static void measure_child_cb (Ft.Gizmo        gizmo,
                                                   Gtk.Orientation orientation,
                                                   int             for_size,
                                                   out int         minimum,
@@ -198,8 +238,8 @@ namespace Pomodoro
                 natural_baseline = -1;
             }
 
-            private static void snapshot_through_cb (Pomodoro.Gizmo gizmo,
-                                                     Gtk.Snapshot   snapshot)
+            private static void snapshot_through_cb (Ft.Gizmo     gizmo,
+                                                     Gtk.Snapshot snapshot)
             {
                 var self = (Segment) gizmo.parent;
 
@@ -208,8 +248,8 @@ namespace Pomodoro
                 }
             }
 
-            private static void snapshot_highlight_cb (Pomodoro.Gizmo gizmo,
-                                                       Gtk.Snapshot   snapshot)
+            private static void snapshot_highlight_cb (Ft.Gizmo     gizmo,
+                                                       Gtk.Snapshot snapshot)
             {
                 var self = (Segment) gizmo.parent;
 
@@ -218,16 +258,16 @@ namespace Pomodoro
                 }
             }
 
-            private void snapshot_through (Pomodoro.Gizmo gizmo,
-                                           Gtk.Snapshot   snapshot)
+            private void snapshot_through (Ft.Gizmo     gizmo,
+                                           Gtk.Snapshot snapshot)
             {
                 snapshot.push_rounded_clip (this.outline);
                 snapshot.append_color (gizmo.get_color (), this.bounds);
                 snapshot.pop ();
             }
 
-            private void snapshot_highlight (Pomodoro.Gizmo gizmo,
-                                             Gtk.Snapshot   snapshot)
+            private void snapshot_highlight (Ft.Gizmo     gizmo,
+                                             Gtk.Snapshot snapshot)
             {
                 var timestamp = this.get_current_time ();
                 var display_value = this._cycle != null
@@ -291,13 +331,6 @@ namespace Pomodoro
                 this._display_value = display_value;
             }
 
-            private inline int64 get_current_time ()
-            {
-                return this._timer.is_running ()
-                        ? this._timer.get_current_time (this.get_frame_clock ().get_frame_time ())
-                        : this._timer.get_last_state_changed_time ();
-            }
-
             public void set_span_range (float span_start,
                                         float span_end)
             {
@@ -334,7 +367,7 @@ namespace Pomodoro
                 distance *= (float) TIMEOUT_RESOLUTION;
 
                 return distance > 0.0
-                        ? Pomodoro.Timestamp.to_milliseconds_uint ((int64) Math.roundf (duration / distance))
+                        ? Ft.Timestamp.to_milliseconds_uint ((int64) Math.roundf (duration / distance))
                         : 0;
             }
 
@@ -369,7 +402,7 @@ namespace Pomodoro
                             return GLib.Source.CONTINUE;
                         });
                     GLib.Source.set_name_by_id (this.timeout_id,
-                                                "Pomodoro.SessionProgressBar.Segment.queue_draw");
+                                                "Ft.SessionProgressBar.Segment.queue_draw");
                 }
                 else if (this.tick_callback_id == 0 && timeout_interval == 0)
                 {
@@ -415,7 +448,7 @@ namespace Pomodoro
                     return;
                 }
 
-                var current_time_block = this._timer.user_data as Pomodoro.TimeBlock;
+                var current_time_block = this._timer.user_data as Ft.TimeBlock;
                 if (current_time_block != null && !this._cycle.contains (current_time_block)) {
                     return;
                 }
@@ -440,8 +473,8 @@ namespace Pomodoro
                     return;  // retain last weight
                 }
 
-                if (this._weight != weight) {
-                    // TODO: animate weight
+                // Set the initial weight. Let patent animate weights.
+                if (this._weight != weight && this._weight == 0.0f) {
                     this._weight = weight;
                 }
 
@@ -521,6 +554,11 @@ namespace Pomodoro
             {
                 this.stop_timeout ();
 
+                if (this.weight_animation != null) {
+                    this.weight_animation.pause ();
+                    this.weight_animation = null;
+                }
+
                 this.through.unparent ();
                 this.highlight.unparent ();
 
@@ -534,30 +572,30 @@ namespace Pomodoro
         }
 
 
-        public Pomodoro.Timer timer {
+        public Ft.Timer timer {
             get {
                 return this._timer;
             }
             construct {
                 this._timer = value != null
                         ? value
-                        : Pomodoro.Timer.get_default ();
+                        : Ft.Timer.get_default ();
             }
         }
 
-        public Pomodoro.SessionManager session_manager {
+        public Ft.SessionManager session_manager {
             get {
                 return this._session_manager;
             }
             construct {
                 this._session_manager = value != null
                         ? value
-                        : Pomodoro.SessionManager.get_default ();
+                        : Ft.SessionManager.get_default ();
             }
         }
 
         [CCode (notify = false)]
-        public Pomodoro.Session session {
+        public Ft.Session session {
             get {
                 return this._session;
             }
@@ -606,19 +644,19 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.Timer?          _timer = null;
-        private Pomodoro.SessionManager? _session_manager = null;
-        private Pomodoro.Session?        _session = null;
-        private float                    _line_width = DEFAULT_LINE_WIDTH;
-        private bool                     _reveal = true;
-        private bool                     revealing = false;
-        private unowned Segment?         current_segment = null;
-        private float                    scale = float.NAN;
-        private Adw.TimedAnimation?      scale_animation = null;
-        private Adw.TimedAnimation?      opacity_animation = null;
-        private Adw.TimedAnimation?      value_animation = null;
-        private int64                    long_break_time = Pomodoro.Timestamp.UNDEFINED;
-        private uint                     tick_callback_id = 0;
+        private Ft.Timer?           _timer = null;
+        private Ft.SessionManager?  _session_manager = null;
+        private Ft.Session?         _session = null;
+        private float               _line_width = DEFAULT_LINE_WIDTH;
+        private bool                _reveal = true;
+        private bool                revealing = false;
+        private unowned Segment?    current_segment = null;
+        private float               scale = float.NAN;
+        private Adw.TimedAnimation? scale_animation = null;
+        private Adw.TimedAnimation? opacity_animation = null;
+        private Adw.TimedAnimation? value_animation = null;
+        private int64               long_break_time = Ft.Timestamp.UNDEFINED;
+        private uint                tick_callback_id = 0;
 
         static construct
         {
@@ -816,7 +854,7 @@ namespace Pomodoro
             var cycles = this._session.get_cycles ();
             var cycles_count = 0U;
 
-            unowned GLib.List<unowned Pomodoro.Cycle> link = cycles.first ();
+            unowned GLib.List<unowned Ft.Cycle> link = cycles.first ();
             unowned var segment = (Segment?) this.get_first_child ();
             unowned var current_cycle = this._session_manager.get_current_cycle ();
             unowned Segment? current_segment = null;
@@ -875,7 +913,7 @@ namespace Pomodoro
             }
 
             if (this._reveal) {
-                // this.animate_weights ();  TODO
+                this.animate_weights ();
                 this.animate_scale (scale_from, scale_to);
                 this.animate_value (position_from, position_to);
             }
@@ -890,13 +928,13 @@ namespace Pomodoro
          */
         private void update_long_break_time ()
         {
-            var long_break_time = Pomodoro.Timestamp.UNDEFINED;
+            var long_break_time = Ft.Timestamp.UNDEFINED;
 
             this._session?.@foreach (
                 (time_block) => {
-                    if (time_block.state == Pomodoro.State.LONG_BREAK &&
-                        time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED &&
-                        Pomodoro.Timestamp.is_undefined (long_break_time))
+                    if (time_block.state == Ft.State.LONG_BREAK &&
+                        time_block.get_status () == Ft.TimeBlockStatus.SCHEDULED &&
+                        Ft.Timestamp.is_undefined (long_break_time))
                     {
                         long_break_time = time_block.start_time;
                     }
@@ -993,14 +1031,19 @@ namespace Pomodoro
 
             while (segment != null)
             {
-                var display_value_from = (
-                        (position_from - segment.span_start) /
-                        (segment.span_end - segment.span_start)).clamp (0.0f, 1.0f);
-                var display_value_to = (
-                        (position_to - segment.span_start) /
-                        (segment.span_end - segment.span_start)).clamp (0.0f, 1.0f);
+                if (segment.span_start < segment.span_end)
+                {
+                    var display_value_from = (
+                            (position_from - segment.span_start) /
+                            (segment.span_end - segment.span_start)).clamp (0.0f, 1.0f);
+                    var display_value_to = (
+                            (position_to - segment.span_start) /
+                            (segment.span_end - segment.span_start)).clamp (0.0f, 1.0f);
 
-                segment.prepare_value_animation (display_value_from, display_value_to);
+                    segment.prepare_value_animation (
+                            float.max (display_value_from, segment.display_value),
+                            display_value_to);
+                }
 
                 segment = (Segment?) segment.get_next_sibling ();
             }
@@ -1106,6 +1149,39 @@ namespace Pomodoro
 
 
         /*
+         * Weights animation
+         */
+        private void animate_weights ()
+        {
+            var segment = (Segment?) this.get_first_child ();
+
+            // Find the first segment whose weight differs from its current span.
+            // Assume that only one segment may be animated at a time.
+            while (segment != null)
+            {
+                var weight = segment.cycle != null
+                        ? (float) segment.cycle.get_weight ()
+                        : segment.weight;
+
+                if (weight != segment.weight)
+                {
+                    var animation_target = new Adw.CallbackAnimationTarget (
+                        (value) => {
+                            segment.weight = (float) value;
+
+                            this.update_segments_span ();
+                        });
+
+                    segment.animate_weight (segment.weight, weight, animation_target);
+                    break;
+                }
+
+                segment = (Segment?) segment.get_next_sibling ();
+            }
+        }
+
+
+        /*
          * Opacity animation (fade-in / fade-out)
          */
 
@@ -1201,7 +1277,7 @@ namespace Pomodoro
          * Timer / session change handlers
          */
 
-        private void on_session_changed (Pomodoro.Session session)
+        private void on_session_changed (Ft.Session session)
         {
             this.queue_update ();
         }
@@ -1210,11 +1286,11 @@ namespace Pomodoro
          * Timer state may change after rescheduling / updating segments,
          * so only prod current segment if there's no timeout.
          */
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
+        private void on_timer_state_changed (Ft.TimerState current_state,
+                                             Ft.TimerState previous_state)
         {
-            unowned Segment? segment = (Segment?) this.get_first_child ();
-            unowned var current_time_block = (Pomodoro.TimeBlock?) current_state.user_data;
+            unowned var segment = (Segment?) this.get_first_child ();
+            unowned var current_time_block = (Ft.TimeBlock?) current_state.user_data;
 
             if (current_time_block == null) {
                 return;
@@ -1222,7 +1298,10 @@ namespace Pomodoro
 
             while (segment != null)
             {
-                if (segment.cycle?.contains (current_time_block) && !segment.has_timeout ()) {
+                if (segment.cycle != null &&
+                    segment.cycle.contains (current_time_block) &&
+                    !segment.has_timeout ())
+                {
                     segment.update_timeout ();
                     break;
                 }
@@ -1386,17 +1465,17 @@ namespace Pomodoro
             var timestamp = int64.max (this._timer.get_last_state_changed_time (),
                                        this._timer.get_last_tick_time ());
             var remaining = this._timer.is_running () &&
-                            Pomodoro.Timestamp.is_defined (this.long_break_time)
-                    ? Pomodoro.Timestamp.subtract (this.long_break_time, timestamp)
+                            Ft.Timestamp.is_defined (this.long_break_time)
+                    ? Ft.Timestamp.subtract (this.long_break_time, timestamp)
                     : 0;
 
             if (remaining > 0)
             {
-                var seconds = Pomodoro.Timestamp.to_seconds (remaining);
-                var seconds_uint = (uint) Pomodoro.round_seconds (seconds);
+                var seconds = Ft.Timestamp.to_seconds (remaining);
+                var seconds_uint = (uint) Ft.round_seconds (seconds);
 
                 tooltip.set_markup (_("Long break due in <b>%s</b>").printf (
-                        Pomodoro.format_time (seconds_uint)));
+                        Ft.format_time (seconds_uint)));
 
                 // TODO: connect to the timer tick to update the tooltip
 

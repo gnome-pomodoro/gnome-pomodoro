@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
-  <template class="PomodoroConditionWidget" parent="GtkBox">
+  <template class="FtConditionWidget" parent="GtkBox">
     <property name="spacing">6</property>
     <style>
       <class name="card"/>
@@ -108,7 +108,7 @@
         <property name="orientation">vertical</property>
         <property name="margin-top">3</property>
         <property name="margin-bottom">3</property>
-        <property name="visible" bind-source="PomodoroConditionWidget" bind-property="removable" bind-flags="sync-create"/>
+        <property name="visible" bind-source="FtConditionWidget" bind-property="removable" bind-flags="sync-create"/>
       </object>
     </child>
     <child>
@@ -117,7 +117,7 @@
         <property name="valign">center</property>
         <property name="margin-start">3</property>
         <property name="margin-end">3</property>
-        <property name="visible" bind-source="PomodoroConditionWidget" bind-property="removable" bind-flags="sync-create"/>
+        <property name="visible" bind-source="FtConditionWidget" bind-property="removable" bind-flags="sync-create"/>
         <style>
           <class name="flat"/>
         </style>

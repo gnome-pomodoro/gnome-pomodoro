@@ -1,3 +1,11 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     public class CycleTest : Tests.TestSuite
@@ -29,14 +37,14 @@ namespace Tests
 
         public override void setup ()
         {
-            Pomodoro.Timestamp.freeze_to (2000000000 * Pomodoro.Interval.SECOND);
+            Ft.Timestamp.freeze_to (2000000000 * Ft.Interval.SECOND);
         }
 
         public override void teardown ()
         {
-            Pomodoro.Timestamp.thaw ();
+            Ft.Timestamp.thaw ();
 
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.revert ();
         }
 
@@ -45,10 +53,10 @@ namespace Tests
             var removed_emitted = 0;
             var weak_notify_emitted = 0;
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block.weak_ref (() => { weak_notify_emitted++; });
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block);
             cycle.removed.connect (() => { removed_emitted++; });
 
@@ -64,31 +72,31 @@ namespace Tests
 
         public void test_get_weight ()
         {
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block_1.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.UNCOMPLETED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.UNCOMPLETED,
                     weight = 1.0,
                 }
             );
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block_2.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 1.0,
                 }
             );
 
-            var time_block_3 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            var time_block_3 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
             time_block_3.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 0.0,
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
 
             cycle.append (time_block_1);
             assert_cmpfloat_with_epsilon (cycle.get_weight (),
@@ -108,98 +116,98 @@ namespace Tests
 
         public void test_get_completion_time ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block_1.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.UNCOMPLETED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.UNCOMPLETED,
                     weight = 1.0,
-                    completion_time = now + 20 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 20 * Ft.Interval.MINUTE,
                 }
             );
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block_2.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 1.0,
-                    completion_time = now + 25 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 25 * Ft.Interval.MINUTE,
                 }
             );
 
-            var time_block_3 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            var time_block_3 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
             time_block_3.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 0.0,
-                    completion_time = now + 29 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 29 * Ft.Interval.MINUTE,
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
 
             cycle.append (time_block_1);
             assert_cmpvariant (
                 new GLib.Variant.int64 (cycle.get_completion_time ()),
-                new GLib.Variant.int64 (Pomodoro.Timestamp.UNDEFINED)
+                new GLib.Variant.int64 (Ft.Timestamp.UNDEFINED)
             );
 
             cycle.append (time_block_2);
             assert_cmpvariant (
                 new GLib.Variant.int64 (cycle.get_completion_time ()),
-                new GLib.Variant.int64 (now + 25 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 25 * Ft.Interval.MINUTE)
             );
 
             cycle.append (time_block_3);
             assert_cmpvariant (
                 new GLib.Variant.int64 (cycle.get_completion_time ()),
-                new GLib.Variant.int64 (now + 25 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 25 * Ft.Interval.MINUTE)
             );
         }
 
         public void test_get_completion_time__with_gaps ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var gap = new Pomodoro.Gap ();
-            gap.set_time_range (now + 5 * Pomodoro.Interval.MINUTE, now + 7 * Pomodoro.Interval.MINUTE);  // 2 minutes
+            var gap = new Ft.Gap ();
+            gap.set_time_range (now + 5 * Ft.Interval.MINUTE, now + 7 * Ft.Interval.MINUTE);  // 2 minutes
 
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block_1.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.IN_PROGRESS,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.IN_PROGRESS,
                     weight = 1.0,
-                    intended_duration = 25 * Pomodoro.Interval.MINUTE,
-                    completion_time = now + 22 * Pomodoro.Interval.MINUTE,
+                    intended_duration = 25 * Ft.Interval.MINUTE,
+                    completion_time = now + 22 * Ft.Interval.MINUTE,
                 }
             );
             time_block_1.add_gap (gap);
-            time_block_1.set_time_range (now, now + 27 * Pomodoro.Interval.MINUTE);
+            time_block_1.set_time_range (now, now + 27 * Ft.Interval.MINUTE);
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
             time_block_2.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 0.0,
-                    completion_time = now + 29 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 29 * Ft.Interval.MINUTE,
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block_1);
             cycle.append (time_block_2);
             assert_cmpvariant (
                 new GLib.Variant.int64 (cycle.get_completion_time ()),
-                new GLib.Variant.int64 (now + 22 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 22 * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_progress__empty ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
 
             assert_cmpfloat (
                 cycle.calculate_progress (now),
@@ -210,29 +218,29 @@ namespace Tests
 
         public void test_calculate_progress__scheduled ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_1.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_1.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
             time_block_1.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 1.0,
-                    completion_time = now + 20 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 20 * Ft.Interval.MINUTE,
                 }
             );
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block_2.set_time_range (now + 25 * Pomodoro.Interval.MINUTE, now + 30 * Pomodoro.Interval.MINUTE);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block_2.set_time_range (now + 25 * Ft.Interval.MINUTE, now + 30 * Ft.Interval.MINUTE);
             time_block_2.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 0.0,
-                    completion_time = now + 29 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 29 * Ft.Interval.MINUTE,
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block_1);
             cycle.append (time_block_2);
 
@@ -255,42 +263,42 @@ namespace Tests
 
         public void test_calculate_progress__in_progress ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_1.set_time_range (now, now + 5 * Pomodoro.Interval.MINUTE);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_1.set_time_range (now, now + 5 * Ft.Interval.MINUTE);
             time_block_1.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.UNCOMPLETED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.UNCOMPLETED,
                     weight = 1.0,
-                    completion_time = now + 20 * Pomodoro.Interval.MINUTE,
-                    intended_duration = 25 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 20 * Ft.Interval.MINUTE,
+                    intended_duration = 25 * Ft.Interval.MINUTE,
                 }
             );
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_2.set_time_range (now + 5 * Pomodoro.Interval.MINUTE, now + 30 * Pomodoro.Interval.MINUTE);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_2.set_time_range (now + 5 * Ft.Interval.MINUTE, now + 30 * Ft.Interval.MINUTE);
             time_block_2.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.IN_PROGRESS,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.IN_PROGRESS,
                     weight = 1.0,
-                    completion_time = now + 25 * Pomodoro.Interval.MINUTE,
-                    intended_duration = 25 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 25 * Ft.Interval.MINUTE,
+                    intended_duration = 25 * Ft.Interval.MINUTE,
                 }
             );
 
-            var time_block_3 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block_3.set_time_range (now + 30 * Pomodoro.Interval.MINUTE, now + 35 * Pomodoro.Interval.MINUTE);
+            var time_block_3 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block_3.set_time_range (now + 30 * Ft.Interval.MINUTE, now + 35 * Ft.Interval.MINUTE);
             time_block_3.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 0.0,
-                    completion_time = now + 29 * Pomodoro.Interval.MINUTE,
-                    intended_duration = 5 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 29 * Ft.Interval.MINUTE,
+                    intended_duration = 5 * Ft.Interval.MINUTE,
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block_1);
             cycle.append (time_block_2);
             cycle.append (time_block_3);
@@ -298,7 +306,7 @@ namespace Tests
             assert_cmpfloat_with_epsilon (cycle.calculate_progress (time_block_1.end_time),
                                           0.0,
                                           0.0001);
-            assert_cmpfloat_with_epsilon (cycle.calculate_progress (time_block_2.start_time + 5 * Pomodoro.Interval.MINUTE),
+            assert_cmpfloat_with_epsilon (cycle.calculate_progress (time_block_2.start_time + 5 * Ft.Interval.MINUTE),
                                           0.25,
                                           0.0001);
             assert_cmpfloat_with_epsilon (cycle.calculate_progress (time_block_2.end_time),
@@ -311,31 +319,31 @@ namespace Tests
 
         public void test_calculate_progress__completed ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_1.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_1.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
             time_block_1.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.COMPLETED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.COMPLETED,
                     weight = 1.0,
-                    completion_time = now + 20 * Pomodoro.Interval.MINUTE,
-                    intended_duration = 25 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 20 * Ft.Interval.MINUTE,
+                    intended_duration = 25 * Ft.Interval.MINUTE,
                 }
             );
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block_2.set_time_range (now + 25 * Pomodoro.Interval.MINUTE, now + 30 * Pomodoro.Interval.MINUTE);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block_2.set_time_range (now + 25 * Ft.Interval.MINUTE, now + 30 * Ft.Interval.MINUTE);
             time_block_2.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.COMPLETED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.COMPLETED,
                     weight = 0.0,
-                    completion_time = now + 29 * Pomodoro.Interval.MINUTE,
-                    intended_duration = 5 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 29 * Ft.Interval.MINUTE,
+                    intended_duration = 5 * Ft.Interval.MINUTE,
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block_1);
             cycle.append (time_block_2);
 
@@ -346,31 +354,31 @@ namespace Tests
 
         public void test_calculate_progress__uncompleted ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_1.set_time_range (now, now + 10 * Pomodoro.Interval.MINUTE);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_1.set_time_range (now, now + 10 * Ft.Interval.MINUTE);
             time_block_1.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.UNCOMPLETED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.UNCOMPLETED,
                     weight = 0.0,
-                    completion_time = now + 20 * Pomodoro.Interval.MINUTE,
-                    intended_duration = 25 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 20 * Ft.Interval.MINUTE,
+                    intended_duration = 25 * Ft.Interval.MINUTE,
                 }
             );
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block_2.set_time_range (now + 10 * Pomodoro.Interval.MINUTE, now + 15 * Pomodoro.Interval.MINUTE);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block_2.set_time_range (now + 10 * Ft.Interval.MINUTE, now + 15 * Ft.Interval.MINUTE);
             time_block_2.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.IN_PROGRESS,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.IN_PROGRESS,
                     weight = 0.0,
-                    completion_time = now + 14 * Pomodoro.Interval.MINUTE,
-                    intended_duration = 5 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 14 * Ft.Interval.MINUTE,
+                    intended_duration = 5 * Ft.Interval.MINUTE,
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block_1);
             cycle.append (time_block_2);
 
@@ -388,62 +396,62 @@ namespace Tests
 
         public void test_calculate_progress__with_gaps ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block_1.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block_1.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
             time_block_1.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.IN_PROGRESS,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.IN_PROGRESS,
                     weight = 1.0,
-                    completion_time = now + 20 * Pomodoro.Interval.MINUTE,
-                    intended_duration = 25 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 20 * Ft.Interval.MINUTE,
+                    intended_duration = 25 * Ft.Interval.MINUTE,
                 }
             );
-            var gap = new Pomodoro.Gap ();
-            gap.set_time_range (now + 5 * Pomodoro.Interval.MINUTE, Pomodoro.Timestamp.UNDEFINED);
+            var gap = new Ft.Gap ();
+            gap.set_time_range (now + 5 * Ft.Interval.MINUTE, Ft.Timestamp.UNDEFINED);
             time_block_1.add_gap (gap);
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
-            time_block_2.set_time_range (now + 25 * Pomodoro.Interval.MINUTE,
-                                         now + 30 * Pomodoro.Interval.MINUTE);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
+            time_block_2.set_time_range (now + 25 * Ft.Interval.MINUTE,
+                                         now + 30 * Ft.Interval.MINUTE);
             time_block_2.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 0.0,
-                    completion_time = now + 29 * Pomodoro.Interval.MINUTE,
-                    intended_duration = 5 * Pomodoro.Interval.MINUTE,
+                    completion_time = now + 29 * Ft.Interval.MINUTE,
+                    intended_duration = 5 * Ft.Interval.MINUTE,
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block_1);
             cycle.append (time_block_2);
 
             assert_cmpfloat_with_epsilon (
-                    cycle.calculate_progress (gap.start_time + Pomodoro.Interval.MINUTE),
+                    cycle.calculate_progress (gap.start_time + Ft.Interval.MINUTE),
                     0.25,
                     0.0001);
         }
 
         public void test_is_visible__empty ()
         {
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
 
             assert_false (cycle.is_visible ());
         }
 
         public void test_is_visible__only_uncompleted ()
         {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.UNCOMPLETED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.UNCOMPLETED,
                     weight = 1.0,
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block);
 
             assert_false (cycle.is_visible ());
@@ -451,15 +459,15 @@ namespace Tests
 
         public void test_is_visible__only_zero_weight ()
         {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            var time_block = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
             time_block.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 0.0,
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block);
 
             assert_false (cycle.is_visible ());
@@ -467,15 +475,15 @@ namespace Tests
 
         public void test_is_visible__scheduled ()
         {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 1.0
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block);
 
             assert_true (cycle.is_visible ());
@@ -483,15 +491,15 @@ namespace Tests
 
         public void test_is_visible__in_progress ()
         {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.IN_PROGRESS,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.IN_PROGRESS,
                     weight = 1.0
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block);
 
             assert_true (cycle.is_visible ());
@@ -499,15 +507,15 @@ namespace Tests
 
         public void test_is_visible__completed ()
         {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.COMPLETED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.COMPLETED,
                     weight = 1.0
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block);
 
             assert_true (cycle.is_visible ());
@@ -515,23 +523,23 @@ namespace Tests
 
         public void test_is_visible__mixed_uncompleted_then_scheduled ()
         {
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block_1.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.UNCOMPLETED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.UNCOMPLETED,
                     weight = 1.0,
                 }
             );
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block_2.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 1.0
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block_1);
             cycle.append (time_block_2);
 
@@ -541,23 +549,23 @@ namespace Tests
 
         public void test_is_visible__mixed_zero_weight_then_weighted ()
         {
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
             time_block_1.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.COMPLETED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.COMPLETED,
                     weight = 0.0,
                 }
             );
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.POMODORO);
             time_block_2.set_meta (
-                Pomodoro.TimeBlockMeta () {
-                    status = Pomodoro.TimeBlockStatus.SCHEDULED,
+                Ft.TimeBlockMeta () {
+                    status = Ft.TimeBlockStatus.SCHEDULED,
                     weight = 1.0
                 }
             );
 
-            var cycle = new Pomodoro.Cycle ();
+            var cycle = new Ft.Cycle ();
             cycle.append (time_block_1);
             cycle.append (time_block_2);
 

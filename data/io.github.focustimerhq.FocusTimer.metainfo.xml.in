@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2025-2026 Kamil Prusko <kamilprusko@gmail.com> -->
+<component type="desktop-application">
+
+  <!-- General -->
+  <id>io.github.focustimerhq.FocusTimer</id>
+  <translation type="gettext">focus-timer</translation>
+  ​<launchable type="desktop-id">io.github.focustimerhq.FocusTimer.desktop</launchable>
+  <name>Focus Timer</name>
+  <summary>Maintain focus by taking frequent breaks</summary>
+  <description>
+    <p>
+      A productivity timer that helps you work more effectively by breaking your time into focused work sessions followed by short breaks.
+      Work for 25 minutes, then take a 5-minute break to maintain concentration and prevent burnout.
+    </p>
+    <p>
+      Key features:
+    </p>
+    <ul>
+      <li>Customizable work session and break lengths</li>
+      <li>Visual and audio notifications</li>
+      <li>Time tracking and statistics</li>
+      <li>GNOME desktop integration</li>
+      <li>Screen overlay during breaks</li>
+      <li>Run custom commands after Pomodoro or break</li>
+    </ul>
+  </description>
+  <keywords>
+    <keyword>pomodoro</keyword>
+    <keyword>timer</keyword>
+    <keyword>productivity</keyword>
+    <keyword>focus</keyword>
+    <keyword>time management</keyword>
+  </keywords>
+  <categories>
+    <category>Utility</category>
+    <category>Clock</category>
+    <category>GNOME</category>
+  </categories>
+  <provides>
+    <binary>focus-timer</binary>
+    <dbus type="user">io.github.focustimerhq.FocusTimer</dbus>
+  </provides>
+  <content_rating type="oars-1.1"/>
+  <update_contact>kamilprusko@gmail.com</update_contact>
+
+  <!-- Branding -->
+  <developer_name translate="no">Kamil Prusko</developer_name>
+  <developer id="io.github.focustimerhq">
+    <name translate="no">Kamil Prusko</name>
+  </developer>
+  <branding>
+    <color type="primary" scheme_preference="light">#adcae6</color>
+    <color type="primary" scheme_preference="dark">#94b4d1</color>
+  </branding>
+
+  <!-- License -->
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <!-- URLs -->
+  <url type="homepage">https://github.com/focustimerhq/FocusTimer</url>
+  <url type="bugtracker">https://github.com/focustimerhq/FocusTimer/issues</url>
+  <url type="vcs-browser">https://github.com/focustimerhq/FocusTimer</url>
+  <url type="donation">https://liberapay.com/kamilprusko</url>
+
+  <!-- Screenshots -->
+  <screenshots>
+    <screenshot type="default">
+      <image>https://gnomepomodoro.org/release/1.0/timer.png</image>
+      <caption>Timer</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gnomepomodoro.org/release/1.0/stats-daily.png</image>
+      <caption>Daily stats</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gnomepomodoro.org/release/1.0/stats-monthly.png</image>
+      <caption>Monthly stats</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gnomepomodoro.org/release/1.0/preferences.png</image>
+      <caption>Preferences</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gnomepomodoro.org/release/1.0/screen-overlay.png</image>
+      <caption>Screen overlay</caption>
+    </screenshot>
+  </screenshots>
+
+  <!-- Releases -->
+  <releases>
+    <release version="1.0-beta" date="2026-01-20">
+      <description translate="no">
+        <p>Overview of changes in focus-timer 1.0-beta</p>
+        <ul>
+          <li>Ported the app to GTK+4 and libadwaita</li>
+          <li>Updated Swedish translation (thanks @haaninjo)</li>
+          <li>Updated Georgian translation (thanks @NorwayFun)</li>
+          <li>Updated Indonesian translation (thanks @atriwidada)</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>

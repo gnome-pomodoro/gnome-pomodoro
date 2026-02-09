@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
-  <template class="PomodoroChart" parent="GtkWidget">
+  <template class="FtChart" parent="GtkWidget">
     <property name="accessible-role">img</property>
     <child>
       <object class="GtkScrolledWindow" id="scrolled_window">
@@ -13,7 +13,7 @@
         <property name="overlay-scrolling">false</property>
         <property name="hexpand">true</property>
         <property name="child">
-          <object class="PomodoroChartContents" id="contents"/>
+          <object class="FtChartContents" id="contents"/>
         </property>
         <child>
           <object class="GtkGesturePan">

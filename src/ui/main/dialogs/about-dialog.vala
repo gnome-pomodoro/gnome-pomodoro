@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2025 gnome-pomodoro contributors
+ * Copyright (c) 2013-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,13 +7,14 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public Adw.AboutDialog create_about_dialog ()
     {
         var about_dialog = new Adw.AboutDialog ();
         about_dialog.application_icon = Config.APPLICATION_ID;
-        about_dialog.application_name = _("Pomodoro");
+        // translators: consider 'Concentration Timer' as an alternative, whichever sounds more natural
+        about_dialog.application_name = _("Focus Timer");
         about_dialog.version = Config.PACKAGE_VERSION;
         about_dialog.website = Config.PACKAGE_WEBSITE;
         about_dialog.issue_url = Config.PACKAGE_ISSUE_URL;
@@ -23,7 +24,7 @@ namespace Pomodoro
             "Kamil Prusko <kamilprusko@gmail.com>",
             "Arun Mahapatra <pratikarun@gmail.com>"
         };
-        about_dialog.copyright = "\xc2\xa9 2011-2025 Arun Mahapatra, Kamil Prusko";
+        about_dialog.copyright = "\xc2\xa9 2011-2026 Arun Mahapatra, Kamil Prusko";
         about_dialog.license_type = Gtk.License.GPL_3_0;
 
         var translator_credits = _("translator-credits");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 gnome-pomodoro contributors
+ * Copyright (c) 2022-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,10 +7,10 @@
 using GLib;
 
 
-namespace Pomodoro.Database
+namespace Ft.Database
 {
     private const uint VERSION = 3;
-    private const string MIGRATIONS_URI = "resource:///org/gnomepomodoro/Pomodoro/migrations";
+    private const string MIGRATIONS_URI = "resource:///io/github/focustimerhq/FocusTimer/migrations";
     private const string DATE_FORMAT = "%Y-%m-%d";  // TODO: make functions to convert date
 
     private Gom.Adapter? adapter = null;
@@ -18,7 +18,7 @@ namespace Pomodoro.Database
 
     public unowned Gom.Repository? get_repository ()
     {
-        return Pomodoro.Database.repository;
+        return Ft.Database.repository;
     }
 
     private void make_directory_with_parents (GLib.File directory)
@@ -83,7 +83,7 @@ namespace Pomodoro.Database
                                     uint           version)
                                     throws GLib.Error
     {
-        var is_test = Pomodoro.is_test ();
+        var is_test = Ft.is_test ();
 
         // Gom tries to re-apply last migration (bug in Gom?).
         if (is_migration_applied (repository, adapter, version))
@@ -105,7 +105,7 @@ namespace Pomodoro.Database
                 GLib.info ("Migrating database to version %u", version);
             }
 
-            Pomodoro.Database.execute_sql (adapter, (string) file_contents);
+            Ft.Database.execute_sql (adapter, (string) file_contents);
         }
         catch (GLib.Error error) {
             throw error;
@@ -148,8 +148,8 @@ namespace Pomodoro.Database
 
             // TODO: back-up before migrating
 
-            repository.migrate_sync (Pomodoro.Database.VERSION,
-                                     Pomodoro.Database.migrate_repository);
+            repository.migrate_sync (Ft.Database.VERSION,
+                                     Ft.Database.migrate_repository);
         }
         catch (GLib.Error error) {
             GLib.error ("Failed to migrate database: %s", error.message);
@@ -176,68 +176,68 @@ namespace Pomodoro.Database
     {
         GLib.File? file = null;
 
-        if (Pomodoro.Database.repository != null) {
+        if (Ft.Database.repository != null) {
             return;
         }
 
-        if (!Pomodoro.is_test ())
+        if (!Ft.is_test ())
         {
-            if (Pomodoro.is_flatpak ())
-            {
-                var host_db_path = GLib.Path.build_filename (GLib.Environment.get_home_dir (),
-                                                             ".local",
-                                                             "share",
-                                                             Config.PACKAGE_NAME,
-                                                             "database.sqlite");
-                var sandbox_data_dir = GLib.Path.build_filename (GLib.Environment.get_user_data_dir (),
-                                                                 Config.PACKAGE_NAME);
-                var sandbox_db_path = GLib.Path.build_filename (sandbox_data_dir, "database.sqlite");
+            var directory_path = GLib.Path.build_filename (GLib.Environment.get_user_data_dir (),
+                                                           Config.PACKAGE_NAME);
+            var directory_file = GLib.File.new_for_path (directory_path);
 
-                var host_file = GLib.File.new_for_path (host_db_path);
-                var sandbox_dir_file = GLib.File.new_for_path (sandbox_data_dir);
-                var sandbox_file = GLib.File.new_for_path (sandbox_db_path);
-
-                if (host_file.query_exists () && !sandbox_file.query_exists ())
-                {
-                    make_directory_with_parents (sandbox_dir_file);
-
-                    try {
-                        host_file.copy (sandbox_file, GLib.FileCopyFlags.NONE, null, null);
-                        GLib.info ("Imported database from host to sandbox: %s -> %s",
-                                   host_db_path, sandbox_db_path);
-                    }
-                    catch (GLib.Error error) {
-                        GLib.warning ("Failed to import host database: %s", error.message);
-                    }
-                }
+            if (!directory_file.query_exists ()) {
+                make_directory_with_parents (directory_file);
             }
 
-            var file_path = GLib.Path.build_filename (GLib.Environment.get_user_data_dir (),
-                                                      Config.PACKAGE_NAME,
-                                                      "database.sqlite");
+            var file_path = GLib.Path.build_filename (directory_path, "database.sqlite");
             file = GLib.File.new_for_path (file_path);
+
+            var old_file_path = GLib.Path.build_filename (GLib.Environment.get_user_data_dir (),
+                                                          "gnome-pomodoro",
+                                                          "database.sqlite");
+            if (Ft.is_flatpak ()) {
+                old_file_path = GLib.Path.build_filename (GLib.Environment.get_home_dir (),
+                                                          ".local",
+                                                          "share",
+                                                          "gnome-pomodoro",
+                                                          "database.sqlite");
+            }
+
+            var old_file = GLib.File.new_for_path (old_file_path);
+
+            if (!file.query_exists () && old_file.query_exists ())
+            {
+                try {
+                    old_file.copy (file, GLib.FileCopyFlags.NONE, null, null);
+                    GLib.info ("Imported database from %s to %s", old_file_path, file_path);
+                }
+                catch (GLib.Error error) {
+                    GLib.warning ("Failed to import database: %s", error.message);
+                }
+            }
         }
 
-        Pomodoro.Database.adapter = new Gom.Adapter ();
-        Pomodoro.Database.repository = open_repository (Pomodoro.Database.adapter, file);
+        Ft.Database.adapter = new Gom.Adapter ();
+        Ft.Database.repository = open_repository (Ft.Database.adapter, file);
     }
 
     public void close ()
     {
-        if (Pomodoro.Database.repository == null) {
+        if (Ft.Database.repository == null) {
             return;
         }
 
-        close_repository (Pomodoro.Database.repository);
+        close_repository (Ft.Database.repository);
 
-        Pomodoro.Database.repository = null;
-        Pomodoro.Database.adapter = null;
+        Ft.Database.repository = null;
+        Ft.Database.adapter = null;
     }
 
     public string serialize_date (GLib.Date date)
     {
         return date.valid ()
-                ? Pomodoro.DateUtils.format_date (date, DATE_FORMAT)
+                ? Ft.DateUtils.format_date (date, DATE_FORMAT)
                 : "";  // TODO: is this acceptable by SQLite?
     }
 

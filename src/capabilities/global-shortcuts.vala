@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,22 +7,22 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
-    public class GlobalShortcutsCapability : Pomodoro.Capability
+    public class GlobalShortcutsCapability : Ft.Capability
     {
-        private Pomodoro.KeyboardManager? keyboard_manager = null;
+        private Ft.KeyboardManager? keyboard_manager = null;
 
         public GlobalShortcutsCapability ()
         {
-            base ("global-shortcuts", Pomodoro.Priority.DEFAULT);
+            base ("global-shortcuts", Ft.Priority.DEFAULT);
         }
 
         private void update_status ()
         {
             this.status = this.keyboard_manager.global_shortcuts_supported
-                ? Pomodoro.CapabilityStatus.DISABLED
-                : Pomodoro.CapabilityStatus.UNAVAILABLE;
+                ? Ft.CapabilityStatus.DISABLED
+                : Ft.CapabilityStatus.UNAVAILABLE;
         }
 
         private void on_global_shortcuts_supported_notify (GLib.Object    object,
@@ -34,7 +34,7 @@ namespace Pomodoro
         public override void initialize ()
         {
             if (this.keyboard_manager == null) {
-                this.keyboard_manager = new Pomodoro.KeyboardManager ();
+                this.keyboard_manager = new Ft.KeyboardManager ();
                 this.keyboard_manager.notify["global-shortcuts-supported"].connect (
                         this.on_global_shortcuts_supported_notify);
             }

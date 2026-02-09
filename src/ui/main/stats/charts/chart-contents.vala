@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * Extra wrapper around canvas for displaying axes and grid over charts content.
@@ -19,25 +19,25 @@ namespace Pomodoro
     {
         private const int AXIS_TEXT_OFFSET = 8;
 
-        public Pomodoro.Canvas canvas {
+        public Ft.Canvas canvas {
             get {
                 return this._canvas;
             }
         }
 
-        public Pomodoro.ChartAxis x_axis {
+        public Ft.ChartAxis x_axis {
             get {
                 return this._x_axis;
             }
         }
 
-        public Pomodoro.ChartAxis y_axis {
+        public Ft.ChartAxis y_axis {
             get {
                 return this._y_axis;
             }
         }
 
-        public Pomodoro.ChartGrid grid {
+        public Ft.ChartGrid grid {
             get {
                 return this._grid;
             }
@@ -86,31 +86,31 @@ namespace Pomodoro
         }
 
 
-        private Pomodoro.Canvas?     _canvas = null;
-        private Pomodoro.ChartAxis?  _x_axis = null;
-        private Pomodoro.ChartAxis?  _y_axis = null;
-        private Pomodoro.ChartGrid?  _grid = null;
-        private int                  _x_origin = 0;
-        private int                  _y_origin = 0;
-        private float                _y_value_from = float.NAN;
-        private float                _y_value_to = float.NAN;
-        private weak Pomodoro.Chart? chart = null;
-        private bool                 is_empty = true;
+        private Ft.Canvas?      _canvas = null;
+        private Ft.ChartAxis?   _x_axis = null;
+        private Ft.ChartAxis?   _y_axis = null;
+        private Ft.ChartGrid?   _grid = null;
+        private int             _x_origin = 0;
+        private int             _y_origin = 0;
+        private float           _y_value_from = float.NAN;
+        private float           _y_value_to = float.NAN;
+        private weak Ft.Chart?  chart = null;
+        private bool            is_empty = true;
 
         construct
         {
             this.accessible_role = Gtk.AccessibleRole.IMG;
             this.add_css_class ("contents");
 
-            this._canvas = new Pomodoro.Canvas ();
+            this._canvas = new Ft.Canvas ();
 
-            this._x_axis = new Pomodoro.ChartAxis (Gtk.Orientation.HORIZONTAL);
+            this._x_axis = new Ft.ChartAxis (Gtk.Orientation.HORIZONTAL);
             this._x_axis.text_offset = AXIS_TEXT_OFFSET;
 
-            this._y_axis = new Pomodoro.ChartAxis (Gtk.Orientation.VERTICAL);
+            this._y_axis = new Ft.ChartAxis (Gtk.Orientation.VERTICAL);
             this._y_axis.text_offset = AXIS_TEXT_OFFSET;
 
-            this._grid = new Pomodoro.ChartGrid (this.x_axis, this._y_axis);
+            this._grid = new Ft.ChartGrid (this.x_axis, this._y_axis);
 
             this._grid.insert_before (this, null);
             this._x_axis.insert_before (this, null);
@@ -118,7 +118,7 @@ namespace Pomodoro
             this._canvas.insert_before (this, null);
         }
 
-        private unowned Pomodoro.Chart? get_chart ()
+        private unowned Ft.Chart? get_chart ()
         {
             if (this.chart != null) {
                 return this.chart;
@@ -128,9 +128,9 @@ namespace Pomodoro
 
             while (widget != null)
             {
-                if (widget is Pomodoro.Chart)
+                if (widget is Ft.Chart)
                 {
-                    this.chart = (Pomodoro.Chart) widget;
+                    this.chart = (Ft.Chart) widget;
 
                     return this.chart;
                 }

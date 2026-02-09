@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/org/gnomepomodoro/Pomodoro">
+  <gresource prefix="/io/github/focustimerhq/FocusTimer">
     <!-- Migrations -->
     <file compressed="true">migrations/version-1.sql</file>
     <file compressed="true">migrations/version-2.sql</file>

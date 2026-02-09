@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2025 gnome-pomodoro contributors
+ * Copyright (c) 2016-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,20 +7,20 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
-    public class SoundsCapability : Pomodoro.Capability
+    public class SoundsCapability : Ft.Capability
     {
-        private Pomodoro.SoundManager? sound_manager = null;
+        private Ft.SoundManager? sound_manager = null;
 
         public SoundsCapability ()
         {
-            base ("sounds", Pomodoro.Priority.DEFAULT);
+            base ("sounds", Ft.Priority.DEFAULT);
         }
 
         public override void enable ()
         {
-            this.sound_manager = new Pomodoro.SoundManager ();
+            this.sound_manager = new Ft.SoundManager ();
 
             base.enable ();
         }

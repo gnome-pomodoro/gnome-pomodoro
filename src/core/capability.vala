@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016,2024 gnome-pomodoro contributors
+ * Copyright (c) 2016,2024 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public enum CapabilityStatus
     {
@@ -53,7 +53,7 @@ namespace Pomodoro
          * UNAVAILABLE status may be error prone. We assume that capability may become unavailable at any point.
          * Once it becomes available it jumps back to ENABLED or DISABLED status.
          */
-        public bool validate_transition (Pomodoro.CapabilityStatus target_status)
+        public bool validate_transition (Ft.CapabilityStatus target_status)
         {
             if (target_status == this) {
                 return true;
@@ -98,14 +98,14 @@ namespace Pomodoro
             construct;
         }
 
-        public Pomodoro.Priority priority {
+        public Ft.Priority priority {
             get;
             construct;
-            default = Pomodoro.Priority.DEFAULT;
+            default = Ft.Priority.DEFAULT;
         }
 
         [CCode (notify = false)]
-        public Pomodoro.CapabilityStatus status {
+        public Ft.CapabilityStatus status {
             get {
                 return this._status;
             }
@@ -127,11 +127,11 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.CapabilityStatus _status = Pomodoro.CapabilityStatus.NULL;
-        private GLib.GenericSet<string>?  details = null;
+        private Ft.CapabilityStatus      _status = Ft.CapabilityStatus.NULL;
+        private GLib.GenericSet<string>? details = null;
 
-        protected Capability (string            name,
-                              Pomodoro.Priority priority = Pomodoro.Priority.DEFAULT)
+        protected Capability (string      name,
+                              Ft.Priority priority = Ft.Priority.DEFAULT)
         {
             GLib.Object (
                 name: name,
@@ -148,18 +148,18 @@ namespace Pomodoro
 
         public inline bool is_initialized ()
         {
-            return this.status != Pomodoro.CapabilityStatus.NULL;
+            return this.status != Ft.CapabilityStatus.NULL;
         }
 
         public inline bool is_available ()
         {
-            return this.status != Pomodoro.CapabilityStatus.NULL &&
-                   this.status != Pomodoro.CapabilityStatus.UNAVAILABLE;
+            return this.status != Ft.CapabilityStatus.NULL &&
+                   this.status != Ft.CapabilityStatus.UNAVAILABLE;
         }
 
         public inline bool is_enabled ()
         {
-            return this.status == Pomodoro.CapabilityStatus.ENABLED;
+            return this.status == Ft.CapabilityStatus.ENABLED;
         }
 
         public void add_detail (string detail)
@@ -197,12 +197,12 @@ namespace Pomodoro
          */
         public virtual void initialize ()
         {
-            this.status = Pomodoro.CapabilityStatus.DISABLED;
+            this.status = Ft.CapabilityStatus.DISABLED;
         }
 
         public virtual void uninitialize ()
         {
-            this.status = Pomodoro.CapabilityStatus.NULL;
+            this.status = Ft.CapabilityStatus.NULL;
 
             this.remove_all_details ();
         }
@@ -217,7 +217,7 @@ namespace Pomodoro
         {
             assert (this.is_available ());
 
-            this.status = Pomodoro.CapabilityStatus.ENABLED;
+            this.status = Ft.CapabilityStatus.ENABLED;
         }
 
         /**
@@ -225,7 +225,7 @@ namespace Pomodoro
          */
         public virtual void disable ()
         {
-            this.status = Pomodoro.CapabilityStatus.DISABLED;
+            this.status = Ft.CapabilityStatus.DISABLED;
         }
 
         /**
@@ -241,14 +241,14 @@ namespace Pomodoro
         }
 
         public void destroy ()
-                             ensures (this.status == Pomodoro.CapabilityStatus.NULL)
+                             ensures (this.status == Ft.CapabilityStatus.NULL)
         {
-            if (this.status == Pomodoro.CapabilityStatus.ENABLED) {
+            if (this.status == Ft.CapabilityStatus.ENABLED) {
                 this.disable ();
             }
 
-            if (this.status == Pomodoro.CapabilityStatus.DISABLED ||
-                this.status == Pomodoro.CapabilityStatus.UNAVAILABLE)
+            if (this.status == Ft.CapabilityStatus.DISABLED ||
+                this.status == Ft.CapabilityStatus.UNAVAILABLE)
             {
                 this.uninitialize ();
             }
@@ -264,14 +264,14 @@ namespace Pomodoro
 
 
     /*
-    public class SimpleCapability : Pomodoro.Capability
+    public class SimpleCapability : Ft.Capability
     {
         private GLib.Callback? enable_func = null;
         private GLib.Callback? disable_func = null;
         private GLib.Callback? activate_func = null;
 
         public SimpleCapability (string               name,
-                                 Pomodoro.Priority    priortity,
+                                 Ft.Priority    priortity,
                                  owned GLib.Callback? enable_func,
                                  owned GLib.Callback? disable_func,
                                  owned GLib.Callback? activate_func = null)
@@ -286,21 +286,21 @@ namespace Pomodoro
 
         public override void enable ()
         {
-            if (this.status == Pomodoro.CapabilityStatus.ENABLING ||
-                this.status == Pomodoro.CapabilityStatus.ENABLED)
+            if (this.status == Ft.CapabilityStatus.ENABLING ||
+                this.status == Ft.CapabilityStatus.ENABLED)
             {
                 GLib.warning ("Capability %s is already enabled.", this.get_debug_name ());
                 return;
             }
 
-            if (this.status != Pomodoro.CapabilityStatus.DISABLED) {
+            if (this.status != Ft.CapabilityStatus.DISABLED) {
                 GLib.warning ("Capability %s is not available.", this.get_debug_name ());
                 return;
             }
 
             var previous_status = this.status;
 
-            // this.status = Pomodoro.CapabilityStatus.ENABLING;
+            // this.status = Ft.CapabilityStatus.ENABLING;
 
             if (this.enable_func != null) {
                 this.enable_func ();
@@ -311,19 +311,19 @@ namespace Pomodoro
 
         public override void disable ()
         {
-            if (this.status != Pomodoro.CapabilityStatus.UNAVAILABLE) {
+            if (this.status != Ft.CapabilityStatus.UNAVAILABLE) {
                 GLib.warning ("Capability %s is not available.", this.get_debug_name ());
                 return;
             }
 
-            if (this.status != Pomodoro.CapabilityStatus.ENABLED) {
+            if (this.status != Ft.CapabilityStatus.ENABLED) {
                 GLib.warning ("Capability %s is not enabled.", this.get_debug_name ());
                 return;
             }
 
             var previous_status = this.status;
 
-            // this.status = Pomodoro.CapabilityStatus.DISABLING;
+            // this.status = Ft.CapabilityStatus.DISABLING;
 
             if (this.disable_func != null) {
                 this.disable_func ();
@@ -334,7 +334,7 @@ namespace Pomodoro
 
         public override void activate ()
         {
-            if (this.status != Pomodoro.CapabilityStatus.ENABLED) {
+            if (this.status != Ft.CapabilityStatus.ENABLED) {
                 GLib.warning ("Capability %s is not enabled.", this.get_debug_name ());
                 return;
             }
@@ -359,7 +359,7 @@ namespace Pomodoro
     */
 
     /*  TODO: move to service?
-    public class ExternalCapability : Pomodoro.SimpleCapability
+    public class ExternalCapability : Ft.SimpleCapability
     {
         private static uint next_id = 1;
 
@@ -377,7 +377,7 @@ namespace Pomodoro
         private uint _id = 0;
 
         public ExternalCapability (string               name,
-                                   Pomodoro.Priority    priority,
+                                   Ft.Priority    priority,
                                    owned GLib.Callback? enable_func,
                                    owned GLib.Callback? disable_func,
                                    owned GLib.Callback? activate_func = null)

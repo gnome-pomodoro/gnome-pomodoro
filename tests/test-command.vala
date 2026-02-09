@@ -1,3 +1,11 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     private struct Case
@@ -11,7 +19,7 @@ namespace Tests
     private inline void assert_command_error (GLib.Error error,
                                               int        expected_error_code)
     {
-        var error_domain = GLib.Quark.from_string ("pomodoro-command-error-quark");
+        var error_domain = GLib.Quark.from_string ("ft-command-error-quark");
 
         assert_error (error, error_domain, expected_error_code);
     }
@@ -37,13 +45,13 @@ namespace Tests
             { "foo # comment\n bar", { "foo", "bar" }, -1 },
             { "foo a#b", { "foo", "a#b" }, -1 },
             { "foo '/bar/summer'\\''09 tours.pdf'", { "foo", "/bar/summer'09 tours.pdf" }, -1},
-            { "foo bar \"", { }, Pomodoro.CommandError.SYNTAX_ERROR },
-            { "foo 'bar baz", { }, Pomodoro.CommandError.SYNTAX_ERROR },
-            { "foo '\"bar\" baz", { }, Pomodoro.CommandError.SYNTAX_ERROR },
-            { "foo bar \\", { }, Pomodoro.CommandError.SYNTAX_ERROR },
-            { "", { }, Pomodoro.CommandError.EMPTY_LINE },
-            { "  ", { }, Pomodoro.CommandError.EMPTY_LINE },
-            { "# comment", { }, Pomodoro.CommandError.EMPTY_LINE },
+            { "foo bar \"", { }, Ft.CommandError.SYNTAX_ERROR },
+            { "foo 'bar baz", { }, Ft.CommandError.SYNTAX_ERROR },
+            { "foo '\"bar\" baz", { }, Ft.CommandError.SYNTAX_ERROR },
+            { "foo bar \\", { }, Ft.CommandError.SYNTAX_ERROR },
+            { "", { }, Ft.CommandError.EMPTY_LINE },
+            { "  ", { }, Ft.CommandError.EMPTY_LINE },
+            { "# comment", { }, Ft.CommandError.EMPTY_LINE },
         };
 
         static Case[] CASES_WITH_VARIABLES =
@@ -137,11 +145,11 @@ namespace Tests
             this.main_loop.quit ();
         }
 
-        private Pomodoro.CommandExecution? execute_sync (Pomodoro.Command command,
-                                                         Pomodoro.Context context)
-                                                         throws Pomodoro.CommandError, GLib.Error
+        private Ft.CommandExecution? execute_sync (Ft.Command command,
+                                                   Ft.Context context)
+                                                   throws Ft.CommandError, GLib.Error
         {
-            Pomodoro.CommandExecution? execution = null;
+            Ft.CommandExecution? execution = null;
 
             command.execute_async.begin (
                 context,
@@ -162,94 +170,94 @@ namespace Tests
 
         public void test_validate__empty_line ()
         {
-            var command = new Pomodoro.Command ("");
+            var command = new Ft.Command ("");
 
-            Pomodoro.CommandError? error = null;
+            Ft.CommandError? error = null;
 
             try {
                 command.validate ();
             }
-            catch (Pomodoro.CommandError _error) {
+            catch (Ft.CommandError _error) {
                 error = _error;
             }
 
-            assert_command_error (error, Pomodoro.CommandError.EMPTY_LINE);
+            assert_command_error (error, Ft.CommandError.EMPTY_LINE);
         }
 
         public void test_validate__syntax_error ()
         {
-            var command = new Pomodoro.Command ("echo \"unclosed");
+            var command = new Ft.Command ("echo \"unclosed");
 
-            Pomodoro.CommandError? error = null;
+            Ft.CommandError? error = null;
 
             try {
                 command.validate ();
             }
-            catch (Pomodoro.CommandError _error) {
+            catch (Ft.CommandError _error) {
                 error = _error;
             }
 
-            assert_command_error (error, Pomodoro.CommandError.SYNTAX_ERROR);
+            assert_command_error (error, Ft.CommandError.SYNTAX_ERROR);
         }
 
         public void test_validate__not_found ()
         {
-            var command = new Pomodoro.Command ("@non-existing@");
+            var command = new Ft.Command ("@non-existing@");
 
-            Pomodoro.CommandError? error = null;
+            Ft.CommandError? error = null;
 
             try {
                 command.validate ();
             }
-            catch (Pomodoro.CommandError _error) {
+            catch (Ft.CommandError _error) {
                 error = _error;
             }
 
-            assert_command_error (error, Pomodoro.CommandError.NOT_FOUND);
+            assert_command_error (error, Ft.CommandError.NOT_FOUND);
         }
 
         public void test_validate__unknown_variable ()
         {
-            var command = new Pomodoro.Command ("echo ${invalid}");
+            var command = new Ft.Command ("echo ${invalid}");
 
-            Pomodoro.CommandError? error = null;
+            Ft.CommandError? error = null;
 
             try {
                 command.validate ();
             }
-            catch (Pomodoro.CommandError _error) {
+            catch (Ft.CommandError _error) {
                 error = _error;
             }
 
-            assert_command_error (error, Pomodoro.CommandError.UNKNOWN_VARIABLE);
+            assert_command_error (error, Ft.CommandError.UNKNOWN_VARIABLE);
         }
 
         public void test_validate__unknown_variable_format ()
         {
-            var command = new Pomodoro.Command ("echo ${timestamp:invalid}");
+            var command = new Ft.Command ("echo ${timestamp:invalid}");
 
-            Pomodoro.CommandError? error = null;
+            Ft.CommandError? error = null;
 
             try {
                 command.validate ();
             }
-            catch (Pomodoro.CommandError _error) {
+            catch (Ft.CommandError _error) {
                 error = _error;
             }
 
-            assert_command_error (error, Pomodoro.CommandError.UNKNOWN_VARIABLE_FORMAT);
+            assert_command_error (error, Ft.CommandError.UNKNOWN_VARIABLE_FORMAT);
         }
 
-        private void test_prepare_case (Pomodoro.Context context,
+        private void test_prepare_case (Ft.Context context,
                                         string           line,
                                         string[]         expected_args,
                                         int              expected_error_code)
         {
-            var command = new Pomodoro.Command (line);
+            var command = new Ft.Command (line);
 
             var execution = command.prepare (context);
 
-            if (expected_error_code == Pomodoro.CommandError.EMPTY_LINE) {
+            if (expected_error_code == Ft.CommandError.EMPTY_LINE) {
                 assert_null (execution);
             }
             else {
@@ -268,7 +276,7 @@ namespace Tests
 
         public void test_prepare ()
         {
-            var context = new Pomodoro.Context ();
+            var context = new Ft.Context ();
 
             foreach (var _case in BASE_CASES)
             {
@@ -281,13 +289,13 @@ namespace Tests
 
         public void test_prepare__variables ()
         {
-            var context = new Pomodoro.Context ();
+            var context = new Ft.Context ();
             context.timestamp = 1200000;
-            context.timer_state = Pomodoro.TimerState () {
+            context.timer_state = Ft.TimerState () {
                 started_time = 1000000,
                 paused_time = 1200000,
             };
-            context.time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            context.time_block = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
 
             foreach (var _case in CASES_WITH_VARIABLES)
             {
@@ -300,11 +308,11 @@ namespace Tests
 
         public void test_prepare__use_subshell ()
         {
-            var context = new Pomodoro.Context ();
+            var context = new Ft.Context ();
             context.timestamp = 1200000;
-            context.time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            context.time_block = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
 
-            var command = new Pomodoro.Command ("echo ${state} && echo ${timestamp}");
+            var command = new Ft.Command ("echo ${state} && echo ${timestamp}");
             command.use_subshell = true;
 
             var execution = command.prepare (context);
@@ -314,8 +322,8 @@ namespace Tests
 
         public void test_execute ()
         {
-            var command = new Pomodoro.Command ("echo hello");
-            var context = new Pomodoro.Context ();
+            var command = new Ft.Command ("echo hello");
+            var context = new Ft.Context ();
 
             try {
                 var execution = this.execute_sync (command, context);
@@ -331,10 +339,10 @@ namespace Tests
 
         public void test_execute__use_subshell ()
         {
-            var command = new Pomodoro.Command ("cat <<< \"hello\"");
+            var command = new Ft.Command ("cat <<< \"hello\"");
             command.use_subshell = true;
 
-            var context = new Pomodoro.Context ();
+            var context = new Ft.Context ();
 
             try {
                 var execution = this.execute_sync (command, context);
@@ -350,10 +358,10 @@ namespace Tests
 
         public void test_execute__working_directory ()
         {
-            var command = new Pomodoro.Command ("pwd");
+            var command = new Ft.Command ("pwd");
             command.working_directory = "/tmp";
 
-            var context = new Pomodoro.Context ();
+            var context = new Ft.Context ();
 
             try {
                 var execution = this.execute_sync (command, context);
@@ -369,8 +377,8 @@ namespace Tests
 
         public void test_execute__empty_line ()
         {
-            var command = new Pomodoro.Command ("");
-            var context = new Pomodoro.Context ();
+            var command = new Ft.Command ("");
+            var context = new Ft.Context ();
 
             try {
                 var execution = this.execute_sync (command, context);

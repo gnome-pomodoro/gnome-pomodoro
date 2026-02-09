@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2025 gnome-pomodoro contributors
+ * Copyright (c) 2013-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,52 +7,52 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/stats/stats-month-page.ui")]
-    public class StatsMonthPage : Adw.Bin, Pomodoro.StatsPage
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/stats-month-page.ui")]
+    public class StatsMonthPage : Adw.Bin, Ft.StatsPage
     {
         private const int DAYS_PER_WEEK = 7;
 
         public GLib.Date date { get; construct; }
 
         [GtkChild]
-        private unowned Pomodoro.BubbleChart bubble_chart;
+        private unowned Ft.BubbleChart bubble_chart;
         [GtkChild]
-        private unowned Pomodoro.StatsCard pomodoro_card;
+        private unowned Ft.StatsCard pomodoro_card;
         [GtkChild]
-        private unowned Pomodoro.StatsCard breaks_card;
+        private unowned Ft.StatsCard breaks_card;
         [GtkChild]
-        private unowned Pomodoro.StatsCard interruptions_card;
+        private unowned Ft.StatsCard interruptions_card;
         [GtkChild]
-        private unowned Pomodoro.StatsCard break_ratio_card;
+        private unowned Ft.StatsCard break_ratio_card;
 
-        private Pomodoro.StatsManager? stats_manager;
-        private GLib.Date              display_start_date;
-        private GLib.Date              display_end_date;
+        private Ft.StatsManager? stats_manager;
+        private GLib.Date        display_start_date;
+        private GLib.Date        display_end_date;
 
         construct
         {
-            this.stats_manager = new Pomodoro.StatsManager ();
+            this.stats_manager = new Ft.StatsManager ();
             this.stats_manager.entry_saved.connect (this.on_entry_saved);
             this.stats_manager.entry_deleted.connect (this.on_entry_deleted);
 
-            this.bubble_chart.category = Pomodoro.StatsCategory.POMODORO;
+            this.bubble_chart.category = Ft.StatsCategory.POMODORO;
 
             this.bubble_chart.set_category_label (
-                    Pomodoro.StatsCategory.POMODORO, _("Pomodoro"));
+                    Ft.StatsCategory.POMODORO, _("Pomodoro"));
             this.bubble_chart.set_category_unit (
-                    Pomodoro.StatsCategory.POMODORO, Pomodoro.Unit.INTERVAL);
+                    Ft.StatsCategory.POMODORO, Ft.Unit.INTERVAL);
 
             this.bubble_chart.set_category_label (
-                    Pomodoro.StatsCategory.BREAK, _("Breaks"));
+                    Ft.StatsCategory.BREAK, _("Breaks"));
             this.bubble_chart.set_category_unit (
-                    Pomodoro.StatsCategory.BREAK, Pomodoro.Unit.INTERVAL);
+                    Ft.StatsCategory.BREAK, Ft.Unit.INTERVAL);
 
             this.bubble_chart.set_category_label (
-                    Pomodoro.StatsCategory.INTERRUPTION, _("Interruptions"));
+                    Ft.StatsCategory.INTERRUPTION, _("Interruptions"));
             this.bubble_chart.set_category_unit (
-                    Pomodoro.StatsCategory.INTERRUPTION, Pomodoro.Unit.AMOUNT);
+                    Ft.StatsCategory.INTERRUPTION, Ft.Unit.AMOUNT);
 
             var month = this.date.get_month ();
             var year = this.date.get_year ();
@@ -63,8 +63,8 @@ namespace Pomodoro
             var month_end_date = GLib.Date ();
             month_end_date.set_dmy (GLib.Date.get_days_in_month (month, year), month, year);
 
-            this.display_start_date = Pomodoro.Timeframe.WEEK.normalize_date (month_start_date);
-            this.display_end_date   = Pomodoro.Timeframe.WEEK.normalize_date (month_end_date);
+            this.display_start_date = Ft.Timeframe.WEEK.normalize_date (month_start_date);
+            this.display_end_date   = Ft.Timeframe.WEEK.normalize_date (month_end_date);
             this.display_end_date.add_days (6U);
 
             this.populate.begin (
@@ -121,11 +121,11 @@ namespace Pomodoro
         private void update_category_colors ()
         {
             var foreground_color = this.bubble_chart.get_color ();
-            var pomodoro_color = Pomodoro.get_chart_primary_color (foreground_color);
-            var break_color = Pomodoro.get_chart_secondary_color (foreground_color);
+            var pomodoro_color = Ft.get_chart_primary_color (foreground_color);
+            var break_color = Ft.get_chart_secondary_color (foreground_color);
 
-            this.bubble_chart.set_category_color (Pomodoro.StatsCategory.POMODORO, pomodoro_color);
-            this.bubble_chart.set_category_color (Pomodoro.StatsCategory.BREAK, break_color);
+            this.bubble_chart.set_category_color (Ft.StatsCategory.POMODORO, pomodoro_color);
+            this.bubble_chart.set_category_color (Ft.StatsCategory.BREAK, break_color);
         }
 
         private void update_bubble_chart_labels ()
@@ -134,7 +134,7 @@ namespace Pomodoro
             year_start_date.set_dmy (1, 1, this.date.get_year ());
 
             var date = this.display_start_date.copy ();
-            var first_day_of_week = Pomodoro.Locale.get_first_day_of_week ();
+            var first_day_of_week = Ft.Locale.get_first_day_of_week ();
             var week_number_offset = 1U - (
                     first_day_of_week == GLib.DateWeekday.MONDAY
                         ? year_start_date.get_monday_week_of_year ()
@@ -146,14 +146,14 @@ namespace Pomodoro
             while (date.compare (this.display_end_date) <= 0)
             {
                 var tooltip_label = capitalize_words (
-                        Pomodoro.DateUtils.format_date (date, "%e %B"));
+                        Ft.DateUtils.format_date (date, "%e %B"));
 
                 this.bubble_chart.set_bubble_tooltip_label (row, column, tooltip_label);
 
                 if (row == 0)
                 {
                     var weekday_name = capitalize_words (
-                        Pomodoro.DateUtils.format_date (date, "%a"));
+                        Ft.DateUtils.format_date (date, "%a"));
 
                     this.bubble_chart.set_column_label (column, weekday_name);
                 }
@@ -188,27 +188,27 @@ namespace Pomodoro
 
         private async Gom.ResourceGroup? fetch_aggregated_entries ()
         {
-            var repository = Pomodoro.Database.get_repository ();
+            var repository = Ft.Database.get_repository ();
 
             var start_date_value = GLib.Value (typeof (string));
-            start_date_value.set_string (Pomodoro.Database.serialize_date (this.display_start_date));
+            start_date_value.set_string (Ft.Database.serialize_date (this.display_start_date));
 
             var end_date_value = GLib.Value (typeof (string));
-            end_date_value.set_string (Pomodoro.Database.serialize_date (this.display_end_date));
+            end_date_value.set_string (Ft.Database.serialize_date (this.display_end_date));
 
             var start_date_filter = new Gom.Filter.gte (
-                    typeof (Pomodoro.AggregatedStatsEntry),
+                    typeof (Ft.AggregatedStatsEntry),
                     "date",
                     start_date_value);
             var end_date_filter = new Gom.Filter.lte (
-                    typeof (Pomodoro.AggregatedStatsEntry),
+                    typeof (Ft.AggregatedStatsEntry),
                     "date",
                     end_date_value);
             var date_filter = new Gom.Filter.and (start_date_filter, end_date_filter);
 
             try {
                 var aggregated_entries = yield repository.find_async (
-                        typeof (Pomodoro.AggregatedStatsEntry),
+                        typeof (Ft.AggregatedStatsEntry),
                         date_filter);
                 yield aggregated_entries.fetch_async (0U, aggregated_entries.count);
 
@@ -221,14 +221,14 @@ namespace Pomodoro
             }
         }
 
-        private void process_aggregated_entry (Pomodoro.AggregatedStatsEntry entry)
+        private void process_aggregated_entry (Ft.AggregatedStatsEntry entry)
         {
-            var entry_category = Pomodoro.StatsCategory.from_string (entry.category);
-            var entry_date     = Pomodoro.Database.parse_date (entry.date);
+            var entry_category = Ft.StatsCategory.from_string (entry.category);
+            var entry_date     = Ft.Database.parse_date (entry.date);
             var entry_duration = entry.duration;
 
             // Validate if entry is relevant
-            if (entry_category == Pomodoro.StatsCategory.INVALID) {
+            if (entry_category == Ft.StatsCategory.INVALID) {
                 return;
             }
 
@@ -240,8 +240,8 @@ namespace Pomodoro
                 return;
             }
 
-            var bucket_value = entry_category != Pomodoro.StatsCategory.INTERRUPTION
-                    ? Pomodoro.Interval.to_seconds (entry_duration)
+            var bucket_value = entry_category != Ft.StatsCategory.INTERRUPTION
+                    ? Ft.Interval.to_seconds (entry_duration)
                     : (double) entry.count;
 
             this.bubble_chart.add_value (row,
@@ -254,15 +254,15 @@ namespace Pomodoro
             {
                 switch (entry_category)
                 {
-                    case Pomodoro.StatsCategory.POMODORO:
+                    case Ft.StatsCategory.POMODORO:
                         this.pomodoro_card.value += bucket_value;
                         break;
 
-                    case Pomodoro.StatsCategory.BREAK:
+                    case Ft.StatsCategory.BREAK:
                         this.breaks_card.value += bucket_value;
                         break;
 
-                    case Pomodoro.StatsCategory.INTERRUPTION:
+                    case Ft.StatsCategory.INTERRUPTION:
                         this.interruptions_card.value += bucket_value;
                         break;
 
@@ -279,16 +279,16 @@ namespace Pomodoro
             }
         }
 
-        private void process_entry (Pomodoro.StatsEntry entry,
-                                    int                 sign = 1)
+        private void process_entry (Ft.StatsEntry entry,
+                                    int           sign = 1)
                                     requires (sign == 1 || sign == -1)
         {
-            var entry_category = Pomodoro.StatsCategory.from_string (entry.category);
-            var entry_date     = Pomodoro.Database.parse_date (entry.date);
+            var entry_category = Ft.StatsCategory.from_string (entry.category);
+            var entry_date     = Ft.Database.parse_date (entry.date);
             var entry_duration = entry.duration;
 
             // Validate if entry is relevant
-            if (entry_category == Pomodoro.StatsCategory.INVALID) {
+            if (entry_category == Ft.StatsCategory.INVALID) {
                 return;
             }
 
@@ -306,8 +306,8 @@ namespace Pomodoro
                 return;
             }
 
-            var bucket_value = entry_category != Pomodoro.StatsCategory.INTERRUPTION
-                    ? Pomodoro.Interval.to_seconds (sign * entry_duration)
+            var bucket_value = entry_category != Ft.StatsCategory.INTERRUPTION
+                    ? Ft.Interval.to_seconds (sign * entry_duration)
                     : (double) sign;
 
             this.bubble_chart.add_value (row,
@@ -322,15 +322,15 @@ namespace Pomodoro
 
             switch (entry_category)
             {
-                case Pomodoro.StatsCategory.POMODORO:
+                case Ft.StatsCategory.POMODORO:
                     this.pomodoro_card.value += bucket_value;
                     break;
 
-                case Pomodoro.StatsCategory.BREAK:
+                case Ft.StatsCategory.BREAK:
                     this.breaks_card.value += bucket_value;
                     break;
 
-                case Pomodoro.StatsCategory.INTERRUPTION:
+                case Ft.StatsCategory.INTERRUPTION:
                     this.interruptions_card.value += bucket_value;
                     break;
 
@@ -356,16 +356,16 @@ namespace Pomodoro
 
             for (var index = 0U; index < aggregated_entries.count; index++) {
                 this.process_aggregated_entry (
-                        (Pomodoro.AggregatedStatsEntry) aggregated_entries.get_index (index));
+                        (Ft.AggregatedStatsEntry) aggregated_entries.get_index (index));
             }
         }
 
-        private void on_entry_saved (Pomodoro.StatsEntry entry)
+        private void on_entry_saved (Ft.StatsEntry entry)
         {
             this.process_entry (entry, 1);
         }
 
-        private void on_entry_deleted (Pomodoro.StatsEntry entry)
+        private void on_entry_deleted (Ft.StatsEntry entry)
         {
             this.process_entry (entry, -1);
         }
@@ -378,7 +378,7 @@ namespace Pomodoro
 
             this.activate_action_variant (
                     "stats.select-day",
-                    Pomodoro.DateUtils.date_to_variant (date));
+                    Ft.DateUtils.date_to_variant (date));
         }
 
         public override void css_changed (Gtk.CssStyleChange change)

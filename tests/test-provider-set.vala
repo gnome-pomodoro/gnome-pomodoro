@@ -1,3 +1,11 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     [Flags]
@@ -10,13 +18,13 @@ namespace Tests
     }
 
 
-    public interface AntiGravityProvider : Pomodoro.Provider
+    public interface AntiGravityProvider : Ft.Provider
     {
         public abstract Scenario scenario { get; construct set; }
     }
 
 
-    public class SimpleAntiGravityProvider : Pomodoro.Provider, AntiGravityProvider
+    public class SimpleAntiGravityProvider : Ft.Provider, AntiGravityProvider
     {
         public Scenario scenario { get; construct set; }
 
@@ -144,14 +152,14 @@ namespace Tests
 
         public void test_enable_single__available ()
         {
-            var providers = new Pomodoro.ProviderSet<AntiGravityProvider> (Pomodoro.SelectionMode.SINGLE);
+            var providers = new Ft.ProviderSet<AntiGravityProvider> (Ft.SelectionMode.SINGLE);
             providers.provider_enabled.connect (() => { this.quit_main_loop (); });
 
             var provider_low = new SimpleAntiGravityProvider ();
-            providers.add (provider_low, Pomodoro.Priority.LOW);
+            providers.add (provider_low, Ft.Priority.LOW);
 
             var provider_high = new SimpleAntiGravityProvider ();
-            providers.add (provider_high, Pomodoro.Priority.HIGH);
+            providers.add (provider_high, Ft.Priority.HIGH);
 
             assert_cmpuint (provider_low.initialize_count, GLib.CompareOperator.EQ, 0);
             assert_cmpuint (provider_high.initialize_count, GLib.CompareOperator.EQ, 0);
@@ -205,15 +213,15 @@ namespace Tests
 
         public void test_enable_single__unavailable ()
         {
-            var providers = new Pomodoro.ProviderSet<AntiGravityProvider> (Pomodoro.SelectionMode.SINGLE);
+            var providers = new Ft.ProviderSet<AntiGravityProvider> (Ft.SelectionMode.SINGLE);
             providers.provider_enabled.connect (() => { this.quit_main_loop (); });
 
             var provider_low = new SimpleAntiGravityProvider ();
-            providers.add (provider_low, Pomodoro.Priority.LOW);
+            providers.add (provider_low, Ft.Priority.LOW);
             assert_cmpuint (provider_low.initialize_count, GLib.CompareOperator.EQ, 0);
 
             var provider_high = new SimpleAntiGravityProvider (Scenario.UNAVAILABLE);
-            providers.add (provider_high, Pomodoro.Priority.HIGH);
+            providers.add (provider_high, Ft.Priority.HIGH);
             assert_cmpuint (provider_low.initialize_count, GLib.CompareOperator.EQ, 0);
 
             providers.enable ();
@@ -238,15 +246,15 @@ namespace Tests
 
         public void test_enable_single__temporarily_unavailable ()
         {
-            var providers = new Pomodoro.ProviderSet<AntiGravityProvider> (Pomodoro.SelectionMode.SINGLE);
+            var providers = new Ft.ProviderSet<AntiGravityProvider> (Ft.SelectionMode.SINGLE);
             providers.provider_enabled.connect (() => { this.quit_main_loop (); });
 
             var provider_low = new SimpleAntiGravityProvider ();
-            providers.add (provider_low, Pomodoro.Priority.LOW);
+            providers.add (provider_low, Ft.Priority.LOW);
             assert_cmpuint (provider_low.initialize_count, GLib.CompareOperator.EQ, 0);
 
             var provider_high = new SimpleAntiGravityProvider (Scenario.TEMPORARILY_UNAVAILABLE);
-            providers.add (provider_high, Pomodoro.Priority.HIGH);
+            providers.add (provider_high, Ft.Priority.HIGH);
             assert_cmpuint (provider_high.initialize_count, GLib.CompareOperator.EQ, 0);
 
             providers.enable ();
@@ -267,15 +275,15 @@ namespace Tests
 
         public void test_enable_single__async_initialize ()
         {
-            var providers = new Pomodoro.ProviderSet<AntiGravityProvider> (Pomodoro.SelectionMode.SINGLE);
+            var providers = new Ft.ProviderSet<AntiGravityProvider> (Ft.SelectionMode.SINGLE);
             providers.provider_enabled.connect (() => { this.quit_main_loop (); });
 
             var provider_low = new SimpleAntiGravityProvider ();
-            providers.add (provider_low, Pomodoro.Priority.LOW);
+            providers.add (provider_low, Ft.Priority.LOW);
             assert_cmpuint (provider_low.initialize_count, GLib.CompareOperator.EQ, 0);
 
             var provider_high = new SimpleAntiGravityProvider (Scenario.ASYNC_INITIALIZE);
-            providers.add (provider_high, Pomodoro.Priority.HIGH);
+            providers.add (provider_high, Ft.Priority.HIGH);
             assert_cmpuint (provider_high.initialize_count, GLib.CompareOperator.EQ, 0);
 
             providers.enable ();

@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 namespace Gnome
 {
-    public class ExtensionProvider : Pomodoro.Provider, Pomodoro.ExtensionProvider
+    public class ExtensionProvider : Ft.Provider, Ft.ExtensionProvider
     {
-        private const string EXTENSION_UUID = "pomodoro@gnomepomodoro.org";
+        private const string EXTENSION_UUID = "focustimer@focustimerhq.github.io";
 
         public bool extension_enabled {
             get {
@@ -175,7 +175,7 @@ namespace Gnome
             }
         }
 
-        public async bool install_extension () throws Pomodoro.ExtensionError
+        public async bool install_extension () throws Ft.ExtensionError
         {
             assert (this.shell_extensions_proxy != null);
 
@@ -197,28 +197,28 @@ namespace Gnome
             }
             catch (GLib.IOError error) {
                 if (error.code == GLib.IOError.TIMED_OUT) {
-                    throw new Pomodoro.ExtensionError.TIMED_OUT ("Timed out");
+                    throw new Ft.ExtensionError.TIMED_OUT ("Timed out");
                 }
 
                 if (error.code == GLib.IOError.DBUS_ERROR &&
                     error.message.contains ("Shell.Extensions.Error.NotAllowed"))
                 {
-                    throw new Pomodoro.ExtensionError.NOT_ALLOWED ("Not allowed");
+                    throw new Ft.ExtensionError.NOT_ALLOWED ("Not allowed");
                 }
 
                 if (error.code == GLib.IOError.DBUS_ERROR &&
                     error.message.contains ("Shell.Extensions.Error.InfoDownloadFailed") ||
                     error.message.contains ("Shell.Extensions.Error.DownloadFailed"))
                 {
-                    throw new Pomodoro.ExtensionError.DOWNLOAD_FAILED ("Failed to download the extension");
+                    throw new Ft.ExtensionError.DOWNLOAD_FAILED ("Failed to download the extension");
                 }
 
                 this.log_error ("Error while installing extension", error);
-                throw new Pomodoro.ExtensionError.OTHER (error.message);
+                throw new Ft.ExtensionError.OTHER (error.message);
             }
             catch (GLib.Error error) {
                 this.log_error ("Error while installing extension", error);
-                throw new Pomodoro.ExtensionError.OTHER (error.message);
+                throw new Ft.ExtensionError.OTHER (error.message);
             }
         }
 

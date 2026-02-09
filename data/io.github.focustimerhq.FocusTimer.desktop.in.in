@@ -1,10 +1,9 @@
 [Desktop Entry]
-# Translators: Do NOT translate or transliterate this text
-Name=@APPLICATION_NAME@
+Name=Focus Timer
 Comment=Time management utility
 # Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-Keywords=timer;
-Exec=gnome-pomodoro
+Keywords=pomodoro;timer;
+Exec=focus-timer
 # Translators: Do NOT translate or transliterate this text (this is an icon file name)!
 Icon=@APPLICATION_ID@
 StartupNotify=false

@@ -1,26 +1,14 @@
 /*
- * This file is part of GNOME Pomodoro
+ * This file is part of focus-timer
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
- *
  */
 
 namespace Tests
 {
-    public class AntiGravityCapability : Pomodoro.Capability
+    public class AntiGravityCapability : Ft.Capability
     {
         public uint initialize_count = 0;
         public uint uninitialize_count = 0;
@@ -28,8 +16,8 @@ namespace Tests
         public uint disable_count = 0;
         public uint activate_count = 0;
 
-        public AntiGravityCapability (string            name,
-                                      Pomodoro.Priority priority = Pomodoro.Priority.DEFAULT)
+        public AntiGravityCapability (string      name,
+                                      Ft.Priority priority = Ft.Priority.DEFAULT)
         {
             base (name, priority);
         }
@@ -94,7 +82,7 @@ namespace Tests
             var capability = new AntiGravityCapability ("anti-gravity");
             capability.initialize ();
 
-            assert_true (capability.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.DISABLED);
             assert_cmpuint (capability.initialize_count, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (capability.uninitialize_count, GLib.CompareOperator.EQ, 0);
         }
@@ -105,7 +93,7 @@ namespace Tests
             capability.initialize ();
             capability.uninitialize ();
 
-            assert_true (capability.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability.status == Ft.CapabilityStatus.NULL);
             assert_cmpuint (capability.initialize_count, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (capability.uninitialize_count, GLib.CompareOperator.EQ, 1);
         }
@@ -116,7 +104,7 @@ namespace Tests
             capability.initialize ();
             capability.enable ();
 
-            assert_true (capability.status == Pomodoro.CapabilityStatus.ENABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.ENABLED);
             assert_cmpuint (capability.enable_count, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (capability.disable_count, GLib.CompareOperator.EQ, 0);
         }
@@ -128,7 +116,7 @@ namespace Tests
             capability.enable ();
             capability.disable ();
 
-            assert_true (capability.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.DISABLED);
             assert_cmpuint (capability.enable_count, GLib.CompareOperator.EQ, 1);
             assert_cmpuint (capability.disable_count, GLib.CompareOperator.EQ, 1);
         }
@@ -180,3 +168,4 @@ public static int main (string[] args)
         // new Tests.ExternalCapabilityTest ()
     );
 }
+

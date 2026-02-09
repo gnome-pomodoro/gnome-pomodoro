@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<interface domain="gnome-pomodoro">
+<interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroStatsCard" parent="AdwBin">
+  <template class="FtStatsCard" parent="AdwBin">
     <property name="focusable">false</property>
     <property name="child">
       <object class="GtkBox">
@@ -11,7 +11,7 @@
         <property name="halign">center</property>
         <child>
           <object class="GtkLabel">
-            <property name="label" bind-source="PomodoroStatsCard" bind-property="label" bind-flags="sync-create"/>
+            <property name="label" bind-source="FtStatsCard" bind-property="label" bind-flags="sync-create"/>
             <style>
               <class name="heading"/>
             </style>

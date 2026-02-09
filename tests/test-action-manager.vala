@@ -1,3 +1,11 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     public class EventActionTest : Tests.TestSuite
@@ -18,9 +26,9 @@ namespace Tests
         public void test_load ()
         {
             var settings = new GLib.Settings.with_path (
-                    "org.gnomepomodoro.Pomodoro.actions.action",
-                    @"/org/gnomepomodoro/Pomodoro/actions/$(this.uuid)/");
-            settings.set_enum ("trigger", Pomodoro.ActionTrigger.EVENT);
+                    "io.github.focustimerhq.FocusTimer.actions.action",
+                    @"/io/github/focustimerhq/FocusTimer/actions/$(this.uuid)/");
+            settings.set_enum ("trigger", Ft.ActionTrigger.EVENT);
             settings.set_boolean ("enabled", true);
             settings.set_string ("display-name", "Event Action");
             settings.set_strv ("events", {"start", "stop"});
@@ -31,7 +39,7 @@ namespace Tests
             settings.set_boolean ("use-subshell", true);
             settings.set_boolean ("pass-input", true);
 
-            var action = new Pomodoro.EventAction (this.uuid);
+            var action = new Ft.EventAction (this.uuid);
             action.load (settings);
 
             assert_true (action.enabled);
@@ -49,15 +57,15 @@ namespace Tests
         public void test_save ()
         {
             var settings = new GLib.Settings.with_path (
-                    "org.gnomepomodoro.Pomodoro.actions.action",
-                    @"/org/gnomepomodoro/Pomodoro/actions/$(uuid)/");
+                    "io.github.focustimerhq.FocusTimer.actions.action",
+                    @"/io/github/focustimerhq/FocusTimer/actions/$(uuid)/");
 
-            var action = new Pomodoro.EventAction (this.uuid);
+            var action = new Ft.EventAction (this.uuid);
             action.display_name = "Event Action";
             action.event_names = {"start", "stop"};
-            action.condition = new Pomodoro.Variable ("is-running");
+            action.condition = new Ft.Variable ("is-running");
             action.wait_for_completion = true;
-            action.command = new Pomodoro.Command ("echo Event");
+            action.command = new Ft.Command ("echo Event");
             action.command.working_directory = "/tmp";
             action.command.use_subshell = true;
             action.command.pass_input = true;
@@ -94,9 +102,9 @@ namespace Tests
         public void test_load ()
         {
             var settings = new GLib.Settings.with_path (
-                    "org.gnomepomodoro.Pomodoro.actions.action",
-                    @"/org/gnomepomodoro/Pomodoro/actions/$(this.uuid)/");
-            settings.set_enum ("trigger", Pomodoro.ActionTrigger.CONDITION);
+                    "io.github.focustimerhq.FocusTimer.actions.action",
+                    @"/io/github/focustimerhq/FocusTimer/actions/$(this.uuid)/");
+            settings.set_enum ("trigger", Ft.ActionTrigger.CONDITION);
             settings.set_boolean ("enabled", true);
             settings.set_string ("display-name", "Condition Action");
             settings.set_string ("condition", "isRunning");
@@ -106,7 +114,7 @@ namespace Tests
             settings.set_boolean ("use-subshell", true);
             settings.set_boolean ("pass-input", true);
 
-            var action = new Pomodoro.ConditionAction (this.uuid);
+            var action = new Ft.ConditionAction (this.uuid);
             action.load (settings);
 
             assert_true (action.enabled);
@@ -126,14 +134,14 @@ namespace Tests
         public void test_save ()
         {
             var settings = new GLib.Settings.with_path (
-                    "org.gnomepomodoro.Pomodoro.actions.action",
-                    @"/org/gnomepomodoro/Pomodoro/actions/$(this.uuid)/");
+                    "io.github.focustimerhq.FocusTimer.actions.action",
+                    @"/io/github/focustimerhq/FocusTimer/actions/$(this.uuid)/");
 
-            var action = new Pomodoro.ConditionAction (this.uuid);
+            var action = new Ft.ConditionAction (this.uuid);
             action.display_name = "Condition Action";
-            action.condition = new Pomodoro.Variable ("is-running");
-            action.enter_command = new Pomodoro.Command ("echo Enter");
-            action.exit_command = new Pomodoro.Command ("echo Exit");
+            action.condition = new Ft.Variable ("is-running");
+            action.enter_command = new Ft.Command ("echo Enter");
+            action.exit_command = new Ft.Command ("echo Exit");
             action.exit_command.working_directory = action.enter_command.working_directory = "/tmp";
             action.exit_command.use_subshell = action.enter_command.use_subshell = true;
             action.exit_command.pass_input = action.enter_command.pass_input = true;
@@ -141,7 +149,7 @@ namespace Tests
 
             assert_cmpuint (settings.get_enum ("trigger"),
                             GLib.CompareOperator.EQ,
-                            Pomodoro.ActionTrigger.CONDITION);
+                            Ft.ActionTrigger.CONDITION);
             assert_true (settings.get_boolean ("enabled"));
             assert_cmpstr (settings.get_string ("display-name"), GLib.CompareOperator.EQ, "Condition Action");
             assert_cmpstr (settings.get_string ("condition"), GLib.CompareOperator.EQ, "isRunning");
@@ -168,7 +176,7 @@ namespace Tests
 
         public override void setup ()
         {
-            this.settings = new GLib.Settings ("org.gnomepomodoro.Pomodoro.actions");
+            this.settings = new GLib.Settings ("io.github.focustimerhq.FocusTimer.actions");
             this.settings.set_strv ("actions", {});
         }
 
@@ -179,9 +187,9 @@ namespace Tests
 
         public void test_save_action__create ()
         {
-            var model = new Pomodoro.ActionListModel ();
+            var model = new Ft.ActionListModel ();
 
-            assert_true (model.get_item_type () == typeof (Pomodoro.Action));
+            assert_true (model.get_item_type () == typeof (Ft.Action));
             assert_cmpuint (model.get_n_items (), GLib.CompareOperator.EQ, 0U);
             assert_cmpuint (model.n_items, GLib.CompareOperator.EQ, 0U);
             assert_null (model.get_item (0));
@@ -197,9 +205,9 @@ namespace Tests
                 signals_count++;
             });
 
-            var action = new Pomodoro.EventAction (null);
+            var action = new Ft.EventAction (null);
             action.display_name = "Action";
-            action.command = new Pomodoro.Command ("echo Action");
+            action.command = new Ft.Command ("echo Action");
             action.event_names = {"start"};
 
             model.save_action (action);
@@ -220,18 +228,18 @@ namespace Tests
             assert (model.lookup (uuid) == action);
 
             // After first get_item, subsequent calls should return same instance
-            var item_0 = (Pomodoro.Action) model.get_item (0);
-            var item_0_again = (Pomodoro.Action) model.get_item (0);
+            var item_0 = (Ft.Action) model.get_item (0);
+            var item_0_again = (Ft.Action) model.get_item (0);
             assert (item_0 == item_0_again);
         }
 
         public void test_save_action__update ()
         {
-            var model = new Pomodoro.ActionListModel ();
+            var model = new Ft.ActionListModel ();
 
-            var action_1 = new Pomodoro.EventAction ("00000000-0000-0000-0000-000000000000");
+            var action_1 = new Ft.EventAction ("00000000-0000-0000-0000-000000000000");
             action_1.display_name = "Action 1";
-            action_1.command = new Pomodoro.Command ("echo 1");
+            action_1.command = new Ft.Command ("echo 1");
             action_1.event_names = {"start"};
 
             model.save_action (action_1);
@@ -247,9 +255,9 @@ namespace Tests
                 signals_count++;
             });
 
-            var action_2 = new Pomodoro.EventAction (action_1.uuid);
+            var action_2 = new Ft.EventAction (action_1.uuid);
             action_2.display_name = "Action 2";
-            action_2.command = new Pomodoro.Command ("echo 2");
+            action_2.command = new Ft.Command ("echo 2");
             action_2.event_names = {"resume"};
 
             model.save_action (action_2);
@@ -261,7 +269,7 @@ namespace Tests
             assert_cmpuint (observed_added, GLib.CompareOperator.EQ, 1U);
             assert_cmpuint (model.get_n_items (), GLib.CompareOperator.EQ, 1U);
 
-            var action = (Pomodoro.EventAction?) model.lookup (action_1.uuid);
+            var action = (Ft.EventAction?) model.lookup (action_1.uuid);
             assert_cmpstr (action.display_name, GLib.CompareOperator.EQ, action_2.display_name);
             assert_cmpstr (action.command.line, GLib.CompareOperator.EQ, action_2.command.line);
             assert_cmpstrv (action.event_names, action_2.event_names);
@@ -269,11 +277,11 @@ namespace Tests
 
         public void test_delete_action ()
         {
-            var model = new Pomodoro.ActionListModel ();
+            var model = new Ft.ActionListModel ();
 
-            var action = new Pomodoro.EventAction (null);
+            var action = new Ft.EventAction (null);
             action.display_name = "Action";
-            action.command = new Pomodoro.Command ("echo Action");
+            action.command = new Ft.Command ("echo Action");
             action.event_names = {"start"};
             model.save_action (action);
 
@@ -300,23 +308,23 @@ namespace Tests
 
         public void test_move_action ()
         {
-            var model = new Pomodoro.ActionListModel ();
+            var model = new Ft.ActionListModel ();
 
-            var action_1 = new Pomodoro.EventAction (null);
+            var action_1 = new Ft.EventAction (null);
             action_1.display_name = "Action 1";
-            action_1.command = new Pomodoro.Command ("echo 1");
+            action_1.command = new Ft.Command ("echo 1");
             action_1.event_names = {"start"};
             model.save_action (action_1);
 
-            var action_2 = new Pomodoro.EventAction (null);
+            var action_2 = new Ft.EventAction (null);
             action_2.display_name = "Action 2";
-            action_2.command = new Pomodoro.Command ("echo 2");
+            action_2.command = new Ft.Command ("echo 2");
             action_2.event_names = {"start"};
             model.save_action (action_2);
 
-            var action_3 = new Pomodoro.EventAction (null);
+            var action_3 = new Ft.EventAction (null);
             action_3.display_name = "Action 3";
-            action_3.command = new Pomodoro.Command ("echo 3");
+            action_3.command = new Ft.Command ("echo 3");
             action_3.event_names = {"start"};
             model.save_action (action_3);
 
@@ -349,16 +357,16 @@ namespace Tests
             assert_cmpint (model.index (action_1.uuid), GLib.CompareOperator.EQ, 2);
 
             // Verify get_item ordering
-            assert ((Pomodoro.Action) model.get_item (0) == model.lookup (action_2.uuid));
-            assert ((Pomodoro.Action) model.get_item (1) == model.lookup (action_3.uuid));
-            assert ((Pomodoro.Action) model.get_item (2) == model.lookup (action_1.uuid));
+            assert ((Ft.Action) model.get_item (0) == model.lookup (action_2.uuid));
+            assert ((Ft.Action) model.get_item (1) == model.lookup (action_3.uuid));
+            assert ((Ft.Action) model.get_item (2) == model.lookup (action_1.uuid));
         }
     }
 
 
     public class ActionManagerTest : Tests.TestSuite
     {
-        private class DummyEventAction : Pomodoro.EventAction
+        private class DummyEventAction : Ft.EventAction
         {
             public uint bind_count { get; private set; default = 0U; }
             public uint unbind_count { get; private set; default = 0U; }
@@ -381,7 +389,7 @@ namespace Tests
             }
         }
 
-        private class DummyConditionAction : Pomodoro.ConditionAction
+        private class DummyConditionAction : Ft.ConditionAction
         {
             public uint bind_count { get; private set; default = 0U; }
             public uint unbind_count { get; private set; default = 0U; }
@@ -417,7 +425,7 @@ namespace Tests
 
         public override void setup ()
         {
-            this.settings = new GLib.Settings ("org.gnomepomodoro.Pomodoro.actions");
+            this.settings = new GLib.Settings ("io.github.focustimerhq.FocusTimer.actions");
             this.settings.set_strv ("actions", {});
         }
 
@@ -428,11 +436,11 @@ namespace Tests
 
         public void test_save_event_action ()
         {
-            var manager = new Pomodoro.ActionManager ();
+            var manager = new Ft.ActionManager ();
 
             var action = new DummyEventAction (null);
             action.display_name = "Action";
-            action.command = new Pomodoro.Command ("echo Action");
+            action.command = new Ft.Command ("echo Action");
             action.event_names = {"start"};
 
             manager.model.save_action (action);
@@ -454,11 +462,11 @@ namespace Tests
 
         public void test_delete_event_action ()
         {
-            var manager = new Pomodoro.ActionManager ();
+            var manager = new Ft.ActionManager ();
 
             var action = new DummyEventAction (null);
             action.display_name = "Action";
-            action.command = new Pomodoro.Command ("echo Action");
+            action.command = new Ft.Command ("echo Action");
             action.event_names = {"start"};
 
             manager.model.save_action (action);
@@ -481,13 +489,13 @@ namespace Tests
 
         public void test_save_condition_action ()
         {
-            var manager = new Pomodoro.ActionManager ();
+            var manager = new Ft.ActionManager ();
 
             var action = new DummyConditionAction (null);
             action.display_name = "Condition";
-            action.condition = new Pomodoro.Variable ("is-running");
-            action.enter_command = new Pomodoro.Command ("echo Enter");
-            action.exit_command = new Pomodoro.Command ("echo Exit");
+            action.condition = new Ft.Variable ("is-running");
+            action.enter_command = new Ft.Command ("echo Enter");
+            action.exit_command = new Ft.Command ("echo Exit");
 
             manager.model.save_action (action);
 
@@ -508,13 +516,13 @@ namespace Tests
 
         public void test_delete_condition_action ()
         {
-            var manager = new Pomodoro.ActionManager ();
+            var manager = new Ft.ActionManager ();
 
             var action = new DummyConditionAction (null);
             action.display_name = "Condition";
-            action.condition = new Pomodoro.Variable ("is-running");
-            action.enter_command = new Pomodoro.Command ("echo Enter");
-            action.exit_command = new Pomodoro.Command ("echo Exit");
+            action.condition = new Ft.Variable ("is-running");
+            action.enter_command = new Ft.Command ("echo Enter");
+            action.exit_command = new Ft.Command ("echo Exit");
 
             manager.model.save_action (action);
 
@@ -533,18 +541,18 @@ namespace Tests
 
         public void test_destroy ()
         {
-            var manager = new Pomodoro.ActionManager ();
+            var manager = new Ft.ActionManager ();
 
             var e = new DummyEventAction (null);
             e.display_name = "E";
-            e.command = new Pomodoro.Command ("echo E");
+            e.command = new Ft.Command ("echo E");
             e.event_names = {"start"};
 
             var c = new DummyConditionAction (null);
             c.display_name = "C";
-            c.condition = new Pomodoro.Variable ("is-running");
-            c.enter_command = new Pomodoro.Command ("echo Enter");
-            c.exit_command = new Pomodoro.Command ("echo Exit");
+            c.condition = new Ft.Variable ("is-running");
+            c.enter_command = new Ft.Command ("echo Enter");
+            c.exit_command = new Ft.Command ("echo Exit");
 
             manager.model.save_action (e);
             manager.model.save_action (c);

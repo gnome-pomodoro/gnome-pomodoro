@@ -4,7 +4,7 @@ dbus_conf.set('BINDIR', get_option('prefix') / get_option('bindir'))
 dbus_conf.set('APPLICATION_ID', application_id)
 
 configure_file(
-  input: 'org.gnomepomodoro.Pomodoro.service.in',
+  input: 'io.github.focustimerhq.FocusTimer.service.in',
   output: '@0@.service'.format(application_id),
   configuration: dbus_conf,
   install: true,
@@ -12,9 +12,9 @@ configure_file(
 )
 
 install_data(
-  'org.gnomepomodoro.Pomodoro.xml',
-  'org.gnomepomodoro.Pomodoro.Session.xml',
-  'org.gnomepomodoro.Pomodoro.Timer.xml',
+  'io.github.focustimerhq.FocusTimer.xml',
+  'io.github.focustimerhq.FocusTimer.Session.xml',
+  'io.github.focustimerhq.FocusTimer.Timer.xml',
   install_dir: get_option('datadir') / 'dbus-1/interfaces',
 )
 
@@ -25,7 +25,7 @@ desktop_conf.set('APPLICATION_NAME', application_name)
 
 desktop_file = i18n.merge_file(
   input: configure_file(
-    input: 'org.gnomepomodoro.Pomodoro.desktop.in.in',
+    input: 'io.github.focustimerhq.FocusTimer.desktop.in.in',
     output: '@0@.desktop.in'.format(application_id),
     configuration: desktop_conf
   ),
@@ -47,7 +47,7 @@ endif
 
 # Appdata
 appdata = i18n.merge_file(
-  input: 'org.gnomepomodoro.Pomodoro.metainfo.xml.in',
+  input: 'io.github.focustimerhq.FocusTimer.metainfo.xml.in',
   output: '@BASENAME@',
   install: true,
   install_dir: get_option('datadir') / 'metainfo',
@@ -67,7 +67,7 @@ endif
 
 # GSchema
 install_data(
-  'org.gnomepomodoro.Pomodoro.gschema.xml',
+  'io.github.focustimerhq.FocusTimer.gschema.xml',
   install_dir: gschema_dir,
 )
 
@@ -79,7 +79,7 @@ if compile_schemas.found()
 endif
 
 compiled_schemas = gnome.compile_schemas(
-  depend_files: 'org.gnomepomodoro.Pomodoro.gschema.xml'
+  depend_files: 'io.github.focustimerhq.FocusTimer.gschema.xml'
 )
 
 # Run required post-install steps

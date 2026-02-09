@@ -1,3 +1,11 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     public class TimeBlockTest : Tests.TestSuite
@@ -60,9 +68,9 @@ namespace Tests
 
         public override void setup ()
         {
-            Pomodoro.Timestamp.freeze_to (2000000000 * Pomodoro.Interval.SECOND);
+            Ft.Timestamp.freeze_to (2000000000 * Ft.Interval.SECOND);
 
-            // var settings = Pomodoro.get_settings ();
+            // var settings = Ft.get_settings ();
             // settings.set_uint ("pomodoro-duration", POMODORO_DURATION);
             // settings.set_uint ("short-break-duration", SHORT_BREAK_DURATION);
             // settings.set_uint ("long-break-duration", LONG_BREAK_DURATION);
@@ -71,9 +79,9 @@ namespace Tests
 
         public override void teardown ()
         {
-            Pomodoro.Timestamp.thaw ();
+            Ft.Timestamp.thaw ();
 
-            // var settings = Pomodoro.get_settings ();
+            // var settings = Ft.get_settings ();
             // settings.revert ();
         }
 
@@ -84,42 +92,42 @@ namespace Tests
 
         public void test_new__undefined ()
         {
-            var state = Pomodoro.State.STOPPED;
-            var time_block = new Pomodoro.TimeBlock (state);
+            var state = Ft.State.STOPPED;
+            var time_block = new Ft.TimeBlock (state);
 
             assert_true (time_block.state == state);
-            assert_true (Pomodoro.Timestamp.is_undefined (time_block.start_time));
-            assert_true (Pomodoro.Timestamp.is_undefined (time_block.end_time));
+            assert_true (Ft.Timestamp.is_undefined (time_block.start_time));
+            assert_true (Ft.Timestamp.is_undefined (time_block.end_time));
         }
 
         public void test_new__pomodoro ()
         {
-            var state = Pomodoro.State.POMODORO;
-            var time_block = new Pomodoro.TimeBlock (state);
+            var state = Ft.State.POMODORO;
+            var time_block = new Ft.TimeBlock (state);
 
             assert_true (time_block.state == state);
-            assert_true (Pomodoro.Timestamp.is_undefined (time_block.start_time));
-            assert_true (Pomodoro.Timestamp.is_undefined (time_block.end_time));
+            assert_true (Ft.Timestamp.is_undefined (time_block.start_time));
+            assert_true (Ft.Timestamp.is_undefined (time_block.end_time));
         }
 
         public void test_new__short_break ()
         {
-            var state = Pomodoro.State.SHORT_BREAK;
-            var time_block = new Pomodoro.TimeBlock (state);
+            var state = Ft.State.SHORT_BREAK;
+            var time_block = new Ft.TimeBlock (state);
 
             assert_true (time_block.state == state);
-            assert_true (Pomodoro.Timestamp.is_undefined (time_block.start_time));
-            assert_true (Pomodoro.Timestamp.is_undefined (time_block.end_time));
+            assert_true (Ft.Timestamp.is_undefined (time_block.start_time));
+            assert_true (Ft.Timestamp.is_undefined (time_block.end_time));
         }
 
         public void test_new__long_break ()
         {
-            var state = Pomodoro.State.LONG_BREAK;
-            var time_block = new Pomodoro.TimeBlock (state);
+            var state = Ft.State.LONG_BREAK;
+            var time_block = new Ft.TimeBlock (state);
 
             assert_true (time_block.state == state);
-            assert_true (Pomodoro.Timestamp.is_undefined (time_block.start_time));
-            assert_true (Pomodoro.Timestamp.is_undefined (time_block.end_time));
+            assert_true (Ft.Timestamp.is_undefined (time_block.start_time));
+            assert_true (Ft.Timestamp.is_undefined (time_block.end_time));
         }
 
 
@@ -129,14 +137,14 @@ namespace Tests
 
         public void test_set_session ()
         {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
 
             var notify_session_emitted = 0;
             time_block.notify["session"].connect (() => {
                 notify_session_emitted++;
             });
 
-            var session_1 = new Pomodoro.Session ();
+            var session_1 = new Ft.Session ();
             time_block.session = session_1;
             assert_true (time_block.session == session_1);
             assert_true (notify_session_emitted == 1);
@@ -145,7 +153,7 @@ namespace Tests
             assert_true (time_block.session == session_1);
             assert_true (notify_session_emitted == 1);  // unchanged
 
-            var session_2 = new Pomodoro.Session ();
+            var session_2 = new Ft.Session ();
             time_block.session = session_2;
             assert_true (time_block.session == session_2);
             assert_true (notify_session_emitted == 2);
@@ -153,14 +161,14 @@ namespace Tests
 
         public void test_state ()
         {
-            var time_block_1 = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            assert_true (time_block_1.state == Pomodoro.State.POMODORO);
+            var time_block_1 = new Ft.TimeBlock (Ft.State.POMODORO);
+            assert_true (time_block_1.state == Ft.State.POMODORO);
 
-            var time_block_2 = new Pomodoro.TimeBlock (Pomodoro.State.BREAK);
-            assert_true (time_block_2.state == Pomodoro.State.BREAK);
+            var time_block_2 = new Ft.TimeBlock (Ft.State.BREAK);
+            assert_true (time_block_2.state == Ft.State.BREAK);
 
-            var time_block_3 = new Pomodoro.TimeBlock (Pomodoro.State.STOPPED);
-            assert_true (time_block_3.state == Pomodoro.State.STOPPED);
+            var time_block_3 = new Ft.TimeBlock (Ft.State.STOPPED);
+            assert_true (time_block_3.state == Ft.State.STOPPED);
         }
 
         // public void test_start_time ()
@@ -186,47 +194,47 @@ namespace Tests
 
         public void test_move_by__without_gaps ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var time_block = new Pomodoro.TimeBlock ();
+            var now = Ft.Timestamp.peek ();
+            var time_block = new Ft.TimeBlock ();
 
             var changed_emitted = 0;
             time_block.changed.connect (() => {
                 changed_emitted++;
             });
 
-            time_block.set_time_range (Pomodoro.Timestamp.UNDEFINED, now);
-            time_block.move_by (Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (Ft.Timestamp.UNDEFINED, now);
+            time_block.move_by (Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.start_time),
-                new GLib.Variant.int64 (Pomodoro.Timestamp.UNDEFINED)
+                new GLib.Variant.int64 (Ft.Timestamp.UNDEFINED)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.end_time),
-                new GLib.Variant.int64 (now + Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + Ft.Interval.MINUTE)
             );
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 2);
 
-            time_block.set_time_range (now, Pomodoro.Timestamp.UNDEFINED);
-            time_block.move_by (Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, Ft.Timestamp.UNDEFINED);
+            time_block.move_by (Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.start_time),
-                new GLib.Variant.int64 (now + Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.end_time),
-                new GLib.Variant.int64 (Pomodoro.Timestamp.UNDEFINED)
+                new GLib.Variant.int64 (Ft.Timestamp.UNDEFINED)
             );
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 4);
 
-            time_block.set_time_range (now, now + Pomodoro.Interval.MINUTE);
-            time_block.move_by (Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + Ft.Interval.MINUTE);
+            time_block.move_by (Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.start_time),
-                new GLib.Variant.int64 (now + Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.end_time),
-                new GLib.Variant.int64 (now + 2 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 2 * Ft.Interval.MINUTE)
             );
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 6);
 
@@ -236,43 +244,43 @@ namespace Tests
 
         public void test_move_by__with_gaps ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var time_block = new Pomodoro.TimeBlock ();
-            time_block.set_time_range (now, now + 5 * Pomodoro.Interval.MINUTE);
+            var now = Ft.Timestamp.peek ();
+            var time_block = new Ft.TimeBlock ();
+            time_block.set_time_range (now, now + 5 * Ft.Interval.MINUTE);
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (now + 0 * Pomodoro.Interval.SECOND,
-                                  now + 5 * Pomodoro.Interval.SECOND);
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (now + 0 * Ft.Interval.SECOND,
+                                  now + 5 * Ft.Interval.SECOND);
             time_block.add_gap (gap_1);
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (now + 10 * Pomodoro.Interval.SECOND,
-                                  now + 20 * Pomodoro.Interval.SECOND);
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (now + 10 * Ft.Interval.SECOND,
+                                  now + 20 * Ft.Interval.SECOND);
             time_block.add_gap (gap_2);
 
-            time_block.move_by (Pomodoro.Interval.MINUTE);
+            time_block.move_by (Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (gap_1.start_time),
-                new GLib.Variant.int64 (now + Pomodoro.Interval.MINUTE + 0 * Pomodoro.Interval.SECOND)
+                new GLib.Variant.int64 (now + Ft.Interval.MINUTE + 0 * Ft.Interval.SECOND)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (gap_1.end_time),
-                new GLib.Variant.int64 (now + Pomodoro.Interval.MINUTE + 5 * Pomodoro.Interval.SECOND)
+                new GLib.Variant.int64 (now + Ft.Interval.MINUTE + 5 * Ft.Interval.SECOND)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (gap_2.start_time),
-                new GLib.Variant.int64 (now + Pomodoro.Interval.MINUTE + 10 * Pomodoro.Interval.SECOND)
+                new GLib.Variant.int64 (now + Ft.Interval.MINUTE + 10 * Ft.Interval.SECOND)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (gap_2.end_time),
-                new GLib.Variant.int64 (now + Pomodoro.Interval.MINUTE + 20 * Pomodoro.Interval.SECOND)
+                new GLib.Variant.int64 (now + Ft.Interval.MINUTE + 20 * Ft.Interval.SECOND)
             );
         }
 
         public void test_move_to ()
         {
-            var now = Pomodoro.Timestamp.advance (0);
-            var time_block = new Pomodoro.TimeBlock ();
+            var now = Ft.Timestamp.advance (0);
+            var time_block = new Ft.TimeBlock ();
 
             var changed_emitted = 0;
             time_block.changed.connect (() => {
@@ -280,11 +288,11 @@ namespace Tests
             });
 
             // Move +1 minute, while range is not defined.
-            time_block.set_time_range (Pomodoro.Timestamp.UNDEFINED, now);
-            time_block.move_to (now + Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (Ft.Timestamp.UNDEFINED, now);
+            time_block.move_to (now + Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.start_time),
-                new GLib.Variant.int64 (Pomodoro.Timestamp.UNDEFINED)
+                new GLib.Variant.int64 (Ft.Timestamp.UNDEFINED)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.end_time),
@@ -293,33 +301,33 @@ namespace Tests
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 1);
 
             // Move +1 minute, while range is not defined.
-            time_block.set_time_range (now, Pomodoro.Timestamp.UNDEFINED);
-            time_block.move_to (now + Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, Ft.Timestamp.UNDEFINED);
+            time_block.move_to (now + Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.start_time),
-                new GLib.Variant.int64 (now + Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.end_time),
-                new GLib.Variant.int64 (Pomodoro.Timestamp.UNDEFINED)
+                new GLib.Variant.int64 (Ft.Timestamp.UNDEFINED)
             );
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 3);
 
             // Move +1 minute.
-            time_block.set_time_range (now, now + Pomodoro.Interval.MINUTE);
-            time_block.move_to (now + Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now, now + Ft.Interval.MINUTE);
+            time_block.move_to (now + Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.start_time),
-                new GLib.Variant.int64 (now + Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.end_time),
-                new GLib.Variant.int64 (now + 2 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + 2 * Ft.Interval.MINUTE)
             );
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 5);
 
             // Move -1 minute.
-            time_block.set_time_range (now + Pomodoro.Interval.MINUTE, now + 2 * Pomodoro.Interval.MINUTE);
+            time_block.set_time_range (now + Ft.Interval.MINUTE, now + 2 * Ft.Interval.MINUTE);
             time_block.move_to (now);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.start_time),
@@ -327,7 +335,7 @@ namespace Tests
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.end_time),
-                new GLib.Variant.int64 (now + Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (now + Ft.Interval.MINUTE)
             );
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 6);
 
@@ -346,19 +354,19 @@ namespace Tests
 
         public void test_add_gap ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var time_block = new Pomodoro.TimeBlock ();
-            time_block.set_time_range (now + Pomodoro.Interval.MINUTE,
-                                       now + 30 * Pomodoro.Interval.MINUTE);
+            var now = Ft.Timestamp.peek ();
+            var time_block = new Ft.TimeBlock ();
+            time_block.set_time_range (now + Ft.Interval.MINUTE,
+                                       now + 30 * Ft.Interval.MINUTE);
 
             var changed_emitted = 0;
             time_block.changed.connect (() => {
                 changed_emitted++;
             });
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (time_block.start_time + 5 * Pomodoro.Interval.MINUTE,
-                                  Pomodoro.Timestamp.UNDEFINED);
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (time_block.start_time + 5 * Ft.Interval.MINUTE,
+                                  Ft.Timestamp.UNDEFINED);
 
             // Expect that `Gap.time_block` is set and that `changed` signal is emitted.
             time_block.add_gap (gap_1);
@@ -368,38 +376,38 @@ namespace Tests
             time_block.add_gap (gap_1);
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 1);  // no change
 
-            gap_1.end_time = time_block.start_time + 10 * Pomodoro.Interval.MINUTE;
+            gap_1.end_time = time_block.start_time + 10 * Ft.Interval.MINUTE;
             assert_cmpuint (changed_emitted, GLib.CompareOperator.EQ, 2);
 
             // Expect add_gap to keep gaps in order.
-            var gap_2 = new Pomodoro.Gap ();
+            var gap_2 = new Ft.Gap ();
             gap_2.set_time_range (time_block.start_time,
-                                  time_block.start_time + Pomodoro.Interval.MINUTE);
+                                  time_block.start_time + Ft.Interval.MINUTE);
             time_block.add_gap (gap_2);
             assert_true (time_block.get_last_gap () == gap_1);
 
-            var gap_3 = new Pomodoro.Gap ();
-            gap_3.set_time_range (time_block.start_time + 20 * Pomodoro.Interval.MINUTE,
-                                  time_block.start_time + 25 * Pomodoro.Interval.MINUTE);
+            var gap_3 = new Ft.Gap ();
+            gap_3.set_time_range (time_block.start_time + 20 * Ft.Interval.MINUTE,
+                                  time_block.start_time + 25 * Ft.Interval.MINUTE);
             time_block.add_gap (gap_3);
             assert_true (time_block.get_last_gap () == gap_3);
         }
 
         public void test_normalize_gaps__invalid ()
         {
-            var time_block = new Pomodoro.TimeBlock ();
+            var time_block = new Ft.TimeBlock ();
 
-            var gap_valid = new Pomodoro.Gap ();
-            gap_valid.set_time_range (10 * Pomodoro.Interval.MINUTE,
-                                      20 * Pomodoro.Interval.MINUTE);
+            var gap_valid = new Ft.Gap ();
+            gap_valid.set_time_range (10 * Ft.Interval.MINUTE,
+                                      20 * Ft.Interval.MINUTE);
 
-            var gap_invalid_undefined_start = new Pomodoro.Gap ();
-            gap_invalid_undefined_start.set_time_range (Pomodoro.Timestamp.UNDEFINED,
-                                                        12 * Pomodoro.Interval.MINUTE);
+            var gap_invalid_undefined_start = new Ft.Gap ();
+            gap_invalid_undefined_start.set_time_range (Ft.Timestamp.UNDEFINED,
+                                                        12 * Ft.Interval.MINUTE);
 
-            var gap_invalid_end_before_start = new Pomodoro.Gap ();
-            gap_invalid_end_before_start.set_time_range (25 * Pomodoro.Interval.MINUTE,
-                                                         24 * Pomodoro.Interval.MINUTE);
+            var gap_invalid_end_before_start = new Ft.Gap ();
+            gap_invalid_end_before_start.set_time_range (25 * Ft.Interval.MINUTE,
+                                                         24 * Ft.Interval.MINUTE);
 
             time_block.add_gap (gap_valid);
             time_block.add_gap (gap_invalid_undefined_start);
@@ -417,11 +425,11 @@ namespace Tests
                         assert_true (gap == gap_valid);
                         assert_cmpvariant (
                             new GLib.Variant.int64 (gap.start_time),
-                            new GLib.Variant.int64 (10 * Pomodoro.Interval.MINUTE)
+                            new GLib.Variant.int64 (10 * Ft.Interval.MINUTE)
                         );
                         assert_cmpvariant (
                             new GLib.Variant.int64 (gap.end_time),
-                            new GLib.Variant.int64 (20 * Pomodoro.Interval.MINUTE)
+                            new GLib.Variant.int64 (20 * Ft.Interval.MINUTE)
                         );
                     }
 
@@ -434,19 +442,19 @@ namespace Tests
         public void test_normalize_gaps__overlap ()
         {
             int gaps_count;
-            // unowned Pomodoro.Gap? gap;
+            // unowned Ft.Gap? gap;
 
             // Case 1: Two finite gaps overlapping. Expect them to be merged into one
             //         by extending the later gap backwards - preserving total duration.
-            var time_block_1 = new Pomodoro.TimeBlock ();
+            var time_block_1 = new Ft.TimeBlock ();
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (10 * Pomodoro.Interval.MINUTE,
-                                  20 * Pomodoro.Interval.MINUTE);
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (10 * Ft.Interval.MINUTE,
+                                  20 * Ft.Interval.MINUTE);
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (18 * Pomodoro.Interval.MINUTE,
-                                  25 * Pomodoro.Interval.MINUTE);
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (18 * Ft.Interval.MINUTE,
+                                  25 * Ft.Interval.MINUTE);
 
             time_block_1.add_gap (gap_1);
             time_block_1.add_gap (gap_2);
@@ -462,11 +470,11 @@ namespace Tests
                     {
                         assert_cmpvariant (
                             new GLib.Variant.int64 (gap.start_time),
-                            new GLib.Variant.int64 (8 * Pomodoro.Interval.MINUTE)
+                            new GLib.Variant.int64 (8 * Ft.Interval.MINUTE)
                         );
                         assert_cmpvariant (
                             new GLib.Variant.int64 (gap.end_time),
-                            new GLib.Variant.int64 (25 * Pomodoro.Interval.MINUTE)
+                            new GLib.Variant.int64 (25 * Ft.Interval.MINUTE)
                         );
                     }
 
@@ -477,15 +485,15 @@ namespace Tests
 
             // Case 2: Overlap with an ongoing (unfinished) next gap. Expect previous gap
             //         to be shifted back.
-            var time_block_2 = new Pomodoro.TimeBlock ();
+            var time_block_2 = new Ft.TimeBlock ();
 
-            var gap_3 = new Pomodoro.Gap ();
-            gap_3.set_time_range (10 * Pomodoro.Interval.MINUTE,
-                                  20 * Pomodoro.Interval.MINUTE);
+            var gap_3 = new Ft.Gap ();
+            gap_3.set_time_range (10 * Ft.Interval.MINUTE,
+                                  20 * Ft.Interval.MINUTE);
 
-            var gap_4 = new Pomodoro.Gap ();
-            gap_4.set_time_range (18 * Pomodoro.Interval.MINUTE,
-                                  Pomodoro.Timestamp.UNDEFINED);
+            var gap_4 = new Ft.Gap ();
+            gap_4.set_time_range (18 * Ft.Interval.MINUTE,
+                                  Ft.Timestamp.UNDEFINED);
 
             time_block_2.add_gap (gap_3);
             time_block_2.add_gap (gap_4);
@@ -500,11 +508,11 @@ namespace Tests
                     {
                         assert_cmpvariant (
                             new GLib.Variant.int64 (gap.start_time),
-                            new GLib.Variant.int64 (8 * Pomodoro.Interval.MINUTE)
+                            new GLib.Variant.int64 (8 * Ft.Interval.MINUTE)
                         );
                         assert_cmpvariant (
                             new GLib.Variant.int64 (gap.end_time),
-                            new GLib.Variant.int64 (18 * Pomodoro.Interval.MINUTE)
+                            new GLib.Variant.int64 (18 * Ft.Interval.MINUTE)
                         );
                     }
 
@@ -512,9 +520,9 @@ namespace Tests
                     {
                         assert_cmpvariant (
                             new GLib.Variant.int64 (gap.start_time),
-                            new GLib.Variant.int64 (18 * Pomodoro.Interval.MINUTE)
+                            new GLib.Variant.int64 (18 * Ft.Interval.MINUTE)
                         );
-                        assert_true (Pomodoro.Timestamp.is_undefined (gap.end_time));
+                        assert_true (Ft.Timestamp.is_undefined (gap.end_time));
                     }
 
                     gaps_count++;
@@ -526,15 +534,15 @@ namespace Tests
         public void test_normalize_gaps__unfinished ()
         {
             // Unfinished (ongoing) gap not overlapping should remain unchanged
-            var time_block = new Pomodoro.TimeBlock ();
+            var time_block = new Ft.TimeBlock ();
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (10 * Pomodoro.Interval.MINUTE,
-                                  15 * Pomodoro.Interval.MINUTE);
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (10 * Ft.Interval.MINUTE,
+                                  15 * Ft.Interval.MINUTE);
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (20 * Pomodoro.Interval.MINUTE,
-                                  Pomodoro.Timestamp.UNDEFINED);
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (20 * Ft.Interval.MINUTE,
+                                  Ft.Timestamp.UNDEFINED);
 
             time_block.add_gap (gap_1);
             time_block.add_gap (gap_2);
@@ -550,11 +558,11 @@ namespace Tests
                     {
                         assert_cmpvariant (
                             new GLib.Variant.int64 (gap.start_time),
-                            new GLib.Variant.int64 (10 * Pomodoro.Interval.MINUTE)
+                            new GLib.Variant.int64 (10 * Ft.Interval.MINUTE)
                         );
                         assert_cmpvariant (
                             new GLib.Variant.int64 (gap.end_time),
-                            new GLib.Variant.int64 (15 * Pomodoro.Interval.MINUTE)
+                            new GLib.Variant.int64 (15 * Ft.Interval.MINUTE)
                         );
                     }
 
@@ -562,9 +570,9 @@ namespace Tests
                     {
                         assert_cmpvariant (
                             new GLib.Variant.int64 (gap.start_time),
-                            new GLib.Variant.int64 (20 * Pomodoro.Interval.MINUTE)
+                            new GLib.Variant.int64 (20 * Ft.Interval.MINUTE)
                         );
-                        assert_true (Pomodoro.Timestamp.is_undefined (gap.end_time));
+                        assert_true (Ft.Timestamp.is_undefined (gap.end_time));
                     }
 
                     gaps_count++;
@@ -575,24 +583,24 @@ namespace Tests
 
         public void test_remove_gap ()
         {
-            var now = Pomodoro.Timestamp.peek ();
-            var time_block = new Pomodoro.TimeBlock ();
-            time_block.set_time_range (now + Pomodoro.Interval.MINUTE,
-                                       now + 30 * Pomodoro.Interval.MINUTE);
+            var now = Ft.Timestamp.peek ();
+            var time_block = new Ft.TimeBlock ();
+            time_block.set_time_range (now + Ft.Interval.MINUTE,
+                                       now + 30 * Ft.Interval.MINUTE);
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (time_block.start_time + 1 * Pomodoro.Interval.MINUTE,
-                                  time_block.start_time + 2 * Pomodoro.Interval.MINUTE);
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (time_block.start_time + 1 * Ft.Interval.MINUTE,
+                                  time_block.start_time + 2 * Ft.Interval.MINUTE);
             time_block.add_gap (gap_1);
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (time_block.start_time + 3 * Pomodoro.Interval.MINUTE,
-                                  time_block.start_time + 4 * Pomodoro.Interval.MINUTE);
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (time_block.start_time + 3 * Ft.Interval.MINUTE,
+                                  time_block.start_time + 4 * Ft.Interval.MINUTE);
             time_block.add_gap (gap_2);
 
-            var gap_3 = new Pomodoro.Gap ();
-            gap_3.set_time_range (time_block.start_time + 5 * Pomodoro.Interval.MINUTE,
-                                  time_block.start_time + 6 * Pomodoro.Interval.MINUTE);
+            var gap_3 = new Ft.Gap ();
+            gap_3.set_time_range (time_block.start_time + 5 * Ft.Interval.MINUTE,
+                                  time_block.start_time + 6 * Ft.Interval.MINUTE);
 
             var changed_emitted = 0;
             time_block.changed.connect (() => {
@@ -615,46 +623,46 @@ namespace Tests
 
         public void test_calculate_elapsed__without_gaps ()
         {
-            var time_block = new Pomodoro.TimeBlock ();
+            var time_block = new Ft.TimeBlock ();
             time_block.set_time_range (
-                5 * Pomodoro.Interval.MINUTE,
-                30 * Pomodoro.Interval.MINUTE);
+                5 * Ft.Interval.MINUTE,
+                30 * Ft.Interval.MINUTE);
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.start_time)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (0 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.start_time - Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.start_time - Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 (0 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.end_time)),
-                new GLib.Variant.int64 (25 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (25 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.end_time + Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 (25 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.end_time + Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 (25 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_elapsed (10 * Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 (5 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_elapsed (10 * Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 (5 * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_elapsed__with_gaps ()
         {
-            var time_block = new Pomodoro.TimeBlock ();
-            time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock ();
+            time_block.set_time_range (5 * Ft.Interval.MINUTE, 30 * Ft.Interval.MINUTE);
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (5 * Pomodoro.Interval.MINUTE, 9 * Pomodoro.Interval.MINUTE);  // 4 minutes
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (5 * Ft.Interval.MINUTE, 9 * Ft.Interval.MINUTE);  // 4 minutes
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (15 * Pomodoro.Interval.MINUTE, 17 * Pomodoro.Interval.MINUTE);  // 2 minutes
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (15 * Ft.Interval.MINUTE, 17 * Ft.Interval.MINUTE);  // 2 minutes
 
-            var gap_3 = new Pomodoro.Gap ();
-            gap_3.set_time_range (29 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);  // 1 minute
+            var gap_3 = new Ft.Gap ();
+            gap_3.set_time_range (29 * Ft.Interval.MINUTE, 30 * Ft.Interval.MINUTE);  // 1 minute
 
             time_block.add_gap (gap_1);
             time_block.add_gap (gap_2);
@@ -662,141 +670,141 @@ namespace Tests
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.start_time)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (0 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (gap_1.end_time)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (0 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.start_time - Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.start_time - Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 (0 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.end_time)),
-                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (gap_3.start_time)),
-                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.end_time + Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.end_time + Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (gap_2.end_time)),
-                new GLib.Variant.int64 ((10 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((10 - 4) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (gap_2.start_time)),
-                new GLib.Variant.int64 ((10 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((10 - 4) * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_elapsed__with_ongoing_gap ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.end_time)),
-                new GLib.Variant.int64 (25 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (25 * Ft.Interval.MINUTE)
             );
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (now + 10 * Pomodoro.Interval.MINUTE,
-                                  Pomodoro.Timestamp.UNDEFINED);
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (now + 10 * Ft.Interval.MINUTE,
+                                  Ft.Timestamp.UNDEFINED);
             time_block.add_gap (gap_1);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.start_time +
-                                                                      Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 (Pomodoro.Interval.MINUTE)
+                                                                      Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 (Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (gap_1.start_time)),
-                new GLib.Variant.int64 (10 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (10 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.end_time)),
-                new GLib.Variant.int64 (10 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (10 * Ft.Interval.MINUTE)
             );
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (now + Pomodoro.Interval.SECOND,
-                                  now + 10 * Pomodoro.Interval.MINUTE);
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (now + Ft.Interval.SECOND,
+                                  now + 10 * Ft.Interval.MINUTE);
             time_block.add_gap (gap_2);
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (time_block.end_time)),
-                new GLib.Variant.int64 (Pomodoro.Interval.SECOND)
+                new GLib.Variant.int64 (Ft.Interval.SECOND)
             );
         }
 
         public void test_calculate_elapsed__with_gaps_overlapping ()
         {
-            var time_block = new Pomodoro.TimeBlock ();
-            time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock ();
+            time_block.set_time_range (5 * Ft.Interval.MINUTE, 30 * Ft.Interval.MINUTE);
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (7 * Pomodoro.Interval.MINUTE, 11 * Pomodoro.Interval.MINUTE);  // 4 minutes
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (7 * Ft.Interval.MINUTE, 11 * Ft.Interval.MINUTE);  // 4 minutes
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (10 * Pomodoro.Interval.MINUTE, 13 * Pomodoro.Interval.MINUTE);  // 3 minutes, 1 minute ovrlapping
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (10 * Ft.Interval.MINUTE, 13 * Ft.Interval.MINUTE);  // 3 minutes, 1 minute ovrlapping
 
             time_block.add_gap (gap_1);
             time_block.add_gap (gap_2);
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (gap_1.end_time)),
-                new GLib.Variant.int64 ((6 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((6 - 4) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_elapsed (gap_2.end_time)),
-                new GLib.Variant.int64 ((8 - 4 - 3 + 1) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((8 - 4 - 3 + 1) * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_remaining__without_gaps ()
         {
-            var time_block = new Pomodoro.TimeBlock ();
-            time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock ();
+            time_block.set_time_range (5 * Ft.Interval.MINUTE, 30 * Ft.Interval.MINUTE);
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (time_block.start_time)),
-                new GLib.Variant.int64 (25 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (25 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.start_time - Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 (25 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.start_time - Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 (25 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (time_block.end_time)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (0 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.end_time + Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.end_time + Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 (0 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (10 * Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 (20 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_remaining (10 * Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 (20 * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_remaining__with_gaps ()
         {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.STOPPED);
-            time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock (Ft.State.STOPPED);
+            time_block.set_time_range (5 * Ft.Interval.MINUTE, 30 * Ft.Interval.MINUTE);
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (2 * Pomodoro.Interval.MINUTE, 9 * Pomodoro.Interval.MINUTE);  // 4 minutes
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (2 * Ft.Interval.MINUTE, 9 * Ft.Interval.MINUTE);  // 4 minutes
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (15 * Pomodoro.Interval.MINUTE, 17 * Pomodoro.Interval.MINUTE);  // 2 minutes
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (15 * Ft.Interval.MINUTE, 17 * Ft.Interval.MINUTE);  // 2 minutes
 
-            var gap_3 = new Pomodoro.Gap ();
-            gap_3.set_time_range (29 * Pomodoro.Interval.MINUTE, 35 * Pomodoro.Interval.MINUTE);  // 1 minute
+            var gap_3 = new Ft.Gap ();
+            gap_3.set_time_range (29 * Ft.Interval.MINUTE, 35 * Ft.Interval.MINUTE);  // 1 minute
 
             time_block.add_gap (gap_1);
             time_block.add_gap (gap_2);
@@ -804,145 +812,145 @@ namespace Tests
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (time_block.start_time)),
-                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_1.end_time)),
-                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.start_time - Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.start_time - Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 ((25 - 1 - 2 - 4) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (time_block.end_time)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (0 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_3.start_time)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (0 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.end_time + Pomodoro.Interval.MINUTE)),
-                new GLib.Variant.int64 (0 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_remaining (time_block.end_time + Ft.Interval.MINUTE)),
+                new GLib.Variant.int64 (0 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_2.end_time)),
-                new GLib.Variant.int64 ((13 - 1) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((13 - 1) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_2.start_time)),
-                new GLib.Variant.int64 ((13 - 1) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((13 - 1) * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_remaining__with_ongoing_gap ()
         {
-            var now = Pomodoro.Timestamp.peek ();
+            var now = Ft.Timestamp.peek ();
 
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.POMODORO);
-            time_block.set_time_range (now, now + 25 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock (Ft.State.POMODORO);
+            time_block.set_time_range (now, now + 25 * Ft.Interval.MINUTE);
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (now + 1 * Pomodoro.Interval.MINUTE,
-                                  now + 5 * Pomodoro.Interval.MINUTE);
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (now + 1 * Ft.Interval.MINUTE,
+                                  now + 5 * Ft.Interval.MINUTE);
             time_block.add_gap (gap_1);
             time_block.duration += gap_1.duration;
 
-            var gap_2 = new Pomodoro.Gap.with_start_time (now + 10 * Pomodoro.Interval.MINUTE);
+            var gap_2 = new Ft.Gap.with_start_time (now + 10 * Ft.Interval.MINUTE);
             time_block.add_gap (gap_2);
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (time_block.start_time)),
-                new GLib.Variant.int64 (25 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (25 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_1.start_time)),
-                new GLib.Variant.int64 (24 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (24 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_1.end_time)),
-                new GLib.Variant.int64 (24 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (24 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_2.start_time)),
-                new GLib.Variant.int64 (19 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (19 * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
-                new GLib.Variant.int64 (time_block.calculate_remaining (gap_2.start_time + Pomodoro.Interval.HOUR)),
-                new GLib.Variant.int64 (19 * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 (time_block.calculate_remaining (gap_2.start_time + Ft.Interval.HOUR)),
+                new GLib.Variant.int64 (19 * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_remaining__with_gaps_overlapping ()
         {
-            var time_block = new Pomodoro.TimeBlock ();
-            time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
+            var time_block = new Ft.TimeBlock ();
+            time_block.set_time_range (5 * Ft.Interval.MINUTE, 30 * Ft.Interval.MINUTE);
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (7 * Pomodoro.Interval.MINUTE, 11 * Pomodoro.Interval.MINUTE);  // 4 minutes
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (7 * Ft.Interval.MINUTE, 11 * Ft.Interval.MINUTE);  // 4 minutes
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (10 * Pomodoro.Interval.MINUTE, 13 * Pomodoro.Interval.MINUTE);  // 3 minutes, 1 minute ovrlapping
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (10 * Ft.Interval.MINUTE, 13 * Ft.Interval.MINUTE);  // 3 minutes, 1 minute ovrlapping
 
             time_block.add_gap (gap_1);
             time_block.add_gap (gap_2);
 
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_1.start_time)),
-                new GLib.Variant.int64 ((25 - 2 - 4 - 3 + 1) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((25 - 2 - 4 - 3 + 1) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_1.end_time)),
-                new GLib.Variant.int64 ((25 - 6 - 3 + 1) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((25 - 6 - 3 + 1) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_2.start_time)),
-                new GLib.Variant.int64 ((25 - 5 - 3) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((25 - 5 - 3) * Ft.Interval.MINUTE)
             );
             assert_cmpvariant (
                 new GLib.Variant.int64 (time_block.calculate_remaining (gap_2.end_time)),
-                new GLib.Variant.int64 ((25 - 8) * Pomodoro.Interval.MINUTE)
+                new GLib.Variant.int64 ((25 - 8) * Ft.Interval.MINUTE)
             );
         }
 
         public void test_calculate_progress__without_gaps ()
         {
-            var time_block = new Pomodoro.TimeBlock ();
-            time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var time_block = new Ft.TimeBlock ();
+            time_block.set_time_range (5 * Ft.Interval.MINUTE, 30 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
             assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.start_time),
                                           0.0,
                                           0.0001);
-            assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.start_time - Pomodoro.Interval.MINUTE),
+            assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.start_time - Ft.Interval.MINUTE),
                                           0.0,
                                           0.0001);
             assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.end_time),
                                           1.0,
                                           0.0001);
-            assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.end_time + Pomodoro.Interval.MINUTE),
+            assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.end_time + Ft.Interval.MINUTE),
                                           1.04,
                                           0.0001);
-            assert_cmpfloat_with_epsilon (time_block.calculate_progress (10 * Pomodoro.Interval.MINUTE),
+            assert_cmpfloat_with_epsilon (time_block.calculate_progress (10 * Ft.Interval.MINUTE),
                                           0.2,
                                           0.0001);
         }
 
         public void test_calculate_progress__with_gaps ()
         {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.STOPPED);
-            time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var time_block = new Ft.TimeBlock (Ft.State.STOPPED);
+            time_block.set_time_range (5 * Ft.Interval.MINUTE, 30 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var gap_1 = new Pomodoro.Gap ();
-            gap_1.set_time_range (2 * Pomodoro.Interval.MINUTE, 9 * Pomodoro.Interval.MINUTE);  // 4 minutes
+            var gap_1 = new Ft.Gap ();
+            gap_1.set_time_range (2 * Ft.Interval.MINUTE, 9 * Ft.Interval.MINUTE);  // 4 minutes
 
-            var gap_2 = new Pomodoro.Gap ();
-            gap_2.set_time_range (15 * Pomodoro.Interval.MINUTE, 17 * Pomodoro.Interval.MINUTE);  // 2 minutes
+            var gap_2 = new Ft.Gap ();
+            gap_2.set_time_range (15 * Ft.Interval.MINUTE, 17 * Ft.Interval.MINUTE);  // 2 minutes
 
-            var gap_3 = new Pomodoro.Gap ();
-            gap_3.set_time_range (29 * Pomodoro.Interval.MINUTE, 35 * Pomodoro.Interval.MINUTE);  // 1 minute
+            var gap_3 = new Ft.Gap ();
+            gap_3.set_time_range (29 * Ft.Interval.MINUTE, 35 * Ft.Interval.MINUTE);  // 1 minute
 
             time_block.add_gap (gap_1);
             time_block.add_gap (gap_2);
@@ -954,7 +962,7 @@ namespace Tests
             assert_cmpfloat_with_epsilon (time_block.calculate_progress (gap_1.end_time),
                                           0.0,
                                           0.0001);
-            assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.start_time - Pomodoro.Interval.MINUTE),
+            assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.start_time - Ft.Interval.MINUTE),
                                           0.0,
                                           0.0001);
             assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.end_time),
@@ -963,7 +971,7 @@ namespace Tests
             assert_cmpfloat_with_epsilon (time_block.calculate_progress (gap_3.start_time),
                                           1.0,
                                           0.0001);
-            assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.end_time + Pomodoro.Interval.MINUTE),
+            assert_cmpfloat_with_epsilon (time_block.calculate_progress (time_block.end_time + Ft.Interval.MINUTE),
                                           1.0,
                                           0.0001);
             assert_cmpfloat_with_epsilon (time_block.calculate_progress (gap_2.end_time),
@@ -976,20 +984,20 @@ namespace Tests
 
         public void test_calculate_progress__with_ongoing_gap ()
         {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.STOPPED);
-            time_block.set_time_range (5 * Pomodoro.Interval.MINUTE, 30 * Pomodoro.Interval.MINUTE);
-            time_block.set_completion_time (25 * Pomodoro.Interval.MINUTE);
-            time_block.set_status (Pomodoro.TimeBlockStatus.IN_PROGRESS);
+            var time_block = new Ft.TimeBlock (Ft.State.STOPPED);
+            time_block.set_time_range (5 * Ft.Interval.MINUTE, 30 * Ft.Interval.MINUTE);
+            time_block.set_completion_time (25 * Ft.Interval.MINUTE);
+            time_block.set_status (Ft.TimeBlockStatus.IN_PROGRESS);
 
-            var gap = new Pomodoro.Gap ();
-            gap.set_time_range (10 * Pomodoro.Interval.MINUTE, Pomodoro.Timestamp.UNDEFINED);
+            var gap = new Ft.Gap ();
+            gap.set_time_range (10 * Ft.Interval.MINUTE, Ft.Timestamp.UNDEFINED);
 
             time_block.add_gap (gap);
 
             assert_cmpfloat_with_epsilon (time_block.calculate_progress (gap.start_time),
                                           0.25,
                                           0.0001);
-            assert_cmpfloat_with_epsilon (time_block.calculate_progress (gap.start_time + Pomodoro.Interval.MINUTE),
+            assert_cmpfloat_with_epsilon (time_block.calculate_progress (gap.start_time + Ft.Interval.MINUTE),
                                           0.25,
                                           0.0001);
         }

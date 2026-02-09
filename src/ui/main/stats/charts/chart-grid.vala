@@ -1,22 +1,22 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public class ChartGrid : Gtk.Widget
     {
-        public Pomodoro.ChartAxis x_axis {
+        public Ft.ChartAxis x_axis {
             get {
                 return this._x_axis;
             }
         }
 
-        public Pomodoro.ChartAxis y_axis {
+        public Ft.ChartAxis y_axis {
             get {
                 return this._y_axis;
             }
@@ -73,21 +73,21 @@ namespace Pomodoro
             }
         }
 
-        private unowned Pomodoro.ChartAxis? _x_axis = null;
-        private unowned Pomodoro.ChartAxis? _y_axis = null;
-        private int                         _x_origin = 0;
-        private int                         _y_origin = 0;
-        private float                       _line_width = 1.0f;
-        private bool                        _horizontal = true;
-        private bool                        _vertical = true;
+        private unowned Ft.ChartAxis?   _x_axis = null;
+        private unowned Ft.ChartAxis?   _y_axis = null;
+        private int                     _x_origin = 0;
+        private int                     _y_origin = 0;
+        private float                   _line_width = 1.0f;
+        private bool                    _horizontal = true;
+        private bool                    _vertical = true;
 
         static construct
         {
             set_css_name ("chartgrid");
         }
 
-        public ChartGrid (Pomodoro.ChartAxis? x_axis,
-                          Pomodoro.ChartAxis? y_axis)
+        public ChartGrid (Ft.ChartAxis? x_axis,
+                          Ft.ChartAxis? y_axis)
         {
             this._x_axis = x_axis;
             this._y_axis = y_axis;

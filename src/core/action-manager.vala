@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016,2025 gnome-pomodoro contributors
+ * Copyright (c) 2016,2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * Glue together actions storage with event bus and logger (for things related to actions).
@@ -17,22 +17,22 @@ namespace Pomodoro
     [SingleInstance]
     public class ActionManager : GLib.Object
     {
-        public Pomodoro.ActionListModel model { get; construct; }
+        public Ft.ActionListModel model { get; construct; }
 
-        private Pomodoro.Logger? logger = null;
+        private Ft.Logger? logger = null;
 
         construct
         {
-            this.model = new Pomodoro.ActionListModel ();
+            this.model = new Ft.ActionListModel ();
             this.model.action_added.connect (this.on_action_added);
             this.model.action_removed.connect (this.on_action_removed);
 
-            this.logger = new Pomodoro.Logger ();
+            this.logger = new Ft.Logger ();
 
             this.bind_actions ();
         }
 
-        private void foreach_action (GLib.Func<Pomodoro.Action> func)
+        private void foreach_action (GLib.Func<Ft.Action> func)
         {
             if (this.model == null) {
                 return;
@@ -42,20 +42,20 @@ namespace Pomodoro
             var n_items = model.n_items;
 
             for (var position = 0U; position < n_items; position++) {
-                func ((Pomodoro.Action) model.get_item (position));
+                func ((Ft.Action) model.get_item (position));
             }
         }
 
-        private void bind_action (Pomodoro.Action action)
+        private void bind_action (Ft.Action action)
         {
             action.notify["enabled"].connect (this.on_action_notify_enabled);
 
-            var event_action = action as Pomodoro.EventAction;
+            var event_action = action as Ft.EventAction;
             if (event_action != null) {
                 event_action.triggered.connect (this.on_triggered);
             }
 
-            var condition_action = action as Pomodoro.ConditionAction;
+            var condition_action = action as Ft.ConditionAction;
             if (condition_action != null) {
                 condition_action.entered_condition.connect (this.on_entered_condition);
                 condition_action.exited_condition.connect (this.on_exited_condition);
@@ -66,16 +66,16 @@ namespace Pomodoro
             }
         }
 
-        private void unbind_action (Pomodoro.Action action)
+        private void unbind_action (Ft.Action action)
         {
             action.notify["enabled"].disconnect (this.on_action_notify_enabled);
 
-            var event_action = action as Pomodoro.EventAction;
+            var event_action = action as Ft.EventAction;
             if (event_action != null) {
                 event_action.triggered.disconnect (this.on_triggered);
             }
 
-            var condition_action = action as Pomodoro.ConditionAction;
+            var condition_action = action as Ft.ConditionAction;
             if (condition_action != null) {
                 condition_action.entered_condition.disconnect (this.on_entered_condition);
                 condition_action.exited_condition.disconnect (this.on_exited_condition);
@@ -103,8 +103,8 @@ namespace Pomodoro
         /**
          * We don't notify about validation errors
          */
-        private void notify_action_failed (Pomodoro.Action           action,
-                                           Pomodoro.CommandExecution execution,
+        private void notify_action_failed (Ft.Action           action,
+                                           Ft.CommandExecution execution,
                                            ulong                     entry_id)
         {
             var notification = new GLib.Notification (
@@ -129,9 +129,9 @@ namespace Pomodoro
                             .send_notification (@"action:$(action.uuid)", notification);
         }
 
-        private void watch_action_failed (Pomodoro.Action            action,
-                                          Pomodoro.CommandExecution? execution,
-                                          ulong                      entry_id)
+        private void watch_action_failed (Ft.Action            action,
+                                          Ft.CommandExecution? execution,
+                                          ulong                entry_id)
         {
             if (execution == null) {
                 return;
@@ -151,7 +151,7 @@ namespace Pomodoro
         private void on_action_notify_enabled (GLib.Object    object,
                                                GLib.ParamSpec pspec)
         {
-            var action = (Pomodoro.Action) object;
+            var action = (Ft.Action) object;
 
             // Sync settings attribute without doing full save
             action.settings.set_boolean ("enabled", action.enabled);
@@ -166,41 +166,41 @@ namespace Pomodoro
             // TODO: log action toggled
         }
 
-        private void on_triggered (Pomodoro.EventAction       action,
-                                   Pomodoro.Context           context,
-                                   Pomodoro.CommandExecution? execution)
+        private void on_triggered (Ft.EventAction       action,
+                                   Ft.Context           context,
+                                   Ft.CommandExecution? execution)
         {
             var entry_id = this.logger.log_action_triggered (action, context, execution);
 
             this.watch_action_failed (action, execution, entry_id);
         }
 
-        private void on_entered_condition (Pomodoro.ConditionAction   action,
-                                           Pomodoro.Context           context,
-                                           Pomodoro.CommandExecution? execution)
+        private void on_entered_condition (Ft.ConditionAction   action,
+                                           Ft.Context           context,
+                                           Ft.CommandExecution? execution)
         {
             var entry_id = this.logger.log_action_entered_condition (action, context, execution);
 
             this.watch_action_failed (action, execution, entry_id);
         }
 
-        private void on_exited_condition (Pomodoro.ConditionAction   action,
-                                          Pomodoro.Context           context,
-                                          Pomodoro.CommandExecution? execution)
+        private void on_exited_condition (Ft.ConditionAction   action,
+                                          Ft.Context           context,
+                                          Ft.CommandExecution? execution)
         {
             var entry_id = this.logger.log_action_exited_condition (action, context, execution);
 
             this.watch_action_failed (action, execution, entry_id);
         }
 
-        private void on_action_added (Pomodoro.Action action)
+        private void on_action_added (Ft.Action action)
         {
             this.bind_action (action);
 
             // TODO: log action added
         }
 
-        private void on_action_removed (Pomodoro.Action action)
+        private void on_action_removed (Ft.Action action)
         {
             this.unbind_action (action);
 

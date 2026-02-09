@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    private Pomodoro.Expression? ensure_operation (Pomodoro.Expression? expression)
+    private Ft.Expression? ensure_operation (Ft.Expression? expression)
     {
-        return (expression is Pomodoro.Operation)
-            ? expression
-            : new Pomodoro.Operation (Pomodoro.Operator.AND, expression);
+        return (expression is Ft.Operation)
+                ? expression
+                : new Ft.Operation (Ft.Operator.AND, expression);
     }
 
 
@@ -46,22 +46,22 @@ namespace Pomodoro
     }
 
 
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/automation/action/action-edit-window.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/automation/action/action-edit-window.ui")]
     public class ActionEditWindow : Adw.Window
     {
         public string? action_uuid { get; construct; }
         public bool creating { get; construct; }
 
-        public Pomodoro.ActionTrigger trigger
+        public Ft.ActionTrigger trigger
         {
             get {
                 return this.event_radio.active
-                    ? Pomodoro.ActionTrigger.EVENT
-                    : Pomodoro.ActionTrigger.CONDITION;
+                        ? Ft.ActionTrigger.EVENT
+                        : Ft.ActionTrigger.CONDITION;
             }
             set {
-                this.event_radio.active = value == Pomodoro.ActionTrigger.EVENT;
-                this.condition_radio.active = value == Pomodoro.ActionTrigger.CONDITION;
+                this.event_radio.active = value == Ft.ActionTrigger.EVENT;
+                this.condition_radio.active = value == Ft.ActionTrigger.CONDITION;
             }
         }
 
@@ -168,7 +168,7 @@ namespace Pomodoro
         [GtkChild]
         private unowned Adw.PreferencesGroup events_group;
         [GtkChild]
-        private unowned Pomodoro.ConditionGroupWidget condition_group_widget;
+        private unowned Ft.ConditionGroupWidget condition_group_widget;
         [GtkChild]
         private unowned Gtk.MenuButton add_event_button;
         [GtkChild]
@@ -176,7 +176,7 @@ namespace Pomodoro
         [GtkChild]
         private unowned Adw.PreferencesGroup event_condition_group;
         [GtkChild]
-        private unowned Pomodoro.ConditionGroupWidget event_condition_group_widget;
+        private unowned Ft.ConditionGroupWidget event_condition_group_widget;
         [GtkChild]
         private unowned Adw.EntryRow working_directory_entryrow;
         [GtkChild]
@@ -186,17 +186,17 @@ namespace Pomodoro
         [GtkChild]
         private unowned Adw.SwitchRow wait_for_completion_switchrow;
         [GtkChild]
-        private unowned Pomodoro.CommandEntryRow command_entryrow;
+        private unowned Ft.CommandEntryRow command_entryrow;
         [GtkChild]
-        private unowned Pomodoro.CommandEntryRow enter_command_entryrow;
+        private unowned Ft.CommandEntryRow enter_command_entryrow;
         [GtkChild]
-        private unowned Pomodoro.CommandEntryRow exit_command_entryrow;
+        private unowned Ft.CommandEntryRow exit_command_entryrow;
         [GtkChild]
         private unowned Adw.PreferencesGroup buttons_group;
 
-        private Pomodoro.ActionManager? action_manager = null;
-        private Pomodoro.EventProducer? event_producer = null;
-        private unowned Gtk.ListBox?    events_listbox = null;
+        private Ft.ActionManager?    action_manager = null;
+        private Ft.EventProducer?    event_producer = null;
+        private unowned Gtk.ListBox? events_listbox = null;
 
         public ActionEditWindow (string? action_uuid = null)
         {
@@ -237,8 +237,8 @@ namespace Pomodoro
                 GLib.warning ("Could not find events listbox.");
             }
 
-            this.action_manager = new Pomodoro.ActionManager ();
-            this.event_producer = new Pomodoro.EventProducer ();  // TODO: get from action manager
+            this.action_manager = new Ft.ActionManager ();
+            this.event_producer = new Ft.EventProducer ();  // TODO: get from action manager
 
             this.add_event_button.menu_model = this.create_add_event_menu ();
             this.events_listbox = events_listbox;
@@ -266,15 +266,15 @@ namespace Pomodoro
                 : null;
 
             if (action == null) {
-                action = new Pomodoro.EventAction (this.action_uuid);
+                action = new Ft.EventAction (this.action_uuid);
             }
 
             this.enabled = action.enabled;
             this.display_name = action.display_name;
 
-            if (action is Pomodoro.EventAction)
+            if (action is Ft.EventAction)
             {
-                var event_action = (Pomodoro.EventAction) action;
+                var event_action = (Ft.EventAction) action;
                 var condition = event_action.condition;
                 var command = event_action.command;
                 var row = this.events_group.get_first_child ();
@@ -283,7 +283,7 @@ namespace Pomodoro
                 {
                     var next_sibling = row.get_next_sibling ();
 
-                    if (row is Pomodoro.EventRow) {
+                    if (row is Ft.EventRow) {
                         this.events_group.remove (row);
                     }
 
@@ -299,7 +299,7 @@ namespace Pomodoro
                     }
                 }
 
-                this.trigger = Pomodoro.ActionTrigger.EVENT;
+                this.trigger = Ft.ActionTrigger.EVENT;
                 this.event_condition_group_widget.expression = ensure_operation (condition);
                 this.event_condition_button.active = condition != null;
                 this.wait_for_completion = event_action.wait_for_completion;
@@ -312,15 +312,15 @@ namespace Pomodoro
                 }
             }
 
-            if (action is Pomodoro.ConditionAction)
+            if (action is Ft.ConditionAction)
             {
-                var condition_action = (Pomodoro.ConditionAction) action;
+                var condition_action = (Ft.ConditionAction) action;
                 var condition = action.condition;
                 var enter_command = condition_action.enter_command;
                 var exit_command = condition_action.exit_command;
                 var any_command = enter_command != null ? enter_command : exit_command;
 
-                this.trigger = Pomodoro.ActionTrigger.CONDITION;
+                this.trigger = Ft.ActionTrigger.CONDITION;
                 this.condition_group_widget.expression = ensure_operation (condition);
 
                 if (enter_command != null) {
@@ -347,9 +347,9 @@ namespace Pomodoro
             action.enabled = this.enabled;
             action.display_name = this.display_name;
 
-            if (action is Pomodoro.EventAction)
+            if (action is Ft.EventAction)
             {
-                var event_action = (Pomodoro.EventAction) action;
+                var event_action = (Ft.EventAction) action;
 
                 event_action.event_names = this.get_event_names ();
                 event_action.condition = event_condition_button.active
@@ -357,24 +357,24 @@ namespace Pomodoro
                     : null;
                 event_action.wait_for_completion = this.wait_for_completion;
 
-                event_action.command = new Pomodoro.Command (this.command_line);
+                event_action.command = new Ft.Command (this.command_line);
                 event_action.command.working_directory = this.working_directory;
                 event_action.command.use_subshell = this.use_subshell;
                 event_action.command.pass_input = this.pass_input;
             }
 
-            if (action is Pomodoro.ConditionAction)
+            if (action is Ft.ConditionAction)
             {
-                var condition_action = (Pomodoro.ConditionAction) action;
+                var condition_action = (Ft.ConditionAction) action;
 
                 condition_action.condition = this.condition_group_widget.expression;
 
-                condition_action.enter_command = new Pomodoro.Command (this.enter_command_line);
+                condition_action.enter_command = new Ft.Command (this.enter_command_line);
                 condition_action.enter_command.working_directory = this.working_directory;
                 condition_action.enter_command.use_subshell = this.use_subshell;
                 condition_action.enter_command.pass_input = this.pass_input;
 
-                condition_action.exit_command = new Pomodoro.Command (this.exit_command_line);
+                condition_action.exit_command = new Ft.Command (this.exit_command_line);
                 condition_action.exit_command.working_directory = this.working_directory;
                 condition_action.exit_command.use_subshell = this.use_subshell;
                 condition_action.exit_command.pass_input = this.pass_input;
@@ -393,7 +393,7 @@ namespace Pomodoro
         private GLib.Menu create_add_event_menu ()
         {
             var menu = new GLib.Menu ();
-            var sections = new GLib.HashTable<Pomodoro.EventCategory, GLib.Menu> (
+            var sections = new GLib.HashTable<Ft.EventCategory, GLib.Menu> (
                     GLib.direct_hash, GLib.direct_equal);
 
             foreach (var event_spec in this.event_producer.list_events ())
@@ -413,7 +413,7 @@ namespace Pomodoro
                 section.append_item (section_item);
             }
 
-            Pomodoro.EventCategory.@foreach (
+            Ft.EventCategory.@foreach (
                 (category) => {
                     var section = sections.lookup (category);
 

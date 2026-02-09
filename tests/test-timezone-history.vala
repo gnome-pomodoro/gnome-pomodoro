@@ -1,3 +1,11 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     private int64[] generate_random_timestamps (uint size)
@@ -70,17 +78,17 @@ namespace Tests
                 assert_no_error (error);
             }
 
-            Pomodoro.Database.open ();
+            Ft.Database.open ();
         }
 
         public override void teardown ()
         {
-            Pomodoro.Database.close ();
+            Ft.Database.close ();
         }
 
         public void test_insert__reverse_order ()
         {
-            var timezone_history = new Pomodoro.TimezoneHistory ();
+            var timezone_history = new Ft.TimezoneHistory ();
             timezone_history.insert (400, this.new_york_timezone);
             timezone_history.insert (300, this.london_timezone);
             timezone_history.insert (200, this.new_york_timezone);
@@ -108,7 +116,7 @@ namespace Tests
         {
             GLib.TimeZone? timezone;
 
-            var timezone_history = new Pomodoro.TimezoneHistory ();
+            var timezone_history = new Ft.TimezoneHistory ();
 
             timezone_history.insert (200, this.new_york_timezone);
             timezone = timezone_history.search (200);
@@ -127,7 +135,7 @@ namespace Tests
 
         public void test_insert__duplicate ()
         {
-            var timezone_history = new Pomodoro.TimezoneHistory ();
+            var timezone_history = new Ft.TimezoneHistory ();
             timezone_history.insert (200, this.new_york_timezone);
             timezone_history.insert (300, this.new_york_timezone);
 
@@ -140,7 +148,7 @@ namespace Tests
 
         public void test_search__null ()
         {
-            var timezone_history = new Pomodoro.TimezoneHistory ();
+            var timezone_history = new Ft.TimezoneHistory ();
             timezone_history.insert (200, this.new_york_timezone);
 
             unowned var timezone = timezone_history.search (199);
@@ -149,7 +157,7 @@ namespace Tests
 
         public void test_search__exact ()
         {
-            var timezone_history = new Pomodoro.TimezoneHistory ();
+            var timezone_history = new Ft.TimezoneHistory ();
             timezone_history.insert (200, this.new_york_timezone);
             timezone_history.insert (300, this.london_timezone);
             timezone_history.insert (400, this.new_york_timezone);
@@ -175,7 +183,7 @@ namespace Tests
 
         public void test_search__closest ()
         {
-            var timezone_history = new Pomodoro.TimezoneHistory ();
+            var timezone_history = new Ft.TimezoneHistory ();
             timezone_history.insert (200, this.new_york_timezone);
             timezone_history.insert (300, this.london_timezone);
 
@@ -192,12 +200,12 @@ namespace Tests
                            "Europe/London");
         }
 
-        private void test_scan (Pomodoro.TimezoneHistory timezone_history,
-                                int64                    start_time,
-                                int64                    end_time,
-                                int64[]                  expected_start_times,
-                                int64[]                  expected_end_times,
-                                string[]                 expected_timezone_identifiers)
+        private void test_scan (Ft.TimezoneHistory timezone_history,
+                                int64              start_time,
+                                int64              end_time,
+                                int64[]            expected_start_times,
+                                int64[]            expected_end_times,
+                                string[]           expected_timezone_identifiers)
         {
             int64[] start_times = {};
             int64[] end_times = {};
@@ -225,7 +233,7 @@ namespace Tests
 
         public void test_scan__timezones ()
         {
-            var timezone_history = new Pomodoro.TimezoneHistory ();
+            var timezone_history = new Ft.TimezoneHistory ();
             timezone_history.insert (200, this.new_york_timezone);
             timezone_history.insert (300, this.london_timezone);
             timezone_history.insert (400, this.tokyo_timezone);
@@ -249,12 +257,12 @@ namespace Tests
 
         public void test_scan__dst_switch ()
         {
-            var dst_switch_time = Pomodoro.Timestamp.from_datetime (
+            var dst_switch_time = Ft.Timestamp.from_datetime (
                     new GLib.DateTime (this.new_york_timezone, 2000, 4, 2, 2, 0, 0));
-            var start_time = dst_switch_time - Pomodoro.Interval.MINUTE;
-            var end_time = dst_switch_time + Pomodoro.Interval.MINUTE;
+            var start_time = dst_switch_time - Ft.Interval.MINUTE;
+            var end_time = dst_switch_time + Ft.Interval.MINUTE;
 
-            var timezone_history = new Pomodoro.TimezoneHistory ();
+            var timezone_history = new Ft.TimezoneHistory ();
             timezone_history.insert (start_time, this.new_york_timezone);
 
             this.test_scan (
@@ -266,7 +274,7 @@ namespace Tests
 
         public void test_fetch ()
         {
-            var timezone_history = new Pomodoro.TimezoneHistory ();
+            var timezone_history = new Ft.TimezoneHistory ();
             var timestamps = generate_random_timestamps (1000);
 
             for (var index = 0; index < timestamps.length; index++)
@@ -279,7 +287,7 @@ namespace Tests
             // Destroy one instance to check if entries have been saved and a new instance is
             // fetching it properly.
             timezone_history = null;
-            timezone_history = new Pomodoro.TimezoneHistory ();
+            timezone_history = new Ft.TimezoneHistory ();
 
             for (var index = 0; index < timestamps.length; index++)
             {
@@ -295,15 +303,15 @@ namespace Tests
 
         public void test_fetch__max ()
         {
-            var timestamp = Pomodoro.Timestamp.MAX;
+            var timestamp = Ft.Timestamp.MAX;
 
-            var timezone_history = new Pomodoro.TimezoneHistory ();
+            var timezone_history = new Ft.TimezoneHistory ();
             timezone_history.insert (timestamp, this.new_york_timezone);
 
             // Destroy one instance to check if entries have been saved and a new instance is
             // fetching it properly.
             timezone_history = null;
-            timezone_history = new Pomodoro.TimezoneHistory ();
+            timezone_history = new Ft.TimezoneHistory ();
 
             unowned var timezone = timezone_history.search (timestamp);
             assert_nonnull (timezone);

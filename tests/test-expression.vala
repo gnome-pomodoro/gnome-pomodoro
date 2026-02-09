@@ -1,7 +1,15 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
-    public inline void assert_value_equals (Pomodoro.Value value,
-                                            Pomodoro.Value expected_value)
+    public inline void assert_value_equals (Ft.Value value,
+                                            Ft.Value expected_value)
     {
         assert_cmpstr (value.get_type_name (),
                        GLib.CompareOperator.EQ,
@@ -14,7 +22,7 @@ namespace Tests
 
     public class ConstantTest : Tests.TestSuite
     {
-        private Pomodoro.Context? context;
+        private Ft.Context? context;
 
         public ConstantTest ()
         {
@@ -26,7 +34,7 @@ namespace Tests
 
         public override void setup ()
         {
-            this.context = new Pomodoro.Context ();
+            this.context = new Ft.Context ();
         }
 
         public override void teardown ()
@@ -36,14 +44,14 @@ namespace Tests
 
         public void test_state ()
         {
-            var state = Pomodoro.State.BREAK;
-            var constant = new Pomodoro.Constant (new Pomodoro.StateValue (state));
+            var state = Ft.State.BREAK;
+            var constant = new Ft.Constant (new Ft.StateValue (state));
 
             try {
                 assert_value_equals (constant.evaluate (this.context),
-                                     new Pomodoro.StateValue (state));
+                                     new Ft.StateValue (state));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
 
@@ -54,34 +62,34 @@ namespace Tests
 
         public void test_timestamp ()
         {
-            var timestamp = Pomodoro.Timestamp.from_now ();
-            var constant = new Pomodoro.Constant (new Pomodoro.TimestampValue (timestamp));
+            var timestamp = Ft.Timestamp.from_now ();
+            var constant = new Ft.Constant (new Ft.TimestampValue (timestamp));
 
             try {
                 assert_value_equals (constant.evaluate (this.context),
-                                     new Pomodoro.TimestampValue (timestamp));
+                                     new Ft.TimestampValue (timestamp));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
 
             assert_cmpstr (constant.to_string (),
                            GLib.CompareOperator.EQ,
-                           @"\"$(Pomodoro.Timestamp.to_iso8601(timestamp))\"");
+                           @"\"$(Ft.Timestamp.to_iso8601(timestamp))\"");
         }
 
         public void test_interval ()
         {
-            var interval = Pomodoro.Interval.HOUR;
-            var constant = new Pomodoro.Constant (new Pomodoro.IntervalValue (interval));
+            var interval = Ft.Interval.HOUR;
+            var constant = new Ft.Constant (new Ft.IntervalValue (interval));
 
             try {
                 assert_value_equals (
                     constant.evaluate (this.context),
-                    new Pomodoro.IntervalValue (interval)
+                    new Ft.IntervalValue (interval)
                 );
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
 
@@ -92,13 +100,13 @@ namespace Tests
 
         public void test_boolean ()
         {
-            var constant = new Pomodoro.Constant (new Pomodoro.BooleanValue (true));
+            var constant = new Ft.Constant (new Ft.BooleanValue (true));
 
             try {
                 assert_value_equals (constant.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (true));
+                                     new Ft.BooleanValue (true));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
 
@@ -111,7 +119,7 @@ namespace Tests
 
     public class VariableTest : Tests.TestSuite
     {
-        private Pomodoro.Context? context;
+        private Ft.Context? context;
 
         public VariableTest ()
         {
@@ -132,13 +140,13 @@ namespace Tests
 
         public override void setup ()
         {
-            var time_block = new Pomodoro.TimeBlock (Pomodoro.State.SHORT_BREAK);
+            var time_block = new Ft.TimeBlock (Ft.State.SHORT_BREAK);
             time_block.set_time_range (1000, 1600);
-            time_block.set_status (Pomodoro.TimeBlockStatus.COMPLETED);
+            time_block.set_status (Ft.TimeBlockStatus.COMPLETED);
 
-            var context = new Pomodoro.Context ();
+            var context = new Ft.Context ();
             context.timestamp = 1000;
-            context.timer_state = Pomodoro.TimerState () {
+            context.timer_state = Ft.TimerState () {
                 duration = 600,
                 user_data = time_block
             };
@@ -154,185 +162,185 @@ namespace Tests
 
         public void test_timestamp ()
         {
-            var variable = new Pomodoro.Variable ("timestamp");
+            var variable = new Ft.Variable ("timestamp");
 
             try {
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.TimestampValue (1000));
+                                     new Ft.TimestampValue (1000));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_state ()
         {
-            var variable = new Pomodoro.Variable ("state");
+            var variable = new Ft.Variable ("state");
 
             try {
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.StateValue (Pomodoro.State.SHORT_BREAK));
+                                     new Ft.StateValue (Ft.State.SHORT_BREAK));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_status ()
         {
-            var variable = new Pomodoro.Variable ("status");
+            var variable = new Ft.Variable ("status");
 
             try {
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.StatusValue (Pomodoro.TimeBlockStatus.COMPLETED));
+                                     new Ft.StatusValue (Ft.TimeBlockStatus.COMPLETED));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_is_started ()
         {
-            var variable = new Pomodoro.Variable ("is-started");
+            var variable = new Ft.Variable ("is-started");
 
             try {
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (false));
+                                     new Ft.BooleanValue (false));
 
                 this.context.timer_state.started_time = 1200;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (true));
+                                     new Ft.BooleanValue (true));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_is_paused ()
         {
-            var variable = new Pomodoro.Variable ("is-paused");
+            var variable = new Ft.Variable ("is-paused");
 
             try {
                 this.context.timer_state.started_time = 1200;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (false));
+                                     new Ft.BooleanValue (false));
 
                 this.context.timer_state.paused_time = 1400;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (true));
+                                     new Ft.BooleanValue (true));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_is_finished ()
         {
-            var variable = new Pomodoro.Variable ("is-finished");
+            var variable = new Ft.Variable ("is-finished");
 
             try {
                 this.context.timer_state.started_time = 1200;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (false));
+                                     new Ft.BooleanValue (false));
 
                 this.context.timer_state.finished_time = 1600;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (true));
+                                     new Ft.BooleanValue (true));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_is_running ()
         {
-            var variable = new Pomodoro.Variable ("is-running");
+            var variable = new Ft.Variable ("is-running");
 
             try {
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (false));
+                                     new Ft.BooleanValue (false));
 
                 this.context.timer_state.started_time = 1200;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (true));
+                                     new Ft.BooleanValue (true));
 
                 this.context.timer_state.paused_time = 1400;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (false));
+                                     new Ft.BooleanValue (false));
 
-                this.context.timer_state.paused_time = Pomodoro.Timestamp.UNDEFINED;
+                this.context.timer_state.paused_time = Ft.Timestamp.UNDEFINED;
                 this.context.timer_state.finished_time = 1600;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (false));
+                                     new Ft.BooleanValue (false));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_duration ()
         {
-            var variable = new Pomodoro.Variable ("duration");
+            var variable = new Ft.Variable ("duration");
 
             try {
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.IntervalValue (600));
+                                     new Ft.IntervalValue (600));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_offset ()
         {
-            var variable = new Pomodoro.Variable ("offset");
+            var variable = new Ft.Variable ("offset");
 
             try {
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.IntervalValue (0));
+                                     new Ft.IntervalValue (0));
 
                 this.context.timer_state.offset = 60;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.IntervalValue (60));
+                                     new Ft.IntervalValue (60));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_elapsed ()
         {
-            var variable = new Pomodoro.Variable ("elapsed");
+            var variable = new Ft.Variable ("elapsed");
 
             try {
                 this.context.timestamp = 1300;
                 this.context.timer_state.started_time = 1200;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.IntervalValue (100));
+                                     new Ft.IntervalValue (100));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_remaining ()
         {
-            var variable = new Pomodoro.Variable ("remaining");
+            var variable = new Ft.Variable ("remaining");
 
             try {
                 this.context.timestamp = 1300;
                 this.context.timer_state.started_time = 1200;
                 assert_value_equals (variable.evaluate (this.context),
-                                     new Pomodoro.IntervalValue (500));
+                                     new Ft.IntervalValue (500));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_to_string ()
         {
-            var variable = new Pomodoro.Variable ("is-paused");
+            var variable = new Ft.Variable ("is-paused");
 
             assert_cmpstr (variable.to_string (),
                            GLib.CompareOperator.EQ,
@@ -343,7 +351,7 @@ namespace Tests
 
     public class OperationTest : Tests.TestSuite
     {
-        private Pomodoro.Context? context;
+        private Ft.Context? context;
 
         public OperationTest ()
         {
@@ -358,7 +366,7 @@ namespace Tests
 
         public override void setup ()
         {
-            this.context = new Pomodoro.Context ();
+            this.context = new Ft.Context ();
         }
 
         public override void teardown ()
@@ -377,18 +385,18 @@ namespace Tests
 
             for (var index=0; index < 4; index++)
             {
-                var value_1 = new Pomodoro.BooleanValue (cases[index, 0]);
-                var value_2 = new Pomodoro.BooleanValue (cases[index, 1]);
-                var expected_result = new Pomodoro.BooleanValue (cases[index, 2]);
+                var value_1 = new Ft.BooleanValue (cases[index, 0]);
+                var value_2 = new Ft.BooleanValue (cases[index, 1]);
+                var expected_result = new Ft.BooleanValue (cases[index, 2]);
 
-                var operation = new Pomodoro.Operation (Pomodoro.Operator.AND,
-                                                        new Pomodoro.Constant (value_1),
-                                                        new Pomodoro.Constant (value_2));
+                var operation = new Ft.Operation (Ft.Operator.AND,
+                                                        new Ft.Constant (value_1),
+                                                        new Ft.Constant (value_2));
                 try {
                     assert_value_equals (operation.evaluate (this.context),
                                          expected_result);
                 }
-                catch (Pomodoro.ExpressionError error) {
+                catch (Ft.ExpressionError error) {
                     assert_no_error (error);
                 }
             }
@@ -396,79 +404,79 @@ namespace Tests
 
         public void test_and__timestamp ()
         {
-            var value_1 = new Pomodoro.TimestampValue (Pomodoro.Timestamp.UNDEFINED);
-            var value_2 = new Pomodoro.TimestampValue (Pomodoro.Timestamp.from_now ());
-            var value_3 = new Pomodoro.BooleanValue (true);
+            var value_1 = new Ft.TimestampValue (Ft.Timestamp.UNDEFINED);
+            var value_2 = new Ft.TimestampValue (Ft.Timestamp.from_now ());
+            var value_3 = new Ft.BooleanValue (true);
 
             try {
-                var operation_1 = new Pomodoro.Operation (Pomodoro.Operator.AND,
-                                                          new Pomodoro.Constant (value_1),
-                                                          new Pomodoro.Constant (value_3));
+                var operation_1 = new Ft.Operation (Ft.Operator.AND,
+                                                          new Ft.Constant (value_1),
+                                                          new Ft.Constant (value_3));
                 assert_value_equals (operation_1.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (false));
+                                     new Ft.BooleanValue (false));
 
-                var operation_2 = new Pomodoro.Operation (Pomodoro.Operator.AND,
-                                                          new Pomodoro.Constant (value_2),
-                                                          new Pomodoro.Constant (value_3));
+                var operation_2 = new Ft.Operation (Ft.Operator.AND,
+                                                          new Ft.Constant (value_2),
+                                                          new Ft.Constant (value_3));
                 assert_value_equals (operation_2.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (true));
+                                     new Ft.BooleanValue (true));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_and__state ()
         {
-            var value_1 = new Pomodoro.StateValue (Pomodoro.State.STOPPED);
-            var value_2 = new Pomodoro.StateValue (Pomodoro.State.POMODORO);
-            var value_3 = new Pomodoro.BooleanValue (true);
+            var value_1 = new Ft.StateValue (Ft.State.STOPPED);
+            var value_2 = new Ft.StateValue (Ft.State.POMODORO);
+            var value_3 = new Ft.BooleanValue (true);
 
             try {
-                var operation_1 = new Pomodoro.Operation (Pomodoro.Operator.AND,
-                                                          new Pomodoro.Constant (value_1),
-                                                          new Pomodoro.Constant (value_3));
+                var operation_1 = new Ft.Operation (Ft.Operator.AND,
+                                                          new Ft.Constant (value_1),
+                                                          new Ft.Constant (value_3));
                 assert_value_equals (operation_1.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (false));
+                                     new Ft.BooleanValue (false));
 
-                var operation_2 = new Pomodoro.Operation (Pomodoro.Operator.AND,
-                                                          new Pomodoro.Constant (value_2),
-                                                          new Pomodoro.Constant (value_3));
+                var operation_2 = new Ft.Operation (Ft.Operator.AND,
+                                                          new Ft.Constant (value_2),
+                                                          new Ft.Constant (value_3));
                 assert_value_equals (operation_2.evaluate (this.context),
-                                     new Pomodoro.BooleanValue (true));
+                                     new Ft.BooleanValue (true));
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_to_string__single_argument ()
         {
-            var argument_1 = new Pomodoro.Variable ("is-paused");
-            var argument_2 = new Pomodoro.Constant (
-                new Pomodoro.IntervalValue (Pomodoro.Interval.HOUR));
-            var argument_3 = new Pomodoro.Comparison (
-                new Pomodoro.Variable ("state"),
-                Pomodoro.Operator.EQ,
-                new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.POMODORO)));
-            var argument_4 = new Pomodoro.Operation (Pomodoro.Operator.OR, argument_1, argument_3);
+            var argument_1 = new Ft.Variable ("is-paused");
+            var argument_2 = new Ft.Constant (
+                new Ft.IntervalValue (Ft.Interval.HOUR));
+            var argument_3 = new Ft.Comparison (
+                new Ft.Variable ("state"),
+                Ft.Operator.EQ,
+                new Ft.Constant (new Ft.StateValue (Ft.State.POMODORO)));
+            var argument_4 = new Ft.Operation (Ft.Operator.OR, argument_1, argument_3);
 
-            var operation_1 = new Pomodoro.Operation (Pomodoro.Operator.AND, argument_1);
+            var operation_1 = new Ft.Operation (Ft.Operator.AND, argument_1);
             assert_cmpstr (operation_1.to_string (),
                            GLib.CompareOperator.EQ,
                            argument_1.to_string ());
 
-            var operation_2 = new Pomodoro.Operation (Pomodoro.Operator.AND, argument_2);
+            var operation_2 = new Ft.Operation (Ft.Operator.AND, argument_2);
             assert_cmpstr (operation_2.to_string (),
                            GLib.CompareOperator.EQ,
                            argument_2.to_string ());
 
-            var operation_3 = new Pomodoro.Operation (Pomodoro.Operator.AND, argument_3);
+            var operation_3 = new Ft.Operation (Ft.Operator.AND, argument_3);
             assert_cmpstr (operation_3.to_string (),
                            GLib.CompareOperator.EQ,
                            argument_3.to_string ());
 
-            var operation_4 = new Pomodoro.Operation (Pomodoro.Operator.AND, argument_4);
+            var operation_4 = new Ft.Operation (Ft.Operator.AND, argument_4);
             assert_cmpstr (operation_4.to_string (),
                            GLib.CompareOperator.EQ,
                            argument_4.to_string ());
@@ -476,24 +484,24 @@ namespace Tests
 
         public void test_to_string__nested ()
         {
-            var argument_1 = new Pomodoro.Variable ("is-started");
-            var argument_2 = new Pomodoro.Variable ("is-paused");
-            var argument_3 = new Pomodoro.Variable ("is-running");
-            var argument_4 = new Pomodoro.Variable ("is-finished");
+            var argument_1 = new Ft.Variable ("is-started");
+            var argument_2 = new Ft.Variable ("is-paused");
+            var argument_3 = new Ft.Variable ("is-running");
+            var argument_4 = new Ft.Variable ("is-finished");
 
-            var operation_1 = new Pomodoro.Operation (
-                Pomodoro.Operator.AND,
-                new Pomodoro.Operation (Pomodoro.Operator.OR, argument_1, argument_2),
-                new Pomodoro.Operation (Pomodoro.Operator.OR, argument_3, argument_4)
+            var operation_1 = new Ft.Operation (
+                Ft.Operator.AND,
+                new Ft.Operation (Ft.Operator.OR, argument_1, argument_2),
+                new Ft.Operation (Ft.Operator.OR, argument_3, argument_4)
             );
             assert_cmpstr (operation_1.to_string (),
                            GLib.CompareOperator.EQ,
                            "(isStarted || isPaused) && (isRunning || isFinished)");
 
-            var operation_2 = new Pomodoro.Operation (
-                Pomodoro.Operator.OR,
-                new Pomodoro.Operation (Pomodoro.Operator.AND, argument_1, argument_2),
-                new Pomodoro.Operation (Pomodoro.Operator.AND, argument_3, argument_4)
+            var operation_2 = new Ft.Operation (
+                Ft.Operator.OR,
+                new Ft.Operation (Ft.Operator.AND, argument_1, argument_2),
+                new Ft.Operation (Ft.Operator.AND, argument_3, argument_4)
             );
             assert_cmpstr (operation_2.to_string (),
                            GLib.CompareOperator.EQ,
@@ -502,15 +510,15 @@ namespace Tests
 
         public void test_to_string__wrap_argument ()
         {
-            var argument_1 = new Pomodoro.Variable ("state");
-            var argument_2 = new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.POMODORO));
-            var argument_3 = new Pomodoro.Variable ("is-started");
-            var argument_4 = new Pomodoro.Variable ("is-paused");
+            var argument_1 = new Ft.Variable ("state");
+            var argument_2 = new Ft.Constant (new Ft.StateValue (Ft.State.POMODORO));
+            var argument_3 = new Ft.Variable ("is-started");
+            var argument_4 = new Ft.Variable ("is-paused");
 
-            var operation = new Pomodoro.Operation (
-                Pomodoro.Operator.AND,
-                new Pomodoro.Comparison (argument_1, Pomodoro.Operator.EQ, argument_2),
-                new Pomodoro.Operation (Pomodoro.Operator.OR, argument_3, argument_4)
+            var operation = new Ft.Operation (
+                Ft.Operator.AND,
+                new Ft.Comparison (argument_1, Ft.Operator.EQ, argument_2),
+                new Ft.Operation (Ft.Operator.OR, argument_3, argument_4)
             );
             assert_cmpstr (operation.to_string (),
                            GLib.CompareOperator.EQ,
@@ -521,7 +529,7 @@ namespace Tests
 
     public class ComparisonTest : Tests.TestSuite
     {
-        private Pomodoro.Context? context;
+        private Ft.Context? context;
 
         public ComparisonTest ()
         {
@@ -535,7 +543,7 @@ namespace Tests
 
         public override void setup ()
         {
-            this.context = new Pomodoro.Context ();
+            this.context = new Ft.Context ();
         }
 
         public override void teardown ()
@@ -545,52 +553,52 @@ namespace Tests
 
         public void test_eq__state ()
         {
-            var comparison_1 = new Pomodoro.Comparison (
-                new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.POMODORO)),
-                Pomodoro.Operator.EQ,
-                new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.POMODORO)));
+            var comparison_1 = new Ft.Comparison (
+                new Ft.Constant (new Ft.StateValue (Ft.State.POMODORO)),
+                Ft.Operator.EQ,
+                new Ft.Constant (new Ft.StateValue (Ft.State.POMODORO)));
 
             try {
                 assert_true (comparison_1.evaluate (this.context)?.to_boolean ());
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
 
-            var comparison_2 = new Pomodoro.Comparison (
-                new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.SHORT_BREAK)),
-                Pomodoro.Operator.EQ,
-                new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.BREAK)));
+            var comparison_2 = new Ft.Comparison (
+                new Ft.Constant (new Ft.StateValue (Ft.State.SHORT_BREAK)),
+                Ft.Operator.EQ,
+                new Ft.Constant (new Ft.StateValue (Ft.State.BREAK)));
 
             try {
                 assert_true (comparison_2.evaluate (this.context)?.to_boolean ());
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_not_eq__state ()
         {
-            var comparison = new Pomodoro.Comparison (
-                new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.STOPPED)),
-                Pomodoro.Operator.NOT_EQ,
-                new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.POMODORO)));
+            var comparison = new Ft.Comparison (
+                new Ft.Constant (new Ft.StateValue (Ft.State.STOPPED)),
+                Ft.Operator.NOT_EQ,
+                new Ft.Constant (new Ft.StateValue (Ft.State.POMODORO)));
 
             try {
                 assert_true (comparison.evaluate (this.context)?.to_boolean ());
             }
-            catch (Pomodoro.ExpressionError error) {
+            catch (Ft.ExpressionError error) {
                 assert_no_error (error);
             }
         }
 
         public void test_to_string__simple ()
         {
-            var comparison = new Pomodoro.Comparison (
-                new Pomodoro.Variable ("state"),
-                Pomodoro.Operator.EQ,
-                new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.POMODORO)));
+            var comparison = new Ft.Comparison (
+                new Ft.Variable ("state"),
+                Ft.Operator.EQ,
+                new Ft.Constant (new Ft.StateValue (Ft.State.POMODORO)));
             assert_cmpstr (comparison.to_string (),
                            GLib.CompareOperator.EQ,
                            "state == \"pomodoro\"");
@@ -598,17 +606,17 @@ namespace Tests
 
         public void test_to_string__nested ()
         {
-            var comparison_1 = new Pomodoro.Comparison (
-                new Pomodoro.Variable ("state"),
-                Pomodoro.Operator.EQ,
-                new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.POMODORO)));
-            var comparison_2 = new Pomodoro.Comparison (
-                new Pomodoro.Variable ("duration"),
-                Pomodoro.Operator.GT,
-                new Pomodoro.Constant (new Pomodoro.IntervalValue (Pomodoro.Interval.MINUTE)));
+            var comparison_1 = new Ft.Comparison (
+                new Ft.Variable ("state"),
+                Ft.Operator.EQ,
+                new Ft.Constant (new Ft.StateValue (Ft.State.POMODORO)));
+            var comparison_2 = new Ft.Comparison (
+                new Ft.Variable ("duration"),
+                Ft.Operator.GT,
+                new Ft.Constant (new Ft.IntervalValue (Ft.Interval.MINUTE)));
 
-            var comparison = new Pomodoro.Comparison (comparison_1,
-                                                      Pomodoro.Operator.EQ,
+            var comparison = new Ft.Comparison (comparison_1,
+                                                      Ft.Operator.EQ,
                                                       comparison_2);
             assert_cmpstr (comparison.to_string (),
                            GLib.CompareOperator.EQ,
@@ -617,7 +625,7 @@ namespace Tests
 
         public void test_to_string__is_true ()
         {
-            var comparison = new Pomodoro.Comparison.is_true (new Pomodoro.Variable ("is-started"));
+            var comparison = new Ft.Comparison.is_true (new Ft.Variable ("is-started"));
             assert_cmpstr (comparison.to_string (),
                            GLib.CompareOperator.EQ,
                            "isStarted");

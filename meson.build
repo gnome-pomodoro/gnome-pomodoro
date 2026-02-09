@@ -1,7 +1,7 @@
 project(
-  'gnome-pomodoro',
+  'focus-timer',
   ['vala', 'c'],
-  version: '1.0-alpha',
+  version: '1.0-beta',
   meson_version: '>=0.59.0',
   default_options: [
     'warning_level=2',
@@ -21,7 +21,6 @@ libadwaita_dep = dependency('libadwaita-1', version: '>= 1.8.0')
 introspection_dep = dependency('gobject-introspection-1.0', version: '>=0.10.1')
 peas_dep = dependency('libpeas-1.0', version: '>=1.5.0')
 gom_dep = dependency('gom-1.0', version: '>=0.5.0')
-gsound_dep = dependency('gsound', version: '>=1.0')
 gstreamer_dep = dependency('gstreamer-1.0', version: '>=1.0.10')
 json_dep = dependency('json-glib-1.0', version: '>=1.6.2')
 sqlite_dep = dependency('sqlite3')
@@ -94,13 +93,13 @@ if gtk_wayland_dep.found()
   add_project_arguments(['-D', 'HAVE_GDK_WAYLAND'], language: 'vala')
 endif
 
-application_id = 'org.gnomepomodoro.Pomodoro'
-application_name = 'Pomodoro'
+application_id = 'io.github.focustimerhq.FocusTimer'
+application_name = 'Focus Timer'
 package_name = meson.project_name()
 package_version = meson.project_version()
-package_website = 'https://gnomepomodoro.org'
-package_issue_url = 'https://github.com/gnome-pomodoro/gnome-pomodoro/issues'
-package_support_url = 'https://github.com/gnome-pomodoro/gnome-pomodoro/discussions'
+package_website = 'https://github.com/focustimerhq/FocusTimer'
+package_issue_url = 'https://github.com/focustimerhq/FocusTimer/issues'
+package_support_url = 'https://github.com/focustimerhq/FocusTimer/discussions'
 package_donate_url = 'https://liberapay.com/kamilprusko'
 package_datadir = get_option('prefix') / get_option('datadir') / meson.project_name()
 package_localedir = get_option('prefix') / get_option('datadir') / 'locale'
@@ -110,7 +109,7 @@ gettext_package = package_name
 # Change app id for development builds
 if get_option('profile') == 'development'
   application_id = '@0@.Devel'.format(application_id)
-  application_name = 'Pomodoro (Development)'
+  application_name = '@0@ (Development)'.format(application_name)
 endif
 
 conf = configuration_data()
@@ -171,7 +170,6 @@ configure_file(
 
 # Include the config.h we just generated
 config_h_dir = include_directories('.')
-
 
 subdir('po')
 subdir('data')

@@ -1,38 +1,38 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui")]
-    public class PreferencesPanelKeyboardShortcuts : Pomodoro.PreferencesPanel
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/keyboard-shortcuts/preferences-panel-keyboard-shortcuts.ui")]
+    public class PreferencesPanelKeyboardShortcuts : Ft.PreferencesPanel
     {
         [GtkChild]
-        private unowned Pomodoro.AcceleratorRow start_stop_timer_row;
+        private unowned Ft.AcceleratorRow start_stop_timer_row;
         [GtkChild]
-        private unowned Pomodoro.AcceleratorRow start_pause_resume_timer_row;
+        private unowned Ft.AcceleratorRow start_pause_resume_timer_row;
         [GtkChild]
-        private unowned Pomodoro.AcceleratorRow start_timer_row;
+        private unowned Ft.AcceleratorRow start_timer_row;
         [GtkChild]
-        private unowned Pomodoro.AcceleratorRow stop_timer_row;
+        private unowned Ft.AcceleratorRow stop_timer_row;
         [GtkChild]
-        private unowned Pomodoro.AcceleratorRow pause_timer_row;
+        private unowned Ft.AcceleratorRow pause_timer_row;
         [GtkChild]
-        private unowned Pomodoro.AcceleratorRow resume_timer_row;
+        private unowned Ft.AcceleratorRow resume_timer_row;
         [GtkChild]
-        private unowned Pomodoro.AcceleratorRow skip_timer_row;
+        private unowned Ft.AcceleratorRow skip_timer_row;
         [GtkChild]
-        private unowned Pomodoro.AcceleratorRow rewind_timer_row;
+        private unowned Ft.AcceleratorRow rewind_timer_row;
         [GtkChild]
-        private unowned Pomodoro.AcceleratorRow toggle_window_row;
+        private unowned Ft.AcceleratorRow toggle_window_row;
 
-        private Pomodoro.KeyboardManager? keyboard_manager = null;
+        private Ft.KeyboardManager? keyboard_manager = null;
 
         construct
         {
-            this.keyboard_manager = new Pomodoro.KeyboardManager ();
+            this.keyboard_manager = new Ft.KeyboardManager ();
             this.keyboard_manager.shortcut_changed.connect (this.on_shortcut_changed);
 
             this.update_accelerators ();

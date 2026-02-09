@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ * Copyright (c) 2023-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     // TODO: rename to DurationRow
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/timer/widgets/log-scale-row.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/timer/widgets/log-scale-row.ui")]
     public class LogScaleRow : Adw.ActionRow
     {
         public Gtk.Adjustment adjustment {
@@ -35,7 +35,7 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Label value_label;
         [GtkChild]
-        private unowned Pomodoro.LogScale scale;
+        private unowned Ft.LogScale scale;
 
         private Gtk.Adjustment _adjustment;
         private ulong          value_changed_id = 0;
@@ -53,7 +53,7 @@ namespace Pomodoro
             if (this._adjustment != null) {
                 var seconds = (int) Math.round (this._adjustment.value).clamp (0, int.MAX);
 
-                this.value_label.label = Pomodoro.format_time (seconds);
+                this.value_label.label = Ft.format_time (seconds);
             }
         }
 

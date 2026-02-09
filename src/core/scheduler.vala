@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2023-2025 gnome-pomodoro contributors
+ * Copyright (c) 2023-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * Structure describing current cycle or energy level within a session.
@@ -15,24 +15,24 @@ namespace Pomodoro
      */
     public struct SchedulerContext
     {
-        public int64          timestamp;
-        public Pomodoro.State state;
-        public bool           is_session_completed;
-        public bool           needs_long_break;
-        public double         score;
+        public int64    timestamp;
+        public Ft.State state;
+        public bool     is_session_completed;
+        public bool     needs_long_break;
+        public double   score;
 
         public SchedulerContext ()
         {
-            this.timestamp = Pomodoro.Timestamp.UNDEFINED;
-            this.state = Pomodoro.State.STOPPED;
+            this.timestamp = Ft.Timestamp.UNDEFINED;
+            this.state = Ft.State.STOPPED;
             this.is_session_completed = false;
             this.needs_long_break = false;
             this.score = 0.0;
         }
 
-        public static Pomodoro.SchedulerContext initial (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        public static Ft.SchedulerContext initial (int64 timestamp = Ft.Timestamp.UNDEFINED)
         {
-            Pomodoro.ensure_timestamp (ref timestamp);
+            Ft.ensure_timestamp (ref timestamp);
 
             return SchedulerContext () {
                 timestamp = timestamp,
@@ -45,7 +45,7 @@ namespace Pomodoro
          * This function is unnecessary. Structs in vala are copied by default. It's kept
          * to bring more clarity to our code.
          */
-        public Pomodoro.SchedulerContext copy ()
+        public Ft.SchedulerContext copy ()
         {
             return this;
         }
@@ -101,7 +101,7 @@ namespace Pomodoro
         /**
          * A progress threshold that qualifies time-block to be marked as completed.
          *
-         * When set to 0.5 it would count two cycles per completed pomodoro. Reasonable values are > 0.667.
+         * When set to 0.5 it would count two cycles per completed Ft. Reasonable values are > 0.667.
          */
         protected const double COMPLETION_THRESHOLD = 0.8;
 
@@ -112,7 +112,7 @@ namespace Pomodoro
 
 
         [CCode (notify = false)]
-        public Pomodoro.SessionTemplate session_template {
+        public Ft.SessionTemplate session_template {
             get {
                 return this._session_template;
             }
@@ -127,14 +127,14 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.SessionTemplate _session_template;
+        private Ft.SessionTemplate _session_template;
 
 
-        public int64 calculate_time_block_completion_time (Pomodoro.TimeBlock time_block)
+        public int64 calculate_time_block_completion_time (Ft.TimeBlock time_block)
         {
-            if (Pomodoro.Timestamp.is_undefined (time_block.start_time)) {
+            if (Ft.Timestamp.is_undefined (time_block.start_time)) {
                 GLib.debug ("calculate_time_block_completion_time: `start_time` is not set");
-                return Pomodoro.Timestamp.UNDEFINED;
+                return Ft.Timestamp.UNDEFINED;
             }
 
             var intended_duration = time_block.get_intended_duration ();
@@ -148,7 +148,7 @@ namespace Pomodoro
 
             time_block.foreach_gap (
                 (gap) => {
-                    if (Pomodoro.Timestamp.is_undefined (gap.end_time)) {
+                    if (Ft.Timestamp.is_undefined (gap.end_time)) {
                         return;
                     }
 
@@ -164,50 +164,50 @@ namespace Pomodoro
             return reference_time + remaining_elapsed;
         }
 
-        public abstract double calculate_time_block_score (Pomodoro.TimeBlock time_block,
-                                                           int64              timestamp);
+        public abstract double calculate_time_block_score (Ft.TimeBlock time_block,
+                                                           int64        timestamp);
 
-        public abstract double calculate_time_block_weight (Pomodoro.TimeBlock time_block);
+        public abstract double calculate_time_block_weight (Ft.TimeBlock time_block);
 
         /**
          * Update given state according to given time-block.
          *
          * The context will hold info about current state of the session.
          */
-        public abstract void resolve_context (Pomodoro.TimeBlock            time_block,
-                                              bool                          is_resuming,
-                                              int64                         timestamp,
-                                              ref Pomodoro.SchedulerContext context);
+        public abstract void resolve_context (Ft.TimeBlock            time_block,
+                                              bool                    is_resuming,
+                                              int64                   timestamp,
+                                              ref Ft.SchedulerContext context);
 
         /**
          * Resolve next time-block state according to scheduler state.
          */
-        public abstract Pomodoro.State resolve_state (Pomodoro.SchedulerContext context);
+        public abstract Ft.State resolve_state (Ft.SchedulerContext context);
 
         /**
          * Resolve next time-block according to scheduler state.
          */
-        public abstract Pomodoro.TimeBlock? resolve_time_block (Pomodoro.SchedulerContext context);
+        public abstract Ft.TimeBlock? resolve_time_block (Ft.SchedulerContext context);
 
         /**
          * Check whether time-block has been completed at given time.
          */
-        public abstract bool is_time_block_completed (Pomodoro.TimeBlock time_block,
-                                                      int64              timestamp);
+        public abstract bool is_time_block_completed (Ft.TimeBlock time_block,
+                                                      int64        timestamp);
 
         /**
          * Build a scheduler context from completed/in-progress time-blocks.
          */
-        internal void build_scheduler_context (Pomodoro.Session                          session,
-                                               bool                                      is_resuming,
-                                               int64                                     timestamp,
-                                               out Pomodoro.SchedulerContext             context,
-                                               out unowned GLib.List<Pomodoro.TimeBlock> first_scheduled_link)
+        internal void build_scheduler_context (Ft.Session                          session,
+                                               bool                                is_resuming,
+                                               int64                               timestamp,
+                                               out Ft.SchedulerContext             context,
+                                               out unowned GLib.List<Ft.TimeBlock> first_scheduled_link)
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = session.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> link = session.time_blocks.first ();
 
-            context = Pomodoro.SchedulerContext.initial (
-                    link != null && link.data.get_status () != Pomodoro.TimeBlockStatus.SCHEDULED
+            context = Ft.SchedulerContext.initial (
+                    link != null && link.data.get_status () != Ft.TimeBlockStatus.SCHEDULED
                     ? link.data.start_time
                     : timestamp);
             first_scheduled_link = null;
@@ -217,7 +217,7 @@ namespace Pomodoro
                 var time_block = link.data;
                 var time_block_status = time_block.get_status ();
 
-                if (time_block_status == Pomodoro.TimeBlockStatus.SCHEDULED) {
+                if (time_block_status == Ft.TimeBlockStatus.SCHEDULED) {
                     first_scheduled_link = link;
                     break;
                 }
@@ -225,7 +225,7 @@ namespace Pomodoro
                 if (!context.is_session_completed)
                 {
                     var time_block_timestamp =
-                            time_block_status == Pomodoro.TimeBlockStatus.IN_PROGRESS
+                            time_block_status == Ft.TimeBlockStatus.IN_PROGRESS
                             ? timestamp
                             : time_block.end_time;
                     this.resolve_context (
@@ -244,24 +244,24 @@ namespace Pomodoro
         /**
          * Adjust time-block start-time and duration.
          */
-        public void reschedule_time_block (Pomodoro.TimeBlock time_block,
-                                           int64              timestamp = Pomodoro.Timestamp.UNDEFINED)
+        public void reschedule_time_block (Ft.TimeBlock time_block,
+                                           int64        timestamp = Ft.Timestamp.UNDEFINED)
         {
-            if (time_block.state == Pomodoro.State.STOPPED) {
+            if (time_block.state == Ft.State.STOPPED) {
                 return;
             }
 
-            if (time_block.get_status () == Pomodoro.TimeBlockStatus.COMPLETED ||
-                time_block.get_status () == Pomodoro.TimeBlockStatus.UNCOMPLETED)
+            if (time_block.get_status () == Ft.TimeBlockStatus.COMPLETED ||
+                time_block.get_status () == Ft.TimeBlockStatus.UNCOMPLETED)
             {
                 return;
             }
 
-            Pomodoro.ensure_timestamp (ref timestamp);
+            Ft.ensure_timestamp (ref timestamp);
 
             // TODO: adjust session template according to available time
 
-            if (time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED)
+            if (time_block.get_status () == Ft.TimeBlockStatus.SCHEDULED)
             {
                 var intended_duration = this._session_template.get_duration (time_block.state);
 
@@ -273,15 +273,15 @@ namespace Pomodoro
             time_block.set_weight (this.calculate_time_block_weight (time_block));
         }
 
-        public bool reschedule_session (Pomodoro.Session    session,
-                                        Pomodoro.TimeBlock? next_time_block,
-                                        bool                is_resuming,
-                                        int64               timestamp)
+        public bool reschedule_session (Ft.Session    session,
+                                        Ft.TimeBlock? next_time_block,
+                                        bool          is_resuming,
+                                        int64         timestamp)
         {
-            Pomodoro.ensure_timestamp (ref timestamp);
+            Ft.ensure_timestamp (ref timestamp);
 
-            Pomodoro.SchedulerContext context;
-            unowned GLib.List<Pomodoro.TimeBlock> link;
+            Ft.SchedulerContext context;
+            unowned GLib.List<Ft.TimeBlock> link;
 
             var initial_version = session.version;
             session.freeze_changed ();
@@ -293,7 +293,7 @@ namespace Pomodoro
             if (next_time_block != null)
             {
                 assert (session.contains (next_time_block));
-                assert (next_time_block.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
+                assert (next_time_block.get_status () == Ft.TimeBlockStatus.SCHEDULED);
 
                 // Remove time-blocks leading to `next_time_block`
                 while (link != null && link.data != next_time_block)
@@ -320,7 +320,7 @@ namespace Pomodoro
 
             while (true)
             {
-                if (i++ >= Pomodoro.Scheduler.MAX_ITERATIONS) {
+                if (i++ >= Ft.Scheduler.MAX_ITERATIONS) {
                     GLib.error ("`Session.reschedule()` reached iterations limit.");
                     // break;
                 }
@@ -335,7 +335,7 @@ namespace Pomodoro
                     link.data.state == time_block.state)
                 {
                     // Update existing time-block.
-                    assert (link.data.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED);
+                    assert (link.data.get_status () == Ft.TimeBlockStatus.SCHEDULED);
 
                     link.data.set_time_range (time_block.start_time, time_block.end_time);
                     link.data.set_meta (time_block.get_meta ());
@@ -368,7 +368,7 @@ namespace Pomodoro
             return session.version != initial_version;
         }
 
-        public void ensure_time_block_meta (Pomodoro.TimeBlock time_block)
+        public void ensure_time_block_meta (Ft.TimeBlock time_block)
         {
             if (time_block.get_intended_duration () == 0) {
                 time_block.set_intended_duration (
@@ -384,11 +384,11 @@ namespace Pomodoro
         /**
          * Update meta for all time-blocks, not only scheduled. Intended for restoring a session.
          */
-        public void ensure_session_meta (Pomodoro.Session session)
+        public void ensure_session_meta (Ft.Session session)
         {
             session.@foreach (
                 (time_block) => {
-                    if (time_block.state != Pomodoro.State.STOPPED) {
+                    if (time_block.state != Ft.State.STOPPED) {
                         this.ensure_time_block_meta (time_block);
                     }
                 });
@@ -404,19 +404,19 @@ namespace Pomodoro
         private double MAX_SCORE = 2.0;
 
         /* Minimum intended-duration to consider scores above 1.0  */
-        private int64 SCORE_INTENDED_DURATION_THRESHOLD = 20 * Pomodoro.Interval.MINUTE;
+        private int64 SCORE_INTENDED_DURATION_THRESHOLD = 20 * Ft.Interval.MINUTE;
 
-        public SimpleScheduler.with_template (Pomodoro.SessionTemplate session_template)
+        public SimpleScheduler.with_template (Ft.SessionTemplate session_template)
         {
             GLib.Object (
                 session_template: session_template
             );
         }
 
-        private double calculate_time_block_score_internal (Pomodoro.TimeBlock time_block,
-                                                            bool               include_uncompleted_gaps,
-                                                            int64              timestamp)
-                                    requires (Pomodoro.Timestamp.is_defined (time_block.start_time))
+        private double calculate_time_block_score_internal (Ft.TimeBlock time_block,
+                                                            bool         include_uncompleted_gaps,
+                                                            int64        timestamp)
+                                    requires (Ft.Timestamp.is_defined (time_block.start_time))
                                     requires (time_block.end_time >= time_block.start_time)
         {
             var intended_duration = time_block.get_intended_duration ();
@@ -426,8 +426,8 @@ namespace Pomodoro
                 intended_duration = this.session_template.get_duration (time_block.state);
             }
 
-            if (time_block.state != Pomodoro.State.POMODORO ||
-                time_block.get_status () == Pomodoro.TimeBlockStatus.UNCOMPLETED ||
+            if (time_block.state != Ft.State.POMODORO ||
+                time_block.get_status () == Ft.TimeBlockStatus.UNCOMPLETED ||
                 intended_duration <= 0)
             {
                 return score;
@@ -439,8 +439,8 @@ namespace Pomodoro
             if (include_uncompleted_gaps &&
                 last_gap != null &&
                 last_gap.start_time < timestamp &&
-                Pomodoro.Timestamp.is_undefined (last_gap.end_time) &&
-                time_block.get_status () == Pomodoro.TimeBlockStatus.IN_PROGRESS)
+                Ft.Timestamp.is_undefined (last_gap.end_time) &&
+                time_block.get_status () == Ft.TimeBlockStatus.IN_PROGRESS)
             {
                 elapsed += int64.min (timestamp, time_block.end_time) - last_gap.start_time;
             }
@@ -472,44 +472,44 @@ namespace Pomodoro
             return score;
         }
 
-        public override double calculate_time_block_score (Pomodoro.TimeBlock time_block,
-                                                           int64              timestamp)
+        public override double calculate_time_block_score (Ft.TimeBlock time_block,
+                                                           int64        timestamp)
         {
             return this.calculate_time_block_score_internal (time_block, false, timestamp);
         }
 
-        public override double calculate_time_block_weight (Pomodoro.TimeBlock time_block)
+        public override double calculate_time_block_weight (Ft.TimeBlock time_block)
         {
             return this.calculate_time_block_score_internal (time_block, true, time_block.end_time);
         }
 
-        public override void resolve_context (Pomodoro.TimeBlock            time_block,
-                                              bool                          is_resuming,
-                                              int64                         timestamp,
-                                              ref Pomodoro.SchedulerContext context)
+        public override void resolve_context (Ft.TimeBlock            time_block,
+                                              bool                    is_resuming,
+                                              int64                   timestamp,
+                                              ref Ft.SchedulerContext context)
         {
-            if (time_block.state == Pomodoro.State.STOPPED) {
+            if (time_block.state == Ft.State.STOPPED) {
                 return;
             }
 
             var status = time_block.get_status ();
-            var is_long_break = time_block.state == Pomodoro.State.LONG_BREAK ||
-                                time_block.state == Pomodoro.State.BREAK;
+            var is_long_break = time_block.state == Ft.State.LONG_BREAK ||
+                                time_block.state == Ft.State.BREAK;
 
-            if (status == Pomodoro.TimeBlockStatus.IN_PROGRESS)
+            if (status == Ft.TimeBlockStatus.IN_PROGRESS)
             {
                 var last_gap = time_block.get_last_gap ();
                 var is_paused = last_gap != null &&
-                                Pomodoro.Timestamp.is_undefined (last_gap.end_time);
+                                Ft.Timestamp.is_undefined (last_gap.end_time);
 
                 if (!is_resuming && is_paused)
                 {
-                    status = Pomodoro.TimeBlockStatus.COMPLETED;
+                    status = Ft.TimeBlockStatus.COMPLETED;
                 }
                 else {
                     status = this.is_time_block_completed (time_block, timestamp)
-                            ? Pomodoro.TimeBlockStatus.COMPLETED
-                            : Pomodoro.TimeBlockStatus.UNCOMPLETED;
+                            ? Ft.TimeBlockStatus.COMPLETED
+                            : Ft.TimeBlockStatus.UNCOMPLETED;
                 }
 
                 context.timestamp = timestamp;
@@ -518,8 +518,8 @@ namespace Pomodoro
                 context.timestamp = time_block.end_time;
             }
 
-            if (status == Pomodoro.TimeBlockStatus.SCHEDULED ||
-                status == Pomodoro.TimeBlockStatus.COMPLETED)
+            if (status == Ft.TimeBlockStatus.SCHEDULED ||
+                status == Ft.TimeBlockStatus.COMPLETED)
             {
                 context.score += this.calculate_time_block_weight (time_block);
 
@@ -533,17 +533,17 @@ namespace Pomodoro
                                         context.score >= this.session_template.cycles;
         }
 
-        public override Pomodoro.State resolve_state (Pomodoro.SchedulerContext context)
+        public override Ft.State resolve_state (Ft.SchedulerContext context)
         {
-            if (context.state != Pomodoro.State.POMODORO) {
-                return Pomodoro.State.POMODORO;
+            if (context.state != Ft.State.POMODORO) {
+                return Ft.State.POMODORO;
             }
 
             if (this.session_template.has_uniform_breaks ()) {
-                return Pomodoro.State.BREAK;
+                return Ft.State.BREAK;
             }
 
-            return context.needs_long_break ? Pomodoro.State.LONG_BREAK : Pomodoro.State.SHORT_BREAK;
+            return context.needs_long_break ? Ft.State.LONG_BREAK : Ft.State.SHORT_BREAK;
         }
 
         /**
@@ -551,14 +551,14 @@ namespace Pomodoro
          *
          * Alternate between a pomodoro and a break, regardless whether previous time-block has been completed.
          */
-        public override Pomodoro.TimeBlock? resolve_time_block (Pomodoro.SchedulerContext context)
+        public override Ft.TimeBlock? resolve_time_block (Ft.SchedulerContext context)
         {
             if (context.is_session_completed) {
                 return null;  // Suggest starting a new session.
             }
 
             var state = this.resolve_state (context);
-            var time_block = new Pomodoro.TimeBlock (state);
+            var time_block = new Ft.TimeBlock (state);
 
             this.reschedule_time_block (time_block, context.timestamp);
 
@@ -568,12 +568,12 @@ namespace Pomodoro
         /**
          * Determine whether time-block should be marked as completed.
          */
-        public override bool is_time_block_completed (Pomodoro.TimeBlock time_block,
-                                                      int64              timestamp)
+        public override bool is_time_block_completed (Ft.TimeBlock time_block,
+                                                      int64        timestamp)
         {
             var completion_time = time_block.get_completion_time ();
 
-            if (Pomodoro.Timestamp.is_undefined (completion_time)) {
+            if (Ft.Timestamp.is_undefined (completion_time)) {
                 completion_time = this.calculate_time_block_completion_time (time_block);
             }
 

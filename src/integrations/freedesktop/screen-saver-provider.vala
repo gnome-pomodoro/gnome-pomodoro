@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 namespace Freedesktop
 {
-    public class ScreenSaverProvider : Pomodoro.Provider, Pomodoro.ScreenSaverProvider
+    public class ScreenSaverProvider : Ft.Provider, Ft.ScreenSaverProvider
     {
         public bool active {
             get {

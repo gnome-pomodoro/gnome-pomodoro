@@ -1,13 +1,21 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     public class EventBusTest : Tests.TestSuite
     {
-        private Pomodoro.Timer                     timer;
-        private Pomodoro.SessionManager            session_manager;
-        private Pomodoro.EventProducer             producer;
-        private Pomodoro.EventBus                  bus;
-        private Pomodoro.SessionManagerActionGroup session_manager_action_group;
-        private Pomodoro.TimerActionGroup          timer_action_group;
+        private Ft.Timer                     timer;
+        private Ft.SessionManager            session_manager;
+        private Ft.EventProducer             producer;
+        private Ft.EventBus                  bus;
+        private Ft.SessionManagerActionGroup session_manager_action_group;
+        private Ft.TimerActionGroup          timer_action_group;
 
         public EventBusTest ()
         {
@@ -23,10 +31,10 @@ namespace Tests
 
         public override void setup ()
         {
-            Pomodoro.Timestamp.freeze_to (2000000000 * Pomodoro.Interval.SECOND);
-            Pomodoro.Timestamp.set_auto_advance (Pomodoro.Interval.MICROSECOND);
+            Ft.Timestamp.freeze_to (2000000000 * Ft.Interval.SECOND);
+            Ft.Timestamp.set_auto_advance (Ft.Interval.MICROSECOND);
 
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.set_uint ("pomodoro-duration", 1500);
             settings.set_uint ("short-break-duration", 300);
             settings.set_uint ("long-break-duration", 900);
@@ -34,19 +42,19 @@ namespace Tests
             settings.set_boolean ("confirm-starting-break", false);
             settings.set_boolean ("confirm-starting-pomodoro", false);
 
-            this.timer = new Pomodoro.Timer ();
-            Pomodoro.Timer.set_default (this.timer);
+            this.timer = new Ft.Timer ();
+            Ft.Timer.set_default (this.timer);
 
-            this.session_manager = new Pomodoro.SessionManager.with_timer (this.timer);
-            Pomodoro.SessionManager.set_default (this.session_manager);
+            this.session_manager = new Ft.SessionManager.with_timer (this.timer);
+            Ft.SessionManager.set_default (this.session_manager);
 
-            this.session_manager_action_group = new Pomodoro.SessionManagerActionGroup ();
+            this.session_manager_action_group = new Ft.SessionManagerActionGroup ();
             assert (this.session_manager_action_group.session_manager == this.session_manager);
 
-            this.timer_action_group = new Pomodoro.TimerActionGroup ();
+            this.timer_action_group = new Ft.TimerActionGroup ();
             assert (this.timer_action_group.timer == this.timer);
 
-            this.producer = new Pomodoro.EventProducer ();
+            this.producer = new Ft.EventProducer ();
             assert (producer.session_manager == this.session_manager);
             assert (producer.timer == this.timer);
 
@@ -60,12 +68,12 @@ namespace Tests
             this.session_manager = null;
             this.timer = null;
 
-            Pomodoro.SessionManager.set_default (null);
-            Pomodoro.Timer.set_default (null);
+            Ft.SessionManager.set_default (null);
+            Ft.Timer.set_default (null);
 
-            Pomodoro.Context.unset_event_source ();
+            Ft.Context.unset_event_source ();
 
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
             settings.revert ();
         }
 
@@ -75,7 +83,7 @@ namespace Tests
 
         public void test_add_event_watch__start ()
         {
-            var expected_timestamp = Pomodoro.Timestamp.from_now ();
+            var expected_timestamp = Ft.Timestamp.from_now ();
             var event_triggered_count = 0;
 
             this.bus.add_event_watch ("start", null, (event) => {
@@ -87,7 +95,7 @@ namespace Tests
                 );
             });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.timer_action_group.activate_action ("start", null);
 
             assert_cmpuint (event_triggered_count, GLib.CompareOperator.EQ, 1);
@@ -97,7 +105,7 @@ namespace Tests
         {
             this.timer.start ();
 
-            var expected_timestamp = Pomodoro.Timestamp.from_now ();
+            var expected_timestamp = Ft.Timestamp.from_now ();
             var event_triggered_count = 0;
 
             this.bus.add_event_watch ("pause", null, (event) => {
@@ -109,7 +117,7 @@ namespace Tests
                 );
             });
 
-            Pomodoro.Timestamp.freeze_to (expected_timestamp);
+            Ft.Timestamp.freeze_to (expected_timestamp);
             this.timer_action_group.activate_action ("pause", null);
 
             assert_cmpuint (event_triggered_count, GLib.CompareOperator.EQ, 1);
@@ -117,10 +125,10 @@ namespace Tests
 
         public void test_add_event_watch__with_condition ()
         {
-            var condition = new Pomodoro.Comparison (
-                new Pomodoro.Variable ("state"),
-                Pomodoro.Operator.EQ,
-                new Pomodoro.Constant (new Pomodoro.StateValue (Pomodoro.State.BREAK))
+            var condition = new Ft.Comparison (
+                new Ft.Variable ("state"),
+                Ft.Operator.EQ,
+                new Ft.Constant (new Ft.StateValue (Ft.State.BREAK))
             );
             var event_triggered_count = 0;
 
@@ -130,7 +138,7 @@ namespace Tests
                 assert_true (event.context.timer_state.is_paused ());
             });
 
-            this.session_manager.advance_to_state (Pomodoro.State.POMODORO);
+            this.session_manager.advance_to_state (Ft.State.POMODORO);
 
             // Make condition unmet.
             this.timer_action_group.activate_action ("pause", null);
@@ -167,15 +175,15 @@ namespace Tests
 
         public void test_add_condition_watch ()
         {
-            var start_timestamp = Pomodoro.Timestamp.peek ();
-            var pause_timestamp = start_timestamp + Pomodoro.Interval.MINUTE;
-            var stop_timestamp = pause_timestamp + Pomodoro.Interval.MINUTE;
+            var start_timestamp = Ft.Timestamp.peek ();
+            var pause_timestamp = start_timestamp + Ft.Interval.MINUTE;
+            var stop_timestamp = pause_timestamp + Ft.Interval.MINUTE;
             var signals = new string[0];
             var paused_called = false;
             var resumed_called = false;
 
             this.bus.add_condition_watch (
-                    new Pomodoro.Comparison.is_true (new Pomodoro.Variable ("is-started")),
+                    new Ft.Comparison.is_true (new Ft.Variable ("is-started")),
                     (context) => {
                         signals += "enter-condition";
 
@@ -194,7 +202,7 @@ namespace Tests
                     });
 
             this.bus.add_condition_watch (
-                    new Pomodoro.Comparison.is_true (new Pomodoro.Variable ("is-paused")),
+                    new Ft.Comparison.is_true (new Ft.Variable ("is-paused")),
                     (context) => {
                         paused_called = true;
 
@@ -212,13 +220,13 @@ namespace Tests
                         );
                     });
 
-            Pomodoro.Timestamp.freeze_to (start_timestamp);
+            Ft.Timestamp.freeze_to (start_timestamp);
             this.timer.start ();
 
-            Pomodoro.Timestamp.freeze_to (pause_timestamp);
+            Ft.Timestamp.freeze_to (pause_timestamp);
             this.timer.pause ();
 
-            Pomodoro.Timestamp.freeze_to (stop_timestamp);
+            Ft.Timestamp.freeze_to (stop_timestamp);
             this.timer.reset ();
 
             assert_cmpstrv (signals, {
@@ -234,12 +242,12 @@ namespace Tests
          */
         public void test_destroy ()
         {
-            var start_timestamp = Pomodoro.Timestamp.peek ();
-            var destroy_timestamp = start_timestamp + Pomodoro.Interval.MINUTE;
+            var start_timestamp = Ft.Timestamp.peek ();
+            var destroy_timestamp = start_timestamp + Ft.Interval.MINUTE;
             var signals = new string[0];
 
             this.bus.add_condition_watch (
-                    new Pomodoro.Comparison.is_true (new Pomodoro.Variable ("is-started")),
+                    new Ft.Comparison.is_true (new Ft.Variable ("is-started")),
                     (context) => {
                         signals += "enter-condition";
 
@@ -258,16 +266,16 @@ namespace Tests
                     });
 
             // Activate the condition so the watch becomes active.
-            Pomodoro.Timestamp.freeze_to (start_timestamp);
+            Ft.Timestamp.freeze_to (start_timestamp);
             this.timer.start ();
 
             // Destroy should call leave on active watches with current context.
-            Pomodoro.Timestamp.freeze_to (destroy_timestamp);
+            Ft.Timestamp.freeze_to (destroy_timestamp);
             this.bus.destroy ();
 
             // Ensure no duplicate leave after a subsequent reset.
-            var after_destroy_timestamp = destroy_timestamp + Pomodoro.Interval.SECOND;
-            Pomodoro.Timestamp.freeze_to (after_destroy_timestamp);
+            var after_destroy_timestamp = destroy_timestamp + Ft.Interval.SECOND;
+            Ft.Timestamp.freeze_to (after_destroy_timestamp);
             this.timer.reset ();
 
             assert_cmpstrv (signals, {

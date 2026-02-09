@@ -6,5 +6,5 @@ option(
     'development',
   ],
   value: 'default',
-  description: 'The build profile for Pomodoro. One of "default" or "development".'
+  description: 'The build profile for Focus Timer. One of "default" or "development".'
 )

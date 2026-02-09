@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2025 gnome-pomodoro contributors
+ * Copyright (c) 2013, 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     private static int _is_flatpak = -1;
 
@@ -17,8 +17,8 @@ namespace Pomodoro
 
     public inline void ensure_timestamp (ref int64 timestamp)
     {
-        if (Pomodoro.Timestamp.is_undefined (timestamp)) {
-            timestamp = Pomodoro.Timestamp.from_now ();
+        if (Ft.Timestamp.is_undefined (timestamp)) {
+            timestamp = Ft.Timestamp.from_now ();
         }
     }
 
@@ -291,7 +291,7 @@ namespace Pomodoro
 
                     // Schedule the callback in the main loop
                     var idle_source = new GLib.IdleSource ();
-                    idle_source.set_name ("Pomodoro.AsyncQueue.wait");
+                    idle_source.set_name ("Ft.AsyncQueue.wait");
                     idle_source.set_callback ((owned) callback);
                     idle_source.attach (GLib.MainContext.@default ());
 

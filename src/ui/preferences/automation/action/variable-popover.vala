@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     private class VariableItem : GLib.Object
     {
@@ -32,10 +32,10 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.VariableSpec spec;
+        private Ft.VariableSpec spec;
         private string                _display_name;
 
-        public VariableItem (Pomodoro.VariableSpec spec)
+        public VariableItem (Ft.VariableSpec spec)
         {
             this.spec = spec;
             this._display_name = to_camel_case (spec.name);
@@ -68,7 +68,7 @@ namespace Pomodoro
     }
 
 
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/automation/action/variable-popover.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/automation/action/variable-popover.ui")]
     public class VariablePopover : Gtk.Popover
     {
         [GtkChild]
@@ -112,7 +112,7 @@ namespace Pomodoro
             }
 
             if (format == null) {
-                format = Pomodoro.get_default_value_format (value_type);
+                format = Ft.get_default_value_format (value_type);
             }
 
             return ensure_string (format);
@@ -139,7 +139,7 @@ namespace Pomodoro
         {
             var model = new GLib.ListStore (typeof (VariableItem));
 
-            foreach (unowned var variable in Pomodoro.list_variables ())
+            foreach (unowned var variable in Ft.list_variables ())
             {
                 model.append (new VariableItem (variable));
             }
@@ -151,7 +151,7 @@ namespace Pomodoro
         {
             var model = new GLib.ListStore (typeof (FormatItem));
 
-            foreach (unowned var variable_format in Pomodoro.list_value_formats (value_type))
+            foreach (unowned var variable_format in Ft.list_value_formats (value_type))
             {
                 model.append (new FormatItem (variable_format));
             }
@@ -203,7 +203,11 @@ namespace Pomodoro
                 });
             var notify_selected_id = list_item.notify["selected"].connect (
                 (obj, pspec) => {
-                    check_button.active = list_item.selected;
+                    if (check_button.active != list_item.selected) {
+                        GLib.SignalHandler.block (check_button, toggled_id);
+                        check_button.active = list_item.selected;
+                        GLib.SignalHandler.unblock (check_button, toggled_id);
+                    }
                 });
 
             list_item.set_data<ulong> ("toggled-id", toggled_id);
@@ -238,7 +242,7 @@ namespace Pomodoro
                 var variable_name = variable_item.name;
                 var format_name = format_item != null ? format_item.name : "";
 
-                if (format_name == Pomodoro.get_default_value_format (variable_item.value_type)) {
+                if (format_name == Ft.get_default_value_format (variable_item.value_type)) {
                     format_name = "";
                 }
 

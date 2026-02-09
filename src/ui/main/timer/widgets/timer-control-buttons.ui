@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk" version="4.0"/>
-  <template class="PomodoroTimerControlButtons" parent="GtkBox">
+  <template class="FtTimerControlButtons" parent="GtkBox">
     <property name="spacing">10</property>
     <property name="valign">center</property>
     <property name="homogeneous">true</property>
     <style>
-      <class name="pomodoro-timer-control-buttons"/>
+      <class name="ft-timer-control-buttons"/>
     </style>
     <child>
       <object class="GtkButton" id="left_button">

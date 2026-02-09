@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/appearance/preferences-panel-appearance.ui")]
-    public class PreferencesPanelAppearance : Pomodoro.PreferencesPanel
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/appearance/preferences-panel-appearance.ui")]
+    public class PreferencesPanelAppearance : Ft.PreferencesPanel
     {
         [GtkChild]
         private unowned Adw.SwitchRow dark_theme_switchrow;
@@ -18,7 +18,7 @@ namespace Pomodoro
 
         construct
         {
-            this.settings = Pomodoro.get_settings ();
+            this.settings = Ft.get_settings ();
 
             this.settings.bind ("dark-theme",
                                 this.dark_theme_switchrow,

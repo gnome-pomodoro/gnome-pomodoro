@@ -11,23 +11,23 @@ hicolor_icondir = get_option('datadir') / 'icons/hicolor'
 
 foreach i:icon_dirs
   install_data(
-    i / 'org.gnomepomodoro.Pomodoro.png',
+    i / 'io.github.focustimerhq.FocusTimer.png',
     install_dir: hicolor_icondir / i / 'apps',
   )
 endforeach
 
 install_data(
   [
-    'scalable/org.gnomepomodoro.Pomodoro.svg',
-    'scalable/org.gnomepomodoro.Pomodoro.Devel.svg',
+    'scalable/io.github.focustimerhq.FocusTimer.svg',
+    'scalable/io.github.focustimerhq.FocusTimer.Devel.svg',
   ],
   install_dir: hicolor_icondir / 'scalable/apps',
 )
 
 install_data(
   [
-    'symbolic/org.gnomepomodoro.Pomodoro-symbolic.svg',
-    'symbolic/org.gnomepomodoro.Pomodoro.Devel-symbolic.svg',
+    'symbolic/io.github.focustimerhq.FocusTimer-symbolic.svg',
+    'symbolic/io.github.focustimerhq.FocusTimer.Devel-symbolic.svg',
   ],
   install_dir: hicolor_icondir / 'symbolic/apps',
 )

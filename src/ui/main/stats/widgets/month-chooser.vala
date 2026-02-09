@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,9 +9,9 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/stats/widgets/month-chooser.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/widgets/month-chooser.ui")]
     public sealed class MonthChooser : Adw.Bin
     {
         private const int MONTHS_PER_ROW = 3;
@@ -101,7 +101,7 @@ namespace Pomodoro
         private Gtk.Button create_month_button (GLib.Date date)
         {
             var button = new Gtk.Button ();
-            button.label = Pomodoro.DateUtils.format_date (date, "%b");
+            button.label = capitalize_words (Ft.DateUtils.format_date (date, "%b"));
             button.add_css_class ("pill");
             button.add_css_class ("flat");
             button.add_css_class ("month");
@@ -255,7 +255,7 @@ namespace Pomodoro
                 this.set_display_year (this._selected_date.get_year ());
             }
             else {
-                var today = Pomodoro.DateUtils.get_today ();
+                var today = Ft.DateUtils.get_today ();
 
                 this.set_display_year (today.get_year ());
             }

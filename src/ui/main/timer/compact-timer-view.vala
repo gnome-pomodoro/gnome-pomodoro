@@ -1,29 +1,28 @@
 /*
- * Copyright (c) 2022-2025 gnome-pomodoro contributors
+ * Copyright (c) 2022-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/timer/compact-timer-view.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/timer/compact-timer-view.ui")]
     public class CompactTimerView : Adw.Bin, Gtk.Buildable
     {
         [GtkChild]
         private unowned Gtk.MenuButton state_menubutton;
         [GtkChild]
-        private unowned Pomodoro.TimerLabel timer_label;
+        private unowned Ft.TimerLabel timer_label;
 
-        private Pomodoro.SessionManager session_manager;
-        private Pomodoro.Timer          timer;
-        private GLib.MenuModel?         state_menu;
-        private GLib.MenuModel?         uniform_state_menu;
-        private ulong                   timer_state_changed_id = 0;
-        private ulong                   notify_current_time_block_id = 0;
-        private ulong                   notify_has_uniform_breaks_id = 0;
-        private ulong                   current_time_block_changed_id = 0;
-        private Pomodoro.TimeBlock?     current_time_block;
-
+        private Ft.SessionManager   session_manager;
+        private Ft.Timer            timer;
+        private GLib.MenuModel?     state_menu;
+        private GLib.MenuModel?     uniform_state_menu;
+        private ulong               timer_state_changed_id = 0;
+        private ulong               notify_current_time_block_id = 0;
+        private ulong               notify_has_uniform_breaks_id = 0;
+        private ulong               current_time_block_changed_id = 0;
+        private Ft.TimeBlock?       current_time_block;
 
         static construct
         {
@@ -32,10 +31,10 @@ namespace Pomodoro
 
         construct
         {
-            this.session_manager = Pomodoro.SessionManager.get_default ();
+            this.session_manager = Ft.SessionManager.get_default ();
             this.timer           = session_manager.timer;
 
-            var builder = new Gtk.Builder.from_resource ("/org/gnomepomodoro/Pomodoro/ui/main/timer/menus.ui");
+            var builder = new Gtk.Builder.from_resource ("/io/github/focustimerhq/FocusTimer/ui/main/timer/menus.ui");
             this.state_menu = (GLib.MenuModel) builder.get_object ("state_menu");
             this.uniform_state_menu = (GLib.MenuModel) builder.get_object ("uniform_state_menu");
 
@@ -52,7 +51,7 @@ namespace Pomodoro
         {
             var current_time_block = this.session_manager.current_time_block;
             var current_state = current_time_block != null
-                    ? current_time_block.state : Pomodoro.State.STOPPED;
+                    ? current_time_block.state : Ft.State.STOPPED;
 
             return current_state.get_label ();
         }
@@ -78,7 +77,7 @@ namespace Pomodoro
         {
             var session_template = this.session_manager.scheduler.session_template;
 
-            this.timer_label.placeholder_has_hours = session_template.pomodoro_duration >= Pomodoro.Interval.HOUR;
+            this.timer_label.placeholder_has_hours = session_template.pomodoro_duration >= Ft.Interval.HOUR;
         }
 
         private void update ()
@@ -88,8 +87,8 @@ namespace Pomodoro
             this.update_timer_label_placeholder ();
         }
 
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
+        private void on_timer_state_changed (Ft.TimerState current_state,
+                                             Ft.TimerState previous_state)
         {
             this.update ();
         }

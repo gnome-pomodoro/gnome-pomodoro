@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 [CCode (cprefix = "")]
-namespace Pomodoro.DateUtils
+namespace Ft.DateUtils
 {
     public GLib.Date get_today ()
     {
@@ -77,7 +77,7 @@ namespace Pomodoro.DateUtils
         if (weekday_number != 0)
         {
             var first_day_of_week_number = (int) get_weekday_number_internal (
-                    Pomodoro.Locale.get_first_day_of_week ());
+                    Ft.Locale.get_first_day_of_week ());
             if (first_day_of_week_number == 0) {
                 first_day_of_week_number = 7;  // default to SUNDAY as the first day of week
             }

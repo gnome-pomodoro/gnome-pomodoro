@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public enum Unit
     {
@@ -41,8 +41,8 @@ namespace Pomodoro
                     // round +/- 10s
                     var value_rounded = 20.0 * Math.round (value / 20.0);
 
-                    return Pomodoro.Interval.format_short (
-                            Pomodoro.Interval.from_seconds (value_rounded));
+                    return Ft.Interval.format_short (
+                            Ft.Interval.from_seconds (value_rounded));
 
                 default:
                     assert_not_reached ();
@@ -55,7 +55,7 @@ namespace Pomodoro
     {
         public string        label;
         public Gdk.RGBA      color;
-        public Pomodoro.Unit unit;
+        public Ft.Unit unit;
         public bool          visible;
     }
 
@@ -72,7 +72,7 @@ namespace Pomodoro
      *
      * The content is scrollable horizontally.
      */
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/stats/charts/chart.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/charts/chart.ui")]
     public abstract class Chart : Gtk.Widget, Gtk.Buildable
     {
         private const int MIN_WIDTH = 300;
@@ -127,11 +127,11 @@ namespace Pomodoro
         }
 
         [GtkChild]
-        protected unowned Pomodoro.ChartContents contents;
+        protected unowned Ft.ChartContents contents;
         [GtkChild]
         private unowned Gtk.ScrolledWindow scrolled_window;
 
-        private Pomodoro.ChartAxis? y_axis = null;
+        private Ft.ChartAxis?       y_axis = null;
         private float               _x_spacing = 1.0f;
         private float               _y_spacing = 1.0f;
         private float               _aspect_ratio = 1.0f;
@@ -168,7 +168,7 @@ namespace Pomodoro
             this.@unref ();
         }
 
-        public void set_format_value_func (owned Pomodoro.FormatValueFunc? func)
+        public void set_format_value_func (owned Ft.FormatValueFunc? func)
         {
             this.format_value_func = (owned) func;
 
@@ -291,14 +291,14 @@ namespace Pomodoro
             return true;
         }
 
-        public abstract Gtk.SizeRequestMode get_contents_request_mode (Pomodoro.Canvas canvas);
+        public abstract Gtk.SizeRequestMode get_contents_request_mode (Ft.Canvas canvas);
 
         /**
          * Create and position canvas items in the value space.
          */
-        public abstract void update_canvas (Pomodoro.Canvas canvas);
+        public abstract void update_canvas (Ft.Canvas canvas);
 
-        public abstract void measure_canvas (Pomodoro.Canvas canvas,
+        public abstract void measure_canvas (Ft.Canvas canvas,
                                              Gtk.Orientation orientation,
                                              int             for_size,
                                              out int         minimum,
@@ -314,7 +314,7 @@ namespace Pomodoro
          * If size exceeds `available_width`, the content will be scrolled horizontally. The
          * `working_area` represents area available for drawing values.
          */
-        public abstract void measure_working_area (Pomodoro.Canvas   canvas,
+        public abstract void measure_working_area (Ft.Canvas   canvas,
                                                    int               available_width,
                                                    int               available_height,
                                                    out Gdk.Rectangle working_area);
@@ -476,7 +476,7 @@ namespace Pomodoro
             this.format_value_func = null;
 
             // HACK: Without this `GtkScrolledWindow` does not get disposed properly
-            this.dispose_template (typeof (Pomodoro.Chart));
+            this.dispose_template (typeof (Ft.Chart));
 
             base.dispose ();
         }

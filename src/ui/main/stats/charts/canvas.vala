@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * A container for placing widgets at given coordinates in a user-defined value space.
@@ -91,7 +91,7 @@ namespace Pomodoro
         static construct
         {
             set_css_name ("canvas");
-            set_layout_manager_type (typeof (Pomodoro.CanvasLayout));
+            set_layout_manager_type (typeof (Ft.CanvasLayout));
         }
 
         private void invalidate_transform ()
@@ -163,7 +163,7 @@ namespace Pomodoro
 
         internal void update_origin ()
         {
-            var layout = (Pomodoro.CanvasLayout) this.layout_manager;
+            var layout = (Ft.CanvasLayout) this.layout_manager;
             int x_origin, y_origin;
 
             if (layout.calculate_origin (this, out x_origin, out y_origin)) {
@@ -224,7 +224,7 @@ namespace Pomodoro
                                      out float y_from,
                                      out float y_to)
         {
-            var layout = (Pomodoro.CanvasLayout) this.layout_manager;
+            var layout = (Ft.CanvasLayout) this.layout_manager;
             var range = layout.calculate_range (this);
 
             x_from = range.origin.x;
@@ -241,9 +241,9 @@ namespace Pomodoro
         /**
          * Get the layout child for a widget (for advanced usage)
          */
-        internal inline unowned Pomodoro.CanvasLayoutChild? get_layout_child (Gtk.Widget child)
+        internal inline unowned Ft.CanvasLayoutChild? get_layout_child (Gtk.Widget child)
         {
-            return (Pomodoro.CanvasLayoutChild?) this.layout_manager?.get_layout_child (child);
+            return (Ft.CanvasLayoutChild?) this.layout_manager?.get_layout_child (child);
         }
 
         /**

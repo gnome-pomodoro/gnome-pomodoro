@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -9,7 +9,7 @@ using GLib;
 
 namespace Portal
 {
-    public class BackgroundProvider : Pomodoro.Provider, Pomodoro.BackgroundProvider
+    public class BackgroundProvider : Ft.Provider, Ft.BackgroundProvider
     {
         /**
          * Warn if underlying `Background` API version changes. Bump this value after testing.

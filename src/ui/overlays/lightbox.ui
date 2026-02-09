@@ -2,10 +2,9 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroLightbox" parent="GtkWindow">
+  <template class="FtLightbox" parent="GtkWindow">
     <property name="width-request">360</property>
     <property name="height-request">200</property>
-    <property name="icon-name">gnome-pomodoro</property>
     <property name="decorated">false</property>
     <property name="deletable">false</property>
     <property name="resizable">true</property><!-- it's required for the fullscreen -->
@@ -14,7 +13,7 @@
     <property name="child">
       <object class="AdwBin" id="container">
         <property name="layout-manager">
-          <object class="PomodoroMonitorConstrainedLayoutManager"/>
+          <object class="FtMonitorConstrainedLayoutManager"/>
         </property>
       </object>
     </property>

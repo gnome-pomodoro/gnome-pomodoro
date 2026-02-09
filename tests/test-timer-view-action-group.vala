@@ -1,9 +1,17 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     public class TimerViewActionGroupTest : Tests.TestSuite
     {
-        private Pomodoro.Timer?          timer;
-        private Pomodoro.SessionManager? session_manager;
+        private Ft.Timer?          timer;
+        private Ft.SessionManager? session_manager;
 
         public TimerViewActionGroupTest ()
         {
@@ -17,15 +25,15 @@ namespace Tests
 
         public override void setup ()
         {
-            Pomodoro.Timestamp.freeze_to (2000000000 * Pomodoro.Interval.SECOND);
+            Ft.Timestamp.freeze_to (2000000000 * Ft.Interval.SECOND);
 
-            this.timer = new Pomodoro.Timer ();
-            this.session_manager = new Pomodoro.SessionManager.with_timer (this.timer);
+            this.timer = new Ft.Timer ();
+            this.session_manager = new Ft.SessionManager.with_timer (this.timer);
         }
 
         public override void teardown ()
         {
-            Pomodoro.Timestamp.thaw ();
+            Ft.Timestamp.thaw ();
 
             this.timer = null;
             this.session_manager = null;
@@ -34,7 +42,7 @@ namespace Tests
 
         public void test_new ()
         {
-            var action_group = new Pomodoro.TimerViewActionGroup (this.session_manager);
+            var action_group = new Ft.TimerViewActionGroup (this.session_manager);
 
             assert_true (action_group.session_manager == this.session_manager);
             assert_true (action_group.timer == this.timer);
@@ -44,8 +52,8 @@ namespace Tests
 
         public void test_start ()
         {
-            var now = Pomodoro.Timestamp.tick (0);
-            var action_group = new Pomodoro.TimerViewActionGroup (this.session_manager);
+            var now = Ft.Timestamp.tick (0);
+            var action_group = new Ft.TimerViewActionGroup (this.session_manager);
 
             action_group.activate_action ("start", null);
 

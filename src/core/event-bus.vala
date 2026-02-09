@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,10 +9,10 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
-    public delegate void EventCallback (Pomodoro.Event event);
-    public delegate void ConditionCallback (Pomodoro.Context context);
+    public delegate void EventCallback (Ft.Event event);
+    public delegate void ConditionCallback (Ft.Context context);
 
 
     [SingleInstance]
@@ -21,10 +21,10 @@ namespace Pomodoro
         [Compact]
         private class EventWatch
         {
-            public uint                   id;
-            public string                 event_name;
-            public Pomodoro.Expression?   condition;
-            public Pomodoro.EventCallback callback;
+            public uint             id;
+            public string           event_name;
+            public Ft.Expression?   condition;
+            public Ft.EventCallback callback;
 
             ~EventWatch ()
             {
@@ -33,7 +33,7 @@ namespace Pomodoro
                 this.callback = null;
             }
 
-            public bool check_condition (Pomodoro.Context context)
+            public bool check_condition (Ft.Context context)
             {
                 if (this.condition == null) {
                     return true;
@@ -44,7 +44,7 @@ namespace Pomodoro
 
                     return result != null ? result.to_boolean () : false;
                 }
-                catch (Pomodoro.ExpressionError error) {
+                catch (Ft.ExpressionError error) {
                     GLib.warning ("Error while evaluating event condition: %s", error.message);
                     return false;
                 }
@@ -54,11 +54,11 @@ namespace Pomodoro
         [Compact]
         private class ConditionWatch
         {
-            public uint                        id;
-            public Pomodoro.Expression         condition;
-            public Pomodoro.ConditionCallback? enter_callback;
-            public Pomodoro.ConditionCallback? leave_callback;
-            public bool                        active = false;
+            public uint                  id;
+            public Ft.Expression         condition;
+            public Ft.ConditionCallback? enter_callback;
+            public Ft.ConditionCallback? leave_callback;
+            public bool                  active = false;
 
             ~ConditionWatch ()
             {
@@ -67,7 +67,7 @@ namespace Pomodoro
                 this.leave_callback = null;
             }
 
-            public void check_condition (Pomodoro.Context context)
+            public void check_condition (Ft.Context context)
             {
                 var active = this.active;
 
@@ -76,7 +76,7 @@ namespace Pomodoro
 
                     active = result != null ? result.to_boolean () : false;
                 }
-                catch (Pomodoro.ExpressionError error) {
+                catch (Ft.ExpressionError error) {
                     GLib.warning ("Error while evaluating condition: %s", error.message);
                     return;
                 }
@@ -97,7 +97,7 @@ namespace Pomodoro
         }
 
         private static uint                          next_watch_id = 1;
-        private Pomodoro.Context?                    last_context = null;
+        private Ft.Context?                          last_context = null;
         private GLib.HashTable<uint, EventWatch>     event_watches = null;
         private GLib.HashTable<string, GLib.Array<unowned EventWatch>> event_watches_by_name = null;
         private GLib.HashTable<uint, ConditionWatch> condition_watches = null;
@@ -113,7 +113,7 @@ namespace Pomodoro
                     GLib.direct_hash, GLib.direct_equal);
         }
 
-        private void check_conditions (Pomodoro.Context context)
+        private void check_conditions (Ft.Context context)
         {
             if (this.check_conditions_idle_id != 0) {
                 GLib.Source.remove (this.check_conditions_idle_id);
@@ -142,27 +142,27 @@ namespace Pomodoro
                 () => {
                     this.check_conditions_idle_id = 0;
 
-                    this.check_conditions (new Pomodoro.Context.build ());
+                    this.check_conditions (new Ft.Context.build ());
 
                     return GLib.Source.REMOVE;
                 },
                 GLib.Priority.DEFAULT
             );
             GLib.Source.set_name_by_id (this.check_conditions_idle_id,
-                                        "Pomodoro.EventBus.check_conditions");
+                                        "Ft.EventBus.check_conditions");
         }
 
-        public void push_event (Pomodoro.Event event)
+        public void push_event (Ft.Event event)
         {
             this.event (event);
         }
 
-        public uint add_event_watch (string                       event_name,
-                                     Pomodoro.Expression?         condition,
-                                     owned Pomodoro.EventCallback callback)
+        public uint add_event_watch (string                 event_name,
+                                     Ft.Expression?         condition,
+                                     owned Ft.EventCallback callback)
         {
-            var watch_id = Pomodoro.EventBus.next_watch_id;
-            Pomodoro.EventBus.next_watch_id++;
+            var watch_id = Ft.EventBus.next_watch_id;
+            Ft.EventBus.next_watch_id++;
 
             var watch = new EventWatch ();
             watch.id = watch_id;
@@ -189,12 +189,12 @@ namespace Pomodoro
             return watch_id;
         }
 
-        public uint add_condition_watch (Pomodoro.Expression               condition,
-                                         owned Pomodoro.ConditionCallback? enter_callback,
-                                         owned Pomodoro.ConditionCallback? leave_callback)
+        public uint add_condition_watch (Ft.Expression               condition,
+                                         owned Ft.ConditionCallback? enter_callback,
+                                         owned Ft.ConditionCallback? leave_callback)
         {
-            var watch_id = Pomodoro.EventBus.next_watch_id;
-            Pomodoro.EventBus.next_watch_id++;
+            var watch_id = Ft.EventBus.next_watch_id;
+            Ft.EventBus.next_watch_id++;
 
             var watch = new ConditionWatch ();
             watch.id = watch_id;
@@ -248,7 +248,7 @@ namespace Pomodoro
             if (watch.active)
             {
                 if (watch.leave_callback != null) {
-                    watch.leave_callback (new Pomodoro.Context.build ());
+                    watch.leave_callback (new Ft.Context.build ());
                 }
 
                 watch.active = false;
@@ -264,7 +264,7 @@ namespace Pomodoro
                 this.check_conditions_idle_id = 0;
             }
 
-            var context = new Pomodoro.Context.build ();
+            var context = new Ft.Context.build ();
 
             this.condition_watches.@foreach (
                 (id, watch) => {
@@ -279,7 +279,7 @@ namespace Pomodoro
                 });
         }
 
-        public signal void event (Pomodoro.Event event)
+        public signal void event (Ft.Event event)
         {
             unowned var watches_array = this.event_watches_by_name.lookup (event.spec.name);
 

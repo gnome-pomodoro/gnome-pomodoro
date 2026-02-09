@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/widgets/sidebar-row.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/widgets/sidebar-row.ui")]
     public class SidebarRow : Gtk.Box
     {
         public string icon_name {

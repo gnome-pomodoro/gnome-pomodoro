@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<interface domain="gnome-pomodoro">
+<interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroStatsDatePopover" parent="GtkPopover">
+  <template class="FtStatsDatePopover" parent="GtkPopover">
     <property name="halign">start</property>
     <property name="has-arrow">false</property>
     <property name="child">
@@ -47,7 +47,7 @@
                 <property name="name">day</property>
                 <property name="title"></property>
                 <property name="child">
-                  <object class="PomodoroDayChooser" id="day_chooser">
+                  <object class="FtDayChooser" id="day_chooser">
                     <signal name="selected" handler="on_day_selected"/>
                   </object>
                 </property>
@@ -58,7 +58,7 @@
                 <property name="name">week</property>
                 <property name="title"></property>
                 <property name="child">
-                  <object class="PomodoroWeekChooser" id="week_chooser">
+                  <object class="FtWeekChooser" id="week_chooser">
                     <signal name="selected" handler="on_week_selected"/>
                     <signal name="display-changed" handler="on_week_display_changed"/>
                   </object>
@@ -70,7 +70,7 @@
                 <property name="name">month</property>
                 <property name="title"></property>
                 <property name="child">
-                  <object class="PomodoroMonthChooser" id="month_chooser">
+                  <object class="FtMonthChooser" id="month_chooser">
                     <signal name="selected" handler="on_month_selected"/>
                   </object>
                 </property>

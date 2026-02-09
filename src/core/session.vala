@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 gnome-pomodoro contributors
+ * Copyright (c) 2021-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public struct SessionTemplate
     {
@@ -20,21 +20,21 @@ namespace Pomodoro
 
         public SessionTemplate.with_defaults ()
         {
-            var settings = Pomodoro.get_settings ();
+            var settings = Ft.get_settings ();
 
-            this.pomodoro_duration = Pomodoro.Timestamp.from_seconds_uint (
+            this.pomodoro_duration = Ft.Timestamp.from_seconds_uint (
                 settings.get_uint ("pomodoro-duration")
             );
-            this.short_break_duration = Pomodoro.Timestamp.from_seconds_uint (
+            this.short_break_duration = Ft.Timestamp.from_seconds_uint (
                 settings.get_uint ("short-break-duration")
             );
-            this.long_break_duration = Pomodoro.Timestamp.from_seconds_uint (
+            this.long_break_duration = Ft.Timestamp.from_seconds_uint (
                 settings.get_uint ("long-break-duration")
             );
             this.cycles = settings.get_uint ("cycles");
         }
 
-        public bool equals (Pomodoro.SessionTemplate other)
+        public bool equals (Ft.SessionTemplate other)
         {
             return this.pomodoro_duration == other.pomodoro_duration &&
                    this.short_break_duration == other.short_break_duration &&
@@ -77,21 +77,21 @@ namespace Pomodoro
             return this.cycles == 1;
         }
 
-        public int64 get_duration (Pomodoro.State state)
+        public int64 get_duration (Ft.State state)
         {
             switch (state)
             {
-                case Pomodoro.State.POMODORO:
+                case Ft.State.POMODORO:
                     return this.pomodoro_duration;
 
-                case Pomodoro.State.BREAK:
-                case Pomodoro.State.SHORT_BREAK:
+                case Ft.State.BREAK:
+                case Ft.State.SHORT_BREAK:
                     return this.short_break_duration;
 
-                case Pomodoro.State.LONG_BREAK:
+                case Ft.State.LONG_BREAK:
                     return this.long_break_duration;
 
-                case Pomodoro.State.STOPPED:
+                case Ft.State.STOPPED:
                     return 0;
 
                 default:
@@ -130,7 +130,7 @@ namespace Pomodoro
 
 
     /**
-     * Pomodoro.Session class.
+     * Ft.Session class.
      *
      * By "session" in this project we mean mostly a streak of pomodoros interleaved with breaks.
      * Session ends with either by a long break or inactivity.
@@ -159,7 +159,7 @@ namespace Pomodoro
          */
         public int64 duration {
             get {
-                return Pomodoro.Timestamp.subtract (this._end_time, this._start_time);
+                return Ft.Timestamp.subtract (this._end_time, this._start_time);
             }
         }
 
@@ -190,17 +190,17 @@ namespace Pomodoro
         /**
          * Time-blocks can me modified by scheduler.
          */
-        internal GLib.List<Pomodoro.TimeBlock> time_blocks;  // XXX: make it private
-        internal ulong                         version = 0;
-        internal Pomodoro.SessionEntry?        entry = null;
+        internal GLib.List<Ft.TimeBlock> time_blocks;  // XXX: make it private
+        internal ulong                   version = 0;
+        internal Ft.SessionEntry?        entry = null;
 
-        private int64                          _start_time = Pomodoro.Timestamp.UNDEFINED;
-        private int64                          _end_time = Pomodoro.Timestamp.UNDEFINED;
-        private int64                          _expiry_time = Pomodoro.Timestamp.UNDEFINED;
-        private GLib.List<Pomodoro.Cycle>      cycles;
-        private bool                           cycles_need_update = true;
-        private int                            changed_freeze_count = 0;
-        private bool                           changed_is_pending = false;
+        private int64                    _start_time = Ft.Timestamp.UNDEFINED;
+        private int64                    _end_time = Ft.Timestamp.UNDEFINED;
+        private int64                    _expiry_time = Ft.Timestamp.UNDEFINED;
+        private GLib.List<Ft.Cycle>      cycles;
+        private bool                     cycles_need_update = true;
+        private int                      changed_freeze_count = 0;
+        private bool                     changed_is_pending = false;
 
 
         /**
@@ -217,10 +217,10 @@ namespace Pomodoro
          *
          * It's intended to be used in unit tests. In real world, session should be built by `Scheduler`.
          */
-        public Session.from_template (Pomodoro.SessionTemplate template,
-                                      int64                    timestamp = Pomodoro.Timestamp.UNDEFINED)
+        public Session.from_template (Ft.SessionTemplate template,
+                                      int64              timestamp = Ft.Timestamp.UNDEFINED)
         {
-            Pomodoro.ensure_timestamp (ref timestamp);
+            Ft.ensure_timestamp (ref timestamp);
 
             this.freeze_changed ();
 
@@ -230,9 +230,9 @@ namespace Pomodoro
             {
                 var needs_long_break = cycle >= template.cycles;
 
-                var pomodoro_time_block = new Pomodoro.TimeBlock.with_start_time (
+                var pomodoro_time_block = new Ft.TimeBlock.with_start_time (
                         timestamp,
-                        Pomodoro.State.POMODORO);
+                        Ft.State.POMODORO);
                 pomodoro_time_block.duration = template.pomodoro_duration;
                 this.time_blocks.append (pomodoro_time_block);
                 this.emit_added (pomodoro_time_block);
@@ -240,9 +240,9 @@ namespace Pomodoro
                 timestamp += pomodoro_time_block.duration;
                 this._end_time = timestamp;
 
-                var break_time_block = new Pomodoro.TimeBlock.with_start_time (
+                var break_time_block = new Ft.TimeBlock.with_start_time (
                         timestamp,
-                        needs_long_break ? Pomodoro.State.LONG_BREAK : Pomodoro.State.SHORT_BREAK);
+                        needs_long_break ? Ft.State.LONG_BREAK : Ft.State.SHORT_BREAK);
                 break_time_block.duration = needs_long_break
                         ? template.long_break_duration
                         : template.short_break_duration;
@@ -266,10 +266,10 @@ namespace Pomodoro
 
             var start_time = first_time_block != null
                     ? first_time_block.start_time
-                    : Pomodoro.Timestamp.UNDEFINED;
+                    : Ft.Timestamp.UNDEFINED;
             var end_time = last_time_block != null
                     ? last_time_block.end_time
-                    : Pomodoro.Timestamp.UNDEFINED;
+                    : Ft.Timestamp.UNDEFINED;
 
             if (this._start_time != start_time) {
                 this._start_time = start_time;
@@ -293,14 +293,14 @@ namespace Pomodoro
 
         private void update_cycles ()
         {
-            var cycles = new GLib.List<Pomodoro.Cycle> ();
-            unowned Pomodoro.Cycle? last_cycle = null;
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            var cycles = new GLib.List<Ft.Cycle> ();
+            unowned Ft.Cycle? last_cycle = null;
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
 
             while (link != null)
             {
-                if (last_cycle == null || link.data.state == Pomodoro.State.POMODORO) {
-                    var cycle = new Pomodoro.Cycle ();
+                if (last_cycle == null || link.data.state == Ft.State.POMODORO) {
+                    var cycle = new Ft.Cycle ();
                     cycles.append (cycle);
                     last_cycle = cycle;
                 }
@@ -321,7 +321,7 @@ namespace Pomodoro
             }
         }
 
-        internal void emit_added (Pomodoro.TimeBlock time_block)
+        internal void emit_added (Ft.TimeBlock time_block)
         {
             time_block.session = this;
             time_block.changed.connect (this.on_time_block_changed);
@@ -329,7 +329,7 @@ namespace Pomodoro
             this.added (time_block);
         }
 
-        internal void emit_removed (Pomodoro.TimeBlock time_block)
+        internal void emit_removed (Ft.TimeBlock time_block)
         {
             time_block.session = null;
             time_block.changed.disconnect (this.on_time_block_changed);
@@ -377,9 +377,9 @@ namespace Pomodoro
         /**
          * Check whether a session is suitable for reuse after being unused.
          */
-        public bool is_expired (int64 timestamp = Pomodoro.Timestamp.UNDEFINED)
+        public bool is_expired (int64 timestamp = Ft.Timestamp.UNDEFINED)
         {
-            Pomodoro.ensure_timestamp (ref timestamp);
+            Ft.ensure_timestamp (ref timestamp);
 
             return this._expiry_time >= 0
                 ? timestamp >= this._expiry_time
@@ -388,13 +388,13 @@ namespace Pomodoro
 
         public bool is_scheduled ()
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
 
             var first_status = link != null
                 ? link.data.get_status ()
-                : Pomodoro.TimeBlockStatus.SCHEDULED;
+                : Ft.TimeBlockStatus.SCHEDULED;
 
-            return first_status == Pomodoro.TimeBlockStatus.SCHEDULED;
+            return first_status == Ft.TimeBlockStatus.SCHEDULED;
         }
 
         /**
@@ -404,13 +404,13 @@ namespace Pomodoro
          */
         public bool is_completed ()
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
 
             while (link != null)
             {
-                if (link.data.get_status () == Pomodoro.TimeBlockStatus.COMPLETED && (
-                    link.data.state == Pomodoro.State.LONG_BREAK ||
-                    link.data.state == Pomodoro.State.BREAK))
+                if (link.data.get_status () == Ft.TimeBlockStatus.COMPLETED && (
+                    link.data.state == Ft.State.LONG_BREAK ||
+                    link.data.state == Ft.State.BREAK))
                 {
                     return true;
                 }
@@ -428,9 +428,9 @@ namespace Pomodoro
          */
         public float calculate_break_ratio (int64 timestamp = -1)
         {
-            Pomodoro.ensure_timestamp (ref timestamp);
+            Ft.ensure_timestamp (ref timestamp);
 
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
             int64 pomodoros_total = 0;
             int64 breaks_total = 0;
 
@@ -440,16 +440,16 @@ namespace Pomodoro
 
                 switch (time_block.state)
                 {
-                    case Pomodoro.State.POMODORO:
-                        pomodoros_total = Pomodoro.Interval.add (pomodoros_total,
-                                                                 time_block.calculate_elapsed (timestamp));
+                    case Ft.State.POMODORO:
+                        pomodoros_total = Ft.Interval.add (pomodoros_total,
+                                                           time_block.calculate_elapsed (timestamp));
                         break;
 
-                    case Pomodoro.State.BREAK:
-                    case Pomodoro.State.SHORT_BREAK:
-                    case Pomodoro.State.LONG_BREAK:
-                        breaks_total = Pomodoro.Interval.add (breaks_total,
-                                                              time_block.calculate_elapsed (timestamp));
+                    case Ft.State.BREAK:
+                    case Ft.State.SHORT_BREAK:
+                    case Ft.State.LONG_BREAK:
+                        breaks_total = Ft.Interval.add (breaks_total,
+                                                        time_block.calculate_elapsed (timestamp));
                         break;
 
                     default:
@@ -459,7 +459,7 @@ namespace Pomodoro
                 link = link.next;
             }
 
-            var total = Pomodoro.Interval.add (pomodoros_total, breaks_total);
+            var total = Ft.Interval.add (pomodoros_total, breaks_total);
             var ratio = total > 0
                 ? (double) breaks_total / (double) total
                 : 0.0;
@@ -476,7 +476,7 @@ namespace Pomodoro
         /**
          * Remove link.
          */
-        internal void remove_link (GLib.List<Pomodoro.TimeBlock>? link)
+        internal void remove_link (GLib.List<Ft.TimeBlock>? link)
         {
             if (link == null) {
                 return;
@@ -494,7 +494,7 @@ namespace Pomodoro
         /**
          * Remove links following.
          */
-        internal void remove_links_after (GLib.List<Pomodoro.TimeBlock>? link)
+        internal void remove_links_after (GLib.List<Ft.TimeBlock>? link)
         {
             if (link == null) {
                 return;
@@ -509,7 +509,7 @@ namespace Pomodoro
         /**
          * Add the time-block and align it with the last block.
          */
-        public void append (Pomodoro.TimeBlock time_block)
+        public void append (Ft.TimeBlock time_block)
                             requires (time_block.session == null)
         {
             var last_time_block = this.get_last_time_block ();
@@ -526,14 +526,14 @@ namespace Pomodoro
         /**
          * Add the time-block as first and align it to first time-block.
          */
-        public void prepend (Pomodoro.TimeBlock time_block)
+        public void prepend (Ft.TimeBlock time_block)
                              requires (time_block.session == null)
         {
             var first_time_block = this.get_first_time_block ();
 
             if (first_time_block != null) {
-                var new_start_time = Pomodoro.Timestamp.subtract (first_time_block.start_time,
-                                                                  time_block.duration);
+                var new_start_time = Ft.Timestamp.subtract (first_time_block.start_time,
+                                                            time_block.duration);
                 time_block.move_to (new_start_time);
             }
 
@@ -545,12 +545,12 @@ namespace Pomodoro
         /**
          * Insert the time-block before given time-block.
          */
-        public void insert_before (Pomodoro.TimeBlock time_block,
-                                   Pomodoro.TimeBlock sibling)
+        public void insert_before (Ft.TimeBlock time_block,
+                                   Ft.TimeBlock sibling)
                                    requires (time_block.session == null)
                                    requires (sibling.session == this)
         {
-            unowned GLib.List<Pomodoro.TimeBlock> sibling_link = this.time_blocks.find (sibling);
+            unowned GLib.List<Ft.TimeBlock> sibling_link = this.time_blocks.find (sibling);
 
             time_block.move_to (sibling.start_time);
 
@@ -562,12 +562,12 @@ namespace Pomodoro
         /**
          * Insert the time-block after given time-block and align it to the sibling.
          */
-        public void insert_after (Pomodoro.TimeBlock time_block,
-                                  Pomodoro.TimeBlock sibling)
+        public void insert_after (Ft.TimeBlock time_block,
+                                  Ft.TimeBlock sibling)
                                   requires (time_block.session == null)
                                   requires (sibling.session == this)
         {
-            unowned GLib.List<Pomodoro.TimeBlock> sibling_link = this.time_blocks.find (sibling);
+            unowned GLib.List<Ft.TimeBlock> sibling_link = this.time_blocks.find (sibling);
 
             if (sibling_link.next == null) {
                 this.append (time_block);
@@ -581,9 +581,9 @@ namespace Pomodoro
             }
         }
 
-        public void remove (Pomodoro.TimeBlock time_block)
+        public void remove (Ft.TimeBlock time_block)
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.find (time_block);
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.find (time_block);
 
             if (link != null) {
                 this.remove_link (link);
@@ -593,9 +593,9 @@ namespace Pomodoro
             }
         }
 
-        public void remove_before (Pomodoro.TimeBlock time_block)
+        public void remove_before (Ft.TimeBlock time_block)
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.find (time_block);
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.find (time_block);
 
             if (link == null) {
                 GLib.warning ("Ignoring `Session.remove_before()`. Time-block does not belong to the session.");
@@ -612,9 +612,9 @@ namespace Pomodoro
             this.thaw_changed ();
         }
 
-        public void remove_after (Pomodoro.TimeBlock time_block)
+        public void remove_after (Ft.TimeBlock time_block)
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.find (time_block);
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.find (time_block);
 
             if (link == null) {
                 GLib.warning ("Ignoring `Session.remove_after()`. Time-block does not belong to the session.");
@@ -633,14 +633,14 @@ namespace Pomodoro
 
         public void remove_scheduled ()
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
-            unowned GLib.List<Pomodoro.TimeBlock> tmp;
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> tmp;
 
             this.freeze_changed ();
 
             while (link != null)
             {
-                if (link.data.get_status () == Pomodoro.TimeBlockStatus.SCHEDULED) {
+                if (link.data.get_status () == Ft.TimeBlockStatus.SCHEDULED) {
                     tmp = link.next;
                     this.remove_link (link);
                     link = tmp;
@@ -653,28 +653,28 @@ namespace Pomodoro
             this.thaw_changed ();
         }
 
-        public unowned Pomodoro.TimeBlock? get_first_time_block ()
+        public unowned Ft.TimeBlock? get_first_time_block ()
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
 
             return link != null ? link.data : null;
         }
 
-        public unowned Pomodoro.TimeBlock? get_last_time_block ()
+        public unowned Ft.TimeBlock? get_last_time_block ()
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.last ();
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.last ();
 
             return link != null ? link.data : null;
         }
 
-        public unowned Pomodoro.TimeBlock? get_nth_time_block (uint index)
+        public unowned Ft.TimeBlock? get_nth_time_block (uint index)
         {
             return this.time_blocks.nth_data (index);
         }
 
-        public unowned Pomodoro.TimeBlock? get_previous_time_block (Pomodoro.TimeBlock? time_block)
+        public unowned Ft.TimeBlock? get_previous_time_block (Ft.TimeBlock? time_block)
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.find (time_block);
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.find (time_block);
 
             if (link == null || link.prev == null) {
                 return null;
@@ -683,9 +683,9 @@ namespace Pomodoro
             return link.prev.data;
         }
 
-        public unowned Pomodoro.TimeBlock? get_next_time_block (Pomodoro.TimeBlock? time_block)
+        public unowned Ft.TimeBlock? get_next_time_block (Ft.TimeBlock? time_block)
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.find (time_block);
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.find (time_block);
 
             if (link == null || link.next == null) {
                 return null;
@@ -694,17 +694,17 @@ namespace Pomodoro
             return link.next.data;
         }
 
-        public int index (Pomodoro.TimeBlock time_block)
+        public int index (Ft.TimeBlock time_block)
         {
             return this.time_blocks.index (time_block);
         }
 
-        public bool contains (Pomodoro.TimeBlock time_block)
+        public bool contains (Ft.TimeBlock time_block)
         {
             return this.time_blocks.index (time_block) >= 0;
         }
 
-        public void @foreach (GLib.Func<unowned Pomodoro.TimeBlock> func)
+        public void @foreach (GLib.Func<unowned Ft.TimeBlock> func)
         {
             this.time_blocks.@foreach (func);
         }
@@ -716,7 +716,7 @@ namespace Pomodoro
             this.freeze_changed ();
 
             this.time_blocks.@foreach ((time_block) => {
-                if (!logged_warnining && time_block.get_status () > Pomodoro.TimeBlockStatus.IN_PROGRESS) {
+                if (!logged_warnining && time_block.get_status () > Ft.TimeBlockStatus.IN_PROGRESS) {
                     GLib.warning ("Moving time-blocks that have been completed.");
                     logged_warnining = true;
                 }
@@ -734,10 +734,10 @@ namespace Pomodoro
          */
         public void move_to (int64 timestamp)
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
 
             if (link != null) {
-                this.move_by (Pomodoro.Timestamp.subtract (timestamp, link.data.start_time));
+                this.move_by (Ft.Timestamp.subtract (timestamp, link.data.start_time));
             }
         }
 
@@ -746,11 +746,11 @@ namespace Pomodoro
          * Methods for managing time-blocks metadata
          */
 
-        public void set_time_block_status (Pomodoro.TimeBlock       time_block,
-                                           Pomodoro.TimeBlockStatus status)
+        public void set_time_block_status (Ft.TimeBlock       time_block,
+                                           Ft.TimeBlockStatus status)
         {
             var changed = false;
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
 
             if (!this.contains (time_block)) {
                 return;
@@ -769,8 +769,8 @@ namespace Pomodoro
                     break;
                 }
 
-                if (prevoious_status <= Pomodoro.TimeBlockStatus.IN_PROGRESS) {
-                    link.data.set_status (Pomodoro.TimeBlockStatus.UNCOMPLETED);
+                if (prevoious_status <= Ft.TimeBlockStatus.IN_PROGRESS) {
+                    link.data.set_status (Ft.TimeBlockStatus.UNCOMPLETED);
                     changed = true;
                 }
 
@@ -786,20 +786,20 @@ namespace Pomodoro
          * Cycles are not an structural part of a session, they are more like annotations. They are generated if needed
          * with `get_cycles ()`.
          */
-        public GLib.List<unowned Pomodoro.Cycle> get_cycles ()
+        public GLib.List<unowned Ft.Cycle> get_cycles ()
         {
             this.update_cycles_if_queued ();
 
             return this.cycles.copy ();
         }
 
-        public uint count_time_blocks (Pomodoro.FilterFunc<Pomodoro.TimeBlock>? func = null)
+        public uint count_time_blocks (Ft.FilterFunc<Ft.TimeBlock>? func = null)
         {
             if (func == null) {
                 return this.time_blocks.length ();
             }
 
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
             var count = 0U;
 
             while (link != null)
@@ -814,7 +814,7 @@ namespace Pomodoro
             return count;
         }
 
-        public uint count_cycles (Pomodoro.FilterFunc<Pomodoro.Cycle>? func = null)
+        public uint count_cycles (Ft.FilterFunc<Ft.Cycle>? func = null)
         {
             this.update_cycles_if_queued ();
 
@@ -822,7 +822,7 @@ namespace Pomodoro
                 return this.cycles.length ();
             }
 
-            unowned GLib.List<Pomodoro.Cycle> link = this.cycles.first ();
+            unowned GLib.List<Ft.Cycle> link = this.cycles.first ();
             var count = 0U;
 
             while (link != null)
@@ -849,7 +849,7 @@ namespace Pomodoro
 
         internal bool should_create_entry ()
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
 
             while (link != null)
             {
@@ -872,11 +872,11 @@ namespace Pomodoro
             return this.entry.version != this.version;
         }
 
-        internal unowned Pomodoro.SessionEntry create_or_update_entry ()
+        internal unowned Ft.SessionEntry create_or_update_entry ()
         {
             if (this.entry == null) {
-                this.entry = new Pomodoro.SessionEntry ();
-                this.entry.repository = Pomodoro.Database.get_repository ();
+                this.entry = new Ft.SessionEntry ();
+                this.entry.repository = Ft.Database.get_repository ();
             }
 
             this.entry.start_time = this._start_time;
@@ -889,7 +889,7 @@ namespace Pomodoro
 
         internal void unset_entry ()
         {
-            unowned GLib.List<Pomodoro.TimeBlock> link = this.time_blocks.first ();
+            unowned GLib.List<Ft.TimeBlock> link = this.time_blocks.first ();
 
             while (link != null)
             {
@@ -905,13 +905,13 @@ namespace Pomodoro
          */
 
         [Signal (run = "last")]
-        public signal void added (Pomodoro.TimeBlock time_block)
+        public signal void added (Ft.TimeBlock time_block)
         {
             this.emit_changed ();
         }
 
         [Signal (run = "last")]
-        public signal void removed (Pomodoro.TimeBlock time_block)
+        public signal void removed (Ft.TimeBlock time_block)
         {
             this.emit_changed ();
         }

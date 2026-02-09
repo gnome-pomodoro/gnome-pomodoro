@@ -1,3 +1,11 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     public enum Scenario
@@ -8,12 +16,12 @@ namespace Tests
     }
 
 
-    public interface AntiGravityProvider : Pomodoro.Provider
+    public interface AntiGravityProvider : Ft.Provider
     {
     }
 
 
-    public class SimpleAntiGravityProvider : Pomodoro.Provider, AntiGravityProvider
+    public class SimpleAntiGravityProvider : Ft.Provider, AntiGravityProvider
     {
         public bool mark_as_available { get; set; }
 
@@ -47,7 +55,7 @@ namespace Tests
     }
 
 
-    public class AntiGravity : Pomodoro.ProvidedObject<AntiGravityProvider>
+    public class AntiGravity : Ft.ProvidedObject<AntiGravityProvider>
     {
         public Scenario scenario { get; construct set; }
 
@@ -81,8 +89,8 @@ namespace Tests
                     break;
 
                 case Scenario.FALLBACK:
-                    this.providers.add (new SimpleAntiGravityProvider (false), Pomodoro.Priority.HIGH);
-                    this.providers.add (new SimpleAntiGravityProvider (true), Pomodoro.Priority.LOW);
+                    this.providers.add (new SimpleAntiGravityProvider (false), Ft.Priority.HIGH);
+                    this.providers.add (new SimpleAntiGravityProvider (true), Ft.Priority.LOW);
                     break;
 
                 default:

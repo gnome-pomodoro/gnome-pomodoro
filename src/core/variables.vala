@@ -1,26 +1,26 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-namespace Pomodoro
+namespace Ft
 {
     [CCode (has_target = false)]
-    public delegate Pomodoro.Value EvaluateFunc (Pomodoro.Context context);
+    public delegate Ft.Value EvaluateFunc (Ft.Context context);
 
 
     public class VariableSpec
     {
-        public string                name;
-        public string                description;
-        public GLib.Type             value_type;
-        public Pomodoro.EvaluateFunc evaluate_func;
+        public string          name;
+        public string          description;
+        public GLib.Type       value_type;
+        public Ft.EvaluateFunc evaluate_func;
 
-        public VariableSpec (string                      name,
-                             string                      description,
-                             GLib.Type                   value_type,
-                             owned Pomodoro.EvaluateFunc evaluate_func)
+        public VariableSpec (string                name,
+                             string                description,
+                             GLib.Type             value_type,
+                             owned Ft.EvaluateFunc evaluate_func)
         {
             this.name = name;
             this.description = description;
@@ -28,152 +28,152 @@ namespace Pomodoro
             this.evaluate_func = evaluate_func;
         }
 
-        public inline Pomodoro.Value evaluate (Pomodoro.Context context)
-                                               requires (this.evaluate_func != null)
+        public inline Ft.Value evaluate (Ft.Context context)
+                                         requires (this.evaluate_func != null)
         {
             return this.evaluate_func (context);
         }
     }
 
 
-    private Pomodoro.VariableSpec[] variable_specs = null;
-    private GLib.HashTable<string, unowned Pomodoro.VariableSpec> variable_spec_by_name = null;
+    private Ft.VariableSpec[] variable_specs = null;
+    private GLib.HashTable<string, unowned Ft.VariableSpec> variable_spec_by_name = null;
 
 
     namespace Variables
     {
-        private Pomodoro.Value get_timestamp (Pomodoro.Context context)
+        private Ft.Value get_timestamp (Ft.Context context)
         {
-            return new Pomodoro.TimestampValue (context.timestamp);
+            return new Ft.TimestampValue (context.timestamp);
         }
 
-        private Pomodoro.StateValue get_state (Pomodoro.Context context)
+        private Ft.StateValue get_state (Ft.Context context)
         {
-            return new Pomodoro.StateValue (context.time_block != null
-                                            ? context.time_block.state
-                                            : Pomodoro.State.STOPPED);
+            return new Ft.StateValue (context.time_block != null
+                                      ? context.time_block.state
+                                      : Ft.State.STOPPED);
         }
 
-        private Pomodoro.StatusValue get_status (Pomodoro.Context context)
+        private Ft.StatusValue get_status (Ft.Context context)
         {
-            return new Pomodoro.StatusValue (context.time_block != null
+            return new Ft.StatusValue (context.time_block != null
                                              ? context.time_block.get_status ()
-                                             : Pomodoro.TimeBlockStatus.SCHEDULED);
+                                             : Ft.TimeBlockStatus.SCHEDULED);
         }
 
-        private Pomodoro.BooleanValue get_is_started (Pomodoro.Context context)
+        private Ft.BooleanValue get_is_started (Ft.Context context)
         {
-            return new Pomodoro.BooleanValue (context.timer_state.is_started ());
+            return new Ft.BooleanValue (context.timer_state.is_started ());
         }
 
-        private Pomodoro.BooleanValue get_is_paused (Pomodoro.Context context)
+        private Ft.BooleanValue get_is_paused (Ft.Context context)
         {
-            return new Pomodoro.BooleanValue (context.timer_state.is_paused ());
+            return new Ft.BooleanValue (context.timer_state.is_paused ());
         }
 
-        private Pomodoro.BooleanValue get_is_finished (Pomodoro.Context context)
+        private Ft.BooleanValue get_is_finished (Ft.Context context)
         {
-            return new Pomodoro.BooleanValue (context.timer_state.is_finished ());
+            return new Ft.BooleanValue (context.timer_state.is_finished ());
         }
 
-        private Pomodoro.BooleanValue get_is_running (Pomodoro.Context context)
+        private Ft.BooleanValue get_is_running (Ft.Context context)
         {
-            return new Pomodoro.BooleanValue (context.timer_state.is_running ());
+            return new Ft.BooleanValue (context.timer_state.is_running ());
         }
 
-        private Pomodoro.IntervalValue get_duration (Pomodoro.Context context)
+        private Ft.IntervalValue get_duration (Ft.Context context)
         {
-            return new Pomodoro.IntervalValue (context.timer_state.duration);
+            return new Ft.IntervalValue (context.timer_state.duration);
         }
 
-        private Pomodoro.IntervalValue get_offset (Pomodoro.Context context)
+        private Ft.IntervalValue get_offset (Ft.Context context)
         {
-            return new Pomodoro.IntervalValue (context.timer_state.offset);
+            return new Ft.IntervalValue (context.timer_state.offset);
         }
 
-        private Pomodoro.IntervalValue get_elapsed (Pomodoro.Context context)
+        private Ft.IntervalValue get_elapsed (Ft.Context context)
         {
-            return new Pomodoro.IntervalValue (context.timer_state.calculate_elapsed (context.timestamp));
+            return new Ft.IntervalValue (context.timer_state.calculate_elapsed (context.timestamp));
         }
 
-        private Pomodoro.IntervalValue get_remaining (Pomodoro.Context context)
+        private Ft.IntervalValue get_remaining (Ft.Context context)
         {
-            return new Pomodoro.IntervalValue (context.timer_state.calculate_remaining (context.timestamp));
+            return new Ft.IntervalValue (context.timer_state.calculate_remaining (context.timestamp));
         }
 
-        private Pomodoro.TimestampValue get_start_time (Pomodoro.Context context)
+        private Ft.TimestampValue get_start_time (Ft.Context context)
         {
-            return new Pomodoro.TimestampValue (context.timer_state.started_time);
+            return new Ft.TimestampValue (context.timer_state.started_time);
         }
 
         private void initialize ()
         {
-            variable_specs = new Pomodoro.VariableSpec[0];
-            variable_spec_by_name = new GLib.HashTable<string, unowned Pomodoro.VariableSpec> (GLib.str_hash, GLib.str_equal);
+            variable_specs = new Ft.VariableSpec[0];
+            variable_spec_by_name = new GLib.HashTable<string, unowned Ft.VariableSpec> (GLib.str_hash, GLib.str_equal);
 
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("timestamp",
-                                           _("The exact time of the current event."),
-                                           typeof (Pomodoro.TimestampValue),
-                                           get_timestamp));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("state",
-                                           _("The current phase of the Pomodoro cycle. Possible values: <tt>stopped</tt>, <tt>pomodoro</tt>, <tt>break</tt>, <tt>short-break</tt>, <tt>long-break</tt>."),
-                                           typeof (Pomodoro.StateValue),
-                                           get_state));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("status",
-                                           _("Status of the current time-block. Possible values: <tt>scheduled</tt>, <tt>in-progress</tt>, <tt>completed</tt>, <tt>uncompleted</tt>."),
-                                           typeof (Pomodoro.StatusValue),
-                                           get_status));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("is-started",
-                                           _("A flag indicating whether countdown has begun."),
-                                           typeof (Pomodoro.BooleanValue),
-                                           get_is_started));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("is-paused",
-                                           _("A flag indicating whether countdown is paused."),
-                                           typeof (Pomodoro.BooleanValue),
-                                           get_is_paused));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("is-finished",
-                                           _("A flag indicating whether countdown has finished."),
-                                           typeof (Pomodoro.BooleanValue),
-                                           get_is_finished));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("is-running",
-                                           _("A flag indicating whether the timer is actively counting down."),
-                                           typeof (Pomodoro.BooleanValue),
-                                           get_is_running));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("duration",
-                                           _("Duration of the current countdown."),
-                                           typeof (Pomodoro.IntervalValue),
-                                           get_duration));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("offset",
-                                           // translators: Time difference between displayed value on the timer and real time. Think of it as a lost time.
-                                           _("Discrepancy between elapsed time and the time passed."),
-                                           typeof (Pomodoro.IntervalValue),
-                                           get_offset));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("elapsed",
-                                           // translators: Time since the start of countdown
-                                           _("The amount of time spent on the countdown."),
-                                           typeof (Pomodoro.IntervalValue),
-                                           get_elapsed));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("remaining",
-                                           // translators: Displayed timer value.
-                                           _("The amount of time left before the countdown ends."),
-                                           typeof (Pomodoro.IntervalValue),
-                                           get_remaining));
-            Pomodoro.install_variable (
-                new Pomodoro.VariableSpec ("start-time",
-                                           _("Time when the countdown has started."),
-                                           typeof (Pomodoro.TimestampValue),
-                                           get_start_time));
+            Ft.install_variable (
+                new Ft.VariableSpec ("timestamp",
+                                     _("The exact time of the current event."),
+                                     typeof (Ft.TimestampValue),
+                                     get_timestamp));
+            Ft.install_variable (
+                new Ft.VariableSpec ("state",
+                                     _("The current phase of the Pomodoro cycle. Possible values: <tt>stopped</tt>, <tt>pomodoro</tt>, <tt>break</tt>, <tt>short-break</tt>, <tt>long-break</tt>."),
+                                     typeof (Ft.StateValue),
+                                     get_state));
+            Ft.install_variable (
+                new Ft.VariableSpec ("status",
+                                     _("Status of the current time-block. Possible values: <tt>scheduled</tt>, <tt>in-progress</tt>, <tt>completed</tt>, <tt>uncompleted</tt>."),
+                                     typeof (Ft.StatusValue),
+                                     get_status));
+            Ft.install_variable (
+                new Ft.VariableSpec ("is-started",
+                                     _("A flag indicating whether countdown has begun."),
+                                     typeof (Ft.BooleanValue),
+                                     get_is_started));
+            Ft.install_variable (
+                new Ft.VariableSpec ("is-paused",
+                                     _("A flag indicating whether countdown is paused."),
+                                     typeof (Ft.BooleanValue),
+                                     get_is_paused));
+            Ft.install_variable (
+                new Ft.VariableSpec ("is-finished",
+                                     _("A flag indicating whether countdown has finished."),
+                                     typeof (Ft.BooleanValue),
+                                     get_is_finished));
+            Ft.install_variable (
+                new Ft.VariableSpec ("is-running",
+                                     _("A flag indicating whether the timer is actively counting down."),
+                                     typeof (Ft.BooleanValue),
+                                     get_is_running));
+            Ft.install_variable (
+                new Ft.VariableSpec ("duration",
+                                     _("Duration of the current countdown."),
+                                     typeof (Ft.IntervalValue),
+                                     get_duration));
+            Ft.install_variable (
+                new Ft.VariableSpec ("offset",
+                                     // translators: Time difference between displayed value on the timer and real time. Think of it as a lost time.
+                                     _("Discrepancy between elapsed time and the time passed."),
+                                     typeof (Ft.IntervalValue),
+                                     get_offset));
+            Ft.install_variable (
+                new Ft.VariableSpec ("elapsed",
+                                     // translators: Time since the start of countdown
+                                     _("The amount of time spent on the countdown."),
+                                     typeof (Ft.IntervalValue),
+                                     get_elapsed));
+            Ft.install_variable (
+                new Ft.VariableSpec ("remaining",
+                                     // translators: Displayed timer value.
+                                     _("The amount of time left before the countdown ends."),
+                                     typeof (Ft.IntervalValue),
+                                     get_remaining));
+            Ft.install_variable (
+                new Ft.VariableSpec ("start-time",
+                                     _("Time when the countdown has started."),
+                                     typeof (Ft.TimestampValue),
+                                     get_start_time));
         }
 
         internal inline void ensure_initialized ()
@@ -185,22 +185,22 @@ namespace Pomodoro
     }
 
 
-    public void install_variable (Pomodoro.VariableSpec variable_spec)
+    public void install_variable (Ft.VariableSpec variable_spec)
     {
         variable_specs += variable_spec;
         variable_spec_by_name.insert (variable_spec.name, variable_spec);
     }
 
-    public unowned Pomodoro.VariableSpec? find_variable (string variable_name)
+    public unowned Ft.VariableSpec? find_variable (string variable_name)
     {
-        Pomodoro.Variables.ensure_initialized ();
+        Ft.Variables.ensure_initialized ();
 
         return variable_spec_by_name.lookup (variable_name);
     }
 
-    public (unowned Pomodoro.VariableSpec)[] list_variables ()
+    public (unowned Ft.VariableSpec)[] list_variables ()
     {
-        Pomodoro.Variables.ensure_initialized ();
+        Ft.Variables.ensure_initialized ();
 
         return variable_specs;
     }
@@ -212,11 +212,11 @@ namespace Pomodoro
             return true;
         }
 
-        var variable_spec = Pomodoro.find_variable (variable_name);
+        var variable_spec = Ft.find_variable (variable_name);
 
         if (variable_spec != null)
         {
-            foreach (var format in Pomodoro.list_value_formats (variable_spec.value_type))
+            foreach (var format in Ft.list_value_formats (variable_spec.value_type))
             {
                 if (variable_format == format) {
                     return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public abstract class LogEntry : GLib.Object
     {
@@ -16,21 +16,21 @@ namespace Pomodoro
                 return this._id;
             }
             construct {
-                this._id = Pomodoro.LogEntry.next_id;
+                this._id = Ft.LogEntry.next_id;
 
-                Pomodoro.LogEntry.next_id++;
+                Ft.LogEntry.next_id++;
             }
         }
         public int64 timestamp { get; set; }
         public string label { get; set; }
-        public Pomodoro.Context context { get; set; }
+        public Ft.Context context { get; set; }
 
         private ulong        _id;
         private static ulong next_id = 1;
     }
 
 
-    public sealed class EventLogEntry : Pomodoro.LogEntry
+    public sealed class EventLogEntry : Ft.LogEntry
     {
         public string event_name {
             get {
@@ -43,7 +43,7 @@ namespace Pomodoro
 
         private string _event_name;
 
-        public EventLogEntry (Pomodoro.Event event)
+        public EventLogEntry (Ft.Event event)
         {
             GLib.Object (
                 timestamp: event.context.timestamp,
@@ -55,7 +55,7 @@ namespace Pomodoro
     }
 
 
-    public class ActionLogEntry : Pomodoro.LogEntry
+    public class ActionLogEntry : Ft.LogEntry
     {
         public string action_uuid {
             get {
@@ -104,10 +104,10 @@ namespace Pomodoro
         private string? _command_line;
         private string? _command_output;
 
-        public ActionLogEntry (Pomodoro.Action            action,
-                               string                     event_name,
-                               Pomodoro.Context           context,
-                               Pomodoro.CommandExecution? execution)
+        public ActionLogEntry (Ft.Action            action,
+                               string               event_name,
+                               Ft.Context           context,
+                               Ft.CommandExecution? execution)
         {
             GLib.Object (
                 timestamp: context.timestamp,
@@ -141,7 +141,7 @@ namespace Pomodoro
         {
             // TODO: ensure model is sorted and group entries into sections,
             //       likely we will need custom model
-            this._model = new GLib.ListStore (typeof (Pomodoro.LogEntry));
+            this._model = new GLib.ListStore (typeof (Ft.LogEntry));
         }
 
         private bool transform_to_error_message (GLib.Binding   binding,
@@ -155,7 +155,7 @@ namespace Pomodoro
             return true;
         }
 
-        private inline ulong log (Pomodoro.LogEntry entry)
+        private inline ulong log (Ft.LogEntry entry)
         {
             this._model.append (entry);
 
@@ -166,17 +166,17 @@ namespace Pomodoro
             return entry.id;
         }
 
-        public ulong log_event (Pomodoro.Event event)
+        public ulong log_event (Ft.Event event)
         {
-            return this.log (new Pomodoro.EventLogEntry (event));
+            return this.log (new Ft.EventLogEntry (event));
         }
 
-        private ulong log_action_event (Pomodoro.Action            action,
+        private ulong log_action_event (Ft.Action            action,
                                         string                     event_name,
-                                        Pomodoro.Context           context,
-                                        Pomodoro.CommandExecution? execution)
+                                        Ft.Context           context,
+                                        Ft.CommandExecution? execution)
         {
-            var entry = new Pomodoro.ActionLogEntry (action, event_name, context, execution);
+            var entry = new Ft.ActionLogEntry (action, event_name, context, execution);
 
             if (execution != null)
             {
@@ -205,23 +205,23 @@ namespace Pomodoro
             return this.log (entry);
         }
 
-        public ulong log_action_triggered (Pomodoro.EventAction       action,
-                                           Pomodoro.Context           context,
-                                           Pomodoro.CommandExecution? execution)
+        public ulong log_action_triggered (Ft.EventAction       action,
+                                           Ft.Context           context,
+                                           Ft.CommandExecution? execution)
         {
             return this.log_action_event (action, "triggered", context, execution);
         }
 
-        public ulong log_action_entered_condition (Pomodoro.ConditionAction   action,
-                                                  Pomodoro.Context           context,
-                                                  Pomodoro.CommandExecution? execution)
+        public ulong log_action_entered_condition (Ft.ConditionAction   action,
+                                                   Ft.Context           context,
+                                                   Ft.CommandExecution? execution)
         {
             return this.log_action_event (action, "entered-condition", context, execution);
         }
 
-        public ulong log_action_exited_condition (Pomodoro.ConditionAction   action,
-                                                 Pomodoro.Context           context,
-                                                 Pomodoro.CommandExecution? execution)
+        public ulong log_action_exited_condition (Ft.ConditionAction   action,
+                                                  Ft.Context           context,
+                                                  Ft.CommandExecution? execution)
         {
             return this.log_action_event (action, "exited-condition", context, execution);
         }

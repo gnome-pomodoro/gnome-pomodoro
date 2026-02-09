@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2025 gnome-pomodoro contributors
+ * Copyright (c) 2013-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public struct Accelerator
     {
@@ -33,20 +33,20 @@ namespace Pomodoro
         public uint             keyval;
         public Gdk.ModifierType modifiers;
 
-        public static Pomodoro.Accelerator empty ()
+        public static Ft.Accelerator empty ()
         {
-            return Pomodoro.Accelerator () {
+            return Ft.Accelerator () {
                 keycode   = 0,
                 keyval    = 0,
                 modifiers = Gdk.ModifierType.NO_MODIFIER_MASK
             };
         }
 
-        public static Pomodoro.Accelerator from_keycode (uint             keycode,
-                                                         Gdk.ModifierType modifiers,
-                                                         uint             group)
+        public static Ft.Accelerator from_keycode (uint             keycode,
+                                                   Gdk.ModifierType modifiers,
+                                                   uint             group)
         {
-            var accelerator = Pomodoro.Accelerator () {
+            var accelerator = Ft.Accelerator () {
                 keycode   = keycode,
                 keyval    = 0,
                 modifiers = modifiers
@@ -55,7 +55,7 @@ namespace Pomodoro
             return accelerator.normalize (group);
         }
 
-        public static Pomodoro.Accelerator from_string (string accelerator_string)
+        public static Ft.Accelerator from_string (string accelerator_string)
         {
             int index = 0;
             int modifier_position = -1;
@@ -111,7 +111,7 @@ namespace Pomodoro
                 }
             }
 
-            return Pomodoro.Accelerator () {
+            return Ft.Accelerator () {
                 keycode   = 0,
                 keyval    = Gdk.keyval_from_name (accelerator_string.slice (keyval_position, index)),
                 modifiers = modifiers
@@ -169,7 +169,7 @@ namespace Pomodoro
          * level > 0, such as for numbers in the num-row in AZERTY.
          * Next it checks if all the specified modifiers were pressed.
          */
-        public Pomodoro.Accelerator normalize (uint group)
+        public Ft.Accelerator normalize (uint group)
         {
             uint unmodified_keyval;
             uint shifted_keyval;
@@ -222,7 +222,7 @@ namespace Pomodoro
             /* CapsLock isn't supported as a keybinding modifier, so keep it from confusing us */
             used_modifiers &= ~Gdk.ModifierType.LOCK_MASK;
 
-            return Pomodoro.Accelerator () {
+            return Ft.Accelerator () {
                 keycode   = 0,
                 keyval    = unmodified_keyval,
                 modifiers = used_modifiers

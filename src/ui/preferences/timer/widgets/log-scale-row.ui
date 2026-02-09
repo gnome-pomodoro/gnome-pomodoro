@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroLogScaleRow" parent="AdwActionRow">
+  <template class="FtLogScaleRow" parent="AdwActionRow">
     <property name="child">
       <object class="GtkGrid">
         <property name="orientation">vertical</property>
@@ -35,7 +35,7 @@
           </object>
         </child>
         <child>
-          <object class="PomodoroLogScale" id="scale">
+          <object class="FtLogScale" id="scale">
             <property name="halign">fill</property>
             <property name="show-fill-level">true</property>
             <layout>
@@ -48,7 +48,7 @@
       </object>
     </property>
     <style>
-      <class name="pomodoro-log-scale"/>
+      <class name="ft-log-scale"/>
     </style>
   </template>
 </interface>

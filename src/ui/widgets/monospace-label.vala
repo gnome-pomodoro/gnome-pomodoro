@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2021-2025 gnome-pomodoro contributors
+ * Copyright (c) 2021-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     // TODO: rename to NumericLabel
     /**

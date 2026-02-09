@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroPreferencesPanelTimer" parent="PomodoroPreferencesPanel">
+  <template class="FtPreferencesPanelTimer" parent="FtPreferencesPanel">
     <property name="child">
       <object class="AdwToolbarView">
         <child type="top">
@@ -16,7 +16,7 @@
               <object class="AdwPreferencesGroup">
                 <property name="title" translatable="yes">Session</property>
                 <child>
-                  <object class="PomodoroLogScaleRow">
+                  <object class="FtLogScaleRow">
                     <property name="title" translatable="yes">Pomodoro Duration</property>
                     <property name="adjustment">
                       <object class="GtkAdjustment" id="pomodoro_duration_adjustment">
@@ -27,7 +27,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="PomodoroLogScaleRow">
+                  <object class="FtLogScaleRow">
                     <property name="title" translatable="yes">Short Break Duration</property>
                     <property name="adjustment">
                       <object class="GtkAdjustment" id="short_break_duration_adjustment">
@@ -38,7 +38,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="PomodoroLogScaleRow" id="long_break_row">
+                  <object class="FtLogScaleRow" id="long_break_row">
                     <property name="title" translatable="yes">Long Break Duration</property>
                     <property name="adjustment">
                       <object class="GtkAdjustment" id="long_break_duration_adjustment">
@@ -92,7 +92,7 @@
               <object class="AdwPreferencesGroup">
                 <property name="title" translatable="yes">Behavior</property>
                 <child>
-                  <object class="AdwSwitchRow" id="pomodoro_pause_on_lockscreen_switchrow">
+                  <object class="AdwSwitchRow" id="pause_on_lockscreen_switchrow">
                     <property name="title" translatable="yes">Pause By Locking The Screen</property>
                   </object>
                 </child>

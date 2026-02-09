@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * A list model for storing actions in settings.
@@ -27,20 +27,19 @@ namespace Pomodoro
             }
         }
 
-        private GLib.HashTable<string, Pomodoro.Action> actions;
-        private string[]                                uuids;
-        private uint                                    _n_items = 0;
-        private GLib.Settings                           settings = null;
-        private ulong                                   settings_changed_id = 0;
-        private int                                     settings_changed_inhibit_count = 0;
+        private GLib.HashTable<string, Ft.Action> actions;
+        private string[]                          uuids;
+        private uint                              _n_items = 0;
+        private GLib.Settings                     settings = null;
+        private ulong                             settings_changed_id = 0;
+        private int                               settings_changed_inhibit_count = 0;
 
         construct
         {
             this.uuids = new string[0];
-            this.actions = new GLib.HashTable<string, Pomodoro.Action> (GLib.str_hash,
-                                                                        GLib.str_equal);
+            this.actions = new GLib.HashTable<string, Ft.Action> (GLib.str_hash, GLib.str_equal);
 
-            this.settings = new GLib.Settings ("org.gnomepomodoro.Pomodoro.actions");
+            this.settings = new GLib.Settings ("io.github.focustimerhq.FocusTimer.actions");
             this.settings_changed_id = this.settings.changed.connect (this.on_settings_changed);
 
             this.load ();
@@ -79,8 +78,8 @@ namespace Pomodoro
                 return existing_settings;
             }
 
-            return new GLib.Settings.with_path ("org.gnomepomodoro.Pomodoro.actions.action",
-                                                @"/org/gnomepomodoro/Pomodoro/actions/$(uuid)/");
+            return new GLib.Settings.with_path ("io.github.focustimerhq.FocusTimer.actions.action",
+                                                @"/io/github/focustimerhq/FocusTimer/actions/$(uuid)/");
         }
 
         private void inhibit_settings_changed ()
@@ -93,7 +92,7 @@ namespace Pomodoro
             this.settings_changed_inhibit_count--;
         }
 
-        private Pomodoro.Action load_action (string uuid)
+        private Ft.Action load_action (string uuid)
         {
             var settings = this.create_action_settings (uuid);
             var action = this.create_action (uuid, settings.get_enum ("trigger"));
@@ -156,7 +155,7 @@ namespace Pomodoro
 
         public GLib.Type get_item_type ()
         {
-            return typeof (Pomodoro.Action);
+            return typeof (Ft.Action);
         }
 
         public uint get_n_items ()
@@ -192,7 +191,7 @@ namespace Pomodoro
             return -1;
         }
 
-        public Pomodoro.Action? lookup (string uuid)
+        public Ft.Action? lookup (string uuid)
         {
             return this.actions.lookup (uuid);
         }
@@ -200,28 +199,28 @@ namespace Pomodoro
         /**
          * Initialize an action instance.
          */
-        public Pomodoro.Action create_action (string?                uuid = null,
-                                              Pomodoro.ActionTrigger trigger = Pomodoro.ActionTrigger.EVENT)
+        public Ft.Action create_action (string?          uuid = null,
+                                        Ft.ActionTrigger trigger = Ft.ActionTrigger.EVENT)
         {
             switch (trigger)
             {
-                case Pomodoro.ActionTrigger.EVENT:
-                    return new Pomodoro.EventAction (uuid);
+                case Ft.ActionTrigger.EVENT:
+                    return new Ft.EventAction (uuid);
 
-                case Pomodoro.ActionTrigger.CONDITION:
-                    return new Pomodoro.ConditionAction (uuid);
+                case Ft.ActionTrigger.CONDITION:
+                    return new Ft.ConditionAction (uuid);
 
                 default:
                     assert_not_reached ();
             }
         }
 
-        public void save_action (Pomodoro.Action action)
+        public void save_action (Ft.Action action)
         {
             var creating = action.uuid == null;
             var settings = action.settings;
             var position = 0U;
-            Pomodoro.Action? previous_action = null;
+            Ft.Action? previous_action = null;
 
             if (creating) {
                 action.set_uuid_internal (GLib.Uuid.string_random ());
@@ -344,9 +343,9 @@ namespace Pomodoro
             this.items_changed (uint.min (source_position, destination_position), n_changes, n_changes);
         }
 
-        public signal void action_added (Pomodoro.Action action);
+        public signal void action_added (Ft.Action action);
 
-        public signal void action_removed (Pomodoro.Action action);
+        public signal void action_removed (Ft.Action action);
 
         public override void dispose ()
         {

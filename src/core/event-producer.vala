@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,40 +9,40 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     [CCode (has_target = false)]
     public delegate bool TriggerFunc ();
 
     [CCode (has_target = false)]
     public delegate bool TimerStateChangedTriggerFunc (
-                                       Pomodoro.TimerState current_state,
-                                       Pomodoro.TimerState previous_state);
+                                       Ft.TimerState current_state,
+                                       Ft.TimerState previous_state);
 
     [CCode (has_target = false)]
     public delegate bool SessionManagerConfirmAdvancementTriggerFunc (
-                                       Pomodoro.TimeBlock next_time_block,
-                                       Pomodoro.TimeBlock previous_time_block);
+                                       Ft.TimeBlock next_time_block,
+                                       Ft.TimeBlock previous_time_block);
 
     [CCode (has_target = false)]
     public delegate bool SessionManagerAdvancedTriggerFunc (
-                                       Pomodoro.Session?   current_session,
-                                       Pomodoro.TimeBlock? current_time_block,
-                                       Pomodoro.Session?   previous_session,
-                                       Pomodoro.TimeBlock? previous_time_block);
+                                       Ft.Session?   current_session,
+                                       Ft.TimeBlock? current_time_block,
+                                       Ft.Session?   previous_session,
+                                       Ft.TimeBlock? previous_time_block);
 
     [CCode (has_target = false)]
     public delegate bool SessionManagerNotifyCurrentStateTriggerFunc (
-                                       Pomodoro.State current_state,
-                                       Pomodoro.State previous_state);
+                                       Ft.State current_state,
+                                       Ft.State previous_state);
 
     [CCode (has_target = false)]
     public delegate bool SessionManagerSessionRescheduledTriggerFunc (
-                                       Pomodoro.Session session);
+                                       Ft.Session session);
 
     [CCode (has_target = false)]
     public delegate bool SessionManagerSessionExpiredTriggerFunc (
-                                       Pomodoro.Session session);
+                                       Ft.Session session);
 
 
     public enum TriggerHook
@@ -59,9 +59,9 @@ namespace Pomodoro
 
     public struct Trigger
     {
-        public unowned Pomodoro.EventSpec   event_spec;
-        public Pomodoro.TriggerHook         hook;
-        public Pomodoro.TriggerFunc         func;
+        public unowned Ft.EventSpec   event_spec;
+        public Ft.TriggerHook         hook;
+        public Ft.TriggerFunc         func;
     }
 
 
@@ -73,7 +73,7 @@ namespace Pomodoro
     [SingleInstance]
     public class EventProducer : GLib.Object
     {
-        public Pomodoro.SessionManager session_manager
+        public Ft.SessionManager session_manager
         {
             get {
                 return this._session_manager;
@@ -91,7 +91,7 @@ namespace Pomodoro
             }
         }
 
-        public Pomodoro.Timer timer
+        public Ft.Timer timer
         {
             get {
                 return this._timer;
@@ -103,7 +103,7 @@ namespace Pomodoro
             }
         }
 
-        public Pomodoro.EventBus bus
+        public Ft.EventBus bus
         {
             get {
                 return this._bus;
@@ -113,54 +113,55 @@ namespace Pomodoro
             }
         }
 
-        private Pomodoro.SessionManager?                   _session_manager = null;
-        private Pomodoro.Timer?                            _timer = null;
-        private Pomodoro.EventBus?                         _bus = null;
-        private Pomodoro.EventSpec[]                       event_specs = null;
-        private GLib.HashTable<string, unowned Pomodoro.EventSpec> event_spec_by_name = null;
-        private Pomodoro.State                             previous_state;
-        private GLib.Queue<unowned Pomodoro.EventSpec>     queue = null;
-        private uint                                       idle_id = 0;
-        private int64                                      event_source_timestamp = Pomodoro.Timestamp.UNDEFINED;
-        private bool                                       destroying = false;
+        private Ft.SessionManager?                   _session_manager = null;
+        private Ft.Timer?                            _timer = null;
+        private Ft.EventBus?                         _bus = null;
+        private Ft.EventSpec[]                       event_specs = null;
+        private GLib.HashTable<string, unowned Ft.EventSpec> event_spec_by_name = null;
+        private Ft.State                             previous_state;
+        private GLib.Queue<unowned Ft.EventSpec>     queue = null;
+        private uint                                 idle_id = 0;
+        private int64                                event_source_timestamp = Ft.Timestamp.UNDEFINED;
+        private int64                                last_session_rescheduled_time = Ft.Timestamp.UNDEFINED;
+        private bool                                 destroying = false;
 
-        private Pomodoro.Trigger[]                         timer_state_change_triggers;
-        private Pomodoro.Trigger[]                         session_manager_confirm_advancement_triggers;
-        private Pomodoro.Trigger[]                         session_manager_advanced_triggers;
-        private Pomodoro.Trigger[]                         session_manager_notify_current_state_triggers;
-        private Pomodoro.Trigger[]                         session_manager_session_rescheduled_triggers;
-        private Pomodoro.Trigger[]                         session_manager_session_expired_triggers;
+        private Ft.Trigger[]                         timer_state_change_triggers;
+        private Ft.Trigger[]                         session_manager_confirm_advancement_triggers;
+        private Ft.Trigger[]                         session_manager_advanced_triggers;
+        private Ft.Trigger[]                         session_manager_notify_current_state_triggers;
+        private Ft.Trigger[]                         session_manager_session_rescheduled_triggers;
+        private Ft.Trigger[]                         session_manager_session_expired_triggers;
 
         construct
         {
-            this.event_specs = new Pomodoro.EventSpec[0];
-            this.event_spec_by_name = new GLib.HashTable<string, unowned Pomodoro.EventSpec> (GLib.str_hash, GLib.str_equal);
-            this.queue = new GLib.Queue<unowned Pomodoro.EventSpec> ();
+            this.event_specs = new Ft.EventSpec[0];
+            this.event_spec_by_name = new GLib.HashTable<string, unowned Ft.EventSpec> (GLib.str_hash, GLib.str_equal);
+            this.queue = new GLib.Queue<unowned Ft.EventSpec> ();
 
-            this.timer_state_change_triggers                   = new Pomodoro.Trigger[0];
-            this.session_manager_confirm_advancement_triggers  = new Pomodoro.Trigger[0];
-            this.session_manager_advanced_triggers             = new Pomodoro.Trigger[0];
-            this.session_manager_notify_current_state_triggers = new Pomodoro.Trigger[0];
-            this.session_manager_session_rescheduled_triggers  = new Pomodoro.Trigger[0];
-            this.session_manager_session_expired_triggers      = new Pomodoro.Trigger[0];
+            this.timer_state_change_triggers                   = new Ft.Trigger[0];
+            this.session_manager_confirm_advancement_triggers  = new Ft.Trigger[0];
+            this.session_manager_advanced_triggers             = new Ft.Trigger[0];
+            this.session_manager_notify_current_state_triggers = new Ft.Trigger[0];
+            this.session_manager_session_rescheduled_triggers  = new Ft.Trigger[0];
+            this.session_manager_session_expired_triggers      = new Ft.Trigger[0];
 
-            Pomodoro.initialize_events (this);
+            Ft.initialize_events (this);
         }
 
         public EventProducer ()
         {
-            var bus = new Pomodoro.EventBus ();
+            var bus = new Ft.EventBus ();
 
             GLib.Object (
-                session_manager: Pomodoro.SessionManager.get_default (),
-                timer: Pomodoro.Timer.get_default (),
+                session_manager: Ft.SessionManager.get_default (),
+                timer: Ft.Timer.get_default (),
                 bus: bus
             );
         }
 
-        public EventProducer.with_session_manager (Pomodoro.SessionManager session_manager)
+        public EventProducer.with_session_manager (Ft.SessionManager session_manager)
         {
-            var bus = new Pomodoro.EventBus ();
+            var bus = new Ft.EventBus ();
 
             GLib.Object (
                 session_manager: session_manager,
@@ -169,7 +170,7 @@ namespace Pomodoro
             );
         }
 
-        public void install_event (Pomodoro.EventSpec event_spec)
+        public void install_event (Ft.EventSpec event_spec)
         {
             unowned var unowned_event_spec = event_spec;
 
@@ -177,27 +178,27 @@ namespace Pomodoro
             {
                 switch (trigger.hook)
                 {
-                    case Pomodoro.TriggerHook.TIMER_STATE_CHANGED:
+                    case Ft.TriggerHook.TIMER_STATE_CHANGED:
                         this.timer_state_change_triggers += trigger;
                         break;
 
-                    case Pomodoro.TriggerHook.SESSION_MANAGER_CONFIRM_ADVANCEMENT:
+                    case Ft.TriggerHook.SESSION_MANAGER_CONFIRM_ADVANCEMENT:
                         this.session_manager_confirm_advancement_triggers += trigger;
                         break;
 
-                    case Pomodoro.TriggerHook.SESSION_MANAGER_ADVANCED:
+                    case Ft.TriggerHook.SESSION_MANAGER_ADVANCED:
                         this.session_manager_advanced_triggers += trigger;
                         break;
 
-                    case Pomodoro.TriggerHook.SESSION_MANAGER_NOTIFY_CURRENT_STATE:
+                    case Ft.TriggerHook.SESSION_MANAGER_NOTIFY_CURRENT_STATE:
                         this.session_manager_notify_current_state_triggers += trigger;
                         break;
 
-                    case Pomodoro.TriggerHook.SESSION_MANAGER_SESSION_RESCHEDULED:
+                    case Ft.TriggerHook.SESSION_MANAGER_SESSION_RESCHEDULED:
                         this.session_manager_session_rescheduled_triggers += trigger;
                         break;
 
-                    case Pomodoro.TriggerHook.SESSION_MANAGER_SESSION_EXPIRED:
+                    case Ft.TriggerHook.SESSION_MANAGER_SESSION_EXPIRED:
                         this.session_manager_session_expired_triggers += trigger;
                         break;
 
@@ -214,19 +215,19 @@ namespace Pomodoro
             }
         }
 
-        public unowned Pomodoro.EventSpec? find_event (string event_name)
+        public unowned Ft.EventSpec? find_event (string event_name)
         {
             return this.event_spec_by_name.lookup (event_name);
         }
 
-        public (unowned Pomodoro.EventSpec)[] list_events ()
+        public (unowned Ft.EventSpec)[] list_events ()
         {
             return this.event_specs;
         }
 
-        private void trigger_queued_events (Pomodoro.Context context)
+        private void trigger_queued_events (Ft.Context context)
         {
-            Pomodoro.EventSpec event_spec;
+            Ft.EventSpec event_spec;
 
             if (this.idle_id != 0) {
                 GLib.Source.remove (this.idle_id);
@@ -235,43 +236,43 @@ namespace Pomodoro
 
 	        while ((event_spec = this.queue.pop_head ()) != null)
             {
-                this.event (new Pomodoro.Event (event_spec, context));
+                this.event (new Ft.Event (event_spec, context));
 	        }
         }
 
-        private void trigger_event (Pomodoro.EventSpec event_spec,
-                                    int64              timestamp)
+        private void trigger_event (Ft.EventSpec event_spec,
+                                    int64        timestamp)
         {
             if (this.destroying) {
                 return;
             }
 
-            var context = new Pomodoro.Context.build (timestamp);
+            var context = new Ft.Context.build (timestamp);
 
             this.trigger_queued_events (context);
 
-            this.event (new Pomodoro.Event (event_spec, context));
+            this.event (new Ft.Event (event_spec, context));
         }
 
         private bool on_idle ()
         {
             var timestamp = this.event_source_timestamp;
 
-            if (Pomodoro.Timestamp.is_undefined (timestamp))
+            if (Ft.Timestamp.is_undefined (timestamp))
             {
                 timestamp = int64.max (this._timer.get_last_state_changed_time (),
                                        this._timer.get_last_tick_time ());
             }
 
             this.idle_id = 0;
-            this.event_source_timestamp = Pomodoro.Timestamp.UNDEFINED;
+            this.event_source_timestamp = Ft.Timestamp.UNDEFINED;
 
-            this.trigger_queued_events (new Pomodoro.Context.build (timestamp));
+            this.trigger_queued_events (new Ft.Context.build (timestamp));
 
             return GLib.Source.REMOVE;
         }
 
-        private void queue_event (Pomodoro.EventSpec event_spec)
+        private void queue_event (Ft.EventSpec event_spec)
         {
             if (this.destroying) {
                 return;
@@ -280,22 +281,22 @@ namespace Pomodoro
             // TODO: preserve event current timestamp, for the context
             this.queue.push_tail (event_spec);
 
-            this.event_source_timestamp = Pomodoro.Context.get_event_source_timestamp ();
+            this.event_source_timestamp = Ft.Context.get_event_source_timestamp ();
 
             if (this.idle_id == 0) {
                 this.idle_id = GLib.Idle.add (this.on_idle, GLib.Priority.DEFAULT);
-                GLib.Source.set_name_by_id (this.idle_id, "Pomodoro.EventProducer.trigger_queued_events");
+                GLib.Source.set_name_by_id (this.idle_id, "Ft.EventProducer.trigger_queued_events");
             }
         }
 
-        private void on_timer_state_changed (Pomodoro.TimerState current_state,
-                                             Pomodoro.TimerState previous_state)
+        private void on_timer_state_changed (Ft.TimerState current_state,
+                                             Ft.TimerState previous_state)
         {
             var timestamp = this._timer.get_last_state_changed_time ();
 
             foreach (var trigger in this.timer_state_change_triggers)
             {
-                var trigger_func = (Pomodoro.TimerStateChangedTriggerFunc) trigger.func;
+                var trigger_func = (Ft.TimerStateChangedTriggerFunc) trigger.func;
 
                 if (trigger_func (current_state, previous_state)) {
                     this.trigger_event (trigger.event_spec, timestamp);
@@ -303,14 +304,14 @@ namespace Pomodoro
             }
         }
 
-        private void on_session_manager_confirm_advancement (Pomodoro.TimeBlock current_time_block,
-                                                             Pomodoro.TimeBlock next_time_block)
+        private void on_session_manager_confirm_advancement (Ft.TimeBlock current_time_block,
+                                                             Ft.TimeBlock next_time_block)
         {
             var timestamp = current_time_block.end_time;
 
             foreach (var trigger in this.session_manager_confirm_advancement_triggers)
             {
-                var trigger_func = (Pomodoro.SessionManagerConfirmAdvancementTriggerFunc) trigger.func;
+                var trigger_func = (Ft.SessionManagerConfirmAdvancementTriggerFunc) trigger.func;
 
                 if (trigger_func (current_time_block, next_time_block)) {
                     this.trigger_event (trigger.event_spec, timestamp);
@@ -318,10 +319,10 @@ namespace Pomodoro
             }
         }
 
-        private void on_session_manager_advanced (Pomodoro.Session?   current_session,
-                                                  Pomodoro.TimeBlock? current_time_block,
-                                                  Pomodoro.Session?   previous_session,
-                                                  Pomodoro.TimeBlock? previous_time_block)
+        private void on_session_manager_advanced (Ft.Session?   current_session,
+                                                  Ft.TimeBlock? current_time_block,
+                                                  Ft.Session?   previous_session,
+                                                  Ft.TimeBlock? previous_time_block)
         {
             var timestamp = this._timer.get_last_state_changed_time ();
 
@@ -335,7 +336,7 @@ namespace Pomodoro
 
             foreach (var trigger in this.session_manager_advanced_triggers)
             {
-                var trigger_func = (Pomodoro.SessionManagerAdvancedTriggerFunc) trigger.func;
+                var trigger_func = (Ft.SessionManagerAdvancedTriggerFunc) trigger.func;
 
                 if (trigger_func (current_session, current_time_block, previous_session, previous_time_block)) {
                     this.trigger_event (trigger.event_spec, timestamp);
@@ -357,7 +358,7 @@ namespace Pomodoro
 
             foreach (var trigger in this.session_manager_notify_current_state_triggers)
             {
-                var trigger_func = (Pomodoro.SessionManagerNotifyCurrentStateTriggerFunc) trigger.func;
+                var trigger_func = (Ft.SessionManagerNotifyCurrentStateTriggerFunc) trigger.func;
 
                 if (trigger_func (current_state, previous_state)) {
                     this.queue_event (trigger.event_spec);
@@ -365,12 +366,21 @@ namespace Pomodoro
             }
         }
 
-        private void on_session_manager_session_rescheduled (Pomodoro.Session session,
-                                                             int64            timestamp)
+        private void on_session_manager_session_rescheduled (Ft.Session session,
+                                                             int64      timestamp)
         {
+            // Workaround for redundant signals.
+            // FIXME: It should be fixed in SessionManager - it calls rescheduling too often at times
+            if (timestamp == this.last_session_rescheduled_time) {
+                GLib.debug ("Detected duplicate 'session-rescheduled' event. Dropping...");
+                return;
+            }
+
+            this.last_session_rescheduled_time = timestamp;
+
             foreach (var trigger in this.session_manager_session_rescheduled_triggers)
             {
-                var trigger_func = (Pomodoro.SessionManagerSessionRescheduledTriggerFunc) trigger.func;
+                var trigger_func = (Ft.SessionManagerSessionRescheduledTriggerFunc) trigger.func;
 
                 if (trigger_func (session)) {
                     // Reschedule is typically done as first thing before any action.
@@ -380,12 +390,12 @@ namespace Pomodoro
             }
         }
 
-        private void on_session_manager_session_expired (Pomodoro.Session session,
-                                                         int64            timestamp)
+        private void on_session_manager_session_expired (Ft.Session session,
+                                                         int64      timestamp)
         {
             foreach (var trigger in this.session_manager_session_expired_triggers)
             {
-                var trigger_func = (Pomodoro.SessionManagerSessionExpiredTriggerFunc) trigger.func;
+                var trigger_func = (Ft.SessionManagerSessionExpiredTriggerFunc) trigger.func;
 
                 if (trigger_func (session)) {
                     this.trigger_event (trigger.event_spec, timestamp);
@@ -395,17 +405,17 @@ namespace Pomodoro
 
         public void flush ()
         {
-            this.trigger_queued_events (new Pomodoro.Context.build ());
+            this.trigger_queued_events (new Ft.Context.build ());
         }
 
         public void destroy ()
         {
             this.destroying = true;
-            this.trigger_queued_events (new Pomodoro.Context.build ());
+            this.trigger_queued_events (new Ft.Context.build ());
         }
 
         [Signal (run = "first")]
-        public signal void event (Pomodoro.Event event)
+        public signal void event (Ft.Event event)
         {
             this._bus.push_event (event);
         }
@@ -439,7 +449,7 @@ namespace Pomodoro
             this.event_specs = null;
             this.event_spec_by_name = null;
             this.queue = null;
-            this.event_source_timestamp = Pomodoro.Timestamp.UNDEFINED;
+            this.event_source_timestamp = Ft.Timestamp.UNDEFINED;
 
             this.timer_state_change_triggers = null;
             this.session_manager_confirm_advancement_triggers = null;

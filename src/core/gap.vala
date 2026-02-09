@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     [Flags]
     public enum GapFlags
@@ -15,7 +15,7 @@ namespace Pomodoro
         INTERRUPTION = 1,
         SLEEP = 2;
 
-        public static Pomodoro.GapFlags from_string (string? str)
+        public static Ft.GapFlags from_string (string? str)
         {
             var result = DEFAULT;
 
@@ -64,7 +64,7 @@ namespace Pomodoro
     }
 
 
-    public class Gap : GLib.InitiallyUnowned, Pomodoro.Schedulable
+    public class Gap : GLib.InitiallyUnowned, Ft.Schedulable
     {
         [CCode (notify = false)]
         public int64 start_time {
@@ -76,8 +76,8 @@ namespace Pomodoro
                     return;
                 }
 
-                if (Pomodoro.Timestamp.is_undefined (value) ||
-                    Pomodoro.Timestamp.is_undefined (this._end_time) ||
+                if (Ft.Timestamp.is_undefined (value) ||
+                    Ft.Timestamp.is_undefined (this._end_time) ||
                     value <= this._end_time)
                 {
                     this.set_time_range (value, this._end_time);
@@ -98,8 +98,8 @@ namespace Pomodoro
                     return;
                 }
 
-                if (Pomodoro.Timestamp.is_undefined (value) ||
-                    Pomodoro.Timestamp.is_undefined (this._start_time) ||
+                if (Ft.Timestamp.is_undefined (value) ||
+                    Ft.Timestamp.is_undefined (this._start_time) ||
                     value >= this._start_time)
                 {
                     this.set_time_range (this._start_time, value);
@@ -116,12 +116,12 @@ namespace Pomodoro
         [CCode (notify = false)]
         public int64 duration {
             get {
-                return Pomodoro.Timestamp.subtract (this._end_time, this._start_time);
+                return Ft.Timestamp.subtract (this._end_time, this._start_time);
             }
             set {
-                if (Pomodoro.Timestamp.is_defined (this._start_time)) {
+                if (Ft.Timestamp.is_defined (this._start_time)) {
                     this.set_time_range (this._start_time,
-                                         Pomodoro.Timestamp.add_interval (this._start_time, value));
+                                         Ft.Timestamp.add_interval (this._start_time, value));
                 }
                 else {
                     GLib.warning ("Can't change time-block duration without a defined start-time.");
@@ -129,7 +129,7 @@ namespace Pomodoro
             }
         }
 
-        public Pomodoro.GapFlags flags {
+        public Ft.GapFlags flags {
             get {
                 return this._flags;
             }
@@ -141,24 +141,24 @@ namespace Pomodoro
             }
         }
 
-        public weak Pomodoro.TimeBlock time_block { get; set; }  // parent
+        public weak Ft.TimeBlock time_block { get; set; }  // parent
 
         internal ulong              version = 0;
-        internal Pomodoro.GapEntry? entry = null;
+        internal Ft.GapEntry? entry = null;
 
-        private int64               _start_time = Pomodoro.Timestamp.UNDEFINED;
-        private int64               _end_time = Pomodoro.Timestamp.UNDEFINED;
-        private Pomodoro.GapFlags   _flags = Pomodoro.GapFlags.DEFAULT;
+        private int64         _start_time = Ft.Timestamp.UNDEFINED;
+        private int64         _end_time = Ft.Timestamp.UNDEFINED;
+        private Ft.GapFlags   _flags = Ft.GapFlags.DEFAULT;
 
-        public Gap (Pomodoro.GapFlags flags = Pomodoro.GapFlags.DEFAULT)
+        public Gap (Ft.GapFlags flags = Ft.GapFlags.DEFAULT)
         {
             GLib.Object (
                 flags: flags
             );
         }
 
-        public Gap.with_start_time (int64             start_time,
-                                    Pomodoro.GapFlags flags = Pomodoro.GapFlags.DEFAULT)
+        public Gap.with_start_time (int64       start_time,
+                                    Ft.GapFlags flags = Ft.GapFlags.DEFAULT)
         {
             GLib.Object (
                 flags: flags
@@ -167,17 +167,17 @@ namespace Pomodoro
             this.set_time_range (start_time, this._end_time);
         }
 
-        public inline bool has_flag (Pomodoro.GapFlags flag)
+        public inline bool has_flag (Ft.GapFlags flag)
         {
             return (this._flags & flag) == flag;
         }
 
-        public inline void set_flag (Pomodoro.GapFlags flag)
+        public inline void set_flag (Ft.GapFlags flag)
         {
             this.flags |= flag;
         }
 
-        public inline void unset_flag (Pomodoro.GapFlags flag)
+        public inline void unset_flag (Ft.GapFlags flag)
         {
             this.flags = this._flags & (~flag);
         }
@@ -221,31 +221,31 @@ namespace Pomodoro
 
         public void move_by (int64 offset)
         {
-            var start_time = Pomodoro.Timestamp.is_defined (this._start_time)
-                ? Pomodoro.Timestamp.add_interval (this._start_time, offset)
-                : Pomodoro.Timestamp.UNDEFINED;
-            var end_time = Pomodoro.Timestamp.is_defined (this._end_time)
-                ? Pomodoro.Timestamp.add_interval (this._end_time, offset)
-                : Pomodoro.Timestamp.UNDEFINED;
+            var start_time = Ft.Timestamp.is_defined (this._start_time)
+                    ? Ft.Timestamp.add_interval (this._start_time, offset)
+                    : Ft.Timestamp.UNDEFINED;
+            var end_time = Ft.Timestamp.is_defined (this._end_time)
+                    ? Ft.Timestamp.add_interval (this._end_time, offset)
+                    : Ft.Timestamp.UNDEFINED;
 
             this.set_time_range (start_time, end_time);
         }
 
         public void move_to (int64 start_time)
         {
-            if (Pomodoro.Timestamp.is_undefined (this._start_time) &&
-                Pomodoro.Timestamp.is_undefined (this._end_time))
+            if (Ft.Timestamp.is_undefined (this._start_time) &&
+                Ft.Timestamp.is_undefined (this._end_time))
             {
                 this.set_time_range (start_time, this._end_time);
                 return;
             }
 
-            if (Pomodoro.Timestamp.is_undefined (this._start_time)) {
+            if (Ft.Timestamp.is_undefined (this._start_time)) {
                 GLib.warning ("Unable to move gap. Gap start-time is undefined.");
                 return;
             }
 
-            this.move_by (Pomodoro.Timestamp.subtract (start_time, this._start_time));
+            this.move_by (Ft.Timestamp.subtract (start_time, this._start_time));
         }
 
 
@@ -255,7 +255,7 @@ namespace Pomodoro
 
         internal bool should_create_entry ()
         {
-            return Pomodoro.Timestamp.is_defined (this.start_time);
+            return Ft.Timestamp.is_defined (this.start_time);
         }
 
         internal bool should_update_entry ()
@@ -267,13 +267,13 @@ namespace Pomodoro
             return this.entry.version != this.version;
         }
 
-        internal unowned Pomodoro.GapEntry create_or_update_entry ()
+        internal unowned Ft.GapEntry create_or_update_entry ()
                                            requires (this.time_block.entry != null)
         {
             if (this.entry == null)
             {
-                this.entry = new Pomodoro.GapEntry ();
-                this.entry.repository = Pomodoro.Database.get_repository ();
+                this.entry = new Ft.GapEntry ();
+                this.entry.repository = Ft.Database.get_repository ();
 
                 this.time_block.entry.bind_property ("id",
                                                      this.entry,

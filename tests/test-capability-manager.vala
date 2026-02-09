@@ -1,21 +1,9 @@
 /*
- * This file is part of GNOME Pomodoro
+ * This file is part of focus-timer
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
- *
  */
 
 namespace Tests
@@ -28,7 +16,7 @@ namespace Tests
     }
 
 
-    public class AntiGravityCapability : Pomodoro.Capability
+    public class AntiGravityCapability : Ft.Capability
     {
         public uint initialize_count = 0;
         public uint uninitialize_count = 0;
@@ -36,8 +24,8 @@ namespace Tests
         public uint disable_count = 0;
         public uint activate_count = 0;
 
-        public AntiGravityCapability (string            name,
-                                      Pomodoro.Priority priority = Pomodoro.Priority.DEFAULT)
+        public AntiGravityCapability (string      name,
+                                      Ft.Priority priority = Ft.Priority.DEFAULT)
         {
             base (name, priority);
         }
@@ -97,28 +85,28 @@ namespace Tests
 
         public void test_register ()
         {
-            var manager = new Pomodoro.CapabilityManager ();
+            var manager = new Ft.CapabilityManager ();
 
             var capability_1 = new AntiGravityCapability ("anti-gravity");
-            assert_true (capability_1.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability_1.status == Ft.CapabilityStatus.NULL);
             assert_false (manager.is_enabled ("anti-gravity"));
 
             manager.register (capability_1);
             assert_false (manager.is_enabled ("anti-gravity"));
-            assert_true (capability_1.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability_1.status == Ft.CapabilityStatus.DISABLED);
         }
 
         public void test_enable__before_register ()
         {
             var capability = new AntiGravityCapability ("anti-gravity");
-            var manager    = new Pomodoro.CapabilityManager ();
+            var manager    = new Ft.CapabilityManager ();
 
             manager.enable ("anti-gravity");
             assert_false (manager.is_enabled ("anti-gravity"));
 
             manager.register (capability);
             assert_true (manager.is_enabled ("anti-gravity"));
-            assert_true (capability.status == Pomodoro.CapabilityStatus.ENABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.ENABLED);
         }
     }
 }

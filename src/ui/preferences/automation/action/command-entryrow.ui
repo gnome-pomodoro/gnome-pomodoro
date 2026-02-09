@@ -2,14 +2,14 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
-  <template class="PomodoroCommandEntryRow" parent="AdwEntryRow">
+  <template class="FtCommandEntryRow" parent="AdwEntryRow">
     <property name="input-hints">no-spellcheck | no-emoji</property>
     <child type="suffix">
       <object class="GtkMenuButton">
         <property name="icon-name">variable-symbolic</property>
         <property name="valign">center</property>
         <property name="popover">
-          <object class="PomodoroVariablePopover" id="insert_variable_popover">
+          <object class="FtVariablePopover" id="insert_variable_popover">
             <signal name="selected" handler="on_insert_variable_popover_selected"/>
           </object>
         </property>

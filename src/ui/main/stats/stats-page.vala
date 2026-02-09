@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 gnome-pomodoro contributors
+ * Copyright (c) 2024-2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,7 +7,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     public enum StatsCategory
     {

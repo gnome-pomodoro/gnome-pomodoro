@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -8,10 +8,10 @@
  * Based on cc-keyboard-shortcut-editor.c from gnome-control-center
  */
 
-namespace Pomodoro
+namespace Ft
 {
     // TODO: make it a dialog window
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/preferences/keyboard-shortcuts/accelerator-chooser-window.ui")]
     public class AcceleratorChooserWindow : Adw.Window
     {
         private enum Mode
@@ -43,13 +43,13 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Label           capture_hint;
 
-        private Mode                      mode;
-        private bool                      system_shortcuts_inhibited = false;
-        private Pomodoro.KeyboardManager? keyboard_manager;
+        private Mode                mode;
+        private bool                system_shortcuts_inhibited = false;
+        private Ft.KeyboardManager? keyboard_manager;
 
         construct
         {
-            this.keyboard_manager = new Pomodoro.KeyboardManager ();
+            this.keyboard_manager = new Ft.KeyboardManager ();
 
             this.set_mode (Mode.CAPTURE);
         }
@@ -163,9 +163,9 @@ namespace Pomodoro
                 return Gdk.EVENT_STOP;
             }
 
-            var accelerator = Pomodoro.Accelerator.from_keycode (keycode,
-                                                                 state,
-                                                                 event_controller.get_group ());
+            var accelerator = Ft.Accelerator.from_keycode (keycode,
+                                                           state,
+                                                           event_controller.get_group ());
 
             if (accelerator.modifiers == Gdk.ModifierType.NO_MODIFIER_MASK)
             {

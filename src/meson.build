@@ -1,16 +1,16 @@
 # Resources
 resources_sources = files(
-  'org.gnomepomodoro.Pomodoro.gresource.xml',
+  'io.github.focustimerhq.FocusTimer.gresource.xml',
 )
 resources = gnome.compile_resources(
-  'org.gnomepomodoro.Pomodoro',
+  'io.github.focustimerhq.FocusTimer',
   resources_sources,
   c_name: 'resources',
 )
 
 
 # Common library
-libgnome_pomodoro_sources = files(
+libfocus_timer_sources = files(
   'integrations/freedesktop/interfaces.vala',
   'integrations/freedesktop/lock-screen-provider.vala',
   'integrations/freedesktop/notifications-provider.vala',
@@ -82,9 +82,9 @@ libgnome_pomodoro_sources = files(
   'core/variables.vala',
 )
 
-libgnome_pomodoro = static_library(
-  'gnome-pomodoro',
-  libgnome_pomodoro_sources,
+libfocus_timer = static_library(
+  'focus-timer',
+  libfocus_timer_sources,
   dependencies: [
     gio_dep,
     gobject_dep,
@@ -92,7 +92,6 @@ libgnome_pomodoro = static_library(
     libm_dep,
     peas_dep,
     sqlite_dep,
-    gsound_dep,
     gstreamer_dep,
     posix_dep,
     json_dep,
@@ -100,26 +99,25 @@ libgnome_pomodoro = static_library(
   include_directories: config_h_dir,
 )
 
-libgnome_pomodoro_dep = declare_dependency(
-  link_with: libgnome_pomodoro,
+libfocus_timer_dep = declare_dependency(
+  link_with: libfocus_timer,
   dependencies: [
     gio_dep,
     gobject_dep,
     gom_dep,
     peas_dep,
-    gsound_dep,
     gstreamer_dep,
     posix_dep,
   ],
   include_directories: [
-    # Include gnome-pomodoro.h
+    # Include focus-timer.h
     include_directories('.'),
   ],
 )
 
 
-# The gnome-pomodoro binary
-gnome_pomodoro_vala_sources = files(
+# The focus-timer binary
+focus_timer_vala_sources = files(
   'capabilities/global-shortcuts.vala',
   'capabilities/notifications.vala',
   'capabilities/sounds.vala',
@@ -185,16 +183,16 @@ gnome_pomodoro_vala_sources = files(
   'dbus-services.vala',
   'main.vala',
 )
-gnome_pomodoro_sources = [
-  gnome_pomodoro_vala_sources,
+focus_timer_sources = [
+  focus_timer_vala_sources,
   resources,
 ]
 
 executable(
-  'gnome-pomodoro',
-  gnome_pomodoro_sources,
+  'focus-timer',
+  focus_timer_sources,
   dependencies: [
-    libgnome_pomodoro_dep,
+    libfocus_timer_dep,
     gtk_dep,
     gtk_x11_dep,
     gtk_wayland_dep,

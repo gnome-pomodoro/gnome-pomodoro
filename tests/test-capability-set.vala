@@ -1,3 +1,11 @@
+/*
+ * This file is part of focus-timer
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Authors: Kamil Prusko <kamilprusko@gmail.com>
+ */
+
 namespace Tests
 {
     [Flags]
@@ -8,7 +16,7 @@ namespace Tests
     }
 
 
-    public class AntiGravityCapability : Pomodoro.Capability
+    public class AntiGravityCapability : Ft.Capability
     {
         public Scenario scenario { get; set; default = Scenario.NONE; }
 
@@ -19,8 +27,8 @@ namespace Tests
         public uint activate_count = 0;
 
 
-        public AntiGravityCapability (string            name,
-                                      Pomodoro.Priority priority = Pomodoro.Priority.DEFAULT)
+        public AntiGravityCapability (string      name,
+                                      Ft.Priority priority = Ft.Priority.DEFAULT)
         {
             base (name, priority);
         }
@@ -30,7 +38,7 @@ namespace Tests
             this.initialize_count++;
 
             if (Scenario.UNAVAILABLE in this.scenario) {
-                this.status = Pomodoro.CapabilityStatus.UNAVAILABLE;
+                this.status = Ft.CapabilityStatus.UNAVAILABLE;
                 return;
             }
 
@@ -66,8 +74,8 @@ namespace Tests
         public void set_available (bool value)
         {
             this.status = value
-                ? Pomodoro.CapabilityStatus.DISABLED
-                : Pomodoro.CapabilityStatus.UNAVAILABLE;
+                    ? Ft.CapabilityStatus.DISABLED
+                    : Ft.CapabilityStatus.UNAVAILABLE;
         }
     }
 
@@ -102,14 +110,14 @@ namespace Tests
          */
         public void test_add__null ()
         {
-            var capability_set = new Pomodoro.CapabilitySet ();
+            var capability_set = new Ft.CapabilitySet ();
 
             var capability = new AntiGravityCapability ("anti-gravity");
-            assert_true (capability.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability.status == Ft.CapabilityStatus.NULL);
 
             capability_set.add (capability);
             assert_true (capability_set.preferred_capability == capability);
-            assert_true (capability.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.DISABLED);
         }
 
         /**
@@ -117,19 +125,19 @@ namespace Tests
          */
         public void test_add__disabled ()
         {
-            var capability_set = new Pomodoro.CapabilitySet ();
+            var capability_set = new Ft.CapabilitySet ();
             var capability = new AntiGravityCapability ("anti-gravity");
 
             capability.initialize ();
 
             capability_set.add (capability);
             assert_true (capability_set.preferred_capability == capability);
-            assert_true (capability.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.DISABLED);
         }
 
         public void test_add__enabled ()
         {
-            var capability_set = new Pomodoro.CapabilitySet ();
+            var capability_set = new Ft.CapabilitySet ();
             var capability = new AntiGravityCapability ("anti-gravity");
 
             capability.initialize ();
@@ -137,7 +145,7 @@ namespace Tests
 
             capability_set.add (capability);
             assert_true (capability_set.preferred_capability == capability);
-            assert_true (capability.status == Pomodoro.CapabilityStatus.ENABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.ENABLED);
         }
 
         /**
@@ -146,70 +154,70 @@ namespace Tests
          */
         public void test_add__unavailable ()
         {
-            var capability_set = new Pomodoro.CapabilitySet ();
+            var capability_set = new Ft.CapabilitySet ();
 
-            var capability_unavailable = new AntiGravityCapability ("unavailable", Pomodoro.Priority.HIGH);
+            var capability_unavailable = new AntiGravityCapability ("unavailable", Ft.Priority.HIGH);
             capability_unavailable.scenario = Scenario.UNAVAILABLE;
             capability_set.add (capability_unavailable);
             assert_true (capability_set.preferred_capability == capability_unavailable);
-            assert_true (capability_unavailable.status == Pomodoro.CapabilityStatus.UNAVAILABLE);
+            assert_true (capability_unavailable.status == Ft.CapabilityStatus.UNAVAILABLE);
 
-            var capability_available = new AntiGravityCapability ("available", Pomodoro.Priority.LOW);
+            var capability_available = new AntiGravityCapability ("available", Ft.Priority.LOW);
             capability_set.add (capability_available);
             assert_true (capability_set.preferred_capability == capability_available);
-            assert_true (capability_available.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability_available.status == Ft.CapabilityStatus.DISABLED);
         }
 
         public void test_add__low_priority_first ()
         {
-            var capability_set = new Pomodoro.CapabilitySet ();
+            var capability_set = new Ft.CapabilitySet ();
 
-            var capability_low = new AntiGravityCapability ("low", Pomodoro.Priority.LOW);
+            var capability_low = new AntiGravityCapability ("low", Ft.Priority.LOW);
             capability_set.add (capability_low);
             assert_true (capability_set.preferred_capability == capability_low);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability_low.status == Ft.CapabilityStatus.DISABLED);
 
-            var capability_high = new AntiGravityCapability ("high", Pomodoro.Priority.HIGH);
+            var capability_high = new AntiGravityCapability ("high", Ft.Priority.HIGH);
             capability_set.add (capability_high);
             assert_true (capability_set.preferred_capability == capability_high);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.DISABLED);
-            assert_true (capability_high.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability_low.status == Ft.CapabilityStatus.DISABLED);
+            assert_true (capability_high.status == Ft.CapabilityStatus.DISABLED);
 
             capability_set.remove (capability_high);
             assert_true (capability_set.preferred_capability == capability_low);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.DISABLED);
-            assert_true (capability_high.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability_low.status == Ft.CapabilityStatus.DISABLED);
+            assert_true (capability_high.status == Ft.CapabilityStatus.NULL);
 
             capability_set.remove (capability_low);
             assert_null (capability_set.preferred_capability);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.NULL);
-            assert_true (capability_high.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability_low.status == Ft.CapabilityStatus.NULL);
+            assert_true (capability_high.status == Ft.CapabilityStatus.NULL);
         }
 
         public void test_add__low_priority_second ()
         {
-            var capability_set = new Pomodoro.CapabilitySet ();
+            var capability_set = new Ft.CapabilitySet ();
 
-            var capability_high = new AntiGravityCapability ("high", Pomodoro.Priority.HIGH);
+            var capability_high = new AntiGravityCapability ("high", Ft.Priority.HIGH);
             capability_set.add (capability_high);
             assert_true (capability_set.preferred_capability == capability_high);
-            assert_true (capability_high.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability_high.status == Ft.CapabilityStatus.DISABLED);
 
-            var capability_low = new AntiGravityCapability ("low", Pomodoro.Priority.LOW);
+            var capability_low = new AntiGravityCapability ("low", Ft.Priority.LOW);
             capability_set.add (capability_low);
             assert_true (capability_set.preferred_capability == capability_high);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.DISABLED);
-            assert_true (capability_high.status == Pomodoro.CapabilityStatus.DISABLED);
+            assert_true (capability_low.status == Ft.CapabilityStatus.DISABLED);
+            assert_true (capability_high.status == Ft.CapabilityStatus.DISABLED);
 
             capability_set.remove (capability_high);
             assert_true (capability_set.preferred_capability == capability_low);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.DISABLED);
-            assert_true (capability_high.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability_low.status == Ft.CapabilityStatus.DISABLED);
+            assert_true (capability_high.status == Ft.CapabilityStatus.NULL);
 
             capability_set.remove (capability_low);
             assert_null (capability_set.preferred_capability);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.NULL);
-            assert_true (capability_high.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability_low.status == Ft.CapabilityStatus.NULL);
+            assert_true (capability_high.status == Ft.CapabilityStatus.NULL);
         }
 
         /**
@@ -217,29 +225,29 @@ namespace Tests
          */
         public void test_add__pre_enabled ()
         {
-            var capability_set = new Pomodoro.CapabilitySet ();
+            var capability_set = new Ft.CapabilitySet ();
             capability_set.enable = true;
 
-            var capability_low = new AntiGravityCapability ("low", Pomodoro.Priority.LOW);
+            var capability_low = new AntiGravityCapability ("low", Ft.Priority.LOW);
             capability_set.add (capability_low);
             assert_true (capability_set.preferred_capability == capability_low);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.ENABLED);
+            assert_true (capability_low.status == Ft.CapabilityStatus.ENABLED);
 
-            var capability_high = new AntiGravityCapability ("high", Pomodoro.Priority.HIGH);
+            var capability_high = new AntiGravityCapability ("high", Ft.Priority.HIGH);
             capability_set.add (capability_high);
             assert_true (capability_set.preferred_capability == capability_high);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.DISABLED);
-            assert_true (capability_high.status == Pomodoro.CapabilityStatus.ENABLED);
+            assert_true (capability_low.status == Ft.CapabilityStatus.DISABLED);
+            assert_true (capability_high.status == Ft.CapabilityStatus.ENABLED);
 
             capability_set.remove (capability_high);
             assert_true (capability_set.preferred_capability == capability_low);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.ENABLED);
-            assert_true (capability_high.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability_low.status == Ft.CapabilityStatus.ENABLED);
+            assert_true (capability_high.status == Ft.CapabilityStatus.NULL);
 
             capability_set.remove (capability_low);
             assert_null (capability_set.preferred_capability);
-            assert_true (capability_low.status == Pomodoro.CapabilityStatus.NULL);
-            assert_true (capability_high.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability_low.status == Ft.CapabilityStatus.NULL);
+            assert_true (capability_high.status == Ft.CapabilityStatus.NULL);
         }
 
         /**
@@ -247,35 +255,35 @@ namespace Tests
          */
         public void test_add__pre_enabled__unavailable ()
         {
-            var capability_set = new Pomodoro.CapabilitySet ();
+            var capability_set = new Ft.CapabilitySet ();
             capability_set.enable = true;
 
-            var capability_unavailable = new AntiGravityCapability ("unavailable", Pomodoro.Priority.HIGH);
+            var capability_unavailable = new AntiGravityCapability ("unavailable", Ft.Priority.HIGH);
             capability_unavailable.scenario = Scenario.UNAVAILABLE;
             capability_set.add (capability_unavailable);
             assert_true (capability_set.preferred_capability == capability_unavailable);
-            assert_true (capability_unavailable.status == Pomodoro.CapabilityStatus.UNAVAILABLE);
+            assert_true (capability_unavailable.status == Ft.CapabilityStatus.UNAVAILABLE);
 
-            var capability_available = new AntiGravityCapability ("available", Pomodoro.Priority.LOW);
+            var capability_available = new AntiGravityCapability ("available", Ft.Priority.LOW);
             capability_set.add (capability_available);
             assert_true (capability_set.preferred_capability == capability_available);
-            assert_true (capability_available.status == Pomodoro.CapabilityStatus.ENABLED);
-            assert_true (capability_unavailable.status == Pomodoro.CapabilityStatus.UNAVAILABLE);
+            assert_true (capability_available.status == Ft.CapabilityStatus.ENABLED);
+            assert_true (capability_unavailable.status == Ft.CapabilityStatus.UNAVAILABLE);
 
             capability_set.remove (capability_available);
             assert_true (capability_set.preferred_capability == capability_unavailable);
-            assert_true (capability_unavailable.status == Pomodoro.CapabilityStatus.UNAVAILABLE);
-            assert_true (capability_available.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability_unavailable.status == Ft.CapabilityStatus.UNAVAILABLE);
+            assert_true (capability_available.status == Ft.CapabilityStatus.NULL);
 
             capability_set.remove (capability_unavailable);
             assert_null (capability_set.preferred_capability);
-            assert_true (capability_unavailable.status == Pomodoro.CapabilityStatus.NULL);
-            assert_true (capability_available.status == Pomodoro.CapabilityStatus.NULL);
+            assert_true (capability_unavailable.status == Ft.CapabilityStatus.NULL);
+            assert_true (capability_available.status == Ft.CapabilityStatus.NULL);
         }
 
         public void test_remove ()
         {
-            var capability_set = new Pomodoro.CapabilitySet ();
+            var capability_set = new Ft.CapabilitySet ();
             var capability = new AntiGravityCapability ("anti-gravity");
 
             capability_set.add (capability);
@@ -290,22 +298,22 @@ namespace Tests
 
         public void test_capability_becomes_available ()
         {
-            var capability_set = new Pomodoro.CapabilitySet ();
+            var capability_set = new Ft.CapabilitySet ();
             capability_set.enable = true;
 
             var capability = new AntiGravityCapability ("anti-gravity");
             capability.scenario = Scenario.UNAVAILABLE;
             capability_set.add (capability);
             assert_true (capability_set.preferred_capability == capability);
-            assert_true (capability.status == Pomodoro.CapabilityStatus.UNAVAILABLE);
+            assert_true (capability.status == Ft.CapabilityStatus.UNAVAILABLE);
 
             capability.set_available (true);
             assert_true (capability_set.preferred_capability == capability);
-            assert_true (capability.status == Pomodoro.CapabilityStatus.ENABLED);
+            assert_true (capability.status == Ft.CapabilityStatus.ENABLED);
 
             capability.set_available (false);
             assert_true (capability_set.preferred_capability == capability);
-            assert_true (capability.status == Pomodoro.CapabilityStatus.UNAVAILABLE);
+            assert_true (capability.status == Ft.CapabilityStatus.UNAVAILABLE);
         }
     }
 }

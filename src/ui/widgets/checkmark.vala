@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
  * Authors: Kamil Prusko <kamilprusko@gmail.com>
  */
 
-namespace Pomodoro
+namespace Ft
 {
     public class Checkmark : Gtk.Widget
     {
@@ -114,7 +114,7 @@ namespace Pomodoro
 
                         return GLib.Source.REMOVE;
                     });
-            GLib.Source.set_name_by_id (this.timeout_id, "Pomodoro.Checkmark.animate");
+            GLib.Source.set_name_by_id (this.timeout_id, "Ft.Checkmark.animate");
 
             this.animation_done = false;
         }

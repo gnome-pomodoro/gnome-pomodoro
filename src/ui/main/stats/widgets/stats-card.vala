@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 gnome-pomodoro contributors
+ * Copyright (c) 2025 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -7,14 +7,14 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
-    [GtkTemplate (ui = "/org/gnomepomodoro/Pomodoro/ui/main/stats/widgets/stats-card.ui")]
+    [GtkTemplate (ui = "/io/github/focustimerhq/FocusTimer/ui/main/stats/widgets/stats-card.ui")]
     public class StatsCard : Adw.Bin
     {
         public string label { get; set; }
 
-        public Pomodoro.Unit unit {
+        public Ft.Unit unit {
             get {
                 return this._unit;
             }
@@ -39,8 +39,8 @@ namespace Pomodoro
         [GtkChild]
         private unowned Gtk.Label value_label;
 
-        private Pomodoro.Unit _unit = Pomodoro.Unit.AMOUNT;
-        private double        _value = double.NAN;
+        private Ft.Unit _unit = Ft.Unit.AMOUNT;
+        private double  _value = double.NAN;
 
         static construct
         {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016,2024 gnome-pomodoro contributors
+ * Copyright (c) 2016,2024 focus-timer contributors
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -9,7 +9,7 @@
 using GLib;
 
 
-namespace Pomodoro
+namespace Ft
 {
     /**
      * Default timeout in seconds. The intent is to prevent commands from blocking the task queue.
@@ -97,20 +97,20 @@ namespace Pomodoro
     }
 
 
-    public class EventAction : Pomodoro.Action
+    public class EventAction : Ft.Action
     {
         public string[] event_names { get; set; }
-        public Pomodoro.Expression? condition { get; set; }
-        public Pomodoro.Command command { get; set; }
+        public Ft.Expression? condition { get; set; }
+        public Ft.Command command { get; set; }
         public bool wait_for_completion { get; set; default = true; }
 
-        private Pomodoro.EventBus bus;
-        private uint[]            watch_ids;
-        private uint              last_context_checksum = 0;
+        private Ft.EventBus bus;
+        private uint[]      watch_ids;
+        private uint        last_context_checksum = 0;
 
         construct
         {
-            this.bus = new Pomodoro.EventBus ();
+            this.bus = new Ft.EventBus ();
             this.watch_ids = new uint[0];
         }
 
@@ -126,16 +126,16 @@ namespace Pomodoro
             base.load (settings);
 
             var condition_string = settings.get_string ("condition");
-            Pomodoro.Expression? condition = null;
+            Ft.Expression? condition = null;
 
             if (condition_string != "")
             {
-                var parser = new Pomodoro.ExpressionParser ();
+                var parser = new Ft.ExpressionParser ();
 
                 try {
                     condition = parser.parse (condition_string);
                 }
-                catch (Pomodoro.ExpressionParserError error) {
+                catch (Ft.ExpressionParserError error) {
                     GLib.warning ("Failed to parse action condition: `%s`", condition_string);
                 }
             }
@@ -144,7 +144,7 @@ namespace Pomodoro
             this.condition = condition;
             this.wait_for_completion = settings.get_boolean ("wait-for-completion");
 
-            this.command = new Pomodoro.Command (settings.get_string ("command"));
+            this.command = new Ft.Command (settings.get_string ("command"));
             this.command.working_directory = settings.get_string ("working-directory");
             this.command.use_subshell = settings.get_boolean ("use-subshell");
             this.command.pass_input = settings.get_boolean ("pass-input");
@@ -157,7 +157,7 @@ namespace Pomodoro
 
             base.save (settings);
 
-            settings.set_enum ("trigger", Pomodoro.ActionTrigger.EVENT);
+            settings.set_enum ("trigger", Ft.ActionTrigger.EVENT);
             settings.set_strv ("events", this.event_names);
             settings.set_boolean ("wait-for-completion", this.wait_for_completion);
 
@@ -182,11 +182,11 @@ namespace Pomodoro
             }
         }
 
-        private void on_event (Pomodoro.Event event)
+        private void on_event (Ft.Event event)
         {
             var command = this.command;
             var context_checksum = event.context.calculate_checksum ();
-            Pomodoro.CommandExecution? execution = null;
+            Ft.CommandExecution? execution = null;
 
             if (context_checksum == this.last_context_checksum) {
                 // The action may be triggered by several events. Prevent executing the command if the context
@@ -206,7 +206,7 @@ namespace Pomodoro
                     {
                         execution.timeout = COMMAND_TIMEOUT;
 
-                        var queue = new Pomodoro.JobQueue ();
+                        var queue = new Ft.JobQueue ();
                         queue.push (execution);
                     }
                 }
@@ -243,23 +243,23 @@ namespace Pomodoro
             this.watch_ids = {};
         }
 
-        public signal void triggered (Pomodoro.Context           context,
-                                      Pomodoro.CommandExecution? execution);
+        public signal void triggered (Ft.Context           context,
+                                      Ft.CommandExecution? execution);
     }
 
 
-    public class ConditionAction : Pomodoro.Action
+    public class ConditionAction : Ft.Action
     {
-        public Pomodoro.Expression condition { get; set; }
-        public Pomodoro.Command enter_command { get; set; }
-        public Pomodoro.Command exit_command { get; set; }
+        public Ft.Expression condition { get; set; }
+        public Ft.Command enter_command { get; set; }
+        public Ft.Command exit_command { get; set; }
 
-        private Pomodoro.EventBus bus;
-        private uint              watch_id = 0;
+        private Ft.EventBus bus;
+        private uint        watch_id = 0;
 
         construct
         {
-            this.bus = new Pomodoro.EventBus ();
+            this.bus = new Ft.EventBus ();
         }
 
         public ConditionAction (string? uuid = null)
@@ -274,28 +274,28 @@ namespace Pomodoro
             base.load (settings);
 
             var condition_string = settings.get_string ("condition");
-            Pomodoro.Expression? condition = null;
+            Ft.Expression? condition = null;
 
             if (condition_string != "")
             {
-                var parser = new Pomodoro.ExpressionParser ();
+                var parser = new Ft.ExpressionParser ();
 
                 try {
                     condition = parser.parse (condition_string);
                 }
-                catch (Pomodoro.ExpressionParserError error) {
+                catch (Ft.ExpressionParserError error) {
                     GLib.warning ("Failed to parse action condition: `%s`", condition_string);
                 }
             }
 
             this.condition = condition;
 
-            this.enter_command = new Pomodoro.Command (settings.get_string ("command"));
+            this.enter_command = new Ft.Command (settings.get_string ("command"));
             this.enter_command.working_directory = settings.get_string ("working-directory");
             this.enter_command.use_subshell = settings.get_boolean ("use-subshell");
             this.enter_command.pass_input = settings.get_boolean ("pass-input");
 
-            this.exit_command = new Pomodoro.Command (settings.get_string ("exit-command"));
+            this.exit_command = new Ft.Command (settings.get_string ("exit-command"));
             this.exit_command.working_directory = settings.get_string ("working-directory");
             this.exit_command.use_subshell = settings.get_boolean ("use-subshell");
             this.exit_command.pass_input = settings.get_boolean ("pass-input");
@@ -310,7 +310,7 @@ namespace Pomodoro
 
             base.save (settings);
 
-            settings.set_enum ("trigger", Pomodoro.ActionTrigger.CONDITION);
+            settings.set_enum ("trigger", Ft.ActionTrigger.CONDITION);
 
             if (condition != null) {
                 settings.set_string ("condition", condition.to_string ());
@@ -345,10 +345,10 @@ namespace Pomodoro
             }
         }
 
-        private void on_enter_condition (Pomodoro.Context context)
+        private void on_enter_condition (Ft.Context context)
         {
             var command = this.enter_command;
-            Pomodoro.CommandExecution? execution = null;
+            Ft.CommandExecution? execution = null;
 
             if (command != null)
             {
@@ -358,7 +358,7 @@ namespace Pomodoro
                 {
                     execution.timeout = COMMAND_TIMEOUT;
 
-                    var queue = new Pomodoro.JobQueue ();
+                    var queue = new Ft.JobQueue ();
                     queue.push (execution);
                 }
             }
@@ -366,10 +366,10 @@ namespace Pomodoro
             this.entered_condition (context, execution);
         }
 
-        private void on_exit_condition (Pomodoro.Context context)
+        private void on_exit_condition (Ft.Context context)
         {
             var command = this.exit_command;
-            Pomodoro.CommandExecution? execution = null;
+            Ft.CommandExecution? execution = null;
 
             if (command != null)
             {
@@ -379,7 +379,7 @@ namespace Pomodoro
                 {
                     execution.timeout = COMMAND_TIMEOUT;
 
-                    var queue = new Pomodoro.JobQueue ();
+                    var queue = new Ft.JobQueue ();
                     queue.push (execution);
                 }
             }
@@ -407,10 +407,10 @@ namespace Pomodoro
             }
         }
 
-        public signal void entered_condition (Pomodoro.Context           context,
-                                              Pomodoro.CommandExecution? execution);
+        public signal void entered_condition (Ft.Context           context,
+                                              Ft.CommandExecution? execution);
 
-        public signal void exited_condition (Pomodoro.Context           context,
-                                             Pomodoro.CommandExecution? execution);
+        public signal void exited_condition (Ft.Context           context,
+                                             Ft.CommandExecution? execution);
     }
 }
