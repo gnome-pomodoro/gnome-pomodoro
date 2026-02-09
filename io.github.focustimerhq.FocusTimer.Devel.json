@@ -49,17 +49,17 @@
       "buildsystem": "meson",
       "builddir": true,
       "config-opts": [
+        "-Dgjs=false",
         "-Dlua51=false",
         "-Dpython3=false",
         "-Dintrospection=true",
-        "-Dvapi=true",
-        "--libdir=/app/lib"
+        "-Dvapi=true"
       ],
       "sources": [
         {
           "type": "git",
           "url": "https://gitlab.gnome.org/GNOME/libpeas.git",
-          "tag": "libpeas-1.36.0"
+          "tag": "2.2.0"
         }
       ]
     },
