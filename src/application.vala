@@ -23,7 +23,7 @@ using GLib;
 
 namespace Pomodoro
 {
-    public interface ApplicationExtension : Peas.ExtensionBase
+    public interface ApplicationExtension : GLib.Object
     {
     }
 
@@ -225,7 +225,9 @@ namespace Pomodoro
                 return GLib.Source.REMOVE;
             });
 
-            this.extensions = new Peas.ExtensionSet (engine, typeof (Pomodoro.ApplicationExtension));
+            string[] prop_names = {};
+            GLib.Value[] prop_values = {};
+            this.extensions = new Peas.ExtensionSet.with_properties (engine, typeof (Pomodoro.ApplicationExtension), prop_names, prop_values);
             this.extensions.extension_added.connect ((extension_set,
                                                       info,
                                                       extension_object) => {
@@ -358,13 +360,14 @@ namespace Pomodoro
                 enabled_hash.remove (name);
             }
 
-            foreach (var plugin_info in engine.get_plugin_list ())
+            for (uint i = 0; i < engine.get_n_items (); i++)
             {
+                var plugin_info = engine.get_item (i) as Peas.PluginInfo;
                 if (plugin_info.is_hidden () || enabled_hash.contains (plugin_info.get_module_name ())) {
-                    engine.try_load_plugin (plugin_info);
+                    engine.load_plugin (plugin_info);
                 }
                 else {
-                    engine.try_unload_plugin (plugin_info);
+                    engine.unload_plugin (plugin_info);
                 }
             }
         }
@@ -717,8 +720,9 @@ namespace Pomodoro
 
             var engine = Peas.Engine.get_default ();
 
-            foreach (var plugin_info in engine.get_plugin_list ()) {
-                engine.try_unload_plugin (plugin_info);
+            for (uint i = 0; i < engine.get_n_items (); i++) {
+                var plugin_info = engine.get_item (i) as Peas.PluginInfo;
+                engine.unload_plugin (plugin_info);
             }
 
             try {

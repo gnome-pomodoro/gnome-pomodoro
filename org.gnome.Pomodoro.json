@@ -46,26 +46,19 @@
         {
             "name": "libpeas",
             "buildsystem": "meson",
+            "builddir": true,
             "config-opts": [
+                "-Dgjs=false",
                 "-Dlua51=false",
                 "-Dpython3=false",
-                "-Ddemos=false"
-            ],
-            "cleanup": [
-                "/bin/*",
-                "/lib/peas-demo",
-                "/include",
-                "/lib/girepository-1.0",
-                "/lib/*.la",
-                "/lib/pkgconfig",
-                "/share/gir-1.0",
-                "/share/gtk-doc"
+                "-Dintrospection=true",
+                "-Dvapi=true"
             ],
             "sources": [
                 {
                     "type": "git",
-                    "branch": "master",
-                    "url": "https://gitlab.gnome.org/GNOME/libpeas.git"
+                    "url": "https://gitlab.gnome.org/GNOME/libpeas.git",
+                    "tag": "2.2.0"
                 }
             ]
         },

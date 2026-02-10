@@ -381,7 +381,7 @@ namespace Actions
     }
 
 
-    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
+    public class ApplicationExtension : GLib.Object, Pomodoro.ApplicationExtension
     {
         private Gtk.CssProvider css_provider;
         private Actions.ApplicationExtensionInternals internals;
@@ -410,7 +410,7 @@ namespace Actions
     }
 
 
-    public class PreferencesDialogExtension : Peas.ExtensionBase, Pomodoro.PreferencesDialogExtension
+    public class PreferencesDialogExtension : GLib.Object, Pomodoro.PreferencesDialogExtension
     {
         private Pomodoro.PreferencesDialog dialog;
         private GLib.List<Gtk.ListBoxRow> rows;

@@ -544,7 +544,7 @@ namespace SoundsPlugin
         }
     }
 
-    public class PreferencesDialogExtension : Peas.ExtensionBase, Pomodoro.PreferencesDialogExtension
+    public class PreferencesDialogExtension : GLib.Object, Pomodoro.PreferencesDialogExtension
     {
         private const string[] VOLUME_ICONS = {
             "audio-volume-muted-symbolic",
@@ -1056,7 +1056,7 @@ namespace SoundsPlugin
     }
 
 
-    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
+    public class ApplicationExtension : GLib.Object, Pomodoro.ApplicationExtension
     {
         public static unowned ApplicationExtension instance;
 

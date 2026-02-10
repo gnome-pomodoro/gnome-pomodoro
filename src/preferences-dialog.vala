@@ -87,7 +87,7 @@ namespace Pomodoro
         }
     }
 
-    public interface PreferencesDialogExtension : Peas.ExtensionBase
+    public interface PreferencesDialogExtension : GLib.Object
     {
     }
 
@@ -360,8 +360,9 @@ namespace Pomodoro
         private void on_settings_changed (GLib.Settings settings,
                                           string        key)
         {
-            foreach (var plugin_info in this.engine.get_plugin_list ())
+            for (uint i = 0; i < this.engine.get_n_items (); i++)
             {
+                var plugin_info = this.engine.get_item (i) as Peas.PluginInfo;
                 var toggle  = this.toggles.lookup (plugin_info.get_module_name ());
                 var enabled = false;
 
@@ -475,8 +476,10 @@ namespace Pomodoro
         {
             this.engine.rescan_plugins ();
 
-            foreach (var plugin_info in this.engine.get_plugin_list ())
+            for (uint i = 0; i < this.engine.get_n_items (); i++)
             {
+                var plugin_info = this.engine.get_item (i) as Peas.PluginInfo;
+
                 if (plugin_info.is_hidden ()) {
                     continue;
                 }
@@ -831,8 +834,12 @@ namespace Pomodoro
             this.set_page ("main");
 
             /* let page be modified by extensions */
-            this.extensions = new Peas.ExtensionSet (Peas.Engine.get_default (),
-                                                     typeof (Pomodoro.PreferencesDialogExtension));
+            string[] prop_names = {};
+            GLib.Value[] prop_values = {};
+            this.extensions = new Peas.ExtensionSet.with_properties (Peas.Engine.get_default (),
+                                                                     typeof (Pomodoro.PreferencesDialogExtension),
+                                                                     prop_names,
+                                                                     prop_values);
 
             this.stack.notify["visible-child"].connect (this.on_visible_child_notify);
 

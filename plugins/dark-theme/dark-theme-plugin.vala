@@ -21,7 +21,7 @@ using GLib;
 
 namespace DarkThemePlugin
 {
-    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension
+    public class ApplicationExtension : GLib.Object, Pomodoro.ApplicationExtension
     {
         construct
         {

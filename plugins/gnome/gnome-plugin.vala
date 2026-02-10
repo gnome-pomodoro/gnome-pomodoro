@@ -30,7 +30,7 @@ namespace GnomePlugin
 
     private const string CURRENT_DESKTOP_VARIABLE = "XDG_CURRENT_DESKTOP";
 
-    public class ApplicationExtension : Peas.ExtensionBase, Pomodoro.ApplicationExtension, GLib.AsyncInitable
+    public class ApplicationExtension : GLib.Object, Pomodoro.ApplicationExtension, GLib.AsyncInitable
     {
         private Pomodoro.Timer                  timer;
         private GLib.Settings                   settings;
@@ -265,7 +265,7 @@ namespace GnomePlugin
         }
     }
 
-    public class PreferencesDialogExtension : Peas.ExtensionBase, Pomodoro.PreferencesDialogExtension
+    public class PreferencesDialogExtension : GLib.Object, Pomodoro.PreferencesDialogExtension
     {
         private Pomodoro.PreferencesDialog dialog;
 
