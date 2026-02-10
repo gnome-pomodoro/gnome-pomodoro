@@ -77,4 +77,5 @@ executable(
   ],
   include_directories: incs,
   install: true,
+  install_rpath: '$ORIGIN/../lib64:$ORIGIN/../lib',
 )
