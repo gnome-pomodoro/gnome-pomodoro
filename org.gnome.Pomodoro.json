@@ -1,7 +1,7 @@
 {
     "app-id": "org.gnome.Pomodoro",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "master",
+    "runtime-version": "49",
     "sdk": "org.gnome.Sdk",
     "command": "gnome-pomodoro",
     "copy-icon": true,
@@ -10,7 +10,6 @@
         "--share=ipc",
         "--socket=x11",
         "--socket=wayland",
-        "--talk-name=org.gnome.Shell",
         "--device=dri",
         "--socket=pulseaudio",
         "--socket=session-bus",
@@ -19,6 +18,8 @@
         "--filesystem=xdg-run/dconf",
         "--filesystem=~/.config/dconf:rw",
         "--talk-name=ca.desrt.dconf",
+        "--talk-name=org.gnome.Shell",
+        "--talk-name=org.gnome.Mutter.IdleMonitor",
         "--env=DCONF_USER_CONFIG_DIR=.config/dconf"
     ],
     "build-options": {
@@ -44,6 +45,21 @@
     ],
     "modules": [
         {
+            "name": "libcanberra",
+            "config-opts": [
+                "--disable-alsa",
+                "--disable-null",
+                "--disable-oss"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "http://0pointer.de/lennart/projects/libcanberra/libcanberra-0.30.tar.xz",
+                    "sha256": "c2b671e67e0c288a69fc33dc1b6f1b534d07882c2aceed37004bf48c601afa72"
+                }
+            ]
+        },
+        {
             "name": "libpeas",
             "buildsystem": "meson",
             "builddir": true,
@@ -65,29 +81,22 @@
         {
             "name": "gom",
             "buildsystem": "meson",
-            "config-opts": [
-                "--prefix=/app"
-            ],
+            "builddir": true,
             "sources": [
                 {
                     "type": "git",
-                    "branch": "master",
-                    "url": "https://gitlab.gnome.org/GNOME/gom.git"
+                    "url": "https://gitlab.gnome.org/GNOME/gom.git",
+                    "tag": "0.5.5"
                 }
             ]
         },
         {
             "name": "gnome-pomodoro",
-            "buildsystem": "autotools",
+            "buildsystem": "meson",
             "sources": [
                 {
-                    "type": "file",
+                    "type": "dir",
                     "path": "."
-                },
-                {
-                    "type": "git",
-                    "branch": "master",
-                    "url": "https://github.com/gnome-pomodoro/gnome-pomodoro.git"
                 }
             ]
         }
