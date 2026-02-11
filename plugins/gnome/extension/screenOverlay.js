@@ -728,7 +728,11 @@ const ScreenOverlayBase = GObject.registerClass({
         if (!this._hasModal)
             return;
 
-        Main.popModal(this._grab, timestamp);
+        if (Utils.isVersionAtLeast('50'))
+            Main.popModal(this._grab);
+        else
+            Main.popModal(this._grab, timestamp);
+
         this._grab = null;
         this._hasModal = false;
         this._lightbox.reactive = false;
@@ -744,7 +748,7 @@ const ScreenOverlayBase = GObject.registerClass({
             return false;
 
         const params = {actionMode: Shell.ActionMode.SYSTEM_MODAL};
-        if (timestamp)
+        if (!Utils.isVersionAtLeast('50') && timestamp)
             params['timestamp'] = timestamp;
 
         const grab = Main.pushModal(this, params);
