@@ -752,7 +752,7 @@ const ScreenOverlayBase = GObject.registerClass({
             params['timestamp'] = timestamp;
 
         const grab = Main.pushModal(this, params);
-        if (grab && grab.get_seat_state() !== Clutter.GrabState.ALL) {
+        if (!Utils.isVersionAtLeast('50') && grab && grab.get_seat_state() !== Clutter.GrabState.ALL) {
             Utils.logWarning('Unable become fully modal');
             Main.popModal(grab);
             return false;
