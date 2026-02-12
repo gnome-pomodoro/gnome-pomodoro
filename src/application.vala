@@ -1047,6 +1047,8 @@ namespace Ft
         private void on_leave_session (Ft.Session session)
         {
             session.changed.disconnect (this.on_current_session_changed);
+
+            Ft.Database.schedule_backup ();
         }
 
         private void on_advanced (Ft.Session?   current_session,
